@@ -144,6 +144,21 @@ module DataFixup
     end
 
     class IndexCleaner
+      def self.clean_index_records(index, rows)
+        cleaner = new(index)
+
+        # Clean the records
+        updated_indexes = cleaner.clean(rows)
+
+        # Get Updated Ids
+        rows.map do |row|
+          row_id = row[index.id_column]
+
+          # Look to see if this row was fixed.  If so return that id.
+          updated_indexes[cleaner.updated_index_key(row_id, row['timestamp'])] || row_id
+        end
+      end
+
       def initialize(index)
         @index = index
         @corrected_ids = {}
@@ -209,6 +224,7 @@ module DataFixup
 
       # cleans corrupted index rows
       def clean(rows)
+        updated_indexes = {}
         need_inspection = []
         need_tombstone = []
         updates = []
@@ -259,7 +275,8 @@ module DataFixup
                 # key.  If they are different its corrupted.  If its the same we know its clean.
                 # We need to convert the actual_key to a string, a proc might return a non string
                 # but the index key will always be a string.
-                actual_key = (index.key_proc ? index.key_proc.call(*entry) : entry).to_s
+                actual_key = (index.key_proc ? index.key_proc.call(*entry) : entry)
+                actual_key = actual_key.is_a?(Array) ? actual_key.join('/') : actual_key.to_s
                 if key != actual_key
                   need_tombstone << row
                 else
@@ -292,9 +309,16 @@ module DataFixup
             updates.each do |current_id, key, timestamp, actual_id|
               delete_index_entry(current_id, key, timestamp)
               create_index_entry(actual_id, key, timestamp)
+              updated_indexes[updated_index_key(current_id, timestamp)] = actual_id
             end
           end
         end
+
+        updated_indexes
+      end
+
+      def updated_index_key(id, timestamp)
+        "#{id}/#{timestamp}"
       end
 
       def create_tombstone(id, timestamp)

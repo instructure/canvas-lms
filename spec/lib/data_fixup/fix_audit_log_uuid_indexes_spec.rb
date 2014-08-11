@@ -109,6 +109,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   def corrupt_course_changes
     event_id = CanvasSlug.generate
+    courses = []
     CanvasUUID.stubs(:generate).returns(event_id)
 
     (1..3).each do |i|
@@ -116,13 +117,14 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
       Timecop.freeze(time) do
         course_with_teacher
-        Auditors::Course.record_created(@course, @teacher, source: :manual)
+        Auditors::Course.record_created(@course, @teacher, { name: @course.name }, source: :manual)
+        courses << @course
       end
     end
 
     CanvasUUID.unstub(:generate)
 
-    { event_id: event_id, count: 3 }
+    { event_id: event_id, count: 3, courses: courses }
   end
 
   def corrupt_authentications
@@ -173,5 +175,74 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
     migration.expects(:update_index_batch).never
     migration.fix_index(index)
+  end
+
+  it "fixes index rows as they are queried for different keys" do
+    check = corrupt_course_changes
+
+    check[:courses].each do |course|
+      Auditors::Course.for_course(course).paginate(per_page: 5).size.should eq 1
+    end
+
+    check_event_stream(check[:event_id], 'courses', check[:count])
+  end
+
+  it "fixes index rows as they are queried for the same key" do
+    event_id = CanvasSlug.generate
+    course_with_teacher
+    CanvasUUID.stubs(:generate).returns(event_id)
+    Auditors::Course.record_created(@course, @teacher, { name: @course.name }, source: :manual)
+    Timecop.freeze(Time.now + 1.hour) do
+      Auditors::Course.record_updated(@course, @teacher, { name: @course.name }, source: :manual)
+    end
+    CanvasUUID.unstub(:generate)
+
+    Auditors::Course.for_course(@course).paginate(per_page: 5).size.should eq 2
+  end
+
+  it "fixes index rows as they are queried for events that have multiple indexes" do
+    users = []
+    pseudonyms = []
+    event_id = CanvasSlug.generate
+    CanvasUUID.stubs(:generate).returns(event_id)
+    (1..3).each do |i|
+      time = Time.now - i.days
+
+      Timecop.freeze(time) do
+        user_with_pseudonym(account: Account.site_admin)
+        site_admin_user(user: @user)
+        users << @user
+        pseudonyms << @pseudonym
+        Auditors::Authentication.record(@pseudonym, 'login')
+        Timecop.freeze(time + 10.minutes) do
+          Auditors::Authentication.record(@pseudonym, 'logout')
+        end
+      end
+    end
+    CanvasUUID.unstub(:generate)
+
+    users.each do |user|
+      Auditors::Authentication.for_user(user).paginate(per_page: 5).size.should eq 2
+    end
+
+    pseudonyms.each do |pseudonym|
+      Auditors::Authentication.for_pseudonym(pseudonym).paginate(per_page: 5).size.should eq 2
+    end
+  end
+
+  it "should return records within the default bucket range" do
+    user_with_pseudonym(account: Account.site_admin)
+
+    event = Auditors::Authentication.record(@pseudonym, 'login')
+    first_event_at = event.created_at.to_i
+    record = Auditors::Authentication::Record.generate(@pseudonym, event.event_type)
+    record.attributes['id'] = event.id
+    record.attributes['created_at'] = Time.now + 100.days
+    Auditors::Authentication::Stream.insert(record)
+
+    events = Auditors::Authentication.for_user(@user).paginate(per_page: 5)
+    events.size.should eq 1
+
+    events.first.attributes['created_at'].to_i.should eq first_event_at
   end
 end
