@@ -1054,15 +1054,15 @@ class UsersController < ApplicationController
       @user.validation_root_account = @domain_root_account
     end
 
-    @observee = nil
+    @invalid_observee_creds = nil
     if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
-      if observee = Pseudonym.authenticate(params[:observee] || {},
+      if observee_pseudonym = Pseudonym.authenticate(params[:observee] || {},
           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-        @user.observed_users << observee.user unless @user.observed_users.include?(observee.user)
+        @observee = observee_pseudonym.user
       else
-        @observee = Pseudonym.new
-        @observee.errors.add('unique_id', 'bad_credentials')
+        @invalid_observee_creds = Pseudonym.new
+        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
       end
     end
 
@@ -1090,7 +1090,7 @@ class UsersController < ApplicationController
     @cc.user = @user
     @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
-    if @user.valid? && @pseudonym.valid? && @observee.nil?
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still
@@ -1102,6 +1102,10 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
+      if @observee && !@user.user_observees.where(user_id: @observee).exists?
+        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
+      end
+
       message_sent = false
       if notify == :self_registration
         unless @user.pending_approval? || @user.registered?
@@ -1116,7 +1120,7 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if @cc.has_merge_candidates?
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
         render(:json => user_json(@user, @current_user, session, %w{locale}))
       else
@@ -1127,7 +1131,7 @@ class UsersController < ApplicationController
         :errors => {
           :user => @user.errors.as_json[:errors],
           :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          :observee => @observee ? @observee.errors.as_json[:errors] : {}
+          :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
         }
       }
       render :json => errors, :status => :bad_request

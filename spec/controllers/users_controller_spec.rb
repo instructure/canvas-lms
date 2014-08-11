@@ -264,9 +264,16 @@ describe UsersController do
 
         it "should allow observers to self register" do
           user_with_pseudonym(:active_all => true, :password => 'lolwut')
+          course_with_student(:user => @user, :active_all => true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
           response.should be_success
+          new_pseudo = Pseudonym.find_by_unique_id('jane@example.com')
+          new_user = new_pseudo.user
+          new_user.observed_users.should == [@user]
+          oe = new_user.observer_enrollments.first
+          oe.course.should == @course
+          oe.associated_user.should == @user
         end
 
         it "should redirect 'new' action to root_url" do
