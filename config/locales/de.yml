@@ -252,7 +252,7 @@ de:
       saml_required: "Zum Testen von SAML ist eine SAML-konfiguration erforderlich"
   account_notification: 
     errors: 
-      invalid_account_notification_end_at: "Endzeit für Benachrichtigung für das Konto liegt vor Startzeit"
+      invalid_account_notification_end_at: "Die Endzeit für Benachrichtigungen für das Konto liegt vor der Startzeit"
   account_notifications: 
     announcement_created_notice: "Ankündigung erfolgreich erstellt"
     announcement_creation_failed_notice: "Ankündigung konnte nicht erstellt werden"
@@ -523,7 +523,7 @@ de:
       grade_change_logging_item: 
         blank_placeholder: "-"
         event_type: 
-          corrupted: "Keine Details verfügbar"
+          corrupted: "Details nicht verfügbar"
       grade_change_logging_results: 
         Assignment: Aufgabe
         Course: Kurs
@@ -2173,14 +2173,14 @@ de:
       attendance_help: Teilnahmehilfe
       new_attendance_column: "Neue Anwesenheitsspalte"
   auth_logging: 
-    corrupted: "Keine Details verfügbar"
+    corrupted: "Details nicht verfügbar"
     login: ANMELDUNG
     logout: ABMELDUNG
   bb_display: "Blackboard Learn"
   bb_file_description: "ZIP-Datei für Blackboard 6/7/8/9-Export"
   bb_name: "Blackboard Converter"
   better_file_browsing_description: |-
-      Eine neue, einfachere und bedienerfreundlichere Benutzeroberfläche zum Durchsuchen von Dateien. Wenn Sie dies auf Kursebene aktivieren,
+      Eine neue, einfachere und bedienungsfreundlichere Benutzeroberfläche zum Durchsuchen von Dateien. Wenn Sie diese auf Kursebene aktivieren,
       wird die neue Benutzeroberfläche allen Benutzern des Kurses angezeigt. Damit die Oberfläche angezeigt wird, wenn jemand
       zur Seite mit persönlichen Dateien für einen Benutzer wechselt ('/files'), müssen Sie sie für das Konto des Benutzers aktivieren.
   big_blue_button_conference: 
@@ -4166,7 +4166,7 @@ de:
       concluded: Abgeschlossen
       copied_from: "Kopiert von"
       copied_to: "Kopiert in"
-      corrupted: "Keine Details verfügbar"
+      corrupted: "Details nicht verfügbar"
       created: Erstellt
       deleted: Gelöscht
       published: Veröffentlicht
@@ -4367,7 +4367,7 @@ de:
               Wenn Sie Canvas verlassen müssen, speichern Sie *diesen Link*, um später hierher zurückzukehren.
               Bitte **melden Sie sich an** oder ***registrieren Sie sich***, um diesen Kurs anzufordern.
         files: "Auf der Registerkarte 'Dateien' können Sie Ihren Studenten Vorlesungsfolien, Beispieldokumente und Lehrmaterial zum Herunterladen bereitstellen. Das Hochladen und Verwalten Ihrer Dateien ist mit Canvas denkbar einfach. Wir zeigen Ihnen nun, wie das geht."
-        home2: "Wenn Personen den Kurs besuchen, wird ihnen diese Seite angezeigt. Sie können die Seite so einrichten, dass ein Aktivitäts-Stream, die Liste der Kursmodule, ein Syllabus oder eine benutzerdefinierte Seite angezeigt wird, die Sie selber verfassen können. Standardmäßig wird der Aktivitäts-Stream für den Kurs angezeigt. Um diese Einstellung anzupassen, klicken Sie einfach auf %{choose_home_page}."
+        home2: "Wenn Personen den Kurs besuchen, wird ihnen diese Seite angezeigt. Sie können die Seite so einrichten, dass ein Aktivitäts-Stream, die Liste der Kursmodule, ein Syllabus oder eine benutzerdefinierte Seite, die Sie selber verfassen können, angezeigt werden. Standardmäßig wird der Aktivitäts-Stream für den Kurs angezeigt. Um diese Einstellung anzupassen, klicken Sie einfach auf %{choose_home_page}."
         import: "Wenn Sie bisher ein anderes Kursmanagementsystem verwendet haben, besitzen Sie wahrscheinlich Materialien, die Sie auf Canvas weiterverwenden wollen. Die Migration Ihrer Inhalte zu Canvas ist denkbar einfach; wenn sie wollen, zeigen wir es Ihnen."
         navigation: "Als Standardeinstellung sind alle Links für einen Kurs aktiviert. Abschnitte ohne Inhalte sind für die Studenten unsichtbar. Wenn Sie beispielsweise keine Quizzes erstellt haben, wird den Studenten der Link \"Quizzes\" nicht angezeigt. Sie können Links sortieren und individuell deaktivieren, wenn Ihre Studenten auf diese Bereiche nicht zugreifen sollen."
         publish: 
@@ -7487,7 +7487,7 @@ de:
       next: Weiter
       previous: Zurück
   k12_description: |-
-      Funktionen, Einstellungen und Stile, die vor allem in K-12-Umgebungen mehr Sinn machen. Derzeit gilt dies nur
+      Funktionen, Einstellungen und Stile, die vor allem in K-12-Umgebungen Sinn machen. Derzeit gilt dies nur
       für einige Stiländerungen. In Zukunft werden jedoch u. U. weitere K-12-spezifische Elemente hinzugefügt.
   labels: 
     lock_module_until: "Modul bis zu einem bestimmten Datum sperren"
@@ -9708,7 +9708,7 @@ de:
     sure_you_want_to_mute: "Möchten Sie diese Aufgabe wirklich stummschalten? Solange diese Aufgabe stummgeschaltet ist, erhalten die Studenten keine neuen Benachrichtigungen und sehen keine Informationen im Zusammenhang mit:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Sie haben eine neue Nachricht von Canvas"
-  new_quiz_moderate_desc: "Wenn die Funktionen 'Entwurfstatus' und 'Quiz-Statistiken' zulässig/aktiviert sind, ist die neue Seite für die Quiz-Moderation für ein Konto verfügbar."
+  new_quiz_moderate_desc: "Wenn die Funktionen 'Entwurfstatus' und 'Quiz-Statistiken' zulässig/aktiviert sind, ist die neue Seite zur Quiz-Moderation für ein Konto verfügbar."
   new_quiz_statistics_desc: "Wenn die Funktion 'Entwurfstatus' zulässig/aktiviert ist, ist die neue Seite mit Quiz-Statistiken für ein Konto verfügbar."
   new_styles_description: |-
       Wir aktualisieren gerade die Benutzeroberfläche von Canvas. Aktivieren Sie diese Option, 
@@ -9972,7 +9972,7 @@ de:
     new_observee_password: Passwort
     new_observee_username: Benutzername
     observee_added: "%{user} werden jetzt beobachtet"
-    observing: "Unter Beobachtung"
+    observing: "Wird beobachtet"
   options: 
     ? "no"
     : Nein
@@ -10083,7 +10083,7 @@ de:
       attempt_info: "Versuch %{attempt_number}, %{attempt_date}"
       outcome_mastered: erreichte
       scoring: "%{points} von insgesamt %{possible_points}"
-    remedial: Abhilfmaßnahme
+    remedial: Abhilfemaßnahme
     show: 
       no_aligned_items: "Keine angepassten Elemente"
       no_artifacts: "Keine Artefakte"
@@ -11229,8 +11229,8 @@ de:
     message_not_sent_because_empty: "Nachricht wurde nicht gesendet, da sie leer war"
     message_sent_successfully: "Nachricht erfolgreich gesendet"
     message_students_who: "Studenten benachrichtigen, die ..."
-    student_who_have_not_taken_the_quiz: "Studenten, die nicht am Quiz teilgenommen haben"
-    students_who_have_taken_the_quiz: "Studenten, die am Quiz teilgenommen haben"
+    student_who_have_not_taken_the_quiz: "Studenten, die das Quiz nicht absolviert haben"
+    students_who_have_taken_the_quiz: "Studenten, die das Quiz absolviert haben"
   quiz_model: 
     everyone: Alle
     everyone_else: "Alle anderen"
@@ -11255,7 +11255,7 @@ de:
       generating_report_name: "%{report_name} wird generiert..."
       item_analysis_not_available: "Elementanalyse steht für Befragungen nicht zur Verfügung"
   quiz_results_protected: "Die Quizergebnisse für dieses Quiz sind geschützt und für die Studenten nicht sichtbar."
-  quiz_results_protected_after_first_glimpse: "Die Quizergebnisse für dieses Quiz sind geschützt und können nur einmal sofort nach der Einsendung angezeigt werden."
+  quiz_results_protected_after_first_glimpse: "Die Quizergebnisse für dieses Quiz sind geschützt und können nur einmal gleich nach der Einsendung angezeigt werden."
   quiz_results_protected_until_last_attempt: "Die Quizergebnisse für dieses Quiz sind geschützt und für Studenten erst sichtbar, wenn sie ihren letzten Versuch eingesandt haben."
   quiz_route: 
     that_quiz_doesnt_exist: "Dieses Quiz ist nicht vorhanden"
@@ -11271,22 +11271,22 @@ de:
     errors: 
       stats_empty: 
         header: "Hier gibt es nichts zu sehen."
-        info: "Keiner Ihrer Studenten hat bisher an diesem Quiz teilgenommen."
+        info: "Keiner Ihrer Studenten hat bisher das Quiz absolviert."
       stats_too_large: 
         header: "Hier ist zu viel los."
         info: "Dieses Quiz ist für die Anzeige zu groß."
     essay_score: "Punktzahl: %{score}"
-    generatable: "Der Bericht wurde nie erstellt."
-    generated: "Der Bericht ist fertig."
+    generatable: "Bericht wurde nie erstellt."
+    generated: "Bericht ist fertig."
     generated_at: "Erstellt am %{date}"
-    generating: "Der Bericht wird erstellt ..."
+    generating: "Bericht wird erstellt ..."
     generation_failed: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
     item_analysis: Elementanalyse
     no_answer: "Keine Antwort"
     sort_by_discrimination_index: "Nach Unterscheidung sortieren"
     sort_by_position: "Nach Position sortieren"
     stats_error: 
-      image_alt: "Die Quiz-Statistiken stehen nocht nicht zur Verfügung."
+      image_alt: "Die Quiz-Statistiken stehen noch nicht zur Verfügung."
     student_analysis: Studentenanalyse
     unknown: 
       header: "Ein Fehler ist aufgetreten."
@@ -13073,7 +13073,7 @@ de:
     new_course_form: 
       cancel: Abbrechen
       course_cose_explanation: "Dies wird an Stellen mit wenig Platz angezeigt"
-      course_is_public_explanation: "Kurs für alle sichtbar machen *(Studentendaten bleiben privat)*"
+      course_is_public_explanation: "Kurs für alle sichtbar machen *(student data will remain private)*"
       create_course: "Kurs erstellen"
       creating_course: "Kurs wird erstellt..."
       labels: 
@@ -13572,7 +13572,7 @@ de:
     group_leave: "Hat die Gruppe %{group_name} verlassen"
     group_name: "%{group_name} in %{group_category}"
     search_groups_placeholder: "Gruppen oder Personen durchsuchen"
-    student_groups_filter_description: "Wenn Sie etwas in dieses Feld eingeben, wird die Liste der Gruppen automatisch nach den Gruppen gefiltert, deren Namen mit Ihrer Eingabe übereinstimmt."
+    student_groups_filter_description: "Wenn Sie etwas in dieses Feld eingeben, wird die Liste der Gruppen automatisch nach den Gruppen gefiltert, deren Namen mit Ihrer Eingabe übereinstimmen."
     students_count: 
       one: "1 Student"
       other: "%{count} Studenten"
@@ -13766,7 +13766,7 @@ de:
     grades: Noten
     home: Startseite
     modules: Module
-    observees: "Unter Beobachtung"
+    observees: "Wird beobachtet"
     outcomes: Resultate
     pages: Seiten
     people: Personen
@@ -13873,7 +13873,7 @@ de:
       image_width: Bildbreite
       url: URL
   title: 
-    edit_announcement: "Ankündigungen bearbeiten"
+    edit_announcement: "Ankündigung bearbeiten"
     edit_topic: "Diskussionsthema bearbeiten"
     new_announcement: "Neue Ankündigung"
     new_topic: "Neues Diskussionsthema"
@@ -14542,7 +14542,7 @@ de:
     page_link: 
       link_hidden_from_students_warning: "Studenten wird dieser Link nicht angezeigt"
     page_revisions: 
-      page_revisions_title: "%{title}-Überarbeitungen: %{context_name}"
+      page_revisions_title: "Überarbeitungen für %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: Seiten
