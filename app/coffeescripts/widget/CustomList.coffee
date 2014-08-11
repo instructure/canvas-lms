@@ -147,7 +147,7 @@ define [
         args.unshift(item.id)
         @addError.apply(this, args)
 
-      url = @options.url + '/' + item.id   
+      url = @options.url + '/' + item.id
       req = jQuery.ajaxJSON(url, 'POST', {}, success, error)
 
       @requests.add[item.id] = req
