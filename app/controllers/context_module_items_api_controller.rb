@@ -516,7 +516,7 @@ class ContextModuleItemsApiController < ApplicationController
       tags = @context.module_items_visible_to(@current_user).
           select('content_tags.*, context_modules.id as module_id, context_modules.position AS module_position').
           reject { |item| item.content_type == 'ContextModuleSubHeader' }.
-          sort_by { |item| [item.module_position.to_i, item.module_id, item.position] }
+          sort_by { |item| [item.module_position.to_i, item.module_id, item.position || CanvasSort::Last] }
 
       # find content tags to include
       tag_indices = []
