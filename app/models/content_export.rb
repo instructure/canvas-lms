@@ -48,17 +48,24 @@ class ContentExport < ActiveRecord::Base
     state :deleted
   end
 
+  def send_notification?
+    context_type == 'Course' &&
+            export_type != ZIP &&
+            content_migration.blank? &&
+            !settings[:skip_notifications]
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever {|record|
-      record.context_type == 'Course' && record.export_type != ZIP && record.changed_state(:exported) && self.content_migration.blank?
+      record.changed_state(:exported) && record.send_notification?
     }
     
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
-      record.context_type == 'Course' && record.export_type != ZIP && record.changed_state(:failed) && self.content_migration.blank?
+      record.changed_state(:failed) && record.send_notification?
     }
   end
 

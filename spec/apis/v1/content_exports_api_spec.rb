@@ -173,6 +173,13 @@ describe ContentExportsApiController, type: :request do
         {}, {}, { expected_status: 400 })
     end
 
+    it "should set skip notifications flag" do
+      json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports",
+        { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge', skip_notifications: true })
+      export = t_course.content_exports.find_by_id(json['id'])
+      export.send_notification?.should be_false
+    end
+
     it "should create a qti export" do
       json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=qti",
         { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'qti' })
