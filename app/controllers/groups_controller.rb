@@ -182,7 +182,7 @@ class GroupsController < ApplicationController
   #
   # Returns a list of active groups for the current user.
   #
-  # @argument context_type [Optional, String, "Account"|"Course"]
+  # @argument context_type [String, "Account"|"Course"]
   #  Only include groups that are in this type of context.
   #
   # @example_request
@@ -544,7 +544,7 @@ class GroupsController < ApplicationController
   # Sends an invitation to all supplied email addresses which will allow the
   # receivers to join the group.
   #
-  # @argument invitees[] [String]
+  # @argument invitees[] [Required, String]
   #   An array of email addresses to be sent invitations.
   #
   # @example_request
@@ -609,7 +609,7 @@ class GroupsController < ApplicationController
   #
   # Returns a list of users in the group.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #

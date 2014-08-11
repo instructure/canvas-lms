@@ -146,30 +146,30 @@ class GroupCategoriesController < ApplicationController
   # @API Create a Group Category
   # Create a new group category
   #
-  # @argument name [String]
+  # @argument name [Required, String]
   #   Name of the group category
   #
-  # @argument self_signup [Optional, "enabled"|"restricted"]
+  # @argument self_signup [String, "enabled"|"restricted"]
   #   Allow students to sign up for a group themselves (Course Only).
   #   valid values are:
   #   "enabled":: allows students to self sign up for any group in course
   #   "restricted":: allows students to self sign up only for groups in the
   #                  same section null disallows self sign up
   #
-  # @argument auto_leader [Optional, "first"|"random"]
+  # @argument auto_leader [String, "first"|"random"]
   #   Assigns group leaders automatically when generating and allocating students to groups
   #   Valid values are:
   #   "first":: the first student to be allocated to a group is the leader
   #   "random":: a random student from all members is chosen as the leader
   #
-  # @argument group_limit [Optional]
+  # @argument group_limit [Integer]
   #   Limit the maximum number of users in each group (Course Only). Requires
   #   self signup.
   #
-  # @argument create_group_count [Optional]
+  # @argument create_group_count [Integer]
   #   Create this number of groups (Course Only).
   #
-  # @argument split_group_count [Optional] (Deprecated)
+  # @argument split_group_count (Deprecated)
   #   Create this number of groups, and evenly distribute students
   #   among them. not allowed with "enable_self_signup". because
   #   the group assignment happens synchronously, it's recommended
@@ -204,27 +204,27 @@ class GroupCategoriesController < ApplicationController
   # @argument name [String]
   #   Name of the group category
   #
-  # @argument self_signup [Optional, "enabled"|"restricted"]
+  # @argument self_signup [String, "enabled"|"restricted"]
   #   Allow students to sign up for a group themselves (Course Only).
   #   Valid values are:
   #   "enabled":: allows students to self sign up for any group in course
   #   "restricted":: allows students to self sign up only for groups in the
   #                  same section null disallows self sign up
   #
-  # @argument auto_leader [Optional, "first"|"random"]
+  # @argument auto_leader [String, "first"|"random"]
   #   Assigns group leaders automatically when generating and allocating students to groups
   #   Valid values are:
   #   "first":: the first student to be allocated to a group is the leader
   #   "random":: a random student from all members is chosen as the leader
   #
-  # @argument group_limit [Optional]
+  # @argument group_limit [Integer]
   #   Limit the maximum number of users in each group (Course Only). Requires
   #   self signup.
   #
-  # @argument create_group_count [Optional]
+  # @argument create_group_count [Integer]
   #   Create this number of groups (Course Only).
   #
-  # @argument split_group_count [Optional] (Deprecated)
+  # @argument split_group_count (Deprecated)
   #   Create this number of groups, and evenly distribute students
   #   among them. not allowed with "enable_self_signup". because
   #   the group assignment happens synchronously, it's recommended
@@ -311,11 +311,11 @@ class GroupCategoriesController < ApplicationController
   #
   # Returns a list of users in the group category.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results
   #   list. Must be at least 3 characters.
   #
-  # @argument unassigned [Optional, Boolean]
+  # @argument unassigned [Boolean]
   #   Set this value to true if you wish only to search unassigned users in the
   #   group category.
   #
@@ -355,7 +355,7 @@ class GroupCategoriesController < ApplicationController
   # Assign all unassigned members as evenly as possible among the existing
   # student groups.
   #
-  # @argument sync [Optional, Boolean]
+  # @argument sync [Boolean]
   #   The assigning is done asynchronously by default. If you would like to
   #   override this and have the assigning done synchronously, set this value
   #   to true.
