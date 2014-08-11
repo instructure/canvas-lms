@@ -15,7 +15,9 @@
   end
 %>
 
+
 <% content_for :right_side do %>
+  <%= render :partial => "screenreader_heading" %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
@@ -30,6 +32,7 @@
     }
   </style>
 <% end %>
+
 
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
