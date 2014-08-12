@@ -38,7 +38,7 @@ module SFU
       def section_tutorials(course_code, term_code, section_code)
         details = info(course_code, term_code)
         # Used to match against sections starting with e.g. 'd1' for 'd100'
-        main_section = section_code[0..1].downcase 
+        main_section = section_code[0..1].downcase
         sections = []
         has_no_child_sections = true
         section_exists = false
@@ -49,9 +49,10 @@ module SFU
             section_exists = true if section.eql? section_code.downcase
 
 	          if section_code.end_with?("00")
+              classType = info["course"]["classType"]
               code = info["course"]["name"] + info["course"]["number"]
 
-	            if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+	            if code.downcase == course_code.downcase && section.start_with?(main_section) && classType.eql?("n")
                 sections << info["course"]["section"]
                 has_no_child_sections = false
               end
