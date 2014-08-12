@@ -27,11 +27,12 @@ class Mailer < ActionMailer::Base
 
     params = {
       from: from_mailbox(m),
-      reply_to: reply_to_mailbox(m),
       to: m.to,
       subject: m.subject
     }
 
+    reply_to = reply_to_mailbox(m)
+    params[:reply_to] = reply_to if reply_to
     params[:cc] = m.cc if m.cc
     params[:bcc] = m.bcc if m.bcc
 
@@ -49,6 +50,7 @@ class Mailer < ActionMailer::Base
   def reply_to_mailbox(message)
     address = IncomingMail::ReplyToAddress.new(message).address
     return address unless message.reply_to_name.present?
+    return nil unless address.present?
     "#{message.reply_to_name} <#{address}>"
   end
 end

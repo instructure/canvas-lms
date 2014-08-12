@@ -26,5 +26,13 @@ describe Mailer do
       mail.header['From'].to_s.should== "Handy Randy <#{HostUrl.outgoing_email_address}>"
     end
 
+    it 'omits reply_to for sms' do
+      message = message_model(path_type: 'sms')
+      message.from_name = "Handy Randy"
+      message.reply_to_name = "Stan Theman"
+      mail = Mailer.create_message(message)
+      mail.header['Reply-To'].should be_nil
+      mail.header['From'].to_s.should== "Handy Randy <#{HostUrl.outgoing_email_address}>"
+    end
   end
 end
