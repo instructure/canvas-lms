@@ -765,6 +765,7 @@ describe "external tools" do
   describe 'content migration launch through full-width redirect' do
     before do
       course_with_teacher_logged_in(active_all: true)
+      @course.root_account.enable_feature!(:lor_for_account)
       @tool = @course.context_external_tools.create!(
           name: "new tool",
           consumer_key: "key",
@@ -796,6 +797,13 @@ describe "external tools" do
       # should redirect to the content_migration page on success
       driver.current_url.should match %r{/courses/\d+/content_migrations+}
       @course.content_migrations.count.should == 1
+    end
+
+    it "should not show the link if the LOR feature flag is not enabled" do
+      @course.root_account.disable_feature!(:lor_for_account)
+      get "/courses/#{@course.id}"
+      tool_link = f('a.course-home-sub-navigation-lti')
+      tool_link.should be_nil
     end
   end
 

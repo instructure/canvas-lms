@@ -155,7 +155,7 @@ class ContentMigrationsController < ApplicationController
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
-      external_tools = ContextExternalTool.all_tools_for(@context, :type => :migration_selection)
+      external_tools = ContextExternalTool.all_tools_for(@context, :type => :migration_selection, :root_account => @domain_root_account, :current_user => @current_user)
       options.concat(external_tools.map do |et|
         {
           id: et.asset_string,

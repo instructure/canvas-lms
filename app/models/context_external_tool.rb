@@ -448,6 +448,11 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   def self.all_tools_for(context, options={})
+    if [:course_home_sub_navigation, :course_settings_sub_navigation, :migration_selection].include?(options[:type])
+      return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
+          (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    end
+
     contexts = []
     if options[:user]
       contexts << options[:user]
