@@ -328,7 +328,12 @@ shared_examples_for "all selenium tests" do
     if real_login
       logout_link = f('#identity .logout a')
       if logout_link
-        expect_new_page_load { logout_link.click() }
+        if logout_link.displayed?
+          expect_new_page_load { logout_link.click() }
+        else
+          get '/'
+          destroy_session(true)
+        end
       end
     else
       PseudonymSession.any_instance.unstub :session_credentials
