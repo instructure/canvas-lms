@@ -868,6 +868,154 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  context "differentiated assignments" do
+
+    def calls_display_topic(topic, opts={except: []})
+      get_index(topic.context)
+      JSON.parse(response.body).to_s.should include("#{topic.assignment.title}")
+
+      calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
+      calls.reject!{|call| opts[:except].include?(call) }
+      calls.each{ |call| self.send(call, topic).to_s.should_not == "401"}
+    end
+
+    def calls_do_not_show_topic(topic)
+      get_index(topic.context)
+      JSON.parse(response.body).to_s.should_not include("#{topic.assignment.title}")
+
+      calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
+      calls.each{ |call| self.send(call, topic).to_s.should == "401"}
+    end
+
+    def get_index(course)
+      raw_api_call(:get, "/api/v1/courses/#{course.id}/discussion_topics.json",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => course.id.to_s})
+    end
+
+    def get_show(topic)
+      raw_api_call(:get, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s})
+    end
+
+    def get_entries(topic)
+      url = "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries"
+      raw_api_call(:get, url, controller: 'discussion_topics_api',action: 'entries', format: 'json', course_id: topic.context.to_param, topic_id: topic.id.to_s)
+    end
+
+    def get_replies(topic)
+      raw_api_call(:get, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries/#{topic.discussion_entries.last.id}/replies",
+         { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s })
+    end
+
+    def add_entry(topic)
+      raw_api_call( :post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries.json",
+        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+          :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s },
+        { :message => "example entry"})
+    end
+
+    def add_reply(topic)
+      raw_api_call( :post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries/#{topic.discussion_entries.last.id}/replies.json",
+        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+          :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s },
+        { :message => "example reply" })
+    end
+
+
+    def create_graded_discussion_for_da(assignment_opts={})
+      assignment = @course.assignments.create!(assignment_opts)
+      assignment.submission_types = 'discussion_topic'
+      assignment.save!
+      topic = @course.discussion_topics.create!(:user => @teacher, :title => assignment_opts[:title], :message => "woo", :assignment => assignment)
+      entry = topic.discussion_entries.create!(:message => "second message", :user => @student)
+      entry.save
+      [assignment, topic]
+    end
+
+    before do
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @student_with_override, @student_without_override= create_users(2, return_type: :record)
+
+      @assignment_1, @topic_with_restricted_access = create_graded_discussion_for_da(title: "only visible to student one", only_visible_to_overrides: true)
+      @assignment_2, @topic_visible_to_all = create_graded_discussion_for_da(title: "assigned to all", only_visible_to_overrides: false)
+
+      @course.enroll_student(@student_without_override, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student_with_override)
+      create_section_override_for_assignment(@assignment_1, {course_section: @section})
+
+      @observer = User.create
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active')
+      @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+    end
+
+    context "feature flag on" do
+      before {@course.enable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all topics" do
+        @user = @teacher
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      end
+
+      it "lets students with visibility see topics" do
+        @user = @student_with_override
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      end
+
+      it 'gives observers the same visibility as their student' do
+        @user = @observer
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+      end
+
+      it 'observers without students see all' do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+      end
+
+      it "restricts access to students without visibility" do
+        @user = @student_without_override
+        calls_do_not_show_topic(@topic_with_restricted_access)
+        calls_display_topic(@topic_visible_to_all)
+      end
+
+      it "doesnt show extra assignments with overrides in the index" do
+        @assignment_3, @topic_assigned_to_empty_section = create_graded_discussion_for_da(title: "assigned to none", only_visible_to_overrides: true)
+        @unassigned_section = @course.course_sections.create!(name: "unassigned section")
+        create_section_override_for_assignment(@assignment_3, {course_section: @unassigned_section})
+
+        @user = @student_with_override
+        get_index(@course)
+        JSON.parse(response.body).to_s.should_not include("#{@assignment_3.title}")
+      end
+
+      it "doesnt hide topics without assignment" do
+        @non_graded_topic = @course.discussion_topics.create!(:user => @teacher, :title => "non_graded_topic", :message => "hi")
+
+        @user = @student_without_override
+        get_index(@course)
+        JSON.parse(response.body).to_s.should include("#{@non_graded_topic.title}")
+      end
+    end
+
+    context "feature flag off" do
+      before {@course.disable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all topics" do
+        @user = @teacher
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      end
+
+      it "lets students with visibility see topics" do
+        @user = @student_with_override
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      end
+
+      it "lets students without visibility see all topics" do
+        @user = @student_without_override
+        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      end
+    end
+  end
+
   it "should translate user content in topics" do
     should_translate_user_content(@course) do |user_content|
       @topic = create_topic(@course, :title => "Topic 1", :message => user_content)

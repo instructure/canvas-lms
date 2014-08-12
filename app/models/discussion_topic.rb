@@ -474,6 +474,11 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
+  scope :visible_to_students_with_da_enabled, lambda { |user_ids|
+    joins("LEFT JOIN assignment_student_visibilities ON assignment_student_visibilities.assignment_id = discussion_topics.assignment_id").
+    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids)
+   }
+
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
@@ -897,6 +902,11 @@ class DiscussionTopic < ActiveRecord::Base
 
     # user is an admin in the context (teacher/ta/designer)
     return true if context.grants_right?(user, :manage)
+
+    # assignment exists and isnt assigned to user (differentiated assignments)
+    if for_assignment? && !self.assignment.visible_to_user?(user)
+      return false
+    end
 
     # topic is not published
     if !published?

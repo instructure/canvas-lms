@@ -277,6 +277,19 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      student_ids = [@current_user.id]
+
+      if @context.user_has_been_observer?(@current_user)
+        observed_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
+        student_ids.concat(observed_student_ids)
+        # if no observed students, dont filter based on section
+        scope = scope.visible_to_students_with_da_enabled(student_ids) if observed_student_ids.any?
+      else
+        scope = scope.visible_to_students_with_da_enabled(student_ids)
+      end
+    end
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
 
     if states.present?
@@ -400,6 +413,13 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if authorized_action(@topic, @current_user, :read)
+      if @current_user && @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
+        respond_to do |format|
+          flash[:error] = t 'notices.discussion_not_availible', "You do not have access to the requested discussion."
+          format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+        end
+        return
+      end
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)

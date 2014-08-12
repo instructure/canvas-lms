@@ -28,6 +28,10 @@ class DiscussionTopicsApiController < ApplicationController
   before_filter :require_initial_post, except: [:add_entry, :mark_topic_read,
                                                 :mark_topic_unread, :show,
                                                 :unsubscribe_topic]
+  before_filter :check_differentiated_assignments, only: [:replies, :entries,
+                                                          :add_entry, :add_reply,
+                                                          :show, :view, :entry_list,
+                                                          :subscribe_topic]
 
   # @API Get a single topic
   #
@@ -599,6 +603,11 @@ class DiscussionTopicsApiController < ApplicationController
     if authorized_action(@entry, @current_user, :read)
       render_state_change_result @entry.change_read_state(new_state, @current_user, opts)
     end
+  end
+
+  def check_differentiated_assignments
+    return true unless @context.feature_enabled?(:differentiated_assignments)
+    return render_unauthorized_action if @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
   end
 
   # the result of several state change functions are the following:
