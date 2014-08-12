@@ -285,7 +285,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 }
 
 
-i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
+i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-]{
 
   &:before {
     font-family: "canvas-icons";
@@ -382,6 +382,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-calendar-month:before { content: "\f1b9"; }
 .icon-check:before { content: "\f1bc"; }
 .icon-check-dark:before { content: "\f1bd"; }
+.icon-check-mark:before { content: "\f237"; }
 .icon-check-plus:before { content: "\f1be"; }
 .icon-clock:before { content: "\f1bf"; }
 .icon-collapse:before { content: "\f102"; }

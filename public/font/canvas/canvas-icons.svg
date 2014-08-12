@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2014-7-24: Created.
+2014-8-12: Created.
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Thu Jul 24 12:13:21 2014
+Created by FontForge 20120731 at Tue Aug 12 14:01:26 2014
  By Colleen Palmer
 Created by Colleen Palmer with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -22,7 +22,7 @@ Created by Colleen Palmer with FontForge 2.0 (http://fontforge.sf.net)
     bbox="-1.71191 -64.416 513.008 449.376"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F102-F236"
+    unicode-range="U+F102-F237"
   />
     <missing-glyph />
     <glyph glyph-name="uniF19C" unicode="&#xf19c;" 
@@ -122,6 +122,8 @@ c17.6641 0 32 14.3037 32 32c0 17.6641 -14.3359 32 -32 32s-32 -14.3359 -32 -32c0 
 d="M128 256h256l-128 -128z" />
     <glyph glyph-name="uniF1AF" unicode="&#xf1af;" 
 d="M256 416c123.712 0 224 -100.288 224 -224s-100.288 -224 -224 -224s-224 100.288 -224 224s100.288 224 224 224zM284 164h140v56h-140v140h-56v-140h-140v-56h140v-140h56v140z" />
+    <glyph glyph-name="uniF237" unicode="&#xf237;" 
+d="M475.2 444.8c0 -67.2002 1.59961 -94.3994 33.5996 -169.6c-83.2002 -17.6006 -214.399 -235.2 -270.399 -337.601c-80 97.6006 -171.2 179.2 -236.801 203.2l148.801 86.4004l75.1992 -144s59.2002 264 249.601 361.6z" />
     <glyph glyph-name="uniF1FF" unicode="&#xf1ff;" 
 d="M348.912 284.48h0.0478516l-162.4 -162.385c-8.94336 -8.94336 -8.94336 -23.5195 0 -32.4639c8.95996 -8.95996 23.5205 -8.95996 32.4805 0l194.88 194.849c26.8477 26.8477 26.8643 70.5596 0 97.4238c-26.8643 26.8633 -70.5918 26.8633 -97.4395 0
 l-204.641 -204.576l0.0166016 -0.0322266c-0.144531 -0.12793 -0.288086 -0.271484 -0.448242 -0.416016c-44.5283 -44.5283 -44.5283 -116.96 0 -161.488c44.5439 -44.5273 116.992 -44.5273 161.536 0c0.12793 0.12793 0.271484 0.288086 0.416016 0.416016

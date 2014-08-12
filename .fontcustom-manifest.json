@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "0e99401e8ff492bd69eb3886960756b80bf5bc174b02cd6944c05f1e59fcea35",
-    "current": "0e99401e8ff492bd69eb3886960756b80bf5bc174b02cd6944c05f1e59fcea35"
+    "previous": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551",
+    "current": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -89,6 +89,10 @@
     "check-dark": {
       "codepoint": 61885,
       "source": "public/font/icons/check-dark.svg"
+    },
+    "check-mark": {
+      "codepoint": 62007,
+      "source": "public/font/icons/check-mark.svg"
     },
     "check-plus": {
       "codepoint": 61886,
