@@ -149,7 +149,8 @@ $listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%);
 $contentBoxPadding:             8px;
 $listBorderColor:               lighten($borderColor, 5%);
 $activeBG:                      #d6ecfc;
-$dimmedOpacity:                 0.4;
+@if $use_high_contrast { $dimmedOpacity: 0.9; }
+@else { $dimmedOpacity: 0.6; }
 
 $masquerade-link-color: #ffa500;
 
