@@ -2,12 +2,14 @@ define [
   'require'
   'Backbone'
   'underscore'
+  'vendor/backbone-identity-map'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
-  'compiled/collections/FoldersCollection'
-], (require, Backbone, _, PaginatedCollection, FilesCollection, _THIS_WILL_BE_NULL_) ->
+], (require, Backbone, _, identityMapMixin, PaginatedCollection, FilesCollection) ->
 
-  class Folder extends Backbone.Model
+
+
+  Folder = identityMapMixin class __Folder extends Backbone.Model
 
     defaults:
       'name' : ''
@@ -36,38 +38,36 @@ define [
 
     setUpFilesAndFoldersIfNeeded: ->
       unless @folders
-        # this breaks the circular dependency between Folder <-> FoldersCollection
-        FoldersCollection = require('compiled/collections/FoldersCollection')
         @folders = new FoldersCollection [], parentFolder: this
       unless @files
         @files = new FilesCollection [], parentFolder: this
 
-    expand: (force=false) ->
+    expand: (force=false, options={}) ->
       @isExpanded = true
       @trigger 'expanded'
-      unless @expandDfd || force
-        @isExpanding = true
-        @trigger 'beginexpanding'
-        @expandDfd = $.Deferred().done =>
-          @isExpanding = false
-          @trigger 'endexpanding'
+      return $.when() if @expandDfd || force
+      @isExpanding = true
+      @trigger 'beginexpanding'
+      @expandDfd = $.Deferred().done =>
+        @isExpanding = false
+        @trigger 'endexpanding'
 
-        selfHasntBeenFetched = @folders.url is @folders.constructor::url or @files.url is @files.constructor::url
-        fetchDfd = @fetch() if selfHasntBeenFetched || force
-        $.when(fetchDfd).done =>
-          foldersDfd = @folders.fetch() unless @get('folders_count') is 0
-          filesDfd = @files.fetch() unless @get('files_count') is 0
-          $.when(foldersDfd, filesDfd).done(@expandDfd.resolve)
+      selfHasntBeenFetched = @folders.url is @folders.constructor::url or @files.url is @files.constructor::url
+      fetchDfd = @fetch() if selfHasntBeenFetched || force
+      $.when(fetchDfd).done =>
+        foldersDfd = @folders.fetch() unless @get('folders_count') is 0
+        filesDfd = @files.fetch() if (@get('files_count') isnt 0) and !options.onlyShowFolders
+        $.when(foldersDfd, filesDfd).done(@expandDfd.resolve)
 
     collapse: ->
       @isExpanded = false
       @trigger 'collapsed'
 
-    toggle: ->
+    toggle: (options) ->
       if @isExpanded
         @collapse()
       else
-        @expand()
+        @expand(false, options)
 
     previewUrl: ->
       if @get('context_type') in ['Course', 'Group']
@@ -88,7 +88,6 @@ define [
       $.get(url).pipe (folders) ->
         folders.map (folderAttrs) ->
           new Folder(folderAttrs, {parse: true})
-
 
     getSortProp = (model, sortProp) ->
       # if we are sorting by name use 'display_name' for files and 'name' for folders.
@@ -116,3 +115,30 @@ define [
 
     children: ({sort, order}) ->
       (@folders.toArray().concat @files.toArray()).sort(@childrenSorter.bind(null, sort, order))
+
+
+
+
+
+
+
+
+  # FoldersCollection is defined inside of this file, and not where it
+  # should be, because RequireJS sucks at figuring out circular dependencies.
+  # 'compiled/collections/FoldersCollection' just grabs this and re-exports it.
+  Folder.FoldersCollection = class FoldersCollection extends PaginatedCollection
+    @optionProperty 'parentFolder'
+
+    model: Folder
+
+    parse: (response) ->
+      if response
+        _.each response, (folder) =>
+          folder.contentTypes = @parentFolder.contentTypes
+      super
+
+
+
+
+
+  return Folder

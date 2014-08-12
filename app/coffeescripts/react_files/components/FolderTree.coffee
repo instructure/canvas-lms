@@ -1,81 +1,43 @@
 define [
   'react'
-  'compiled/react/shared/utils/withReactDOM'
-], (React, withReactDOM) ->
+  'react-router'
+  'compiled/views/FileBrowserView'
+], (React, Router, FileBrowserView) ->
 
-  FolderChildren = React.createClass
+  FolderTree = React.createClass
 
-    render: withReactDOM ->
 
-      div( {className:"ef-folder-list"},
-        ul( {role:"tree"},
-          li( {role:"treeitem", 'aria-expanded':"true"},
-            header( {className:"ef-folder-header"},
-              a( {href:"#"}, i( {className:"icon-arrow-down"})),
-              a( {href:"#"},
-                span( {className:"ef-folder-name"}, "SEE 510B")
-              )
-            ),
-            ul( {role:"group"},
-              li( {role:"treeitem"},
-                header( {className:"ef-folder-header", style: {'padding-left': '18px'}},
-                  a( {href:"#"}, i( {className:"icon-arrow-right"})),
-                  a( {href:"#"},
-                    span( {className:"ef-folder-name"}, "Assignments")
-                  )
-                )
-              ),
-              li( {role:"treeitem", 'aria-expanded':"true", 'aria-selected':"true"},
-                header( {className:"ef-folder-header", style: {'padding-left': '18px'}},
-                  a( {href:"#"}, i( {className:"icon-arrow-down"})),
-                  a( {href:"#"},
-                    span( {className:"ef-folder-name"}, "Calculus")
-                  )
-                ),
-                ul( {role:"group"},
-                  li( {role:"treeitem"},
-                    header( {className:"ef-folder-header", style: {'padding-left': '18px'}},
-                      a( {href:"#"}, i( {className:"icon-arrow-right"})),
-                      a( {href:"#"},
-                        span( {className:"ef-folder-name"}, "1010 Introduction into Calculus")
-                      )
-                    )
-                  ),
-                  li( {role:"treeitem"},
-                    header( {className:"ef-folder-header", style: {'padding-left': '18px'}},
-                      a( {href:"#"}, i( {className:"icon-arrow-right"})),
-                      a( {href:"#"},
-                        span( {className:"ef-folder-name"}, "1020 Advanced Calclulus - The amazing adventure begines here")
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          ),
-          li( {role:"treeitem"},
-            header( {className:"ef-folder-header"},
-              a( {href:"#"}, i( {className:"icon-arrow-right"})),
-              a( {href:"#"},
-                span( {className:"ef-folder-name"}, "Outcomes")
-              )
-            )
-          ),
-          li( {role:"treeitem"},
-            header( {className:"ef-folder-header"},
-              a( {href:"#"}, i( {className:"icon-arrow-right"})),
-              a( {href:"#"},
-                span( {className:"ef-folder-name"}, "Quizzes")
-              )
-            )
-          ),
-          li( {role:"treeitem"},
-            header( {className:"ef-folder-header"},
-              a( {href:"#"}, i( {className:"icon-arrow-right"})),
-              a( {href:"#"},
-                span( {className:"ef-folder-name"}, "Pages")
-              )
-            )
-          )
-        )
-      )
+    componentDidMount: ->
+      rootFolder = @props.rootTillCurrentFolder[0]
+      new FileBrowserView({
+        onlyShowFolders: true,
+        rootFoldersToShow: [rootFolder]
+        onClick: @onClick
+        href: @hrefFor
+      }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode())
+      @expandTillCurrentFolder(@props)
+
+
+    componentWillReceiveProps: (newProps) ->
+      @expandTillCurrentFolder(newProps)
+
+
+    onClick: (event, folder) ->
+      event.preventDefault()
+      Router.transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), contextType: @props.contextType, contextId: @props.contextId, splat: folder.urlPath()
+
+
+    hrefFor: (folder) ->
+      Router.makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), contextType: @props.contextType, contextId: @props.contextId, splat: folder.urlPath()
+
+
+    expandTillCurrentFolder: (props) ->
+      expandFolder = (folderIndex) ->
+        return unless folder = props.rootTillCurrentFolder[folderIndex]
+        folder.expand(false, {onlyShowFolders: true}).then ->
+          expandFolder(folderIndex + 1)
+      expandFolder(0)
+
+
+    render: ->
+      React.DOM.div( {className:"ef-folder-list", ref: 'FolderTreeHolder'})

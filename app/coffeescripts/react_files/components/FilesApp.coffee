@@ -25,7 +25,7 @@ define [
         Breadcrumbs(rootTillCurrentFolder: @state.rootTillCurrentFolder, contextType:@props.params.contextType, contextId:@props.params.contextId) if @state.rootTillCurrentFolder
         div className: 'ef-main',
           aside className: 'visible-desktop ef-folder-content',
-            FolderTree()
+            FolderTree(rootTillCurrentFolder: @state.rootTillCurrentFolder, contextType:@props.params.contextType, contextId:@props.params.contextId) if @state.rootTillCurrentFolder
             FilesUsage(contextType:@props.params.contextType, contextId:@props.params.contextId)
           @props.activeRouteHandler
             onResolvePath: @onResolvePath

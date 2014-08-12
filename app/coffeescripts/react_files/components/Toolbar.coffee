@@ -1,8 +1,9 @@
 define [
+  'i18n!react_files'
   'react'
   'react-router'
   'compiled/react/shared/utils/withReactDOM'
-], (React, Router, withReactDOM) ->
+], (I18n, React, Router, withReactDOM) ->
 
   Toolbar = React.createClass
 
@@ -18,7 +19,7 @@ define [
       header className:'ef-header',
         form onSubmit: @onSubmitSearch, className:'ef-search-container',
           i className:'icon-search',
-          input type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
+          input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
         div className:'ef-main-buttons',
           button onClick: @addFolder, className:'btn',
             i className:'icon-plus'
