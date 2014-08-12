@@ -1,12 +1,13 @@
 define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
+  'compiled/fn/preventDefault'
   'compiled/models/Folder'
   'compiled/models/File'
   './RestrictedDialogForm'
   './DialogAdapter'
-  'i18n!dialog_adapter'
-], (React, withReactDOM, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n) ->
+  'i18n!react_files'
+], (React, withReactDOM, preventDefault, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n) ->
 
   # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
@@ -22,12 +23,18 @@ define [
 
     isAFolderCog: -> @props.model instanceof Folder
 
-    openRestrictedDialog: (event) ->
-      event.preventDefault()
+    openRestrictedDialog: preventDefault ->
       @setState restrictedDialogOpen: true
 
     closeRestrictedDialog: ->
       @setState restrictedDialogOpen: false
+
+    deleteItem: preventDefault ->
+      message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
+        name: @props.model.get('name') || @props.model.get('display_name')
+      })
+      if confirm message
+        @props.model.destroy()
 
     render: withReactDOM ->
       div null,
@@ -52,7 +59,7 @@ define [
                 li {},
                   a onClick: @openRestrictedDialog, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
                 li {},
-                  a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
+                  a onClick: @deleteItem, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
 
                 (li {},
                   a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download as Zip',

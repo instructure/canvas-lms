@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'react'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
@@ -8,9 +9,27 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-], (React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder) ->
+], (_, React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder) ->
 
   ShowFolder = React.createClass
+
+    debouncedForceUpdate: _.debounce ->
+      @forceUpdate() if @isMounted()
+    , 0
+
+
+    registerListeners: (props) ->
+      return unless props.currentFolder
+      props.currentFolder.folders.on('all', @debouncedForceUpdate, this)
+      props.currentFolder.files.on('all', @debouncedForceUpdate, this)
+
+    unregisterListeners: ->
+      # Ensure that we clean up any dangling references when the component is destroyed.
+      @props.currentFolder?.off(null, null, this)
+
+    componentWillUnmount: ->
+      @unregisterListeners()
+
 
     getCurrentFolder: ->
       path = '/' + (@props.params.splat || '')
@@ -21,9 +40,10 @@ define [
         [currentFolder.folders, currentFolder.files].forEach (collection) =>
           updateAPIQuerySortParams(collection, @props.query)
           # TODO: use scroll position to only fetch the pages we need
-          getAllPages collection, => @forceUpdate() if @isMounted()
+          getAllPages(collection, @debouncedForceUpdate)
 
     componentWillMount: ->
+      @registerListeners(@props)
       @getCurrentFolder()
 
     componentWillUnmount: ->
@@ -32,7 +52,9 @@ define [
 
 
     componentWillReceiveProps: (newProps) ->
+      @unregisterListeners()
       return unless newProps.currentFolder
+      @registerListeners(newProps)
       [newProps.currentFolder.folders, newProps.currentFolder.files].forEach (collection) ->
         updateAPIQuerySortParams(collection, newProps.query)
 
