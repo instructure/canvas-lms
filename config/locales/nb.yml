@@ -2276,6 +2276,7 @@ nb:
     cancel: Avbryt
     choose_a_file: "Velg en fil "
     delete: Slett
+    delete_file: "Slett filen %{name}"
     done: Ferdig
     filter: Filter
     find_user: "Finn bruker"
@@ -5899,6 +5900,7 @@ nb:
   errors: 
     bad_navigation_config: "Ugyldig konfigurasjon av kursfane"
     blank: Obligatorisk
+    dynamic_format: "%{message}"
     failed: Feilet
     format: "%{attribute} %{message}"
     index: 
@@ -7308,6 +7310,7 @@ nb:
   helpers: 
     button: 
       create: "Opprett %{model}"
+      submit: "Lagre %{model}"
       update: "Oppdater %{model}"
     course: Kurs
     dashboard_helper: 
@@ -9833,6 +9836,17 @@ nb:
     due_date_display: Frist
     files_description: "Ny fil lagt til i kurset ditt"
     files_display: Filer
+    grading_description: |-
+        Inkluderer:
+        
+        * Overdragelse/innsending karakter angitt/endret
+        * U-dempet oppdrag karakter
+        * Karakter vekt endret
+        
+        
+        
+        Sjekk inkluderer poengsum når varsling om endringer i karakterer 'hvis du ønsker å se karakterene dine i varslingene.
+        Hvis din epost ikke er institusjonen email dette betyr at sensitivt innhold sendes utenfor institusjon.
     grading_display: Karaktersetting
     grading_notify_include_grade: "Inkluder resultat når det varsles om karakterendringer."
     grading_policies_description: "Retningslinjer for karaktersetting i kurset er endret"
