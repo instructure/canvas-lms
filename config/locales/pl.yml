@@ -255,6 +255,9 @@ pl:
       logout_request_to_idp: "LogoutRequest sent to IdP"
       logout_response_from_idp: "LogoutResponse from IdP"
       saml_required: "Konfiguracja SAML jest wymagana, aby testować SAML"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Czas zakończenia powiadomienia konta jest wcześniejszy od czasu rozpoczęcia"
   account_notifications: 
     announcement_created_notice: "Ogłoszenie zostało pomyślnie utworzone"
     announcement_creation_failed_notice: "Tworzenie ogłoszenia nie powiodło się"
@@ -277,10 +280,29 @@ pl:
       term_text: "Termin: %{term_name};"
     grades: 
       deleted: "Dołącz usunięte obiekty: prawda;"
+      limited: "usunięte obiekty ograniczone przez określoną liczbę dni;"
     outcomes: 
       order: "Kolejność: %{order}"
     report_header_account_id: identyfikator_konta
+    report_header_assessment_id: "identyfikator oceny"
+    report_header_assessment_question: "pytanie oceniające"
+    report_header_assessment_question_id: "identyfikator pytania oceniającego"
+    report_header_assessment_title: "Tytuł oceny"
+    report_header_assessment_type: "typ oceny"
+    report_header_assignment_id: "identyfikator zadania"
+    report_header_assignment_title: "tytuł zadania"
+    report_header_assignment_url: "url zadania"
+    report_header_associated_user_id: powiązany_identyfikator_użytkownika
     report_header_attempt: próba
+    report_header_canvas_account_id: identyfikator_konta_canvas
+    report_header_canvas_associated_user_id: identyfikator_powiązanego_użytkownika_canvas
+    report_header_canvas_course_id: identyfikator_kursu_canvas
+    report_header_canvas_group_id: identyfikator_grupy_canvas
+    report_header_canvas_parent_id: identyfikator_rodzica_canvas
+    report_header_canvas_section_id: identyfikator_sekcji_canvas
+    report_header_canvas_term_id: identyfikator_semestru_canvas
+    report_header_canvas_user_id: identyfikator_użytkownika_canvas
+    report_header_canvas_xlist_course_id: identyfikator_kursu_xlist_canvas
     report_header_course: kurs
     report_header_course__id: identyfikator_kursu
     report_header_course_id: "identyfikator kursu"
@@ -290,26 +312,43 @@ pl:
     report_header_created_at: "utworzono o"
     report_header_current_score: "bieżący wynik"
     report_header_email: e-mail
+    report_header_end__date: data_końcowa
     report_header_end_date: "data końcowa"
     report_header_enrollment_state: "stan zapisu"
     report_header_final_score: "wynik końcowy"
+    report_header_first_name: pierwszę_imię
+    report_header_group_id: identyfikator_grupy
     report_header_id: identyfikator
     report_header_last_access_at: "ostatni dostęp o"
     report_header_last_ip: "ostatnie ip"
     report_header_last_name: nazwisko
+    report_header_learning_outcome_id: "identyfikator wyniku nauczania"
+    report_header_learning_outcome_name: "nazwa wyniku nauczania"
+    report_header_login_id: identyfikator_login
+    report_header_long__name: długa_nazwa
+    report_header_long_name: "długa nazwa"
     report_header_name: nazwa
+    report_header_outcome_score: "ocena wyników"
+    report_header_parent_account_id: identyfikator_konta_rodzica
+    report_header_role: rola
     report_header_section: sekcja
     report_header_section__id: sekcja_id
     report_header_section_id: "identyfikator sekcji"
     report_header_section_name: "nazwa sekcji"
     report_header_section_sis: "system sis sekcji"
     report_header_section_sis_id: "identyfikator systemu sis sekcji"
+    report_header_short__name: krótka_nazwa
+    report_header_short_name: "krótka nazwa"
     report_header_sis_id: "identyfikator systemu sis"
+    report_header_start__date: data_rozpoczęcia
     report_header_start_date: "data rozpoczęcia"
+    report_header_status: status
     report_header_student_id: "identyfikator uczestnika"
     report_header_student_name: "nazwa uczestnika"
     report_header_student_sis: "system sis uczestnika"
     report_header_student_sis_id: "identyfikator systemu sis uczestnika"
+    report_header_submission_date: "data przesłania"
+    report_header_submission_score: "wynik przesłanego zadania"
     report_header_term: termin
     report_header_term__id: identyfikator_terminu
     report_header_term_id: "identyfikator terminu"
@@ -318,6 +357,7 @@ pl:
     report_header_user_id: "identyfikator użytkownika"
     report_header_user_name: "nazwa użytkownika"
     report_header_user_sis_id: "identyfikator systemu sis użytkownika"
+    report_header_xlist_course_id: identyfikator_kursu_xlist
     sis_exporter: 
       reports: "Raporty: %{files}"
     student: 
@@ -489,6 +529,8 @@ pl:
         message_course_id: "Identyfikator kursu"
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "Informacje szczegółowe nie są dostępne"
       grade_change_logging_results: 
         Assignment: Zadanie
         Course: Kurs
@@ -703,6 +745,11 @@ pl:
         sis_export: 
           description: 
             text: "Ten raport wyeksportuje wszystkie niezbędne informacje, które odnoszą się do zastrzegania systemu Canvas w odpowiednich kategoriach."
+    public_courses_csv_description: 
+      account_reports: 
+        default: 
+          public_courses: 
+            text: "W raporcie przedstawiono wszystkie publiczne kursy, które nie zostały skasowane dla danego semestru. Wynikowy plik csv będzie zawierał jeden rząd na kurs i zostanie w nim wyświetlony identyfikator kursu, identyfikator systemu sis kursu, skrócona nazwa kursu, nazwa kursu, data rozpoczęcia i  zakończenia kursu."
     quota_integer_required: "Liczba całkowita jest wymagana"
     quota_must_be_positive: "Wartość musi być dodatnia"
     quota_not_updated: "Przydział nie został zaktualizowany"
@@ -804,6 +851,8 @@ pl:
       help_link_available_to_all_teachers: Instruktorzy
       help_link_available_to_all_users: Użytkownicy
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Jeśli chcesz wstawić łącze do własnej strony pomocy w okienku pomocy, możesz to zrobić tutaj"
+      interpolate_account_domain: "Wprowadź \"{{ACCOUNT_DOMAIN}}\", aby zamienić domenę konta źródłowego użytkownika"
+      interpolate_user_id: "Wprowadź \"{{CANVAS_USER_ID}}\", aby zamienić unikatowy identyfikator Canvas użytkownika"
       ip_filter_filter_label: Filtruj
       ip_filter_name_label: Nazwa
       labels: 
@@ -893,7 +942,9 @@ pl:
         subject: Temat
       open_registration_delegated_warning_message: "Zewnętrzny dostawca tożsamości jest włączony i użytkownicy utworzeni poprzez otwartą rejestrację mogą nie mieć możliwości zalogowania się, dopóki formularz logowania zewnętrznego dostawcy tożsamości nie odwoła się z powrotem do %{url}."
       open_registration_delegated_warning_tooltip: "Zewnętrzny dostawca tożsamości jest włączony"
+      open_report_description: "Otwórz opis raportu"
       page_title: "Ustawienia konta"
+      quiz_ip_filters_delete: "Usuń filtr"
       quiz_ip_filters_help_message: |-
           Filtry IP testu służą do ograniczania dostępu do testów dla komputerów z danego zakresu IP.
           
@@ -2131,6 +2182,7 @@ pl:
       attendance_help: "Obecność — pomoc"
       new_attendance_column: "Nowa kolumna obecności"
   auth_logging: 
+    corrupted: "Informacje szczegółowe nie są dostępne"
     login: LOGOWANIE
     logout: WYLOGOWANIE
   bb_display: "Nauka w systemie Blackboard"
@@ -4115,6 +4167,7 @@ pl:
       concluded: Ukończone
       copied_from: "Skopiowano z"
       copied_to: "Skopiowano do"
+      corrupted: "Informacje szczegółowe nie są dostępne"
       created: Utworzono
       deleted: Usunięty
       published: Opublikowane
