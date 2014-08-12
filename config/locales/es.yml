@@ -18,9 +18,11 @@ es:
     student_count: 
       one: "1 alumno"
       other: "%{count} alumnos"
+    student_count_max: "%{count} / %{max} alumnos"
     user_count: 
       one: "1 usuario"
       other: "%{count} usuarios"
+    user_count_max: "%{count} / %{max} usuarios"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "AVISO: %{user} ya es miembro de %{group}"
@@ -250,6 +252,9 @@ es:
       logout_request_to_idp: "Solicitud de cierre de sesión enviada a IdP"
       logout_response_from_idp: "Respuesta de cierre de sesión de IdP"
       saml_required: "Una configuración SAML es necesaria para probar SAML"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "La hora de finalización de la notificación de la cuenta es anterior a la hora de inicio"
   account_notifications: 
     announcement_created_notice: "Anuncio creado con éxito"
     announcement_creation_failed_notice: "Falló la creación del anuncio"
@@ -270,14 +275,45 @@ es:
       term_text: "Período: %{term_name};"
     grades: 
       deleted: "Incluir objetos eliminados: verdadero;"
+      limited: "objetos eliminados limitados por días especificados;"
     outcomes: 
       order: "Orden: %{order}"
+    report_header_account_id: "ID de cuenta"
+    report_header_assessment_id: "ID de evaluación"
+    report_header_assessment_question: "Pregunta de evaluación"
+    report_header_assessment_question_id: "ID de pregunta de evaluación"
+    report_header_assessment_title: "Título de evaluación"
+    report_header_assessment_type: "Tipo de evaluación"
+    report_header_assignment_id: "ID de tarea"
+    report_header_assignment_title: "Título de tarea"
+    report_header_assignment_url: "URL de la tarea"
     report_header_attempt: intento
     report_header_course: curso
+    report_header_course__id: "ID de curso"
+    report_header_course_id: "ID de curso"
+    report_header_course_name: "Nombre del curso"
+    report_header_course_sis: "SIS del curso"
+    report_header_course_sis_id: "ID SIS del curso"
     report_header_created_at: "creado en"
+    report_header_current_score: "Puntuación actual"
     report_header_email: "correo electrónico"
+    report_header_end__date: "Fecha de finalización"
+    report_header_end_date: "Fecha de finalización"
+    report_header_enrollment_state: "Estado de la inscripción"
+    report_header_final_score: "Puntuación final"
+    report_header_first_name: Nombre
+    report_header_group_id: "ID de grupo"
     report_header_id: identificación
+    report_header_last_access_at: "accedió por última vez a las"
+    report_header_last_ip: "última IP"
+    report_header_last_name: Apellido
+    report_header_learning_outcome_id: "ID del nivel de aprendizaje"
+    report_header_learning_outcome_name: "Nombre del nivel de aprendizaje"
+    report_header_login_id: "ID de inicio de sesión"
+    report_header_long__name: "Nombre largo"
+    report_header_long_name: "Nombre largo"
     report_header_name: nombre
+    report_header_outcome_score: "puntuación del resultado"
     report_header_section: sección
     report_header_section__id: section_id
     sis_exporter: 
