@@ -9299,8 +9299,14 @@ nl:
         html: 
           link_message: "Hier klikken om je beoordeling te voltooien"
         subject: "Toegewezen peer review voor %{reviewee}"
+      facebook: 
+        body: "Je bent voor een peer review uitgenodigd voor %{reviewee}. Volg de koppeling hieronder om ze te beoordelen!"
       sms: 
         more_info: "Meer informatie op %{url}"
+      summary: 
+        body: "Je bent voor een peer review uitgenodigd voor %{reviewee}. Volg de koppeling hieronder om ze te beoordelen!"
+      twitter: 
+        body: "Je bent voor een peer review uitgenodigd voor %{reviewee}. Volg de koppeling hieronder om ze te beoordelen!"
     pseudonym_registration: 
       email: 
         body: "Je bent geregistreerd voor een Canvas-account op %{account}! Voordat je kunt aanmelden en Canvas kunt gaan gebruiken, moet je het configuratieproces voltooien."
