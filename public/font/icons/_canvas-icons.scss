@@ -285,7 +285,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 }
 
 
-i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
+i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-]{
 
   &:before {
     font-family: "canvas-icons";

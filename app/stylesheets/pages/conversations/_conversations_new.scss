@@ -437,7 +437,9 @@
 }
 
 i.icon-ok:before {
-  content: "\e015";
+  // this is why we need the component loaded into the compiler sheet
+  // TODO: fix it so we're not using bootstrap.js and their classes
+  @extend .icon-check:before;
   vertical-align: baseline;
 }
 
