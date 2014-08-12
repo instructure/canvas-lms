@@ -6,18 +6,21 @@ define [
 
   Toolbar = React.createClass
 
-    onSubmit: (event) ->
+    onSubmitSearch: (event) ->
       event.preventDefault()
       query = {search_term: @refs.searchTerm.getDOMNode().value}
       Router.transitionTo 'search', @props.params, query
 
+    addFolder: ->
+      @props.currentFolder.folders.add({})
+
     render: withReactDOM ->
       header className:'ef-header',
-        form onSubmit: @onSubmit, className:'ef-search-container',
+        form onSubmit: @onSubmitSearch, className:'ef-search-container',
           i className:'icon-search',
           input type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
         div className:'ef-main-buttons',
-          button className:'btn',
+          button onClick: @addFolder, className:'btn',
             i className:'icon-plus'
             'Folder'
           button className:'btn btn-primary',

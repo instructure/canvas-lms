@@ -18,7 +18,11 @@ define [
       @on 'change:sort change:order', @setQueryStringParams
       super
 
-    url: -> "/api/v1/folders/#{@id}"
+    url: ->
+      if @isNew()
+        super
+      else
+        "/api/v1/folders/#{@id}"
 
     parse: (response) ->
       json = super
@@ -77,7 +81,7 @@ define [
     # out. because urls will end up being /courses/2/files/folder/some folder/another
     EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+\/?/
     urlPath: ->
-      @get('full_name').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
+      (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
 
     @resolvePath = (contextType, contextId, folderPath) ->
       url = "/api/v1/#{contextType}/#{contextId}/folders/by_path#{folderPath}"

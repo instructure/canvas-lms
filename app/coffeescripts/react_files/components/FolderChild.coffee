@@ -1,4 +1,5 @@
 define [
+  'i18n!react_files'
   'react'
   'react-router'
   '../mixins/BackboneMixin'
@@ -8,7 +9,7 @@ define [
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
-], (React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
 
 
   FolderChild = React.createClass
@@ -18,14 +19,23 @@ define [
     getInitialState: ->
       editing: false
 
+    componentWillMount: ->
+      if @props.model.isNew()
+        @startEditingName()
+
     startEditingName: preventDefault ->
       @setState editing: true
       setTimeout =>
         @refs.newName.getDOMNode().focus()
 
 
-    doneEditing: preventDefault ->
+    saveNameEdit: preventDefault ->
       @props.model.save(name: @refs.newName.getDOMNode().value)
+      @setState(editing: false)
+
+
+    cancelEditingName: ->
+      @props.model.collection.remove(@props.model) if @props.model.isNew()
       @setState(editing: false)
 
 
@@ -33,8 +43,17 @@ define [
       div className:'ef-item-row',
         div className:'ef-name-col',
           if @state.editing
-            form onSubmit: @doneEditing,
-              input type:'text', ref:'newName', defaultValue: @props.model.get('name') || @props.model.get('display_name')
+            form className: 'ef-edit-name-form', onSubmit: @saveNameEdit,
+              input({
+                type:'text',
+                ref:'newName',
+                className: 'input-block-level',
+                placeholder: I18n.t('name', 'Name'),
+                defaultValue: @props.model.get('name') || @props.model.get('display_name')
+                onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
+              }),
+              button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,
+                i className: 'icon-x'
           else if @props.model instanceof Folder
             Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
               i className:'icon-folder',
