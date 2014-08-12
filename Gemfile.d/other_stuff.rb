@@ -53,7 +53,7 @@ gem 'mime-types', '1.17.2', :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4'
-gem 'multi_json', '1.8.2'
+gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
