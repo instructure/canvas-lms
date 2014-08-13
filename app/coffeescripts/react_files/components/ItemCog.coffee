@@ -6,27 +6,22 @@ define [
   'compiled/models/FilesystemObject'
   './RestrictedDialogForm'
   './MoveDialog'
-  './DialogAdapter'
   './DialogContent'
   './DialogButtons'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, FilesystemObject, RestrictedDialogForm, MoveDialog, $DialogAdapter, DialogContent, DialogButtons, $) ->
+], (I18n, React, withReactDOM, preventDefault, FilesystemObject, RestrictedDialogForm, MoveDialog, DialogContent, DialogButtons, $) ->
 
-  # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
 
-    getInitialState: ->
-      restrictedDialogOpen: false
-
+    # === React Functions === #
     propTypes:
       model: React.PropTypes.instanceOf(FilesystemObject)
 
-    openRestrictedDialog: preventDefault ->
-      @setState restrictedDialogOpen: true
-
+	# === Custom Functions === #
     closeRestrictedDialog: ->
-      @setState restrictedDialogOpen: false
+      React.unmountComponentAtNode @$dialog[0]
+      @$dialog.remove()
 
     deleteItem: ->
       message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
@@ -48,16 +43,21 @@ define [
       }), $dialog[0])
 
 
+    # Function Summary
+    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
+    # dialog window. This allows us to do react things inside of this all ready rendered 
+    # jQuery plugin
+
+    openRestrictedDialog: ->
+      @$dialog = $('<div>').dialog
+        title: I18n.t("title.limit_student_access", "Limit student access")
+        width: 400
+        'close': @closeRestrictedDialog
+
+      React.renderComponent(RestrictedDialogForm(model: @props.model, closeDialog: @closeRestrictedDialog), @$dialog[0])
+
     render: withReactDOM ->
       div null,
-
-        $DialogAdapter open: @state.restrictedDialogOpen, title: I18n.t("title.limit_student_access", "Limit student access"),
-          DialogContent {},
-            RestrictedDialogForm {}
-          DialogButtons {},
-            input type: 'button', onClick: @closeRestrictedDialog, className: "btn", value: I18n.t("button_text.cancel", "Cancel")
-            input type: "submit", className: "btn btn-primary", value: I18n.t("button_text.update", "Update")
-
         div className:'ef-hover-options',
           a href:'#', className: 'adminCog-download-link',
             i className:'icon-download'
@@ -73,7 +73,7 @@ define [
                 li {},
                   a href:'#', onClick: preventDefault(@props.startEditingName), id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit Name', 'Edit Name'
                 li {},
-                  a onClick: preventDefault(@openRestrictedDialog), href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
+                  a ref: 'restrictedDialog', onClick: preventDefault(@openRestrictedDialog), href:'#', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
                 li {},
                   a onClick: preventDefault(@openMoveDialog), href:'#', id:'content-4', tabIndex:'-1', role:'menuitem', title:'Move', 'Move'
                 li {},
