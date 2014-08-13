@@ -4521,7 +4521,7 @@ nl:
         duplicates_removed: "Enkele duplicaten zijn verwijderd."
         email: E-mail
         email_field_label: "De e-mailadressen van de door jou gewenste gebruikers, gescheiden door komma's, invoeren."
-        email_field_place_holder: "\"Student voorbeeld\" &lt;student@example.com&gt;, \"Achternaam, voornaam\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
+        email_field_place_holder: "\"Cursist voorbeeld\" &lt;student@example.com&gt;, \"Achternaam, voornaam\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Voorbeelden: gebruiker@voorbeeld.com, \"Voornaam Achternaam\" &lt;gebruiker@voorbeeld.com&gt;, \"Achternaam, Voornaam\" &lt;gebruiker@voorbeeld.com&gt;"
         form_instructions: "Een lijst met e-mailadressen typen of plakken in het veld hieronder:"
         go_back: "Opnieuw beginnen"
