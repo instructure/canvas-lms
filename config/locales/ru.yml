@@ -653,7 +653,7 @@ ru:
       account_reports: 
         penn_harris: 
           parameters: 
-            note: "В этом отчете могут не точно отображаться оценки курсов с заданиями, в которых отключен звук. "
+            note: "В этом отчете могут неточно отображаться оценки курсов с заданиями, в которых отключен звук. "
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -5751,19 +5751,19 @@ ru:
       blank: "не может быть пустым"
       confirmation: "не соответствует подтверждению"
       empty: "не может быть пустым"
-      equal_to: "должно равняться %{count}"
+      equal_to: "должно быть равно %{count}"
       even: "должно быть четным числом"
       exclusion: забронировано
       greater_than: "должно быть больше %{count}"
-      greater_than_or_equal_to: "должно быть больше или равняться %{count}"
+      greater_than_or_equal_to: "должно быть больше или равно %{count}"
       inclusion: "не включено в список"
       invalid: неверно
-      less_than: "должно быть менее %{count}"
-      less_than_or_equal_to: "должно быть менее или равняться %{count}"
+      less_than: "должно быть меньше %{count}"
+      less_than_or_equal_to: "должно быть меньше или равно %{count}"
       not_a_number: "не является числом"
       odd: "должно быть нечетным числом"
       too_long: "слишком длинный (максимум %{count} символов)"
-      too_short: "слишком короткий (максимум %{count} символов)"
+      too_short: "слишком короткий (минимум %{count} символов)"
       wrong_length: "неверной длины (должно быть %{count} символов)"
     no_attached_file: "Вы должны приложить хотя бы один файл к данному заданию"
     registration_incomplete: "Вам необходимо подтвердить ваш адрес электронной почты, прежде чем вы сможете просмотреть эту страницу"
@@ -5797,7 +5797,7 @@ ru:
       links: 
         add_external_feed: "Добавить внешний канал"
       options: 
-        content_to_post: "Содержание для размещения"
+        content_to_post: "Содержимое для размещения"
         full_article: "Статья целиком"
         link_only: "Только ссылка"
         truncated: Усеченное
@@ -8641,7 +8641,7 @@ ru:
           labels: 
             grades_based_on_percent: "Оценка основана на взвешенном итоговом значении для каждой группы заданий"
             subject: "Вес оценки изменен"
-          see_details: "Сведения можно просмотреть здесь"
+          see_details: "Сведения можно посмотреть здесь"
         labels: 
           grades_based_on_percent: "Оценка основана на взвешенном общем числе для каждой группы оценок"
           now_see_here: "Сведения можно просмотреть здесь:"
@@ -9042,7 +9042,7 @@ ru:
         body: "%{user} только что зарегистрировался как учитель на %{website}."
         html: 
           body: "%{user} только что зарегистрировался как учитель на %{website}."
-          details: "Щелкните здесь, чтобы посмотреть учителя"
+          details: "Щелкните здесь для просмотра учителя"
           email: "Электронная почта"
           phone: Телефон
           school_name: "Название школы"
@@ -9096,7 +9096,7 @@ ru:
     page_unpublished_module: "Данная страница является частью неопубликованного модуля и на данный момент недоступна."
     peer_review_invitation: 
       sms: 
-        more_info: "Дополнительные сведения доступны в %{url}"
+        more_info: "Дополнительная информация доступна по адресу: %{url}"
     pseudonym_registration: 
       email: 
         body: "Вы зарегистрированы для учетной записи Canvas в %{account}!  Перед входом в систему и использованием Canvas необходимо завершить процесс настройки."
@@ -11003,7 +11003,7 @@ ru:
       generating_report_name: "Создание %{report_name}…"
       item_analysis_not_available: "Анализ элемента недоступен для опросов"
   quiz_route: 
-    that_quiz_has_been_deleted: "Эта контрольная работа удалена"
+    that_quiz_has_been_deleted: "Эта контрольная работа была удалена"
   quiz_statistics: 
     item_analysis: "Анализ элемента"
     no_answer: "Отсутствует ответ"
@@ -12308,7 +12308,7 @@ ru:
         add_rubric: "Добавить рубрику"
       course_rubrics: "Рубрики курса"
       delete_rubric: "Удалить рубрику"
-      edit_rubric: "Редактировать рубрики"
+      edit_rubric: "Редактировать рубрику"
       page_title: Рубрики
       points_possible: 
         few: " %{count} балла(ов) возможно"
@@ -13602,7 +13602,7 @@ ru:
     view_in_separate_window: "Просмотреть в отдельном окне"
   tooltips: 
     finished: готово
-    incomplete: "не завершено"
+    incomplete: незавершенный
     vdd: 
       more_message: "и более %{count}..."
   tours: 
