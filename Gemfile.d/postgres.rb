@@ -1,3 +1,3 @@
 group :postgres do
-  gem 'pg', '0.15.0'
+  gem 'pg', '0.15.1'
 end
