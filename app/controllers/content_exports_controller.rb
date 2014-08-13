@@ -27,7 +27,7 @@ class ContentExportsController < ApplicationController
   end
 
   def index
-    @exports = @context.content_exports_visible_to(@current_user).active.not_for_copy
+    @exports = @context.content_exports_visible_to(@current_user).active.not_for_copy.order('created_at DESC')
 
     @current_export_id = nil
     if export = @context.content_exports_visible_to(@current_user).running.first

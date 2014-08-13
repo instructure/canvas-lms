@@ -75,7 +75,7 @@ describe ContentExportsController do
           user_session(@teacher)
           get :index, course_id: @course.id
           response.should be_success
-          assigns(:exports).map(&:id).should == [@acx.id, @tcx.id, @tzx.id]
+          assigns(:exports).map(&:id).should =~ [@acx.id, @tcx.id, @tzx.id]
         end
       end
 
