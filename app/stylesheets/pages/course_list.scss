@@ -1,0 +1,44 @@
+table.course-list-table
+{
+   td.course-list-star-column {
+      width: 3%;
+      padding-left: 15px;
+      color: #eee;
+      text-shadow: -1px 0 #eee, 0 1px #eee, 1px 0 #eee, 0 -1px #eee;
+   }
+   td.course-list-enrolled-as-column {
+      width: 20%;
+      text-align: right;
+      padding-right: 15px;
+   }
+   td.course-list-course-title-column {
+      width: 57%;
+
+   }
+   td.course-list-unpublished-column {
+      width: 20%;
+   }
+   td.course-list-no-left-border {
+      border-left: 0;
+   }
+
+   .course-list-not-favoritable {
+      width: 60%;
+   }
+
+   .course-list-table-row:hover {
+      background-color: #eee;
+   }
+}
+
+.course-list-favorite-course {
+   color: #ffdba1;
+   text-shadow: none;
+}
+
+.course-list-label-hollow {
+   background: none;
+   border: 2px solid #999;
+   color: #999;
+   text-shadow: none;
+}

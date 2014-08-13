@@ -396,7 +396,7 @@ describe "dashboard" do
       c1.reload
 
       get "/courses"
-      f('.past_enrollments').should include_text(c1.name)
+      fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list and assignments menu for a teacher" do

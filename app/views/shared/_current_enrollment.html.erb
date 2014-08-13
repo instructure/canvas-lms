@@ -1,6 +1,6 @@
 <% dashboard ||= false %>
 <% unless dashboard %>
-  <li class="<%= 'unpublished' if current_enrollment.course.created? || current_enrollment.course.claimed? %> <%= current_enrollment.state_based_on_date %>">
+  <tr class="course-list-table-row">
 <% end %>
 <% if current_enrollment.workflow_state == "invited" %>
   <div class="<%= dashboard ? 'communication_message dashboard_notification alert alert-info' : 'reminder' %>">
@@ -11,34 +11,68 @@
   </div>
 <% else %>
   <% show_link = current_enrollment.course.grants_right?(@current_user, session, :read) %>
-  <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
-    <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
-      <%= current_enrollment.long_name %>
-      <% if current_enrollment.admin? && (current_enrollment.course.created? || current_enrollment.course.claimed?) %>
-        <%= image_tag "hammer.png", :title => t('course_unpublished', "This course hasn't been published yet"), :alt => "Unpublished", :class => "unpublished_icon" %>
+      <% if @show_star_column %>
+      <td class="course-list-star-column">
+      <% favorite_course = @favorite_course_ids.include?(current_enrollment.course_id) %>
+      <% tooltip_message = t('favorited_tooltip', "Click to remove from the courses menu.") if favorite_course %>
+      <% tooltip_message = t('nonfavorited_tooltip', "Click to add to the courses menu.") if !favorite_course %>
+      <% tooltip_message = t('not_favoritable_tooltip', "This course cannot be add to the courses menu at this time.") if !show_link %>
+        <span
+          class="<%= "course-list-favorite-course" if favorite_course %> <%= "course-list-not-favoritable disabled" if !show_link %> <%= "course-list-favoritable" if show_link %>"
+          data-tooltip="bottom"
+          title="<%= tooltip_message %>"
+          role="button"
+          tabindex="0"
+          data-course-id="<%= current_enrollment.course_id %>"
+          <%= "data-favorite-url=#{api_v1_add_favorite_course_url(current_enrollment.course_id)}" if show_link %>
+        >
+          <i class="icon-star" ></i>
+          <span id="course_list_screenreader_message_<%= current_enrollment.course_id %>" class="screenreader-only">
+            <%= tooltip_message %>
+          </span>
+        </span>
+
+      </td>
       <% end %>
-    </span>
+      <td class="course-list-course-title-column
+        <%= "course-list-no-left-border" if @show_star_column %>
+        <%= "course-list-not-favoritable" unless @show_star_column %>">
+        <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
+        <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
+          <%= current_enrollment.long_name %>
+        </span>
 
-    <% unless current_enrollment.course.enrollment_term.default_term? %>
-      <span class="subtitle ellipsis"><%= current_enrollment.course.enrollment_term.name %></span>
-    <% end %>
+        <% unless current_enrollment.course.enrollment_term.default_term? %>
+          <span class="subtitle ellipsis"><%= current_enrollment.course.enrollment_term.name %></span>
+        <% end %>
+        <% if show_link %></a><% end %>
+      </td>
+      <td class="course-list-unpublished-column course-list-no-left-border">
+        <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
+            <span data-tooltip title="<%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %>"
+             class="label label-hollow"><%= t('unpublished_course', "unpublished") %></span>
+             <span class="screenreader-only"><%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %></span>
+        <% end %>
+      </td>
+      <td class="course-list-enrolled-as-column course-list-no-left-border">
+        <%
+           message = t('enrolled_as_student', "Enrolled as a student")
+           case current_enrollment.type
+           when 'TeacherEnrollment'
+             message = t('enrolled_as_teacher', "Enrolled as a teacher")
+           when 'TaEnrollment'
+             message = t('enrolled_as_ta', "Enrolled as a TA")
+           when 'ObserverEnrollment'
+             message = t('enrolled_as_observer', "Enrolled as an observer")
+           when 'DesignerEnrollment'
+             message = t('enrolled_as_designer', "Enrolled as a designer")
+           end
+        %>
+        <span class="subtitle ellipsis"><%= message %></span>
+      </td>
 
-    <%
-       message = t('enrolled_as_student', "Enrolled as a student")
-       case current_enrollment.type
-       when 'TeacherEnrollment'
-         message = t('enrolled_as_teacher', "Enrolled as a teacher")
-       when 'TaEnrollment'
-         message = t('enrolled_as_ta', "Enrolled as a TA")
-       when 'ObserverEnrollment'
-         message = t('enrolled_as_observer', "Enrolled as an observer")
-       when 'DesignerEnrollment'
-         message = t('enrolled_as_designer', "Enrolled as a designer")
-       end
-    %>
-    <span class="subtitle ellipsis"><%= message %></span>
-  <% if show_link %></a><% end %>
+
 <% end %>
 <% unless dashboard %>
-  </li>
+  </tr>
 <% end %>

@@ -22,6 +22,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/instructure_eportfolio.css
   course_show:
     - public/stylesheets/compiled/pages/course_show.css
+  course_list:
+    - public/stylesheets/compiled/pages/course_list.css
   content_migrations:
     - public/stylesheets/compiled/pages/content_migrations.css
   vendor:
@@ -125,9 +127,9 @@ stylesheets:
   select_content_dialog:
     - public/stylesheets/compiled/pages/select_content_dialog.css
   conversations_new:
-    # TODO: we need to look at what's being used here and if we can get purge this file and use  
-    # the styles in /bootstrap/ 
-    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css 
+    # TODO: we need to look at what's being used here and if we can get purge this file and use
+    # the styles in /bootstrap/
+    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css
     # end
     - public/stylesheets/compiled/pages/conversations/compiler-conversations.css
   alerts:
