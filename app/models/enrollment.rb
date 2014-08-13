@@ -849,7 +849,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
+    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users, :read_roster)}
     can :read
 
     given { |user| self.user == user }
