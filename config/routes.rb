@@ -1278,8 +1278,8 @@ CanvasRails::Application.routes.draw do
 
     scope(:controller => :favorites) do
       get "users/self/favorites/courses", :action => :list_favorite_courses, :path_name => :list_favorite_courses
-      post "users/self/favorites/courses/:id", :action => :add_favorite_course
-      delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
+      post "users/self/favorites/courses/:id", :action => :add_favorite_course, :path_name => :add_favorite_course
+      delete "users/self/favorites/courses/:id", :action => :remove_favorite_course, :path_name => :remove_favorite_course
       delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
 
