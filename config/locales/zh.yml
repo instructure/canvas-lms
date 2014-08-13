@@ -253,6 +253,9 @@ zh:
       logout_request_to_idp: "已向 IdP 发送 LogoutRequest"
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
       saml_required: "如果要测试 SAML，需要先配置 SAML。"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
   account_notifications: 
     announcement_created_notice: 通告已成功创建
     announcement_creation_failed_notice: 通告创建失败
@@ -273,6 +276,7 @@ zh:
       term_text: "学期: %{term_name};"
     grades: 
       deleted: "包括删除的对象: true;"
+      limited: 删除的对象受指定天数限制；
     outcomes: 
       order: "顺序：%{order}"
     report_header_account_id: account_id
@@ -284,8 +288,19 @@ zh:
     report_header_assignment_id: "作业 id"
     report_header_assignment_title: 作业标题
     report_header_assignment_url: "作业 url"
+    report_header_associated_user_id: associated_user_id
     report_header_attempt: 尝试次数
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_parent_id: canvas_parent_id
+    report_header_canvas_section_id: canvas_section_id
+    report_header_canvas_term_id: canvas_term_id
+    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: 课程
+    report_header_course__id: course_id
     report_header_course_id: "课程 id"
     report_header_course_name: 课程名称
     report_header_course_sis: "课程 sis"
@@ -293,25 +308,35 @@ zh:
     report_header_created_at: 创建时间
     report_header_current_score: 当前分数
     report_header_email: 电子邮件
+    report_header_end__date: end_date
     report_header_end_date: 结束日期
     report_header_enrollment_state: 注册状态
     report_header_final_score: 最终分数
+    report_header_first_name: first_name
+    report_header_group_id: group_id
     report_header_id: id
     report_header_last_access_at: 上次访问位置
     report_header_last_ip: "上次 ip"
+    report_header_last_name: last_name
     report_header_learning_outcome_id: "学习结果 id"
     report_header_learning_outcome_name: 学习结果名称
+    report_header_login_id: login_id
+    report_header_long__name: long_name
     report_header_long_name: 完整名称
     report_header_name: 姓名
     report_header_outcome_score: 结果分数
+    report_header_parent_account_id: parent_account_id
+    report_header_role: 角色
     report_header_section: 章节
     report_header_section__id: section_id
     report_header_section_id: "章节 id"
     report_header_section_name: 章节名称
     report_header_section_sis: "章节 sis"
     report_header_section_sis_id: "章节 sis id"
+    report_header_short__name: short_name
     report_header_short_name: 简称
     report_header_sis_id: "sis id"
+    report_header_start__date: start_date
     report_header_start_date: 开始日期
     report_header_status: 状态
     report_header_student_id: "学生 id"
@@ -321,11 +346,14 @@ zh:
     report_header_submission_date: 提交日期
     report_header_submission_score: 提交项分数
     report_header_term: 学期
+    report_header_term__id: term_id
     report_header_term_id: "学期 id"
     report_header_term_sis: "学期 sis"
+    report_header_user__id: user_id
     report_header_user_id: "用户 id"
     report_header_user_name: 用户名
     report_header_user_sis_id: "用户 sis id"
+    report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "报告: %{files}"
     student: 
@@ -497,6 +525,8 @@ zh:
         message_course_id: "课程 ID"
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: 详细信息不可用
       grade_change_logging_results: 
         Assignment: 作业
         Course: 课程
@@ -824,6 +854,8 @@ zh:
       help_link_available_to_all_teachers: 教师
       help_link_available_to_all_users: 用户
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: 如果您想要将自己学院的支持网站加入到帮助对话中，可以在此处操作
+      interpolate_account_domain: "输入 \"{{ACCOUNT_DOMAIN}}\" 来替换用户的根帐户域"
+      interpolate_user_id: "输入 \"{{CANVAS_USER_ID}}\" 来替换用户的唯一 Canvas ID"
       ip_filter_filter_label: 过滤
       ip_filter_name_label: 姓名
       labels: 
@@ -913,7 +945,9 @@ zh:
         subject: 主题
       open_registration_delegated_warning_message: "启用外部身份提供程序，通过开放注册创建的用户可能无法登录，除非外部身份提供程序的登录窗体包含返回到 %{url} 的链接。"
       open_registration_delegated_warning_tooltip: 已启用外部身份提供程序
+      open_report_description: 打开报告说明
       page_title: 帐户设置
+      quiz_ip_filters_delete: 删除过滤器
       quiz_ip_filters_help_message: |-
           可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。
           
@@ -1033,6 +1067,9 @@ zh:
         other: "%{count} 个批次等待处理。 "
       pending_batches_title: 待处理批次
       process_data_button: 处理数据
+      select_file_instructions: |-
+          选择要导入的压缩文件。  
+          有关如何生成这些压缩文件的说明，[请参阅本文档](%{url})。
       sis_import_crumb: "SIS 导入"
       started_at_message: "开始时间: %{started_at}"
       title: "SIS 导入"
@@ -2149,11 +2186,16 @@ zh:
       attendance_help: 参与帮助
       new_attendance_column: 新参与列
   auth_logging: 
+    corrupted: 详细信息不可用
     login: 登录
     logout: 登出
   bb_display: "Blackboard 学习"
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
+  better_file_browsing_description: |-
+      一个更为简单和用户友好的全新文件浏览界面。如果您在课程级别启用此界面，
+      该课程中的所有用户将看到这一新界面。要在某人
+      进入某位用户的个人文件页面 ('/files') 时显示该界面，您需要针对他们所属的帐户启用该界面。
   big_blue_button_conference: 
     conference_is_recorded: 正在对此会议进行录制。
     recording_setting: 录制
@@ -2233,6 +2275,7 @@ zh:
     cancel: 取消
     choose_a_file: 选择文件
     delete: 删除
+    delete_file: "删除文件 %{name}"
     done: 完成
     filter: 过滤
     find_user: 查找用户
@@ -2763,6 +2806,7 @@ zh:
       update_assignment_points: "这份作业可能有 %{assignmentPoints} 分，您是否希望改变它以获得 %{rubricPoints} 分以匹配评分标准?"
     titles: 
       update_assignment_points: 是否改变可能得分以匹配评分标准?
+  chcp_student_activity_title: "CHCP 学生活动报告"
   collaboration: 
     default_title: 未命名的协作
   collaborations: 
@@ -3004,6 +3048,7 @@ zh:
     buttons: 
       process: 处理数据
     errors: 
+      couldnt_create: 无法创建内容导出。
       error: "导出课程时出错。请通知系统管理员并提供下列导出标识符: \"%{code}\""
       not_found: 导出不存在
     index: 
@@ -3536,6 +3581,9 @@ zh:
     content_next: 
       add_prerequisite: "添加先修课程到 *%{module}*"
       assignment_points_possible: "满分 %{points_possible} 分"
+      button: 
+        delete_label: 删除先修课程
+        delete_title: 删除先修课程
       buttons: 
         add_module: 添加单元
         add_prerequisite: 添加先修课程
@@ -3830,6 +3878,10 @@ zh:
       edit: 编辑单元设置
       edit_item: 编辑项目详细信息
       student_progress: 学生学习单元的进度
+    url_show: 
+      new_tab: 此站点需要在新的浏览器窗口中打开。
+      open_url_button: "在新窗口中打开 %{title}"
+      tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
   context_modules_api: 
     invalid_position: 位置无效
   conversation_dialog: 
@@ -3944,6 +3996,7 @@ zh:
       total_messages: 总消息数
       unread: 未读
       unstar_conversation: 取消标记会话
+    message_deleted: 消息已删除！
     message_detail: 
       no_subject: 无主题
     message_form: 
@@ -4043,6 +4096,7 @@ zh:
       id: ID
       points_possible: 满分
       read_only_field: （只读）
+      root_account: 根帐户
       section: 班级
       sis_login_id: 登录名或学号
       sis_user_id: 用户学号
@@ -4083,6 +4137,7 @@ zh:
   course_copy_name: "复制 Canvas 课程"
   course_copy_no_course_error: 源课程未找到。
   course_copy_not_allowed_error: 不允许您复制源课程。
+  course_enrollment_title: 注册数
   course_exports: 
     errors: 
       assignment: "作业 \"%{title}\" 无法导出"
@@ -4129,15 +4184,22 @@ zh:
       reset_course_menu: 重置
   course_logging: 
     blank_placeholder: "-"
+    event_source: 
+      api: Api
+      manual: 手动
+      sis: SIS
     event_type: 
       concluded: 已结束
       copied_from: 复制自
       copied_to: 复制到
+      corrupted: 详细信息不可用
       created: 已创建
       deleted: 已删除
       published: 已发布
       reset_from: 重置自
       reset_to: 重置到
+      restored: 已恢复
+      unconcluded: 未结束
       updated: 已更新
     field_label: 
       abstract_course_id: "提取课程 ID"
@@ -4248,6 +4310,7 @@ zh:
       section_enrollments: 班级注册
   course_statistics: 
     unknown: 未知
+  course_status_title: 课程章节状态
   course_users: 
     greater_than_three: 请输入具有三个或更多字符的搜索词
     unknown_error: 搜索时出错，请重试。
@@ -5976,6 +6039,8 @@ zh:
       new_tab: 此工具需要在新的浏览器窗口中加载
       new_tab_expired: 此工具的会话已过期。请重新加载页面以再次访问工具
       new_tab_loaded: 此工具在新的浏览器窗口中成功加载。请重新加载页面以再次访问工具。
+    tool_show: 
+      tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
     user_navigation_configured: 用户导航已配置
   facebook: 
     authorization_required: 只有经授权的用户才能访问该页面。
