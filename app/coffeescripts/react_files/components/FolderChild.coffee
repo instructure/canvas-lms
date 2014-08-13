@@ -17,19 +17,18 @@ define [
     mixins: [BackboneMixin('model')],
 
     getInitialState: ->
-      editing: false
+      editing: @props.model.isNew()
 
-    componentWillMount: ->
-      if @props.model.isNew()
-        @startEditingName()
+    componentDidMount: ->
+      @focusNameInput() if @state.editing
 
-    startEditingName: preventDefault ->
-      @setState editing: true
-      setTimeout =>
-        @refs.newName.getDOMNode().focus()
+    startEditingName: ->
+      @setState editing: true, @focusNameInput
 
+    focusNameInput: ->
+      @refs.newName.getDOMNode().focus()
 
-    saveNameEdit: preventDefault ->
+    saveNameEdit: ->
       @props.model.save(name: @refs.newName.getDOMNode().value)
       @setState(editing: false)
 
@@ -43,7 +42,7 @@ define [
       div className:'ef-item-row',
         div className:'ef-name-col',
           if @state.editing
-            form className: 'ef-edit-name-form', onSubmit: @saveNameEdit,
+            form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),
               input({
                 type:'text',
                 ref:'newName',
@@ -66,7 +65,7 @@ define [
                 i className:'icon-document'
               @props.model.get('display_name')
 
-        div className:'ef-date-created-col', onClick: @startEditing,
+        div className:'ef-date-created-col',
           FriendlyDatetime datetime: @props.model.get('created_at'),
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),

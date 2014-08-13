@@ -29,7 +29,7 @@ define [
     closeRestrictedDialog: ->
       @setState restrictedDialogOpen: false
 
-    deleteItem: preventDefault ->
+    deleteItem: ->
       message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
         name: @props.model.get('name') || @props.model.get('display_name')
       })
@@ -55,11 +55,11 @@ define [
               ul id:'content-1', className:'al-options', role:'menu', tabIndex:'0', 'aria-hidden':'true', 'aria-expanded':'false', 'aria-activedescendant':'content-2',
 
                 li {},
-                  a href:'#', onClick: @props.startEditingName, id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit Name', 'Edit Name'
+                  a href:'#', onClick: preventDefault(@props.startEditingName), id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit Name', 'Edit Name'
                 li {},
-                  a onClick: @openRestrictedDialog, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
+                  a onClick: preventDefault(@openRestrictedDialog), href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
                 li {},
-                  a ref: 'deleteLink', onClick: @deleteItem, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
+                  a ref: 'deleteLink', onClick: preventDefault(@deleteItem), href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
 
                 (li {},
                   a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download as Zip',
