@@ -1,5 +1,10 @@
 full_path_glob = '(/*full_path)'
 
+# allow plugins to prepend routes
+Dir["vendor/plugins/*/config/pre_routes.rb"].each { |pre_routes|
+  load pre_routes
+}
+
 CanvasRails::Application.routes.draw do
   resources :submission_comments, :only => :destroy
 
