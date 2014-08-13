@@ -314,8 +314,32 @@ es:
     report_header_long_name: "Nombre largo"
     report_header_name: nombre
     report_header_outcome_score: "puntuación del resultado"
+    report_header_role: función
     report_header_section: sección
     report_header_section__id: section_id
+    report_header_section_id: "ID de la sección"
+    report_header_section_name: "Nombre de la sección"
+    report_header_section_sis: "SIS de la sección"
+    report_header_section_sis_id: "ID SIS de la sección"
+    report_header_short__name: "nombre abreviado"
+    report_header_short_name: "nombre abreviado"
+    report_header_sis_id: "ID SIS"
+    report_header_start__date: "fecha de inicio"
+    report_header_start_date: "fecha de inicio"
+    report_header_status: estado
+    report_header_student_id: "ID del alumno"
+    report_header_student_name: "nombre del alumno"
+    report_header_student_sis: "SIS del alumno"
+    report_header_student_sis_id: "ID SIS del alumno"
+    report_header_submission_date: "Fecha de envío"
+    report_header_submission_score: "Puntuación de envío"
+    report_header_term: período
+    report_header_term_id: "ID del período"
+    report_header_term_sis: "SIS del período"
+    report_header_user__id: "ID del usuario"
+    report_header_user_id: "ID del usuario"
+    report_header_user_name: "nombre del usuario"
+    report_header_user_sis_id: "ID SIS del usuario"
     sis_exporter: 
       reports: "Informes: %{files}"
     student: 
@@ -429,13 +453,20 @@ es:
         From: De
         To: A
         Value: Valor
+        blank_placeholder: "-"
+        copied_from_label: "Copiado desde"
+        copied_to_label: "Copiado a"
         date: Fecha
         event_id: "Id. evento"
+        event_sis_batch: "Grupo SIS"
         event_source_label: Original
         event_type_label: Tipo
+        reset_from_label: "Restablecer desde"
+        reset_to_label: "Restablecer a"
         time: Tiempo
         user: Usuario
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Ver detalles"
       course_logging_results: 
         date: Fecha
@@ -478,6 +509,10 @@ es:
         grade_change_activity: "Actividad de cambio de calificaciones"
         message_assignment_id: "ID de la tarea"
         message_course_id: "ID del curso"
+      grade_change_logging_item: 
+        blank_placeholder: "-"
+        event_type: 
+          corrupted: "Información no disponible"
       grade_change_logging_results: 
         Assignment: Tarea
         Course: Curso
@@ -692,6 +727,11 @@ es:
         sis_export: 
           description: 
             text: "Este informe exportará toda la información necesaria relacionada con la provisión en Canvas en sus categorías respectivas."
+    public_courses_csv_description: 
+      account_reports: 
+        default: 
+          public_courses: 
+            text: "Este informe muestra todos los cursos que no se hayan eliminado de un período dado y que son públicos. El archivo csv que se genere tendrá una línea por curso y mostrará la ID del curso la ID SIS del curso, el nombre abreviado del curso, el nombre del curso y las fechas de inicio y finalización del curso."
     quota_integer_required: "Valor entero obligatorio"
     quota_must_be_positive: "El valor debe ser positivo"
     quota_not_updated: "No se ha actualizado la cuota"
@@ -794,6 +834,8 @@ es:
       help_link_available_to_all_teachers: Profesores
       help_link_available_to_all_users: Usuarios
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Si desea crear un enlace a la página de asistencia técnica de sus propias instalaciones en el diálogo de ayuda, lo puede hacer aquí"
+      interpolate_account_domain: "Introduzca \"{{ACCOUNT_DOMAIN}}\" para sustituir el dominio de la cuenta principal del usuario"
+      interpolate_user_id: "Introduzca\"{{CANVAS_USER_ID}}\" para sustituir la ID de Canvas exclusiva del usuario"
       ip_filter_filter_label: Filtro
       ip_filter_name_label: Nombre
       labels: 
@@ -885,7 +927,9 @@ es:
         subject: Tema
       open_registration_delegated_warning_message: "Un proveedor de identidad externo está activo, y puede ser que los usuarios que hayan sido creados a través de una inscripción abierta no puedan iniciar sesión a menos que el formulario de inicio de sesión de un proveedor de identidad externo contenga un enlace a %{url}."
       open_registration_delegated_warning_tooltip: "Un proveedor externo de identidad esta activo"
+      open_report_description: "Abrir descripción del informe"
       page_title: "Configuraciones de Cuenta"
+      quiz_ip_filters_delete: "Eliminar filtro"
       quiz_ip_filters_help_message: |-
           Filtros de IP de evaluación son una forma de limitar el acceso a las evaluaciones en computadoras en un rango específico de IP.
           
@@ -1005,6 +1049,9 @@ es:
         other: "%{count} grupos esperando a ser procesados."
       pending_batches_title: "Grupos Pendientes"
       process_data_button: "Información de Proceso"
+      select_file_instructions: |-
+          Seleccione el archivo zip que desea importar.  
+          Para obtener una descripción sobre cómo crear estos archivos zip, [consulte esta documentación](%{url}).
       sis_import_crumb: "Importación SIS"
       started_at_message: "Comenzó: %{started_at}"
       title: "Importación SIS"
@@ -1313,6 +1360,8 @@ es:
     invalid_participants: "Debe permitir que acuda al menos un usuario"
     title: "Editar %{name}"
     update: Actualizar
+  aria_labels: 
+    unlock_at_date: "Desbloquear en la fecha"
   assessment_question: 
     default_question_name: Pregunta
   assessment_question_bank: 
@@ -1396,6 +1445,8 @@ es:
     unmute_button: "Activar la Tarea"
     unmute_dialog: "Esta tarea está obviada. Esto significa que los estudiantes no pueden ver sus calificaciones ni retroalimentación. ¿Quiere activarla ahora?"
     unmuting_assignment: "Activando la tarea..."
+  assignment_scheduling_title: "Programación de tareas"
+  assignment_score_summary_title: "Resumen de la puntuación de tareas"
   assignments: 
     add_assignment_form: 
       assignment_name: "Nombre de la Tarea"
@@ -1627,6 +1678,7 @@ es:
       buttons: 
         not_published: "No publicado"
         published: Publicado
+      manage_assignment: "Gestionar tarea"
       titles: 
         delete: Borrar
     edit_view: 
@@ -1636,6 +1688,7 @@ es:
       description: Descripción
       freeze_properties: "Bloquear las propiedades de la tarea al copiarla"
       notify_content_change: "Notificar a los usuarios que este contenido ha cambiado"
+      only_visible_to_overrides_note: "Nota: Esta tarea *solo* está visible en las secciones que se especifican a continuación:"
       points_possible: Puntos
       post_to_sis: "Publicar en SIS"
       warnings: 
@@ -2111,6 +2164,7 @@ es:
       attendance_help: "Ayuda de Asistencia"
       new_attendance_column: "Columna Nueva de Asistencia"
   auth_logging: 
+    corrupted: "Información no disponible"
     login: "INICIAR SESIÓN"
     logout: "CERRAR SESIÓN"
   bb_display: "Blackboard Learn"
@@ -4062,11 +4116,17 @@ es:
       close_course_menu_title: cerrar
       reset_course_menu: Restablecer
   course_logging: 
+    blank_placeholder: "-"
     event_type: 
       concluded: Finalizado
+      copied_from: "Copiado desde"
+      copied_to: "Copiado a"
+      corrupted: "Información no disponible"
       created: Creado
       deleted: Borrado
       published: Publicado
+      reset_from: "Restablecer desde"
+      reset_to: "Restablecer a"
       updated: Actualizado
     field_label: 
       abstract_course_id: "ID del resumen del curso"
