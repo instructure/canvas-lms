@@ -168,7 +168,8 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'attendance'
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
           format.html { render :action => 'show' }
         end

@@ -313,11 +313,16 @@ class ExternalToolsController < ApplicationController
     else
       selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
       if find_tool(params[:id], selection_type)
-        if selection_type == 'course_home_sub_navigation' && @context.is_a?(Course)
-          @return_url = external_content_success_url('external_tool_redirect', :include_host => true)
-          @redirect_return = true
-          js_env(:course_id => @context.id)
-        end
+
+        @return_url = external_content_success_url('external_tool_redirect')
+        @redirect_return = true
+
+        success_url = tool_return_success_url(selection_type)
+        cancel_url = tool_return_cancel_url(selection_type) || success_url
+        js_env(:redirect_return_success_url => success_url,
+               :redirect_return_cancel_url => cancel_url)
+        js_env(:course_id => @context.id) if @context.is_a?(Course)
+
         @active_tab = @tool.asset_string
         @show_embedded_chat = false if @tool.tool_id == 'chat'
 
@@ -325,6 +330,40 @@ class ExternalToolsController < ApplicationController
         render tool_launch_template(@tool, selection_type)
       end
       add_crumb(@context.name, named_context_url(@context, :context_url))
+    end
+  end
+
+  def tool_return_success_url(selection_type=nil)
+    case @context
+    when Course
+      case selection_type
+      when "course_settings_sub_navigation"
+        course_settings_url(@context)
+      when "course_home_sub_navigation"
+        course_content_migrations_url(@context) # TODO: make course_home_sub_navigation more general
+      else
+        course_url(@context)
+      end
+    when Account
+      case selection_type
+      when "global_navigation"
+        dashboard_url
+      else
+        account_url(@context)
+      end
+    else
+      dashboard_url
+    end
+  end
+
+  def tool_return_cancel_url(selection_type)
+    case @context
+    when Course
+      if selection_type == "course_home_sub_navigation"
+        course_url(@context)
+      end
+    else
+      nil
     end
   end
 

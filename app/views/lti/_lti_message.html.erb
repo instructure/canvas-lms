@@ -1,6 +1,9 @@
 <% content_for :page_title do %><%= @lti_launch.link_text %><% end %>
 
 <% js_bundle 'legacy/external_tools_tool_show' %>
+<% js_bundle :external_tool_redirect if @redirect_return %>
+
+<%= render @prepend_template if @prepend_template %>
 
 <% if @lti_launch.resource_url.start_with?('http://') %>
     <div class="alert alert-error" id="insecure_content_msg">
@@ -36,3 +39,5 @@
     </div>
 </form>
 <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
+
+<%= render @append_template if @append_template %>

@@ -44,7 +44,7 @@ class ContextModulesController < ApplicationController
         reevaluate_modules_if_locked(@tag)
         @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
         @progression.uncollapse! if @progression && @progression.collapsed?
-        content_tag_redirect(@context, @tag, :context_context_modules_url)
+        content_tag_redirect(@context, @tag, :context_context_modules_url, :modules)
       end
     end
   end

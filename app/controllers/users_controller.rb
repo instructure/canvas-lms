@@ -903,23 +903,31 @@ class UsersController < ApplicationController
 
   def external_tool
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
-    @resource_title = @tool.label_for(:user_navigation)
-    @resource_url = @tool.user_navigation(:url)
     @opaque_id = @tool.opaque_identifier_for(@current_user)
     @resource_type = 'user_navigation'
-    @return_url = user_profile_url(@current_user, :include_host => true)
 
+    success_url = user_profile_url(@current_user)
+    @return_url = external_content_success_url('external_tool_redirect')
+    @redirect_return = true
+    js_env(:redirect_return_success_url => success_url,
+           :redirect_return_cancel_url => success_url)
+
+    @lti_launch = Lti::Launch.new
     opts = {
         resource_type: @resource_type,
         link_code: @opaque_id,
         custom_substitutions: common_variable_substitutions
     }
     adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
-    @tool_settings = adapter.generate_post_payload
+    @lti_launch.params = adapter.generate_post_payload
+
+    @lti_launch.resource_url = @tool.user_navigation(:url)
+    @lti_launch.link_text = @tool.label_for(:user_navigation)
+    @lti_launch.analytics_id = @tool.tool_id
 
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
-    render :template => 'external_tools/tool_show'
+    render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['default']
   end
 
   def new

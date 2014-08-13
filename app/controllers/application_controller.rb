@@ -1114,7 +1114,7 @@ class ApplicationController < ActionController::Base
     named_context_url(@context, :context_wiki_page_url, page_name)
   end
 
-  def content_tag_redirect(context, tag, error_redirect_symbol)
+  def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = { :module_item_id => tag.id }
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
@@ -1138,7 +1138,9 @@ class ApplicationController < ActionController::Base
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
         @resource_title = @assignment.title
+        @module_tag = @context.context_module_tags.not_deleted.find(params[:module_item_id]) if params[:module_item_id]
       else
+        @module_tag = @tag
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
@@ -1149,8 +1151,27 @@ class ApplicationController < ActionController::Base
         redirect_to named_context_url(context, error_redirect_symbol)
       else
         return unless require_user
-        @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
+
+        @lti_launch = Lti::Launch.new
+
+        success_url = case tag_type
+        when :assignments
+          named_context_url(@context, :context_assignments_url)
+        when :modules
+          named_context_url(@context, :context_context_modules_url)
+        else
+          named_context_url(@context, :context_url)
+        end
+        if tag.new_tab
+          @lti_launch.launch_type = 'window'
+          @return_url = success_url
+        else
+          @return_url = external_content_success_url('external_tool_redirect')
+          @redirect_return = true
+          js_env(:redirect_return_success_url => success_url,
+                 :redirect_return_cancel_url => success_url)
+        end
 
         opts = {
             launch_url: @resource_url,
@@ -1159,14 +1180,25 @@ class ApplicationController < ActionController::Base
             custom_substitutions: common_variable_substitutions
         }
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
-        if @assignment
-          @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
-        else
-          @tool_settings = adapter.generate_post_payload
+
+        if tag.try(:context_module)
+          add_crumb tag.context_module.name, context_url(@context, :context_context_modules_url)
         end
 
-        @tool_launch_type = 'window' if tag.new_tab
-        render :template => 'external_tools/tool_show'
+        if @assignment
+          add_crumb(@resource_title)
+          @prepend_template = 'assignments/description'
+          @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+        else
+          @lti_launch.params = adapter.generate_post_payload
+        end
+
+        @lti_launch.resource_url = @resource_url
+        @lti_launch.link_text = @resource_title
+        @lti_launch.analytics_id = @tool.tool_id
+
+        @append_template = 'context_modules/tool_sequence_footer'
+        render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['default']
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
