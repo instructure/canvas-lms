@@ -88,6 +88,14 @@ define([
     }
   }
 
+  var isShowingResults = function() {
+    return $('#never_hide_results').prop('checked');
+  };
+
+  var isShowingResultsJustOnce = function() {
+    return $('#quiz_one_time_results').prop('checked');
+  };
+
   if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
 
     ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES;
@@ -918,11 +926,11 @@ define([
         .on('xhrError', that.onFormError)
         .on('serializing', that.serialize);
 
-      $toggler.on('change', function() {
-        $options.toggle($toggler.is(':checked'));
-      }).triggerHandler('change');
-
       that.installValidators();
+    },
+
+    isOn: function() {
+      return correctAnswerVisibility.$toggler.prop('checked');
     },
 
     /**
@@ -1016,7 +1024,7 @@ define([
      * @param  {Object} data  The form/XHR data.
      */
     serialize: function(e, data) {
-      var show;
+      var showResults, showCorrectAnswers, showResultsOnce;
       var resetField = function(key, value) {
         data['quiz[' + key + ']'] = value || '';
       };
@@ -1032,17 +1040,28 @@ define([
         }
       };
 
-      show = data['quiz[hide_results][never]'] != '0';
-      show = show && data['quiz[show_correct_answers]'] == '1';
+      showResults = data['quiz[hide_results][never]'] != '0';
+      showCorrectAnswers = data['quiz[show_correct_answers]'] == '1';
+      showResultsOnce = data['quiz[one_time_results]'] == '1';
 
-      if (show) {
+      if (showResults && showCorrectAnswers) {
         serializeField('show_correct_answers_at');
         serializeField('hide_correct_answers_at');
       } else {
         resetField('show_correct_answers', '0');
-        resetField('one_time_results', '0');
+      }
+
+      // Discard the showAt / hideAt dates if we're showing results only once,
+      // or not at all:
+      if (!showResults || !showCorrectAnswers || showResultsOnce) {
         resetField('show_correct_answers_at');
         resetField('hide_correct_answers_at');
+      }
+
+      // One time results doesn't apply if results are hidden in the first
+      // place:
+      if (!showResults) {
+        resetField('one_time_results', '0');
       }
     },
 
@@ -1050,7 +1069,19 @@ define([
       var that = correctAnswerVisibility;
 
       that.$toggler.prop('checked', false);
-      that.$options.hide();
+      that.showDatePickers(false);
+    },
+
+    // Totally show or hide the showAt/hideAt date pickers
+    showDatePickers: function(isVisible) {
+      correctAnswerVisibility.$options.toggle(isVisible);
+    },
+
+    // Keep the pickers visible, but enable or disable them
+    enableDatePickers: function(isEnabled) {
+      correctAnswerVisibility.$options
+        .find('input, button')
+        .prop('disabled', !isEnabled);
     }
   };
 
@@ -1484,15 +1515,6 @@ define([
         });
       }
     });
-
-    $("#never_hide_results").change(function() {
-      var $this = $(this);
-      $(".show_quiz_results_options").showIf($this.attr('checked'));
-      if (!$this.attr('checked')) {
-        $("#hide_results_only_after_last").attr('checked', false);
-        correctAnswerVisibility.disable();
-      }
-    }).triggerHandler('change');
 
     $("#quiz_one_question_at_a_time").change(function() {
       var $this = $(this);
@@ -3512,4 +3534,24 @@ define([
     toggler.toggle();
   });
 
+  $(function() {
+    $(document).on('change', function controlResultVisibilityFields() {
+      // "Let Students See Their Quiz Responses" related fields visibility:
+      if (isShowingResults()) {
+        $('.show_quiz_results_options').show();
+        // CA options:
+        // 
+        // What we'd like to do is show/hide the date-pickers based on the 
+        // "Let Students See The Correct Answers" option, and disable them
+        // if we're showing results just once ("Only Once After Each Attempt"):
+        correctAnswerVisibility.showDatePickers(correctAnswerVisibility.isOn());
+        correctAnswerVisibility.enableDatePickers(!isShowingResultsJustOnce());
+      } else {
+        correctAnswerVisibility.disable();
+        $('#quiz_one_time_results').prop('checked', false)
+        $('#hide_results_only_after_last').prop('checked', false);
+        $('.show_quiz_results_options').hide();
+      }
+    }).triggerHandler('change');
+  });
 });

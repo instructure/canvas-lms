@@ -58,11 +58,17 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :quiz_data, :points_possible, :context_id, :context_type, :assignment_id, :workflow_state, :shuffle_answers, :show_correct_answers, :time_limit,
-    :allowed_attempts, :scoring_policy, :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, :could_be_locked, :cloned_item_id, :unpublished_question_count,
-    :due_at, :question_count, :last_assignment_id, :published_at, :last_edited_at, :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at, :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :only_visible_to_overrides
+    :id, :title, :description, :quiz_data, :points_possible, :context_id, 
+    :context_type, :assignment_id, :workflow_state, :shuffle_answers, 
+    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, 
+    :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, 
+    :could_be_locked, :cloned_item_id, :unpublished_question_count, :due_at, 
+    :question_count, :last_assignment_id, :published_at, :last_edited_at, 
+    :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter, 
+    :require_lockdown_browser, :require_lockdown_browser_for_results, 
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, 
+    :hide_correct_answers_at, :require_lockdown_browser_monitor, 
+    :lockdown_browser_monitor_data, :only_visible_to_overrides
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :quiz_submissions, :quiz_groups, :quiz_statistics, :attachments, :quiz_regrades, :context, :assignment, :assignment_group]
@@ -353,6 +359,12 @@ class Quizzes::Quiz < ActiveRecord::Base
       (submission && submission.user && submission.user != user)
 
     return false if !self.show_correct_answers
+
+    # If we're showing the results only one time, and are letting students
+    # see their correct answers, don't take the showAt/hideAt dates into
+    # consideration because we really want them to see the CAs just once,
+    # no matter when they submit.
+    return true if self.one_time_results
 
     # Are we past the date the correct answers should no longer be shown after?
     return false if hide_at.present? && Time.now > hide_at
