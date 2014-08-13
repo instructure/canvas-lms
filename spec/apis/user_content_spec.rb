@@ -98,6 +98,22 @@ describe UserContent, type: :request do
     doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
+  it "should not remove wrap parameter on file download links" do
+    attachment_model(:context => @course)
+    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1" alt="important">
+    </p>
+    HTML
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                    { :controller => 'discussion_topics_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
+  end
+
   it "should translate file preview links to directly-downloadable preview urls" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
