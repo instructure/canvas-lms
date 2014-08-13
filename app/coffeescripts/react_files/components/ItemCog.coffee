@@ -59,7 +59,7 @@ define [
                 li {},
                   a onClick: @openRestrictedDialog, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
                 li {},
-                  a onClick: @deleteItem, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
+                  a ref: 'deleteLink', onClick: @deleteItem, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
 
                 (li {},
                   a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download as Zip',
