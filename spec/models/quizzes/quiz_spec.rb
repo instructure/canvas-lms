@@ -1490,6 +1490,24 @@ describe Quizzes::Quiz do
       quiz.show_correct_answers_at.should be_nil
       quiz.hide_correct_answers_at.should be_nil
     end
+
+    it "doesn't consider dates when one_time_results is on" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true,
+        show_correct_answers_at: 10.minutes.from_now,
+        one_time_results: false
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+
+      quiz.update_attributes({ one_time_results: true })
+      quiz.show_correct_answers?(@user, submission).should be_true
+    end
   end
 
   context "permissions" do
