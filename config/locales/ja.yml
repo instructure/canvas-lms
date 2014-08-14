@@ -279,7 +279,7 @@ ja:
       limited: 削除されたオブジェクトは指定した日数によって制限されています;
     outcomes: 
       order: "順位: %{order}"
-    report_header_account_id: "アカウント ID"
+    report_header_account_id: account_id
     report_header_assessment_id: "アセスメント ID"
     report_header_assessment_question: アセスメントの質問
     report_header_assessment_question_id: "アセスメントの質問 ID"
@@ -288,9 +288,19 @@ ja:
     report_header_assignment_id: "課題 ID"
     report_header_assignment_title: 課題のタイトル
     report_header_assignment_url: "課題の URL"
+    report_header_associated_user_id: associated_user_id
     report_header_attempt: 試行
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_parent_id: canvas_parent_id
+    report_header_canvas_section_id: canvas_section_id
+    report_header_canvas_term_id: canvas_term_id
+    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: コース
-    report_header_course__id: "コース ID"
+    report_header_course__id: course_id
     report_header_course_id: "コース ID"
     report_header_course_name: コース名
     report_header_course_sis: "コース SIS"
@@ -298,34 +308,35 @@ ja:
     report_header_created_at: 作成日時
     report_header_current_score: 現在のスコア
     report_header_email: 電子メール
-    report_header_end__date: 終了日
+    report_header_end__date: end_date
     report_header_end_date: 終了日
     report_header_enrollment_state: 登録状態
     report_header_final_score: 最終的なスコア
-    report_header_first_name: 名
-    report_header_group_id: "グループ ID"
+    report_header_first_name: first_name
+    report_header_group_id: group_id
     report_header_id: ID
     report_header_last_access_at: 最終アクセス日時
     report_header_last_ip: "前回の IP"
-    report_header_last_name: 姓
+    report_header_last_name: last_name
     report_header_learning_outcome_id: "学習成果 ID"
     report_header_learning_outcome_name: 学習成果名
-    report_header_login_id: "ログイン ID"
-    report_header_long__name: 長い名前
+    report_header_login_id: login_id
+    report_header_long__name: long_name
     report_header_long_name: 長い名前
     report_header_name: 名前
     report_header_outcome_score: 成果のスコア
+    report_header_parent_account_id: parent_account_id
     report_header_role: 役割
     report_header_section: セクション
-    report_header_section__id: "セクション ID"
+    report_header_section__id: section_id
     report_header_section_id: "セクション ID"
     report_header_section_name: セクション名
     report_header_section_sis: "セクション SIS"
     report_header_section_sis_id: "セクション SIS ID"
-    report_header_short__name: 短い名前
+    report_header_short__name: short_name
     report_header_short_name: 短い名前
     report_header_sis_id: "SIS ID"
-    report_header_start__date: 開始日
+    report_header_start__date: start_date
     report_header_start_date: 開始日
     report_header_status: 状況
     report_header_student_id: "受講生 ID"
@@ -335,13 +346,14 @@ ja:
     report_header_submission_date: 提出日
     report_header_submission_score: 提出物のスコア
     report_header_term: 期間
-    report_header_term__id: "期間 ID"
+    report_header_term__id: term_id
     report_header_term_id: "期間 ID"
     report_header_term_sis: "期間 SIS"
-    report_header_user__id: "ユーザ ID"
+    report_header_user__id: user_id
     report_header_user_id: "ユーザ ID"
     report_header_user_name: ユーザ名
     report_header_user_sis_id: "ユーザ SIS ID"
+    report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "レポート: %{files}"
     student: 
@@ -13592,7 +13604,7 @@ ja:
       n_correct: 正解数
       n_incorrect: 不正解数
       name: 名前
-      root_account: "ルート アカウント"
+      root_account: root_account
       score: スコア
       section: セクション
       section_id: section_id
