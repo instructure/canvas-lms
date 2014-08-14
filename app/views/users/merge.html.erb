@@ -1,13 +1,5 @@
 <% content_for :page_title do %><%= t('titles.merge_accounts', 'Merge User Accounts') %><% end %>
 
-<% content_for :page_header do %>
-  <h1><%= t('titles.merge_accounts', 'Merge User Accounts') %></h1>
-<% end %>
-
-<% content_for :page_subhead do %>
-  <h2><%= @current_user.name %></h2>
-<% end %>
-
 <div style="width: 500px; margin-left: auto; margin-right: auto; margin-top: 10px;">
   <h2><%= t('titles.merge_accounts', 'Merge User Accounts') %></h2>
   <p><%= t('merge_definition', "For one reason or another you may end up with two logins instead of just
