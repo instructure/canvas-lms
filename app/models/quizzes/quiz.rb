@@ -374,8 +374,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def restrict_answers_for_concluded_course?
     course = self.context
-    concluded = course.conclude_at && course.conclude_at < Time.now
-    concluded && course.root_account.settings[:restrict_quiz_questions]
+    course.soft_concluded? && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions

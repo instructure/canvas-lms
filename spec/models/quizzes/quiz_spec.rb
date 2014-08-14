@@ -1363,37 +1363,51 @@ describe Quizzes::Quiz do
   end
 
   describe "#restrict_answers_for_concluded_course?" do
-    it "returns true if course has concluded and account setting is true" do
-      acct = Account.new
-      acct.settings[:restrict_quiz_questions] = true
+    let(:account){Account.new}
+    let(:enrollment_term){EnrollmentTerm.new}
+    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term)}
+    let(:quiz){Quizzes::Quiz.new(context: course)}
 
-      context = Course.new(:conclude_at => 10.minutes.ago)
-      context.stubs(:root_account => acct)
+    before {account.settings[:restrict_quiz_questions] = restrict_quiz_settings}
+    before {enrollment_term.stubs(root_account: account)}
+    before {course.stubs(root_account: account)}
 
-      quiz = Quizzes::Quiz.new(:context => context)
-      quiz.restrict_answers_for_concluded_course?.should be_true
+    context 'When account setting is true' do
+      let(:restrict_quiz_settings){true}
+
+      context 'and the course has concluded' do
+        let(:conclude_at){10.minutes.ago}
+
+        it "should be true" do
+          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+        end
+      end
+
+      context 'and the course has not concluded' do
+        let(:conclude_at){10.minutes.from_now}
+
+        it "should be false" do
+          expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
+        end
+      end
+
+      context 'and the course does not have a conclude_at date but has a concluded enrollment_term' do
+        let(:enrollment_term){EnrollmentTerm.new(end_at: 10.minutes.ago)}
+        let(:conclude_at){nil}
+
+        it "should be true" do
+          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+        end
+      end
     end
 
-    it "returns false if course has not concluded" do
-      acct = Account.new
-      acct.settings[:restrict_quiz_questions] = true
+    context 'When account setting is false and the course has concluded' do
+      let(:restrict_quiz_settings){false}
+      let(:conclude_at){10.minutes.ago}
 
-      context = Course.new(:conclude_at => 10.minutes.from_now)
-      context.stubs(:root_account => acct)
-
-      quiz = Quizzes::Quiz.new(:context => context)
-      quiz.restrict_answers_for_concluded_course?.should be_false
-    end
-
-    it "returns false if account setting is false" do
-      acct = Account.new
-      acct.settings[:restrict_quiz_questions] = false
-
-      context = Course.new(:conclude_at => 10.minutes.ago)
-      context.stubs(:root_account => acct)
-
-      quiz = Quizzes::Quiz.new(:context => context)
-      quiz.restrict_answers_for_concluded_course?.should be_false
+      it "should be false" do
+        expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
+      end
     end
   end
 
