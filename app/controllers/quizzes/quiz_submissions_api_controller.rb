@@ -203,10 +203,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # Start taking a Quiz by creating a QuizSubmission which you can use to answer
   # questions and submit your answers.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
-  # @argument preview [Optional, Boolean]
+  # @argument preview [Boolean]
   #   Whether this should be a preview QuizSubmission and not count towards
   #   the user's course record. Teachers only.
   #
@@ -241,14 +241,14 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # answered, provide comments for the student about their answer(s), or simply
   # fudge the total score by a specific amount of points.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission that should be updated. This
   #   attempt MUST be already completed.
   #
-  # @argument fudge_points [Optional, Float]
+  # @argument fudge_points [Float]
   #   Amount of positive or negative points to fudge the total score by.
   #
-  # @argument questions [Optional, Hash]
+  # @argument questions [Hash]
   #   A set of scores and comments for each question answered by the student.
   #   The keys are the question IDs, and the values are hashes of `score` and
   #   `comment` entries. See {Appendix: Manual Scoring} for more on this
@@ -312,16 +312,16 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # the quiz submission has been marked as complete, no further modifications
   # will be allowed.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission that should be completed. Note
   #   that this must be the latest attempt index, as earlier attempts can not
   #   be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when this Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # <b>Responses</b>

@@ -109,16 +109,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #
   # Provide or update an answer to one or more QuizQuestions.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # @argument quiz_questions [Array]
@@ -177,16 +177,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # Set a flag on a quiz question to indicate that you want to return to it
   # later.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # @example_request
@@ -206,16 +206,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # Remove the flag that you previously set on a quiz question after you've
   # returned to it.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # @example_request

@@ -104,7 +104,7 @@ class Quizzes::QuizReportsController < ApplicationController
   #
   # Returns a list of all available reports.
   #
-  # @argument includes_all_versions [Optional, Boolean]
+  # @argument includes_all_versions [Boolean]
   #   Whether to retrieve reports that consider all the submissions or only
   #   the most recent. Defaults to false, ignored for item_analysis reports.
   #
@@ -129,14 +129,14 @@ class Quizzes::QuizReportsController < ApplicationController
   # generated report matches the arguments and is still current (i.e.
   # there have been no new submissions), it will be returned.
   #
-  # @argument quiz_report[report_type] [String, "student_analysis"|"item_analysis"]
+  # @argument quiz_report[report_type] [Required, String, "student_analysis"|"item_analysis"]
   #   The type of report to be generated.
   #
-  # @argument quiz_report[includes_all_versions] [Optional, Boolean]
+  # @argument quiz_report[includes_all_versions] [Boolean]
   #   Whether the report should consider all submissions or only the most
   #   recent. Defaults to false, ignored for item_analysis.
   #
-  # @argument include [Optional, String[], "file"|"progress"]
+  # @argument include [String[], "file"|"progress"]
   #   Whether the output should include documents for the file and/or progress
   #   objects associated with this report. (Note: JSON-API only)
   #
@@ -169,7 +169,7 @@ class Quizzes::QuizReportsController < ApplicationController
   #
   # Returns the data for a single quiz report.
   #
-  # @argument include [Optional, String[], "file"|"progress"]
+  # @argument include [String[], "file"|"progress"]
   #   Whether the output should include documents for the file and/or progress
   #   objects associated with this report. (Note: JSON-API only)
   #
