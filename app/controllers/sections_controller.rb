@@ -85,7 +85,7 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [Optional, String, "students"|"avatar_url"]
+  # @argument include[] [String, "students"|"avatar_url"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
@@ -110,13 +110,13 @@ class SectionsController < ApplicationController
   # @argument course_section[name] [String]
   #   The name of the section
   #
-  # @argument course_section[sis_section_id] [Optional, String]
+  # @argument course_section[sis_section_id] [String]
   #   The sis ID of the section
   #
-  # @argument course_section[start_at] [Optional, DateTime]
+  # @argument course_section[start_at] [DateTime]
   #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
   #
-  # @argument course_section[end_at] [Optional, DateTime]
+  # @argument course_section[end_at] [DateTime]
   #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   #
   # @returns Section

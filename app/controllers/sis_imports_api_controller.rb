@@ -187,7 +187,7 @@ class SisImportsApiController < ApplicationController
   # For more information on the format that's expected here, please see the
   # "SIS CSV" section in the API docs.
   #
-  # @argument import_type [Optional, String]
+  # @argument import_type [String]
   #   Choose the data format for reading SIS data. With a standard Canvas
   #   install, this option can only be 'instructure_csv', and if unprovided,
   #   will be assumed to be so. Can be part of the query string.
@@ -225,34 +225,34 @@ class SisImportsApiController < ApplicationController
   #         -H "Authorization: Bearer <token>" \
   #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
-  # @argument extension [Optional,String]
+  # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
   #   distinguish between zip, xml, csv, and other file format extensions that
   #   would usually be provided with the filename in the multipart post request
   #   scenario. If not provided, this value will be inferred from the
   #   Content-Type, falling back to zip-file format if all else fails.
   #
-  # @argument batch_mode [Optional,Boolean]
+  # @argument batch_mode [Boolean]
   #   If set, this SIS import will be run in batch mode, deleting any data
   #   previously imported via SIS that is not present in this latest import.
   #   See the SIS CSV Format page for details.
   #
-  # @argument batch_mode_term_id [Optional,String]
+  # @argument batch_mode_term_id [String]
   #   Limit deletions to only this term. Required if batch mode is enabled.
   #
-  # @argument override_sis_stickiness [Optional,Boolean]
+  # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
   #   when something changes in the UI apart from the SIS, that field gets
   #   "stuck." In this way, by default, SIS imports do not override UI changes.
   #   If this field is present, however, it will tell the SIS import to ignore
   #   "stickiness" and override all fields.
   #
-  # @argument add_sis_stickiness [Optional,Boolean]
+  # @argument add_sis_stickiness [Boolean]
   #   This option, if present, will process all changes as if they were UI
   #   changes. This means that "stickiness" will be added to changed fields.
   #   This option is only processed if 'override_sis_stickiness' is also provided.
   #
-  # @argument clear_sis_stickiness [Optional,Boolean]
+  # @argument clear_sis_stickiness [Boolean]
   #   This option, if present, will clear "stickiness" from all fields touched
   #   by this import. Requires that 'override_sis_stickiness' is also provided.
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will

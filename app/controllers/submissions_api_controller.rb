@@ -285,28 +285,28 @@ class SubmissionsApiController < ApplicationController
   # must have permission to manage grades in the appropriate context (course or
   # section).
   #
-  # @argument comment[text_comment] [Optional, String]
+  # @argument comment[text_comment] [String]
   #   Add a textual comment to the submission.
   #
-  # @argument comment[group_comment] [Optional, Boolean]
+  # @argument comment[group_comment] [Boolean]
   #   Whether or not this comment should be sent to the entire group (defaults
   #   to false). Ignored if this is not a group assignment or if no text_comment
   #   is provided.
   #
-  # @argument comment[media_comment_id] [Optional, String]
+  # @argument comment[media_comment_id] [String]
   #   Add an audio/video comment to the submission. Media comments can be added
   #   via this API, however, note that there is not yet an API to generate or
   #   list existing media comments, so this functionality is currently of
   #   limited use.
   #
-  # @argument comment[media_comment_type] [Optional, String, "audio"|"video"]
+  # @argument comment[media_comment_type] [String, "audio"|"video"]
   #   The type of media comment being added.
   #
-  # @argument comment[file_ids][] [Optional,Integer]
+  # @argument comment[file_ids][] [Integer]
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument submission[posted_grade] [Optional, String]
+  # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
   #   fields on the submission record. This parameter can be passed in a few
   #   different formats:
@@ -336,7 +336,7 @@ class SubmissionsApiController < ApplicationController
   #   will only be accepted if the grade equals one of those two values.
   #
   #
-  # @argument rubric_assessment [Optional, RubricAssessment]
+  # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
   #   format is, for each row in the rubric:
