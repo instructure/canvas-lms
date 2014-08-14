@@ -1,14 +1,16 @@
 <div class="row-fluid">
   <div class="span4">
-    <a href="#"
-       class="icon-mini-arrow-right element_toggler"
+    <span
+       class="element_toggler"
        aria-controls="{{id}}-details"
        aria-expanded="false"
-       role="button">
+       role="button"
+       tabindex="0">
        <span class="screenreader-only">
-         {{#t "toggle_feature_details"}}Toggle feature details{{/t}}
+         {{#t "toggle_feature_details"}}Toggle feature details for {{title}} {{/t}}
        </span>
-    </a>
+       <i class="icon-mini-arrow-right"></i>
+    </span>
     <span class="feature-title">{{title}}</span>
 
     {{#each labels}}
@@ -72,7 +74,7 @@
 
 <div class="feature-details row-fluid" id="{{id}}-details">
   <div class="span10">
-    <p class="feature-description">
+    <p tabindex="0" class="feature-description">
       {{#if description}}
         {{description}}
       {{else}}
