@@ -74,25 +74,25 @@ class Quizzes::QuizExtensionsController < ApplicationController
   # @argument user_id [Required, Integer]
   #   The ID of the user we want to add quiz extensions for.
   #
-  # @argument extra_attempts [Optional, Integer]
+  # @argument extra_attempts [Integer]
   #   Number of times the student is allowed to re-take the quiz over the
   #   multiple-attempt limit. This is limited to 1000 attempts or less.
   #
-  # @argument extra_time [Optional, Integer]
+  # @argument extra_time [Integer]
   #   The number of extra minutes to allow for all attempts. This will
   #   add to the existing time limit on the submission. This is limited to
   #   10080 minutes (1 week)
   #
-  # @argument manually_unlocked [Optional, Boolean]
+  # @argument manually_unlocked [Boolean]
   #   Allow the student to take the quiz even if it's locked for
   #   everyone else.
   #
-  # @argument extend_from_now [Optional, Integer]
+  # @argument extend_from_now [Integer]
   #   The number of minutes to extend the quiz from the current time. This is
   #   mutually exclusive to extend_from_end_at. This is limited to 1440
   #   minutes (24 hours)
   #
-  # @argument extend_from_end_at [Optional, Integer]
+  # @argument extend_from_end_at [Integer]
   #   The number of minutes to extend the quiz beyond the quiz's current
   #   ending time. This is mutually exclusive to extend_from_now. This is
   #   limited to 1440 minutes (24 hours)
