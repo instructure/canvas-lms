@@ -17,6 +17,7 @@ config = {
 # RedisSessionStore, and EncryptedCookieStore)
 config[:expire_after] ||= 1.day
 config[:expires] = nil
+config[:logger] = Rails.logger
 session_store = config.delete(:session_store).to_sym
 
 case session_store
