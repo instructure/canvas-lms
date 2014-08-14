@@ -240,7 +240,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions_as_object.map { |q| q[:points_possible].to_i }.compact.sum || 0
+    self.questions_as_object.map { |q| q[:points_possible].to_f }.compact.sum || 0
   end
 
   def questions
