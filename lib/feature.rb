@@ -208,17 +208,6 @@ END
       beta: true,
       development: true
     },
-    'quiz_stats' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
-      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
-When Draft State is allowed/on, this enables the new quiz statistics page for an account.
-END
-      applies_to: 'Course',
-      state: 'allowed',
-      development: true,
-      beta: true
-    },
     'quiz_moderate' =>
     {
       display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
