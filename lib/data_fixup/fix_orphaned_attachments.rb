@@ -3,7 +3,8 @@ module DataFixup
 
     def self.run
       @new_roots = Set.new
-      Shackles.activate(:slave) do
+      env = Shackles.environment == :deploy ? :deploy : :slave
+      Shackles.activate(env) do
         scope = Attachment.
           where('root_attachment_id IS NOT NULL AND
             NOT EXISTS (SELECT id
