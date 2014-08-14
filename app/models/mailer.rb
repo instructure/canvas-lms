@@ -43,14 +43,21 @@ class Mailer < ActionMailer::Base
   end
 
   private
+  def quoted_address(display_name, address)
+    addr = Mail::Address.new(address)
+    addr.display_name = display_name
+    addr.format
+  end
+
   def from_mailbox(message)
-    "#{message.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">"
+    quoted_address(message.from_name || HostUrl.outgoing_email_default_name, HostUrl.outgoing_email_address)
   end
 
   def reply_to_mailbox(message)
     address = IncomingMail::ReplyToAddress.new(message).address
     return address unless message.reply_to_name.present?
     return nil unless address.present?
-    "#{message.reply_to_name} <#{address}>"
+
+    quoted_address(message.reply_to_name, address)
   end
 end
