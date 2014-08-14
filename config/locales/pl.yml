@@ -749,7 +749,7 @@ pl:
       account_reports: 
         default: 
           public_courses: 
-            text: "W raporcie przedstawiono wszystkie publiczne kursy, które nie zostały skasowane dla danego semestru. Wynikowy plik csv będzie zawierał jeden rząd na kurs i zostanie w nim wyświetlony identyfikator kursu, identyfikator systemu sis kursu, skrócona nazwa kursu, nazwa kursu, data rozpoczęcia i  zakończenia kursu."
+            text: "W raporcie przedstawiono wszystkie publiczne kursy, które nie zostały skasowane dla danego semestru. Wynikowy plik csv będzie zawierał jeden rząd na kurs i zostaną tam wyświetlone następujące informacje: identyfikator kursu, identyfikator systemu sis kursu, skrócona nazwa kursu, nazwa kursu, data rozpoczęcia i  zakończenia kursu."
     quota_integer_required: "Liczba całkowita jest wymagana"
     quota_must_be_positive: "Wartość musi być dodatnia"
     quota_not_updated: "Przydział nie został zaktualizowany"
@@ -2123,6 +2123,8 @@ pl:
         originality_report_visible_after_due_date: "Po terminie dostarczenia"
         originality_report_visible_after_grading: "Po ocenieniu zadania"
         originality_report_visible_immediately: Natychmiast
+        settings_exclude_fewer_than_count: "Mniej niż %h{wordsInput} słów"
+        settings_exclude_less_than_percent: "Mniej niż %h{percentInput} dokumentu"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Usuń zadanie"
@@ -2200,7 +2202,7 @@ pl:
   better_file_browsing_description: |-
       Nowy, prostszy, bardziej przyjazny użytkownikowi interfejs przeglądania. Po włączeniu go na poziomie kursu
       wszyscy użytkownicy tego kursu będą mieli wyświetlony przed sobą nowy interfejs. Aby go wyświetlić, gdy inna osoba
-      przechodzi do strony plików osobistych ('/files'), konieczne jest włączenie go dla konta, do którego jest on przypisany.
+      przechodzi do strony plików osobistych ('/files'), konieczne jest włączenie go dla konta odpowiedniego użytkownika.
   big_blue_button_conference: 
     conference_is_recorded: "Ta konferencja jest nagrywana."
     recording_setting: Nagrywanie
@@ -3051,7 +3053,7 @@ pl:
     buttons: 
       process: "Przetwórz dane"
     errors: 
-      couldnt_create: "Eksportowanie kursu nie powiodło się."
+      couldnt_create: "Eksportowanie zawartości nie powiodło się."
       error: "Podczas eksportowania kursu wystąpił błąd.  Powiadom o tym administratora systemu i podaj mu poniższy identyfikator eksportu: \"%{code}\""
       not_found: "Eksport nie istnieje"
     index: 
@@ -4202,8 +4204,8 @@ pl:
       copied_to: "Skopiowano do"
       corrupted: "Informacje szczegółowe nie są dostępne"
       created: Utworzono
-      deleted: Usunięty
-      published: Opublikowane
+      deleted: Usunięto
+      published: Opublikowano
       reset_from: "Resetuj od"
       reset_to: "Resetuj do"
       restored: Przywrócone
@@ -4404,7 +4406,7 @@ pl:
               
               **Zaloguj się** lub ***zarejestruj***, aby zgłosić klasę.
         files: "Zakładka Pliki służy do udostępniania materiałów związanych z zajęciami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przesyłania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
-        home2: "Podczas odwiedzin tego kursu będzie widać tę stronę. Można ustawić, aby widoczna była aktywność, lista modułów kursu, program kursu lub inna strona. Strumień aktywności kursu jest ustawiony domyślnie. Aby zmienić ustawienie, kliknij %{choose_home_page}."
+        home2: "Podczas odwiedzin tego kursu będzie widać tę stronę. Można ustawić, aby widoczne były następujące elementy: strumień aktywności, lista modułów kursu, program kursu lub inna strona. Strumień aktywności kursu jest ustawiony domyślnie. Aby zmienić ustawienie, kliknij %{choose_home_page}."
         import: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
         navigation: "Domyślnie wszystkie łącza są aktywne dla kursu. Uczestnicy nie będą widzieć łączy do sekcji bez zawartości. Na przykład, jeśli nie utworzono żadnych testów, nie wyświetlą się łącza do testów. Możesz posortować i dezaktywować łącza, jeśli nie chcesz, aby uczestnicy mieli dostęp do określonych obszarów kursu."
         publish: 
@@ -4551,7 +4553,7 @@ pl:
         duplicates_removed: "Niektóre duplikaty zostały usunięte"
         email: "Adres e-mail"
         email_field_label: "Wpisz adresy e-mail (oddzielone przecinkiem) użytkowników, których chcesz dodać"
-        email_field_place_holder: "\"Przykładowy uczestnik &lt;student@example.com&gt;, \"Nazwisko, Imię\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
+        email_field_place_holder: "\"Przykładowy uczestnik\" &lt;student@example.com&gt;, \"Nazwisko, Imię\" &lt;imienazwisko@przyklad.com&gt;, jedynieAdresEmail@przyklad.com"
         example_formats: "Przykłady: użytkownik@przyklad.pl, \"Imię Nazwisko\" &lt;użytkownik@przyklad.pl&gt;, \"Nazwisko, Imię\" &lt;użytkownik@przyklad.pl&gt;"
         form_instructions: "Poniżej wpisz lub wklej listę adresów e-mail:"
         go_back: "Rozpocznij ponownie"
@@ -4608,7 +4610,7 @@ pl:
         no_people_found: "Nie znaleziono osób"
         role: Rola
         section: Sekcja
-        total_activity: "Całkowita aktywność"
+        total_activity: "Łączna aktywność"
         you_can_search_by: "Możesz wyszukiwać według:"
       section: 
         remove_user_from_course_section: "Usuń użytkownika z %{name} "
@@ -4622,7 +4624,7 @@ pl:
         add_section: "Dodaj sekcję"
         move_course: "Przenieś kurs"
         update_course: "Aktualizuj szczegółowe informacje dot. kursu"
-      course_conclude_at_warning_message: "Koniec kursu ustawiono na północ, co oznacza, że dzień poprzedzający będzie ostatnim dniem aktywności kursu"
+      course_conclude_at_warning_message: "Koniec kursu ustawiono na północ, co oznacza, że dzień poprzedzający będzie ostatnim dniem aktywności kursu."
       course_conclude_at_warning_title: "Zakończenie kursu o północy"
       course_open_enrollment: "Ten kurs ma otwarte zapisy. Uczestnicy mogą się samodzielnie zapisywać na kurs, jeśli przekażesz im ten adres URL: *%{url}*. Mogą także zapisać się pod adresem: *%{url2}*, używając tego kodu: *%{code}*"
       course_open_enrollment_without_code: "Ten kurs ma otwarte zapisy. Uczestnicy mogą się samodzielnie zapisywać na kurs, jeśli przekażesz im ten adres URL: *%{url}*"
@@ -4774,7 +4776,7 @@ pl:
         headings: 
           set_layout: "Ustaw układ strony głównej"
         labels: 
-          select_content: "Wybierz zawartość, którą chciałbyś wyświetlić na tej stronie głównej."
+          select_content: "Wybierz zawartość, którą chcesz wyświetlić na tej stronie głównej."
         options: 
           assignments: "Lista zadań"
           custom_page: "Strony, pierwsza strona"
@@ -5383,7 +5385,7 @@ pl:
         other: "%{count} wiadomości"
       separated_conversation_notice: "Rozmowa w tym temacie została rozdzielona na osobne grupy. Poniżej znajdują się pogrupowane tematy, do których masz dostęp."
     group_discussion: 
-      separated_conversation_notice: "Ponieważ jest to dyskusja grupowa, każda grupa przprowadza konwersację na ten temat. Tutaj znajdują się te, do których masz dostęp:"
+      separated_conversation_notice: "Ponieważ jest to dyskusja grupowa, każda grupa przeprowadza konwersację na ten temat. Tutaj znajdują się te, do których masz dostęp:"
     group_discussion_locked: "Uczestnicy już przesłali zadania do tej dyskusji, więc nie można już zmienić ustawień grupy."
     group_discussion_title: "Dyskusja w grupie"
     index: 
@@ -5976,7 +5978,7 @@ pl:
       odd: "musi być nieparzyste"
       too_long: "jest za długie (maksymalna liczba znaków to %{count})"
       too_short: "jest za krótkie (minimalna liczba znaków to %{count})"
-      wrong_length: "ma nieprawidłową długość (powinno być %{count} znaki(-ów))"
+      wrong_length: "ma nieprawidłową długość (powinna być następująca liczba znaków: %{count})"
     no_attached_file: "Musisz dołączyć co najmniej jeden plik w tym zadaniu"
     registration_incomplete: "Musisz potwierdzić adres email zanim będziesz mógł przeglądać tę stronę."
     required: Wymagany
@@ -6116,8 +6118,8 @@ pl:
       load_tool_button: "Załaduj %{tool}"
       load_tool_new_tab_button: "Załaduj %{tool} w nowym oknie"
       new_tab: "Narzędzie musi zostać załadowane w nowym oknie przeglądarki"
-      new_tab_expired: "Wygasła sesja tego narzędzia. Ponownie załaduj stronę, uzyskać dostęp do narzędzia"
-      new_tab_loaded: "Ładowane narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
+      new_tab_expired: "Wygasła sesja tego narzędzia. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia"
+      new_tab_loaded: "Ładowanie narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
     tool_show: 
       tool_insecure_warning: "Próbujesz połączyć się z niezabezpieczoną zawartością z poziomu zabezpieczonej strony (canvas). W niektórych przeglądarkach otwarcie tej zawartości może nie być możliwe."
       tool_load_failure: "Wygląda, że treść nie może się załadować. Możesz użyć tego przycisku, aby spróbować ją załadować w nowej karcie. "
@@ -6424,7 +6426,7 @@ pl:
       warning: Ostrzeżenie
   grade_export_title: "Eksport ocen"
   grade_summary: 
-    graph_title: "Średni %{mean}, Wysoki %{high}, Niski %{low}"
+    graph_title: "Średnia %{mean}, Wysoka %{high}, Niska %{low}"
     outcome: 
       alignment_count: "*%{count}* Wyrównań"
   gradebook: 
@@ -7406,11 +7408,11 @@ pl:
   ic_actions: 
     manage: zarządzaj
   icons: 
-    discussion_submission: "Przesyłane zadanie w formie dyskusji"
+    discussion_submission: "Przesłane zadanie w formie dyskusji"
     file_upload_submission: "Przesłane zadanie w formie pliku"
-    media_submission: "Przesyłane zadanie w formie multimedialnej"
+    media_submission: "Przesłane zadanie w formie multimedialnej"
     online_url_submission: "Przesłane zadanie w formie adresu URL on-line"
-    quiz_submission: "Przesyłane zadanie w formie testu"
+    quiz_submission: "Przesłane zadanie w formie testu"
     text_entry_submission: "Przesłane zadanie w formie wpisu"
   images: 
     error_checking_color: "Błąd w trakcie sprawdzania koloru obrazu"
@@ -7742,9 +7744,9 @@ pl:
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
   lti: 
     lti_message: 
-      load_tool_new_tab_button: "Załaduj %{tool} w nowym oknie"
+      load_tool_new_tab_button: "Załaduj narzędzie %{tool} w nowym oknie"
       new_tab: "Narzędzie musi zostać załadowane w nowym oknie przeglądarki"
-      new_tab_expired: "Wygasła sesja tego narzędzia. Ponownie załaduj stronę, uzyskać dostęp do narzędzia"
+      new_tab_expired: "Wygasła sesja dla tego narzędzia. Ponownie załaduj stronę, uzyskać dostęp do narzędzia"
       new_tab_loaded: "Ładowane narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
   lti2: 
     register_tool: "Zarejestruj narzędzie"
@@ -10049,7 +10051,7 @@ pl:
         ⏎
         Rejestracja zadania uczestnika
     student_appointment_display: "Zapisy na spotkania uczestników"
-    submission_comment_description: "Komentarz do przesyłanego zadania"
+    submission_comment_description: "Komentarz do przesłanego zadania"
     submission_comment_display: "Komentarz do przesłanego zadania"
   notification_preferences: 
     communication: 
@@ -10136,6 +10138,7 @@ pl:
   outcome_path_result: "%{path} wynik"
   outcome_results: 
     outcomes_filename: Wyniki
+  outcome_results_title: Wyniki
   outcomes: 
     account_standards: "Standardy konta"
     account_standards_description: "Po lewej stronie można przejrzeć standardy, które przypisała Ci instytucja w celu korzystania z nich  na kursach."
@@ -10190,8 +10193,10 @@ pl:
           manage: 
             description: "*Wyniki są tu tworzone, aby śledzić poziom biegłości podczas kursu. Aby rozpocząć, sprawdź pasek menu na górze. Kliknij przycisk Nowy, aby utworzyć nowy wynik lub przycisk Nowa grupa w celu utworzenia nowej grupy, w której będzie można organizować wyniki. Przycisk Znajdź umożliwia korzystanie z wyników, które zostały utworzone przez instytucję. Po utworzeniu i użyciu wyników będziesz w stanie skorzystać z panelu po lewej stronie w celu odnajdywania swoich wyników. Możesz przeciągać i upuszczać wyniki między różnymi poziomami, aby utworzyć strukturę.**System Canvas umożliwia również dodawanie wyników do rubryk oceniania, można więc szacować biegłość podczas oceniania zadań. Po ustawieniu wyników kliknij Zarządzaj rubrykami, aby rozpocząć korzystanie z wyników do oceniania.*"
             title: "Ustawianie wyników"
+    mastery: Biegłość
     mastery_error: "Musi być większe lub równe 0"
     missing_outcome: "Nie można było odnaleźć wyniku nauczania"
+    near: "W okolicach biegłości"
     new_outcome: "Nowy wynik"
     new_outcome_group: "Nowa grupa wyników"
     outcome: 
@@ -10213,6 +10218,7 @@ pl:
       criterion_dialog: "W kryteriach ocen zadania można uwzględnić wyniki nauczania, dzięki czemu w łatwy sposób można ocenić wyniki dominujące dla określonych zadań. Jeśli określany jest wynik nauczania, powinno zostać również określone kryterium, które zostanie użyte do tworzenia kryteriów ocen zadania. Należy określić tyle kryteriów ocen, ile jest potrzebne oraz podać próg punktowy, który zostanie wykorzystany do określenia, czy dany wynik jest dominujący."
       criterion_info_link: "Kliknij, aby dowiedzieć się więcej o punktacji dla danego kryterium"
       description: "Opisz ten wynik"
+      display_name: "Łatwa do zapamiętania nazwa (opcjonalnie)"
       mastery: "Biegłość wynosi"
       points: "%{points_possible} punkty"
       title: "Nazwij ten wynik"
@@ -10229,6 +10235,7 @@ pl:
       attempt_info: "próba #%{attempt_number}, %{attempt_date}"
       outcome_mastered: uzyskano
       scoring: "%{points} na %{possible_points} możliwych"
+    remedial: "Wymagający poprawy"
     show: 
       no_aligned_items: "Brak elementów uszeregowanych"
       no_artifacts: "Brak artefaktów"
@@ -10241,6 +10248,7 @@ pl:
     titles: 
       find_outcomes: "Wyszukaj wyniki"
     top_level: "%{context} Górny poziom"
+    undefined: Nierozpoczęto
     user_outcome_results: 
       artifacts: 
         few: "%{count} artefakty"
@@ -10316,8 +10324,10 @@ pl:
     view_more_link: "Zobacz więcej"
   paginated_view: 
     loading_more_results: "Trwa ładowanie większej liczby wyników"
+  pasco_user_notes_title: "Notatki użytkownika"
   paypal: 
     exception: "Przepraszamy, wystąpił błąd, spróbuj później."
+  penn_harris_student_grade_title: "Oceny uczestnika Penn Harris"
   plugins: 
     academic_benchmark_importer: 
       description: "Umożliwi to zaimportowanie standardów Academic Benchmark do systemu Canvas."
@@ -10429,12 +10439,12 @@ pl:
     facebook_settings: 
       description: |-
           Konieczne będzie utworzenie [nowej aplikacji w portalu facebook.com](%{facebook_url}) i dodanie „Aplikacja w portalu Facebook” jako platformy.
-          Aby zapewnić prawidłowe działanie własnej aplikacji Facebook
+          Aby zapewnić prawidłowe działanie własnej aplikacji Facebook,
           należy wprowadzić poniższe ustawienia:
           
           * **Settings -- App on Facebook -- Canvas Page:** należy zanotować swój wybór (część po apps.facebook.com) i wprowadzić w poniższym formularzu
           * **Settings -- App on Facebook -- Canvas URL:** ustawiono na %{canvas_url}
-          * Po zapisaniu aplikacji, należy zanotować identyfikator aplikacji, token klienta i klucz tajny aplikacji
+          * Po zapisaniu aplikacji należy zanotować identyfikator aplikacji, token klienta i tajny klucz aplikacji
       domain_name: domena
       headers: 
         domain_settings: "Ustawienia domeny"
@@ -10663,6 +10673,17 @@ pl:
         access_key: "Klucz dostępu"
         api_url: "Api Url"
         secret_key: "Klucz tajny"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "Kurs jest wymagany."
+      validations: 
+        section_belongs_to_course: "Ta sekcja kursu nie należy do istniejącego kursu."
+    poll_submissions: 
+      validations: 
+        poll_choice_belongs_to_poll: "Ta sonda nie należy do istniejącej sondy."
+        poll_is_published: "Ta sesja sondy nie jest otwarta dla przesyłania zadań."
+        user_and_poll_session_uniqueness: "można przesłać jedynie jeden wybór na sesję sondy."
   post_grades_description: |-
       Wysyłanie ocen umożliwia nauczycielom przesyłanie ocen z powrotem do aktywnych systemów SIS: Powerschool,
       Aspire (SIS2000), JMC, systemu SIS z aktywną opcją SIS, która zatwierdza elementy SIF GradingCategory,
@@ -10708,6 +10729,7 @@ pl:
       unregister_service: "Czy na pewno chcesz wyrejestrować się z tej usługi?"
     crumb: "Profil użytkownika %{user}"
     crumbs: 
+      observees: Obserwowanie
       settings_frd: "Ustawienia użytkownika %{user}"
     done_resending: "Zrobione! Dostarczenie wiadomości może zająć kilka minut."
     email_select: 
@@ -10732,6 +10754,8 @@ pl:
       contact_confirmed: "Kontakt pomyślnie potwierdzony!"
       mfa_disabled: "Wieloskładnikowe uwierzytelnianie wyłączone"
       updated_profile: "Profil został pomyślnie zaktualizowany"
+    observees: 
+      page_title: "Obserwowani uczestnicy"
     please_select_an_option: "Wybierz opcję"
     profile: 
       access_token_description: "Tokeny dostępu mogą służyć do zezwalania innym aplikacjom na wykonywanie wywołań API w imieniu użytkownika. Można również generować tokeny i *korzystać z Otwartego API Canvas* do integracji systemu z innymi usługami."
@@ -10968,6 +10992,7 @@ pl:
     upload_file_view: 
       choose_a_picture: "wybierz zdjęcie"
       crop_instructions: "Aby przyciąć obraz, przeciągnij zaznaczenie, a następnie kliknij przycisk Zapisz znajdujący się poniżej. "
+  provisioning_title: Zastrzeganie
   pseudonym: 
     errors: 
       bad_credentials: "NIeprawidłowa nazwa użytkownika lub hasło"
@@ -11090,6 +11115,7 @@ pl:
       email_sent: "Wiadomość z potwierdzeniem została wysłana na adres %{email}, sprawdź, czy nie została uznana za spam"
       link_invalid: "Użyte łącze wygasło.  Jeśli nie możesz się zalogować, kliknij opcję \"Nie znasz swojego hasła?\", aby zresetować swoje hasło."
       password_changed: "Hasło zostało zmienione"
+  public_courses_title: "Kursy publiczne"
   publish_btn_module: 
     buttons: 
       publish: Publikuj
@@ -11206,6 +11232,8 @@ pl:
       payment_info: "Informacje o opłatach"
   qti_display: QTI
   qti_file_description: "Plik .zip z zawartością QTI"
+  qti_img_matching_question: "Zaimportowane pasujące pytanie zawiera obrazy po obu stronach, co nie jest obsługiwane"
+  qti_img_matching_question_distractors: "Zaimportowane pasujące pytanie zawiera obrazy w wyborze, nie można tego naprawić, ponieważ zawiera również fałszywe odpowiedzi"
   qti_name: "QTI Converter"
   qualified_locale: en-US
   question_answered: "Z udzieloną odpowiedzią"
@@ -11324,10 +11352,15 @@ pl:
       new: "Nowy:"
   quiz: 
     cancel: Anuluj
+    cant_take_unpublished_quiz: "Test można napisać dopiero, gdy zostanie opublikowany"
     cant_unpublish_when_students_submit: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
     delete: Usuń
     delete_quiz: "Usuń test"
+    no_more_allowed_quiz_attempts: "Nie możesz kolejny raz podejść do testu."
+    now_on_moderate: "Te informacje można teraz znaleźć w karcie Zarządzaj."
     quiz_regraded_your_score_not_affected: "Test został ponownie oceniony; wynik nie został zmieniony."
+    quiz_successfully_deleted: "Pomyślnie usunięto test!"
+    quiz_successfully_updated: "Pomyślnie zaktualizowano test!"
     regrade: 
       give_everyone_full_credit: "Wstaw wszystkim uczestnikom pełne zaliczenie za to pytanie."
       no_scores_reduced: "Przyznaj punkty za poprawną odpowiedź oraz poprzednie poprawne odpowiedzi (*wyniki nie zostaną zmniejszone*)"
@@ -11335,16 +11368,32 @@ pl:
       regrade_options: "Opcje ponownego oceniania *(w odniesieniu do uczestników, którzy już odpowiedzieli na to pytanie):*"
       some_scores_reduced: "Przydziel punkty jedynie za poprawną odpowiedź (*wyniki niektórych studentów mogą zostać zmniejszone*)"
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
+    regrade_count_affected: "Test został ponownie oceniony; nowy wynik odzwierciedla %{num} zmienionych pytań."
+    regrade_score_affected: "Ten test został oceniony ponownie; wynik został zmieniony."
+    resume_the_quiz: "Wznów test"
+    resume_the_survey: "Wznów ankietę"
     take_the_quiz: "Rozpocznij test"
     take_the_quiz_again: "Ponownie rozpocznij test"
     take_the_survey: "Wypełnij ankietę"
     take_the_survey_again: "Ponownie wypełnij ankietę"
+    there_are_no_files_to_download: "Brak plików do pobrania."
+    there_are_no_submissions_to_grade: "Brak przesłanych zadań do oceny."
+    time_limit_minutes: "%{limit} minut"
     warning: Ostrzeżenie
+    you_cannot_message_unpublished: "Nie można wysyłać komunikatów do uczestników do momentu opublikowania testu."
+  quiz_data_title: "Dane testu"
   quiz_extend_time: 
+    ending_time: "czas zakończenia"
     extend_time: "Wydłuż czas"
+    extensions_student: "Wydłuż czas dla %{student}"
+    extensions_successfully_added: "Pomyślnie dodano rozszerzenia"
     now: teraz
   quiz_extensions: 
+    everyone_gets_attempts: "każdy uczestnik otrzymuje już %{num}"
+    everyone_gets_time: "każdy uczestnik otrzymuje już %{num} minut"
+    extensions_num_students: "Rozszerzenia dla %{num} studentów"
     extensions_student: "Rozszerzenia dla uczestnika %{student}"
+    extensions_successfully_added: "Pomyślnie dodano rozszerzenia"
     student_extensions: "Rozszerzenia dla uczestnika"
   quiz_index_row: 
     cant_unpublish_when_students_submit: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
@@ -11352,8 +11401,21 @@ pl:
       delete_quiz: "Czy na pewno chcesz usunąć ten test?"
     delete_quiz: "Usuń test"
     edit_quiz: "Edytuj test"
+    points: 
+      few: "%{count} punkty"
+      one: "1 punkt"
+      other: "%{count} punktów"
+    questions: 
+      few: "%{count} pytania"
+      one: "1 pytanie"
+      other: "%{count} pytań"
   quiz_message_students: 
+    and_num_more_students: "oraz kolejnych %{num} uczestników"
+    message_not_sent_because_empty: "Nie wysłano wiadomości, ponieważ była pusta"
+    message_sent_successfully: "Pomyślnie wysłano wiadomość"
     message_students_who: "Wyślij wiadomość do uczestników, którzy..."
+    student_who_have_not_taken_the_quiz: "Uczestnicy, którzy nie podeszli do testu"
+    students_who_have_taken_the_quiz: "Uczestnicy, którzy podeszli do testu"
   quiz_model: 
     everyone: Wszyscy
     everyone_else: "Wszyscy pozostali"
@@ -11363,6 +11425,13 @@ pl:
     keep_latest: Najnowsze
     practice_quiz: "Test próbny"
     survey: Ankieta
+  quiz_moderate: 
+    change_extension_for: "Zmień rozszerzenie dla %{num} uczestników"
+    students_have_taken: "%{complete} z %{total} uczestników ukończyło ten test"
+  quiz_moderate_route: 
+    moderate: Zarządzaj
+  quiz_overview_route: 
+    overview: Przegląd
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Pobieranie %{report_name}"
@@ -11370,12 +11439,44 @@ pl:
       generated_at_date_time: "Wygenerowano %{dateAndTime}"
       generating_report_name: "Trwa generowanie raportu o nazwie %{report_name}..."
       item_analysis_not_available: "Analiza elementu nie jest dostępna w przypadku ankiet"
+  quiz_results_protected: "Wyniki tego testu są chronione i nie są widoczne dla uczestników."
+  quiz_results_protected_after_first_glimpse: "Wyniki tego testu są chronione, można je wyświetlić tylko raz bezpośrednio po przesłaniu zadania."
+  quiz_results_protected_until_last_attempt: "Wyniki tego testu są chronione i nie są widoczne dla studentów do momentu przesłania ostatniego podejścia."
   quiz_route: 
+    that_quiz_doesnt_exist: "Test nie istnieje"
     that_quiz_has_been_deleted: "Test został usunięty"
+  quiz_show: 
+    time_limit_minutes: "%{limit} minut"
   quiz_statistics: 
+    attempts: "Liczba prób: %{count} z %{total}"
+    correct_essay_student_ratio: "%{ratio}% uczestników uzyskało pełne zaliczenie za to pytanie."
+    correct_multiple_response_ratio: "%{ratio}% uczestników odpowiedziało poprawnie."
+    correct_response_ratio: "%{ratio}% uczestników poprawnie odpowiedziało na to pytanie."
+    discrimination_index_help_dialog_title: "Wykaz osób dyskryminowanych"
+    errors: 
+      stats_empty: 
+        header: "Brak wyświetlanych elementów w tym miejscu."
+        info: "Żaden z uczestników nie podszedł jeszcze do testu."
+      stats_too_large: 
+        header: "Zbyt duży ruch w tym miejscu."
+        info: "Test jest zbyt duży, aby go wyświetlić."
+    essay_score: "Wynik: %{score}"
+    generatable: "Nie wygenerowano wcześniej raportu."
+    generated: "Raport jest gotowy."
+    generated_at: "Wygenerowano %{date}"
+    generating: "Raport jest generowany..."
+    generation_failed: "Coś poszło nie tak, spróbuj ponownie później."
     item_analysis: "Analiza elementu"
     no_answer: "Brak odpowiedzi"
+    sort_by_discrimination_index: "Sortuj według dyskryminacji"
+    sort_by_position: "Sortuj według stanowiska"
+    stats_error: 
+      image_alt: "Statystyki testu nie są jeszcze dostępne."
     student_analysis: "Analiza uczestnika"
+    unknown: 
+      header: "Coś poszło nie tak."
+      info: "Pojawił się nieoczekiwany błąd."
+    unknown_answer: "Coś innego"
   quiz_statistics_route: 
     quiz_statistics: Statystyki
   quiz_statistics_title: "Statystyki testu"
@@ -11966,8 +12067,10 @@ pl:
           extra_attempts: "Dodatkowe próby"
           extra_time_per_attempt: "Dodatkowy czas na każdej z prób"
           manually_unlock: "Ustaw ręczne odblokowanie testu do kolejnej próby"
+          reset_has_seen_results: "Pozwól uczestnikom obejrzeć wyniki kolejny raz"
           started: Rozpoczęto
         minutes: minuty
+        moderate_page_title: "%{title}: Zarządzaj"
         page_title: "Zarządzaj testem"
         student_gets_extra_time: "*Uczestnik %{student_name}* **otrzymuje dodatkowe %{extra_time} minut na każdą z prób**"
         student_n: "Uczestnik %{n}"
@@ -12024,6 +12127,8 @@ pl:
         new_assignment: "Nowe zadanie"
         new_discussion: "Nowa dyskusja"
         one_question_at_a_time: "Wyświetlaj pytania po kolei"
+        one_time_results: "Tylko raz po każdej próbie"
+        only_visible_to_overrides_note: "Uwaga: ten test jest **jedynie** widoczny w sekcjach podanych poniżej:"
         points_possible: "Punkty %{n}"
         quiz_title: "Tytuł testu"
         quiz_type: "Typ testu"
@@ -12491,6 +12596,7 @@ pl:
   quizzes_route: 
     quizzes_route_title: Testy
   quizzez_submission_row: 
+    gets_extra_minutes: "otrzyma %{num} dodatkowych minut do każdej próby"
     unlimited: Nieograniczono
   re_upload_submissions_form: 
     buttons: 
@@ -12499,9 +12605,11 @@ pl:
     upload_info: "W przypadku wprowadzenia zmian do pobranych wcześniej plików z zadaniami należy spakować je ponownie i przekazać paczkę wraz z poniższym formularzem. Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania."
     upload_warning: "Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać."
   react_files: 
-    loading_more_results: "Trwa ładowanie większej liczby wyników"
+    loading_more_results: "Trwa ładowanie kolejnych wyników"
+    usage_details: "%{quota_used} z %{quota}"
   recent_student: 
     last_logged_in: "ostatnio zalogowani w %{last_login}"
+  recently_deleted_courses_title: "Ostatnio usunięte kursy"
   recipient_input: 
     context_search_placeholder: "Wprowadź nazwę, kurs lub grupę."
     context_search_title: "Nazwa, kurs lub grupa"
@@ -12518,6 +12626,7 @@ pl:
       few: "%{count} sekcje"
       one: "1 sekcja"
       other: "%{count} sekcji"
+  registrar_tile: "Raport kierownika"
   registration: 
     get_started: Rozpocznij
     incomplete_registration_warning: 
@@ -12554,6 +12663,7 @@ pl:
         email: "Adres e-mail"
         name: Nazwa
     welcome_to_canvas: "Witamy w systemie Canvas!"
+  reply_from_name: "%{name} za pośrednictwem powiadomień z systemu Canvas"
   retrieve_timeout: "nie można pobrać konfiguracji, serwer nie odpowiadał zbyt długo"
   role_override: 
     permission: 
@@ -12595,6 +12705,7 @@ pl:
       manage_students: "Dodaj uczestników do kursu/usuń uczestników z kursu"
       manage_user_logins: "Modyfikuj informacje szczegółowe logowania użytkowników"
       manage_user_notes: "Zarządzaj wpisami do dziennika wydziałowego"
+      manage_user_observers: "Zarządzaj obserwatorami dla użytkowników"
       manage_wiki: "Zarządzaj stronami Wiki ( dodaj / edytuj / usuń )"
       managed_jobs: "Zarządzaj zadaniami wykonywanymi w tle"
       moderate_form: "Moderuj dyskusje ( usuń / edytuj wpisy, blokuj tematy)"
@@ -12651,6 +12762,10 @@ pl:
     account_admin: "Administrator konta"
     new_role: 
       add: Dodaj
+      add_role: "Dodaj rolę"
+      add_role_label: "Dodaj rolę"
+      role_name: "Nazwa roli"
+      role_name_label: "Nazwa roli"
     permission_button: 
       rolebutton: 
         disable: Wyłącz
@@ -12659,6 +12774,9 @@ pl:
         enable_and_lock: "Uaktywnij i zablokuj"
         use_default: "Użyj domyślne"
     permissions: Uprawnienia
+    roles_override_index: 
+      account_roles: "Role konta"
+      course_roles: "Role kursu"
   roster: 
     delete_confirm: "Czy na pewno chcesz usunąć tego użytkownika?"
     error_sending_invitations: "Wystąpił błąd podczas wysyłania zaproszenia.  Spróbuj ponownie."
@@ -12728,6 +12846,8 @@ pl:
         are_you_sure_delete: "Czy na pewno chcesz usunąć te kryteria ocen?  Lokalizacje obecnie uzyskujące dostęp do kryteriów ocen nie stracą go, jednak nikt inny nie będzie mógł ich użyć."
         are_you_sure_remove: "Czy na pewno chcesz usunąć te kryteria ocen ze swojej listy?"
       remove_rubric: "Usuń te kryteria ocen z mojej listy"
+  safety_drill_title: "Planowanie szczegółów zabezpieczeń"
+  scantron_quiz_title: "Test Scantron"
   scribd: 
     upgrade_flash: "Halo, posiadasz starą wersję Adobe Flash Player. Aby używać iPaper (i masę innych rzeczy w sieci) musisz %{link_tag}pobrać najnowszy Flash player%{end_link}."
   search: 
@@ -13042,9 +13162,13 @@ pl:
           email: "Adres e-mail (opcjonalne)"
     event_list: 
       at_least_more_events: "jeszcze co najmniej %{count_of_events}"
+      at_least_more_events_one_week: "co najmniej o %{count_of_events} więcej w ubiegłym tygodniu"
+      at_least_more_events_two_weeks: "co najmniej o %{count_of_events} więcej w ubiegłych dwóch tygodniach"
       links: 
         view_calendar: "Pokaż kalendarz"
       more_events: "jeszcze %{count_of_events}"
+      more_events_one_week: "%{count_of_events} więcej w ubiegłym tygodniu"
+      more_events_two_weeks: "%{count_of_events} więcej w ubiegłym tygodniu"
       nothing_for_now: "Brak bieżących elementów"
       nothing_one_week: "Brak elementów w przyszłym tygodniu"
       nothing_two_weeks: "Brak elementów w ciągu kolejnych dwóch tygodni"
@@ -13171,6 +13295,7 @@ pl:
         body: Wiadomość
         subject: Temat
       message_students_who: "Wyślij wiadomość do uczestników, którzy..."
+      message_type: "Typ wiadomości"
       out_of_points: "na %{points_possible} możliwych"
     mute_dialog: 
       gradebook: 
@@ -13192,6 +13317,7 @@ pl:
     new_course_form: 
       cancel: Anuluj
       course_cose_explanation: "Zostanie to wyświetlone w miejscach o małej przestrzeni"
+      course_is_public_explanation: "Spraw, aby kurs był widoczny *(dane uczestników pozostaną prywatne)*"
       create_course: "Utwórz kurs"
       creating_course: "Tworzenie kursu..."
       labels: 
@@ -13303,6 +13429,7 @@ pl:
         additional_comments: "Komentarze dodatkowe"
       instructor_comments: "Komentarz instruktora"
       labels: 
+        long_description: "Długi opis"
         save_criterion_for_reuse: "Zachowaj ten komentarz do ponownego użycia"
         threshold: próg
       links: 
@@ -13322,6 +13449,7 @@ pl:
         update_description: "Aktualizuj opis"
       labels: 
         additional_comments: "Komentarze dodatkowe"
+        long_description: "Długi opis"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Użyj tych kryteriów ocen"
@@ -13349,6 +13477,8 @@ pl:
       defaults: 
         description: "Opis kryterium"
       full_marks: "Pełne oceny"
+      labels: 
+        long_description: "Długi opis"
       links: 
         view_longer_description: "pokaż szczegółowy opis"
       no_marks: "Brak ocen"
@@ -13553,6 +13683,7 @@ pl:
       unrecorgnized_type: "Nierozpoznany typ importu"
     instructure_csv: "Format CSV firmy Instructure lub plik .zip z plikami CSV"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_export_title: "Eksport danych SIS"
   sis_import: 
     buttons: 
       process_data: "Przetwórz dane"
@@ -13636,12 +13767,15 @@ pl:
     assignment_unmuted: "Kliknij, aby ukryć."
     discussion_topic: "Temat dyskusji"
     external_tool: "Narzędzie zewnętrzne"
+    final_point_ratio: "%{pointRatio} punktów"
     invalid_group_warning: 
       few: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
       one: "Uwaga: wynik nie uwzględnia zadań z nazwy grupy %{list_of_group_names}, ponieważ nie można w niej zdobywać punktów."
       other: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
     media_recordin: "Nagranie multimedialne"
+    next_object: "Następny %{type}"
     no_assignment: "Brak wybranych zadań"
+    no_outcome: "Nie wybrano wyniku"
     no_student: "Brak wybranych uczestników"
     none: Brak
     notes: Uwagi
@@ -13650,6 +13784,7 @@ pl:
     online_text_entry: "Wpis online"
     online_upload: "Przekazanie online"
     online_url: "Adres URL online"
+    previous_object: "Poprzedni %{type}"
     student_hidden_name: "Uczestnik %{position}"
   statistics: 
     csv_columns: 
@@ -13658,6 +13793,7 @@ pl:
       n_correct: "n poprawnych"
       n_incorrect: "n niepoprawnych"
       name: nazwa
+      root_account: konto_źródłowe
       score: "wynik punktowy"
       section: sekcja
       section_id: sekcja_id
@@ -13675,14 +13811,32 @@ pl:
     not_available: "Termin dostępności:"
     pending: "Niedostępny do"
   step: Etap
+  student_access_title: "Raport dostępu uczestników"
+  student_assignment_outcome_map_title: "Kompetencje uczestnika"
+  student_grades_title: "Oceny uczestnika"
+  student_groups: 
+    group_join: "Uczestnika dołączono do grupy %{group_name}"
+    group_leave: "Uczestnik opuścił grupę %{group_name}"
+    group_name: "%{group_name} w %{group_category}"
+    search_groups_placeholder: "Wyszukaj grupy lub osoby"
+    student_groups_filter_description: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
+    students_count: 
+      few: "%{count} uczestników"
+      one: "1 uczestnik"
+      other: "%{count} uczestników"
+  student_groups_desc: |-
+      Umożliwia to dodanie strony z nową grupą studentów do konta. Nowa strona została utworzona w celu szybszego rejestrowania
+      grupy.
   student_id: "Identyfikator uczestnika"
+  student_ip_title: "Adresy IP uczestnika"
   student_name: "Nazwa uczestnika"
   student_outcome_gradebook_description: |-
-      Dzienniczek nauki poziomu biegłości uczestnika umożliwia uczestnikom szybki podgląd
-      postępu
+      Dzienniczek nauki poziomu biegłości uczestnika umożliwia uczestnikom szybki podgląd postępu
       w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
       , a postęp uczestników jest wyświetlony jako wynik numeryczny i przydzielony do kategorii biegły/
       w okolicach biegłości/wymagający poprawy.
+  student_submissions_title: "Przesłane zadania uczestnika"
+  students_with_no_submissions_title: "Uczestnicy bez przesłanych zadań"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Nie można usunąć podkonta, w którym znajdują się kursy"
@@ -13726,6 +13880,7 @@ pl:
       unsubmitted: nieprzesłane
   submission_comment: 
     unknown_author: Gość
+  submission_data_title: "Dane przesłanego zadania"
   submission_detail: 
     go_to_submission_url: "Przejdź do adresu URL przesłanych zadań"
     no_submission: "Brak przesłanych zadań"
@@ -13734,6 +13889,7 @@ pl:
   submission_details_dialog: 
     add_a_comment: "Dodaj komentarz"
     comments: Komentarze
+    grade_form_label: "Ocena:"
     labels: 
       group_comment: "Wyślij komentarz do całej grupy"
     late: "PO CZASIE"
@@ -13744,6 +13900,7 @@ pl:
     post_comment: "Zamieść komentarz"
     submitted: "Przesłano:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Wielokrotnie przesyłane, wybierz, którą wersję wyświetlić:"
+    update_grade: "Aktualizuj ocenę"
     view_rubric_assessment_in_the_speedgrader: "Pokaż ocenianie wg kryteriów ocen w programie SpeedGrader"
   submissions: 
     assignment_submit_success: "Zadanie zostało pomyślnie dostarczone."
@@ -13856,6 +14013,7 @@ pl:
     collaborations: "Projekty współpracy"
     conferences: Konferencje
     course_assignments: "Zadania dla kursu"
+    course_grades: "Oceny kursu"
     course_settings: "Ustawienia kursu"
     discussions: Dyskusje
     eportfolios: ePortfolio
@@ -13863,6 +14021,7 @@ pl:
     grades: Oceny
     home: "Strona główna"
     modules: Moduły
+    observees: Obserwowanie
     outcomes: Wyniki
     pages: Strony
     people: Użytkownicy
@@ -13872,6 +14031,7 @@ pl:
     syllabus: "Program kursu"
     tab_location_error: "Położenie tej karty jest niepoprawne"
     tab_unmanagable_error: "nie można zarządzać %{css_class}"
+  tempe_grade_export_title: "Eksport ocen Tempe"
   terms: 
     index: 
       date: 
@@ -13972,6 +14132,7 @@ pl:
       image_width: "Szerokość obrazu"
       url: "Adres URL"
   title: 
+    edit_announcement: "Edytuj ogłoszenie"
     edit_topic: "Edytuj temat dyskusji"
     new_announcement: "Nowe ogłoszenie"
     new_topic: "Nowy temat dyskusji"
@@ -13996,7 +14157,7 @@ pl:
     view_in_separate_window: "Pokaż w osobnym oknie"
   tooltips: 
     finished: ukończono
-    incomplete: nieukończony
+    incomplete: nieukończono
     vdd: 
       more_message: "oraz %{count} więcej..."
   tours: 
@@ -14021,10 +14182,13 @@ pl:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Wyślij ponownie do programu Turnitin"
+  ungraded_submissions_tile: "Nieocenione przesłane zadania uczestnika"
   unknown: Nieznany
   unknown_question_bank: "Nieznany bank pytań"
   unknown_quiz: "Nieznany test"
+  unpublished_courses_title: "Nieopublikowane kursy"
   unsupported_package: "Nieobsługiwany pakiet zawartości"
+  unused_courses_title: "Nieużywane kursy"
   user: 
     default_user_name: Użytkownik
     errors: 
@@ -14037,9 +14201,11 @@ pl:
     registration: 
       agree_to_terms_and_privacy_policy: "Zgadzasz się na *warunki użytkowania* i potwierdzasz **politykę prywatności**."
       agree_to_terms_with_code_of_conduct: "Zgadzasz się na *warunki użytkowania* i  **kodeks postępowania**."
+  user_access_title: "Raport dostępu użytkownika"
   user_date_range_search: 
     cant_be_blank: "Identyfikator użytkownika systemu Canvas nie może pozostać pusty"
     cant_come_before_from: "Pole „Do daty” musi zawierać datę późniejszą niż pole „Od daty”"
+  user_inactivity_title: "Raport braku aktywności użytkownika"
   user_lists: 
     add_n_users: 
       few: "OK, Wygląda dobrze, dodaj tych %{count} użytkowników"
@@ -14228,6 +14394,7 @@ pl:
       roles_student: "Zapisano w roli uczestnika."
       roles_ta: "Zapisano w roli asystenta instruktora."
       roles_teacher: "Zapisano w roli instruktora."
+      unenrollr: "Wypisz z kursu"
       unpublished: Nieopublikowane
     errors: 
       no_teacher_courses: "Dla tego instruktora i uczestnika nie ma kursów wspólnych"
@@ -14638,6 +14805,8 @@ pl:
       page_updated: "Strona została pomyślnie zaktualizowana."
     page_link: 
       link_hidden_from_students_warning: "Uczestnicy nie będą widzieć tego łącza"
+    page_revisions: 
+      page_revisions_title: "Korekty %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: Strony
@@ -14672,10 +14841,26 @@ pl:
     cannot_update_published: "Brak uprawnień, aby aktualizować stan publikowanych tej strony typu wiki"
     cannot_update_title: "Brak uprawnień, aby aktualizować tytuł tej strony typu wiki"
     invalid_editing_roles: "Dostarczone role edytowania są nieprawidłowe"
+  will_paginate: 
+    next_label: "Następne &#8594;"
+    page_entries_info: 
+      multi_page: "Wyświetlanie %{model} %{from} - %{to} z %{count} łącznie"
+      multi_page_html: "Wyświetlanie %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> z <b>%{count}</b> łącznie"
+      single_page: 
+        one: "Wyświetlanie 1 %{model}"
+        other: "Wyświetlanie wszystkich %{count} %{model}"
+        zero: "Nie znaleziono %{model}"
+      single_page_html: 
+        one: "Wyświetlanie <b>1</b> %{model}"
+        other: "Wyświetlanie <b>all&nbsp;%{count}</b> %{model}"
+        zero: "Nie znaleziono %{model}"
+    page_gap: "&hellip;"
+    previous_label: "&#8592; Poprzednie"
   wimba_conference: 
     external_urls: 
       archive: Archiwum
       archive_link: "Pokaż archiwa"
+  zero_activity_title: "Zerowa aktywność"
   zip_argument_error: "Do przekazania pliku .zip potrzebny jest folder, do którego plik zostanie przekazany."
   zip_file_description: "Wtyczka migracji w celu rozpakowania zwykłych plików .zip do kursu, grupy lub plików użytkownika"
   zip_file_display: "Importowanie pliku"
