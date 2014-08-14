@@ -37,7 +37,7 @@ fr:
     no_authority: "Impossible de trouver une autorité à mettre à jour"
     no_file: "Aucun fichier de résultat ou d’autorité fourni"
     no_permissions: "L’utilisateur n’est pas autorisé à modifier les résultats  globaux. "
-    no_perms: "L’utilisateur n’est pas autorisé à modifier les résultats  globaux. "
+    no_perms: "L’utilisateur n’est pas autorisé à modifier les acquis globaux. "
   account: 
     account_settings: 
       account_surveys: "Enquêtes du compte"
@@ -71,7 +71,7 @@ fr:
     tab_faculty_journal: "Journal des enseignants"
     tab_grading_standards: "Systèmes de notation"
     tab_jobs: Tâches
-    tab_outcomes: Résultats
+    tab_outcomes: Acquis
     tab_permissions: Autorisations
     tab_plugins: Plug-ins
     tab_question_banks: "Banques de questions"
@@ -318,13 +318,13 @@ fr:
     report_header_last_access_at: "Dernier accès le"
     report_header_last_ip: "Dernier IP"
     report_header_last_name: last_name
-    report_header_learning_outcome_id: "ID des résultats d’apprentissage"
-    report_header_learning_outcome_name: "Nom des résultats d’apprentissage"
+    report_header_learning_outcome_id: "ID des acquis"
+    report_header_learning_outcome_name: "Nom des acquis"
     report_header_login_id: login_id
     report_header_long__name: long_name
     report_header_long_name: "Nom long"
     report_header_name: nom
-    report_header_outcome_score: "Note des résultats"
+    report_header_outcome_score: "Résultats des acquis"
     report_header_parent_account_id: parent_account_id
     report_header_role: rôle
     report_header_section: section
@@ -717,7 +717,7 @@ fr:
       account_reports: 
         outcomes: 
           description: 
-            text: "Ce rapport affiche les résultats de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-résultat et affiche les détails, dont le travail associé."
+            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le travail associé."
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -726,7 +726,7 @@ fr:
           order: 
             label: Ordre
           outcome: 
-            radio: Résultats
+            radio: Acquis
           user: 
             radio: Utilisateurs
     ph_student_grades_csv_parameters: 
@@ -1116,7 +1116,7 @@ fr:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Ce rapport affiche les résultats de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-résultat et affiche les détails, dont le travail associé. Il donne les résultats uniquement pour les travaux et n’inclut pas ceux des banques de questions."
+            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le travail associé. Il donne les résultats uniquement pour les travaux et n’inclut pas ceux des banques de questions."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -2267,7 +2267,7 @@ fr:
     add_item: "Ajouter un élément"
     apply: Appliquer
     authorize_google_docs: "Autoriser l’accès à Google Docs"
-    back_to_outcomes: "Revenir aux résultats"
+    back_to_outcomes: "Revenir aux acquis"
     cancel: Annuler
     choose_a_file: "Choisir un fichier"
     delete: Supprimer
@@ -3320,7 +3320,7 @@ fr:
         user_account_details: "Informations du compte utilisateur"
         user_grades: "Notes pour %{user}"
         user_only_view_section: "laisser cet utilisateur voir uniquement les utilisateurs de la même section"
-        user_outcomes: "Résultats pour %{user}"
+        user_outcomes: "Acquis pour %{user}"
         user_view_all_sections: "laisser cet utilisateur voir tous les utilisateurs du cours"
       user_only_view_section: "cet utilisateur peut voir les étudiants seulement dans leurs sections de cours attribuées"
       user_view_all_sections: "cet utilisateur peut afficher les étudiants de n’importe quelle section de cours"
@@ -3386,7 +3386,7 @@ fr:
         user_account_details: "Informations du compte utilisateur"
         user_grades: Notes
         user_only_view_section: "laisser cet utilisateur voir uniquement les utilisateurs de la même section"
-        user_outcomes: Résultats
+        user_outcomes: Acquis
         user_view_all_sections: "laisser cet utilisateur voir tous les utilisateurs du cours"
       no_messages: "Aucun message"
       no_services: "%{user} n’a lié encore aucun service externe à son compte."
@@ -4142,7 +4142,7 @@ fr:
       file_meta: "Échec de l’exportation des métadonnées du fichier"
       files: "Échec de l’exportation de certains fichiers"
       grading_standards: "Échec de l’exportation des critères de notation"
-      learning_outcomes: "Échec de l’exportation des résultats d’apprentissage"
+      learning_outcomes: "Échec de l’exportation des acquis d’apprentissage"
       lti_links: "Échec de l’exportation de certains liens Web"
       media_file: "Échec de l’exportation d’un fichier multimédia"
       media_files: "Échec de l’exportation de certains fichiers multimédias"
@@ -4722,7 +4722,7 @@ fr:
       headings: 
         current_users: "Utilisateurs actuels"
       help: 
-        reset_course_content: "La réinitialisation du contenu du cours aura pour effet la suppression définitive de l’ensemble des tâches, discussions, quizz, modules, barèmes, pages, fichiers, résultats d’apprentissage, banques de questions, collaborations, conférences ou tout autre contenu associé. Cette action est irréversible et les données ne *pourront pas* être récupérées. Voulez-vous vraiment continuer ?"
+        reset_course_content: "La réinitialisation du contenu du cours aura pour effet la suppression définitive de l’ensemble des tâches, discussions, quizz, modules, barèmes, pages, fichiers, acquis, banques de questions, collaborations, conférences ou tout autre contenu associé. Cette action est irréversible et les données ne *pourront pas* être récupérées. Voulez-vous vraiment continuer ?"
       links: 
         calendar: "Calendrier du cours"
         conclude: "Terminer ce cours"
@@ -5986,7 +5986,9 @@ fr:
       delete: Supprimer
     cannot_locate_launch_request: "Impossible de localiser la demande de lancement. Veuillez recommencer."
     consumer_key: "Code client"
+    course_home_sub_navigation_configured: "Sous-navigation configurée pour l’accueil du cours"
     course_navigation_configured: "Navigation du cours configurée"
+    course_settings_sub_navigation_configured: "Sous-navigation configurée pour les paramètres du cours"
     delete: Supprimer
     dialog_title_add_app: "Ajouter une application"
     dialog_title_edit_tool: "Modifier l’outil externe"
@@ -6069,6 +6071,7 @@ fr:
       new_tab_loaded: "Cet outil a bien été chargé dans une nouvelle fenêtre du navigateur. Rechargez cette page pour accéder de nouveau à l’outil."
     tool_show: 
       tool_insecure_warning: "Vous essayez de lancer un contenu peu sûr depuis un site sécurisé (Canvas). Certains navigateurs Internet peuvent empêcher le chargement de ce contenu."
+      tool_load_failure: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet"
     user_navigation_configured: "Navigation utilisateur configurée"
   facebook: 
     authorization_required: "Seuls les utilisateurs autorisés peuvent accéder à cette page."
@@ -6117,6 +6120,7 @@ fr:
       notifications_config_notice: "Les notifications de Canvas peuvent être envoyées automatiquement vers votre compte Facebook. Vous trouverez ci-dessous le type de notifications que vous pouvez envoyer. Vous pouvez modifier vos préférences de notifications à tout moment, soit ici, soit dans Canvas."
       settings_title: "Paramètres de notification Canvas"
       updating_preferences: "Mise à jour des préférences..."
+  faculty_success_tile: "Rapport – Succès des enseignants"
   feature_flags: 
     feature_flag: 
       allow: Autoriser
@@ -6477,7 +6481,7 @@ fr:
       menu: m
       sort: s
       tooltip: t
-    learning_outcome: "Résultats d’apprentissage"
+    learning_outcome: Acquis
     mastery: maîtrisé
     near_mastery: "presque maîtrisé"
     no_assignments_have_points_warning: "Impossible de calculer le résultat jusqu’à ce qu’une tâche ait des points possibles"
@@ -7352,14 +7356,16 @@ fr:
   importers/context_module_importer: 
     migration_module_item_type: "Élément de module"
   importers/course_content_importer: 
+    account_grading_standard_warning: "Impossible de trouver le critère de notation du compte pour le cours."
+    copied_grading_standard_warning: "Impossible de trouver le critère de notation copié pour le cours."
     due_dates_warning: "Impossible de rectifier les dates d’échéance."
     failed_import_media_objects: "Échec de l’importation des objets multimédias"
     file_import_warning: "Le fichier %{file} est introuvable"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les résultats  globaux. Impossible d’ajouter « %{title} »."
+    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter \"%{title}\"."
   importers/learning_outcome_importer: 
-    no_context_found: "Les résultats externes sont introuvables pour « %{title} ». Création d’une copie."
-    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les résultats  globaux. Impossible d’ajouter « %{title} »."
+    no_context_found: "Les acquis externes sont introuvables pour \"%{title}\". Création d’une copie."
+    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter \"%{title}\"."
   importers/rubric_importer: 
     no_context_found: "Le barème externe est introuvable pour « %{title} ». Création d’une copie."
   importers/wiki_page_importer: 
@@ -7438,6 +7444,7 @@ fr:
       view_in_new_window: "Afficher dans une nouvelle fenêtre"
     tooltips: 
       enter_search_terms: "entrer les termes de la recherche"
+  invalid_points_possible: "La valeur des points possibles pour ce travail doit être au moins égale à zéro."
   invalid_url_in_xml: "URL non valide dans le XML. Les signes & doivent être précédés d’un  caractère d’échappement."
   invalid_xml_syntax: "Syntaxe XMLl incorrecte"
   jobs: 
@@ -7501,6 +7508,12 @@ fr:
     module_sequence_footer: 
       next: Suivant
       previous: Précédent
+  k12_description: |-
+      Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela 
+      applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
+  labels: 
+    lock_module_until: "Verrouiller le module jusqu’à une date donnée"
+  last_submission_activity_title: "Dernière activité d’envoi"
   last_user_access_title: "Dernier accès utilisateur"
   layouts: 
     application: 
@@ -7521,6 +7534,7 @@ fr:
         grades: Notes
       navigation: 
         main: "Navigation principale"
+        user_menu: "Menu Utilisateur"
       open_source_learning_management_system: "LMS Open Source"
     facebook: 
       title: "Page Facebook"
@@ -7543,11 +7557,12 @@ fr:
       log_in_to_canvas: "Connexion à Canvas"
   learning_mastery_gradebook_description: |-
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement 
-      la progression des étudiants et du cours dans les différents résultats d’apprentissage. 
+      la progression des étudiants et du cours dans les différents apprentissages. 
       Les acquis sont présentés comme un relevé de notes et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
   learning_outcome: 
     no_comment: "Aucun commentaire"
     no_description: "Pas de description"
+  learning_outcome_assignment_type_title: "Type de travail et acquis"
   lib: 
     angel: 
       failed_import_link: "Échec de l’importation des liens"
@@ -7583,7 +7598,7 @@ fr:
         discussion_topics: "Sujets de discussion"
         external_tools: "Outils externes"
         groups: "Groupes d’étudiants"
-        learning_outcomes: "Résultats d’apprentissage"
+        learning_outcomes: Acquis
         quizzes: Questionnaires
         rubrics: Barèmes
         syllabus_body: "Corpus du programme"
@@ -7654,6 +7669,8 @@ fr:
       new_tab: "Cet outil doit être ouvert dans une nouvelle fenêtre du navigateur"
       new_tab_expired: "La session de cet outil a expiré. Rechargez cette page pour accéder de nouveau à l’outil."
       new_tab_loaded: "Cet outil a bien été ouvert dans une nouvelle fenêtre du navigateur. Rechargez cette page pour accéder de nouveau à l’outil."
+  lti2: 
+    register_tool: "Enregistrer un outil"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Outil d’importation Moodle"
   manage_avatars: 
@@ -8453,6 +8470,7 @@ fr:
         subject: "Échec de l’exportation du cours : %{course}"
     content_export_finished: 
       email: 
+        body: "L’exportation de contenu pour \"%{course}\" est terminée."
         html: 
           body2: "L’exportation de votre cours *%{course}* est terminée."
           link: "Cliquez ici pour afficher les exportations"
@@ -9282,8 +9300,19 @@ fr:
     page_locked_until: "Cette page est verrouillée jusqu’au %{date}."
     page_unpublished_module: "Cette page fait partie d’un module non publié et n’est pas encore disponible."
     peer_review_invitation: 
+      email: 
+        body: "Vous avez été sollicité pour effectuer la révision du travail de %{reviewee}. Suivez le lien ci-dessous pour effectuer cette révision. "
+        html: 
+          link_message: "Cliquez ici pour effectuer votre  révision"
+        subject: "Révision par un pair attribuée pour %{reviewee}"
+      facebook: 
+        body: "Vous avez été sollicité pour effectuer la révision du travail de %{reviewee}. Suivez le lien ci-dessous pour effectuer cette révision. "
       sms: 
         more_info: "Informations complémentaires sur %{url}"
+      summary: 
+        body: "Vous avez été sollicité pour effectuer la révision du travail de %{reviewee}. Suivez le lien ci-dessous pour effectuer cette révision. "
+      twitter: 
+        body: "Vous avez été sollicité pour effectuer la révision du travail de %{reviewee}. Suivez le lien ci-dessous pour effectuer cette révision. "
     pseudonym_registration: 
       email: 
         body: "Vous avez été enregistré pour un compte Canvas sur %{account}. Avant de vous connecter pour utiliser Canvas, vous devez terminer le processus de configuration."
@@ -9420,6 +9449,7 @@ fr:
         body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
         html: 
           body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
+          link_message: "Vous pouvez consulter les détails de l’envoi en cliquant sur ce lien :"
           review_submission: "Cliquez ici pour revoir l’envoi"
           someone: Quelqu’un
           subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
@@ -9634,7 +9664,7 @@ fr:
     file_type: Fichier
     grading_standard_type: "Critère de notation"
     group_type: Groupe
-    learning_outcome_type: "Résultats d’apprentissage"
+    learning_outcome_type: Acquis
     module_type: Module
     quiz_question_type: "Question du questionnaire"
     quiz_type: Questionnaire
@@ -9707,6 +9737,7 @@ fr:
     where_to_move: "Où voulez-vous déplacer *%{name}* ?"
   move_dialog_select: 
     move_to_end: "-- Tout en bas --"
+  multi_student_progress_title: "Progression de plusieurs étudiants"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
@@ -9719,6 +9750,8 @@ fr:
     sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
   name: "Outil d’importation Academic Benchmarks"
   new_facebook_message: "Vous avez un nouveau message de Canvas"
+  new_quiz_moderate_desc: "Lorsque le mode Brouillon et les statistiques des questionnaires sont autorisés/activés, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
+  new_quiz_statistics_desc: "Lorsque le mode Brouillon est autorisé/activé, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
   new_styles_description: |-
       Nous sommes en train de revoir l’interface utilisateur de Canvas. Activez cette option pour 
       afficher la nouvelle interface, offrant un aspect et un fonctionnement simplifiés.
@@ -9786,8 +9819,19 @@ fr:
     due_date_display: "Date d’échéance"
     files_description: "Nouveau fichier ajouté à votre cours"
     files_display: Fichiers
+    grading_description: |-
+        Inclut :
+        
+        * Note de travail/envoi saisie/modifiée
+        * Note de travail non silencieux
+        * Coefficient modifié
+        
+        ​
+        
+        Cochez l’option « Inclure les résultats dans les alertes de modification de notes » si vous voulez voir vos notes dans les notifications.
+        Si votre adresse e-mail n’est pas un e-mail de l’établissement, cela signifie que du contenu sensible sera envoyé vers l’extérieur.
     grading_display: Notation
-    grading_notify_include_grade: "Inclure les notes dans les alertes de modification de notes."
+    grading_notify_include_grade: "Inclure les résultats dans les alertes de modification de notes."
     grading_policies_description: "Modification des règles de notation du cours"
     grading_policies_display: "Règles de notation"
     invitation_description: |-
@@ -9898,6 +9942,7 @@ fr:
         
         Inscription de rendez-vous d’étudiant
     student_appointment_display: "Inscriptions des étudiants aux rendez-vous"
+    submission_comment_description: "Commentaire sur l’envoi du travail"
     submission_comment_display: "Commentaire sur l’envoi"
   notification_preferences: 
     communication: 
@@ -9968,6 +10013,8 @@ fr:
     being_observed: "Étudiants observés"
     new_observee_password: "Mot de passe"
     new_observee_username: "Nom d’utilisateur"
+    observee_added: "Observer maintenant %{user}"
+    observing: Observer
   options: 
     ? "no"
     : Non
@@ -9981,6 +10028,7 @@ fr:
   outcome_path_result: "%{path} – Résultat"
   outcome_results: 
     outcomes_filename: Résultats
+  outcome_results_title: Résultats
   outcomes: 
     account_standards: "Critères du compte"
     account_standards_description: "Sur la gauche, vous voyez les critères que votre institution a établis et que vous devez utiliser dans vos cours."
@@ -10167,6 +10215,7 @@ fr:
   pasco_user_notes_title: "Remarques de l’utilisateur"
   paypal: 
     exception: "Désolé, une erreur est survenue. Veuillez réessayer ultérieurement."
+  penn_harris_student_grade_title: "Notes des étudiants de Penn Harris "
   plugins: 
     academic_benchmark_importer: 
       description: "Cet outil permet d’importer les critères Academic Benchmark dans Canvas."
@@ -10217,12 +10266,15 @@ fr:
     buttons: 
       saving: "Enregistrement en cours..."
     canvadocs: 
+      description: "Activer Canvadocs (compatible avec Box View) comme option d’aperçu de document "
       name: Canvadocs
     canvadocs_settings: 
+      description: "Ce plug-in s’intègre avec Canvadocs (ou n’importe quelle API compatible Box View) pour fournir une option d’aperçu de document HTML5."
       labels: 
         api_key: "Clé API"
         base_url: "URL de base"
     crocodoc: 
+      description: "Activer Crocodoc comme option d’aperçu de document "
       name: Crocodoc
     crocodoc_settings: 
       description: "Ce plug-in s’intègre à Crocodoc pour fournir un mode de prévisualisation de document HTML5 qui permet aux enseignants et aux élèves d’annoter les documents."
@@ -10273,10 +10325,19 @@ fr:
       description: "Application Canvas Facebook"
       name: Facebook
     facebook_settings: 
+      description: |-
+          Vous devrez créer une [nouvelle application sur facebook.com](%{facebook_url}), puis ajouter 'App sur Facebook' comme plate-forme.
+          Définissez les options de configuration suivantes pour garantir que votre application Facebook
+          fonctionnera correctement :
+          
+          * **Paramètres -- App sur Facebook -- Page Canvas :** notez quelque part les options que vous choisissez (la partie après apps.facebook.com) et spécifiez-les comme ci-dessous.
+          * **Paramètres -- App sur Facebook -- URL Canvas :** définir %{canvas_url}
+          * Une fois votre application enregistrée, notez son ID, le jeton du client et le secret
       domain_name: domaine
       headers: 
         domain_settings: "Paramètres du domaine"
       hints: 
+        api_key: "Également appelée Jeton du client"
         canvas_domain: "domaine spécifié dans \"URL Canvas\""
         canvas_name: "chemin spécifié dans \"Page Canvas\""
         disable_ssl: "Utiliser uniquement pour les tests en local"
@@ -10511,6 +10572,7 @@ fr:
       validations: 
         poll_choice_belongs_to_poll: "Ce choix n’appartient pas au sondage existant."
         poll_is_published: "Cette session de sondage n’accepte pas les envois."
+        user_and_poll_session_uniqueness: "peut uniquement proposer un choix par session de sondage."
   post_grades_description: |-
       L’option Publier les notes permet aux enseignants de renvoyer les notes sur les systèmes SIS activés : Powerschool,
       Aspire (SIS2000), JMC et tout autre système SIS acceptant les éléments SIF GradingCategory,
@@ -10556,6 +10618,7 @@ fr:
       unregister_service: "Voulez-vous vraiment annuler l’enregistrement de ce service ?"
     crumb: "profil de %{user}"
     crumbs: 
+      observees: Observer
       settings_frd: "Paramètres de %{user}"
     done_resending: "C’est fait ! La remise du message peut prendre quelques minutes."
     email_select: 
@@ -10818,6 +10881,7 @@ fr:
     upload_file_view: 
       choose_a_picture: "choisir une image"
       crop_instructions: "Pour rogner l’image, faites glisser la sélection, puis cliquez sur le bouton Enregistrer en dessous."
+  provisioning_title: "Mise en service"
   pseudonym: 
     errors: 
       bad_credentials: "Nom d’utilisateur ou mot de passe erroné"
@@ -11055,6 +11119,8 @@ fr:
       payment_info: "Informations sur le paiement"
   qti_display: QTI
   qti_file_description: "Fichier .zip QTI"
+  qti_img_matching_question: "La question correspondante importée contient des images des deux côtés, ce qui n’est pas pris en charge"
+  qti_img_matching_question_distractors: "La question correspondante importée contient des images à l’intérieur des choix, ce qui ne peut pas être rectifié car elle contient aussi des distracteurs"
   qti_name: "Convertisseur QTI"
   qualified_locale: fr-FR
   question_answered: "Réponse donnée"
@@ -11172,6 +11238,8 @@ fr:
     cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
     delete: Supprimer
     delete_quiz: "Supprimer le questionnaire"
+    no_more_allowed_quiz_attempts: "Il ne vous reste plus aucune tentative sur ce questionnaire."
+    now_on_moderate: "Ces informations se trouvent désormais dans l’onglet Modéré."
     quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
     quiz_successfully_deleted: "Questionnaire supprimé !"
     quiz_successfully_updated: "Questionnaire mis  à jour !"
@@ -11182,6 +11250,7 @@ fr:
       regrade_options: "Options de recalcul de la note *(pour les étudiants qui ont déjà répondu à cette question) :*"
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
+    regrade_count_affected: "La note de ce questionnaire a été recalculée et votre nouveau résultat tient compte des %{num} questions concernées."
     regrade_score_affected: "La note de ce questionnaire a été recalculée. Votre résultat a changé."
     resume_the_quiz: "Reprendre le questionnaire"
     resume_the_survey: "Reprendre l’enquête"
@@ -11202,6 +11271,8 @@ fr:
     extensions_successfully_added: "Délais supplémentaires ajoutés"
     now: maintenant
   quiz_extensions: 
+    everyone_gets_attempts: "tout le monde a déjà %{num}"
+    everyone_gets_time: "tout le monde a déjà %{num} minutes"
     extensions_num_students: "Délais supplémentaires pour %{num} étudiants"
     extensions_student: "Délais supplémentaires pour %{student}"
     extensions_successfully_added: "Délais supplémentaires ajoutés"
@@ -11261,16 +11332,26 @@ fr:
     correct_essay_student_ratio: "%{ratio}% de vos étudiants ont obtenu tous les points pour cette question."
     correct_multiple_response_ratio: "%{ratio}% de vos étudiants ont répondu correctement."
     correct_response_ratio: "%{ratio}% de vos étudiants ont correctement répondu à cette question."
+    discrimination_index_help_dialog_title: "L’indice de discrimination "
     errors: 
       stats_empty: 
         header: "Rien à voir ici."
+        info: "Aucun de vos étudiants n’a encore répondu à ce questionnaire."
+      stats_too_large: 
+        header: "Trop de choses se passent ici."
+        info: "Ce questionnaire est trop grand pour pouvoir être affiché."
     essay_score: "Résultat : %{score}"
     generatable: "Le rapport n’a jamais été généré."
     generated: "Le rapport est prêt."
     generated_at: "Générées le %{date}"
     generating: "Rapport en cours de création..."
+    generation_failed: "Un problème s’est produit, veuillez réessayer ultérieurement."
     item_analysis: "Analyse - élément"
     no_answer: "Aucune réponse"
+    sort_by_discrimination_index: "Trier par discrimination"
+    sort_by_position: "Trier par position"
+    stats_error: 
+      image_alt: "Les statistiques du questionnaire ne sont pas encore disponibles."
     student_analysis: "Analyse - étudiant"
     unknown: 
       header: "Un problème s’est produit."
@@ -11918,6 +11999,7 @@ fr:
         new_discussion: "Nouvelle discussion"
         one_question_at_a_time: "Afficher une question à la fois"
         one_time_results: "Une seule fois après chaque tentative"
+        only_visible_to_overrides_note: "Remarque : ce questionnaire est visible **uniquement** pour la ou les sections spécifiées ci-dessous :"
         points_possible: "%{n} points"
         quiz_title: "Titre du questionnaire"
         quiz_type: "Type de questionnaire"
@@ -12361,6 +12443,7 @@ fr:
   quizzes_route: 
     quizzes_route_title: Questionnaires
   quizzez_submission_row: 
+    gets_extra_minutes: "a %{num} minutes supplémentaires pour chaque tentative"
     unlimited: "Sans limite"
   re_upload_submissions_form: 
     buttons: 
@@ -12387,6 +12470,7 @@ fr:
     sections_count: 
       one: "1 section"
       other: "%{count} sections"
+  registrar_tile: "Rapport de l’administration"
   registration: 
     get_started: "Premiers pas"
     incomplete_registration_warning: 
@@ -12423,6 +12507,7 @@ fr:
         email: E-mail
         name: Nom
     welcome_to_canvas: "Bienvenue dans Canvas !"
+  reply_from_name: "%{name} via les notifications Canvas "
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
   role_override: 
     permission: 
@@ -12464,6 +12549,7 @@ fr:
       manage_students: "Ajouter/supprimer des étudiants pour le cours"
       manage_user_logins: "Modifier les informations de connexion des utilisateurs"
       manage_user_notes: "Gérer les entrées du journal des enseignants"
+      manage_user_observers: "Gérer les observateurs pour les étudiants"
       manage_wiki: "Gérer Wiki (ajouter/modifier/supprimer des pages)"
       managed_jobs: "Gérer des tâches en arrière-plan"
       moderate_form: "Modérer les discussion (supprimer/modifier les billets des utilisateurs, verrouiller les sujets)"
@@ -12602,6 +12688,8 @@ fr:
         are_you_sure_delete: "Voulez-vous vraiment supprimer ce barème ? Toute zone utilisant actuellement le barème continuera d’avoir accès, mais personne d’autre ne pourra l’utiliser."
         are_you_sure_remove: "Voulez-vous vraiment supprimer ce barème de la liste ?"
       remove_rubric: "Supprimer ce barème de votre liste"
+  safety_drill_title: "Planification des exercices d’entraînement"
+  scantron_quiz_title: "Questionnaire Scantron "
   scribd: 
     upgrade_flash: "Bonjour, votre version d’Adobe Flash Player est obsolète. Pour utiliser iPaper (et beaucoup d’autres outils du Web), vous devez %{link_tag}vous procurer le dernier lecteur Flash%{end_link}."
   search: 
@@ -12912,9 +13000,13 @@ fr:
           email: "E-mail (facultatif)"
     event_list: 
       at_least_more_events: "au moins %{count_of_events} supplémentaires"
+      at_least_more_events_one_week: "au moins %{count_of_events} en plus la semaine dernière "
+      at_least_more_events_two_weeks: "au moins %{count_of_events} en plus la dernière quinzaine"
       links: 
         view_calendar: "Afficher le calendrier"
       more_events: "%{count_of_events} supplémentaires"
+      more_events_one_week: "%{count_of_events} en plus la semaine passée"
+      more_events_two_weeks: "%{count_of_events} en plus la dernière quinzaine"
       nothing_for_now: "Rien pour l’instant"
       nothing_one_week: "Rien pour la semaine prochaine"
       nothing_two_weeks: "Rien pour les deux semaines prochaines"
@@ -13061,6 +13153,7 @@ fr:
     new_course_form: 
       cancel: Annuler
       course_cose_explanation: "Ceci sera affiché dans des emplacements réduits."
+      course_is_public_explanation: "Rendre le cours visible publiquement *(les données des étudiants resteront privées)*"
       create_course: "Créer un cours"
       creating_course: "Création d’un cours..."
       labels: 
@@ -13515,6 +13608,7 @@ fr:
     media_recordin: "Enregistrement multimédia"
     next_object: "%{type} suivant"
     no_assignment: "Aucun travail sélectionné"
+    no_outcome: "Aucun résultat sélectionné"
     no_student: "Aucun étudiant sélectionné"
     none: Aucun
     notes: Remarques
@@ -13558,12 +13652,21 @@ fr:
     group_leave: "A quitté le groupe %{group_name}"
     group_name: "%{group_name} de %{group_category}"
     search_groups_placeholder: "Rechercher des groupes ou des personnes"
+    student_groups_filter_description: "Au fur et à mesure que vous remplissez ce champ, la liste des groupes est filtrée automatiquement pour inclure uniquement les noms correspondant aux caractères tapés."
     students_count: 
       one: "1 étudiant"
       other: "%{count} étudiants"
+  student_groups_desc: |-
+      Cela active la nouvelle page de groupes d’étudiants pour un compte. Cette page a été créée pour faciliter l’inscription des 
+      groupes.
   student_id: "ID de l’étudiant"
   student_ip_title: "Adresses IP des étudiants"
   student_name: "Nom de l’étudiant"
+  student_outcome_gradebook_description: |-
+      Le relevé de notes pour la maîtrise de l’apprentissage permet aux étudiants de voir rapidement
+      leurs progrès dans les différents apprentissages du cours. Ces acquis sont présentés
+      dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la 
+      forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
   student_submissions_title: "Envois des étudiants"
   students_with_no_submissions_title: "Étudiants n’ayant rien envoyé"
   sub_accounts: 
@@ -13746,6 +13849,7 @@ fr:
     grades: Notes
     home: Accueil
     modules: Modules
+    observees: Observer
     outcomes: Résultats
     pages: Pages
     people: Personnes
@@ -13755,6 +13859,7 @@ fr:
     syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
+  tempe_grade_export_title: "Exportation des notes de Tempe"
   terms: 
     index: 
       date: 
@@ -13901,6 +14006,7 @@ fr:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Renvoyer à Turnitin"
+  ungraded_submissions_tile: "Envois d’étudiant non notés"
   unknown: Inconnu
   unknown_question_bank: "Banque de questions inconnue"
   unknown_quiz: "Questionnaire inconnu"
@@ -13919,9 +14025,11 @@ fr:
     registration: 
       agree_to_terms_and_privacy_policy: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       agree_to_terms_with_code_of_conduct: "Vous acceptez les *conditions d’utilisation* et le **code de déontologie**."
+  user_access_title: "Relevé des accès utilisateur"
   user_date_range_search: 
     cant_be_blank: "Vous devez fournir l’identifiant Canvas"
     cant_come_before_from: "La date de fin ne peut pas être antérieure à la date de début."
+  user_inactivity_title: "Rapport d’inactivité des utilisateurs"
   user_lists: 
     add_n_users: 
       one: "Semble correct. Ajouter cet utilisateur"
@@ -14551,9 +14659,15 @@ fr:
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
   will_paginate: 
     page_entries_info: 
+      multi_page: "Afficher les %{model} de %{from} à %{to} sur un total de %{count} "
+      multi_page_html: "Afficher les %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> sur un total de <b>%{count}</b> "
       single_page: 
+        one: "Afficher 1 %{model}"
+        other: "Afficher les %{count} %{model}"
         zero: "Aucun %{model} trouvé"
       single_page_html: 
+        one: "Afficher <b>1</b> %{model}"
+        other: "Afficher les <b>all&nbsp;%{count}</b> %{model}"
         zero: "Aucun %{model} trouvé"
     page_gap: "&hellip;"
   wimba_conference: 
