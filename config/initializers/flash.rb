@@ -4,7 +4,7 @@ class ActionController::Flash::FlashHash < Hash
   def to_rails3
     result = ActionDispatch::Flash::FlashHash.new
     result.instance_variable_set(:@now, @now)
-    result.instance_variable_set(:@flashes, to_h)
+    result.instance_variable_set(:@flashes, to_hash)
     result.instance_variable_set(:@used, @used.select { |k, v| v }.keys.to_set)
     result
   end
