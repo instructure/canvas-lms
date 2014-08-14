@@ -16,7 +16,7 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 
   gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
-  gem 'encrypted_cookie_store-instructure', '1.0.6', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.0.8', :require => 'encrypted_cookie_store'
   gem 'erubis', '2.7.0'
   gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
