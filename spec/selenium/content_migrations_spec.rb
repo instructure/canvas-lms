@@ -87,6 +87,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "should import all content immediately by default" do
+      pending('fragile')
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
@@ -164,6 +165,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "should import selective content" do
+      pending('fragile')
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
@@ -175,6 +177,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "should overwrite quizzes when option is checked and duplicate otherwise" do
+      pending('fragile')
       pending unless Qti.qti_enabled?
 
       # Pre-create the quiz
@@ -282,6 +285,7 @@ describe "content migrations", :non_parallel do
       end
 
       it "should import into default question bank if not selected" do
+        pending('fragile')
         pending unless Qti.qti_enabled?
 
         old_bank = @course.assessment_question_banks.create!(:title => "bankity bank")

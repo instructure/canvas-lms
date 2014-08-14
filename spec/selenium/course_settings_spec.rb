@@ -189,6 +189,7 @@ describe "course settings" do
     end
 
     it "should move a nav item to disabled" do
+      pending('fragile')
       get "/courses/#{@course.id}/settings#tab-navigation"
 
       keep_trying_until do
