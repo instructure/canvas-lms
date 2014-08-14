@@ -58,7 +58,6 @@ module SIS
 
         @total_rows = 1
         @current_row = 0
-        @last_progress_update = Time.now
     
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
@@ -236,6 +235,7 @@ module SIS
       end
 
       def update_progress?
+        @last_progress_update ||= Time.now
         update_interval = Setting.get('sis_batch_progress_interval', 2.seconds).to_i
         @last_progress_update < update_interval.ago
       end
