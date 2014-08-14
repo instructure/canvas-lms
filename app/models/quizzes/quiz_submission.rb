@@ -206,7 +206,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       false
     elsif quiz.hide_results == 'until_after_last_attempt'
       # Visible if quiz has unlimited attempts (no way to get to last
-      # attempts), if this attempt it higher than the allowed attempts
+      # attempts), if this attempt is higher than the allowed attempts
       # (once you get into extra attempts), or if this attempt is
       # the last attempt and has been taken (checking for completion
       # prevents the student from starting to take the quiz for the last
