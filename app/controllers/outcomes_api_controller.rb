@@ -120,26 +120,26 @@ class OutcomesApiController < ApplicationController
   # description". Any new ratings lacking a point value are given a default of
   # 0.
   #
-  # @argument title [Optional, String]
+  # @argument title [String]
   #   The new outcome title.
   #
-  # @argument display_name [Optional, String]
+  # @argument display_name [String]
   #   A friendly name shown in reports for outcomes with cryptic titles,
   #   such as common core standards names.
   #
-  # @argument description [Optional, String]
+  # @argument description [String]
   #   The new outcome description.
   #
-  # @argument vendor_guid [Optional, String]
+  # @argument vendor_guid [String]
   #   A custom GUID for the learning standard.
   #
-  # @argument mastery_points [Optional, Integer]
+  # @argument mastery_points [Integer]
   #   The new mastery threshold for the embedded rubric criterion.
   #
-  # @argument ratings[][description] [Optional, String]
+  # @argument ratings[][description] [String]
   #   The description of a new rating level for the embedded rubric criterion.
   #
-  # @argument ratings[][points] [Optional, Integer]
+  # @argument ratings[][points] [Integer]
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
