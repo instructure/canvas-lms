@@ -215,7 +215,9 @@ module SIS
         if @rows_since_progress_update >= @updates_every
           if @parallelism > 1
             SisBatch.transaction do
-              @batch.reload(:select => 'data, progress', :lock => true)
+              lock_type = true
+              lock_type = 'FOR NO KEY UPDATE' if SisBatch.connection.adapter_name == 'PostgreSQL' && SisBatch.connection.send(:postgresql_version) >= 90300
+              @batch.reload(:select => 'data, progress', :lock => lock_type)
               @current_row += @batch.data[:current_row]
               @batch.data[:current_row] = @current_row
               @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
