@@ -798,7 +798,7 @@ ar:
           section_id: 
             field: "معرف القسم"
     settings: 
-      about_google_docs_tooltip: "نبذة حول معاينة Google Docs"
+      about_google_docs_tooltip: "نبذة حول معاينات Google Docs"
       account_admins_title: "مسؤولو الحساب"
       account_quotas: 
         file_quota: "حصة الملف"
