@@ -2201,6 +2201,7 @@ fr:
     no_manifest: "Le répertoire racine de ce fichier .zip Blackboard ne contient pas de fichier imsmanifest.xml."
   bookmark_service: 
     default_title: "Sans titre"
+  bucks_zero_activity_title: "Bucks – Activité nulle"
   bulk_course_migration: 
     export_failed: "Une erreur est survenue lors de l’exportation du cours portant l’identifiant bb_lcid %{id} à partir de Blackboard"
     export_failed_no_id: "Une erreur est survenue lors de l’importation d’un cours"
@@ -2796,11 +2797,13 @@ fr:
     by_sa: "Licence CC Paternité Partage à l’identique"
     private: "Privé (protégé par le droit d’auteur)"
     public_domain: "Domaine public"
+  ccp_zero_activity_title: "CCP – Activité nulle"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Ce travail a %{assignmentPoints} points possibles. Voulez-vous remplacer ce nombre par %{rubricPoints} points possibles pour vous aligner sur ce barème ?"
     titles: 
       update_assignment_points: "Voulez-vous modifier le nombre de points possibles pour vous aligner sur le barème ?"
+  chcp_student_activity_title: "Rapport d’activité des étudiants CHCP "
   collaboration: 
     default_title: "Collaboration sans titre"
   collaborations: 
@@ -6443,7 +6446,7 @@ fr:
     error: 
       update: "Une erreur s’est produite pendant la mise à jour de cette tâche. Veuillez réactualiser la page et recommencer."
     errors: 
-      no_points_possible: "Cannot curve without points possible"
+      no_points_possible: "Impossible de créer la courbe sans points possibles"
       none_to_update: "Aucune mise à jour nécessaire"
       upload_as_zip: "Veuillez télécharger les fichiers sous forme de fichier zip."
     grade_display_warning: 
@@ -6919,7 +6922,7 @@ fr:
       imported: "Groupes importés"
       student_organized: "Groupes d’étudiants"
       uncategorized: "Sans catégorie"
-    invalid_auto_leader: "AutoLeader type needs to be one of the following values: %{values}"
+    invalid_auto_leader: "Le type AutoLeader doit être l’une des valeurs suivantes : %{values}"
     invalid_self_signup: "L’auto-inscription doit être l’une de ces valeurs : %{values}"
     name_required: "Le nom doit être spécifié."
     name_reserved: "%{name} est un nom réservé."
@@ -14658,6 +14661,7 @@ fr:
     cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
   will_paginate: 
+    next_label: "&#8594; suivante"
     page_entries_info: 
       multi_page: "Afficher les %{model} de %{from} à %{to} sur un total de %{count} "
       multi_page_html: "Afficher les %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> sur un total de <b>%{count}</b> "
@@ -14670,6 +14674,7 @@ fr:
         other: "Afficher les <b>all&nbsp;%{count}</b> %{model}"
         zero: "Aucun %{model} trouvé"
     page_gap: "&hellip;"
+    previous_label: "&#8592; précédente"
   wimba_conference: 
     external_urls: 
       archive: Archiver
