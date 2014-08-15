@@ -20,6 +20,11 @@ if (process.env.CANVAS_BUILD_CONCURRENCY) clusterOpts.max_processes = parseInt(p
 if (sassFileToConvert) clusterOpts.max_processes = 1;
 var cc = new computecluster(clusterOpts);
 
+cc.on('error', function(e) {
+  cc.exit()
+  process.exit(1);
+});
+
 const VARIANTS = 'legacy_normal_contrast legacy_high_contrast new_styles_normal_contrast new_styles_high_contrast k12_normal_contrast k12_high_contrast'.split(' ')
 
 var toRun = 0;
@@ -30,7 +35,7 @@ VARIANTS.forEach(function(variant){
 
     toRun++
     cc.enqueue([variant, sassFile], function(err,r){
-      if (err) return console.log("an error occured compiling sass:", err);
+      if (err) return// console.log("an error occured compiling sass:", err);
       if (--toRun === 0) {
         cc.exit();
       }

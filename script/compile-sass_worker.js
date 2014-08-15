@@ -31,6 +31,10 @@ process.on('message', function(variantAndSassFile){
         process.send('complete')
       })
     },
+    error: function(errorMsg){
+      console.log('Error compiling sass:', errorMsg)
+      throw new Error(errorMsg)
+    },
     includePaths: ['app/stylesheets', 'app/stylesheets/variants/' + variant],
     imagePath: '/images',
     outputStyle: outputStyle,
