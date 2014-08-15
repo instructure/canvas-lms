@@ -7143,6 +7143,8 @@ es:
         cancel: Cancelar
         group_join_level: Unirse
         group_max_membership: "Limitar grupos a "
+        group_max_membership_help: "(Dejar en blanco para utilizar el máximo establecido por grupo)"
+        group_max_membership_members: miembros
         group_name: "Nombre del grupo"
         invitation_only: "Solo con invitación"
         open: "Cualquier miembro puede unirse"
@@ -7151,11 +7153,16 @@ es:
       group_user: 
         assign_to_group: "Asignar a grupo"
         assign_user_to_group: "Asignar %{name} a un grupo"
+        edit_group_membership: "Editar la suscripción de  %{name}"
         group_leader: "Líder grupal"
         move: "Mover a..."
         move_to_new_group: "Mover a %{name} a un nuevo grupo"
         remove: Eliminar
+        remove_as_leader: "Eliminar como líder"
         remove_from_group: "Eliminar a %{name} del grupo"
+        remove_user_as_leader: "Eliminar a %{name} como líder"
+        set_as_leader: "Fijar como líder"
+        set_user_as_leader: "Fijar a %{name} como líder"
       group_users: 
         add_student: "Agregar un alumno para empezar."
         add_user: "Agregar a un usuario para empezar."
@@ -7173,6 +7180,7 @@ es:
       self_signup_help: 
         about_self_signup_groups: "Sobre los grupos de autoinscripción "
         self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los alumnos podrán moverse de un grupo a otro."
+    max_membership_number: "Suscripciones máximas debe ser un número"
     member: 
       one: "1 miembro"
       other: "%{count} miembros"
@@ -7245,6 +7253,10 @@ es:
     which_course_is_this_question_about: "¿A qué curso corresponde esta pregunta?"
     your_email_address: "Su dirección de correo electrónico"
   helpers: 
+    button: 
+      create: "Crear %{model}"
+      submit: "Guardar %{model}"
+      update: "Actualizar %{model}"
     course: Curso
     dashboard_helper: 
       announcement_details: "Detalles del anuncio"
@@ -7264,16 +7276,23 @@ es:
       x_new_in_discussions: 
         one: "*1* debate"
         other: "*%{count}* debates"
+    local: Local
     select: 
       prompt: "Por favor seleccione"
+    submit: 
+      create: "Crear %{model}"
+      submit: "Guardar %{model}"
+      update: "Actualizar %{model}"
   high_contrast_description: |-
       Si prefiere ver una versión de la interfaz de usuario de Canvas con mayor contraste, habilite esta opción.
       Esta opción puede ser útil para personas con visión reducida o con dificultad para leer.
+  html5_first_videos_description: "De manera predeterminada, Canvas tratará de usar Flash en primer lugar para reproducir vídeos. Active esta opción para que intente utilizar HTML5 primero, y después recurrir a Flash."
   ic_actions: 
     manage: gestionar
   icons: 
     discussion_submission: "Envío del debate"
     file_upload_submission: "Envío de archivos cargados"
+    media_submission: "Envío de contenido multimedia"
     online_url_submission: "Envío de URL online"
     quiz_submission: "Envío de evaluación"
     text_entry_submission: "Envío de introducción de texto"
@@ -7294,7 +7313,11 @@ es:
   importers/context_module_importer: 
     migration_module_item_type: "Elemento de módulo"
   importers/course_content_importer: 
+    account_grading_standard_warning: "No se pudo encontrar el estándar de calificación de cuentas de este curso"
+    copied_grading_standard_warning: "No se pudo encontrar el estándar de calificación copiado de este curso."
+    due_dates_warning: "No se pudieron ajustar las fechas de vencimiento."
     failed_import_media_objects: "Se produjo un error al importar los objetos multimedia"
+    file_import_warning: "No se pudo encontrar e archivo %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "No se le permite gestionar resultados globales, no puede añadir \"%{title}\""
   importers/learning_outcome_importer: 
@@ -7333,6 +7356,7 @@ es:
         am_pm: am/pm
     draft: Borrador
     errors: 
+      cannot_view_document_in_canvas: "Este documento no se puede mostrar en Canvas."
       document_preview_processing: "Todavía se está procesando la vista previa del documento. Inténtelo de nuevo más tarde."
       field_is_required: "Este campo es requerido"
       invalid_datetime: "Valor de fecha/tiempo inválido"
@@ -7377,6 +7401,7 @@ es:
       view_in_new_window: "Ver en una ventana nueva"
     tooltips: 
       enter_search_terms: "ingresar los términos de búsqueda"
+  invalid_points_possible: "El valor de los puntos posibles para esta tarea debe ser cero o mayor que cero."
   invalid_url_in_xml: "URL no válida en xml. Se debe evitar el símbolo &."
   invalid_xml_syntax: "Sintaxis xml inválida"
   jobs: 
@@ -7424,6 +7449,7 @@ es:
         locked_by: "Bloqueado por"
         max_attempts: "Intentos Máximos"
         num_attempts: Intentos
+        original_job_id: "ID de trabajo original"
         priority: Prioridad
         run_at: "Correr en"
         strand: hilo
@@ -7439,8 +7465,14 @@ es:
     module_sequence_footer: 
       next: Siguiente
       previous: Anterior
+  k12_description: "Funciones, configuración y estilo que tienen más sentido específicamente en un entorno K-12. Por el momento, esto solo se aplica a algunas modificaciones de estilo, pero es posible que se incorporen más cosas específicas de K-12 en el futuro."
+  labels: 
+    lock_module_until: "Bloquear módulo hasta una fecha determinada"
+  last_submission_activity_title: "Actividad del último envío"
+  last_user_access_title: "Acceso del último usuario"
   layouts: 
     application: 
+      group_switch: Cambiar
       instructure_description: "Instructure, creadores del sistema de manejo de aprendizaje Canvas"
       keyboard_navigation: 
         close: "Pulse la tecla coma para cerrar este cuadro de diálogo"
@@ -7457,6 +7489,7 @@ es:
         grades: Calificaciones
       navigation: 
         main: "Navegación principal"
+        user_menu: "Menú de usuario"
       open_source_learning_management_system: "Código Abierto LMS"
     facebook: 
       title: "Página de Facebook"
@@ -7481,6 +7514,7 @@ es:
   learning_outcome: 
     no_comment: "Sin Comentario"
     no_description: "Sin Descripción"
+  learning_outcome_assignment_type_title: "Resultado de aprendizaja y tipo de tarea"
   lib: 
     angel: 
       failed_import_link: "Se ha producido un error al importar un enlace"
@@ -7585,6 +7619,8 @@ es:
       new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
       new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
       new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
+  lti2: 
+    register_tool: "Herramienta de registros"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Importador de Moodle"
   manage_avatars: 
@@ -7792,6 +7828,7 @@ es:
           attendee: Participante
           attendees: Participantes
           cancel_reason: "Motivo de la cancelación"
+          click_to_see_appointment: "Haga clic aquí para ver la cita"
           date_and_time: Fecha/Hora
           details: "Detalles de la cita"
           group: Grupo
@@ -8213,6 +8250,7 @@ es:
     assignment_resubmitted: 
       email: 
         html: 
+          link: "Haga clic aquí para ver el envío"
           user_resubmitted: "Reenvío: %{user_name}, %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} acaba de reenviar %{assignment_name} en el curso %{course_name}"
         labels: 
@@ -8233,6 +8271,7 @@ es:
     assignment_submitted: 
       email: 
         html: 
+          link: "Haga clic aquí para ver el envío"
           user_submitted: "Envío: %{user_name}, %{assignment_name}"
           user_submitted_sentence: "%{user_name} acaba de realizar un envío para %{assignment_name} en el curso %{course_name}"
         labels: 
@@ -8253,6 +8292,7 @@ es:
     assignment_submitted_late: 
       email: 
         html: 
+          link: "Haga clic aquí para ver el envío"
           user_resubmitted_sentence: "%{user_name} acaba de realizar un envío atrasado para %{assignment_name} en el curso %{course_name}"
           user_submitted: "Tarea atrasada: %{user_name}, %{assignment_name}"
         labels: 
@@ -8375,6 +8415,7 @@ es:
         subject: "Falló la Exportación del Curso: %{course}"
     content_export_finished: 
       email: 
+        body: "Ha finalizado la exportación de su contenido para \"%{course}\"."
         html: 
           body2: "La exportación de su curso para *%{course}* ha terminado."
           link: "Haga clic para ver las exportaciones"
@@ -8394,8 +8435,10 @@ es:
           download: descargar
           subject: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           unknown_user: "Usuario desconocido"
+          view_message: "Ver este mensaje en Conversaciones"
         subject: "%{user_name} le acaba de enviar un mensaje en Canvas."
         unknown_user: "Usuario Desconocido"
+        view_message: "Ver este mensaje en Conversaciones"
       facebook: 
         body: "%{user_name} le acaba de enviar un mensaje en Canvas."
         link_text: "Ver el Mensaje"
@@ -8850,6 +8893,10 @@ es:
     index: 
       titles: 
         messages: "Mensajes para %{name}"
+    layout: 
+      email: 
+        html: 
+          click_to_preferences: "Actualizar la configuración de sus actualizaciones"
     merge_email_communication_channel: 
       email: 
         body: "Se ha creado una cuenta para usted en %{host}, pero ya tiene una cuenta de Canvas. Si desea combinarlas, diríjase a la siguiente url:"
@@ -9201,8 +9248,19 @@ es:
     page_locked_until: "Esta página está bloqueada hasta %{date}."
     page_unpublished_module: "Esta página es parte de un módulo sin publicar y aún no está disponible."
     peer_review_invitation: 
+      email: 
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+        html: 
+          link_message: "Haga clic aquí para realizar la revisión"
+        subject: "Revisor asignador para %{reviewee}"
+      facebook: 
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
       sms: 
         more_info: "Más información en %{url}"
+      summary: 
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+      twitter: 
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
     pseudonym_registration: 
       email: 
         body: "¡Se ha registrado para una cuenta con Canvas en %{account}! Antes que pueda ingresar y comenzar a usar Canvas, deberá terminar el proceso de configuración."
@@ -9315,6 +9373,7 @@ es:
         body: "%{author} acaba de comentar en el envío para %{user} para %{assignment}"
         html: 
           body: "%{author} acaba de comentar el envío para %{user} para %{assignment}"
+          link_message: "Haga clic aquí para ver el comentario"
           someone: Alguien
           subject: "Comentario sobre el envío: %{user}, %{assignment}, %{context}"
           submission_comment_link_message: "Puede revisar los datos de envío utilizando el enlace siguiente o puede responder a este comentario respondiendo a este mensaje."
@@ -9338,6 +9397,8 @@ es:
         body: "%{author} acaba de comentar en el envío de %{user} para %{assignment}"
         html: 
           body: "%{author} acaba de comentar en el envío de %{user} para %{assignment}"
+          link_message: "Puede revisar los detalles del envío haciendo clic en el enlace que aparece a continuación:"
+          review_submission: "Haga clic aquí para revisar el envío"
           someone: Alguien
           subject: "Comentario sobre el envío: %{user}, %{assignment}, %{context}"
         someone: Alguien
@@ -9562,6 +9623,7 @@ es:
   migration_issues: 
     errors: 
       valid_workflow_state: "Debe enviar un estado de flujo de trabajo válido"
+  mississippi_sis_title: "Datos SIS"
   module_item_types: 
     assignment: Tarea
     disuccsion: Debate
@@ -9623,6 +9685,7 @@ es:
     where_to_move: "¿Dónde desea mover *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- A la parte de abajo --"
+  multi_student_progress_title: "Progreso de varios alumnos"
   mute_dialog: 
     curving_assignments: "Aplicando Curvas a tareas"
     grade_change_notifications: "Notificaciones de Cambios de Calificaciones"
@@ -9635,6 +9698,8 @@ es:
     sure_you_want_to_mute: "¿Está seguro que quiere obviar esta tarea? Mientras esta tarea está obviada, los estudiantes no recibirán nuevas notificaciones acerca o podrá ver:"
   name: "Importador de Academic Benchmark"
   new_facebook_message: "Tiene un mensaje nuevo de Canvas"
+  new_quiz_moderate_desc: "Si el estado borrador y las estadísticas de la evaluación están habilitadas o activadas, la nueva página de moderación de evaluaciones estará disponible para una cuenta determinada."
+  new_quiz_statistics_desc: "Cuando el estado borrador está activado o habilitado, la nueva página de estadísticas de evaluaciones estará disponible para una cuenta determinada."
   new_styles_description: "Estamos rediseñando la interfaz de usuario de Canvas. Active esta opción para poder ver el nuevo aspecto simplificado de la interfaz de Canvas,"
   no_migration_file: "Archivo obligatorio para la migración de contenido."
   not_a_number: "debe ser un número positivo"
@@ -9700,6 +9765,17 @@ es:
     due_date_display: "Fecha de entrega"
     files_description: "Nuevo archivo añadido a su curso"
     files_display: Archivos
+    grading_description: |-
+        Incluye:
+        
+        * Calificación de tareas/envíos introducida/modificada
+        * Calificación de tareas reactivadas
+        * Modificación de la media ponderada de la calificación
+        
+        ​
+        
+        Marque la casilla "Incluir puntuaciones al avisar sobre modificaciones en las calificaciones" si desea ver sus calificaciones en las notificaciones.
+        Si su correo electrónico no pertenece a la institución, esto significa que se enviará informacíón confidencial fuera de la institución.
     grading_display: Calificación
     grading_notify_include_grade: "Incluír calificaciones al alertar acerca de cambios de calificaciones."
     grading_policies_description: "Modificación de la política de calificaciones del curso"
@@ -9812,6 +9888,7 @@ es:
         ⏎
         Registros de citas de alumnos
     student_appointment_display: "Registros de citas para alumnos"
+    submission_comment_description: "Comentario al envío de tareas"
     submission_comment_display: "Comentario de Envío"
   notification_preferences: 
     communication: 
@@ -9861,6 +9938,12 @@ es:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: "Mil millones"
+          million: Millón
+          quadrillion: "Mil billones"
+          thousand: Mil
+          trillion: Billón
       storage_units: 
         format: "%n %u"
         units: 
@@ -9872,8 +9955,12 @@ es:
           mb: MB
           tb: TB
   observees: 
+    add_observee_button: "Añadir alumno"
+    being_observed: "Alumnos en observación"
     new_observee_password: Contraseña
     new_observee_username: "Nombre de usuario"
+    observee_added: "En observación ahora %{user}"
+    observing: "En observación"
   options: 
     ? "no"
     : "No"
@@ -9887,6 +9974,7 @@ es:
   outcome_path_result: "%{path} resultado"
   outcome_results: 
     outcomes_filename: Resultados
+  outcome_results_title: "Determinar resultados"
   outcomes: 
     account_standards: "Estándares de la cuenta"
     account_standards_description: "A la izquierda verá los estándares que ha creado su institución para que los utilice en su cursos."
@@ -9941,8 +10029,10 @@ es:
           manage: 
             description: "*Los resultados se crean aquí para hacer un seguimiento del dominio en un curso. Para empezar, compruebe la barra del menú que se encuentra en la parte superior. Haga clic en el botón New (Nuevo) para crear un nuevo resultado o en el botón New Group (Nuevo grupo) para crear un nuevo grupo en el que organizar sus resultados. El botón Find (Buscar) le permitirá utilizar los resultados que ha creado su estado o institución. A medida que crea y utiliza resultados podrá utilizar el panel izquierdo para navegar por los resultados. Puede arastrar y soltar resultados entre los diferentes niveles para crear una estructura.* *Y, lo que es más importante, Canvas le permite añadir resultados a su epígrafe de evaluación de modo que puede valorar el dominio a medida que evalúa las asignaciones. Una vez que haya fijado los resultados, haga clic en Manage Rubrics (Gestionar epígrafes) para empezar a utilizar sus resultados para evaluar.*"
             title: "Fijando resultados"
+    mastery: Dominio
     mastery_error: "Debe ser mayor o igual que 0"
     missing_outcome: "No se pudo encontrar ese resultado de aprendizaje"
+    near: "Casi dominio"
     new_outcome: "Nuevo resultado"
     new_outcome_group: "Nuevo grupo de resultados"
     outcome: 
@@ -9964,6 +10054,7 @@ es:
       criterion_dialog: "Resultados de aprendizaje pueden incluirse in las rúbricas de tareas como una forma fácil para evaluar el dominio de resultados de tareas específicas. Cuando se define un resultado de aprendizaje, debería definir el criterio que puede usarse al construir las rúbricas de tareas. Defina cuantas columnas de rúbricas sean necesarias, y especifique un punto límite que será usado para definir el dominio de este resultado."
       criterion_info_link: "Haga clic para saber más sobre la evaluación de los criterios"
       description: "Describa este resultado"
+      display_name: "Nombre descriptivo (optativo)"
       mastery: "Dominio en"
       points: "%{points_possible} Puntos"
       title: "Nombre este resultado"
@@ -9980,6 +10071,7 @@ es:
       attempt_info: "intento #%{attempt_number}, %{attempt_date}"
       outcome_mastered: dominado
       scoring: "%{points} de %{possible_points}"
+    remedial: "Medidas correctoras"
     show: 
       no_aligned_items: "No hay elementos asignados"
       no_artifacts: "No hay artefactos"
@@ -9992,6 +10084,7 @@ es:
     titles: 
       find_outcomes: "Buscar resultados"
     top_level: "%{context} Nivel superior"
+    undefined: "Sin comenzar"
     user_outcome_results: 
       artifacts: 
         one: "1 artefacto"
@@ -10065,8 +10158,10 @@ es:
     view_more_link: "Ver más"
   paginated_view: 
     loading_more_results: "Cargando más resultados"
+  pasco_user_notes_title: "Notas del usuario"
   paypal: 
     exception: "Lo sentimos, se ha producido un error. Por favor, inténtelo de nuevo más tarde."
+  penn_harris_student_grade_title: "Calificaciones del alumno en Penn Harris"
   plugins: 
     academic_benchmark_importer: 
       description: "Esta función permite importar los estándares de Academic Benchmark a Canvas."
@@ -10114,11 +10209,16 @@ es:
       secret_description: "Este es el parametro %{parameter_name} que puede encontrarse en el archivo de configuración %{filename}."
     buttons: 
       saving: Guardando...
+    canvadocs: 
+      description: "Habilitar Canvadocs (compatible con Box View) como opción de previsualización de documentos"
+      name: Canvadocs
     canvadocs_settings: 
+      description: "Este plugin se integra con Canvadocs (o cualquier API compatible de Box View) para proporcionar una herramineta de vista previa de documentos HTML5."
       labels: 
         api_key: "Código API"
         base_url: "URL base"
     crocodoc: 
+      description: "Habilitar Crocodoc como opción de previsualización de documentos"
       name: Crocodoc
     crocodoc_settings: 
       description: "Este complemento se integra con Crocodoc para ofrecer un previsualizador de documentos HTML5 que proporciona a los profesores y los alumnos la capacidad para anotar documentos."
@@ -10169,10 +10269,18 @@ es:
       description: "Aplicación de Canvas en Facebook"
       name: Facebook
     facebook_settings: 
+      description: |-
+          Deberá crear una [nueva aplicación en facebook.com](%{facebook_url}), y añadir "Aplicación en Facebook" como plataforma.
+          Establezca las siguientes opciones de configuración para garantizar el correcto funcionamiento de su aplicación de Facebook:
+          
+          * **Configuración -- Aplicación en Facebook -- Página de Canvas:** anote lo que vaya a elegir (la parte que aparece después de apps.facebook.com) e introdúzcala en el formulario que aparece a continuación.
+          * **Configuración -- Aplicación en Facebook -- URL de Canvas:** configurare en %{canvas_url}
+          * Una vez que haya guardado su aplicación, anote la ID de la aplicación el token del cliente y el secreto de la aplicación
       domain_name: dominio
       headers: 
         domain_settings: "Configuraciones del Dominio"
       hints: 
+        api_key: "También llamado Token del cliente"
         canvas_domain: "este es el dominio especificado en \"Canvas URL\""
         canvas_name: "este es la ruta especificada en \"Página Canvas\""
         disable_ssl: "Usar solo para evaluación local"
@@ -10389,6 +10497,16 @@ es:
         access_key: "Clave de acceso"
         api_url: "URL Api"
         secret_key: "Código Secreto"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "El curso es obligatorio."
+      validations: 
+        section_belongs_to_course: "La sección del curso no pertenece al curso exitente."
+    poll_submissions: 
+      validations: 
+        poll_choice_belongs_to_poll: "La opción de la encuesta no pertenece a la encuesta existente"
+        poll_is_published: "La sesión de la encuesta no está abierta para envíos"
   post_grades_description: |-
       La opción Publicar calificaciones permite a los profesores publicar las calificaciones en sistemas preparados para SIS: Powerschool,
       Aspire (SIS2000), JMC y cualquier otro SIS compatible con SIF que acepte los elementos SIF GradingCategory,
@@ -10434,6 +10552,7 @@ es:
       unregister_service: "¿Seguro que quiere cancelar el registro de este servicio?"
     crumb: "Perfil de %{user}"
     crumbs: 
+      observees: "En observación"
       settings_frd: "Configuraciones para %{user}'"
     done_resending: "¡Listo! Enviar el mensaje puede tardar unos minutos."
     email_select: 
@@ -10458,6 +10577,8 @@ es:
       contact_confirmed: "Contacto confirmado correctamente."
       mfa_disabled: "Autenticación de factores múltiples desactivada"
       updated_profile: "Perfil actualizado con éxito"
+    observees: 
+      page_title: "Alumnos en observación"
     please_select_an_option: "Por favor seleccione una opción"
     profile: 
       access_token_description: "Componentes léxicos de acceso pueden ser usados para permitir que otras aplicaciones hagan llamadas API por su parte. Puede generar componentes léxicos de acceso y *usar el API Libre de Canvas* para producir sus propias integraciones. "
@@ -13506,6 +13627,7 @@ es:
     grades: Calificaciones
     home: "Página de Inicio"
     modules: Módulos
+    observees: "En observación"
     outcomes: Resultados
     pages: Páginas
     people: Personas
