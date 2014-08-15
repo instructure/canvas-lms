@@ -160,5 +160,81 @@ describe MediaObject do
       CanvasKaltura::ClientV3.any_instance.stubs(:bulkUploadAdd).returns({})
       MediaObject.add_media_files(@attachment, false)
     end
+
+    context "partner_data" do
+      let(:uploading_user) { user }
+      let(:attachment_context) { uploading_user }
+      let(:attachment) { attachment_obj_with_context(attachment_context, user: uploading_user) }
+      let(:kaltura_config) { {} }
+      let(:kaltura_client) { mock('CanvasKaltura::ClientV3') }
+      let(:wait_for_completion) { false }
+      let(:files_sent_to_kaltura) { [] }
+
+      before do
+        CanvasKaltura::ClientV3.stubs(:config).returns(kaltura_config)
+        CanvasKaltura::ClientV3.expects(:new).returns(kaltura_client)
+
+        kaltura_client.stubs(:startSession)
+        kaltura_client.stubs(:bulkUploadAdd).with do |files|
+          files_sent_to_kaltura.concat(files)
+        end.returns({})
+      end
+
+      it "always includes basic info about attachment and context" do
+        MediaObject.add_media_files([attachment], wait_for_completion)
+
+        partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
+        partner_data_json.should == {
+          "attachment_id" => attachment.id.to_s,
+          "context_source" => "file_upload",
+          "root_account_id" => attachment.root_account_id.to_s,
+        }
+      end
+
+      context "when the kaltura settings for the account include 'Write SIS data to Kaltura'" do
+        let(:kaltura_config) { { 'kaltura_sis' => '1' }}
+
+        it "adds a context_code to the partner_data sent to kaltura" do
+          MediaObject.add_media_files([attachment], wait_for_completion)
+
+          partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
+          partner_data_json['context_code'].should == "user_#{attachment_context.id}"
+        end
+
+        context "and the context has a root_account attached" do
+          let(:attachment_context) { course_with_teacher(user: uploading_user).course }
+
+          context "and the user has a pseudonym with a user_sis_id attached" do
+            let(:uploading_user) { user_with_pseudonym }
+
+            before do
+              uploading_user.pseudonym.sis_user_id = "some_id_from_sis"
+              uploading_user.pseudonym.save
+            end
+
+            it "adds sis_user_id to partner_data" do
+              MediaObject.add_media_files([attachment], wait_for_completion)
+
+              partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
+              partner_data_json["sis_user_id"].should == "some_id_from_sis"
+            end
+          end
+
+          context 'and the context has a sis_source_id attached' do
+            before do
+              attachment_context.sis_source_id = "gooboo"
+              attachment_context.save!
+            end
+
+            it "adds sis_source_id to partner_data" do
+              MediaObject.add_media_files([attachment], wait_for_completion)
+
+              partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
+              partner_data_json["sis_source_id"].should == "gooboo"
+            end
+          end
+        end
+      end
+    end
   end
 end
