@@ -109,4 +109,31 @@ describe "Importing modules" do
     tag2.content.should == tool2
   end
 
+  it "should not create a blank tag if the content is not found" do
+    data = { :migration_id => "1", :title => "derp",
+             :items => [{
+                :migration_id => 'mig1',
+                :type => "linked_resource",
+                :linked_resource_title => "whatevs",
+                :linked_resource_type => "externalurl",
+                :url => "http://exmpale.com/stuff"
+              },
+              {
+                :migration_id => 'mig2',
+                :type => "linked_resource",
+                :linked_resource_title => "whatevs",
+                :linked_resource_type => "WikiPage",
+                :linked_resource_id => '2'
+              }],
+             :completion_requirements => [{:type => "must_view", :item_migration_id => "mig1"}]
+    }
+
+    course_model
+    migration = ContentMigration.new
+    mod = Importers::ContextModuleImporter.import_from_migration(data, @course, migration)
+    mod.reload
+
+    mod.content_tags.count.should == 1
+  end
+
 end
