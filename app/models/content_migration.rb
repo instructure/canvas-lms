@@ -606,6 +606,17 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  # maps the key in the copy parameters hash to the asset string prefix
+  # (usually it's just .singularize; weird names needing special casing go here :P)
+  def self.asset_string_prefix(key)
+    case key
+      when 'quizzes'
+        'quizzes:quiz'
+      else
+        key.singularize
+    end
+  end
+
   # strips out the "id_" prepending the migration ids in the form
   # also converts arrays of migration ids (or real ids for course exports) into the old hash format
   def self.process_copy_params(hash, for_content_export=false, return_asset_strings=false)
@@ -638,7 +649,7 @@ class ContentMigration < ActiveRecord::Base
         # or :select => {:context_modules => [blahblahblah, blahblahblah2]} for normal migration ids
         sub_hash = {}
         if for_content_export
-          asset_type = key.to_s.singularize
+          asset_type = asset_string_prefix(key.to_s)
           value.each do |id|
             sub_hash[process_key.call("#{asset_type}_#{id}")] = '1'
           end

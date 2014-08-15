@@ -247,6 +247,9 @@ describe ContentExportsApiController, type: :request do
         mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
         mod
       end
+      let_once(:quiz_to_copy) do
+        t_course.quizzes.create! title: 'thaumolinguistics'
+      end
 
       it "should create a selective course export with old migration id format" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
@@ -326,6 +329,14 @@ describe ContentExportsApiController, type: :request do
         copied_att.should_not be_nil
         copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
         @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+      end
+
+      it "should select quizzes correctly" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:quizzes => [quiz_to_copy.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.settings['selected_content']['quizzes'].should == {CC::CCHelper.create_key(quiz_to_copy) => "1"}
       end
     end
   end
