@@ -317,7 +317,7 @@ class UsersController < ApplicationController
   # @API List users in account
   # Retrieve the list of users associated with this account.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #
@@ -949,54 +949,54 @@ class UsersController < ApplicationController
   # endpoint to register new users. Certain fields will be required, and
   # others will be ignored (see below).
   #
-  # @argument user[name] [Optional, String]
+  # @argument user[name] [String]
   #   The full name of the user. This name will be used by teacher for grading.
   #   Required if this is a self-registration.
   #
-  # @argument user[short_name] [Optional, String]
+  # @argument user[short_name] [String]
   #   User's name as it will be displayed in discussions, messages, and comments.
   #
-  # @argument user[sortable_name] [Optional, String]
+  # @argument user[sortable_name] [String]
   #   User's name as used to sort alphabetically in lists.
   #
-  # @argument user[time_zone] [Optional, String]
+  # @argument user[time_zone] [String]
   #   The time zone for the user. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
-  # @argument user[locale] [Optional, String]
+  # @argument user[locale] [String]
   #   The user's preferred language as a two-letter ISO 639-1 code.
   #
-  # @argument user[birthdate] [Optional, Date]
+  # @argument user[birthdate] [Date]
   #   The user's birth date.
   #
-  # @argument user[terms_of_use] [Optional, Boolean]
+  # @argument user[terms_of_use] [Boolean]
   #   Whether the user accepts the terms of use. Required if this is a
   #   self-registration and this canvas instance requires users to accept
   #   the terms (on by default).
   #
-  # @argument pseudonym[unique_id] [String]
+  # @argument pseudonym[unique_id] [Required, String]
   #   User's login ID. If this is a self-registration, it must be a valid
   #   email address.
   #
-  # @argument pseudonym[password] [Optional, String]
+  # @argument pseudonym[password] [String]
   #   User's password. Cannot be set during self-registration.
   #
-  # @argument pseudonym[sis_user_id] [Optional, String]
+  # @argument pseudonym[sis_user_id] [String]
   #   SIS ID for the user's account. To set this parameter, the caller must be
   #   able to manage SIS permissions.
   #
-  # @argument pseudonym[send_confirmation] [Optional, Boolean]
+  # @argument pseudonym[send_confirmation] [Boolean]
   #   Send user notification of account creation if true.
   #   Automatically set to true during self-registration.
   #
-  # @argument communication_channel[type] [Optional, String]
+  # @argument communication_channel[type] [String]
   #   The communication channel type, e.g. 'email' or 'sms'.
   #
-  # @argument communication_channel[address] [Optional, String]
+  # @argument communication_channel[address] [String]
   #   The communication channel address, e.g. the user's email address.
   #
-  # @argument communication_channel[skip_confirmation] [Optional, Boolean]
+  # @argument communication_channel[skip_confirmation] [Boolean]
   #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
   #   Otherwise, the user must respond to a confirmation message to confirm the
@@ -1188,24 +1188,24 @@ class UsersController < ApplicationController
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
-  # @argument user[name] [Optional, String]
+  # @argument user[name] [String]
   #   The full name of the user. This name will be used by teacher for grading.
   #
-  # @argument user[short_name] [Optional, String]
+  # @argument user[short_name] [String]
   #   User's name as it will be displayed in discussions, messages, and comments.
   #
-  # @argument user[sortable_name] [Optional, String]
+  # @argument user[sortable_name] [String]
   #   User's name as used to sort alphabetically in lists.
   #
-  # @argument user[time_zone] [Optional, String]
+  # @argument user[time_zone] [String]
   #   The time zone for the user. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
-  # @argument user[locale] [Optional, String]
+  # @argument user[locale] [String]
   #   The user's preferred language as a two-letter ISO 639-1 code.
   #
-  # @argument user[avatar][token] [Optional, String]
+  # @argument user[avatar][token] [String]
   #   A unique representation of the avatar record to assign as the user's
   #   current avatar. This token can be obtained from the user avatars endpoint.
   #   This supersedes the user [avatar] [url] argument, and if both are included
@@ -1214,7 +1214,7 @@ class UsersController < ApplicationController
   #   endpoint and used in the user update endpoint, and should not be
   #   constructed by the client.
   #
-  # @argument user[avatar][url] [Optional, String]
+  # @argument user[avatar][url] [String]
   #   To set the user's avatar to point to an external url, do not include a
   #   token and instead pass the url here. Warning: For maximum compatibility,
   #   please use 128 px square images.
