@@ -197,7 +197,7 @@ ActionView::TemplateRenderer.class_eval do
   def render_template_with_assign(template, *a)
     old_i18n_scope = @lookup_context.i18n_scope
     if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
-      @lookup_context.i18n_scope = virtual_path.sub(/\/_/, '/').gsub('/', '.')
+      @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
     end
     render_template_without_assign(template, *a)
   ensure
@@ -207,14 +207,20 @@ ActionView::TemplateRenderer.class_eval do
 end
 
 ActionView::PartialRenderer.class_eval do
-  def render_partial_with_assign
-    old_i18n_scope = @lookup_context.i18n_scope
-    @lookup_context.i18n_scope = @path.sub(/\/_/, '/').gsub('/', '.') if @path
-    render_partial_without_assign
-  ensure
-    @lookup_context.i18n_scope = old_i18n_scope
+  [:render_partial, :render_collection].each do |method|
+    define_method("#{method}_with_assign") do
+      begin
+        old_i18n_scope = @lookup_context.i18n_scope
+        if @template.respond_to?(:virtual_path) && (virtual_path = @template.virtual_path)
+          @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
+        end
+        send "#{method}_without_assign"
+      ensure
+        @lookup_context.i18n_scope = old_i18n_scope
+      end
+    end
+    alias_method_chain method, :assign
   end
-  alias_method_chain :render_partial, :assign
 end
 
 ActionView::Base.class_eval do
