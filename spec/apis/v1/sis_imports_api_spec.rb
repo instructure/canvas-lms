@@ -417,6 +417,18 @@ describe SisImportsApiController, type: :request do
     end
   end
 
+  it "should allow raw post without content-type" do
+    # In the current API docs, we specify that you need to send a content-type to make raw
+    # post work. However, long ago we added code to make it work even without the header,
+    # so we are going to maintain that behavior.
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", "\xffab=\xffcd", { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+
+    batch = SisBatch.last
+    batch.attachment.filename.should == "sis_import.zip"
+    batch.attachment.content_type.should == "application/x-www-form-urlencoded"
+    batch.attachment.size.should == 7
+  end
+
   it "should allow raw post without charset" do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",

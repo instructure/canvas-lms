@@ -88,7 +88,7 @@ module CanvasRails
     config.middleware.insert_before('ActionDispatch::RequestId', "RequestContextGenerator")
     config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
     config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
-    config.middleware.insert_before('ActionDispatch::ParamsParser', 'PreventNonMultipartParse')
+    config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
