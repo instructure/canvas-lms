@@ -27,8 +27,6 @@ module Lti
       @lti_launch.params = message.post_params
       @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
       @lti_launch.launch_type = message.launch_presentation_document_target
-      @lti_launch.message_type = message.lti_message_type
-
       render template: 'lti/framed_launch'
     end
 
@@ -52,7 +50,6 @@ module Lti
           @lti_launch.params = message_service.signed_params(@lti_launch.resource_url, message)
           @lti_launch.link_text = message_handler.resource.name
           @lti_launch.launch_type = message.launch_presentation_document_target
-          @lti_launch.message_type = message.lti_message_type
 
           render template: 'lti/framed_launch' and return
         end

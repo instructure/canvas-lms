@@ -39,7 +39,7 @@ module Lti
       variable_substitutor = LtiOutbound::VariableSubstitutor.new
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user =  Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
@@ -62,20 +62,21 @@ module Lti
         end
       end
 
-
-      @tool_launch = LtiOutbound::ToolLaunch.new({
-                                                     url: launch_url,
-                                                     link_code: link_code,
-                                                     return_url: return_url,
-                                                     resource_type: resource_type,
-                                                     selected_html: selected_html,
-                                                     outgoing_email_address: HostUrl.outgoing_email_address,
-                                                     context: lti_context,
-                                                     user: lti_user,
-                                                     tool: lti_tool,
-                                                     account: lti_account,
-                                                     :variable_substitutor => variable_substitutor
-                                                 })
+      @tool_launch = LtiOutbound::ToolLaunch.new(
+          {
+              url: launch_url,
+              link_code: link_code,
+              return_url: return_url,
+              resource_type: resource_type,
+              selected_html: selected_html,
+              outgoing_email_address: HostUrl.outgoing_email_address,
+              context: lti_context,
+              user: lti_user,
+              tool: lti_tool,
+              account: lti_account,
+              :variable_substitutor => variable_substitutor
+          }
+      )
       self
     end
 

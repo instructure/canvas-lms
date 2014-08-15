@@ -40,6 +40,132 @@ describe ExternalToolsController do
   before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
+
+  end
+
+  describe "GET 'show'" do
+    context 'ContentItemSelectionResponse' do
+      before :once do
+        @tool = new_valid_tool(@course)
+        @tool.course_navigation = { message_type: 'ContentItemSelectionResponse' }
+        @tool.save!
+
+        @course.name = 'a course'
+        @course.save!
+      end
+
+      it "generates launch params for a ContentItemSelectionResponse message" do
+        user_session(@teacher)
+        Lti::Asset.stubs(:opaque_identifier_for).returns('ABC123')
+
+        @course.root_account.lti_guid = 'root-account-guid'
+        @course.root_account.name = 'root account'
+        @course.root_account.save!
+
+        get :show, :course_id => @course.id, id: @tool.id
+
+        response.should be_success
+        lti_launch = assigns[:lti_launch]
+        lti_launch.link_text.should == 'bob'
+        lti_launch.resource_url.should == 'http://www.example.com/basic_lti'
+        lti_launch.launch_type.should be_nil
+        lti_launch.params['lti_message_type'].should == 'ContentItemSelectionResponse'
+        lti_launch.params['lti_version'].should == 'LTI-1p0'
+        lti_launch.params['context_id'].should == 'ABC123'
+        lti_launch.params['resource_link_id'].should == 'ABC123'
+        lti_launch.params['tool_consumer_instance_guid'].should == 'root-account-guid'
+        lti_launch.params['tool_consumer_instance_name'].should == 'root account'
+        lti_launch.params['context_title'].should == 'a course'
+        lti_launch.params['launch_presentation_return_url'].should start_with 'http'
+      end
+
+      it "sends content item json for a course" do
+        user_session(@teacher)
+        get :show, :course_id => @course.id, id: @tool.id
+        content_item = JSON.parse(assigns[:lti_launch].params['content_items'])
+        placement = content_item['@graph'].first
+
+        content_item['@context'].should == 'http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement'
+        content_item['@graph'].size.should == 1
+        placement['@type'].should == 'ContentItemPlacement'
+        placement['placementOf']['@type'].should == 'FileItem'
+        placement['placementOf']['@id'].should == "#{api_v1_course_content_exports_url(@course)}?export_type=common_cartridge"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
+        placement['placementOf']['title'].should == 'a course'
+      end
+
+      it "sends content item json for an assignment" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        get :show, :course_id => @course.id, id: @tool.id, :assignments => [assignment.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "assignments%5B%5D=#{assignment.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.assignment'
+        placement['placementOf']['title'].should == 'an assignment'
+      end
+
+      it "sends content item json for a quiz" do
+        user_session(@teacher)
+        quiz = @course.quizzes.create!(title: 'a quiz')
+        get :show, :course_id => @course.id, id: @tool.id, :quizzes => [quiz.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "quizzes%5B%5D=#{quiz.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
+        placement['placementOf']['title'].should == 'a quiz'
+      end
+
+      it "sends content item json for a module" do
+        user_session(@teacher)
+        context_module = @course.context_modules.create!(name: 'a module')
+        get :show, :course_id => @course.id, id: @tool.id, :modules => [context_module.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "modules%5B%5D=#{context_module.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.module'
+        placement['placementOf']['title'].should == 'a module'
+      end
+
+      it "sends content item json for a page" do
+        user_session(@teacher)
+        page = @course.wiki.wiki_pages.create!(title: 'a page')
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [page.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "pages%5B%5D=#{page.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.page'
+        placement['placementOf']['title'].should == 'a page'
+      end
+
+      it "sends content item json for selected content" do
+        user_session(@teacher)
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [1,6], :assignments => [6]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include 'export_type=common_cartridge'
+        params.should include 'pages%5B%5D=1'
+        params.should include 'pages%5B%5D=6'
+        params.should include 'assignments%5B%5D=6'
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
+        placement['placementOf']['title'].should == 'a course'
+      end
+    end
   end
 
   describe "GET 'retrieve'" do
@@ -490,4 +616,5 @@ describe ExternalToolsController do
     end
 
   end
+
 end
