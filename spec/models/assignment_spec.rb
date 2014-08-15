@@ -276,20 +276,6 @@ describe Assignment do
   end
 
   context "differentiated_assignment visibility" do
-
-    def setup_DA
-      @course = course(:active_course => true)
-      @course_section = @course.course_sections.create
-      @student1, @student2, @student3 = create_users(3, return_type: :record)
-      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
-      @course.enroll_student(@student2, :enrollment_state => 'active')
-      @section = @course.course_sections.create!(name: "test section")
-      @section2 = @course.course_sections.create!(name: "second test section")
-      student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
-      @course.reload
-    end
-
     describe "students_with_visibility" do
       before :once do
         setup_DA
@@ -1014,6 +1000,56 @@ describe Assignment do
       res.length.should >= 6
       ids = @late_submissions.map{|s| s.user_id}
     end
+
+    context "differentiated_assignments" do
+      before do
+        setup_DA
+        @submissions = []
+        [@student1, @student2].each do |u|
+          @submissions << @assignment.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+      end
+      context "feature on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+
+        it "should assign peer reviews only to students with visibility" do
+          @assignment.peer_review_count = 1
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(0)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should_not be_include(s)
+            res.map{|a| a.assessor_asset}.should_not be_include(s)
+          end
+
+          # once graded the student will have visibility
+          # and will therefore show up in the peer reviews
+          @assignment.grade_student(@student2, :grader => @teacher, :grade => '100')
+
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(@submissions.length)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should be_include(s)
+            res.map{|a| a.assessor_asset}.should be_include(s)
+          end
+        end
+
+      end
+
+      context "feature off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should assign peer reviews to any student with a submission" do
+          @assignment.peer_review_count = 1
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(@submissions.length)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should be_include(s)
+            res.map{|a| a.assessor_asset}.should be_include(s)
+          end
+        end
+      end
+    end
+
+
   end
 
   context "grading scales" do
@@ -3109,3 +3145,14 @@ def zip_submissions
   zip
 end
 
+def setup_DA
+  @course_section = @course.course_sections.create
+  @student1, @student2, @student3 = create_users(3, return_type: :record)
+  @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+  @course.enroll_student(@student2, :enrollment_state => 'active')
+  @section = @course.course_sections.create!(name: "test section")
+  @section2 = @course.course_sections.create!(name: "second test section")
+  student_in_section(@section, user: @student1)
+  create_section_override_for_assignment(@assignment, {course_section: @section})
+  @course.reload
+end

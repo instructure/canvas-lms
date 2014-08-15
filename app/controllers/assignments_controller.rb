@@ -277,7 +277,14 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
+
+      student_scope = if @assignment.differentiated_assignments_applies?
+                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
+                      else
+                        @context.students_visible_to(@current_user)
+                      end
+
+      @students = student_scope.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

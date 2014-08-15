@@ -1494,7 +1494,13 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-    student_ids = context.student_ids
+
+    student_ids = if self.differentiated_assignments_applies?
+                    context.students.able_to_see_assignment_in_course_with_da(self.id, self.context.id).pluck(:id)
+                  else
+                    context.student_ids
+                  end
+
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
 
