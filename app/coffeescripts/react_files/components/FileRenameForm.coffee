@@ -1,0 +1,57 @@
+define [
+  'i18n!file_rename_form'
+  'react'
+  'compiled/react/shared/utils/withReactDOM'
+], (I18n, React, withReactDOM) ->
+
+  FileRenameForm = React.createClass
+
+    # dialog for renaming
+
+    propType:
+      fileOptions: React.PropTypes.object
+      onNameConflictResolved: React.PropTypes.func.isRequired
+
+    getInitialState: ->
+      isEditing: false
+      fileOptions: @props.fileOptions
+
+    componentWillReceiveProps: (newProps) ->
+      @setState(fileOptions: newProps.fileOptions, isEditing: false)
+
+    handleRenameClick: ->
+      @setState isEditing: true
+
+    handleBackClick: ->
+      @setState isEditing: false
+
+    handleReplaceClick: ->
+      @props.onNameConflictResolved({file: @state.fileOptions.file, dup: 'overwrite'})
+
+    handleChangeClick: ->
+      @props.onNameConflictResolved({file: @state.fileOptions.file, dup: 'rename', name: @refs.newName.getDOMNode().value})
+
+
+    getPrompt: withReactDOM ->
+      nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
+      div {},
+        p {}, I18n.t('message','An item named "%{name}" already existings in this location. Do you want to replace the existing file?', {name: nameToUse})
+        button ref: 'renameBtn' ,onClick: @handleRenameClick, (I18n.t('change_name', 'Change Name'))
+        button ref: 'replaceBtn', onClick: @handleReplaceClick, (I18n.t('replace', 'Replace'))
+
+    getForm: withReactDOM ->
+      nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
+      div {},
+        p {}, I18n.t('prompt', 'Changee "%{name}" to', {name: nameToUse})
+        label {}, I18n.t('name', 'Name')
+        input type: 'text', defaultValue: nameToUse, ref: 'newName'
+        button ref: 'backBtn', onClick: @handleBackClick, I18n.t('back', 'Back')
+        button ref: 'commitChangeBtn', onClick: @handleChangeClick, I18n.t('change', 'Change')
+
+
+    render: withReactDOM ->
+      div {},
+        if !@state.isEditing
+          @getPrompt()
+        else
+          @getForm()

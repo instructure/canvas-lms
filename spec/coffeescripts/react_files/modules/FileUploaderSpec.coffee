@@ -7,8 +7,12 @@ define [
   module 'FileUploader',
     setup: ->
       folder = {id: 1}
-      file = {}
-      @uploader = new FileUploader(file, folder)
+      fileOptions =
+        file:
+          size: 1
+          name: 'foo'
+          type: 'bar'
+      @uploader = new FileUploader(fileOptions, folder)
 
     teardown: ->
       delete @uploader

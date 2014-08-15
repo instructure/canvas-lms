@@ -3,6 +3,7 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!restrict_student_access'
+  'jqueryui/dialog'
 ], ($, React, withReactDOM, I18n) ->
   
   DialogAdapter = React.createClass
@@ -21,10 +22,10 @@ define [
       @handlePropsChanged(newProps)
 
     handlePropsChanged: (props) ->
-      props = props || @props
+      props ?= @props
 
       React.renderComponent(
-        React.Children.only(@props.children),
+        React.Children.only(props.children),
         @node
       )
 

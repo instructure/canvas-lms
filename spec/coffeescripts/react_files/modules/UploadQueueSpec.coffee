@@ -3,6 +3,12 @@ define [
   'jquery'
 ], (UploadQueue, $) ->
 
+  mockFileOptions: ->
+      file:
+        size: 1
+        name: 'foo'
+        type: 'bar'
+
   mockFileUploader = (file) ->
     {
       upload: ->
@@ -65,7 +71,7 @@ define [
     equal(@queue.length(), 1)
     @queue.enqueue {baz: 'zoo'}
     equal(@queue.length(), 2)
-    equal(@queue.dequeue().file, foo)
+    equal(@queue.dequeue().options, foo)
 
     @queue.attemptNextUpload = original
 

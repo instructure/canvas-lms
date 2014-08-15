@@ -7,8 +7,9 @@ define [
 
   class FileUploader
 
-    constructor: (file, folder) ->
-      @file = file
+    constructor: (fileOptions, folder) ->
+      @file = fileOptions.file
+      @options = fileOptions
       @folder = folder
 
     onProgress: (percentComplete, file) ->
@@ -28,10 +29,10 @@ define [
     upload: ->
       deferred = $.Deferred()
       params =
-        name: @file.name
+        name: @options.name || @file.name
         size: @file.size
         content_type: @file.type
-        on_duplicate: 'rename' # TODO: prompt for user feedback CNVS-12667
+        on_duplicate: @options.dup || 'rename'
         parent_folder_id: @folder.id
 
       preflightUrl = "/api/v1/folders/#{@folder.id}/files"
@@ -61,6 +62,13 @@ define [
     onUploadComplete: (results) ->
       uploadedFile = new BBFile(results, 'no/url/needed/') #we've already done the upload, no preflight needed
       @folder.files.add(uploadedFile)
+
+      #remove old version if it was just overwritten
+      if @options.dup == 'overwrite'
+        name = @options.name || @file.name
+        previous = @folder.files.findWhere({display_name: name})
+        @folder.files.remove(previous) if previous
+
       uploadedFile
 
     handleContentError: (e) =>

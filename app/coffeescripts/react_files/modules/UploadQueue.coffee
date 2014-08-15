@@ -17,14 +17,14 @@ define [
       # TODO: hook this up to UI CNVS-12658
       console.log("#{file.name}: #{percent} %")
 
-    createUploader: (file, folder) ->
-      f = new FileUploader(file, folder)
+    createUploader: (fileOptions, folder) ->
+      f = new FileUploader(fileOptions, folder)
       f.onProgress = @onUploadProgress
       @_currentUploader = f
       f
 
-    enqueue: (file, folder) ->
-      uploader = @createUploader(file, folder)
+    enqueue: (fileOptions, folder) ->
+      uploader = @createUploader(fileOptions, folder)
       @_queue.push uploader
       @attemptNextUpload()
 
