@@ -401,6 +401,17 @@ class ExternalToolsController < ApplicationController
 
   def lti_launch(tool, selection_type)
     @return_url ||= url_for(@context)
+    message_type = tool.extension_setting(selection_type, 'message_type')
+    case message_type
+      when 'ContentItemSelectionResponse'
+        content_item_selection_response(tool, selection_type)
+      else
+        basic_lti_launch_request(tool, selection_type)
+    end
+  end
+  protected :lti_launch
+
+  def basic_lti_launch_request(tool, selection_type)
     lti_launch = Lti::Launch.new
 
     opts = {
@@ -408,6 +419,7 @@ class ExternalToolsController < ApplicationController
         selected_html: params[:selection],
         custom_substitutions: common_variable_substitutions
     }
+
     adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
     if selection_type == 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])
@@ -421,7 +433,97 @@ class ExternalToolsController < ApplicationController
     lti_launch.analytics_id = tool.tool_id
     lti_launch
   end
-  protected :lti_launch
+  protected :basic_lti_launch_request
+
+  def content_item_selection_response(tool, placement)
+    lti_launch = Lti::Launch.new
+
+    lti_launch.resource_url = tool.extension_setting(placement, :url)
+    lti_launch.link_text = tool.label_for(placement.to_sym)
+    lti_launch.analytics_id = tool.tool_id
+
+    #contstruct query params for the export endpoint
+    query_params = {"export_type" => "common_cartridge"}
+    media_types = []
+    [:assignments, :modules, :pages, :quizzes].each do |type|
+      if params[type]
+        query_params[type] = params[type]
+        media_types << (params[type].size == 1 ? type : :course)
+      end
+    end
+
+    #find the content title
+    media_type = media_types.size == 1 ? media_types.first.to_s.singularize : 'course'
+    case media_type
+      when 'assignment'
+        title = @context.assignments.where(id: params[:assignments].first).first.title
+      when 'module'
+        title = @context.context_modules.where(id: params[:modules].first).first.name
+      when 'page'
+        title = @context.wiki.wiki_pages.where(id: params[:pages].first).first.title
+      when 'quiz'
+        title = @context.quizzes.where(id: params[:quizzes].first).first.title
+      when 'course'
+        title = @context.name
+    end
+
+    content_json = {
+        "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement",
+        "@graph" => [
+            {
+                "@type" => "ContentItemPlacement",
+                "placementOf" => {
+                    "@type" => "FileItem",
+                    "@id" => api_v1_course_content_exports_url(@context) + '?' + query_params.to_query,
+                    "mediaType" => "application/vnd.instructure.api.content-exports.#{media_type}",
+                    "title" => title
+                }
+            }
+        ]
+    }
+
+    params = {
+        #message params
+        lti_message_type: 'ContentItemSelectionResponse',
+        lti_version: 'LTI-1p0',
+        content_items: content_json.to_json,
+
+        #common params
+        context_id: Lti::Asset.opaque_identifier_for(@context),
+        resource_link_id: Lti::Asset.opaque_identifier_for(@context),
+        tool_consumer_instance_guid: @domain_root_account.lti_guid,
+        tool_consumer_instance_name: @domain_root_account.name,
+        context_title: @context.name,
+        launch_presentation_return_url: @return_url,
+    }
+
+    params.merge!({ user_id: Lti::Asset.opaque_identifier_for(@current_user) }) if @current_user
+
+    #adds custom fields to the launch params
+    custom_fields = {}
+    tool.set_custom_fields(custom_fields, placement)
+
+    #replaces custom fields with their values
+    substitutions = common_variable_substitutions()
+    custom_fields.each do |k,v|
+      if substitutions.has_key?(v)
+        if substitutions[v].respond_to?(:call)
+          custom_fields[k] = substitutions[v].call
+        else
+          custom_fields[k] = substitutions[v]
+        end
+      end
+    end
+
+    #add custom params to launch params
+    params.merge!(custom_fields)
+
+    #sign the launch params
+    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
+
+    lti_launch
+  end
+  protected :content_item_selection_response
 
   def tool_launch_template(tool, selection_type)
     TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] || TOOL_DISPLAY_TEMPLATES['default']

@@ -77,7 +77,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[type] = {}.with_indifferent_access
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
-                      :selection_height, :selection_width, :text, :url]
+                      :selection_height, :selection_width, :text, :url, :message_type]
     extension_keys += {
         :visibility => lambda{|v| %w{members admins}.include?(v)}
     }.to_a

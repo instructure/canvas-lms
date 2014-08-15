@@ -19,7 +19,7 @@
       data-tool-launch-type="<%= @lti_launch.launch_type %>"
       data-tool-id="<%= @lti_launch.analytics_id %>"
       data-tool-path="<%= @lti_launch.resource_path %>"
-      data-message-type="<%= @lti_launch.message_type %>">
+      data-message-type="<%= @lti_launch.analytics_message_type %>">
     <% @lti_launch.params.each do |key, value| %>
         <%= hidden_field_tag key, value %>
     <% end %>
