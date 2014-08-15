@@ -60,7 +60,7 @@ pt-BR:
     feedback_coach_sub: "Obter ajuda de um Expert em Canvas"
     feedback_feature_request: "Solcitar recurso"
     feedback_feature_request_canvas_net: "Solicitar um recurso na Rede Canvas"
-    feedback_feature_request_sub: "Tem idéias para melhorar o Canvas?"
+    feedback_feature_request_sub: "Tem ideias para melhorar o Canvas?"
     manually_created_courses: "Cursos criados manualmente"
     root_account_cant_have_sis_id: "IDs do SIS não podem ser definidas em contas raiz"
     sis_id_in_use: "ID do SIS \"%{sis_id}\" já está em uso"
@@ -1014,7 +1014,7 @@ pt-BR:
       account_reports: 
         sis_export: 
           description: 
-            text: "Relatório de exportação SIS: este relatório exportará todos os arquivos necessários para os usuários, as contas, os períodos, os cursos, as seções, as inscrições, os grupos, as associações de grupo, e as listagens cruzadas para uma importação SIS em suas respectivas categorias."
+            text: "Relatório de exportação SIS: este relatório exportará todos os arquivos necessários para os usuários, as contas, os períodos, os cursos, as seções, as inscrições, os grupos, as associações de grupo e as listagens cruzadas para uma importação SIS em suas respectivas categorias."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1039,7 +1039,7 @@ pt-BR:
             check_box: "Lista X CSV"
         sis_default: 
           parameters: 
-            note: "*Configurações de período somente impactam arquivos de cursos, seções, inscrições, e lista X CSV."
+            note: "*Configurações de período somente impactam arquivos de cursos, seções, inscrições e lista X CSV."
     sis_import: 
       add_sis_stickiness_instructions: "Com esta opção selecionada, as alterações feitas através desta importação do SIS serão processadas como se fossem alterações de UI, evitando que importações de não substituição subsequentes alterem os campos aqui alterados."
       add_sis_stickiness_label: "Processar à medida que a IU é alterada"
@@ -2818,7 +2818,7 @@ pt-BR:
         edit: "Editar esta colaboração"
         show_participants: 
           one: "*1* participante"
-          other: "*%{count}* participantes"
+          other: "*%{count}* Participantes"
       titles: 
         collaboration: Colaboração
     collaborator_picker: 
@@ -6574,7 +6574,7 @@ pt-BR:
       headers: 
         import_error: "Existe algo confuso com relação aos dados que você enviou por upload:"
         missing_assignment: "Você fez upload de algumas tarefas que não parecem estar no livro de tarefas até agora. Diga-me se são novas tarefas ou se representam tarefas existentes."
-        missing_student: "Você fez upload de linhas dos seguintes alunos, não foi possível decidir quais alunos em sua turma eles são. Diga-me quais estudantes eles são."
+        missing_student: "Você fez upload de linhas dos seguintes alunos, não foi possível decidir quais alunos estão em sua turma. Diga-me quais são os alunos."
         no_changes: "Não foram detectadas mudanças no livro de notas enviado por upload."
       ignore_assignment_option: "Falso, ignore isto."
       ignore_student_option: "Não está em minha turma, ignorar esta linha."
@@ -6584,7 +6584,7 @@ pt-BR:
         back: "Retornar ao livro de notas"
       new_assignment_option: "Uma nova tarefa"
       notices: 
-        unchanged: "Observação: Você fez upload de algumas tarefas que não têm alterações de notas detectadas. Elas foram ocultas."
+        unchanged: "Observação: Você fez upload de algumas tarefas que não têm alterações de notas detectadas. Elas ficaram ocultas."
       page_title: "Livro de notas"
       student_answer: "Esta pessoa é realmente"
       student_example: Alguém
@@ -6602,7 +6602,7 @@ pt-BR:
     leaving_id_will_match_better_can_add_new_assignment: "Deixar o ID intacto (a parte \"(581)\" neste caso) ajudará a uma melhor correspondência. É possível também adicionar novas tarefas que serão criadas instantaneamente."
     new_assignment_example: "Uma nova tarefa"
     optional_ignored: "Opcional, ignorada."
-    screenreader_csv_explainer: "O que deve constar no arquivo CSV? As seguintes colunas devem constar em seu upload: \"Aluno\", \"ID\", e \"Teste existente (nº)\". A coluna aluno deve ter o nome de cada aluno, formatado como Sobrenome, Nome. Por exemplo, \"Smith, John\". Colunas de testes existentes devem ter o nome do teste seguido da ID do teste entre parênteses. Por exemplo, \"Capítulo Um Planilha (201)\". Se você utilizar SIS, inclua as seguintes colunas: \"ID de usuário SIS\" e \"ID de login SIS\". Se você desejar criar uma nova tarefa, inclua uma coluna intitulada com o nome da tarefa. Por exemplo, \"Planilha Derivados\". As seguintes colunas são opcionais: \"Seção\", \"Pontuação atual\", \"Pontuação final\"."
+    screenreader_csv_explainer: "O que deve constar no arquivo CSV? As seguintes colunas devem constar em seu upload: \"Aluno\", \"ID\" e \"Teste existente (nº)\". A coluna aluno deve ter o nome de cada aluno, formatado como Sobrenome, Nome. Por exemplo, \"Smith, John\". Colunas de testes existentes devem ter o nome do teste seguido da ID do teste entre parênteses. Por exemplo, \"Capítulo Um Planilha (201)\". Se você utilizar SIS, inclua as seguintes colunas: \"ID de usuário SIS\" e \"ID de login SIS\". Se você desejar criar uma nova tarefa, inclua uma coluna intitulada com o nome da tarefa. Por exemplo, \"Planilha Derivados\". As seguintes colunas são opcionais: \"Seção\", \"Pontuação atual\", \"Pontuação final\"."
     titles: 
       upload_form: "Selecione um arquivo CSV para fazer upload"
     what_should_csv_look_like: "Qual seria a aparência do arquivo CSV?"
