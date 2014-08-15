@@ -61,7 +61,8 @@ module Lti
     end
 
     def capabilities
-      ['basic-lti-launch-request']
+
+      %w( basic-lti-launch-request Canvas.api.domain)
     end
 
   end
