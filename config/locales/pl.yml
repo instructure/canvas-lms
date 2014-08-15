@@ -6202,7 +6202,7 @@ pl:
     html5_first_videos: "Wybieraj program HTML5 do odtwarzania plików wideo"
     k12: "Specjalne funkcje w systemie K-12"
     learning_mastery_gradebook: "Dzienniczek nauki poziomu biegłości"
-    new_quiz_moderate: "Strona ujednoliconego nowego testu"
+    new_quiz_moderate: "Strona zarządzanego, nowego testu"
     new_quiz_statistics: "Strona ze statystyką nowego testu"
     new_styles: "Użyj nowych stylów"
     post_grades: "Wyślij oceny do SIS"
@@ -9846,7 +9846,7 @@ pl:
     where_to_move: "Gdzie chciałbyś przenieść nazwę *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- Na dół --"
-  multi_student_progress_title: "Postęp uczestników"
+  multi_student_progress_title: "Postęp grupy uczestników"
   mute_dialog: 
     curving_assignments: "Tworzenie krzywej ocen dla zadań"
     grade_change_notifications: "Powiadomienia o zmianie oceny"
@@ -9859,7 +9859,7 @@ pl:
     sure_you_want_to_mute: "Czy na pewno chcesz ukryć to zadanie? Gdy zadanie jest ukryte, uczestnicy nie otrzymują nowych powiadomień ani nie mogą zobaczyć:"
   name: "Importer usługi Academic Benchmark"
   new_facebook_message: "Masz nową wiadomość z programu Canvas"
-  new_quiz_moderate_desc: "Włączona Wersja robocza oraz Statystyka testu umożliwia wyświetlenie strony ujednoliconego nowego testu na koncie."
+  new_quiz_moderate_desc: "Włączona Wersja robocza oraz Statystyka testu umożliwia wyświetlenie strony zarządzanego, nowego testu na koncie."
   new_quiz_statistics_desc: "Włączona Wersja robocza oraz Statystyka testu umożliwia wyświetlenie strony statystyki nowego testu na koncie."
   new_styles_description: |-
       Pracujemy nad zmianą UI systemu Canvas. Włącz, aby zobaczyć
@@ -10681,7 +10681,7 @@ pl:
         section_belongs_to_course: "Ta sekcja kursu nie należy do istniejącego kursu."
     poll_submissions: 
       validations: 
-        poll_choice_belongs_to_poll: "Ta sonda nie należy do istniejącej sondy."
+        poll_choice_belongs_to_poll: "Ten wybór sondy nie należy do istniejącej sondy."
         poll_is_published: "Ta sesja sondy nie jest otwarta dla przesyłania zadań."
         user_and_poll_session_uniqueness: "można przesłać jedynie jeden wybór na sesję sondy."
   post_grades_description: |-
