@@ -2262,7 +2262,6 @@ nb:
       sis_id_description: "SIS ID på Canvas kurset det skal importere til."
       upload_migration_csv: "Last opp en flytte-CSV"
       user_name: Brukernavn
-      user_name_description: "The user name of the user that has teacher/designer access to the course for the row. This must match one of the user name's listed in the Blackboard login credentials above."
     only_one_bulk_migration: "Bare én samlet kursflyting kan kjøres til enhver tid."
   button: 
     go_back: Tilbake
