@@ -7308,7 +7308,7 @@ en-GB:
     sending: Sending...
     somethings_broken_but_i_can_work_around_it_for_now: "Something's broken but I can work around it for now"
     subject: Subject
-    submit_this_support_request: "Submit tbicket"
+    submit_this_support_request: "Submit ticket"
     which_course_is_this_question_about: "Which course is this question about?"
     your_email_address: "Your email address"
   helpers: 
