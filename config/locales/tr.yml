@@ -253,6 +253,9 @@ tr:
       logout_request_to_idp: "LogoutRequest IdP'ye Gönderildi"
       logout_response_from_idp: "IdP'den LogoutResponse"
       saml_required: "SAML Yapılandırması için SAML'ın test edilmesi gereklidir"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Hesap onay son tarihi başlangıç tarihinden sonra olamaz"
   account_notifications: 
     announcement_created_notice: "Duyuru başarıyla oluşturuldu"
     announcement_creation_failed_notice: "Duyuru oluşturma işlemi başarısız oldu"
@@ -277,6 +280,8 @@ tr:
     outcomes: 
       order: "Sırala: %{order}"
     report_header_account_id: account_id
+    report_header_assessment_id: "değerlendirme idsi"
+    report_header_assessment_question: "değerlendirme sorusu"
     report_header_attempt: girişim
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -5833,7 +5838,7 @@ tr:
       less_than: "%{count}'den küçük olmalıdır "
       less_than_or_equal_to: "%{count}'ye eşit veya küçük olmalıdır "
       not_a_number: "sayı değil"
-      odd: "tekil olmalı"
+      odd: "tek sayı olmalı"
       too_long: "çok uzun (maksimum %{count} karakter)"
       too_short: "çok kısa (minimum %{count} karakter)"
       wrong_length: "yanlış uzunluk (%{count} karakter olmalıdır)"
