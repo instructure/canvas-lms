@@ -53,7 +53,6 @@ class GradeCalculator
     submissions_by_user = @submissions.group_by(&:user_id)
     @user_ids.map do |user_id|
       user_submissions = submissions_by_user[user_id] || []
-      user_submissions.select!{|submission| submission.assignment_visible_to_student?(user_id)}
       current, current_groups = calculate_current_score(user_id, user_submissions)
       final, final_groups = calculate_final_score(user_id, user_submissions)
       [[current, current_groups], [final, final_groups]]
@@ -90,7 +89,7 @@ class GradeCalculator
   end
 
   def calculate_score(submissions, user_id, grade_updates, ignore_ungraded)
-    group_sums = create_group_sums(submissions, ignore_ungraded, user_id)
+    group_sums = create_group_sums(submissions, ignore_ungraded)
     info = calculate_total_from_group_scores(group_sums)
     grade_updates[user_id] = info[:grade]
     [info, group_sums.index_by { |s| s[:id] }]
@@ -106,8 +105,8 @@ class GradeCalculator
   #    :weight   => 50},
   #   ...]
   # each group
-  def create_group_sums(submissions, ignore_ungraded=true, user_id)
-    assignments_by_group_id = assignments_for_user(user_id).group_by(&:assignment_group_id)
+  def create_group_sums(submissions, ignore_ungraded=true)
+    assignments_by_group_id = @assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[
       submissions.map { |s| [s.assignment_id, s] }
     ]
@@ -145,11 +144,6 @@ class GradeCalculator
         :grade    => ((score.to_f / possible * 100).round(2) if possible > 0),
       }
     end
-  end
-
-  def assignments_for_user(user_id)
-    valid_ids = User.find(user_id).assignments_visibile_in_course(@course).pluck(:id)
-    @assignments.select{|assig| valid_ids.include? assig.id}
   end
 
   # see comments for dropAssignments in grade_calculator.coffee

@@ -136,7 +136,10 @@ class GradeSummaryPresenter
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")
       .find_all_by_user_id(student)
-      .select{ |submission| submission.assignment_visible_to_student?(student_id)}
+
+      if @context.feature_enabled?(:differentiated_assignments)
+        ss = ss.select{ |submission| submission.assignment_visible_to_student?(student_id)}
+      end
 
       assignments_index = assignments.index_by(&:id)
 
