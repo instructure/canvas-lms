@@ -278,19 +278,19 @@ es:
       limited: "objetos eliminados limitados por días especificados;"
     outcomes: 
       order: "Orden: %{order}"
-    report_header_account_id: "ID de cuenta"
-    report_header_assessment_id: "ID de evaluación"
+    report_header_account_id: "ID de la cuenta"
+    report_header_assessment_id: "ID de la evaluación"
     report_header_assessment_question: "Pregunta de evaluación"
-    report_header_assessment_question_id: "ID de pregunta de evaluación"
-    report_header_assessment_title: "Título de evaluación"
+    report_header_assessment_question_id: "ID de la pregunta de evaluación"
+    report_header_assessment_title: "Título de la evaluación"
     report_header_assessment_type: "Tipo de evaluación"
-    report_header_assignment_id: "ID de tarea"
-    report_header_assignment_title: "Título de tarea"
+    report_header_assignment_id: "ID de la tarea"
+    report_header_assignment_title: "Título de la tarea"
     report_header_assignment_url: "URL de la tarea"
     report_header_attempt: intento
     report_header_course: curso
-    report_header_course__id: "ID de curso"
-    report_header_course_id: "ID de curso"
+    report_header_course__id: "ID del curso"
+    report_header_course_id: "ID del curso"
     report_header_course_name: "Nombre del curso"
     report_header_course_sis: "SIS del curso"
     report_header_course_sis_id: "ID SIS del curso"
@@ -302,8 +302,8 @@ es:
     report_header_enrollment_state: "Estado de la inscripción"
     report_header_final_score: "Puntuación final"
     report_header_first_name: Nombre
-    report_header_group_id: "ID de grupo"
-    report_header_id: identificación
+    report_header_group_id: "ID del grupo"
+    report_header_id: ID
     report_header_last_access_at: "accedió por última vez a las"
     report_header_last_ip: "última IP"
     report_header_last_name: Apellido
@@ -316,7 +316,7 @@ es:
     report_header_outcome_score: "puntuación del resultado"
     report_header_role: función
     report_header_section: sección
-    report_header_section__id: section_id
+    report_header_section__id: "ID de la sección"
     report_header_section_id: "ID de la sección"
     report_header_section_name: "Nombre de la sección"
     report_header_section_sis: "SIS de la sección"
@@ -332,9 +332,9 @@ es:
     report_header_student_sis: "SIS del alumno"
     report_header_student_sis_id: "ID SIS del alumno"
     report_header_submission_date: "Fecha de envío"
-    report_header_submission_score: "Puntuación de envío"
+    report_header_submission_score: "Puntuación del envío"
     report_header_term: período
-    report_header_term__id: "ID de período"
+    report_header_term__id: "ID del período"
     report_header_term_id: "ID del período"
     report_header_term_sis: "SIS del período"
     report_header_user__id: "ID del usuario"
@@ -460,7 +460,7 @@ es:
         date: Fecha
         event_id: "Id. evento"
         event_sis_batch: "Grupo SIS"
-        event_source_label: Original
+        event_source_label: Origen
         event_type_label: Tipo
         reset_from_label: "Restablecer desde"
         reset_to_label: "Restablecer a"
@@ -472,7 +472,7 @@ es:
       course_logging_results: 
         date: Fecha
         event_details: "Detalles del evento"
-        event_source: Original
+        event_source: Origen
         event_type: Tipo
         no_item_found: "No se ha encontrado ningún elemento"
         time: Tiempo
@@ -732,7 +732,7 @@ es:
       account_reports: 
         default: 
           public_courses: 
-            text: "Este informe muestra todos los cursos que no se hayan eliminado de un período dado y que son públicos. El archivo csv que se genere tendrá una línea por curso y mostrará la ID del curso la ID SIS del curso, el nombre abreviado del curso, el nombre del curso y las fechas de inicio y finalización del curso."
+            text: "Este informe muestra todos los cursos de un período determinado que no se han eliminado y que son públicos. El archivo csv que se genere tendrá una línea por curso y mostrará la ID del curso, la ID SIS del curso, el nombre abreviado del curso, el nombre del curso y las fechas de inicio y finalización del curso."
     quota_integer_required: "Valor entero obligatorio"
     quota_must_be_positive: "El valor debe ser positivo"
     quota_not_updated: "No se ha actualizado la cuota"
@@ -1689,7 +1689,7 @@ es:
       description: Descripción
       freeze_properties: "Bloquear las propiedades de la tarea al copiarla"
       notify_content_change: "Notificar a los usuarios que este contenido ha cambiado"
-      only_visible_to_overrides_note: "Nota: Esta tarea *solo* está visible en las secciones que se especifican a continuación:"
+      only_visible_to_overrides_note: "Nota: Esta tarea *solo* se podrá ver en las secciones que se especifican a continuación:"
       points_possible: Puntos
       post_to_sis: "Publicar en SIS"
       warnings: 
@@ -2173,7 +2173,7 @@ es:
   bb_display: "Blackboard Learn"
   bb_file_description: "Archivo .zip de exportación de Blackboard 6/7/8/9"
   bb_name: "Blackboard Converter"
-  better_file_browsing_description: "Nueva interfaz de exploración de archivos más fácil de usar y más sencilla. Si la activa en el curso, todos los usuarios de ese curso verán la nueva interfaz. Si desea utilizarla para que aparezca cuando alguien va a la página de archivos personales de un usuario (\"/files), deberá habilitarla para la cuenta de la que son miembros."
+  better_file_browsing_description: "Nueva interfaz de exploración de archivos más fácil de usar y más sencilla. Si la activa en este curso, todos los usuarios del curso verán la nueva interfaz. Si desea utilizarla para que aparezca cuando alguien va a la página de archivos personales de un usuario (\"/files), deberá habilitarla para la cuenta de la que son miembros."
   big_blue_button_conference: 
     conference_is_recorded: "Esta conferencia se está grabando."
     recording_setting: Grabación
@@ -2943,7 +2943,7 @@ es:
       preparing_video: "Preparando el vídeo"
       recording: "1 grabación "
       recordings: "%{recordingCount} grabaciones"
-      settings: Configuraciones
+      settings: Configuración
       view: Vista
     confirm: 
       close: |-
@@ -2981,7 +2981,7 @@ es:
       join: Unirse
       recording: "1 grabación"
       recordings: "%{recordingCount} grabaciones"
-      settings: Configuraciones
+      settings: Configuración
       start: Comenzar
       view: Vista
     no_concluded_conferences: "No hay conferencias finalizadas"
@@ -3014,7 +3014,7 @@ es:
     buttons: 
       process: "Procesar Información"
     errors: 
-      couldnt_create: "No se pudo crear la exportación del curso"
+      couldnt_create: "No se pudo crear la exportación del contenido"
       error: "Ocurrió un error al exportar su curso. Por favor notifique al administrador de su sistema y proveale el siguiente identificador: \"%{code}\""
       not_found: "La exportación no existe"
     index: 
@@ -3505,7 +3505,7 @@ es:
           before_students_view: "Antes que los estudiantes puedan ver este módulo"
         new_tab: "Cargar en una pestaña nueva"
         publish_final_grade: "publicar la puntuación final del alumno una vez finalizado el módulo"
-        require_sequential_progress: "Los alumnos deben desplazarse por los requisitos de este módulo en orden secuencial"
+        require_sequential_progress: "Los alumnos deben desplazarse a través de los requisitos de este módulo en orden secuencial"
         sort_by: "Ordenar por"
         title: Título
         unlock_at: "Desbloquear en"
@@ -3548,7 +3548,7 @@ es:
       add_prerequisite: "Agregar prerrequisito a *%{module}*"
       assignment_points_possible: "de %{points_possible}"
       button: 
-        delete_label: "Eliminar requisito previos"
+        delete_label: "Eliminar requisitos previos"
         delete_title: "Eliminar requisitos previos"
       buttons: 
         add_module: "Agregar Módulo"
@@ -3615,7 +3615,7 @@ es:
         modules: 
           before_students_view: "Antes que los estudiantes puedan ver este módulo"
         new_tab: "Cargar en una pestaña nueva"
-        require_sequential_progress: "Los alumnos deben desplazarse por los requisitos de este módulo en orden secuencial"
+        require_sequential_progress: "Los alumnos deben desplazarse a través de los requisitos de este módulo en orden secuencial"
         sort_by: "Ordenar por"
         title: Título
         unlock_at: "Desbloquear en"
@@ -4358,7 +4358,7 @@ es:
               
               Por favor **ingrese** o ***inscríbase*** para reclamar este curso.
         files: "La lengüeta de archivos es el lugar en donde ubicar las diapositivas de clases, documentos de ejemplo, ayudas para estudiar – cualquiera que sus estudiantes quieran descargar. La carga y organización de sus archivos es fácil con Canvas. Le mostraremos como."
-        home2: "Esta es la página que aparecerá cuando se visite el curso. Puede habilitarla para que muestre una secuencia de la actividad, la lista de los módulos del curos, un plan de estudio o una página personalizada escrita por usted mismo. El modelo predeteminado es la secuencia de la actividad del curso. Para personalizarla, haga clic en %{choose_home_page}."
+        home2: "Esta es la página que aparecerá cuando se visite el curso. Puede habilitarla para que muestre una secuencia de la actividad, la lista de los módulos del curos, un plan de estudios o una página personalizada redactada por usted mismo. El modelo predeteminado es la secuencia de la actividad del curso. Para personalizarlo, haga clic en %{choose_home_page}."
         import: "Si ha estado usando otro sistema de manejo de cursos, probablemente ya tiene algo que quiere transferir a Canvas. Le podemos ayudar con el proceso para facilitar el movimiento del contenido hacia Canvas."
         navigation: "De manera predeterminada todos los enlaces estan activados para un curso. Los estudiantes no verán los enlaces hacia secciones sin contenido. Por ejemplo, si no ha creado evaluaciones, los enlaces a estos no se podrán ver. Puede revisar y desactivar estos enlaces si hay áreas del curso a los que no quiere que los estudiantes tengan acceso."
         publish: 
@@ -4574,7 +4574,7 @@ es:
         add_section: "Agregar Sección"
         move_course: "Mover el Curso"
         update_course: "Actualizar Detalles del Curso"
-      course_conclude_at_warning_message: "El curso está configurado para concluir a las 12 de la noche. Esto significa que la noche anterior será el último día en el que este curso esté activo."
+      course_conclude_at_warning_message: "El curso se ha configurado para que concluya a las 12 de la noche. Esto significa que la noche anterior será el último día en el que este curso esté activo."
       course_conclude_at_warning_title: "Curso que finaliza a las 12 de la noche"
       course_open_enrollment: "Este curso permite la matriculación abierta. Los alumnos pueden auto-inscribirse en el curso una vez que usted haya compartido con ellos esta dirección URL: *%{url}*. Como alternativa, pueden inscribirse en *%{url2}* y usar el siguiente código: *%{code}*"
       course_open_enrollment_without_code: "Este curso tiene permite la autoinscripción. Los alumnos pueden autoinscribirse en el curso una vez que comparta con ellos la siguiente URL: *%{url}*"
@@ -4733,11 +4733,11 @@ es:
           recent_activity_dashboard: "Panel de actividad reciente"
           syllabus: "Programa de Estudio"
       empty_body: "Sin Contenido"
-      front_page_not_set: "La página de información se debe configurar primero"
+      front_page_not_set: "La página de información se debe colocar en primer lugar"
       headers: 
         course_status: "Estado del curso"
       headings: 
-        choose_home_page_title: "Página de inicio del curso"
+        choose_home_page_title: "Elegir página de inicio"
         confirm_unenroll: "Confirmar el Borrado de la Inscripción"
         importing: "Este curso está siendo importado."
         set_layout: "Establecer el Diseño de la Página de Inicio"
