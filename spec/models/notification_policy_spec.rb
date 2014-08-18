@@ -24,16 +24,6 @@ describe NotificationPolicy do
     notification_policy_model
   end
   
-  it "should default broadcast to true" do
-    notification_policy_model
-    @notification_policy.broadcast.should be_true
-  end
-  
-  it "should not have a communication_preference if broadcast is set to false." do
-    notification_policy_model(:broadcast => false)
-    @notification_policy.communication_preference.should be_nil
-  end
-
   context "channels" do
     before(:once) do
       @course = factory_with_protected_attributes(Course, :name => "test course", :workflow_state => "available")
@@ -330,27 +320,3 @@ describe NotificationPolicy do
     end
   end
 end
-
-describe NotificationPolicy, "communication_preference" do
-  
-  before(:each) do
-    @cc1 = mock('CommunicationChannel')
-    @cc2 = mock('CommunicationChannel')
-    @user = User.create!
-    @user.stubs(:communication_channel).returns(@cc1)
-    notification_policy_model
-    @notification_policy.stubs(:user).returns(@user)
-  end
-  
-  it "should use the channel defined, if one is given" do
-    @notification_policy.stubs(:communication_channel).returns(@cc2)
-    @notification_policy.communication_preference.should == @cc2
-  end
-
-  it "should use the users default communication channel if one isn't given" do
-    @notification_policy.stubs(:communication_channel).returns(nil)
-    @notification_policy.communication_preference.should == @cc1
-  end
-  
-end
-  
