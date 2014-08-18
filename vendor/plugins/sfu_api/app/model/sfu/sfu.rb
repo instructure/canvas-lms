@@ -35,33 +35,36 @@ module SFU
         REST.json REST.course_info_url, "&course=#{course}&term=#{term}"
       end
 
+      def associated_class_for_section(json_data, section_code)
+        associated_class = nil
+        json_data.each do |info|
+          section = info["course"]["section"].downcase
+          associated_class = info["course"]["associatedClass"] if section.eql?(section_code)
+        end
+        associated_class
+      end
+
       def section_tutorials(course_code, term_code, section_code)
         details = info(course_code, term_code)
-        # Used to match against sections starting with e.g. 'd1' for 'd100'
-        main_section = section_code[0..1].downcase
         sections = []
         has_no_child_sections = true
-        section_exists = false
+        section = nil
 
 	      unless details == "[]"
+          associated_class = associated_class_for_section(details, section_code)
           details.each do |info|
             section = info["course"]["section"].downcase
-            section_exists = true if section.eql? section_code.downcase
+            classType = info["course"]["classType"]
 
-	          if section_code.end_with?("00")
-              classType = info["course"]["classType"]
-              code = info["course"]["name"] + info["course"]["number"]
-
-	            if code.downcase == course_code.downcase && section.start_with?(main_section) && classType.eql?("n")
-                sections << info["course"]["section"]
-                has_no_child_sections = false
-              end
+	          if classType.eql?("n") && associated_class == info["course"]["associatedClass"]
+              sections << info["course"]["section"]
+              has_no_child_sections = false
             end
 	        end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
-        sections << section_code.upcase if has_no_child_sections && section_exists
+        sections << section_code.upcase if has_no_child_sections && !section.nil?
 
         sections
       end
