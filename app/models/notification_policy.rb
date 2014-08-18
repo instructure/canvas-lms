@@ -168,7 +168,7 @@ class NotificationPolicy < ActiveRecord::Base
       policies = communication_channel.notification_policies.all
       Notification.all.each do |notification|
         next if policies.find { |p| p.notification_id == notification.id }
-        Notification.transaction(requires_new: true) do
+        NotificationPolicy.transaction(requires_new: true) do
           np = nil
           begin
             np = communication_channel.notification_policies.build(notification: notification)
