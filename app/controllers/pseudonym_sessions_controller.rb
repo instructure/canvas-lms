@@ -205,7 +205,7 @@ class PseudonymSessionsController < ApplicationController
 
   def destroy
     # Only allow DELETE method for all logout requests except for SAML.
-    if saml_request?
+    if saml_response?
       saml_logout
     else
       logout_user_action
@@ -292,7 +292,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_consume
-    if saml_request?
+    if saml_response?
       # Break up the SAMLResponse into chunks for logging (a truncated version was probably already
       # logged with the request when using syslog)
       chunks = params[:SAMLResponse].scan(/.{1,1024}/)
@@ -434,7 +434,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_logout
-    if saml_request?
+    if saml_response?
       increment_saml_stat("logout_response_received")
       response = saml_logout_response(params[:SAMLResponse])
       if aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
@@ -449,20 +449,29 @@ class PseudonymSessionsController < ApplicationController
           aac.debug_set(:debugging, t('debug.logout_redirect_from_idp', "Received LogoutResponse from IdP"))
         end
       end
-
       logout_user_action
-      return
-    end
-
-    @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
-    respond_to do |format|
-      format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
-      format.json { render :json => { message: @message }, :status => :bad_request }
+    elsif saml_request?
+      # TODO: Validate SAMLRequest parameter
+      logout_user_action
+    else
+      @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
+      respond_to do |format|
+        format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
+        format.json { render :json => { message: @message }, :status => :bad_request }
+      end
     end
   end
 
+  def saml_configured?
+    @saml_configured ||= @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? }
+  end
+
+  def saml_response?
+    saml_configured? && params[:SAMLResponse]
+  end
+
   def saml_request?
-    @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
+    saml_configured? && params[:SAMLRequest]
   end
 
   def saml_response(raw_response, settings=nil)
