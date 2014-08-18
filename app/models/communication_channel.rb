@@ -242,7 +242,7 @@ class CommunicationChannel < ActiveRecord::Base
   scope :unretired, -> { where("communication_channels.workflow_state<>'retired'") }
 
   scope :for_notification_frequency, lambda { |notification, frequency|
-    includes(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
+    joins(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
   }
 
   # Get the list of communication channels that overrides an association's default order clause.

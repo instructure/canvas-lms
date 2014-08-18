@@ -127,10 +127,10 @@ describe NotificationPolicy do
     context "by" do
       before :once do
         user_with_pseudonym(:active_all => 1)
-        @n1 = notification_policy_model(:frequency => 'immediately', :communication_channel => @cc)
-        @n2 = notification_policy_model(:frequency => 'daily', :communication_channel => @cc)
-        @n3 = notification_policy_model(:frequency => 'weekly', :communication_channel => @cc)
-        @n4 = notification_policy_model(:frequency => 'never', :communication_channel => @cc)
+        @n1 = notification_policy_model(:frequency => 'immediately', :communication_channel => @cc, notification: notification_model(name: 'N1'))
+        @n2 = notification_policy_model(:frequency => 'daily', :communication_channel => @cc, notification: notification_model(name: 'N2'))
+        @n3 = notification_policy_model(:frequency => 'weekly', :communication_channel => @cc, notification: notification_model(name: 'N3'))
+        @n4 = notification_policy_model(:frequency => 'never', :communication_channel => @cc, notification: notification_model(name: 'N4'))
       end
       
       it "should have a scope to differentiate by frequency" do
@@ -146,19 +146,9 @@ describe NotificationPolicy do
       end
       
       it "should be able to combine an array of frequencies with a for scope" do
-        user_with_pseudonym(:active_all => 1)
-        n1 = notification_policy_model(
-          :communication_channel => @cc,
-          :frequency => 'daily'
-        )
-        n2 = notification_policy_model(
-            :communication_channel => @cc,
-          :frequency => 'weekly'
-        )
-        n3 = notification_policy_model(:communication_channel => @cc)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n1)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n2)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(n3)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n2)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n3)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(@n1)
       end
     end
     
@@ -175,17 +165,21 @@ describe NotificationPolicy do
       }
       
       n1 = notification_policy_model
-      n2 = notification_policy_model({:frequency => "immediately"}.merge(trifecta_opts) )
-      n3 = notification_policy_model({:frequency => "daily"}.merge(trifecta_opts) )
-      n4 = notification_policy_model({:frequency => "weekly"}.merge(trifecta_opts) )
-      
+
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should_not be_include(n1)
-      policies.should_not be_include(n2)
-      policies.should be_include(n3)
-      policies.should be_include(n4)
-      policies.size.should == 2
-      
+      policies.should == []
+
+      n1.update_attribute(:frequency, 'never')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == []
+
+      n1.update_attribute(:frequency, 'daily')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == [n1]
+
+      n1.update_attribute(:frequency, 'weekly')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == [n1]
     end
     
   end

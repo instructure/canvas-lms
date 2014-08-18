@@ -187,16 +187,23 @@ describe NotificationMessageCreator do
     it "should make a delayed message for each user policy with a delayed frequency" do
       notification_set
       NotificationPolicy.delete_all
-      3.times do |i|
+      nps = (1..3).map do |i|
         communication_channel_model(:path => "user#{i}@example.com").confirm!
-        %w(immediately never daily weekly).each do |frequency|
-          notification_policy_model(:notification => @notification,
-                                    :communication_channel => @communication_channel,
-                                    :frequency => frequency)
-        end
+        notification_policy_model(:notification => @notification,
+                                  :communication_channel => @communication_channel,
+                                  :frequency => 'immediately')
       end
-      
-      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 6
+
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'never'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'daily'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
+
+      nps.each { |np| np.frequency = 'weekly'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
 
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
