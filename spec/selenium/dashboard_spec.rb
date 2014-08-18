@@ -406,18 +406,27 @@ describe "dashboard" do
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       assignment.reload
-      get "/"
+      enable_cache do
+        get "/"
 
-      #verify assignment is in to do list
-      f('.to-do-list > li').should include_text('Grade ' + assignment.title)
+        #verify assignment is in to do list
+        f('.to-do-list > li').should include_text('Grade ' + assignment.title)
 
-      #verify assignment is in drop down
-      driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
+        #verify assignment is in drop down
+        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
 
-      wait_for_ajaximations
+        wait_for_ajaximations
 
-      f('#assignments_menu_item').should include_text("To Grade")
-      f('#assignments_menu_item').should include_text(assignment.title)
+        f('#assignments_menu_item').should include_text("To Grade")
+        f('#assignments_menu_item').should include_text(assignment.title)
+
+        # should update the to-do list when the grader grades
+        assignment.grade_student(student, :grade => 1)
+        get "/"
+        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
+
+        f('#assignments_menu_item').should_not include_text("To Grade")
+      end
     end
 
     it "should show submitted essay quizzes in the todo list" do
