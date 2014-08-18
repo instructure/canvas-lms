@@ -451,7 +451,7 @@ describe PseudonymSessionsController do
         end
 
         context '/saml_logout' do
-          def get_saml_consume
+          def get_saml_logout
             controller.stubs(:saml_logout_response).returns(
                     stub('response', @stub_hash)
             )
@@ -465,7 +465,7 @@ describe PseudonymSessionsController do
             @aac2.any_instantiation.expects(:saml_settings).at_least_once
             controller.expects(:logout_user_action)
 
-            get_saml_consume
+            get_saml_logout
           end
 
           it "should still logout if AAC config not found" do
@@ -474,13 +474,20 @@ describe PseudonymSessionsController do
             controller.expects(:logout_user_action)
 
             @stub_hash[:issuer] = "nobody eh"
-            get_saml_consume
+            get_saml_logout
           end
 
-          it "should return bad request if a SAMLResponse parameter is not provided" do
+          it "should return bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
             controller.expects(:logout_user_action).never
             get 'saml_logout'
             response.status.should == 400
+          end
+
+          it "should logout with a SAMLResponse or SAMLRequest parameter" do
+            controller.expects(:logout_user_action).once
+            controller.expects(:saml_logout_response).never
+            controller.request.env['canvas.domain_root_account'] = @account
+            get 'saml_logout', :SAMLRequest => "foo", :RelayState => "/courses"
           end
         end
       end
@@ -542,7 +549,7 @@ describe PseudonymSessionsController do
         session[:saml_unique_id].should == @unique_id
       end
     end
-    
+
     it "should use the eppn saml attribute if configured" do
       ConfigFile.stub('saml', {})
       unique_id = 'foo'
