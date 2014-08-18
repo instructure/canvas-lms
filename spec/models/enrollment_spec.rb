@@ -1228,8 +1228,7 @@ describe Enrollment do
       end
 
       describe "cached_temporary_invitations" do
-        before do
-          Enrollment.stubs(:cross_shard_invitations?).returns(true)
+        before :once do
           course(:active_all => 1)
           user
           @user.update_attribute(:workflow_state, 'creation_pending')
@@ -1243,7 +1242,10 @@ describe Enrollment do
             @user.communication_channels.create!(:path => 'jt@instructure.com')
             @enrollment2 = @course.enroll_user(@user)
           end
+        end
 
+        before :each do
+          Enrollment.stubs(:cross_shard_invitations?).returns(true)
           pending "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
         end
 

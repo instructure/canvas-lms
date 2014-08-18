@@ -22,11 +22,17 @@ class Quizzes::QuizzesController < ApplicationController
   include KalturaHelper
   include Filters::Quizzes
 
+  # If Quiz#one_time_results is on, this flag must be set whenever we've
+  # rendered the submission results to the student so that the results can be
+  # locked down.
+  attr_reader :lock_results_if_needed
+
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
+  after_filter :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
@@ -44,7 +50,8 @@ class Quizzes::QuizzesController < ApplicationController
         :FLAGS => {
           :question_banks => feature_enabled?(:question_banks),
           :quiz_statistics => true,
-          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate)
+          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate),
+          :differentiated_assignments => @context.feature_enabled?(:differentiated_assignments)
         })
 
         # headless prevents inception in submission preview
@@ -186,6 +193,8 @@ class Quizzes::QuizzesController < ApplicationController
           take_quiz
         end
       else
+        @lock_results_if_needed = true
+
         log_asset_access(@quiz, "quizzes", "quizzes")
       end
       @padless = true
@@ -236,6 +245,7 @@ class Quizzes::QuizzesController < ApplicationController
       sections = @context.course_sections.active
       hash = { :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
              :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user)),
+             :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => course_quizzes_url(@context),
@@ -274,6 +284,7 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
       overrides = delete_override_params
+      params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
@@ -327,6 +338,7 @@ class Quizzes::QuizzesController < ApplicationController
 
           auto_publish = @context.feature_enabled?(:draft_state) && @quiz.published?
           @quiz.with_versioning(auto_publish) do
+            params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]
@@ -618,6 +630,7 @@ class Quizzes::QuizzesController < ApplicationController
     @submission = get_submission
     setup_attachments
     if @submission && @submission.completed?
+      @lock_results_if_needed = true
       render layout: false
     else
       render nothing: true
@@ -805,5 +818,26 @@ class Quizzes::QuizzesController < ApplicationController
     @ember_urls ||= CanvasEmberUrl::UrlMappings.new(
       :course_quizzes => course_quizzes_url
     )
+  end
+
+  # Handler for quiz option: one_time_results
+  #
+  # Prevent the student from seeing their submission results more than once.
+  def lock_results
+    return unless @lock_results_if_needed
+    return unless @quiz.one_time_results?
+
+    # ignore teacher views
+    return if @quiz.grants_right?(@current_user, :update)
+
+    submission = @submission || get_submission
+
+    return unless submission.present?
+
+    if submission.results_visible? && !submission.has_seen_results?
+      Quizzes::QuizSubmission.where({ id: submission }).update_all({
+        has_seen_results: true
+      })
+    end
   end
 end

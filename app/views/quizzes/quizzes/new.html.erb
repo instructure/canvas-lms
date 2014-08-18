@@ -278,6 +278,13 @@
                     </div>
 
                     <div>
+                      <label class="checkbox" for="quiz_one_time_results">
+                        <%= check_box :quiz, :one_time_results %>
+                        <%= t(:one_time_results, "Only Once After Each Attempt") %>
+                      </label>
+                    </div>
+
+                    <div>
                       <label class="checkbox" for="quiz_show_correct_answers">
                         <%= check_box :quiz, :show_correct_answers %>
                         <%= t(:show_correct_answers, "Let Students See The Correct Answers") %>
@@ -370,6 +377,18 @@
               </div>
             </div>
           </fieldset>
+
+          <hr>
+
+          <% if @context.feature_enabled?(:differentiated_assignments) %>
+            <div class="text-center pad-box-mini" style="margin-bottom:10px">
+              <span>
+                <em>
+                <%= mt(:only_visible_to_overrides_note, "Note: This quiz is **only** visible to the section(s) specified below:") %>
+                </em>
+              </span>
+            </div>
+          <% end %>
 
           <div class="js-assignment-overrides"></div>
 

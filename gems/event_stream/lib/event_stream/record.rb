@@ -55,7 +55,11 @@ class EventStream::Record < Struct.new(:attributes)
     attributes
   end
 
- def self.from_attributes(attributes)
+  def self.from_attributes(attributes)
     new(attributes)
+  end
+
+  def as_json(*a)
+    attributes.as_json(*a)
   end
 end

@@ -24,12 +24,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   include Workflow
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
-    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview
+    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview,
+    :has_seen_results
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
@@ -199,6 +200,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def results_visible?
     return true unless quiz
     return false if quiz.restrict_answers_for_concluded_course?
+    return false if quiz.one_time_results && self.has_seen_results?
 
     if quiz.hide_results == 'always'
       false
@@ -226,6 +228,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def has_seen_results?
+    !!self.has_seen_results
   end
 
   def finished_in_words
@@ -347,7 +353,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.submitted_at = self.finished_at
       @assignment_submission.grade_matches_current_submission = true
       @assignment_submission.quiz_submission_id = self.id
-      @assignment_submission.graded_at = self.end_at || Time.now
+      @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
       @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
       @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
       @assignment_submission.user_id = self.user_id
@@ -488,7 +494,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def mark_completed
-    Quizzes::QuizSubmission.where(:id => self).update_all(:workflow_state => 'complete')
+    Quizzes::QuizSubmission.where(:id => self).update_all({
+      workflow_state: 'complete',
+      has_seen_results: false
+    })
   end
 
   def grade_submission(opts={})
@@ -641,7 +650,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     date ? where("quiz_submissions.updated_at>?", date) : scoped
   }
   scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
-  scope :logged_out, -> { where("temporary_user_code is not null") }
+  scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
   scope :completed, -> { where(:workflow_state => %w(complete pending_review)) }
 

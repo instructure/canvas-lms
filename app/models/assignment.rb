@@ -59,6 +59,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
@@ -76,6 +77,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
+  validate :discussion_group_ok?
   validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
@@ -119,6 +121,13 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def discussion_group_ok?
+    return unless new_record? || group_category_id_changed?
+    return unless group_category_id && submission_types == 'discussion_topic'
+    errors.add :group_category_id, I18n.t("discussion_group_category_locked",
+      "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
+  end
+
   API_NEEDED_FIELDS = %w(
     id
     title
@@ -154,6 +163,7 @@ class Assignment < ActiveRecord::Base
     post_to_sis
     integration_data
     integration_id
+    only_visible_to_overrides
   )
 
   def external_tool?
@@ -585,6 +595,14 @@ class Assignment < ActiveRecord::Base
     overridden_users
   end
 
+  def students_with_visibility
+    if self.differentiated_assignments_applies?
+      context.students.able_to_see_assignment_in_course_with_da(self.id, context.id)
+    else
+      context.students
+    end
+  end
+
   attr_accessor :saved_by
   def process_if_quiz
     if self.submission_types == "online_quiz"
@@ -595,9 +613,6 @@ class Assignment < ActiveRecord::Base
         copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
         quiz.saved_by = :assignment
         quiz.save
-      end
-      if self.submission_types_changed? && self.submission_types_was != 'online_quiz'
-        self.before_quiz_submission_types = self.submission_types_was
       end
     end
   end
@@ -999,11 +1014,29 @@ class Assignment < ActiveRecord::Base
   def find_or_create_submissions(students)
     submissions = self.submissions.where(user_id: students).order(:user_id).to_a
     submissions_hash = submissions.index_by(&:user_id)
+    # we touch the user in an after_save; the FK causes a read lock
+    # to be taken on the user during submission INSERT, so to avoid
+    # deadlocks, we pre-lock the users
+    needs_lock = false
+    shard.activate do
+      if Submission.connection.adapter_name == 'PostgreSQL' && Submission.connection.send(:postgresql_version) < 90300
+        needs_lock = Submission.connection.open_transactions == 0
+        # we're already in a transaction, and can lock everyone at once
+        if !needs_lock
+          missing_users = students.map(&:id) - submissions_hash.keys
+          User.shard(shard).where(id: missing_users).order(:id).lock.pluck(:id)
+        end
+      end
+    end
     students.each do |student|
       submission = submissions_hash[student.id]
       if !submission
         begin
           transaction(requires_new: true) do
+            # lock just one user
+            if needs_lock
+              User.shard(shard).where(id: student).lock.pluck(:id)
+            end
             submission = self.submissions.build(user: student)
             submission.assignment = self
             yield submission if block_given?
@@ -1519,6 +1552,12 @@ class Assignment < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+    joins(:assignment_student_visibilities).
+    where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
 
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
 

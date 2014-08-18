@@ -48,7 +48,7 @@ define [
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true
       if options.page?
-        options.url = @urls[options.page] if @urls?
+        options.url = @urls[options.page] if @urls?[options.page]
         options.remove = false unless options.remove?
         # API keeps params intact, kill data here to avoid appending in super
         options.data = ''
@@ -89,7 +89,7 @@ define [
     _setStateAfterFetch: (xhr, options) =>
       @_urlCache ?= []
       urlIsNotCached = options.url not in @_urlCache
-      @_urlCache.push options.url if not urlIsNotCached
+      @_urlCache.push options.url unless urlIsNotCached
       firstRequest = !@atLeastOnePageFetched
       setBottom = firstRequest or (options.page in ['next', 'bottom'] and urlIsNotCached)
       setTop = firstRequest or (options.page in ['prev', 'top'] and urlIsNotCached)
@@ -113,7 +113,7 @@ define [
       url = @urls.first ? @urls.next
       if url?
         perPage = parseInt(url.match(@perPageRegex)[1], 10)
-        (@options.params ?= {}).per_page = perPage
+        ((@options ?= {}).params ?= {}).per_page = perPage
 
       if @urls.last and match = @urls.last.match(@pageRegex)
         @totalPages = parseInt(match[1], 10)

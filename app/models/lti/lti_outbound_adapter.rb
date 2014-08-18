@@ -36,12 +36,12 @@ module Lti
       link_code = opts[:link_code] || default_link_code
       @overrides = opts[:overrides] || {}
 
+      variable_substitutor = LtiOutbound::VariableSubstitutor.new
+
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert
+      lti_user =  Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
-
-      variable_substitutor = LtiOutbound::VariableSubstitutor.new
 
       #Account
       variable_substitutor.add_substitution('$Canvas.account.id', lti_account.id)
@@ -56,12 +56,6 @@ module Lti
         variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)
         variable_substitutor.add_substitution('$Canvas.course.sisSourceId', lti_context.sis_source_id)
       end
-      #User
-      variable_substitutor.add_substitution('$Canvas.user.id', lti_user.id)
-      variable_substitutor.add_substitution('$Canvas.user.sisSourceId', -> { lti_user.sis_source_id })
-      variable_substitutor.add_substitution('$Canvas.user.loginId', -> { lti_user.login_id })
-      variable_substitutor.add_substitution('$Canvas.enrollment.enrollmentState', -> { lti_user.enrollment_state })
-      variable_substitutor.add_substitution('$Canvas.membership.concludedRoles', -> { lti_user.concluded_role_types })
 
       if opts[:custom_substitutions]
         opts[:custom_substitutions].each do |key, value|

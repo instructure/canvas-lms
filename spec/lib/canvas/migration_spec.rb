@@ -50,7 +50,8 @@ describe "Migration package importers" do
     unsupported.each_pair do |key, val|
       it "should correctly identify package type for #{key}" do 
         settings = get_settings(val.first)
-        Canvas::Migration::PackageIdentifier.new(settings).identify_package.should == val.last
+        archive = Canvas::Migration::Archive.new(settings)
+        Canvas::Migration::PackageIdentifier.new(archive).identify_package.should == val.last
       end
     end
   end

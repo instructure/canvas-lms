@@ -1,0 +1,72 @@
+@import "base/environment"
+
+.context_modules2
+  #breadcrumbs
+    border-bottom-color: rgb(182, 186, 191)
+  #content
+    padding: 0
+
+#progression_modules
+  min-height: 450px
+  .student-header
+    margin-left: 25px
+  .collectionViewItems
+    list-style-type: none
+    li
+      .progression-module
+        background-color: $tableBackgroundAccent
+        padding: 0
+        .name, .status.no_subtitle
+          padding: 12px 16px
+        .status
+          padding-right: 16px
+          text-align: right
+          .subtitle
+            color: $hintTextColor
+            font-size: 12px
+            font-weight: normal
+        .completed
+          color: $successText
+        hr
+          margin: 0
+          border-top-color: $listBorderColor
+        .items
+          ul
+            list-style-type: none
+            padding: 6px 0px
+            li
+              padding: 6px 0px
+
+#progression_students
+  background-color: $tableBackgroundAccent
+  border-left: solid 1px $listBorderColor
+  .header
+    border-bottom: solid 1px $listBorderColor
+    h3
+      display: inline
+      font-size: inherit
+      font-weight: bold
+      line-height: inherit
+      text-transform: uppercase
+    a
+      float: right
+  .header, li
+    padding: 8px 16px
+  .collectionViewItems
+    list-style-type: none
+    margin-left: 0
+    overflow-y: scroll
+    .student
+      cursor: pointer
+      border-top: solid 1px transparent
+      a
+        color: $textColor
+      &.active
+        background-color: $btnBackground
+        border-bottom: solid 1px $listBorderColor
+        font-weight: bold
+        margin-left: -1px
+        a
+          color: $linkColor
+    .student + .student.active
+      border-top-color: $listBorderColor

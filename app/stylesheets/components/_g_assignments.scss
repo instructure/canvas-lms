@@ -1,0 +1,415 @@
+#groups {
+
+  /*== Icons ==*/
+  .move_icon, .group_move_icon { cursor: move }
+  .move_icon, .group_move_icon, .links a {
+    left: -10000px;
+    position: relative;
+
+    // the focus class exists to help with testing (i.e. add 'focus' class
+    // before clicking in selenium).
+    &:focus, &.focus {
+      left: auto;
+      text-decoration: none;
+    }
+  }
+
+  .group_assignment .content:hover, .header_content:hover {
+    .move_icon, .group_move_icon, .links a {
+      left: auto;
+      text-decoration: none;
+
+      opacity: 0.5;
+      &:hover { opacity: 1; }
+    }
+  }
+
+  /*== Assignment groups ==*/
+  .assignment_group {
+    background: $lightBackground;
+    border: 1px solid $listBorderColor;
+    margin-bottom: 16px;
+  }
+
+  .group_header {
+    @include clearfix;
+    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
+    border-bottom: 1px solid $listBorderColor;
+    padding: 4px 12px;
+    text-shadow: none;
+    .name {
+      font-weight: bold;
+    }
+  }
+
+  .assignment_list {
+    min-height: 8px;
+  }
+
+  /*== Individual assignments ==*/
+  .group_assignment {
+    display: table;
+    width: 100%;
+
+    .content { display: table-row; }
+  }
+
+  .data, .cell {
+    border-bottom: 1px solid lighten($borderColor, 22%);
+    border-top: 1px solid white;
+    display: table-cell;
+    padding: 4px 0;
+    vertical-align: middle;
+
+    /*== Table cells ==*/
+    &.move {
+      padding-left: 12px;
+      width: 20px;
+    }
+    &.assignment_title {
+      max-width: 200px;
+      min-width: 200px;
+      width: 25%;
+    }
+    &.assignment_due {
+      width: 25%;
+    }
+    &.links {
+      padding-right: 12px;
+      width: 40px;
+    }
+  }
+
+  /*== Loaders ==*/
+  .load_pending {
+    background: url(/images/ajax-loader-small-ccc.gif) center left no-repeat;
+  }
+
+  /*== Add/edit assignment form ==*/
+  .add_assignment_form {
+    display: table-row;
+
+    .vdd_no_edit {
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .cell.first { padding-left:  6px; }
+    .cell.last  { padding-right: 6px; }
+
+    .no_points                    { display: none; }
+    .points_uneditable .points    { display: none; }
+    .points_uneditable .no_points { display: inline; }
+
+    label, select { font-size: 0.8em; }
+    
+    .input-append {
+      display: inline;
+    }
+  }
+}
+
+#assignments_for_student {
+  .group_assignment {
+    min-height: 40px;
+    border-bottom: 1px solid #cccccc;
+    @include clearfix;
+    padding-bottom: 3px;
+    &.last {
+      border-bottom-width: 0px;
+    }
+    .content {
+      padding-top: 9px;
+    }
+    .details {
+      display: block;
+      margin-left: 60px;
+      font-size: 0.8em;
+      margin-bottom: 5px;
+    }
+    .grade {
+      display: none;
+    }
+    &.group_assignment_graded {
+      color: #aaaaaa;
+      a {
+        color: #888888;
+      }
+      a.grade {
+        color: #444444;
+        font-weight: bold;
+        display: inline;
+      }
+    }
+    &.group_assignment_ungraded {
+      .assignment_due {
+        font-weight: bold;
+        color: #888822;
+      }
+    }
+    &.group_assignment_overdue {
+      .assignment_due {
+        font-weight: bold;
+        color: #cc0000;
+      }
+    }
+    &:hover {
+      background-color: #eeeeee;
+      .course_name {
+        opacity: 1 !important;
+      }
+    }
+    div.data {
+      float: left;
+      border: 0px;
+      padding: 2px 5px 2px 5px;
+      &.assignment_title {
+        width: 40%;
+        margin-left: 30px;
+        .title {
+          font-size: 1.3em;
+          font-weight: bold;
+        }
+        .course_name {
+          font-size: 0.8em;
+          line-height: 1.2em;
+          padding: 2px 7px;
+          color: inherit;
+          opacity: 0.75;
+          border-radius: 10px;
+        }
+      }
+      &.assignment_due {
+        width: 30%;
+        font-size: 1em;
+        display: block;
+      }
+      &.assignment_points {
+        font-size: 1em;
+      }
+      &.links {
+        display: none;
+      }
+      &.move {
+        display: none;
+      }
+    }
+  }
+  .assignment_list.show_context {
+    .group_assignment .context_name {
+      display: block;
+    }
+  }
+}
+
+#groups_for_student {
+  .assignment_group {
+    margin: 0 0.5em 1.5em 0.5em;
+    width: auto;
+    border: 1px solid #999999;
+    color: black;
+    border-radius: 5px;
+    .group_move_icon,.add_assignment_link,.edit_group_link,.delete_group_link {
+      display: none;
+    }
+    .group_move {
+      visibility: hidden;
+    }
+    div {
+      &.header {
+        width: auto;
+        border-bottom: 1px solid #999999;
+        background-color: #dddddd;
+        padding-left: 25px;
+        color: #666666;
+        margin-bottom: 0px;
+        @include border-top-radius(3px);
+        .group_name {
+          font-size: 1.5em;
+          font-weight: bold;
+        }
+        .more_info_brief {
+          line-height: 1.7em;
+        }
+        .links {
+          display: none;
+        }
+      }
+      &.padding {
+        padding: 0px 0px 5px 0px;
+        display: none;
+      }
+    }
+    .group_assignment {
+      min-height: 30px;
+      border-radius: 3px;
+      color: #444444;
+      border-bottom: 1px solid #eeeeee;
+      &:hover {
+        background-color: #eeeeee;
+      }
+      .content {
+        padding-top: 3px;
+      }
+      &.group_assignment_graded {
+        color: #aaaaaa;
+        a {
+          color: #888888;
+        }
+      }
+      &.group_assignment_overdue {
+        .assignment_due {
+          font-weight: bold;
+          color: #cc0000;
+        }
+      }
+      div.data {
+        float: left;
+        border: 0px;
+        padding: 2px 5px 2px 5px;
+        &.assignment_title {
+          width: 40%;
+          font-weight: bold;
+          margin-left: 30px;
+          .context_name {
+            font-weight: normal;
+            font-size: 0.7em;
+            padding-left: 10px;
+            color: #888888;
+          }
+        }
+        &.assignment_due {
+          width: 30%;
+          font-size: 0.8em;
+          display: block;
+        }
+        &.assignment_points {
+          font-size: 0.8em;
+        }
+        &.buttons {
+          float: right;
+        }
+        &.links {
+          display: none;
+        }
+        &.name {
+          margin-right: 10px;
+          font-weight: bold;
+          width: 200px;
+        }
+        &.move {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+#group_weight_table {
+  input.weight {
+    width: 35px;
+  }
+  th, td {
+    padding: 1px;
+  }
+  th {
+    font-weight: bold;
+    border-bottom: 1px solid #888888;
+  }
+  td.total {
+    font-weight: bold;
+  }
+  tr.group_weight {
+    .move {
+      cursor: move;
+      visibility: hidden;
+    }
+    td {
+      border-bottom: 1px solid #aaaaaa;
+    }
+  }
+  .group_weight_hover {
+    .move {
+      visibility: visible;
+    }
+  }
+}
+
+.show-only-from {
+  a {
+    display: block;
+    margin-top: 3px;
+    color: $right_side_text_color;
+    padding-left: 5px;
+  }
+}
+
+table.full_assignment_table {
+  select { width: 140px !important; }
+}
+
+#submit_from_external_tool_form {
+  #external_tool_submission_details {
+    padding-left: 10px;
+    &.not_selected {
+      color: #888;
+      font-style: italic;
+    }
+    &.file_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/file.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+    &.url_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/link.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+  }
+  &.has_submission {
+    .tools {
+      opacity: 0.7;
+    }
+  }
+  .tools {
+    list-style-type: none;
+    margin-right: 20px;
+    .tool {
+      display: block;
+      padding: 2px 5px;
+      font-size: 14px;
+      img {
+        vertical-align: middle;
+      }
+      &:hover {
+        background: #eee;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+/*== Multiple Due Dates Tooltip ==*/
+.vdd_tooltip_link {
+  cursor: pointer
+}
+.ui-widget.ui-tooltip {
+  max-width: 240px;
+}
+.dl-horizontal.vdd_tooltip_content {
+  margin: 7px 0;
+  dt {
+    width: 115px;
+    white-space: normal;
+    line-height: 12px;
+    margin-bottom: 5px;
+  }
+  dd {
+    margin-left: 125px;
+    width: 115px;
+    line-height: 12px;
+    text-align: left;
+  }
+}

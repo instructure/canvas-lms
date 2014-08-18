@@ -18,24 +18,25 @@
 
 class ContentExport < ActiveRecord::Base
   include Workflow
-  belongs_to :course
+  belongs_to :context, :polymorphic => true
+
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :course
-  validates_presence_of :course_id, :workflow_state
-  has_one :job_progress, :class_name => 'Progress', :as => :context
+  attr_accessible :context
+  validates_presence_of :context_id, :workflow_state
+  validates_inclusion_of :context_type, :in => ['Course']
 
-  alias_method :context, :course
+  has_one :job_progress, :class_name => 'Progress', :as => :context
 
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
   QTI = 'qti'
-  
+
   workflow do
     state :created
     state :exporting
@@ -49,19 +50,23 @@ class ContentExport < ActiveRecord::Base
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:exported) && self.content_migration.blank?
+      record.context_type == 'Course' && record.changed_state(:exported) && self.content_migration.blank?
     }
     
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:failed) && self.content_migration.blank?
+      record.context_type == 'Course' && record.changed_state(:failed) && self.content_migration.blank?
     }
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage_files) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
     can :manage_files and can :read
+  end
+
+  def course
+    raise "Use context instead"
   end
 
   def export_course(opts={})
@@ -185,7 +190,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   def root_account
-    self.course.root_account
+    self.context.try_rescue(:root_account)
   end
   
   def running?

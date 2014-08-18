@@ -51,7 +51,13 @@ class AssessmentRequest < ActiveRecord::Base
     p.dispatch :rubric_assessment_submission_reminder
     p.to { self.assessor }
     p.whenever { |record|
-      record.assigned? && @send_reminder
+      record.assigned? && @send_reminder && rubric_association
+    }
+
+    p.dispatch :peer_review_invitation
+    p.to { self.assessor }
+    p.whenever { |record|
+      record.assigned? && @send_reminder && !rubric_association
     }
   end
 

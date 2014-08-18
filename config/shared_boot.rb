@@ -79,7 +79,11 @@ params_parser = CANVAS_RAILS2 ? 'ActionController::ParamsParser' : 'ActionDispat
 config.middleware.insert_before(CANVAS_RAILS2 ? params_parser : 'ActionDispatch::RequestId', "RequestContextGenerator")
 config.middleware.insert_before(params_parser, 'StatsTiming')
 config.middleware.insert_before(params_parser, 'Canvas::RequestThrottle')
-config.middleware.insert_before(params_parser, 'PreventNonMultipartParse')
+if CANVAS_RAILS2
+  config.middleware.insert_before(params_parser, 'PreventNonMultipartParse')
+else
+  config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
+end
 
 config.to_prepare do
   require_dependency 'canvas/plugins/default_plugins'
@@ -147,7 +151,7 @@ else
         @@postgresql_patches_applied = true
       end
     end
-    alias_method_chain :initialize, :postgresql_patches
+    alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
   end
 end
 

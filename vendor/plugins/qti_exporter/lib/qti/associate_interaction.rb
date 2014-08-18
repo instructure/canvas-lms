@@ -52,6 +52,32 @@ class AssociateInteraction < AssessmentItemConverter
         end
       end
     end
+
+    if @question[:answers].any?{|a| Nokogiri::HTML(a[:right].to_s).at_css('img')}
+      if @question[:answers].any?{|a| Nokogiri::HTML(a[:left].to_s).at_css('img') || Nokogiri::HTML(a[:left_html].to_s).at_css('img')}
+        # raise warning if the left hand side of the answers also has images
+        @question[:import_warnings] ||= []
+        @question[:import_warnings] << I18n.t(:qti_img_matching_question, "Imported matching question contains images on both sides, which is unsupported")
+      elsif @question[:matches].any?{|m| m[:match_id].present? && !@question[:answers].any?{|a| a[:match_id] == m[:match_id]}}
+        # or if there are distractors
+        @question[:import_warnings] ||= []
+        @question[:import_warnings] << I18n.t(:qti_img_matching_question_distractors, "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors")
+      else
+        # if we're alright, switch the right and left sides
+        @question[:answers] = @question[:answers].map do |answer|
+          @question[:matches].each do |m|
+            if m[:match_id].present? && answer[:match_id] == m[:match_id]
+              m[:text] = answer[:left]
+            end
+          end
+
+          new_answer = answer.dup
+          new_answer[:left] = new_answer[:left_html] = answer[:right]
+          new_answer[:right] = answer[:left]
+          new_answer
+        end
+      end
+    end
   end
   
   def get_canvas_matches(match_map)

@@ -201,6 +201,16 @@ class AssignmentGroup < ActiveRecord::Base
     false
   end
 
+  def visible_assignments(user)
+    return self.active_assignments if context.grants_right?(user, :manage_grades)
+    potential_assignments = self.send(AssignmentGroup.assignment_scope_for_draft_state(context))
+    if context.feature_enabled?(:differentiated_assignments)
+      potential_assignments.visible_to_student_in_course_with_da(user.id, context.id)
+    else
+      potential_assignments
+    end
+  end
+
   def move_assignments_to(move_to_id)
     new_group = context.assignment_groups.active.find(move_to_id)
     order = new_group.assignments.active.pluck(:id)
@@ -212,7 +222,7 @@ class AssignmentGroup < ActiveRecord::Base
     self.reload
   end
 
-  def self.assignment_scope_for_grading(context)
+  def self.assignment_scope_for_draft_state(context)
     if context.feature_enabled?(:draft_state)
       :published_assignments
     else

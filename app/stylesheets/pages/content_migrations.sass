@@ -1,0 +1,137 @@
+@import "base/_environment.scss"
+@import "themes/_variables.sass"
+
+[type=radio].styled-radio
+  margin: 4px 7px 2px 2px
+  float: left
+
+.muted-margin
+  margin-left: 20px
+
+.top-margin
+  margin-top: 5px
+
+.bottomMargin
+  margin-bottom: 5px
+
+.top-padding
+  padding-top: 5px
+
+.migrationProgressItem
+  padding-top: 5px
+  padding-bottom: 5px
+
+.controlMargin
+  padding-top: 8px
+
+.centerText
+  text-align: center
+
+.cancelBtn
+  margin-left: 0
+
+.rightAlign
+  text-align: right
+
+.progress
+  margin-bottom: 0
+
+#progress
+  margin-left: 20px
+  margin-top: 100px
+
+.noMargin
+  margin: 0
+
+.icon-folder
+  font-size: 24px !important
+
+hr
+  margin-bottom: 0 !important
+
+.plain
+  color: black
+
+.control-height
+  height: 30px
+
+.selectContentDialog ul
+  margin: 0
+  list-style: none
+
+  .checkbox-title
+    padding-left: 5px
+
+  .checkbox-caret
+    color: black
+
+  .no-caret
+    margin-left: 20px
+
+  .treeitem-heading
+    min-height: 22px
+
+  input[type=checkbox]
+    margin: 0 10px 3px 0px
+    float: none
+    padding-right: 5px
+
+  label.checkbox
+    display: inline
+    padding-left: 0px
+
+  li.top-level-treeitem
+    margin: 10px 0px 10px 0px
+    border: 1px solid lightgray
+    border-radius: 5px
+
+    > .treeitem-heading
+      padding: 5px
+
+  li.normal-treeitem
+    min-height: 32px
+
+  li
+    list-style: none
+
+    > .treeitem-heading
+      padding: 5px
+      padding-left: 33px
+      &:hover
+        background-color: $hover-color
+
+  li li li li li
+    > .treeitem-heading
+      padding: 5px
+      padding-left: 63px
+
+  li.small-spacing
+    margin: 5px 0px 5px 0px
+
+  li[aria-selected=true]
+    border-radius: 5px
+
+    > .treeitem-heading
+      background-color: $highlight-color
+      label, a
+        color: white
+
+  li[aria-expanded=true]
+    .icon-arrow-right
+      display: none
+    .icon-arrow-down
+      display: inline-block
+
+    > ul
+      display: block
+
+  li[aria-expanded=false]
+    .icon-arrow-right
+      display: inline-block
+
+    .icon-arrow-down
+      display: none
+
+    > ul
+      display: none
+

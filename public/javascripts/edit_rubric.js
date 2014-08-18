@@ -420,7 +420,7 @@ define([
 
 
   rubricEditing.init = function() {
-    var limitToOneRubric = true;
+    var limitToOneRubric = !$("#rubrics").hasClass('raw_listing');
     var $rubric_dialog = $("#rubric_dialog"),
         $rubric_long_description_dialog = $("#rubric_long_description_dialog");
 
@@ -563,9 +563,7 @@ define([
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
       $rubric.find(":text:first").focus().select();
-      if(limitToOneRubric) {
         $(".add_rubric_link").hide();
-      }
     });
 
     $("#rubric_dialog")
@@ -757,6 +755,9 @@ define([
                                           {one: '%{count} point possible', other: '%{count} points possible' },
                                           {count: rubric.points_possible || 0})
           $(".discussion-title .discussion-points").text(discussion_points_text);
+        }
+        if(!limitToOneRubric) {
+          $(".add_rubric_link").show();
         }
         $rubric.find(".rubric_title .links:not(.locked)").show();
       }

@@ -79,10 +79,10 @@ class ActiveRecord::Base
 
   def self.models_from_files
     @from_files ||= Dir[
-      "#{Rails.root}/app/models/*",
-      "#{Rails.root}/vendor/plugins/*/app/models/*"
+      "#{Rails.root}/app/models/**/*.rb",
+      "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
     ].collect { |file|
-      model = File.basename(file, ".*").camelize.constantize
+      model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
       next unless model < ActiveRecord::Base
       model
     }
@@ -1068,7 +1068,9 @@ unless CANVAS_RAILS2
               sql.concat(' ')
             end
 
-            sql.concat(where(join_conditions).arel.where_sql.to_s)
+            scope = self
+            join_conditions.each { |join| scope = scope.where(join) }
+            sql.concat(scope.arel.where_sql.to_s)
             connection.update(sql, "#{name} Update")
           else
             update_all_without_joins(updates, conditions, options)
@@ -1095,7 +1097,9 @@ unless CANVAS_RAILS2
             sql.concat(tables.join(', '))
             sql.concat(' ')
 
-            sql.concat(where(join_conditions).arel.where_sql.to_s)
+            scope = self
+            join_conditions.each { |join| scope = scope.where(join) }
+            sql.concat(scope.arel.where_sql.to_s)
           when 'MySQL', 'Mysql2'
             sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql.to_s} #{arel.where_sql.to_s}"
           else
@@ -1414,8 +1418,14 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
           if CANVAS_RAILS2
             conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
           else
-            model_class = ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s} || ActiveRecord::Base
-            conditions = " WHERE #{model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
+            sql_conditions = options[:where]
+            unless sql_conditions.is_a?(String)
+              model_class = table_name.classify.constantize rescue nil
+              model_class ||= ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s}
+              model_class ||= ActiveRecord::Base
+              sql_conditions = model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)
+            end
+            conditions = " WHERE #{sql_conditions}"
           end
         end
       else

@@ -1,0 +1,107 @@
+.group_list
+  list-style: none
+  .group
+    .group_name
+      clear: left
+      position: relative
+      border-top: 1px dotted #aaa
+      padding-top: 5px
+      margin: 1em
+      margin-bottom: -2px
+      .management
+        float: left
+        position: absolute
+        right: 0
+      .name
+        font-size: 1.5em
+        padding-left: 20px
+        background: url(/images/group.png) no-repeat center left
+    &.teacher_group
+      .name
+        background: url(/images/assignment.png) no-repeat center left
+    .group_info
+      margin-top: -2px
+      padding-left: 3em
+    .member_list
+      list-style: none
+      max-height: 150px
+      overflow: auto
+
+.left_side
+  a.assign_students_link
+    display: none
+
+.student-groups
+  border: 1px solid #c1c7cf
+  border-radius: 3px
+  .student-group-header
+    @include clearfix
+    padding: 16px 16px 16px 10px
+  .icon-mini-arrow-right, .icon-mini-arrow-down
+    float: left
+  .icon-mini-arrow-down
+    display: none
+  &.show-body
+    .student-group-header
+      background-color: #f5f5f5
+      border-bottom: 1px solid #c1c7cf
+      cursor: pointer
+    .icon-mini-arrow-right
+      display: none
+    .icon-mini-arrow-down
+      display: block
+  .student-group-title
+    float: left
+    h3
+      margin: 0 7px 0 5px
+      font-weight: bold
+      font-size: 14px
+      float: left
+      line-height: 18px
+
+      small
+        font-size: 12px
+
+      a
+        color: #555
+    a
+      position: relative
+      top: -1px
+  .student-group-students
+    float: right
+    color: #555
+    font-weight: normal
+  .student-group-join
+    float: right
+    text-transform: uppercase
+    font-weight: bold
+    width: 175px
+    text-align: right
+  .student-group-body
+    padding: 16px 16px 16px 36px
+    &:last-child
+      border-bottom: 0
+    .student-group-list
+      list-style: none
+      margin: 0
+      li
+        float: left
+        width: 25%
+.group-categories-actions
+  height: 36px
+  padding-bottom: 10px
+  z-index: 1
+  position: relative
+
+
+#group_categories_tabs
+  margin: 0 -1em -1em
+  > .collectionViewItems
+    padding: 10px 0 0 1em
+    border-bottom: 0px
+
+  > .tab-panel
+    border-top: 1px solid #aaaaaa
+  > .roster-tab
+    padding-left: 1em
+    padding-right: 1em

@@ -28,3 +28,6 @@ module Importers
     end
   end
 end
+
+require_dependency 'importers/account_content_importer'
+require_dependency 'importers/course_content_importer'

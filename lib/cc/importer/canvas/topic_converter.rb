@@ -57,6 +57,8 @@ module CC::Importer::Canvas
         topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
         topic['delayed_post_at'] = get_time_val(meta_doc, 'delayed_post_at')
         topic['position'] = get_int_val(meta_doc, 'position')
+        wf_state = get_node_val(meta_doc, 'workflow_state')
+        topic['workflow_state'] = wf_state if wf_state.present?
 
         if asmnt_node = meta_doc.at_css('assignment')
           topic['assignment'] = parse_canvas_assignment_data(asmnt_node)

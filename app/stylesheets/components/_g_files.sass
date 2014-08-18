@@ -1,0 +1,171 @@
+
+#folder_content
+  :padding 0px
+  :margin 0px
+  :height 350px
+  
+  a:hover, a:focus
+    background-color: transparent
+
+  li
+    :display block
+    :font-size 1.2em
+    :width auto
+    :list-style-type none
+    :padding 3px 5px 3px 30px
+    :background-position 5px center
+    :background-repeat no-repeat
+    :background-color #fff
+    :min-height 20px
+    :min-width 200px
+    border-radius: 3px
+    
+    &.draggable
+      :cursor pointer
+    
+    .links
+      :display none
+      :float right
+      
+    &.folder
+      :background-image url(/images/folder_big.png)
+      
+      &.currently_locked_folder,&.folder_locked
+        :background-image url(/images/folder_big_locked.png)
+
+      &.drop_target
+        :border 1px solid #999
+
+    &.file
+      :background-image url(/images/file_big.png)
+      
+      &.currently_locked,&.locked
+        :background-image url(/images/file_big_locked.png)
+        
+    &.draggable
+      .name
+        :cursor move
+
+    &:hover
+      :background-color #ffc
+      .links
+        :display block
+        :opacity 0.5
+        &:hover
+          :opacity 1.0
+
+    &.selected,.temp_selected
+      :background-color #fea
+      :font-weight bold
+      
+      .links
+        :display block
+        :opacity 1.0
+#tags
+  ul
+    :padding 10px 0px
+    :margin 0px
+    :list-style-type none
+
+    li.tag
+      :padding 4px 5px 4px 35px
+      :cursor pointer
+      :background-image url(/images/tag_icon.png)
+      :background-position 2px 2px
+      :background-repeat no-repeat
+      :white-space nowrap
+
+      &:hover
+        :background-color #eee
+
+      &.open
+        :background-image url(/images/tag_icon.png)
+
+      &.drop_target
+        :border 1px solid #999
+
+      &.selected
+        :background-color #ddd
+
+#view_options
+  .header
+    :font-size 1.0em
+    :font-weight bold
+
+
+#folders
+  :padding 0px 0px 20px 0px
+
+  ul
+    :padding 0px
+    :margin 0px
+    :list-style-type none
+
+    li.folder
+      :display block
+      :color #444
+
+      ul
+        :margin-left 10px
+
+      .folder_name
+        :padding 5px 5px 5px 30px
+        :cursor pointer
+        :background-image url(/images/folder_closed.png)
+        :background-position 7px center
+        :background-repeat no-repeat
+        :white-space nowrap
+        :vertical-align center
+        :font-size 1.0em
+
+        &:hover
+          :background-color #eee
+
+        &.open
+          :background-image url(/images/folder_open.png)
+          
+        &.drop_target
+          :border 1px solid #999
+
+        &.selected
+          :background-color #ddd
+          :border-top 1px solid #eee
+          :border-bottom 1px solid #eee
+          :font-weight bold
+
+        &.related
+          :background-color #ddd  
+          :border-top 1px solid #eee
+          :border-bottom 1px solid #eee
+
+      &.currently_locked_folder,&.folder_locked
+        .folder_name
+          :background-image url(/images/folder_locked.png)
+
+#multi_file_uploads_link
+  :background url(/images/file_multiple.png) left 5px no-repeat
+
+#file_uploads
+  :width auto
+  :margin 0px 30px 10px
+  .file_upload
+    :font-size 0.8em
+    :border 1px solid #aaa
+    border-radius: 5px
+    :padding 3px
+    :margin-bottom 3px
+    :background-color #ddd
+    &.finished_message
+      :background-color #d0e0f0
+    .file_name 
+      :font-weight bold
+    .cancel_upload_link
+      :float right
+    .progress_bar
+      :height 10px
+      :margin 2px 20px
+
+.embedded_swf
+  min-height: 600px
+  height: 80%
+  width: 100%

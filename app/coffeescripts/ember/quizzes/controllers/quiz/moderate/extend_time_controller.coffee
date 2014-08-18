@@ -12,7 +12,7 @@ define [
     title: I18n.t('extend_time', 'Extend Time')
 
     extendFor: ( ->
-      I18n.t('extensions_student', 'Extend time for for %{student}', student: @get("name"))
+      I18n.t('extensions_student', 'Extend time for %{student}', student: @get("name"))
     ).property('name')
 
     timeOptions: [

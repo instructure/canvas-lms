@@ -131,7 +131,8 @@ define([
         $message_students_dialog.find("[name=subject]").val(currentSettings.subjectCallback(option.text, cutoff));
       }
       $message_students_dialog.find(".cutoff_holder").showIf(option.cutoff);
-      $message_students_dialog.find(".student_list").toggleClass('show_score', option.cutoff || option.score);
+
+      $message_students_dialog.find(".student_list").toggleClass('show_score', !!(option.cutoff || option.score));
       $message_students_dialog.find("button").attr('disabled', student_ids.length == 0);
 
       var student_ids_hash = {};

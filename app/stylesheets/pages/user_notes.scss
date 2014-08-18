@@ -1,0 +1,57 @@
+@import "base/environment";
+
+.page-header {
+  margin-bottom: 15px;
+}
+
+.communication_message {
+  margin-left: 0px;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+  border-bottom: 0px;
+
+  &:first-child {
+    margin-top: 0px;
+  }
+
+  .header {
+    margin-left: 0px;
+    background-color: #efefef;
+    padding: 25px;
+    line-height: 20px;
+
+    .header_title {
+      float: none;
+      padding: 5px;
+      line-height: 1.8em;
+
+      .title {
+        margin-left: 0px;
+        padding-left: 0px;
+      }
+      .sub_title {
+        margin-left: 0px;
+        padding: 0 0 5px 0;
+        color: #888888;
+      }
+    }
+
+    .delete_user_note_link {
+      position: relative;
+      top: 3px;
+      color: #777;
+    }
+
+    .delete_user_note_link:hover {
+      color: $highlight-color;
+    }
+  }
+
+  .content {
+    padding: 10px !important;
+
+    .inner-content {
+      position: static;
+    }
+  }
+}

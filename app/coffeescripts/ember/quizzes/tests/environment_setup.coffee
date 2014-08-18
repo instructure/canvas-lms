@@ -4,6 +4,9 @@ define ['../shared/environment'], (env) ->
     PERMISSIONS: {
       manage: false,
       update: false,
+    },
+    FLAGS: {
+      differentiated_assignments: true
     }
   }
   env.setEnv ENV

@@ -41,10 +41,9 @@ describe ContentMigration do
     end
 
     it "should show correct progress" do
-      ce = ContentExport.new
+      ce = @course.content_exports.build
       ce.export_type = ContentExport::COMMON_CARTRIDGE
       ce.content_migration = @cm
-      ce.course = @course
       @cm.content_export = ce
       ce.save!
 
@@ -400,6 +399,22 @@ describe ContentMigration do
           tag_copy.unpublished?.should == true
           tag_copy.content.unpublished?.should == true
         end
+      end
+
+      it "should copy unpublished discussion topics" do
+        dt1 = @copy_from.discussion_topics.create!(:message => "hideeho", :title => "Blah")
+        dt1.workflow_state = :unpublished
+        dt1.save!
+        dt2 = @copy_from.discussion_topics.create!(:message => "asdf", :title => "qwert")
+        dt2.workflow_state = :active
+        dt2.save!
+
+        run_course_copy
+
+        dt1_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1))
+        dt1_copy.workflow_state.should == 'unpublished'
+        dt2_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt2))
+        dt2_copy.workflow_state.should == 'active'
       end
 
       it "should copy unpublished wiki pages" do
@@ -1788,6 +1803,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.announcements.create!(:title => "hear ye",
+                                       :message => "<p>grades will henceforth be in Cyrillic letters</p>",
+                                       :delayed_post_at => old_start + 10.days)
       @copy_from.calendar_events.create!(:title => "an event",
                                          :start_at => old_start + 4.days,
                                          :end_at => old_start + 4.days + 1.hour)
@@ -1816,6 +1834,9 @@ describe ContentMigration do
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_ann = @copy_to.announcements.first
+      new_ann.delayed_post_at.to_i.should == (new_start + 10.day).to_i
 
       new_event = @copy_to.calendar_events.first
       new_event.start_at.to_i.should == (new_start + 4.day).to_i
@@ -2632,5 +2653,32 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       bank.assessment_questions.count.should == 1
     end
+  end
+
+  it "should identify and import compressed tarball archives" do
+    pending unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.tar.gz")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    cm.migration_issues.should be_empty
+
+    @course.assessment_question_banks.count.should == 1
   end
 end

@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::Course
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :course_id,
                :user_id,
                :event_source,
@@ -42,8 +40,6 @@ class Auditors::Course
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['course']
         self.course = attributes.delete('course')
@@ -97,7 +93,7 @@ class Auditors::Course
     end
 
     def event_data
-      @event_data ||= JSON.parse(attributes['data'])
+      @event_data ||= JSON.parse(attributes['data']) if attributes['data']
     end
 
     def event_data=(value)
@@ -107,7 +103,7 @@ class Auditors::Course
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record

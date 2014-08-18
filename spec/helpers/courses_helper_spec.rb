@@ -24,9 +24,13 @@ describe CoursesHelper do
   include QuizzesHelper
 
   context "a view with a 'Coming Up' sidebar" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      course_with_teacher
       @assignment = factory_with_protected_attributes(@course.assignments, assignment_valid_attributes.merge({ :points_possible => 10, :submission_types => "online_text_entry" }))
+    end
+
+    before(:each) do
+      user_session(@user)
     end
 
     describe "an assignment with no submissions" do
@@ -37,7 +41,7 @@ describe CoursesHelper do
     end
 
     describe "an assignment with submissions" do
-      before(:each) do
+      before(:once) do
         @student_one = factory_with_protected_attributes(User, valid_user_attributes)
         @student_two = factory_with_protected_attributes(User, valid_user_attributes)
         [@student_one, @student_two].each do |student|

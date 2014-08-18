@@ -374,6 +374,7 @@ describe "quizzes question creation" do
   context "drag and drop reordering" do
 
     before(:each) do
+      resize_screen_to_normal
       quiz_with_new_questions
       create_question_group
     end
@@ -390,6 +391,7 @@ describe "quizzes question creation" do
     end
 
     it "should add and remove questions to/from a group" do
+      resize_screen_to_default
       # drag it into the group
       click_questions_tab
       drag_question_into_group @quest1.id, @group.id
@@ -405,6 +407,7 @@ describe "quizzes question creation" do
     end
 
     it "should reorder questions within a group" do
+      resize_screen_to_default
       drag_question_into_group @quest1.id, @group.id
       drag_question_into_group @quest2.id, @group.id
       data = get_question_data_for_group @group.id

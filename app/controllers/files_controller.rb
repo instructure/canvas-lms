@@ -315,7 +315,9 @@ class FilesController < ApplicationController
   def ember_app
     raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && @context.feature_enabled?(:better_file_browsing)
     clear_crumbs
-    js_bundle :files
+    @padless = true
+    @body_classes << 'full-width'
+    js_bundle :react_files
     jammit_css :ember_files
     render :text => "".html_safe, :layout => true
   end

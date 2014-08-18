@@ -17,16 +17,19 @@
 #
 
 define [
+  'require'
   'underscore'
   'Backbone'
-  'compiled/models/Folder'
   'compiled/collections/PaginatedCollection'
-], (_, Backbone, Folder, PaginatedCollection) ->
+  'compiled/models/Folder'
+], (require, _, Backbone, PaginatedCollection, _THIS_WILL_BE_NULL_) ->
 
   class FoldersCollection extends PaginatedCollection
     @optionProperty 'parentFolder'
 
-    model: Folder
+    # this breaks the circular dependency between Folder <-> FoldersCollection
+    require ['compiled/models/Folder'], (Folder) ->
+      FoldersCollection::model = Folder
 
     parse: (response) ->
       if response

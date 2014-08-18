@@ -26,7 +26,7 @@ module Importers
       item ||= ContextModule.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
       item ||= ContextModule.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
       item.name = hash[:title] || hash[:description]
       item.migration_id = hash[:migration_id]
       if hash[:workflow_state] == 'unpublished'
@@ -99,7 +99,7 @@ module Importers
       else
         existing_item.workflow_state = 'active'
       end
-      migration.add_imported_item(existing_item) if migration && existing_item.new_record?
+      migration.add_imported_item(existing_item) if migration
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
@@ -226,7 +226,7 @@ module Importers
     def self.add_custom_fields_to_url(original_url, custom_fields)
       return nil unless uri = URI.parse(original_url)
 
-      custom_fields_query = custom_fields.map{|k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
+      custom_fields_query = custom_fields.map{|k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
       uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
       new_url = uri.to_s
 

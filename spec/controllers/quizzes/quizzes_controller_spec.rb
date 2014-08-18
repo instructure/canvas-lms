@@ -356,6 +356,25 @@ describe Quizzes::QuizzesController do
       assigns[:accessed_asset][:level].should == 'view'
       assigns[:access].view_score.should == 1
     end
+
+    it "locks results if there is a submission and one_time_results is on" do
+      Account.default.disable_feature! :quiz_stats
+      course_with_student_logged_in(active_all: true)
+
+      course_quiz(true)
+      @quiz.one_time_results = true
+      @quiz.save!
+      @quiz.publish!
+
+      submission = @quiz.generate_submission @student
+      submission.mark_completed
+      submission.save
+
+      get 'show', course_id: @course.id, id: @quiz.id
+
+      response.should be_success
+      submission.reload.has_seen_results.should == true
+    end
   end
 
   describe "GET 'show' with quiz stats enabled" do
@@ -464,6 +483,22 @@ describe Quizzes::QuizzesController do
 
       assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
       assigns[:submitted_students].should == [@user1]
+    end
+
+    it "should not include teacher previews" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      quiz = quiz_model(course: @course)
+      quiz.publish!
+
+      quiz_submission = quiz.generate_submission(@teacher, true)
+      quiz_submission.complete!
+
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => quiz.id
+
+      assigns[:submissions_from_users].should be_empty
+      assigns[:submissions_from_logged_out].should be_empty
+      assigns[:submitted_students].should be_empty
     end
   end
 
@@ -1330,6 +1365,35 @@ describe Quizzes::QuizzesController do
         "quizzes/submission_html"
       end
       response.should render_template(template)
+    end
+  end
+
+  describe "GET 'submission_html' (as a student)" do
+    before do
+      course_with_student_logged_in(active_all: true)
+      course_quiz(true)
+    end
+
+    it "locks results if there is a submission and one_time_results is on" do
+      @quiz.one_time_results = true
+      @quiz.save!
+      @quiz.publish!
+
+      submission = @quiz.generate_submission(@student)
+      submission.mark_completed
+      submission.save!
+
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+
+      template = if CANVAS_RAILS2
+        "quizzes/quizzes/submission_html.html.erb"
+      else
+        "quizzes/submission_html"
+      end
+
+      response.should render_template(template)
+      submission.reload.has_seen_results.should == true
     end
   end
 

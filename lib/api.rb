@@ -407,10 +407,13 @@ module Api
       next unless obj && rewriter.user_can_view_content?(obj)
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
+        opts = {:verifier => obj.uuid, :only_path => true}
         if match.rest.start_with?("/preview")
-          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :only_path => true)
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
         else
-          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
+          opts[:download] = '1'
+          opts[:wrap] = '1' if match.rest.include?('wrap=1')
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, opts)
         end
       else
         url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)

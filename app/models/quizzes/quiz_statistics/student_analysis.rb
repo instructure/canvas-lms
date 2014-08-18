@@ -309,7 +309,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       #submissions from users
       for_users = quiz.context.student_ids
       scope = quiz.quiz_submissions.where(:user_id => for_users)
-      logged_out = quiz.quiz_submissions.logged_out.where('NOT was_preview')
+      logged_out = quiz.quiz_submissions.logged_out
 
       all_submissions = []
       all_submissions = prep_submissions scope

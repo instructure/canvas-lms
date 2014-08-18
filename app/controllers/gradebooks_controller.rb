@@ -63,7 +63,7 @@ class GradebooksController < ApplicationController
             'score' => s.grants_right?(@current_user, :read_grade)? s.score  : nil
           }
         }
-        ags_json = light_weight_ags_json(@presenter.groups)
+        ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
                assignment_groups: ags_json,
                group_weighting_scheme: @context.group_weighting_scheme,
@@ -78,10 +78,9 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def light_weight_ags_json(assignment_groups)
+  def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
-      assignments = ag.send(assignment_scope).map do |a|
+      assignments = ag.visible_assignments(opts[:student] || @current_user).map do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,
@@ -209,7 +208,8 @@ class GradebooksController < ApplicationController
       :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
-      :sis_app_url => Setting.get('sis_app_url', nil)
+      :sis_app_url => Setting.get('sis_app_url', nil),
+      :sis_app_token => Setting.get('sis_app_token', nil)
     }
   end
 
@@ -466,11 +466,10 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json(opts={})
-    assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
+    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@context)
     @context.assignment_groups.active.includes(assignment_scope).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?,
-        assignment_group_assignment_scope: assignment_scope
       })
     }
   end

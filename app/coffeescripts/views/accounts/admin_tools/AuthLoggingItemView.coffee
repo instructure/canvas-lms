@@ -18,4 +18,6 @@ define [
         json.event = I18n.t("login", "LOGIN")
       else if json.event_type == "logout"
         json.event = I18n.t("logout", "LOGOUT")
+      else if json.event_type == "corrupted"
+        json.event = I18n.t("corrupted", "Details Not Available")
       json

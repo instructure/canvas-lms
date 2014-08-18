@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -121,6 +121,7 @@ class User < ActiveRecord::Base
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
+  has_many :assignment_student_visibilities
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
@@ -206,6 +207,12 @@ class User < ActiveRecord::Base
   scope :active, -> { where("users.workflow_state<>'deleted'") }
 
   scope :has_current_student_enrollments, -> { where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')") }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :able_to_see_assignment_in_course_with_da, lambda {|assignment_id, course_id|
+    joins(:assignment_student_visibilities).
+    where(:assignment_student_visibilities => { :assignment_id => assignment_id, :course_id => course_id })
+  }
 
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause
@@ -1329,6 +1336,10 @@ class User < ActiveRecord::Base
     !!preferences[:manual_mark_as_read]
   end
 
+  def disabled_inbox?
+    !!preferences[:disable_inbox]
+  end
+
   def use_new_conversations?
     true
   end
@@ -1345,6 +1356,14 @@ class User < ActiveRecord::Base
       end
     end
     self.touch
+  end
+
+  def assignments_visibile_in_course(course)
+    if course.feature_enabled?(:differentiated_assignments)
+      course.active_assignments.visible_to_student_in_course_with_da(self.id, course.id)
+    else
+      course.active_assignments
+    end
   end
 
   def assignments_needing_submitting(opts={})
@@ -1654,12 +1673,13 @@ class User < ActiveRecord::Base
           # THIS IS SLOW, it takes ~230ms for mike
           submissions += Submission.for_context_codes(context_codes).
             select(["submissions.*, last_updated_at_from_db"]).
-            joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], self.id, self.id])).
+            joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], 'submitter', self.id, self.id])).
               INNER JOIN (
                 SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
                 FROM submission_comments, submission_comment_participants
                 WHERE submission_comments.id = submission_comment_id
                   AND (submission_comments.created_at > ?)
+                  AND (submission_comment_participants.participation_type = ?)
                   AND (submission_comment_participants.user_id = ?)
                   AND (submission_comments.author_id <> ?)
                 GROUP BY submission_id
@@ -2451,7 +2471,7 @@ class User < ActiveRecord::Base
   def all_accounts
     @all_accounts ||= shard.activate do
       Rails.cache.fetch(['all_accounts', self].cache_key) do
-        self.accounts.with_each_shard
+        self.accounts.active.with_each_shard
       end
     end
   end

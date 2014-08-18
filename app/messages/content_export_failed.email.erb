@@ -1,12 +1,12 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>/content_exports
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/content_exports
 <% end %>
 
 <% define_content :subject do %>
-<%= t :subject, "Course Export Failed: %{course}", :course => asset.course.name %>
+<%= t :subject, "Course Export Failed: %{course}", :course => asset.context.name %>
 <% end %>
       
-<%= t :body, <<-BODY, :course => asset.course.name, :id => %{"ContentExport:#{asset.id}"}
+<%= t :body, <<-BODY, :course => asset.context.name, :id => %{"ContentExport:#{asset.id}"}
 There was a problem exporting the course "%{course}".
 Please notify your system administrator, and give them the following export identifier: %{id}.
 BODY

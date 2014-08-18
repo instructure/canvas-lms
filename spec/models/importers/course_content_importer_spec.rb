@@ -249,6 +249,28 @@ describe Course do
     end
   end
 
+  describe "shift_date" do
+    it "should round sanely" do
+      course
+      @course.root_account.default_time_zone = Time.zone
+      options = Importers::CourseContentImporter.shift_date_options(@course, {
+          old_start_date: '2014-3-2',  old_end_date: '2014-4-26',
+          new_start_date: '2014-5-11', new_end_date: '2014-7-5'
+      })
+      unlock_at = DateTime.new(2014, 3, 23,  0,  0)
+      due_at    = DateTime.new(2014, 3, 29, 23, 59)
+      lock_at   = DateTime.new(2014, 4,  1, 23, 59)
+
+      new_unlock_at = Importers::CourseContentImporter.shift_date(unlock_at, options)
+      new_due_at    = Importers::CourseContentImporter.shift_date(due_at, options)
+      new_lock_at   = Importers::CourseContentImporter.shift_date(lock_at, options)
+
+      new_unlock_at.should == DateTime.new(2014, 6,  1,  0,  0)
+      new_due_at.should    == DateTime.new(2014, 6,  7, 23, 59)
+      new_lock_at.should   == DateTime.new(2014, 6, 10, 23, 59)
+    end
+  end
+
   describe "import_media_objects" do
     before do
       attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
