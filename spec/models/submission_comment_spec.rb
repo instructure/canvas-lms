@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SubmissionComment do
-  before(:each) do
+  before(:once) do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @assignment = @course.assignments.new(:title => "some assignment")

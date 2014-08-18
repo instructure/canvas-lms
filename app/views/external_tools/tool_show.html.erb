@@ -11,6 +11,7 @@
 <% end %>
 
 <% js_bundle 'legacy/external_tools_tool_show' %>
+<% js_bundle :external_tool_redirect if @redirect_return %>
 <% js_bundle 'module_sequence_footer' %>
 
 

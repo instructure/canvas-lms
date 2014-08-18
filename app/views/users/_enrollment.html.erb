@@ -1,6 +1,9 @@
 <li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %> clearfix">
   <span style="float: right; margin-right: 5px; margin-top: 3px;">
-    <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link"><i class="icon-end standalone-icon"></i></a>
+    <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link" role="button">
+      <i class="icon-end standalone-icon"></i>
+      <span class="screenreader-only"><%= t(:unenrollr, "Unenroll") %></span>
+    </a>
   </span>
   <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left;">
     <span class="name ellipsis" title="<%= enrollment.long_name %>">

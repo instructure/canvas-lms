@@ -148,7 +148,7 @@ describe WikiPage do
   end
 
   context "unpublished" do
-    before do
+    before :once do
       teacher_in_course(:active_all => true)
       @page = @course.wiki.wiki_pages.create(:title => "some page")
       @page.workflow_state = :unpublished
@@ -174,7 +174,7 @@ describe WikiPage do
     end
 
     describe "without :manage_wiki rights" do
-      before do
+      before :once do
         course_with_teacher(:active_all => true)
         course_with_ta(:course => @course, :active_all => true)
         @course.account.role_overrides.create!(:enrollment_type => 'TeacherEnrollment', :permission => 'manage_wiki', :enabled => false)
@@ -213,8 +213,12 @@ describe WikiPage do
 
   context 'initialize_wiki_page' do
     context 'on a course' do
-      before do
-        course_with_teacher_logged_in
+      before :once do
+        course_with_teacher
+      end
+
+      before :each do
+        user_session(@user)
       end
 
       it 'should set the front page body' do
@@ -253,12 +257,12 @@ describe WikiPage do
   end
 
   context 'set policy' do
-    before :each do
+    before :once do
       course :active_all => true
     end
 
     context 'admins' do
-      before :each do
+      before :once do
         account_admin_user
         @page = @course.wiki.wiki_pages.build(:title => 'Some page')
         @page.workflow_state = 'active'
@@ -287,7 +291,7 @@ describe WikiPage do
     end
 
     context 'teachers' do
-      before :each do
+      before :once do
         course_with_teacher :course => @course, :active_all => true
         @page = @course.wiki.wiki_pages.build(:title => 'Some page')
         @page.workflow_state = 'active'
@@ -316,7 +320,7 @@ describe WikiPage do
     end
 
     context 'students' do
-      before :each do
+      before :once do
         course_with_student :course => @course, :active_all => true
         @page = @course.wiki.wiki_pages.build(:title => 'Some page')
         @page.workflow_state = 'active'
@@ -375,7 +379,7 @@ describe WikiPage do
       end
 
       context 'with course editing roles' do
-        before :each do
+        before :once do
           @page.context.default_wiki_editing_roles = 'teachers,students'
           @page.context.save!
         end

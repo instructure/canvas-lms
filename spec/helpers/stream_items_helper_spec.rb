@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe StreamItemsHelper do
-  before do
+  before :once do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
     course_with_student(:active_all => true, :course => @course)

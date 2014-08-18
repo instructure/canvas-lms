@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UserService do
-  before do
+  before :once do
     user_service_model
   end
   

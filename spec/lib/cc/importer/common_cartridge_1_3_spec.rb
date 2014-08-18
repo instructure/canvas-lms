@@ -85,11 +85,55 @@ describe "Standard Common Cartridge importing" do
       url.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
     end
 
-    it "should reference preferred variant in module"
-    it "should reference preferred variant in html content"
-    it "should not import non-preferred variant"
-    it "should ignore not-supported preferred variant"
-    it "should follow variant chain to end"
+  end
+
+  context 'variant support' do
+    before(:all) do
+      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/flat_imsmanifest_with_variants.xml")
+      unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.xml')}", 'oi')
+      @export_folder = File.join(File.dirname(archive_file_path), "cc_flat_imsmanifest_with_variants")
+      @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+      @converter.convert
+      @course_data = @converter.course.with_indifferent_access
+
+      @course = course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+
+    after(:all) do
+      @converter.delete_unzipped_archive
+      if File.exists?(@export_folder)
+        FileUtils::rm_rf(@export_folder)
+      end
+      truncate_all_tables
+    end
+
+    it "should import supported variant" do
+      @course.assignments.find_by_migration_id('Resource1').should_not be_nil
+      @course.assignments.count.should == 1
+    end
+
+    it "should ignore non-preferred variant" do
+      @course.discussion_topics.find_by_migration_id('Resource2').should be_nil
+      @course.discussion_topics.find_by_migration_id('Resource10').should be_nil
+      @course.discussion_topics.count.should == 2
+    end
+
+    it "should reference preferred variant in module" do
+      m = @course.context_modules.first
+      m.content_tags[0].content.migration_id.should == 'Resource1'
+      m.content_tags[1].content.migration_id.should == 'Resource3' # also tests "should follow variant chain to end"
+      m.content_tags[2].url.should == "https://example.com/3" # also tests "should ignore not-supported preferred variant"
+      m.content_tags[3].content.migration_id.should == 'Resource8'
+    end
+
+    it "should not loop on circular references" do
+      m = @course.context_modules.first
+      m.content_tags[4].url.should =~ /loop(1|2)/
+      # also, the import finished executing. :)
+    end
 
   end
 

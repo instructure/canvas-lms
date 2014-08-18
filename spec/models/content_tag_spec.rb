@@ -456,7 +456,6 @@ describe ContentTag do
     tag.update_asset_name!
     
     att.reload
-    att.filename.should == 'important title.txt'
     att.display_name.should == 'important title.txt'
   end
 

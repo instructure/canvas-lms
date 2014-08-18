@@ -81,6 +81,7 @@ routes.draw do
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       collection do
         get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
+        get "search", :controller => :files, :action => :ember_app, :format => false
         get :quota
         post :reorder
       end
@@ -289,6 +290,7 @@ routes.draw do
       match 'homework_submission' => 'external_tools#homework_submission', :as => :homework_submission
       match 'finished' => 'external_tools#finished', :as => :finished
       collection do
+        get :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
         get :retrieve
         get :homework_submissions
       end
@@ -551,6 +553,9 @@ routes.draw do
     resources :external_tools do
       match 'finished' => 'external_tools#finished', :as => :finished
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
+      collection do
+        get  :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
+      end
     end
 
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
@@ -608,6 +613,7 @@ routes.draw do
   match 'login' => 'pseudonym_sessions#new', :as => :login, :via => :get
   match 'login' => 'pseudonym_sessions#create', :via => :post
   match 'logout' => 'pseudonym_sessions#destroy', :as => :logout, :via => :delete
+  match 'logout' => 'pseudonym_sessions#saml_logout', :via => [:get, :post]
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
   match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]
@@ -673,6 +679,7 @@ routes.draw do
   end
 
   scope '/profile' do
+    match 'toggle_disable_inbox' => 'profile#toggle_disable_inbox', :as => :toggle_disable_inbox, :via => :post
     match 'profile_pictures' => 'profile#profile_pics', :as => :profile_pics
     match 'user_services/:id' => 'users#delete_user_service', :as => :profile_user_service, :via => :delete
     match 'user_services' => 'users#create_user_service', :as => :profile_create_user_service, :via => :post
@@ -729,6 +736,7 @@ routes.draw do
   match 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', :as => :switch_calendar, :via => :post
   match 'files' => 'files#index', :as => :files, :via => :get
   get "files/folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
+  get "files/search", :controller => :files, :action => :ember_app, :format => false
   match 'files/s3_success/:id' => 'files#s3_success', :as => :s3_success
   match 'files/:id/public_url' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
@@ -763,7 +771,7 @@ routes.draw do
 
   match 'object_snippet' => 'context#object_snippet', :as => :object_snippet, :via => :post
   match 'saml_consume' => 'pseudonym_sessions#saml_consume', :as => :saml_consume
-  match 'saml_logout' => 'pseudonym_sessions#saml_logout', :as => :saml_logout
+  match 'saml_logout' => 'pseudonym_sessions#saml_logout', :as => :saml_logout, :via => [:get, :post, :delete]
   match 'saml_meta_data' => 'accounts#saml_meta_data', :as => :saml_meta_data
 
   # Routes for course exports
@@ -796,14 +804,6 @@ routes.draw do
   resources :quiz_submissions do
     concerns :files
   end
-
-  # commenting out all collection urls until collections are live
-  # resources :collection_items, :only => [:new]
-  # match 'get_bookmarklet', => 'collection_items#get_bookmarklet', :as => :get_bookmarklet
-  match 'collection_items/link_data' => 'collection_items#link_data', :as => :collection_item_link_data, :via => :post
-  # resources :collections, :only => [:show, :index] do
-  #   resources :collection_items, :only => [:show, :index]
-  # end
 
   scope(:controller => :outcome_results) do
     get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
@@ -1002,7 +1002,6 @@ routes.draw do
       end
       topic_routes("course")
       topic_routes("group")
-      topic_routes("collection_item")
     end
 
     scope(:controller => :collaborations) do
@@ -1239,23 +1238,6 @@ routes.draw do
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
-    end
-
-    scope(:controller => :collections) do
-      get "collections", :action => :list, :path_name => 'collections'
-      resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
-      resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
-      resources :collections, :except => [:index, :create]
-      put "collections/:collection_id/followers/self", :action => :follow
-      delete "collections/:collection_id/followers/self", :action => :unfollow
-
-      scope(:controller => :collection_items) do
-        get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'
-        resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items, :only => [:index, :create]
-        resources :items, :path_prefix => "collections", :name_prefix => "collection_", :controller => :collection_items, :except => [:index, :create]
-        put "collections/items/:item_id/upvotes/self", :action => :upvote
-        delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
-      end
     end
 
     scope(:controller => :developer_keys) do
@@ -1595,6 +1577,15 @@ routes.draw do
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
+  end
+
+  ApiRouteSet.draw(self, "/api/lti") do
+    ['course', 'account'].each do |context|
+      prefix = "#{context}s/:#{context}_id"
+      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/tool_consumer_profile', action: 'show', :as => "#{context}_tool_consumer_profile"
+      post "#{prefix}/tool_proxy", :controller => 'lti/tool_proxy', :action => :create, :path_name => "create_#{context}_lti_tool_proxy"
+    end
+    get  "tool_proxy/:tool_proxy_guid", :controller => 'lti/tool_proxy', :action => :show, :path_name => "show_lti_tool_proxy"
   end
 
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)

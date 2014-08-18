@@ -61,7 +61,7 @@
 {{#ifEqual step 2}}
 <div class="form-dialog-content" id="create-users-step-2">
   {{#if errored_users.length}}
-    <div class="alert alert-error content-box">
+    <div role="alert" tabindex="0" id="user_email_errors" class="alert alert-error content-box">
       <p>
         {{#t "will_not_be_added"}}These users had errors and will not be added. Please ensure they are formatted correctly.{{/t}}<br>
         <small>{{#t "example_formats"}}Examples: user@example.com, "First Last" &lt;user@example.com&gt;, "Last, First" &lt;user@example.com&gt;{{/t}}</small>

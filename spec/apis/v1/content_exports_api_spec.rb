@@ -54,7 +54,7 @@ describe ContentExportsApiController, type: :request do
   def course_copy_export
     export = t_course.content_exports.create
     export.export_type = 'course_copy'
-    export.save
+    export.save!
     export
   end
 

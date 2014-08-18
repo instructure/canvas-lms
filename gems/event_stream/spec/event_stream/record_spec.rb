@@ -34,6 +34,11 @@ describe EventStream::Failure do
       )
     end
 
+    it "responds to as_json with attributes" do
+      hash = @event.as_json
+      expect(hash.keys).to include(*%w[attribute1 attribute2 request_id])
+    end
+
     it "sets default values" do
       expect(@event.id).to_not eq nil
       expect(@event.created_at).to_not eq nil

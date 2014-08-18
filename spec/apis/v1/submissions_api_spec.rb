@@ -364,7 +364,7 @@ describe 'Submissions API', type: :request do
     json['discussion_entries'].should be_nil
   end
 
-  it "should return student discussion entries from child topics for discussion_topic group assignments" do
+  it "should return student discussion entries from child topics for group discussion_topic assignments" do
     @student = user(:active_all => true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
@@ -372,7 +372,7 @@ describe 'Submissions API', type: :request do
     @group = @course.groups.create(:name => "Group", :group_category => group_category)
     @group.add_user(@student)
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model, :group_category => @group.group_category})
+    @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model(:group_category => @group.group_category)})
     @topic.refresh_subtopics # since the DJ won't happen in time
     @child_topic = @group.discussion_topics.find_by_root_topic_id(@topic.id)
 

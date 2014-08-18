@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::GradeChange
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :account_id,
                :grade_after,
                :grade_before,
@@ -40,8 +38,6 @@ class Auditors::GradeChange
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['submission']
         self.submission = attributes.delete('submission')
@@ -121,7 +117,7 @@ class Auditors::GradeChange
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
     record_type Auditors::GradeChange::Record

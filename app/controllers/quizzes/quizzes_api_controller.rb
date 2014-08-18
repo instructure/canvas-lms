@@ -107,6 +107,11 @@
 #           "example": "2013-01-23T23:59:00-07:00",
 #           "type": "datetime"
 #         },
+#         "one_time_results": {
+#           "description": "prevent the students from seeing their results more than once (right after they submit the quiz)",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "scoring_policy": {
 #           "description": "which quiz score to keep (only if allowed_attempts != 1) possible values: 'keep_highest', 'keep_latest'",
 #           "example": "keep_highest",
@@ -412,6 +417,12 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   NOTE: If students have started taking the quiz, or there are any
   #   submissions for the quiz, you may not unpublish a quiz and will recieve
   #   an error.
+  #
+  # @argument quiz[one_time_results] [Optional, Boolean]
+  #   Whether students should be prevented from viewing their quiz results past
+  #   the first time (right after they turn the quiz in.)
+  #   Only valid if "hide_results" is not set to "always".
+  #   Defaults to false.
   #
   # @returns Quiz
   def create

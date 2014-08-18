@@ -148,23 +148,6 @@ module MigratorHelper
     File.open(file_name, 'w') { |file| file << @course.to_json}
     file_name
   end
-  
-  def self.download_archive(settings)
-    config = ConfigFile.load('external_migration') || {}
-    if settings[:export_archive_path]
-      settings[:archive_file] = File.open(settings[:export_archive_path], 'rb')
-    elsif settings[:course_archive_download_url].present?
-      # open-uri downloads the http response to a tempfile
-      settings[:archive_file] = open(settings[:course_archive_download_url])
-    elsif settings[:attachment_id]
-      att = Attachment.find(settings[:attachment_id])
-      settings[:archive_file] = att.open(:temp_folder => config[:data_folder], :need_local_file => true)
-    else
-      raise "No migration file found"
-    end
-
-    settings[:archive_file]
-  end
 
   def id_prepender
     @settings[:id_prepender]

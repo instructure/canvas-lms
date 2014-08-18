@@ -122,6 +122,22 @@ describe Folder do
     @course.folders.count.should == 1
   end
 
+  describe ".assert_path" do
+    specs_require_sharding
+
+    it "should not get confused by the same context on multiple shards" do
+      user1 = User.create!
+      f1 = Folder.assert_path('myfolder', user1)
+      @shard1.activate do
+        user2 = User.new
+        user2.id = user1.local_id
+        user2.save!
+        f2 = Folder.assert_path('myfolder', user2)
+        f2.should_not == f1
+      end
+    end
+  end
+
   describe "resolve_path" do
     before :once do
       @root_folder = Folder.root_folders(@course).first
@@ -191,22 +207,4 @@ describe Folder do
   end
 end
 
-# specs_require_sharding breaks once-ler, thus it gets its own outer example group
-describe Folder do
-  describe ".assert_path" do
-    specs_require_sharding
-
-    it "should not get confused by the same context on multiple shards" do
-      user1 = User.create!
-      f1 = Folder.assert_path('myfolder', user1)
-      @shard1.activate do
-        user2 = User.new
-        user2.id = user1.local_id
-        user2.save!
-        f2 = Folder.assert_path('myfolder', user2)
-        f2.should_not == f1
-      end
-    end
-  end
-end
 

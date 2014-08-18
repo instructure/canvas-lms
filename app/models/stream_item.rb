@@ -398,7 +398,11 @@ class StreamItem < ActiveRecord::Base
           original_res = res
           res = original_res.clone
           res.id = original_res.id
-          res.root_discussion_entries = []
+          if CANVAS_RAILS2
+            res.root_discussion_entries.target = []
+          else
+            res.association(:root_discussion_entries).target = []
+          end
           res.user_has_posted = false
           res.readonly!
         end

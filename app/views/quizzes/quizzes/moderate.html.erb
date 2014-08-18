@@ -137,6 +137,18 @@
           </tr>
         </tr>
       <% end %>
+      <% if @quiz.one_time_results %>
+        <tr>
+          <td colspan="2">
+            <input type="hidden" name="reset_has_seen_results" value="0"/>
+            <input type="checkbox" name="reset_has_seen_results" id="extension_reset_has_seen_results" value="1" />
+            <label for="extension_reset_has_seen_results">
+              <%= t('labels.reset_has_seen_results',
+              "Let the student see the results one more time") %>
+            </label>
+          </td>
+        </tr>
+      <% end %>
       <tr>
         <td colspan="2">
           <input type="hidden" name="manually_unlocked" value="0"/>

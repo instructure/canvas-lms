@@ -102,11 +102,12 @@ class Mailer < ActionMailer::Base
 
     params = {
       from: from_mailbox(m),
-      reply_to: reply_to_mailbox(m),
       to: m.to,
       subject: m.subject
     }
 
+    reply_to = reply_to_mailbox(m)
+    params[:reply_to] = reply_to if reply_to
     params[:cc] = m.cc if m.cc
     params[:bcc] = m.bcc if m.bcc
 
@@ -117,13 +118,21 @@ class Mailer < ActionMailer::Base
   end
 
   private
+  def quoted_address(display_name, address)
+    addr = Mail::Address.new(address)
+    addr.display_name = display_name
+    addr.format
+  end
+
   def from_mailbox(message)
-    "#{message.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">"
+    quoted_address(message.from_name || HostUrl.outgoing_email_default_name, HostUrl.outgoing_email_address)
   end
 
   def reply_to_mailbox(message)
     address = IncomingMail::ReplyToAddress.new(message).address
     return address unless message.reply_to_name.present?
-    "#{message.reply_to_name} <#{address}>"
+    return nil unless address.present?
+
+    quoted_address(message.reply_to_name, address)
   end
 end

@@ -16,7 +16,7 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 
   gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
-  gem 'encrypted_cookie_store-instructure', '1.0.6', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.0.8', :require => 'encrypted_cookie_store'
   gem 'erubis', '2.7.0'
   gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
@@ -25,17 +25,17 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'rails', '3.2.18'
+  gem 'rails', '3.2.19'
   gem 'active_model_serializers', '0.9.0alpha1',
     :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
   gem 'authlogic', '3.3.0'
   gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
   gem 'dynamic_form', '1.1.4'
-  gem 'encrypted_cookie_store-instructure', '1.1.4', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.6', :require => 'encrypted_cookie_store'
   gem 'rails-patch-json-encode', '0.0.1'
   gem 'rack', '1.4.5'
   gem 'routing_concerns', '0.1.0'
-  gem 'switchman', '1.2.10'
+  gem 'switchman', '1.2.12'
   gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
@@ -79,7 +79,7 @@ gem 'mime-types', '1.17.2', :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4'
-gem 'multi_json', '1.8.2'
+gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
@@ -106,7 +106,7 @@ gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.5'
 
 gem 'tzinfo', '0.3.35'
-gem 'useragent', '0.4.16'
+gem 'useragent', '0.10.0'
 gem 'uuid', '2.3.2'
 
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
@@ -149,4 +149,5 @@ gem 'paginated_collection', :path => 'gems/paginated_collection'
 gem 'twitter', :path => 'gems/twitter'
 gem 'utf8_cleaner', :path => 'gems/utf8_cleaner'
 gem 'workflow', :path => 'gems/workflow'
+gem 'ims-lti', '~> 2.0.0.beta.1'
 

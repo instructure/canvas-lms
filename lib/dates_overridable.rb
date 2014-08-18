@@ -63,12 +63,13 @@ module DatesOverridable
   def all_due_dates
     all_dates = assignment_overrides.active.overriding_due_at.map(&:as_hash)
     all_dates << base_due_date_hash unless differentiated_assignments_applies?
+    all_dates
   end
 
   def differentiated_assignments_applies?
     return false if !context.feature_enabled?(:differentiated_assignments)
 
-    if self.is_a?(Assignment)
+    if self.is_a?(Assignment) || self.is_a?(Quizzes::Quiz)
       self.only_visible_to_overrides
     elsif self.assignment
       self.assignment.only_visible_to_overrides
@@ -78,7 +79,9 @@ module DatesOverridable
   end
 
   def all_dates_visible_to(user)
-    if ObserverEnrollment.observed_students(context, user).any?
+    if user.nil?
+      all_due_dates
+    elsif ObserverEnrollment.observed_students(context, user).any?
       observed_student_due_dates(user)
     elsif context.user_has_been_student?(user) || context.user_has_been_admin?(user) || context.user_has_been_observer?(user)
       overrides = overrides_for(user)

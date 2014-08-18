@@ -4,7 +4,7 @@
 
 module MultiVariantCompassCompiler
 
-  VARIANTS = %w{legacy_normal_contrast legacy_high_contrast new_styles_normal_contrast new_styles_high_contrast}.freeze
+  VARIANTS = %w{legacy_normal_contrast legacy_high_contrast new_styles_normal_contrast new_styles_high_contrast k12_normal_contrast k12_high_contrast}.freeze
 
   def all_sass_files
     require 'config/initializers/plugin_symlinks'

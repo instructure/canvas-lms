@@ -176,7 +176,7 @@ module CCHelper
           "#{COURSE_TOKEN}/files"
         else
           if @course && match.obj_class == Attachment
-            obj = @course.attachments.find(match.obj_id)
+            obj = @course.attachments.find_by_id(match.obj_id)
           else
             obj = match.obj_class.find_by_id(match.obj_id)
           end

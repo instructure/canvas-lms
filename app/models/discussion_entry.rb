@@ -355,6 +355,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def create_participants
+    subscription_hold = self.discussion_topic.subscription_hold(self.user, nil, nil)
     transaction do
       scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
       scope = scope.where("user_id<>?", self.user) if self.user
@@ -365,13 +366,13 @@ class DiscussionEntry < ActiveRecord::Base
 
         topic_participant = self.discussion_topic.discussion_topic_participants.find_by_user_id(self.user.id)
         if topic_participant.blank?
-          new_count = self.discussion_topic.unread_count(self.user) - 1
+          new_count = self.discussion_topic.default_unread_count - 1
           topic_participant = self.discussion_topic.discussion_topic_participants.create(:user => self.user,
                                                                                          :unread_entry_count => new_count,
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
         end
-        self.discussion_topic.subscribe(self.user) unless self.discussion_topic.subscription_hold(self.user, nil, nil)
+        self.discussion_topic.subscribe(self.user) unless subscription_hold
       end
     end
   end

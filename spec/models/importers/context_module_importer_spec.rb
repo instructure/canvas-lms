@@ -101,11 +101,11 @@ describe "Importing modules" do
 
     topic.content_tags.count.should == 2
     tag1 = topic.content_tags.find_by_migration_id('mig1')
-    tag1.url.should == 'http://exmpale.com/stuff?heresacustomfields=hooray+and+stuff'
+    tag1.url.should == 'http://exmpale.com/stuff?custom_heresacustomfields=hooray+and+stuff'
     tag1.content.should == tool1
 
     tag2 = topic.content_tags.find_by_migration_id('mig2')
-    tag2.url.should == 'http://exmpale2.com/stuff?query=yay&different=field'
+    tag2.url.should == 'http://exmpale2.com/stuff?query=yay&custom_different=field'
     tag2.content.should == tool2
   end
 

@@ -115,7 +115,7 @@ describe ConversationParticipant do
       c.reload
     end
 
-    before do
+    before :once do
       @me = user
       @c1 = conversation_for("course_1")
       @c2 = conversation_for("course_1", "course_2")
@@ -427,27 +427,22 @@ describe ConversationParticipant do
       @user2.reload.unread_conversations_count.should eql 1
       other_guy.reload.unread_conversations_count.should eql 1
     end
-  end
 
-  context "move_to_user with sharding" do
-    specs_require_sharding
+    context "sharding" do
+      specs_require_sharding
 
-    before do
-      @user1 = user_model
-      @user2 = user_model
-    end
-
-    it "should be able to move to a user on a different shard" do
-      u1 = User.create!
-      cp = u1.initiate_conversation([u1])
-      @shard1.activate do
-        u2 = User.create!
-        cp.move_to_user(u2)
-        cp.reload
-        cp.user.should == u2
-        cp2 = u2.all_conversations.first
-        cp2.should_not == cp
-        cp2.shard.should == @shard1
+      it "should be able to move to a user on a different shard" do
+        u1 = User.create!
+        cp = u1.initiate_conversation([u1])
+        @shard1.activate do
+          u2 = User.create!
+          cp.move_to_user(u2)
+          cp.reload
+          cp.user.should == u2
+          cp2 = u2.all_conversations.first
+          cp2.should_not == cp
+          cp2.shard.should == @shard1
+        end
       end
     end
   end

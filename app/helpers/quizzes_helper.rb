@@ -253,6 +253,16 @@ module QuizzesHelper
     end
   end
 
+  def render_result_protection(quiz, submission)
+    if quiz.one_time_results && submission.has_seen_results?
+      I18n.t(:quiz_results_protected_after_first_glimpse, "Quiz results are protected for this quiz and can be viewed a single time immediately after submission.")
+    elsif quiz.hide_results == 'until_after_last_attempt'
+      I18n.t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz and are not visible to students until they have submitted their last attempt.")
+    else
+      I18n.t(:quiz_results_protected, "Quiz results are protected for this quiz and are not visible to students.")
+    end
+  end
+
   QuestionType = Struct.new(:question_type,
                             :entry_type,
                             :display_answers,

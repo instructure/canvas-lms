@@ -31,15 +31,11 @@ module Api::V1::AssignmentGroup
     includes ||= []
     opts.reverse_merge! override_assignment_dates: true
 
-    hash = api_json(group, user, session,
-                    :only => %w(id name position group_weight))
-
+    hash = api_json(group, user, session,:only => %w(id name position group_weight))
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
-      assignment_scope   = opts[:assignment_group_assignment_scope]
-      assignment_scope ||= assignment_group_assignment_scope(group.context, user)
-      assignments = group.send(assignment_scope)
+      assignments = group.visible_assignments(user)
 
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(
@@ -73,19 +69,5 @@ module Api::V1::AssignmentGroup
     assignment_group.attributes = update_params
 
     assignment_group.save
-  end
-
-  def assignment_group_assignment_scope(context, user)
-    scope = :active_assignments
-
-    # fake assignment used for checking if the @current_user can read unpublished assignments
-    fake = context.assignments.scoped.new
-    fake.workflow_state = 'unpublished'
-    if context.feature_enabled?(:draft_state) && !fake.grants_right?(user, session, :read)
-      # user should not see unpublished assignments
-      scope = :published_assignments
-    end
-
-    scope
   end
 end

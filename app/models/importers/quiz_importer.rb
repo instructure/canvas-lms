@@ -69,7 +69,6 @@ module Importers
       unless ['question_reference', 'text_only_question'].include?(quiz_question['question_type'])
         aq = quiz_question.dup
         new_aqs << aq
-
         quiz_question['question_type'] = 'question_reference'
       end
 
@@ -79,19 +78,34 @@ module Importers
     def self.dedup_assessment_questions(questions, references)
       # it used to skip these in the importer, instead let's remove them outright
       aq_dups = []
-      questions.each do |aq|
-        if aq['assessment_question_migration_id'] &&
-            aq_dup = questions.detect{|other_aq| other_aq != aq && other_aq['migration_id'] == aq['assessment_question_migration_id']}
-          aq_dups << [aq_dup, aq['migration_id']]
+      qq_keys = ['position', 'points_possible']
+      keys_to_ignore = qq_keys + ['assessment_question_migration_id', 'migration_id', 'question_bank_id', 'question_bank_name']
+
+      questions.each_with_index do |quiz_question, qq_index|
+        aq_mig_id = quiz_question['assessment_question_migration_id']
+        next unless aq_mig_id
+
+        questions.each_with_index do |matching_question, mq_index|
+          next if qq_index == mq_index # don't match to yourself
+
+          if aq_mig_id == matching_question['migration_id']
+            # make sure that the match's core question data is identical
+            if quiz_question.reject{|k, v| keys_to_ignore.include?(k)} == matching_question.reject{|k, v| keys_to_ignore.include?(k)}
+              aq_dups << [quiz_question, matching_question['migration_id']]
+            end
+          end
         end
       end
       aq_dups.each do |aq_dup, new_mig_id|
         references.each do |ref|
+
           if ref['migration_id'] == aq_dup['migration_id']
             ref['migration_id'] = new_mig_id
+            qq_keys.each{|k| ref[k] ||= aq_dup[k]}
           end
           if ref['assessment_question_migration_id'] == aq_dup['migration_id']
             ref['assessment_question_migration_id'] = new_mig_id
+            qq_keys.each{|k| ref[k] ||= aq_dup[k]}
           end
         end
         questions.delete(aq_dup)
@@ -150,8 +164,11 @@ module Importers
       item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-      hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration, {:missing_links => hash[:missing_links]})
+
+      missing_links = []
+      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
 
 
       %w[
@@ -185,7 +202,7 @@ module Importers
       if migration
         migration.add_missing_content_links(
           :class => item.class.to_s,
-          :id => item.id, :missing_links => hash[:missing_links],
+          :id => item.id, :missing_links => missing_links,
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
         )
       end

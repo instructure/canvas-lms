@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::Authentication
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :pseudonym_id,
                :account_id,
                :user_id
@@ -30,8 +28,6 @@ class Auditors::Authentication
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['pseudonym']
         self.pseudonym = attributes.delete('pseudonym')
@@ -58,7 +54,7 @@ class Auditors::Authentication
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
     record_type Auditors::Authentication::Record

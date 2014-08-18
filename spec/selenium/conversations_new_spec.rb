@@ -580,4 +580,44 @@ describe "conversations new" do
       @conversations.each { |c| c.reload.should be_starred }
     end
   end
+
+  describe 'conversations inbox opt-out option' do
+    it "should be hidden a feature flag" do
+      get "/profile/settings"
+      ff('#disable_inbox').count.should == 0
+    end
+
+    it "should reveal when the feature flag is set" do
+      @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
+      get "/profile/settings"
+      ff('#disable_inbox').count.should == 1
+    end
+
+    context "when activated" do
+      it "should set the notification preferences for conversations to ASAP, and hide those options" do
+        @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
+        @teacher.reload.disabled_inbox?.should be_falsey
+        notification = Notification.create!(workflow_state: "active", name: "Conversation Message",
+                             category: "Conversation Message", delay_for: 0)
+        policy = NotificationPolicy.create!(notification_id: notification.id, communication_channel_id: @teacher.email_channel.id, broadcast: true, frequency: "weekly")
+        @teacher.update_attribute(:unread_conversations_count, 3)
+        sleep 0.5
+
+        get '/profile/communication'
+        ff('td[data-category="conversation_message"]').count.should == 1
+        ff('.unread-messages-count').count.should == 1
+
+        get "/profile/settings"
+        f('#disable_inbox').click
+        sleep 0.5
+
+        @teacher.reload.disabled_inbox?.should be_truthy
+
+        get '/profile/communication'
+        ff('td[data-category="conversation_message"]').count.should == 0
+        policy.reload.frequency.should == "immediately"
+        ff('.unread-messages-count').count.should == 0
+      end
+    end
+  end
 end

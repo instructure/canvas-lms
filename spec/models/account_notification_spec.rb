@@ -118,14 +118,6 @@ describe AccountNotification do
       end
     end
   end
-end
-
-describe AccountNotification do
-
-  before do
-    account_notification
-    user
-  end
 
   context "sharding" do
     specs_require_sharding

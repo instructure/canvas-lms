@@ -138,27 +138,10 @@ module ApplicationHelper
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
-  # policies from within a view.  Caches the response, but basically
-  # user calls object.grants_right?(user, action)
+  # policies from within a view.
   def can_do(object, user, *actions)
     return false unless object
-    if object.is_a?(OpenObject) && object.type
-      obj = object.temporary_instance
-      if !obj
-        obj = object.type.classify.constantize.new
-        obj.instance_variable_set("@attributes", object.instance_variable_get("@table").with_indifferent_access)
-        obj.instance_variable_set("@new_record", false)
-        object.temporary_instance = obj
-      end
-      return can_do(obj, user, actions)
-    end
-    actions = Array(actions).flatten
-    begin
-      return object.grants_any_right?(user, session, *actions)
-    rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-    end
-    false
+    object.grants_any_right?(user, session, *actions)
   end
 
   # Loads up the lists of files needed for the wiki_sidebar.  Called from
@@ -277,9 +260,15 @@ module ApplicationHelper
   end
 
   def variant_name_for(bundle_name)
-    use_new_styles = @domain_root_account.feature_enabled?(:new_styles)
+    if k12?
+      variant = '_k12'
+    elsif @domain_root_account.feature_enabled?(:new_styles)
+      variant = '_new_styles'
+    else
+      variant = '_legacy'
+    end
+
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    variant = use_new_styles ? '_new_styles' : '_legacy'
     variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
     "#{bundle_name}#{variant}"
   end

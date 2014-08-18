@@ -25,9 +25,10 @@ describe DataFixup::PopulateGroupCategoryOnDiscussionTopics do
     group_category = @course.group_categories.create(:name => "category")
     @group = @course.groups.create(:name => "group", :group_category => group_category)
 
-    assignment1 = course.assignments.build(:submission_types => 'discussion_topic', :title => 'a1')
-    assignment1.group_category = group_category
-    assignment1.save!
+    assignment1 = course.assignments.create!(:submission_types => 'discussion_topic', :title => 'a1')
+    # bypass validation
+    Assignment.where(id: assignment1).update_all(group_category_id: group_category)
+    assignment1.reload
     topic1 = @course.discussion_topics.create!(:title => "topic 1")
     topic1.assignment = assignment1
     topic1.save!

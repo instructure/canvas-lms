@@ -762,6 +762,43 @@ describe "external tools" do
 
   end
 
+  describe 'content migration launch through full-width redirect' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @tool = @course.context_external_tools.create!(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.course_home_sub_navigation = {
+          url: "http://#{HostUrl.default_host}/selection_test",
+          text: "tool text",
+          icon_url: "/images/add.png",
+          display_type: 'full_width'
+      }
+      @tool.save!
+    end
+
+    it "should queue a content migration with content returned from the external tool" do
+      get "/courses/#{@course.id}"
+      tool_link = f('a.course-home-sub-navigation-lti')
+      expect_new_page_load { tool_link.click }
+      wait_for_ajaximations
+
+      expect_new_page_load do
+        in_frame('tool_content') do
+          keep_trying_until { ff("#file_link").length > 0 }
+          f("#file_link").click
+        end
+      end
+
+      # should redirect to the content_migration page on success
+      driver.current_url.should match %r{/courses/\d+/content_migrations+}
+      @course.content_migrations.count.should == 1
+    end
+  end
+
   private
 
   def enable_app_center_plugin

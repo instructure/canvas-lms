@@ -1,0 +1,47 @@
+@import "base/environment";
+
+#main {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $altBG;
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0 0 10px 20px;
+}
+
+#docs {
+  position: absolute;
+  top: 0;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#docs > article {
+  margin: 40px 20px;
+  padding: 20px;
+  min-height: 60%;
+  box-shadow: 2px 6px 16px rgba(0, 0, 0, 0.5);
+  background: #fff;
+  max-width: 700px;
+}
+
+#docs > article:first-child {
+  border:none;
+}
+
+.code-demo:hover {
+  margin-left: -12px;
+  border-left: solid 4px #0088cc;
+  padding-left: 8px;
+}
+

@@ -1,11 +1,11 @@
 <style>
-    #passback-form {
+    .passback-form {
         margin:0;
         margin-bottom: 25px;
         padding: 0;
     }
 
-    #passback-form .assignment-info {
+    .passback-form .assignment-info {
         padding-right: 3px;
         padding-right: 4px \9;
         padding-left: 3px;
@@ -18,7 +18,7 @@
         border-radius: 3px;
     }
 
-    #passback-form button {
+    .passback-form button {
         border: 0;
         background: none;
         /** belows styles are working good */
@@ -92,8 +92,8 @@
 
     #post-grades-container .span1 {
         width: 70px; }
-
 </style>
+
 <div id="assignment-errors">
    <legend class="lead" style><span class="assignment-error-count">{{missing_not_unique.length}}</span> Assignments with Errors</legend>
    <div class="assignment-errors-list">
@@ -105,23 +105,23 @@
        {{#each missing_not_unique}}
            <div class="row">
                <div id="assignment-error-{{id}}">
-                   <div class={{#if not_unique}}"span1 data-circle-error"{{else}}"span1 data-circle-clean"{{/if}} style="width: 4px"></div>
-                   <form id="passback-form" class="form-inline">
-                       <div class="span4">
-                           <input type="text" class="input-xlarge" style="padding-right: 100px" placeholder="{{name}}" value="{{name}}">
+                   <form class="passback-form form-inline" data-assignment-id="{{id}}">
+                       <div class={{#if not_unique}}"span1 data-circle-error"{{else}}"span1 data-circle-clean"{{/if}} style="width: 4px"></div>
+                       <div class="span4 input-container">
+                           <input type="text" class="input-xlarge assignment-name" style="padding-right: 100px" placeholder="No Assignment Name" value="{{name}}">
                        </div>
 
                        {{#if due_at}}
                            <div class="span1 data-circle-clean" style="width: 4px"></div>
-                           <div class="span2 date_field_container">
+                           <div class="span2 date_field_container input-container">
                            <input type="text" class="input-medium date_field assignment-info" value="{{datetimeFormatted due_at}}">
                        {{else}}
                            <div class="span1 data-circle-error" style="width: 4px"></div>
-                           <div class="span2 date_field_container">
+                           <div class="span2 date_field_container input-container">
                            <input type="text" class="input-medium date_field assignment-info" placeholder="No Due Date">
                        {{/if}}
                        </div>
-                       <button style="left: 0px;" data-assignment-id="{{id}}" class="btn ignore-assignment assignment-info">X</button>
+                       <button style="left: 0px;" class="btn ignore-assignment assignment-info">X</button>
                    </form>
                </div>
            </div>

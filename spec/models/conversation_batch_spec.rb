@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe ConversationBatch do
-  before do
+  before :once do
     student_in_course(:active_all => true)
     @user1 = @user
     @message = Conversation.build_message @user1, "hi all"

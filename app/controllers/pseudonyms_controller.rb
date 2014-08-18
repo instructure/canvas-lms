@@ -29,9 +29,6 @@ class PseudonymsController < ApplicationController
   # @API List user logins
   # Given a user ID, return that user's logins for the given account.
   #
-  # @argument user[id] [String]
-  #   The ID of the user to search on.
-  #
   # @response_field account_id The ID of the login's account.
   # @response_field id The unique, numeric ID for the login.
   # @response_field sis_user_id The login's unique SIS id.
@@ -164,10 +161,10 @@ class PseudonymsController < ApplicationController
   # @argument login[unique_id] [String]
   #   The unique ID for the new login.
   #
-  # @argument login[password] [String]
+  # @argument login[password] [Optional, String]
   #   The new login's password.
   #
-  # @argument login[sis_user_id] [String]
+  # @argument login[sis_user_id] [Optional, String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def create
@@ -231,14 +228,14 @@ class PseudonymsController < ApplicationController
   # @API Edit a user login
   # Update an existing login for a user in the given account.
   #
-  # @argument login[unique_id] [String]
+  # @argument login[unique_id] [Optional, String]
   #   The new unique ID for the login.
   #
-  # @argument login[password] [String]
+  # @argument login[password] [Optional, String]
   #   The new password for the login. Can only be set by an admin user if admins
   #   are allowed to change passwords for the account.
   #
-  # @argument login[sis_user_id] [String]
+  # @argument login[sis_user_id] [Optional, String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def update

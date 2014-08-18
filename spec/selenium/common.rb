@@ -397,7 +397,6 @@ shared_examples_for "all selenium tests" do
   end
 
   def expect_new_page_load
-    make_full_screen
     driver.execute_script("INST.still_on_old_page = true;")
     yield
     keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
@@ -779,6 +778,18 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def resize_screen_to_normal
+    w, h = driver.execute_script <<-JS
+        if (window.screen) {
+          return [window.screen.availWidth, window.screen.availHeight];
+        }
+    JS
+    if w != 1200 || h != 600
+      driver.manage.window.move_to(0, 0)
+      driver.manage.window.resize_to(1200, 600)
+    end
+  end
+
   def resize_screen_to_default
     h = driver.execute_script <<-JS
       if (window.screen) {
@@ -981,18 +992,7 @@ shared_examples_for "all selenium tests" do
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
-  end
-
-  append_before (:all) do
-    unless $check_screen_dimensions
-      w, h = driver.execute_script <<-JS
-        if (window.screen) {
-          return [window.screen.availWidth, window.screen.availHeight];
-        }
-      JS
-      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x760 is required.") unless w >= 1024 && h >= 760
-      $check_screen_dimensions = true
-    end
+    resize_screen_to_normal
   end
 
   after(:each) do

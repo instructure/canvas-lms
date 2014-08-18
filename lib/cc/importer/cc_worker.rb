@@ -36,7 +36,14 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
         raise Canvas::Migration::Error, I18n.t(:no_migration_file, "File required for content migration.")
       end
 
-      converter_class = settings[:converter_class] || Canvas::Migration::Worker::get_converter(settings)
+      converter_class = settings[:converter_class]
+      unless converter_class
+        if settings[:no_archive_file]
+          raise ArgumentError, "converter_class required for content migration with no file"
+        end
+        settings[:archive] = Canvas::Migration::Archive.new(settings)
+        converter_class = settings[:archive].get_converter
+      end
       converter = converter_class.new(settings)
 
       course = converter.export
