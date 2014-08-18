@@ -1,5 +1,3 @@
-require 'sfu/api/routing'
-
 module SFU
   module Api
     def self.initialize

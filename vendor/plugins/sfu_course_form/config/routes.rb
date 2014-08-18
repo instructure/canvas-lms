@@ -1,3 +1,5 @@
-ActionController::Routing::Routes.draw do |map|
-  map.course_form_urls
+(CANVAS_RAILS2 ? FakeRails3Routes : CanvasRails::Application.routes).draw do
+  match "/sfu/course/new" => "course_form#new"
+  match "/sfu/course/create" => "course_form#create"
+  match "/sfu/adhoc/new" => "course_form#new_adhoc"
 end

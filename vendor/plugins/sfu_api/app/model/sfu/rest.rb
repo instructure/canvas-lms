@@ -61,12 +61,12 @@ module SFU
     end
 
     def sfu_rest_token
-      token = YAML.load_file Pathname(RAILS_ROOT) + "config/sfu.yml"
+      token = YAML.load_file Pathname(Rails.root) + "config/sfu.yml"
       token["sfu_rest_token"]
     end
 
     def canvas_oauth_token
-      token = YAML.load_file Pathname(RAILS_ROOT) + "config/sfu.yml"
+      token = YAML.load_file Pathname(Rails.root) + "config/sfu.yml"
       token["canvas_oauth_token"]
     end
   end
