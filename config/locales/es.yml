@@ -3014,7 +3014,7 @@ es:
     buttons: 
       process: "Procesar Información"
     errors: 
-      couldnt_create: "No se pudo crear la exportación del contenido"
+      couldnt_create: "No se pudo crear la exportación del contenido."
       error: "Ocurrió un error al exportar su curso. Por favor notifique al administrador de su sistema y proveale el siguiente identificador: \"%{code}\""
       not_found: "La exportación no existe"
     index: 
@@ -4748,7 +4748,7 @@ es:
       license_notice: "El contenido de este curso se ofrece bajo una licensia %{license_type}. El contenido de este curso puede considerarse bajo esta licencia a menos que se notifique de manera diferente."
       links: 
         change_layout: "Cambie el diseño de la página de inicio"
-        choose_home_page: "Elija una página de inicio"
+        choose_home_page: "Elegir página de inicio"
         course_setup: "Lista de comprobación de la Configuración del Curso"
         course_stream: "Vea el flujo de información del Curso"
         drop_course: "Dejar este Curso"
@@ -5211,7 +5211,7 @@ es:
   discussion_entry: 
     atom_no_author: "Sin Autor"
     default_user_name: "Nombre de usuario"
-  discussion_group_category_locked: "Las categorías de grupo no se pueden configurar directamente en una tarea de debate, sino en el propio debate"
+  discussion_group_category_locked: "Las categorías grupales no se pueden configurar directamente en las tareas de debate, sino que debe hacerse en el propio debate"
   discussion_topic: 
     atom_no_author: "Sin Autor"
     default_title: "Sin Título"
@@ -5277,7 +5277,7 @@ es:
       delay_posting: "Atrasar la publicación"
       enable_podcast_feed: "Activar el feed de podcast"
       include_replies_in_podcast_feed: "Incluír respuestas en el feed de podcast"
-      only_visible_to_overrides_note: "Nota: Este debate *solamente* está visible para las secciones que se especifican a continuación:"
+      only_visible_to_overrides_note: "Nota: Este debate *solo* se podrá ver en las secciones que se especifican a continuación:"
       options: Opciones
       points_possible: "Puntos posibles"
       post_at: "Publicar en"
@@ -5884,15 +5884,15 @@ es:
       greater_than: "debe ser mayor que %{count}"
       greater_than_or_equal_to: "debe ser mayor o igual a %{count}"
       inclusion: "no está incluído en la lista"
-      invalid: "es inválido(a)"
-      less_than: "debe ser menos de %{count}"
+      invalid: "no es válido(a)"
+      less_than: "debe ser menor que %{count}"
       less_than_or_equal_to: "debe ser menor o igual a %{count}"
       not_a_number: "no es un número"
       not_an_integer: "debe ser un número entero"
       odd: "debe ser impar"
-      too_long: "es muy largo (máximo son %{count} caracteres)"
-      too_short: "es muy corto (mínimo son %{count} caracteres)"
-      wrong_length: "es la longitud errónea (debería tener %{count} caracteres)"
+      too_long: "es demasiado largo (máximo %{count} caracteres)"
+      too_short: "es demasiado corto (mínimo %{count} caracteres)"
+      wrong_length: "tine una longitud errónea (debería tener %{count} caracteres)"
     no_attached_file: "Debe adjuntar al menos un archivo a esta tarea"
     registration_incomplete: "Necesita confirmar su correo electrónico antes de ver esta página"
     required: Obligatorio
@@ -5963,8 +5963,8 @@ es:
       by_url: "Por URL"
       by_xml: "Pegar XML"
       config_url: "URL de configuración"
-      configuration_type: "Tipo de Configuración"
-      consumer_key: "Código de consumidor"
+      configuration_type: "Tipo de configuración"
+      consumer_key: "Código del consumidor"
       custom_feilds_explanation: "Una por línea. Formato: nombre=valor"
       custom_fields: "Campos personalizados"
       description: Descripción
@@ -6031,9 +6031,9 @@ es:
     tool_post_iframe: 
       load_tool_button: "Cargar %{tool}"
       load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
-      new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
-      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
-      new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
+      new_tab: "Es necesario cargar esta herramienta en una ventana del navegador nueva"
+      new_tab_expired: "Ha caducado la sesión para esta herramienta. Vuelva a cargar la página para poder acceder de nuevo a ella."
+      new_tab_loaded: "Esta herramienta se cargó correctamente en una ventana nueva del navegador. Vuelva a recargar la página para poder acceder de nuevo a la herramienta."
     tool_show: 
       tool_insecure_warning: "Esta tratando de iniciar contenido poco seguro desde un sitio seguro (canvas). Es posible que algunos navegadores de Internet eviten que se cargue este contenido."
       tool_load_failure: "Parece que su contenido no se puede cargar. Puede utilizar este botón para tratar de iniciarlo en una nueva pestaña."
@@ -6326,7 +6326,7 @@ es:
     grade_display_warning: 
       checkbox: "No mostrar de nuevo para este curso"
       warning: Aviso
-  grade_export_title: "Grade Exportar"
+  grade_export_title: "Exportación de calificaciones"
   grade_summary: 
     graph_title: "Medio %{mean}, Alto %{high}, Bajo %{low}"
     outcome: 
@@ -7155,7 +7155,7 @@ es:
       group_user: 
         assign_to_group: "Asignar a grupo"
         assign_user_to_group: "Asignar %{name} a un grupo"
-        edit_group_membership: "Editar la suscripción de  %{name}"
+        edit_group_membership: "Editar la suscripción de %{name}"
         group_leader: "Líder grupal"
         move: "Mover a..."
         move_to_new_group: "Mover a %{name} a un nuevo grupo"
@@ -7163,8 +7163,8 @@ es:
         remove_as_leader: "Eliminar como líder"
         remove_from_group: "Eliminar a %{name} del grupo"
         remove_user_as_leader: "Eliminar a %{name} como líder"
-        set_as_leader: "Fijar como líder"
-        set_user_as_leader: "Fijar a %{name} como líder"
+        set_as_leader: "Designar como líder"
+        set_user_as_leader: "Designar a %{name} como líder"
       group_users: 
         add_student: "Agregar un alumno para empezar."
         add_user: "Agregar a un usuario para empezar."
@@ -7280,7 +7280,7 @@ es:
         other: "*%{count}* debates"
     local: Local
     select: 
-      prompt: "Por favor seleccione"
+      prompt: Seleccione
     submit: 
       create: "Crear %{model}"
       submit: "Guardar %{model}"
@@ -7292,12 +7292,12 @@ es:
   ic_actions: 
     manage: gestionar
   icons: 
-    discussion_submission: "Envío del debate"
+    discussion_submission: "Envío de debates"
     file_upload_submission: "Envío de archivos cargados"
     media_submission: "Envío de contenido multimedia"
     online_url_submission: "Envío de URL online"
-    quiz_submission: "Envío de evaluación"
-    text_entry_submission: "Envío de introducción de texto"
+    quiz_submission: "Envío de evaluaciones"
+    text_entry_submission: "Envío de entradas de texto"
   images: 
     error_checking_color: "Se ha producido un error al comprobar el color de la imagen"
     invalid_background_color: "El color de fondo debe ser %{color}"
@@ -7319,7 +7319,7 @@ es:
     copied_grading_standard_warning: "No se pudo encontrar el estándar de calificación copiado de este curso."
     due_dates_warning: "No se pudieron ajustar las fechas de vencimiento."
     failed_import_media_objects: "Se produjo un error al importar los objetos multimedia"
-    file_import_warning: "No se pudo encontrar e archivo %{file}"
+    file_import_warning: "No se pudo encontrar el archivo %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "No se le permite gestionar resultados globales, no puede añadir \"%{title}\""
   importers/learning_outcome_importer: 
@@ -7451,7 +7451,7 @@ es:
         locked_by: "Bloqueado por"
         max_attempts: "Intentos Máximos"
         num_attempts: Intentos
-        original_job_id: "ID de trabajo original"
+        original_job_id: "ID del trabajo original"
         priority: Prioridad
         run_at: "Correr en"
         strand: hilo
@@ -7467,7 +7467,7 @@ es:
     module_sequence_footer: 
       next: Siguiente
       previous: Anterior
-  k12_description: "Funciones, configuración y estilo que tienen más sentido específicamente en un entorno K-12. Por el momento, esto solo se aplica a algunas modificaciones de estilo, pero es posible que se incorporen más cosas específicas de K-12 en el futuro."
+  k12_description: "Funciones, configuración y estilos que tienen más sentido específicamente en un entorno K-12. Por el momento, esto solo se aplica a algunas modificaciones de estilo, pero es posible que se incorporen más cosas específicas de K-12 en el futuro."
   labels: 
     lock_module_until: "Bloquear módulo hasta una fecha determinada"
   last_submission_activity_title: "Actividad del último envío"
@@ -7516,7 +7516,7 @@ es:
   learning_outcome: 
     no_comment: "Sin Comentario"
     no_description: "Sin Descripción"
-  learning_outcome_assignment_type_title: "Resultado de aprendizaja y tipo de tarea"
+  learning_outcome_assignment_type_title: "Nivel de aprendizaje y tipo de tarea"
   lib: 
     angel: 
       failed_import_link: "Se ha producido un error al importar un enlace"
@@ -7618,9 +7618,9 @@ es:
   lti: 
     lti_message: 
       load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
-      new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
-      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
-      new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
+      new_tab: "Es necesario cargar este herramienta en una ventana nueva del navegador"
+      new_tab_expired: "Ha caducado la sesión para esta herramienta. Vuelva a cargar la página para poder acceder de nuevo a ella."
+      new_tab_loaded: "Esta herramienta se cargó correctamente en una ventana nueva del navegador. Vuelva a cargar la página para poder acceder a la herramienta otra vez."
   lti2: 
     register_tool: "Herramienta de registros"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -9251,18 +9251,18 @@ es:
     page_unpublished_module: "Esta página es parte de un módulo sin publicar y aún no está disponible."
     peer_review_invitation: 
       email: 
-        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para hacerlo."
         html: 
           link_message: "Haga clic aquí para realizar la revisión"
-        subject: "Revisor asignador para %{reviewee}"
+        subject: "Revisor asignado para %{reviewee}"
       facebook: 
-        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para hacerlo."
       sms: 
         more_info: "Más información en %{url}"
       summary: 
-        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para hacerlo."
       twitter: 
-        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para revisarles."
+        body: "Ha sido invitado a revisar a %{reviewee}. Siga el enlace que aparece a continuación para hacerlo."
     pseudonym_registration: 
       email: 
         body: "¡Se ha registrado para una cuenta con Canvas en %{account}! Antes que pueda ingresar y comenzar a usar Canvas, deberá terminar el proceso de configuración."
@@ -9770,7 +9770,7 @@ es:
     grading_description: |-
         Incluye:
         
-        * Calificación de tareas/envíos introducida/modificada
+        * Introducción/modificación de las calificaciones de tareas/envíos
         * Calificación de tareas reactivadas
         * Modificación de la media ponderada de la calificación
         
@@ -9957,7 +9957,7 @@ es:
           mb: MB
           tb: TB
   observees: 
-    add_observee_button: "Añadir alumno"
+    add_observee_button: "Agregar alumno"
     being_observed: "Alumnos en observación"
     new_observee_password: Contraseña
     new_observee_username: "Nombre de usuario"
@@ -10275,8 +10275,8 @@ es:
           Deberá crear una [nueva aplicación en facebook.com](%{facebook_url}), y añadir "Aplicación en Facebook" como plataforma.
           Establezca las siguientes opciones de configuración para garantizar el correcto funcionamiento de su aplicación de Facebook:
           
-          * **Configuración -- Aplicación en Facebook -- Página de Canvas:** anote lo que vaya a elegir (la parte que aparece después de apps.facebook.com) e introdúzcala en el formulario que aparece a continuación.
-          * **Configuración -- Aplicación en Facebook -- URL de Canvas:** configurare en %{canvas_url}
+          * **Configuración -- Aplicación en Facebook -- Página de Canvas:** anote lo que eleja (la parte que aparece después de apps.facebook.com) e introdúzcala en el formulario que aparece a continuación.
+          * **Configuración -- Aplicación en Facebook -- URL de Canvas:** configurar en %{canvas_url}
           * Una vez que haya guardado su aplicación, anote la ID de la aplicación el token del cliente y el secreto de la aplicación
       domain_name: dominio
       headers: 
@@ -10504,11 +10504,11 @@ es:
       errors: 
         course_required: "El curso es obligatorio."
       validations: 
-        section_belongs_to_course: "La sección del curso no pertenece al curso exitente."
+        section_belongs_to_course: "La sección del curso no pertenece al curso existente."
     poll_submissions: 
       validations: 
-        poll_choice_belongs_to_poll: "La opción de la encuesta no pertenece a la encuesta existente"
-        poll_is_published: "La sesión de la encuesta no está abierta para envíos"
+        poll_choice_belongs_to_poll: "La opción de la encuesta no pertenece a la encuesta existente."
+        poll_is_published: "La sesión de la encuesta no está disponible para envíos"
         user_and_poll_session_uniqueness: "solo se puede enviar una opción por sesión de encuesta"
   post_grades_description: |-
       La opción Publicar calificaciones permite a los profesores publicar las calificaciones en sistemas preparados para SIS: Powerschool,
@@ -10654,7 +10654,7 @@ es:
         password_for: "Contraseña Para"
         purpose: Propósito
         short_name: "Mostrar el Nombre"
-        show_user_services: "Permitir que miembros de los cursos y grupos en que participo vean los servicios enlazados a mi perfil."
+        show_user_services: "Permitir que los miembros de los cursos y grupos en los que participo vean los servicios enlazados a mi perfil."
         skype_name: "Nombre de Skype"
         sortable_name: "Nombre clasificable"
         time_zone: "Huso horario"
@@ -11046,8 +11046,8 @@ es:
       payment_info: "Información de pago"
   qti_display: QTI
   qti_file_description: "archivo .zip QTI "
-  qti_img_matching_question: "La pregunta importada que coincide contiene imágenes en ambos lados, lo que no es compatible"
-  qti_img_matching_question_distractors: "La pregunta importada que coincide contiene imágenes dentro de las opciones, y no se puede arreglar porque también contiene distractores"
+  qti_img_matching_question: "La pregunta importada correspondiente contiene imágenes en ambos lados. Esta opción no es compatible"
+  qti_img_matching_question_distractors: "La pregunta importada correspondiente contiene imágenes dentro de las opciones, y no se pudo corregir porque también contiene distractores"
   qti_name: "Conversor de QTI"
   qualified_locale: en-US
   question_answered: Contestado
@@ -11177,7 +11177,7 @@ es:
       regrade_options: "Opciones de cambio de calificación *(para los alumnos que ya hayan respondido a esta pregunta):*"
       some_scores_reduced: "Solo conceder puntos a la respuesta correcta (*las puntuaciones de algunos estudiantes serán menores*)"
       update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
-    regrade_count_affected: "La evaluación se ha calificado de nuevo. Su nueva puntuación refleja las %{num} preguntas afectadas."
+    regrade_count_affected: "La evaluación se ha calificado de nuevo. Su nueva puntuación refleja las %{num} preguntas a las que afecta."
     regrade_score_affected: "Esta evaluación se ha calificado de nuevo y afecta a su puntuación."
     resume_the_quiz: "Reanudar la evaluación"
     resume_the_survey: "Reanudar la encuesta"
@@ -11193,22 +11193,22 @@ es:
   quiz_data_title: "Datos de la evaluación"
   quiz_extend_time: 
     ending_time: "hora de finalización"
-    extend_time: "Ampliar el tiempo"
+    extend_time: "Ampliar el plazo"
     extensions_student: "Ampliar plazo para %{student}"
-    extensions_successfully_added: "Ampliaciones añadidas correctamente"
+    extensions_successfully_added: "Ampliaciones agregadas correctamente"
     now: ahora
   quiz_extensions: 
     everyone_gets_attempts: "todo el mundo ya ha conseguido %{num}"
     everyone_gets_time: "todo el mundo ya ha conseguido %{num} minutos"
     extensions_num_students: "Ampliaciones para %{num} alumnos"
-    extensions_student: "Extensiones para %{student}"
+    extensions_student: "Ampliaciones para %{student}"
     extensions_successfully_added: "Ampliaciones añadidas correctamente"
     student_extensions: "Ampliaciones de los alumnos"
   quiz_index_row: 
     cant_unpublish_when_students_submit: "No se puede ocultar la publicación si hay envíos de alumnos"
     confirms: 
       delete_quiz: "¿Está seguro de que desea eliminar esta evaluación?"
-    delete_quiz: "Borrar la evaluación"
+    delete_quiz: "Eliminar la evaluación"
     edit_quiz: "Editar la evaluación"
     points: 
       one: "1 pto."
@@ -11218,7 +11218,7 @@ es:
       other: "%{count} preguntas"
   quiz_message_students: 
     and_num_more_students: "y %{num} alumnos más"
-    message_not_sent_because_empty: "Mensaje no enviado porque se había dejado vacío"
+    message_not_sent_because_empty: "El mensaje no se ha enviado porque se había dejado vacío"
     message_sent_successfully: "Mensaje enviado correctamente"
     message_students_who: "Enviar mensajes a alumnos que..."
     student_who_have_not_taken_the_quiz: "Alumnos que no han realizado la evaluación"
@@ -11248,7 +11248,7 @@ es:
       item_analysis_not_available: "El análisis de elementos no está disponible para las encuestas"
   quiz_results_protected: "Los resultados de la evaluación están protegidos en este caso y no están visibles para los alumnos."
   quiz_results_protected_after_first_glimpse: "Los resultados de la evaluación están protegidos en este caso y se pueden ver una sola vez justo después del envío."
-  quiz_results_protected_until_last_attempt: "Los resultados de la evaluación están protegidos en este caso y no están visibles para los alumnos hasta que hayan enviado su último intento."
+  quiz_results_protected_until_last_attempt: "Los resultados de la evaluación están protegidos en este caso y los alumnos no pueden verlos hasta que hayan enviado su último intento."
   quiz_route: 
     that_quiz_doesnt_exist: "Esta evaluación no existe"
     that_quiz_has_been_deleted: "Esta evaluación se ha borrado"
@@ -11289,13 +11289,13 @@ es:
   quiz_statistics_title: "Estadísticas de la evaluación"
   quiz_submission_arrows: 
     answers: 
-      correct: ¡Correcto!
-      correct_answers: "Respuestas Correctas"
+      correct: Correcto
+      correct_answers: "Respuestas correctas"
       incorrect: Incorrecto
       partial: Parcial
       right: "Respuesta correcta"
       unanswered: "Sin responder"
-      you_answered: Respondido
+      you_answered: "Ha respondido"
   quizzes: 
     after_last_attempt: "Después del último intento"
     alerts: 
@@ -12526,8 +12526,8 @@ es:
     account_admin: "Administrador de la cuenta"
     new_role: 
       add: Agregar
-      add_role: "Añadir función"
-      add_role_label: "Añadir función"
+      add_role: "Agregar función"
+      add_role_label: "Agregar función"
       role_name: "Nombre de la función"
       role_name_label: "Nombre de la función"
     permission_button: 
@@ -12577,7 +12577,7 @@ es:
         add_rubric: "Agregar Rúbrica"
       course_rubrics: "Rúbricas del curso"
       delete_rubric: "Borrar Rúbrica"
-      edit_rubric: "Editar la Rúbrica"
+      edit_rubric: "Editar la rúbrica"
       page_title: Rúbricas
       points_possible: 
         one: "1 punto posible"
@@ -13070,7 +13070,7 @@ es:
     new_course_form: 
       cancel: Cancelar
       course_cose_explanation: "Esto se mostrará en lugares con poco espacio"
-      course_is_public_explanation: "Hacer que el curso sea visible públicamente *(los datos de los alumnos permanecerán en privado)*"
+      course_is_public_explanation: "Hacer que el curso se pueda ver públicamente *(los datos de los alumnos seguirán siendo privados)*"
       create_course: "Crear un curso"
       creating_course: "Creando curso..."
       labels: 
@@ -13573,14 +13573,14 @@ es:
     students_count: 
       one: "1 alumno"
       other: "%{count} alumnos"
-  student_groups_desc: "Esto permite que la nueva página grupal para alumnos tenga una cuenta. La nueva página se ha creado para ofrecer una forma de inscripción grupal más dinámica."
+  student_groups_desc: "Esto permite que la nueva página grupal para alumnos tenga una cuenta. La nueva página se ha creado como método de inscripción grupal más dinámico."
   student_id: "ID del alumno"
   student_ip_title: "Direcciones IP de los alumnos"
   student_name: "Nombre del alumno"
   student_outcome_gradebook_description: |-
-      El libro de calificaciones de dominio del aprendizaje del alumno representa un modo en el que los alumnos pueden ver su progreso 
+      El libro de calificaciones de dominio del aprendizaje del alumno sirve para que los alumnos pueden ver su progreso 
       en los resultados del curso. Los resultados aparecen en un formato similar al de un libro de calificaciones y el progreso se muestra tanto en formato numérico como con la clasificación dominado/casi dominio/medidas correctoras.
-  student_submissions_title: "Envíos de los estudiantes"
+  student_submissions_title: "Envíos de los alumnos"
   students_with_no_submissions_title: "Alumnos sin envíos"
   sub_accounts: 
     alerts: 
@@ -13753,7 +13753,7 @@ es:
     assignments: Tareas
     collaborations: Colaboraciones
     conferences: Conferencias
-    course_assignments: "Tareas del Curso"
+    course_assignments: "Tareas del curso"
     course_grades: "Calificaciones del curso"
     course_settings: "Configuración del curso"
     discussions: Foros
@@ -13871,8 +13871,8 @@ es:
   title: 
     edit_announcement: "Editar anuncios"
     edit_topic: "Editar el tema de debate"
-    new_announcement: "Anuncio Nuevo"
-    new_topic: "Tema de la Discusión Nueva"
+    new_announcement: "Nuevo anuncio"
+    new_topic: "Nuevo tema de debate"
   title_separator: ": "
   titles: 
     aligned_items: "Asignar Elementos"
