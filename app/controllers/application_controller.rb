@@ -105,6 +105,7 @@ class ApplicationController < ActionController::Base
         :current_user_roles => @current_user.try(:roles),
         :AUTHENTICITY_TOKEN => form_authenticity_token,
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+        :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
       }
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end

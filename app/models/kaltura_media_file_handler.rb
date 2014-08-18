@@ -58,7 +58,7 @@ class KalturaMediaFileHandler
     partner_data.merge({
       attachment_id: attachment.id.to_s,
       context_source: "file_upload",
-      root_account_id: attachment.root_account_id.to_s,
+      root_account_id: Shard.global_id_for(attachment.root_account_id).to_s,
     }).to_json
   end
 

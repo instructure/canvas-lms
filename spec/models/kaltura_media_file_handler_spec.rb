@@ -84,6 +84,8 @@ describe KalturaMediaFileHandler do
     end
 
     context "partner_data" do
+      specs_require_sharding
+
       it "always includes basic info about attachment and context" do
         KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
@@ -91,7 +93,7 @@ describe KalturaMediaFileHandler do
         partner_data_json.should == {
           "attachment_id" => attachment.id.to_s,
           "context_source" => "file_upload",
-          "root_account_id" => attachment.root_account_id.to_s,
+          "root_account_id" => Shard.global_id_for(attachment.root_account_id).to_s,
         }
       end
 

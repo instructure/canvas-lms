@@ -227,7 +227,6 @@
       <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>
       <div id="page_view_id"><%= @page_view.id || @page_view.temporary_id %></div>
     <% end %>
-    <div id="domain_root_account_id"><%= @domain_root_account.try(:id) %></div>
     <% if equella_enabled? %>
       <a id="equella_endpoint_url" href="<%= @equella_settings.endpoint %>">&nbsp;</a>
       <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>

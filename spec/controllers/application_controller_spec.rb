@@ -158,6 +158,15 @@ describe ApplicationController do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should set the global id for the domain_root_account" do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID].should == Account.default.global_id
+      end
+    end
   end
 
   describe "clean_return_to" do
