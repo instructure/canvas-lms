@@ -53,7 +53,7 @@ describe Course do
 
     context "without term end date" do
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -70,7 +70,7 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -87,13 +87,30 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
+
+    context "with coures dates not overriding term dates" do
+      before do
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+      end
+
+      it "should ignore course dates if not set to override term dates when calculating soft-concluded state" do
+        @course.enrollment_term.update_attribute(:end_at, nil)
+        @course.should_not be_soft_concluded
+
+        @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
         @course.should be_soft_concluded
       end
     end

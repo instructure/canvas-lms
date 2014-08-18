@@ -1189,7 +1189,7 @@ class Course < ActiveRecord::Base
   # Returns boolean or nil.
   def soft_concluded?
     now = Time.now
-    return end_at < now if end_at
+    return end_at < now if end_at && restrict_enrollments_to_course_dates
     enrollment_term.end_at && enrollment_term.end_at < now
   end
 
