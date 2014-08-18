@@ -35,10 +35,29 @@ module SFU
         REST.json REST.course_info_url, "&course=#{course}&term=#{term}"
       end
 
+      def sections_exists?(json_data, section_code)
+        exists = false
+        json_data.each do |info|
+          section = info["course"]["section"].to_s.downcase
+          exists = true if section.eql?(section_code)
+        end
+        exists
+      end
+
+      def is_enrollment_section?(json_data, section_code)
+        enrollment_section = false
+        json_data.each do |info|
+          section = info["course"]["section"].to_s.downcase
+          classType = info["course"]["classType"].to_s.downcase
+          enrollment_section = true if section.eql?(section_code) && classType.eql?("e")
+        end
+        enrollment_section
+      end
+
       def associated_class_for_section(json_data, section_code)
         associated_class = nil
         json_data.each do |info|
-          section = info["course"]["section"].downcase
+          section = info["course"]["section"].to_s.downcase
           associated_class = info["course"]["associatedClass"] if section.eql?(section_code)
         end
         associated_class
@@ -48,12 +67,10 @@ module SFU
         details = info(course_code, term_code)
         sections = []
         has_no_child_sections = true
-        section = nil
 
-	      unless details == "[]"
+	      if details != "[]" && is_enrollment_section?(details, section_code)
           associated_class = associated_class_for_section(details, section_code)
           details.each do |info|
-            section = info["course"]["section"].downcase
             classType = info["course"]["classType"]
 
 	          if classType.eql?("n") && associated_class == info["course"]["associatedClass"]
@@ -64,7 +81,7 @@ module SFU
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
-        sections << section_code.upcase if has_no_child_sections && !section.nil?
+        sections << section_code.upcase if has_no_child_sections && sections_exists?(details, section_code)
 
         sections
       end
