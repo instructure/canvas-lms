@@ -189,45 +189,20 @@ I18n.class_eval do
   end
 end
 
-ActionView::LookupContext.class_eval do
-  attr_accessor :i18n_scope
-end
-
-ActionView::TemplateRenderer.class_eval do
-  def render_template_with_assign(template, *a)
-    old_i18n_scope = @lookup_context.i18n_scope
-    if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
-      @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
-    end
-    render_template_without_assign(template, *a)
+ActionView::Template.class_eval do
+  def render_with_i18n_scope(view, *args, &block)
+    old_i18n_scope = view.i18n_scope
+    view.i18n_scope = @virtual_path.gsub(/\/_?/, '.')
+    render_without_i18n_scope(view, *args, &block)
   ensure
-    @lookup_context.i18n_scope = old_i18n_scope
+    view.i18n_scope = old_i18n_scope
   end
-  alias_method_chain :render_template, :assign
-end
-
-ActionView::PartialRenderer.class_eval do
-  [:render_partial, :render_collection].each do |method|
-    define_method("#{method}_with_assign") do
-      begin
-        old_i18n_scope = @lookup_context.i18n_scope
-        if @template.respond_to?(:virtual_path) && (virtual_path = @template.virtual_path)
-          @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
-        end
-        send "#{method}_without_assign"
-      ensure
-        @lookup_context.i18n_scope = old_i18n_scope
-      end
-    end
-    alias_method_chain method, :assign
-  end
+  alias_method_chain :render, :i18n_scope
 end
 
 ActionView::Base.class_eval do
-  delegate :i18n_scope, :to => :lookup_context
-end
+  attr_accessor :i18n_scope
 
-ActionView::Base.class_eval do
   # can accept either translate(key, default: "default text", option: ...) or
   # translate(key, "default text", option: ...). when using the former (default
   # in the options), it's treated as if prepended with a # anchor.
