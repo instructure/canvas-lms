@@ -36,51 +36,37 @@ module SFU
       end
 
       def sections_exists?(json_data, section_code)
-        exists = false
-        json_data.each do |info|
-          section = info["course"]["section"].to_s.downcase
-          exists = true if section.eql?(section_code)
+        json_data.any? do |info|
+          info["course"]["section"].to_s.downcase.eql?(section_code)
         end
-        exists
       end
 
       def have_tutorials?(json_data, associated_class)
-        tutorials = false
-        json_data.each do |info|
+        json_data.any? do |info|
           class_type = info["course"]["classType"].to_s.downcase
           section_code = info["course"]["sectionCode"].to_s.downcase
-          tutorials = true if associated_class == info["course"]["associatedClass"]  && class_type.eql?("n") && section_code.eql?("tut")
+          associated_class == info["course"]["associatedClass"] && class_type.eql?("n") && section_code.eql?("tut")
         end
-        tutorials
       end
 
       def have_labs?(json_data, associated_class)
-        labs = false
-        json_data.each do |info|
+        json_data.any? do |info|
           class_type = info["course"]["classType"].to_s.downcase
           section_code = info["course"]["sectionCode"].to_s.downcase
-          labs = true if associated_class == info["course"]["associatedClass"]  && class_type.eql?("n") && section_code.eql?("lab")
+          associated_class == info["course"]["associatedClass"] && class_type.eql?("n") && section_code.eql?("lab")
         end
-        labs
       end
 
       def is_enrollment_section?(json_data, section_code)
-        enrollment_section = false
-        json_data.each do |info|
-          section = info["course"]["section"].to_s.downcase
-          class_type = info["course"]["classType"].to_s.downcase
-          enrollment_section = true if section.eql?(section_code) && class_type.eql?("e")
+        json_data.any? do |info|
+          info["course"]["section"].to_s.downcase.eql?(section_code) && info["course"]["classType"].to_s.downcase.eql?("e")
         end
-        enrollment_section
       end
 
       def associated_class_for_section(json_data, section_code)
-        associated_class = nil
         json_data.each do |info|
-          section = info["course"]["section"].to_s.downcase
-          associated_class = info["course"]["associatedClass"] if section.eql?(section_code)
+          return info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section_code)
         end
-        associated_class
       end
 
       def section_tutorials(course_code, term_code, section_code)
@@ -88,7 +74,7 @@ module SFU
         sections = []
         has_no_child_sections = true
 
-	      if details != "[]" && is_enrollment_section?(details, section_code)
+        if details != "[]" && is_enrollment_section?(details, section_code)
           associated_class = associated_class_for_section(details, section_code)
           have_tutorials = have_tutorials?(details, associated_class)
           have_labs = have_labs?(details, associated_class)
@@ -97,7 +83,7 @@ module SFU
             class_type = info["course"]["classType"]
             section_code = info["course"]["sectionCode"].to_s.downcase
 
-	          if class_type.eql?("n") && associated_class == info["course"]["associatedClass"]
+            if class_type.eql?("n") && associated_class == info["course"]["associatedClass"]
               if have_tutorials && have_labs
                 # Only return tutorials for enrollment sections that have both labs and tutorials
                 sections << info["course"]["section"] if section_code.eql?("tut")
@@ -107,7 +93,7 @@ module SFU
                 has_no_child_sections = false
               end
             end
-	        end
+          end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
@@ -129,7 +115,7 @@ module SFU
             title = info["course"]["title"] if section.eql? section_code.downcase
           end
         end
-	      title
+        title
       end
 
     end
