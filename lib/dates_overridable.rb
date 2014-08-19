@@ -13,6 +13,10 @@ module DatesOverridable
     base.extend(ClassMethods)
   end
 
+  def reload_overrides_cache?
+    self.updated_at && self.updated_at > 2.seconds.ago
+  end
+
   def without_overrides
     @without_overrides || self
   end

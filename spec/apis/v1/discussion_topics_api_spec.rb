@@ -725,6 +725,51 @@ describe DiscussionTopicsController, type: :request do
         @assignment.should be_deleted
       end
 
+      it "should update due dates with cache enabled" do
+        old_due_date = 1.day.ago
+        @assignment = @topic.context.assignments.build
+        @assignment.due_at = old_due_date
+        @topic.assignment = @assignment
+        @topic.save!
+        @topic.assignment.should be_present
+
+        new_due_date = 2.days.ago
+        enable_cache do
+          Timecop.freeze do
+            api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                     { :assignment => { :due_at => new_due_date.iso8601} })
+            @topic.reload
+          end
+          @topic.assignment.overridden_for(@user).due_at.iso8601.should == new_due_date.iso8601
+        end
+      end
+
+      it "should update due dates with cache enabled and overrides already present" do
+        old_due_date = 1.day.ago
+        @assignment = @topic.context.assignments.build
+        @assignment.due_at = old_due_date
+        @topic.assignment = @assignment
+        @topic.save!
+        @topic.assignment.should be_present
+
+        lock_at_date = 1.day.from_now
+        assignment_override_model(:assignment => @assignment, :lock_at => lock_at_date)
+        @override.set = @course.default_section
+        @override.save!
+
+        new_due_date = 2.days.ago
+        enable_cache do
+          Timecop.freeze do
+            api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                     { :assignment => { :due_at => new_due_date.iso8601} })
+            @topic.reload
+          end
+          @topic.assignment.overridden_for(@user).due_at.iso8601.should == new_due_date.iso8601
+        end
+      end
+
       it "should transfer assignment group category to the discussion" do
         group_category = @course.group_categories.create(:name => 'watup')
         group = group_category.groups.create!(:name => "group1", :context => @course)
