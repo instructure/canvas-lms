@@ -192,7 +192,7 @@ end
 ActionView::Template.class_eval do
   def render_with_i18n_scope(view, *args, &block)
     old_i18n_scope = view.i18n_scope
-    view.i18n_scope = @virtual_path.gsub(/\/_?/, '.')
+    view.i18n_scope = @virtual_path.gsub(/\/_?/, '.') if @virtual_path
     render_without_i18n_scope(view, *args, &block)
   ensure
     view.i18n_scope = old_i18n_scope
