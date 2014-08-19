@@ -1307,6 +1307,7 @@ ja:
       podcast_title_course: "コース アナウンスのポッドキャスト フィード"
       podcast_title_group: "グループ アナウンスのポッドキャスト フィード"
     index_view: 
+      announcements_title: アナウンス
       delete: 削除
       loading: 読み込んでいます...
       lock_for_comments: コメントのロック
@@ -1465,8 +1466,6 @@ ja:
     unmute_button: 課題のミュート解除
     unmute_dialog: この課題は現在ミュートになっています。つまり、受講生は成績やフィードバックを見ることができません。今すぐミュートを解除しますか?
     unmuting_assignment: 課題のミュートを解除しています...
-  assignment_scheduling_title: 課題のスケジューリング
-  assignment_score_summary_title: 課題スコア概要
   assignments: 
     add_assignment_form: 
       assignment_name: 課題名
@@ -1719,7 +1718,12 @@ ja:
       google_docs_masquerade_rejected: "Google Docs に匿名ユーザとして接続できません。"
       reminder_failed: 事前通知に失敗しました
     everyone_else: 他の全員
-    external_content_homework_submission_view: 
+    external_content_homework_file_submission_view: 
+      additional_comments: 追加コメント
+      buttons: 
+        submit_assignment: 課題の提出
+      group_assignment_header: コメント...
+    external_content_homework_url_submission_view: 
       additional_comments: 追加コメント
       buttons: 
         submit_assignment: 課題の提出
@@ -2069,7 +2073,6 @@ ja:
         update_syllabus: 要綱の更新
       headers: 
         date: 日付
-        day: 日
         details: 詳細
       instructions: 
         syllabus: |-
@@ -2204,7 +2207,6 @@ ja:
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
   bookmark_service: 
     default_title: タイトルなし
-  bucks_zero_activity_title: "Bucks ゼロ アクティビティ"
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
     export_failed_no_id: コースをインポートする際にエラーが発生しました
@@ -2303,6 +2305,8 @@ ja:
     update: 更新
     view_account_roster: アカウント名簿の表示
     view_course_roster: コース名簿の表示
+  c_modal_form: 
+    close: 閉じる
   calculator: 
     buttons: 
       save: 保存
@@ -2800,13 +2804,11 @@ ja:
     by_sa: "CC 属性 平等分担"
     private: "私有 (著作権あり)"
     public_domain: 公有財産
-  ccp_zero_activity_title: "CCP ゼロ アクティビティ"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "この課題の配点は %{assignmentPoints} 点です。配点を %{rubricPoints} 点に変更し、この注釈に一致させますか?"
     titles: 
       update_assignment_points: 注釈と一致するように配点を変更しますか?
-  chcp_student_activity_title: "CHCP 受講生アクティビティ レポート"
   collaboration: 
     default_title: 名前の付いていない共同作業
   collaborations: 
@@ -3055,8 +3057,7 @@ ja:
     index: 
       buttons: 
         create: コースのエクスポートの作成
-      crumbs: 
-        course_exports: コースのエクスポート
+      content_exports: コースのエクスポート
       export_type: エクスポートのタイプ
       labels: 
         course: コース
@@ -3066,7 +3067,6 @@ ja:
         download_qti: "%{date} 以降の QTI をエクスポート: *ここをクリックしてダウンロード*"
       message: 
         export_started: エクスポートの処理が開始されました。大きいコースの場合は時間がかかります。*他のページに移動して構いません*。エクスポートが完了すると電子メールが送信されます。
-      page_title: コースのエクスポート
     labels: 
       new_export: "新しいエクスポート:"
     links: 
@@ -4138,7 +4138,6 @@ ja:
   course_copy_name: "Canvas コースのコピー"
   course_copy_no_course_error: コピー元のコースが見つかりませんでした。
   course_copy_not_allowed_error: コピー元のコースのコピーが許可されていません。
-  course_enrollment_title: 登録数
   course_exports: 
     errors: 
       assignment: "課題 \"%{title}\" のエクスポートに失敗しました"
@@ -4311,7 +4310,6 @@ ja:
       section_enrollments: セクションの登録
   course_statistics: 
     unknown: 不明
-  course_status_title: "コース セクション ステータス"
   course_users: 
     greater_than_three: "検索語を 3 文字以上で入力してください"
     unknown_error: 検索中に問題が発生しました。後でもう一度、試してください。
@@ -4330,6 +4328,7 @@ ja:
       need_grading_count: 
         one: "%{count} 個が未採点"
         other: "%{count} 個が未採点"
+      no_peer_review_due_date: "期限: 期日なし"
       points_possible: "配点: %{points_possible}"
     canvasnet_instructor: 
       avatar_url: アバター
@@ -4558,7 +4557,6 @@ ja:
         edit_sections_desc: "セクションはユーザの編成手段の 1 つです。セクションを利用するとで、1 つのコースで複数のクラスを教えることができ、コースの内容を 1 箇所にまとめることができます。以下では、ユーザを別のセクションに移動したり、セクションの登録を追加/削除できます。ユーザは常に 1 つ以上のセクションに含まれる必要があります。"
       index: 
         cannot_add_users: このコースは完了しているため、新しいユーザを追加できません
-        filter_field_description: このフィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力した文字に一致する名前を持つメンバーのみが表示されます。
         group_set: "グループ セット"
         people: メンバー
         role_to_search: 制限付きの役割検索
@@ -4619,6 +4617,7 @@ ja:
       course_open_enrollment: "このコースはオープン登録を有効にしました。URL *%{url}* を知らせれば、受講生は自分でコースに登録できます。または、*%{url2}* でサインアップして、参加コード *%{code}* を使用することもできます"
       course_open_enrollment_without_code: "このコースはオープン登録を有効にしました。この URL を共有すれば、受講生は自分でコースに登録できます: *%{url}*"
       course_overrides_term: この設定は、どの利用可能期間設定よりも優先されます。
+      course_settings_title: コース設定
       date_restricted: ユーザは次の期間のコースにのみ参加できる
       deatils: 
         move_course: "このコースの新しいルート アカウントを選択してください。コースを移動後、必要であればコースに対して新しい学科を指定することもできます。"
@@ -4865,16 +4864,24 @@ ja:
     syllabus: 
       headers: 
         date: 日付
-        day: 日
         details: 詳細
       syllabus: 
         hide_specific_dates: セクション、グループ、個人に関する日付を非表示にする
-        other_day: その他
         show_specific_dates: セクション、グループ、個人に関する日付を表示する
     titles: 
       rss_feed: "%{course} のフィード"
     unauthorized: 
       invalid_link: ご利用になった登録リンクは、有効でないようです。インストラクタまでお問い合せの上、コースに正しく登録されているかご確認ください。
+  create_module_item: 
+    assignment_name: 課題名
+  create_module_item_quiz: 
+    graded_quiz: 採点済みのクイズ
+    graded_survey: 採点済みのサーベイ
+    page_name: ページ名
+    practice_quiz: 練習クイズ
+    quiz_name: クイズ名
+    ungrded_survey: 未採点のサーベイ
+    url: URL
   create_users_view: 
     required: "電子メール アドレスを入力してください:"
   crumbs: 
@@ -4958,7 +4965,6 @@ ja:
       student: 
         count: 不正解の受講生数
         ratio: 受講生の不正解率
-  current_grade_title: 現在の成績
   curve_grades_dialog: 
     average_score: 平均スコア
     buttons: 
@@ -4970,10 +4976,6 @@ ja:
       assign_blanks: 未提出の受講生にゼロを割り当てる
     out_of_points_possible: "配点: %{assignment.points_possible}"
     this_is_permanent: 分布曲線評価は取り消しできません。分布曲線評価を行う前の成績の履歴は利用できますが、分布曲線評価の処理は取り消すことができません。
-  custom_grade_export_title: "CampusVue 成績のエクスポート"
-  custom_outcomes_title: カスタムの成果
-  cv_non_graded_data__title: "CampusVue 未採点の課題レポート"
-  cv_submission_data__title: "CampusVue 提出データ"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L から .zip 形式でエクスポート"
   d2l_name: "D2L コンバータ"
@@ -5386,6 +5388,8 @@ ja:
       current_page: 現在
       first_page: 最初
       last_page: 最後
+    peer_reviews: 
+      due_date: "期限: %{date}"
     points_possible_number: 配点は数値で入力してください
     reply_count_tooltip: 
       one: "1 件の返信があります。"
@@ -5583,7 +5587,6 @@ ja:
     screen_reader_tip: "スクリーン リーダーのユーザ: スクリーン リーダーを利用しているユーザがこのエディタを使用するには、詳細ビューに切り替えてから、LaTeX を直接入力するか、またはツールバーの LaTeX 入力支援機能を使用します。詳細ビューに切り替えるためのリンクは、このダイアログの末尾近くの編集フィールドの直前にあります。"
     search_flickr: "Flickr のクリエイティブ コモンズを検索する"
     switch_editor_html: "HTML エディタ"
-    switch_editor_visual: "ビジュアル エディタ"
     switch_to_mathjax: 基本ビューに切り替え
     switch_to_mathquill: 詳細ビューに切り替え
     tabs: 
@@ -5639,7 +5642,6 @@ ja:
     student: 受講生
     teacher: 講師
     teacher_assistant: TA
-  enrollment_summary_title: 登録の概要
   enrollment_term: 
     errors: 
       not_unique: "SIS ID \"%{sis_source_id}\" は既に使用されています"
@@ -5898,8 +5900,6 @@ ja:
       submissions: 
         body1: "このページの最下部に、ご自分のクラスからの最近の提出物のリストが表示されていることに、既にお気付きかもしれません (%{showme})。ポートフォリオの新しいページへの課題追加も、このページから素早く行うことができます。追加する提出物をクリックすると、シンプルなダイアログがポップアップ表示されます。"
         body2: "OK です!それでは、課題の追加を完成させましょう。課題を追加するセクションを選び、そのページに名前を付ける必要があります。\"ページの追加\" をクリックすると、新しいページに移動します。必要であれば、より詳しく編集できます。"
-  error_messages: 
-    login_invalid: "英数字、空白文字、.、-、_、および @ のみを使用してください。"
   errors: 
     bad_navigation_config: "無効なコース タブ構成です"
     blank: 必須
@@ -6002,6 +6002,7 @@ ja:
     course_settings_sub_navigation_configured: "コース設定のサブ ナビゲーション設定済み"
     delete: 削除
     dialog_title_add_app: アプリの追加
+    dialog_title_add_tool: 新しいアプリの追加
     dialog_title_edit_tool: 外部ツールの編集
     dialog_title_rate_tool: このツールを評価してください
     edit_view: 
@@ -6046,6 +6047,8 @@ ja:
     external_tool_view: 
       delete_tool: ツールの削除
       edit_tool: ツールの編集
+    external_tools_collection_view: 
+      app_headder: 外部アプリ
     finished: 
       load_failure_message: 指定されたツールを読み込む際に問題が発生しました。問題が解決しない場合は、管理者にお問い合わせください。
       load_failure_title: ツールによる読み込みが失敗しました
@@ -6058,7 +6061,6 @@ ja:
       all: すべて
       app_headder: 外部アプリ
       external_tools_note: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
-      external_tools_references: "*ここ* をクリックすると、Canvas との優れた連携機能を持つ LTI ツールを確認できます。**ここ** をクリックすると、LTI ツールについての Canvas コミュニティのトピックを参照できます"
       installed: インストール済み
       not_installed: 未インストール
       search_filter: 名前でフィルタ
@@ -6131,7 +6133,6 @@ ja:
       notifications_config_notice: "Canvas からのお知らせを、自動的に Facebook アカウントに送信できます。送信できるお知らせのタイプには、次のものがあります。お知らせの基本設定は、ここで、または Canvas 内でいつでも変更できます。"
       settings_title: "Canvas のお知らせ設定"
       updating_preferences: 基本設定を更新しています...
-  faculty_success_tile: 講師の成功レポート
   feature_flags: 
     feature_flag: 
       allow: 許可
@@ -6144,7 +6145,6 @@ ja:
       ? "on"
       : オン
       release_notes: "リリース ノート"
-      toggle_feature_details: 機能詳細の切り替え
     feature_flag_admin_view: 
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
@@ -6235,6 +6235,7 @@ ja:
       edit_html_warning: "HTML エディタによって HTML が変更されます。変更を保存する前に、バックアップをダウンロードしてください。"
       file_details: ファイルの詳細
       file_list: "ファイル リスト"
+      files_title: ファイル
       labels: 
         just_hide_file: 自分がファイルにリンクしている場合、受講生はそのファイルをダウンロードまたは表示できる。単に、受講生向けのファイル一覧に表示しない
         just_hide_folder: 自分がこのフォルダ内のファイルにリンクしている場合、受講生はそれらのファイルをダウンロードまたは表示できる。単に、受講生向けのファイル一覧に表示しない
@@ -6372,7 +6373,6 @@ ja:
     invitation: 招待
     question: 問題
     warning: 警告
-  google_doc_accounts_title: "Google ドキュメント アカウント"
   google_docs_domain_restriction_description: |-
       Google ドキュメントのドメイン制限を使用すると、Google ドキュメントの提出や共同作業を
       単一のドメインに制限できます。承認されていないドメインで受講生が課題の提出や共同作業への
@@ -6655,14 +6655,14 @@ ja:
       close_rubric: 注釈を閉じる
       close_score: 閉じる
       close_score_screenreader: スコアの詳細を閉じる
-      collapse: 折りたたみ
+      collapse_title: 折りたたみ
       comment_count: 
         one: "%{count} 件のコメント"
         other: "%{count} 件のコメント"
       comment_count_screenreader: コメントを読む
       comments: コメント
       disabled_for_student_view: 「受講生をテスト」のスコアは成績統計に含まれません。
-      expand: 展開
+      expand_title: 展開
       faculty_journal: "%{user} についての講師日誌"
       for_course: "対象コース: "
       headers: 
@@ -7527,7 +7527,6 @@ ja:
       将来的に K-12 固有の項目が追加される可能性があります。
   labels: 
     lock_module_until: 特定の日付までモジュールをロック
-  last_submission_activity_title: 最終提出アクティビティ
   last_user_access_title: "最終ユーザ アクセス"
   layouts: 
     application: 
@@ -7573,7 +7572,6 @@ ja:
   learning_outcome: 
     no_comment: コメントなし
     no_description: 説明なし
-  learning_outcome_assignment_type_title: 学習の成果と課題のタイプ
   lib: 
     angel: 
       failed_import_link: リンクのインポートに失敗しました
@@ -7673,7 +7671,6 @@ ja:
     help: ヘルプ
     show_me_where: どこに表示するか
   locales: 
-    en: 英語
     ja: 日本語
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
   lti: 
@@ -7682,6 +7679,8 @@ ja:
       new_tab: このツールは、ブラウザの別ウィンドウに読み込む必要があります
       new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
       new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
+      tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
+      tool_load_failure: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
   lti2: 
     register_tool: 登録ツール
   m2c_file_description: "Moodle 1.9/2.x"
@@ -9694,7 +9693,6 @@ ja:
   migration_issues: 
     errors: 
       valid_workflow_state: 有効なワークフロー状態を送信する必要があります
-  mississippi_sis_title: "SIS データ"
   module_item_types: 
     assignment: 課題
     disuccsion: ディスカッション
@@ -9745,6 +9743,13 @@ ja:
       back_to_modules: "モジュール ページに戻る"
       no_students_found: 受講生が見つかりませんでした
       student_progress: 受講生の進捗
+  modules_item_controller: 
+    must_contribute_complete: ページのコンテンツに貢献
+    must_contribute_incomplete: ページのコンテンツに貢献することが必要
+    must_submit_complete: 課題を提出
+    must_submit_incomplete: 課題を提出することが必要
+    must_view_complete: ページを閲覧
+    must_view_incomplete: ページを閲覧することが必要
   moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が、正しくインポートされていない可能性があります"
   moodle_dropdown_warning_title: 複数のドロップダウン問題が正しくインポートされていない可能性があります
   moodle_formula_many_warning_title: "このバンクの %{count} 件の数式問題について、考えられる解答を再生成する必要があります"
@@ -9756,7 +9761,6 @@ ja:
     where_to_move: "*%{name}* をどこに移動しますか?"
   move_dialog_select: 
     move_to_end: "-- 下へ --"
-  multi_student_progress_title: 複数の受講生の進捗
   mute_dialog: 
     curving_assignments: 課題を分布曲線評価
     grade_change_notifications: 成績変更のお知らせ
@@ -10220,10 +10224,8 @@ ja:
     view_more_link: その他を表示
   paginated_view: 
     loading_more_results: より多くの結果を読み込んでいます
-  pasco_user_notes_title: "ユーザ メモ"
   paypal: 
     exception: 申し訳ありません。エラーが発生しました。後でもう一度試してください。
-  penn_harris_student_grade_title: "Penn Harris 受講生成績"
   plugins: 
     academic_benchmark_importer: 
       description: "これを使用すると、Academic Benchmark 標準を Canvas にインポートできます。"
@@ -11252,7 +11254,6 @@ ja:
     time_limit_minutes: "%{limit} 分"
     warning: 警告
     you_cannot_message_unpublished: クイズが公開されるまで、受講生にメッセージを送信できません。
-  quiz_data_title: "クイズ データ"
   quiz_extend_time: 
     ending_time: 終了時刻
     extend_time: 時間の延長
@@ -11348,7 +11349,6 @@ ja:
     unknown_answer: その他
   quiz_statistics_route: 
     quiz_statistics: 統計
-  quiz_statistics_title: クイズの統計情報
   quiz_submission_arrows: 
     answers: 
       correct: 正解です!
@@ -11406,6 +11406,9 @@ ja:
     default_response_to_essay: 受講生が解答を提出した後、受講生に表示する応答
     default_response_to_file_upload: 受講生が解答を提出した後、受講生に表示する応答
     download_all_quiz_file_upload_submissions: "すべてのクイズのファイル アップロードによる提出物のダウンロード"
+    editor: 
+      keyboard_shortcuts: 
+        dialog_title: "キーボード ショートカット"
     enter_answer_variable_above: "[ 上記に解答の変数を入力 ]"
     errors: 
       adding_questions_failed: 問題の追加に失敗しました。もう一度やり直してください
@@ -11473,6 +11476,7 @@ ja:
         manage_question_banks: 問題バンクの管理
         publish_multiple_quizzes: 複数のクイズの公開
         settings: 設定
+      quizzes_title: クイズ
       search_for_quiz: クイズの検索
       title_add_quiz: クイズを追加
     keep_highest: 最高
@@ -12429,7 +12433,12 @@ ja:
     upload_info: "以前にダウンロードした、その受講生からの提出ファイルに変更を加えた場合は、zip ファイルに圧縮しなおして、下のフォームと一緒にアップロードしてください。受講生には、提出用のコメント内に、修正済みのファイルが表示されます。"
     upload_warning: ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。
   react_files: 
-    loading_more_results: その他の結果を読み込んでいます
+    aria_label: 
+      settings: 設定
+    errors: 
+      no_match: 
+        suggestions: "提案:"
+    name: 名前
     usage_details: "%{quota_used} / %{quota}"
   recent_student: 
     last_logged_in: "最終ログイン日時: %{last_login}"
@@ -12447,7 +12456,6 @@ ja:
     sections_count: 
       one: "%{count} 件のセクション"
       other: "%{count} 件のセクション"
-  registrar_tile: 教務課レポート
   registration: 
     get_started: 作業の開始
     incomplete_registration_warning: 
@@ -12485,6 +12493,16 @@ ja:
         name: 名前
     welcome_to_canvas: "Canvas へようこそ!"
   reply_from_name: "%{name} (Canvas のお知らせから)"
+  restrict_student_access: 
+    aria_label: 
+      availableFrom: 次から使用可能
+      availableUntil: 次の日時まで
+    button_text: 
+      cancel: キャンセル
+      update: 更新
+    label: 
+      availableFrom: 次から使用可能
+      availableUntil: 次の日時まで
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   role_override: 
     permission: 
@@ -12665,8 +12683,6 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
-  safety_drill_title: "セーフティ ドリルのスケジューリング"
-  scantron_quiz_title: "マークシート クイズ"
   scribd: 
     upgrade_flash: "古いバージョンの Adobe Flash Player をお使いです。iPaper (および Web 上のさまざまな機能) を使用するには、%{link_tag}最新の Flash Player を入手する%{end_link}必要があります。"
   search: 
@@ -13622,9 +13638,7 @@ ja:
     not_available: 次の日付で利用可能
     pending: 次の日付まで利用不可
   step: 手順
-  student_access_title: "受講生アクセス レポート"
   student_assignment_outcome_map_title: 受講生の能力
-  student_grades_title: 受講生の成績
   student_groups: 
     group_join: "グループ %{group_name} に参加しました"
     group_leave: "グループ %{group_name} を脱退しました"
@@ -13638,13 +13652,11 @@ ja:
       これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページでは、グループのサインアップをより動的に
       行うことができます。
   student_id: "受講生 ID"
-  student_ip_title: "受講生 IP アドレス"
   student_name: 受講生名
   student_outcome_gradebook_description: |-
       受講生は、受講生の学習達成度の成績表を使用して、コース学習成果の進捗を簡単に表示できます。
       成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
       表示されます。
-  student_submissions_title: 受講生の提出物
   students_with_no_submissions_title: 提出物のない受講生
   sub_accounts: 
     alerts: 
@@ -13685,11 +13697,9 @@ ja:
       unsubmitted: 未提出
   submission_comment: 
     unknown_author: 名前未登録ユーザ
-  submission_data_title: 提出データ
   submission_detail: 
     go_to_submission_url: "提出用 URL に進む"
     no_submission: 提出なし
-    online_text_entry_see_details_in_the_speedgrader: "オンライン テキスト入力、*SpeedGrader 内の詳細を参照してください*。"
     submitted_files: "提出済みのファイル:"
   submission_details_dialog: 
     add_a_comment: コメントを追加します
@@ -13836,7 +13846,6 @@ ja:
     syllabus: 要綱
     tab_location_error: そのタブ位置は無効です
     tab_unmanagable_error: "%{css_class} は管理できません"
-  tempe_grade_export_title: "Tempe 成績エクスポート"
   terms: 
     index: 
       date: 
@@ -13983,13 +13992,14 @@ ja:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Turnitin に再提出"
-  ungraded_submissions_tile: 受講生の未採点の提出物
   unknown: 不明
   unknown_question_bank: 不明な問題バンクです
   unknown_quiz: 不明なクイズです
   unpublished_courses_title: 未公開のコース
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   unused_courses_title: 未使用のコース
+  upload_button: 
+    files: ファイル
   user: 
     default_user_name: ユーザ
     errors: 
@@ -14002,11 +14012,9 @@ ja:
     registration: 
       agree_to_terms_and_privacy_policy: "*利用規約*と**プライバシー ポリシー**に同意します。"
       agree_to_terms_with_code_of_conduct: "*利用規約*と**行動規則**に同意します。"
-  user_access_title: "ユーザ アクセス レポート"
   user_date_range_search: 
     cant_be_blank: "Canvas ユーザ ID を空欄にはできません"
     cant_come_before_from: "'終了日付' を '開始日付' より前にすることはできません"
-  user_inactivity_title: ユーザ非アクティブ状況レポート
   user_lists: 
     add_n_users: 
       one: "問題ないので、この %{count} 人のユーザを追加"
@@ -14499,6 +14507,7 @@ ja:
       loading: 読み込んでいます...
       loading_more: その他を読み込んでいます...
       no_pages: まだページが作成されていません。
+      pages_title: ページ
     wiki_page_index_edit_dialog: 
       page_title: タイトル
     wiki_page_index_item: 
