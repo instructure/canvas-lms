@@ -20,7 +20,11 @@ module.exports = {
 
       version: '2.0.0',
 
-      styles: [ "www/dist/<%= grunt.moduleId %>.css" ],
+      styles: [
+        "dist/<%= grunt.moduleId %>.css",
+        "vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css",
+        "vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css"
+      ],
 
       helpers: [
         'test/support/*.js',

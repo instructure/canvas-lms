@@ -48,7 +48,9 @@ define(function() {
       'id',
       'report_type',
       'readable_type',
-      'generatable'
+      'generatable',
+      'includes_all_versions',
+      'url'
     ],
 
     PROGRESS_ATTRS: [
@@ -59,9 +61,14 @@ define(function() {
     ],
 
     ATTACHMENT_ATTRS: [
+      'created_at',
       'url'
     ],
 
-    DISCRIMINATION_INDEX_HELP_ARTICLE_URL: "http://guides.instructure.com/m/4152/l/41484-once-i-publish-my-quiz-what-kinds-of-quiz-statistics-are-available"
+    DISCRIMINATION_INDEX_HELP_ARTICLE_URL: "http://guides.instructure.com/m/4152/l/41484-once-i-publish-my-quiz-what-kinds-of-quiz-statistics-are-available",
+
+    PROGRESS_ACTIVE: 'running',
+    PROGRESS_COMPLETE: 'completed',
+    PROGRESS_FAILED: 'failed',
   };
 });

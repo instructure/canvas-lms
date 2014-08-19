@@ -20,9 +20,15 @@
       href="/dist/canvas_quiz_statistics.css" />
 
     <script src="/vendor/js/require.js"></script>
+    <style>
+      #header {
+        height: 70px;
+      }
+    </style>
   </head>
 
   <body>
+    <div id="header"></div>
     <div id="main"></div>
 
     <script>
@@ -32,6 +38,8 @@
       });
 
       require([ 'boot' ], function(app) {
+        window.app = app;
+
         app.mount(document.body.querySelector('#main'));
       });
     </script>

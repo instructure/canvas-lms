@@ -1,5 +1,6 @@
 define(function(require) {
   var RSVP = require('rsvp');
+  var config = require('../config');
   var singleton;
   var callbacks = {};
   var gActionIndex = 0;
@@ -18,6 +19,7 @@ define(function(require) {
     }
     else {
       console.assert(false, 'No action handler registered to:', action);
+      config.onError('No action handler registered to:', action);
       service.reject('Unknown action "' + action + '"');
     }
 

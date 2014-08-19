@@ -2,10 +2,10 @@
 define(function(require) {
   var React = require('react');
   var I18n = require('i18n!quiz_statistics.summary');
-  var ScorePercentileChart = require('jsx!../components/score_percentile_chart');
+  var ScorePercentileChart = require('jsx!./summary/score_percentile_chart');
+  var Report = require('jsx!./summary/report');
   var secondsToTime = require('../util/seconds_to_time');
   var round = require('../util/round');
-  var Report = require('jsx!./summary/report');
 
   var Summary = React.createClass({
     getDefaultProps: function() {
@@ -25,7 +25,7 @@ define(function(require) {
       var quizPoints = parseFloat(this.props.pointsPossible);
 
       if (quizPoints > 0) {
-        return round(score / quizPoints * 100.0, 0);
+        return round(score / quizPoints * 100.0, 0, 0);
       }
       else {
         return 0;
@@ -36,7 +36,9 @@ define(function(require) {
       return(
         <div id="summary-statistics">
           <header className="padded">
-            <h3 className="section-title inline">{I18n.t('quiz_summary', 'Quiz Summary')}</h3>
+            <h3 className="section-title inline">
+              {I18n.t('quiz_summary', 'Quiz Summary')}
+            </h3>
 
             <aside className="pull-right">
               {this.props.quizReports.map(this.renderReport)}
@@ -76,13 +78,14 @@ define(function(require) {
                 </td>
                 <td>{this.ratioFor(this.props.scoreHigh)}%</td>
                 <td>{this.ratioFor(this.props.scoreLow)}%</td>
-                <td>{round(this.props.scoreStdev)}</td>
+                <td>{round(this.props.scoreStdev, 2, 2)}</td>
                 <td>{secondsToTime(this.props.durationAverage)}</td>
               </tr>
             </tbody>
           </table>
 
           <ScorePercentileChart
+            key="chart"
             scores={this.props.scores} />
         </div>
       );

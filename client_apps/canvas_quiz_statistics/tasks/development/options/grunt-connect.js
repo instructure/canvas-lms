@@ -10,6 +10,13 @@ module.exports = {
       https: false,
       changeOrigin: false,
       xforward: false
+    }, {
+      context: '/files',
+      host: 'localhost',
+      port: 3000,
+      https: false,
+      changeOrigin: true, // needed for <iframe src="" /> not to blow up
+      xforward: false
     }],
 
     options: {

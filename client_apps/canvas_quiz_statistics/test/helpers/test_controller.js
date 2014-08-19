@@ -2,8 +2,7 @@ require([
   'core/delegate',
   'config',
   'lodash',
-  'boot'
-], function(AppDelegate, config, _, App) {
+], function(AppDelegate, config, _) {
   var clone = _.clone;
 
   var stockConfig = clone(config);
@@ -27,9 +26,7 @@ require([
 
   afterEach(function() {
     // Restore any config changed during tests:
-    Object.keys(stockConfig).forEach(function(configKey) {
-      App.config[configKey] = stockConfig[configKey];
-    });
+    AppDelegate.configure(stockConfig);
 
     if (!jasmine.inspecting && container) {
       try {

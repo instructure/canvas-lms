@@ -1,5 +1,6 @@
 define(function(require) {
   var rawAjax = require('../../util/xhr_request');
+  var $ = require('canvas_packages/jquery');
   var Root = this;
   var DEBUG = {
   };
@@ -27,7 +28,7 @@ define(function(require) {
       timeout: 5000
     },
 
-    ajax: rawAjax,
+    ajax: $.ajax,
 
     // This assumes you have set up reverse proxying on /api/v1 to Canvas.
     //

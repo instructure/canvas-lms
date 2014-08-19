@@ -5,7 +5,7 @@ define(function(require) {
     defaults: {
       updateChart: function(props) {
         this.removeChart();
-        this.createChart(this.getDOMNode(), props);
+        this.__svg = this.createChart(this.getDOMNode(), props);
       },
 
       removeChart: function() {

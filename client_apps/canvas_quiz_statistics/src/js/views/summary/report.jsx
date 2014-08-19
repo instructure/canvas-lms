@@ -3,6 +3,22 @@ define(function(require) {
   var React = require('../../ext/react');
   var $ = require('canvas_packages/jquery');
   var Tooltip = require('canvas_packages/tooltip');
+  var Status = require('jsx!./report/status');
+  var I18n = require('i18n!quiz_reports');
+
+  var Static = React.createClass({
+    shouldComponentUpdate: function(nextProps, nextState) {
+      return false;
+    },
+
+    render: function() {
+      return (
+        <div>
+          <div data-title="">{this.props.children}</div>
+        </div>
+      );
+    }
+  });
 
   var Report = React.createClass({
     mixins: [ React.addons.ActorMixin ],
@@ -13,40 +29,72 @@ define(function(require) {
 
     getInitialState: function() {
       return {
-        tooltipContent: null
+        tooltipContent: '',
+        statusLayer: null
       };
     },
 
     getDefaultProps: function() {
       return {
         readableType: 'Analysis Report',
-        generatable: false,
+        generatable: true,
+        isGenerated: false,
         downloadUrl: undefined
       };
     },
 
     componentDidMount: function() {
-      $(this.getDOMNode()).tooltip({
+      var container = document.createElement('div');
+      var tooltip = $(this.getDOMNode()).tooltip({
+        tooltipClass: 'center bottom vertical',
+        show: false,
+        hide: false,
+        items: $(this.getDOMNode()),
+        position: {
+          my: 'center bottom',
+          at: 'center top'
+        },
         content: function() {
-          return this.state.tooltipContent;
-        }.bind(this)
+          return container;
+        }
+      }).data('tooltip');
+
+      this.setState({
+        statusContainer: container,
+        statusLayer: React.renderComponent(Status(), container),
+        tooltip: tooltip
       });
     },
 
-    componentDidUpdate: function(prevProps, prevState) {
+    componentDidUpdate: function(prevProps/*, prevState*/) {
+      this.state.statusLayer.setProps(this.props, function() {
+        var tooltip = this.state.tooltip;
+        var $tooltip = tooltip._find($(tooltip.options.items));
+        var $anchor = $(this.getDOMNode());
 
+        tooltip.option('items', $anchor);
+
+        if ($tooltip.length) {
+          $tooltip.position({
+            my: 'center bottom',
+            at: 'center top',
+            of: $anchor
+          });
+        }
+      }.bind(this));
     },
 
     componentWillUnmount: function() {
-      $(this.getDOMNode()).tooltip('destroy');
+      this.state.tooltip.destroy();
+      React.unmountComponentAtNode(this.state.statusLayer);
     },
 
     render: function() {
       return (
-        <div className="report-generator inline">{
-          this.props.generatable ?
-            this.renderGenerator() :
-            this.renderDownloader()
+        <div className="report-generator inline">
+          {this.props.isGenerated ?
+            this.renderDownloader() :
+            this.renderGenerator()
           }
         </div>
       );
@@ -54,7 +102,10 @@ define(function(require) {
 
     renderGenerator: function() {
       return (
-        <button title="adooken" onClick={this.onGenerate} className="btn btn-link generate-report">
+        <button
+          disabled={!this.props.generatable}
+          onClick={this.onGenerate}
+          className="btn btn-link generate-report">
           <i className="icon-analytics" /> {this.props.readableType}
         </button>
       );
@@ -62,7 +113,7 @@ define(function(require) {
 
     renderDownloader: function() {
       return(
-        <a href={this.props.downloadUrl} className="btn btn-link">
+        <a href={this.props.file.url} className="btn btn-link download-report">
           <i className="icon-analytics" /> {this.props.readableType}
         </a>
       );
@@ -71,7 +122,7 @@ define(function(require) {
     onGenerate: function(e) {
       e.preventDefault();
 
-      this.sendAction('statistics:generateReport', this.props.reportType);
+      this.sendAction('quizReports:generate', this.props.reportType);
     }
   });
 

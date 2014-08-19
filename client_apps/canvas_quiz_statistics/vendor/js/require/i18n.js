@@ -38,7 +38,14 @@ define([], function() {
         return value;
       };
 
-      onLoad({ t: t });
+      var l = function(scope, value) {
+        return ''+value;
+      };
+
+      onLoad({
+        t: t,
+        l: l
+      });
     }
   };
 
