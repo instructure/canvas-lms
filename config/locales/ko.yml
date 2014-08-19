@@ -1134,6 +1134,7 @@ ko:
       podcast_title_course: "과목 공지 Podcast 피드"
       podcast_title_group: "그룹 공지 Podcast 피드"
     index_view: 
+      announcements_title: 공지
       delete: 삭제
       loading: "로드하는 중..."
       lock_for_comments: "의견 잠금"
@@ -1526,7 +1527,12 @@ ko:
       google_docs_masquerade_rejected: "Google Docs에 가장된 사용자로 연결할 수 없습니다."
       reminder_failed: "미리 알림 실패"
     everyone_else: "다른 모든 사람"
-    external_content_homework_submission_view: 
+    external_content_homework_file_submission_view: 
+      additional_comments: "추가 의견"
+      buttons: 
+        submit_assignment: "과제 제출"
+      group_assignment_header: 의견...
+    external_content_homework_url_submission_view: 
       additional_comments: "추가 의견"
       buttons: 
         submit_assignment: "과제 제출"
@@ -1847,7 +1853,6 @@ ko:
         update_syllabus: "강의 계획 업데이트"
       headers: 
         date: 날짜
-        day: 요일
         details: "세부 정보"
       instructions: 
         syllabus: |-
@@ -2061,6 +2066,8 @@ ko:
     update: 업데이트
     view_account_roster: "계정 명부 보기"
     view_course_roster: "과목 명부 보기"
+  c_modal_form: 
+    close: 닫기
   calculator: 
     buttons: 
       save: 저장
@@ -2797,8 +2804,7 @@ ko:
     index: 
       buttons: 
         create: "내보내기 만들기"
-      crumbs: 
-        course_exports: "내용 내보내기"
+      content_exports: "내용 내보내기"
       export_type: "내보내기 유형"
       labels: 
         course: 과목
@@ -2808,7 +2814,6 @@ ko:
         download_qti: "%{date}부터 QTI 내보내기: *다운로드하려면 여기를 클릭*"
       message: 
         export_started: "내보내기 작업을 시작했습니다. 과목이 크면 시간이 오래 걸릴 수도 있습니다. *페이지에서 나가도 되며* 내보내기를 마치면 이메일을 받게 됩니다."
-      page_title: "내용 내보내기"
     labels: 
       new_export: "새 내보내기:"
     links: 
@@ -3972,6 +3977,7 @@ ko:
       need_grading_count: 
         one: "%{count}개 평가 필요함"
         other: "%{count}개 평가 필요함"
+      no_peer_review_due_date: "기한: 기한 없음"
       points_possible: "/ %{points_possible}"
     canvasnet_instructor: 
       avatar_url: 아바타
@@ -4243,6 +4249,7 @@ ko:
       course_open_enrollment: "이 과목은 열린 등록을 사용합니다. 다음 URL을 공유하면 학생이 직접 등록할 수 있습니다: *%{url}*. 또한 *%{url2}*에서 다음 참여 코드를 이용하여 등록할 수도 있습니다: *%{code}*"
       course_open_enrollment_without_code: "이 과목은 열린 등록을 사용합니다. 다음 URL을 공유하면 학생이 직접 등록할 수 있습니다: *%{url}*"
       course_overrides_term: "이는 학기 사용 가능 여부를 재정의합니다."
+      course_settings_title: "과목 설정"
       date_restricted: "사용자가 이 날짜 사이의 과목에만 참여할 수 있음"
       deatils: 
         move_course: "이 과목에 대한 새 루트 계정을 선택하십시오. 과목을 이동한 후에 과목에 대한 새 학부를 지정할 수도 있습니다."
@@ -4468,16 +4475,24 @@ ko:
     syllabus: 
       headers: 
         date: 날짜
-        day: 요일
         details: "세부 정보"
       syllabus: 
         hide_specific_dates: "섹션, 그룹, 사람에 특정한 날짜 숨기기"
-        other_day: 기타
         show_specific_dates: "섹션, 그룹, 사람에 특정한 날짜 표시하기"
     titles: 
       rss_feed: "%{course} 피드"
     unauthorized: 
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
+  create_module_item: 
+    assignment_name: "과제 이름"
+  create_module_item_quiz: 
+    graded_quiz: "평가된 퀴즈"
+    graded_survey: "평가된 설문"
+    page_name: "페이지 이름"
+    practice_quiz: "퀴즈 연습"
+    quiz_name: "퀴즈 이름"
+    ungrded_survey: "평가 안 된 설문"
+    url: URL
   create_users_view: 
     required: "이메일 주소 입력"
   crowdsourced: true
@@ -4922,6 +4937,8 @@ ko:
       current_page: 현재
       first_page: 처음
       last_page: 마지막
+    peer_reviews: 
+      due_date: "기한 %{date}"
     points_possible_number: "가능한 점수는 숫자이어야 함"
     show: 
       add_rubric: "루브릭 추가"
@@ -5407,8 +5424,6 @@ ko:
       submissions: 
         body1: "이 페이지의 아래는 과목의 최근 제출물 목록이라는 것을 알 수 있습니다(%{showme}). 이 페이지에서 포트폴리오에 있는 페이지에 신속하게 제출물을 추가할 수 있습니다. 추가하려는 제출물을 클릭하면 간단한 대화 상자가 나타납니다."
         body2: "좋습니다! 이제 제출물 추가를 마쳤으므로 어떤 섹션에 추가할 것인지 선택하고 페이지에 이름을 붙여야 합니다. \"페이지 추가\"를 클릭하고 나면 새 페이지로 이동하는데 원하는 경우에 세부 정보를 편집할 수 있습니다."
-  error_messages: 
-    login_invalid: "글자, 숫자, 공란과 .-_@ 만 사용하시기 바랍니다."
   errors: 
     bad_navigation_config: "유효하지 않은 과목 탭 구성"
     blank: "필수 사항"
@@ -5504,6 +5519,7 @@ ko:
     course_navigation_configured: "과목 탐색이 구성됨"
     delete: 삭제
     dialog_title_add_app: "앱 추가"
+    dialog_title_add_tool: "새 앱 추가"
     dialog_title_edit_tool: "외부 도구 편집"
     dialog_title_rate_tool: "이 도구를 어떻게 평가하시겠습니까?"
     edit_view: 
@@ -5548,6 +5564,8 @@ ko:
     external_tool_view: 
       delete_tool: "도구 삭제"
       edit_tool: "도구 편집"
+    external_tools_collection_view: 
+      app_headder: "외부 앱"
     finished: 
       load_failure_message: "지정한 도구를 로드하는 데 문제가 있습니다. 문제가 지속되면 관리자에게 문의하시기 바랍니다."
       load_failure_title: "도구 로드 실패"
@@ -5560,7 +5578,6 @@ ko:
       all: 전부
       app_headder: "외부 앱"
       external_tools_note: "앱은 Canvas에 새 기능을 추가하는 쉬운 방법입니다. 개별 과목이나 계정에 있는 모든 과목에 추가할 수 있습니다. 구성을 마치면 과목 모듈을 통해 연결하거나고 평가 도구를 위한 과제를 만들 수 있습니다."
-      external_tools_references: "*여기*를 클릭하면 Canvas와 잘 동작하는 LTI 도구를 볼 수 있습니다. **여기**에서는 LTI 도구와 관련한 Canvas 커뮤니티 주제도 확인할 수 있습니다."
       installed: 설치됨
       not_installed: "설치 안 됨"
       search_filter: "이름으로 필터링"
@@ -5640,7 +5657,6 @@ ko:
       ? "on"
       : 켜기
       release_notes: "배포 노트"
-      toggle_feature_details: "기능 세부 정보 토글"
     feature_flag_admin_view: 
       no_features_available: "현재 사용할 수 있는 기능이 없음"
   features: 
@@ -5710,6 +5726,7 @@ ko:
       edit_html_warning: "HTML 편집기가 여러분의 HTML을 변경하므로 변경 사항을 저장하기 전에 백업을 다운로드해야 합니다."
       file_details: "파일 세부 정보"
       file_list: "파일 목록"
+      files_title: 파일
       labels: 
         just_hide_file: "파일을 링크한 경우에 학생이 다운로드하거나 보는 것을 허용하지만 학생의 파일 목록에 표시하지 않음"
         just_hide_folder: "폴더에 있는 파일을 링크한 경우에 학생이 다운로드하거나 보는 것을 허용하지만 학생의 파일 목록에 표시하지 않음"
@@ -7032,7 +7049,6 @@ ko:
     help: 도움말
     show_me_where: "위치 표시"
   locales: 
-    en: 영어
     ko: "한국말 (crowd-sourced)"
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
   lti: 
@@ -9029,6 +9045,13 @@ ko:
       back_to_modules: "모듈 페이지로 돌아가기"
       no_students_found: "학생을 찾을 수 없음"
       student_progress: "학생 진행률"
+  modules_item_controller: 
+    must_contribute_complete: "페이지 내용에 참여함"
+    must_contribute_incomplete: "페이지 내용에 참여해야 함"
+    must_submit_complete: "과제를 제출함"
+    must_submit_incomplete: "과제를 제출해야 함"
+    must_view_complete: "페이지를 봄"
+    must_view_incomplete: "페이지를 봐야 함"
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
   move_dialog: 
     cancel: 취소
@@ -10468,7 +10491,6 @@ ko:
     student_analysis: "학생 분석"
   quiz_statistics_route: 
     quiz_statistics: 통계
-  quiz_statistics_title: "퀴즈 통계"
   quiz_submission_arrows: 
     answers: 
       correct: 정답입니다!
@@ -10525,6 +10547,9 @@ ko:
     default_response_to_essay: "학생이 답변을 제출한 후에 표시할 대답"
     default_response_to_file_upload: "학생이 답변을 제출한 후에 표시할 대답"
     download_all_quiz_file_upload_submissions: "모든 퀴즈 파일 업로드 제출물 다운로드"
+    editor: 
+      keyboard_shortcuts: 
+        dialog_title: "키보드 단축키"
     enter_answer_variable_above: "[ 위 변수에 답변 입력 ]"
     errors: 
       adding_questions_failed: "문제 추가 실패. 다시 시도하시기 바랍니다."
@@ -10592,6 +10617,7 @@ ko:
         manage_question_banks: "문제 은행 관리"
         publish_multiple_quizzes: "여러 퀴즈 게시"
         settings: 설정
+      quizzes_title: 퀴즈
       search_for_quiz: "퀴즈 검색"
       title_add_quiz: "퀴즈 추가"
     keep_highest: 최고
@@ -11483,7 +11509,12 @@ ko:
     upload_info: "이전에 다운로드한 학생의 제출물 파일을 바꿨다면 다시 압축해서 아래 양식에 압축 파일을 업로드하십시오. 학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다."
     upload_warning: "파일의 이름을 인식할 수 있도록 제출물 파일의 이름을 변경하지 마십시오."
   react_files: 
-    loading_more_results: "더 많은 결과 로드 중"
+    aria_label: 
+      settings: 설정
+    errors: 
+      no_match: 
+        suggestions: "제안:"
+    name: 이름
   recent_student: 
     last_logged_in: "%{last_login}에 마지막으로 로그인"
   recipient_input: 
@@ -11535,6 +11566,16 @@ ko:
         email: 이메일
         name: 이름
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
+  restrict_student_access: 
+    aria_label: 
+      availableFrom: "다음부터 사용 가능"
+      availableUntil: "다음 시간까지"
+    button_text: 
+      cancel: 취소
+      update: 업데이트
+    label: 
+      availableFrom: "다음부터 사용 가능"
+      availableUntil: "다음 시간까지"
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
   role_override: 
     permission: 
@@ -12632,7 +12673,6 @@ ko:
   submission_detail: 
     go_to_submission_url: "제출물 URL로 가기"
     no_submission: "제출물 없음"
-    online_text_entry_see_details_in_the_speedgrader: "온라인 텍스트 항목입니다. *세부 정보는 SpeedGrader에서 참고하십시오*."
     submitted_files: "제출된 파일:"
   submission_details_dialog: 
     add_a_comment: "의견 추가"
@@ -12916,6 +12956,8 @@ ko:
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
   unsupported_package: "지원하지 않는 내용 묶음"
+  upload_button: 
+    files: 파일
   user: 
     default_user_name: 사용자
     errors: 
@@ -13425,6 +13467,7 @@ ko:
       loading: "로드 중..."
       loading_more: "더 로드 중..."
       no_pages: "아직 페이지를 만들지 않았습니다."
+      pages_title: 페이지
     wiki_page_index_edit_dialog: 
       page_title: 제목
     wiki_page_index_item: 
