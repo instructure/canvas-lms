@@ -182,6 +182,12 @@ module CanvasRails
       end
     end
 
+    if defined?(Spring)
+      Spring.after_fork do
+        Canvas.reconnect_redis
+      end
+    end
+
     # don't wrap fields with errors with a <div class="fieldWithErrors" />,
     # since that could leak information (e.g. valid vs invalid username on
     # login page)
