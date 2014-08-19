@@ -35,32 +35,71 @@ module SFU
         REST.json REST.course_info_url, "&course=#{course}&term=#{term}"
       end
 
+      def sections_exists?(json_data, section_code)
+        json_data.any? do |info|
+          info["course"]["section"].to_s.downcase.eql?(section_code)
+        end
+      end
+
+      def have_tutorials?(json_data, associated_class)
+        json_data.any? do |info|
+          class_type = info["course"]["classType"].to_s.downcase
+          section_code = info["course"]["sectionCode"].to_s.downcase
+          associated_class == info["course"]["associatedClass"] && class_type.eql?("n") && section_code.eql?("tut")
+        end
+      end
+
+      def have_labs?(json_data, associated_class)
+        json_data.any? do |info|
+          class_type = info["course"]["classType"].to_s.downcase
+          section_code = info["course"]["sectionCode"].to_s.downcase
+          associated_class == info["course"]["associatedClass"] && class_type.eql?("n") && section_code.eql?("lab")
+        end
+      end
+
+      def is_enrollment_section?(json_data, section_code)
+        json_data.any? do |info|
+          info["course"]["section"].to_s.downcase.eql?(section_code) && info["course"]["classType"].to_s.downcase.eql?("e")
+        end
+      end
+
+      def associated_class_for_section(json_data, section_code)
+        associated_class = nil
+        json_data.each do |info|
+          associated_class = info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section_code)
+        end
+        associated_class
+      end
+
       def section_tutorials(course_code, term_code, section_code)
         details = info(course_code, term_code)
-        # Used to match against sections starting with e.g. 'd1' for 'd100'
-        main_section = section_code[0..1].downcase 
         sections = []
         has_no_child_sections = true
-        section_exists = false
 
-	      unless details == "[]"
+        if details != "[]" && is_enrollment_section?(details, section_code)
+          associated_class = associated_class_for_section(details, section_code)
+          have_tutorials = have_tutorials?(details, associated_class)
+          have_labs = have_labs?(details, associated_class)
+
           details.each do |info|
-            section = info["course"]["section"].downcase
-            section_exists = true if section.eql? section_code.downcase
+            class_type = info["course"]["classType"]
+            section_code = info["course"]["sectionCode"].to_s.downcase
 
-	          if section_code.end_with?("00")
-              code = info["course"]["name"] + info["course"]["number"]
-
-	            if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+            if class_type.eql?("n") && associated_class == info["course"]["associatedClass"]
+              if have_tutorials && have_labs
+                # Only return tutorials for enrollment sections that have both labs and tutorials
+                sections << info["course"]["section"] if section_code.eql?("tut")
+                has_no_child_sections = false
+              else
                 sections << info["course"]["section"]
                 has_no_child_sections = false
               end
             end
-	        end
+          end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
-        sections << section_code.upcase if has_no_child_sections && section_exists
+        sections << section_code.upcase if has_no_child_sections && sections_exists?(details, section_code)
 
         sections
       end
@@ -78,7 +117,7 @@ module SFU
             title = info["course"]["title"] if section.eql? section_code.downcase
           end
         end
-	      title
+        title
       end
 
     end
