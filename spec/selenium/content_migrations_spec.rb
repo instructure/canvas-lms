@@ -230,6 +230,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "should remove dates" do
+      pending('fragile')
       visit_page
       fill_migration_form
       f('#dateAdjustCheckbox').click
@@ -242,6 +243,7 @@ describe "content migrations", :non_parallel do
 
     context "default question bank" do
       it "should import into selected question bank" do
+        pending('fragile')
         pending unless Qti.qti_enabled?
 
         bank = @course.assessment_question_banks.create!(:title => "bankity bank")
