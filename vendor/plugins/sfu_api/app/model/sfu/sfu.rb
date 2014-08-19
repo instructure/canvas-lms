@@ -44,12 +44,32 @@ module SFU
         exists
       end
 
+      def have_tutorials?(json_data, associated_class)
+        tutorials = false
+        json_data.each do |info|
+          class_type = info["course"]["classType"].to_s.downcase
+          section_code = info["course"]["sectionCode"].to_s.downcase
+          tutorials = true if associated_class == info["course"]["associatedClass"]  && class_type.eql?("n") && section_code.eql?("tut")
+        end
+        tutorials
+      end
+
+      def have_labs?(json_data, associated_class)
+        labs = false
+        json_data.each do |info|
+          class_type = info["course"]["classType"].to_s.downcase
+          section_code = info["course"]["sectionCode"].to_s.downcase
+          labs = true if associated_class == info["course"]["associatedClass"]  && class_type.eql?("n") && section_code.eql?("lab")
+        end
+        labs
+      end
+
       def is_enrollment_section?(json_data, section_code)
         enrollment_section = false
         json_data.each do |info|
           section = info["course"]["section"].to_s.downcase
-          classType = info["course"]["classType"].to_s.downcase
-          enrollment_section = true if section.eql?(section_code) && classType.eql?("e")
+          class_type = info["course"]["classType"].to_s.downcase
+          enrollment_section = true if section.eql?(section_code) && class_type.eql?("e")
         end
         enrollment_section
       end
@@ -70,12 +90,22 @@ module SFU
 
 	      if details != "[]" && is_enrollment_section?(details, section_code)
           associated_class = associated_class_for_section(details, section_code)
-          details.each do |info|
-            classType = info["course"]["classType"]
+          have_tutorials = have_tutorials?(details, associated_class)
+          have_labs = have_labs?(details, associated_class)
 
-	          if classType.eql?("n") && associated_class == info["course"]["associatedClass"]
-              sections << info["course"]["section"]
-              has_no_child_sections = false
+          details.each do |info|
+            class_type = info["course"]["classType"]
+            section_code = info["course"]["sectionCode"].to_s.downcase
+
+	          if class_type.eql?("n") && associated_class == info["course"]["associatedClass"]
+              if have_tutorials && have_labs
+                # Only return tutorials for enrollment sections that have both labs and tutorials
+                sections << info["course"]["section"] if section_code.eql?("tut")
+                has_no_child_sections = false
+              else
+                sections << info["course"]["section"]
+                has_no_child_sections = false
+              end
             end
 	        end
         end
