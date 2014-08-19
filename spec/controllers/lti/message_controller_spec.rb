@@ -143,6 +143,25 @@ module Lti
           expect(params['roles']).to eq ["http://purl.imsglobal.org/vocab/lis/v2/person#None"]
         end
 
+        it 'adds module item substitutions' do
+          parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|
+            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
+          end
+          message_handler.parameters = parameters.as_json
+          message_handler.save
+
+          tag = message_handler.context_module_tags.create!(context: account, tag_type: 'context_module')
+          tag.context_module =  ContextModule.create!(context: Course.create!)
+          tag.save!
+
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
+          expect(response.code).to eq "200"
+
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['custom_canvas.module.id']).to eq tag.context_module_id
+          expect(params['custom_canvas.module_item.id']).to eq tag.id
+        end
+
         it 'returns the locale' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
           params = assigns[:lti_launch].params.with_indifferent_access

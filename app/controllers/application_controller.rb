@@ -1221,11 +1221,21 @@ class ApplicationController < ActionController::Base
                  :redirect_return_cancel_url => success_url)
         end
 
+        substitutions = common_variable_substitutions
+        if tag.tag_type == 'context_module'
+          substitutions.merge!(
+              {
+                  '$Canvas.module.id' => tag.context_module_id,
+                  '$Canvas.moduleItem.id' => tag.id,
+              }
+          )
+        end
+
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            custom_substitutions: common_variable_substitutions
+            custom_substitutions: substitutions
         }
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
 

@@ -52,29 +52,31 @@ module Lti
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
           @active_tab = message_handler.asset_string
-          message.add_custom_params(custom_params(message_handler.parameters, tool_proxy, message.resource_link_id))
           @lti_launch = Launch.new
           @lti_launch.resource_url = message.launch_url
-          @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
           @lti_launch.link_text = resource_handler.name
           @lti_launch.launch_type = message.launch_presentation_document_target
+
           module_sequence(message_handler)
+          message.add_custom_params(custom_params(message_handler.parameters, tool_proxy, message.resource_link_id))
+
+          @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
+
           render template: 'lti/framed_launch' and return
         end
       end
       not_found
     end
 
-
     private
 
     def module_sequence(message_handler)
       env_hash = {}
       if params[:module_item_id]
-        context_module_tag = ContextModuleItem.find_tag_with_preferred([message_handler], params[:module_item_id])
-        @lti_launch.launch_type = 'window' if context_module_tag.new_tab
-        context_module_tag.context_module_action(@current_user, :read)
-        sequence_asset = context_module_tag.try(:content)
+        @tag = ContextModuleItem.find_tag_with_preferred([message_handler], params[:module_item_id])
+        @lti_launch.launch_type = 'window' if @tag.new_tab
+        @tag.context_module_action(@current_user, :read)
+        sequence_asset = @tag.try(:content)
         if sequence_asset
           env_hash[:SEQUENCE] = {
             :ASSET_ID => sequence_asset.id,
@@ -135,6 +137,14 @@ module Lti
     def lti2_variable_substitutions(parameters, tool_proxy, resource_link_id)
       substitutions = common_variable_substitutions.inject({}) { |hash, (k, v)| hash[k.gsub(/\A\$/, '')] = v; hash }
       substitutions.merge!(prep_tool_settings(parameters, tool_proxy, resource_link_id))
+      if @tag
+        substitutions.merge!(
+            {
+                'Canvas.module.id' => @tag.context_module_id,
+                'Canvas.moduleItem.id' => @tag.id,
+            }
+        )
+      end
       substitutions
     end
 
