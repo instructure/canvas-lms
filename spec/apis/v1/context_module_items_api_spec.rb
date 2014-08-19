@@ -186,6 +186,26 @@ describe "Module Items API", type: :request do
       end
     end
 
+    it "should return the url for external tool with tool_id" do
+      tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :tool_id => 'ewet00b')
+      @module1.add_item(:type => 'external_tool', :title => 'Tool', :id => tool.id, :url => 'http://www.google.com', :new_tab => false, :indent => 0)
+      @module1.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items.length.should == 1
+      items.each do |item|
+        item.should include('url')
+        uri = URI(item['url'])
+        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include("id=#{tool.id}")
+        uri.query.should include('url=')
+      end
+    end
+
     it "should show module items individually" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
                       :controller => "context_module_items_api", :action => "show", :format => "json",
