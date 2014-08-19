@@ -1306,6 +1306,7 @@ fr:
       podcast_title_course: "Flux podcast d’annonces de cours"
       podcast_title_group: "Flux podcast d’annonces de groupe"
     index_view: 
+      announcements_title: Annonces
       delete: Supprimer
       loading: Chargement...
       lock_for_comments: "Verrouiller les commentaires"
@@ -1464,8 +1465,6 @@ fr:
     unmute_button: "Annuler une tâche silencieuse"
     unmute_dialog: "Cette tâche est actuellement en mode silencieux. Cela signifie que les étudiants ne peuvent pas voir leurs notes ni leurs corrections. Voulez-vous annuler la tâche silencieuse maintenant ?"
     unmuting_assignment: "Réactiver le son pour la tâche..."
-  assignment_scheduling_title: "Calendrier des tâches"
-  assignment_score_summary_title: "Récapitulatif des résultats du travail"
   assignments: 
     add_assignment_form: 
       assignment_name: "Nom de la tâche"
@@ -1718,7 +1717,12 @@ fr:
       google_docs_masquerade_rejected: "Impossible de se connecter à Google Docs sous une autre identité."
       reminder_failed: "Échec du rappel"
     everyone_else: "Tous les autres"
-    external_content_homework_submission_view: 
+    external_content_homework_file_submission_view: 
+      additional_comments: "Autres commentaires"
+      buttons: 
+        submit_assignment: "Envoyer un travail"
+      group_assignment_header: Commentaires...
+    external_content_homework_url_submission_view: 
       additional_comments: "Autres commentaires"
       buttons: 
         submit_assignment: "Envoyer un travail"
@@ -2067,7 +2071,6 @@ fr:
         update_syllabus: "Mettre à jour le programme"
       headers: 
         date: Date
-        day: Jour
         details: Informations
       instructions: 
         syllabus: |-
@@ -2201,7 +2204,6 @@ fr:
     no_manifest: "Le répertoire racine de ce fichier .zip Blackboard ne contient pas de fichier imsmanifest.xml."
   bookmark_service: 
     default_title: "Sans titre"
-  bucks_zero_activity_title: "Bucks – Activité nulle"
   bulk_course_migration: 
     export_failed: "Une erreur est survenue lors de l’exportation du cours portant l’identifiant bb_lcid %{id} à partir de Blackboard"
     export_failed_no_id: "Une erreur est survenue lors de l’importation d’un cours"
@@ -2300,6 +2302,8 @@ fr:
     update: "Mettre à jour"
     view_account_roster: "Afficher la liste des comptes"
     view_course_roster: "Afficher la liste des cours"
+  c_modal_form: 
+    close: fermer
   calculator: 
     buttons: 
       save: Enregistrer
@@ -2797,13 +2801,11 @@ fr:
     by_sa: "Licence CC Paternité Partage à l’identique"
     private: "Privé (protégé par le droit d’auteur)"
     public_domain: "Domaine public"
-  ccp_zero_activity_title: "CCP – Activité nulle"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Ce travail a %{assignmentPoints} points possibles. Voulez-vous remplacer ce nombre par %{rubricPoints} points possibles pour vous aligner sur ce barème ?"
     titles: 
       update_assignment_points: "Voulez-vous modifier le nombre de points possibles pour vous aligner sur le barème ?"
-  chcp_student_activity_title: "Rapport d’activité des étudiants CHCP "
   collaboration: 
     default_title: "Collaboration sans titre"
   collaborations: 
@@ -3046,8 +3048,7 @@ fr:
     index: 
       buttons: 
         create: "Créer une exportation du cours"
-      crumbs: 
-        course_exports: "Exportations du cours"
+      content_exports: "Exportations du cours"
       export_type: "Type d’exportation"
       labels: 
         course: Cours
@@ -3057,7 +3058,6 @@ fr:
         download_qti: "Exportation QTI du %{date} : *Cliquez ici pour télécharger*"
       message: 
         export_started: "Le processus d’exportation a commencé. Cette opération peut prendre un certain temps avec les cours volumineux. *Vous pouvez quitter la page* et vous recevrez un e-mail lorsque l’exportation sera terminée."
-      page_title: "Exportations du cours"
     labels: 
       new_export: "Nouvelle exportation :"
     links: 
@@ -4129,7 +4129,6 @@ fr:
   course_copy_name: "Copier un cours Canvas"
   course_copy_no_course_error: "Cours source introuvable"
   course_copy_not_allowed_error: "Vous n’avez pas l’autorisation requise pour copier le cours source."
-  course_enrollment_title: "Nombre d’inscriptions"
   course_exports: 
     errors: 
       assignment: "L’exportation de la tâche \"%{title}\" a échoué"
@@ -4302,7 +4301,6 @@ fr:
       section_enrollments: "Inscriptions aux sections"
   course_statistics: 
     unknown: inconnu
-  course_status_title: "Statut de section de cours"
   course_users: 
     greater_than_three: "Indiquez un élément à rechercher comprenant au moins trois caractères."
     unknown_error: "Erreur lors de votre recherche. Veuillez réessayer."
@@ -4321,6 +4319,7 @@ fr:
       need_grading_count: 
         one: "1 doit être noté"
         other: "%{count} doivent être notés"
+      no_peer_review_due_date: "échéance : Pas d’échéance"
       points_possible: "sur %{points_possible}"
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4549,7 +4548,6 @@ fr:
         edit_sections_desc: "Les sections constituent une méthode supplémentaire d’organisation des utilisateurs. Elles vous permettent de dispenser le même cours à plusieurs classes et donc de stocker le contenu du cours à un seul endroit. Ci-dessous, vous pouvez déplacer un utilisateur dans une autre section ou ajouter/supprimer des inscriptions aux sections. Les utilisateurs doivent toujours se trouver au moins dans une section."
       index: 
         cannot_add_users: "Il n’est pas possible d’ajouter des utilisateurs, car ce cours est terminé"
-        filter_field_description: "Lorsque vous tapez quelque chose dans ce champ, la liste des personnes est filtrée automatiquement pour inclure uniquement les noms qui correspondent à votre saisie."
         group_set: "Ensemble de groupes"
         people: Personnes
         role_to_search: "Limiter la recherche au rôle"
@@ -4610,6 +4608,7 @@ fr:
       course_open_enrollment: "Ce cours autorise l’inscription libre. Les étudiants peuvent s’inscrire au cours dès que vous leur avez communiqué cette URL : *%{url}*. Ils peuvent aussi s’inscrire à l’adresse *%{url2}* et utiliser le code suivant : *%{code}*"
       course_open_enrollment_without_code: "L’inscription libre est possible pour ce cours. Les étudiants pourront s’y inscrire dès que vous leur aurez communiqué cette URL : *%{url}*"
       course_overrides_term: "Cette action remplacera les paramètres de disponibilité du trimestre."
+      course_settings_title: "Paramètres du cours"
       date_restricted: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates."
       deatils: 
         move_course: "Sélectionnez un nouveau compte racine pour ce cours. Après avoir déplacé le cours, vous devez également spécifier un nouveau département pour ce cours."
@@ -4858,16 +4857,24 @@ fr:
     syllabus: 
       headers: 
         date: Date
-        day: Jour
         details: Détails
       syllabus: 
         hide_specific_dates: "Masquer la section, le groupe et les dates qui ne concernent que la personne"
-        other_day: Autres
         show_specific_dates: "Afficher la section, le groupe et les dates qui ne concernent que la personne"
     titles: 
       rss_feed: "Flux de %{course}"
     unauthorized: 
       invalid_link: "Le lien d’inscription utilisé semble n’être plus valide. Contactez le formateur du cours pour vérifier si vous êtes toujours inscrit."
+  create_module_item: 
+    assignment_name: "Nom de la tâche"
+  create_module_item_quiz: 
+    graded_quiz: "Questionnaire noté"
+    graded_survey: "Enquête notée"
+    page_name: "Nom de la page"
+    practice_quiz: "Questionnaire d’entraînement"
+    quiz_name: "Nom du questionnaire"
+    ungrded_survey: "Enquête non notée"
+    url: URL
   create_users_view: 
     required: "Veuillez indiquer des adresses e-mail"
   crumbs: 
@@ -4951,7 +4958,6 @@ fr:
       student: 
         count: "Nombre d’étudiants ayant donné des réponses erronées"
         ratio: "Ratio d’étudiants ayant donné des réponses erronées"
-  current_grade_title: "Note actuelle"
   curve_grades_dialog: 
     average_score: "Note moyenne"
     buttons: 
@@ -4963,10 +4969,6 @@ fr:
       assign_blanks: "Attribuer un zéro aux tâches non envoyées"
     out_of_points_possible: "sur %{assignment.points_possible}"
     this_is_permanent: "La courbe de notation ne peut pas être annulée. Les historiques restent disponibles, mais l’action relative à la courbe est irréversible."
-  custom_grade_export_title: "Exportation de notes CampusVue "
-  custom_outcomes_title: "Résultats personnalisés"
-  cv_non_graded_data__title: "CampusVue – Rapport des travaux non notés "
-  cv_submission_data__title: "Données des envois CampusVue "
   d2l_display: Desire2Learn
   d2l_file_description: "Format .zip d’exportation D2L"
   d2l_name: "Convertisseur D2L"
@@ -5379,6 +5381,8 @@ fr:
       current_page: Actuelle
       first_page: Première
       last_page: Dernière
+    peer_reviews: 
+      due_date: "à rendre le %{date}"
     points_possible_number: "Les points possibles doivent être spécifiés par un nombre "
     reply_count_tooltip: 
       one: "1 réponse."
@@ -5575,7 +5579,6 @@ fr:
     screen_reader_tip: "Si vous utilisez un lecteur d’écran : le moyen le plus facile d’utiliser cet éditeur est de passer en mode d’affichage avancé, puis d’entrer directement les données en LaTeX ou d’utiliser la barre d’outils comme assistant. Le lien pour passer en mode d’affichage avancé se trouve plus bas, juste avant le champ de saisie."
     search_flickr: "Chercher des contenus Creative Commons flickr"
     switch_editor_html: "Éditeur HTML"
-    switch_editor_visual: "Éditeur visuel"
     switch_to_mathjax: "Passer en mode d’affichage simple"
     switch_to_mathquill: "Passer en mode d’affichage avancé"
     tabs: 
@@ -5631,7 +5634,6 @@ fr:
     student: Étudiant
     teacher: Enseignant
     teacher_assistant: AE
-  enrollment_summary_title: "Récapitulatif des inscriptions"
   enrollment_term: 
     errors: 
       not_unique: "L’ID SIS \"%{sis_source_id}\" est déjà utilisé."
@@ -5890,8 +5892,6 @@ fr:
       submissions: 
         body1: "Vous avez peut-être remarqué en bas de cette page la liste des envois récents de vos classes (%{showme}). Vous pouvez rapidement ajouter des envois aux nouvelles pages de votre portefeuille à partir de cette page. Cliquez simplement sur l’envoi à ajouter pour afficher une boîte de dialogue."
         body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur \"Ajouter une page\" vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
-  error_messages: 
-    login_invalid: "veuillez utiliser exclusivement des lettres, des chiffres, des espaces et les symboles .-_@."
   errors: 
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
@@ -5994,6 +5994,7 @@ fr:
     course_settings_sub_navigation_configured: "Sous-navigation configurée pour les paramètres du cours"
     delete: Supprimer
     dialog_title_add_app: "Ajouter une application"
+    dialog_title_add_tool: "Ajouter une nouvelle application"
     dialog_title_edit_tool: "Modifier l’outil externe"
     dialog_title_rate_tool: "Comment évaluez-vous cet outil ?"
     edit_view: 
@@ -6038,6 +6039,8 @@ fr:
     external_tool_view: 
       delete_tool: "Supprimer l’outil"
       edit_tool: "Modifier l’outil"
+    external_tools_collection_view: 
+      app_headder: "Applications externes"
     finished: 
       load_failure_message: "Un problème s’est produit pendant le chargement de l’outil spécifié. Si le problème persiste, contactez votre administrateur système."
       load_failure_title: "Échec de téléchargement de l’outil"
@@ -6050,7 +6053,6 @@ fr:
       all: Tous
       app_headder: "Applications externes"
       external_tools_note: "Les applications permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Elles peuvent être ajoutées à des cours individuels ou à tous les cours d’un compte. Une fois qu’elles sont configurées, vous pouvez créer un lien vers elles via les modules des cours et créer des activités pour les outils d‘évaluation."
-      external_tools_references: "Cliquez *ici* pour afficher quelques outils externes (LTI) qui fonctionnent très bien avec Canvas. Vous pouvez également parcourir **ici** les rubriques de la communauté Canvas qui s’y rapportent."
       installed: Installés
       not_installed: "Non installés"
       search_filter: "Filtrer par nom"
@@ -6123,7 +6125,6 @@ fr:
       notifications_config_notice: "Les notifications de Canvas peuvent être envoyées automatiquement vers votre compte Facebook. Vous trouverez ci-dessous le type de notifications que vous pouvez envoyer. Vous pouvez modifier vos préférences de notifications à tout moment, soit ici, soit dans Canvas."
       settings_title: "Paramètres de notification Canvas"
       updating_preferences: "Mise à jour des préférences..."
-  faculty_success_tile: "Rapport – Succès des enseignants"
   feature_flags: 
     feature_flag: 
       allow: Autoriser
@@ -6136,7 +6137,6 @@ fr:
       ? "on"
       : Activer
       release_notes: "notes de publication"
-      toggle_feature_details: "Alterner entre les détails de la fonction"
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
@@ -6227,6 +6227,7 @@ fr:
       edit_html_warning: "L’éditeur HTML modifie votre code HTML. Vous devriez télécharger une copie de sauvegarde avant d’enregistrer les modifications."
       file_details: "Informations sur le fichier"
       file_list: "Liste des fichiers"
+      files_title: Fichiers
       labels: 
         just_hide_file: "Laisser les étudiants télécharger ou consulter le fichier si je lui ajoute un lien, mais ne pas l’afficher dans la liste des fichiers pour les étudiants"
         just_hide_folder: "Laisser les étudiants télécharger ou consulter les fichiers si je leur ajoute un lien, mais ne pas l’afficher dans la liste des fichiers pour les étudiants"
@@ -6364,7 +6365,6 @@ fr:
     invitation: invitation
     question: question
     warning: avertissement
-  google_doc_accounts_title: "Comptes Google Doc "
   google_docs_domain_restriction_description: "La restriction de domaine Google Docs permet de restreindre les envois et les collaborations Google Docs à un seul domaine. Les étudiants qui tentent d’envoyer des travaux ou de participer à des collaborations sur un domaine non approuvé recevront un message d’erreur les invitant à mettre à jour leur intégration Google Docs."
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -6644,14 +6644,14 @@ fr:
       close_rubric: "Fermer le barème"
       close_score: Fermer
       close_score_screenreader: "Fermer les détails des résultats"
-      collapse: Réduire
+      collapse_title: Réduire
       comment_count: 
         one: 1 commentaire
         other: "%{count} commentaires"
       comment_count_screenreader: "Lire les commentaires"
       comments: Commentaires
       disabled_for_student_view: "Les résultats des tests d’étudiant ne sont pas inclus dans les statistiques des notes."
-      expand: Développer
+      expand_title: Développer
       faculty_journal: "Journal des enseignants pour %{user}"
       for_course: "Pour le cours,"
       headers: 
@@ -7516,7 +7516,6 @@ fr:
       applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
   labels: 
     lock_module_until: "Verrouiller le module jusqu’à une date donnée"
-  last_submission_activity_title: "Dernière activité d’envoi"
   last_user_access_title: "Dernier accès utilisateur"
   layouts: 
     application: 
@@ -7565,7 +7564,6 @@ fr:
   learning_outcome: 
     no_comment: "Aucun commentaire"
     no_description: "Pas de description"
-  learning_outcome_assignment_type_title: "Type de travail et acquis"
   lib: 
     angel: 
       failed_import_link: "Échec de l’importation des liens"
@@ -7663,7 +7661,6 @@ fr:
     help: Aide
     show_me_where: "Me montrer où"
   locales: 
-    en: Français
     fr: Français
   logged_out_user: "Utilisateur déconnecté %{user_counter}"
   lti: 
@@ -7672,6 +7669,8 @@ fr:
       new_tab: "Cet outil doit être ouvert dans une nouvelle fenêtre du navigateur"
       new_tab_expired: "La session de cet outil a expiré. Rechargez cette page pour accéder de nouveau à l’outil."
       new_tab_loaded: "Cet outil a bien été ouvert dans une nouvelle fenêtre du navigateur. Rechargez cette page pour accéder de nouveau à l’outil."
+      tool_insecure_warning: "Vous essayez de lancer un contenu peu sûr depuis un site sécurisé (Canvas). Certains navigateurs Internet peuvent empêcher le chargement de ce contenu."
+      tool_load_failure: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet"
   lti2: 
     register_tool: "Enregistrer un outil"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -9678,7 +9677,6 @@ fr:
   migration_issues: 
     errors: 
       valid_workflow_state: "Un état de workflow valide doit être envoyé."
-  mississippi_sis_title: "Données SIS"
   module_item_types: 
     assignment: Travail
     disuccsion: Discussion
@@ -9729,6 +9727,13 @@ fr:
       back_to_modules: "Revenir à la page des modules"
       no_students_found: "Aucun étudiant trouvé"
       student_progress: "Progrès des étudiants"
+  modules_item_controller: 
+    must_contribute_complete: "a participé au contenu de la page"
+    must_contribute_incomplete: "doit participer au contenu de la page"
+    must_submit_complete: "a envoyé le travail"
+    must_submit_incomplete: "doit envoyer le travail"
+    must_view_complete: "a consulté la page"
+    must_view_incomplete: "doit consulter la page"
   moodle_dropdown_many_warning_title: "%{count} questions à choix multiples issues de cette banque n’ont peut-être pas été importées correctement"
   moodle_dropdown_warning_title: "Il se peut qu’une question à choix multiples n’ait pas été importée correctement"
   moodle_formula_many_warning_title: "%{count} questions avec formule issues de cette banque nécessiteront une nouvelle génération des réponses possibles"
@@ -9740,7 +9745,6 @@ fr:
     where_to_move: "Où voulez-vous déplacer *%{name}* ?"
   move_dialog_select: 
     move_to_end: "-- Tout en bas --"
-  multi_student_progress_title: "Progression de plusieurs étudiants"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
@@ -10215,10 +10219,8 @@ fr:
     view_more_link: "Afficher plus"
   paginated_view: 
     loading_more_results: "Chargement de résultats supplémentaires"
-  pasco_user_notes_title: "Remarques de l’utilisateur"
   paypal: 
     exception: "Désolé, une erreur est survenue. Veuillez réessayer ultérieurement."
-  penn_harris_student_grade_title: "Notes des étudiants de Penn Harris "
   plugins: 
     academic_benchmark_importer: 
       description: "Cet outil permet d’importer les critères Academic Benchmark dans Canvas."
@@ -11266,7 +11268,6 @@ fr:
     time_limit_minutes: "%{limit} minutes"
     warning: Avertissement
     you_cannot_message_unpublished: "Vous ne pouvez pas envoyer de message aux étudiants tant que ce questionnaire n’est pas publié. "
-  quiz_data_title: "Données de questionnaire"
   quiz_extend_time: 
     ending_time: "Heure de fin"
     extend_time: "Prolonger le délai"
@@ -11362,7 +11363,6 @@ fr:
     unknown_answer: "Autre chose"
   quiz_statistics_route: 
     quiz_statistics: Statistiques
-  quiz_statistics_title: "Statistiques du questionnaire"
   quiz_submission_arrows: 
     answers: 
       correct: "Correct !"
@@ -11420,6 +11420,9 @@ fr:
     default_response_to_essay: "Réponse à afficher après l’envoi d’une réponse par l’étudiant."
     default_response_to_file_upload: "Réponse à afficher après l’envoi d’une réponse par l’étudiant"
     download_all_quiz_file_upload_submissions: "Télécharger tous les envois de chargement de fichiers de questionnaire"
+    editor: 
+      keyboard_shortcuts: 
+        dialog_title: "Raccourcis clavier"
     enter_answer_variable_above: "[ Entrez ci-dessus les variables de réponses ]"
     errors: 
       adding_questions_failed: "L’ajout des questions a échoué, veuillez réessayer"
@@ -11487,6 +11490,7 @@ fr:
         manage_question_banks: "Gérer les banques de questions"
         publish_multiple_quizzes: "Publier plusieurs questionnaires"
         settings: Paramètres
+      quizzes_title: Questionnaires
       search_for_quiz: "Rechercher un questionnaire"
       title_add_quiz: "Ajouter un questionnaire"
     keep_highest: "La plus élevée"
@@ -12455,7 +12459,12 @@ fr:
     upload_info: "Si vous avez apporté des modifications aux fichiers d’envois de l’étudiant que vous avez téléchargés , compressez-les puis téléchargez le fichier zip avec le formulaire ci-dessous. Les étudiants verront les fichiers modifiés dans les commentaires de leur envoi."
     upload_warning: "Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître."
   react_files: 
-    loading_more_results: "Chargement de résultats supplémentaires"
+    aria_label: 
+      settings: Paramètres
+    errors: 
+      no_match: 
+        suggestions: "Suggestions :"
+    name: Nom
     usage_details: "%{quota_used} sur %{quota}"
   recent_student: 
     last_logged_in: "dernière connexion : %{last_login}"
@@ -12473,7 +12482,6 @@ fr:
     sections_count: 
       one: "1 section"
       other: "%{count} sections"
-  registrar_tile: "Rapport de l’administration"
   registration: 
     get_started: "Premiers pas"
     incomplete_registration_warning: 
@@ -12511,6 +12519,16 @@ fr:
         name: Nom
     welcome_to_canvas: "Bienvenue dans Canvas !"
   reply_from_name: "%{name} via les notifications Canvas "
+  restrict_student_access: 
+    aria_label: 
+      availableFrom: "Disponible depuis"
+      availableUntil: Jusqu’au
+    button_text: 
+      cancel: Annuler
+      update: "Mettre à jour"
+    label: 
+      availableFrom: "Disponible depuis"
+      availableUntil: Jusqu’au
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
   role_override: 
     permission: 
@@ -12691,8 +12709,6 @@ fr:
         are_you_sure_delete: "Voulez-vous vraiment supprimer ce barème ? Toute zone utilisant actuellement le barème continuera d’avoir accès, mais personne d’autre ne pourra l’utiliser."
         are_you_sure_remove: "Voulez-vous vraiment supprimer ce barème de la liste ?"
       remove_rubric: "Supprimer ce barème de votre liste"
-  safety_drill_title: "Planification des exercices d’entraînement"
-  scantron_quiz_title: "Questionnaire Scantron "
   scribd: 
     upgrade_flash: "Bonjour, votre version d’Adobe Flash Player est obsolète. Pour utiliser iPaper (et beaucoup d’autres outils du Web), vous devez %{link_tag}vous procurer le dernier lecteur Flash%{end_link}."
   search: 
@@ -13647,9 +13663,7 @@ fr:
     not_available: "Disponible le"
     pending: "Pas disponible jusqu’au"
   step: Étape
-  student_access_title: "Relevé des accès étudiant"
   student_assignment_outcome_map_title: "Compétence de l’étudiant"
-  student_grades_title: "Notes des étudiants"
   student_groups: 
     group_join: "A rejoint le groupe %{group_name}"
     group_leave: "A quitté le groupe %{group_name}"
@@ -13663,14 +13677,12 @@ fr:
       Cela active la nouvelle page de groupes d’étudiants pour un compte. Cette page a été créée pour faciliter l’inscription des 
       groupes.
   student_id: "ID de l’étudiant"
-  student_ip_title: "Adresses IP des étudiants"
   student_name: "Nom de l’étudiant"
   student_outcome_gradebook_description: |-
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux étudiants de voir rapidement
       leurs progrès dans les différents apprentissages du cours. Ces acquis sont présentés
       dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la 
       forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
-  student_submissions_title: "Envois des étudiants"
   students_with_no_submissions_title: "Étudiants n’ayant rien envoyé"
   sub_accounts: 
     alerts: 
@@ -13711,11 +13723,9 @@ fr:
       unsubmitted: "non envoyé"
   submission_comment: 
     unknown_author: Quelqu’un
-  submission_data_title: "Données d’envoi"
   submission_detail: 
     go_to_submission_url: "Accéder à l’URL d’envoi"
     no_submission: "Aucun envoi"
-    online_text_entry_see_details_in_the_speedgrader: "Entrée de texte en ligne, *voir plus d’informations dans SpeedGrader*."
     submitted_files: "Fichiers envoyés :"
   submission_details_dialog: 
     add_a_comment: "Ajouter un commentaire"
@@ -13862,7 +13872,6 @@ fr:
     syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
-  tempe_grade_export_title: "Exportation des notes de Tempe"
   terms: 
     index: 
       date: 
@@ -14009,13 +14018,14 @@ fr:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Renvoyer à Turnitin"
-  ungraded_submissions_tile: "Envois d’étudiant non notés"
   unknown: Inconnu
   unknown_question_bank: "Banque de questions inconnue"
   unknown_quiz: "Questionnaire inconnu"
   unpublished_courses_title: "Cours non publiés"
   unsupported_package: "Package de contenu non pris en charge"
   unused_courses_title: "Cours non utilisés"
+  upload_button: 
+    files: Fichiers
   user: 
     default_user_name: Utilisateur
     errors: 
@@ -14028,11 +14038,9 @@ fr:
     registration: 
       agree_to_terms_and_privacy_policy: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       agree_to_terms_with_code_of_conduct: "Vous acceptez les *conditions d’utilisation* et le **code de déontologie**."
-  user_access_title: "Relevé des accès utilisateur"
   user_date_range_search: 
     cant_be_blank: "Vous devez fournir l’identifiant Canvas"
     cant_come_before_from: "La date de fin ne peut pas être antérieure à la date de début."
-  user_inactivity_title: "Rapport d’inactivité des utilisateurs"
   user_lists: 
     add_n_users: 
       one: "Semble correct. Ajouter cet utilisateur"
@@ -14528,6 +14536,7 @@ fr:
       loading: Chargement...
       loading_more: "Chargement de contenu supplémentaire..."
       no_pages: "Aucune page créée à ce jour."
+      pages_title: Pages
     wiki_page_index_edit_dialog: 
       page_title: Titre
     wiki_page_index_item: 
