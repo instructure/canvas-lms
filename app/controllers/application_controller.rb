@@ -131,6 +131,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method 'k12?'
 
+  def use_new_styles?
+    @domain_root_account && @domain_root_account.feature_enabled?(:new_styles)
+  end
+  helper_method 'use_new_styles?'
+
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #
