@@ -1329,6 +1329,7 @@ ar:
       podcast_title_course: "موجز Podcast لإعلانات المساق"
       podcast_title_group: "موجز Podcast لإعلانات المجموعة"
     index_view: 
+      announcements_title: الإعلانات
       delete: حذف
       loading: "جارٍ التحميل..."
       lock_for_comments: "التأمين ضد التعليقات"
@@ -1491,8 +1492,6 @@ ar:
     unmute_button: "إلغاء حجب المهمة"
     unmute_dialog: "تم حجب هذه المهمة حاليًا. وهذا يعني أن الطلاب لا يمكنهم عرض الدرجات والملاحظات الخاصة بهم. هل ترغب في إلغاء حجبها الآن؟"
     unmuting_assignment: "إظهار درجة التعيين..."
-  assignment_scheduling_title: "جدولة المهمة"
-  assignment_score_summary_title: "ملخص درجات المهمة"
   assignments: 
     add_assignment_form: 
       assignment_name: "اسم المهمة"
@@ -1761,7 +1760,12 @@ ar:
       google_docs_masquerade_rejected: "يتعذر الاتصال بمستندات Google كمستخدم متنكر."
       reminder_failed: "فشل التذكير"
     everyone_else: "أي شخص آخر"
-    external_content_homework_submission_view: 
+    external_content_homework_file_submission_view: 
+      additional_comments: "تعليقات إضافية"
+      buttons: 
+        submit_assignment: "إرسال المهمة"
+      group_assignment_header: تعليقات...
+    external_content_homework_url_submission_view: 
       additional_comments: "تعليقات إضافية"
       buttons: 
         submit_assignment: "إرسال المهمة"
@@ -2122,7 +2126,6 @@ ar:
         update_syllabus: "تحديث المناهج"
       headers: 
         date: التاريخ
-        day: اليوم
         details: التفاصيل
       instructions: 
         syllabus: |-
@@ -2256,7 +2259,6 @@ ar:
     no_manifest: "لا يوجد أي ملف imsmanifest.xml في imsmanifest.xml في الدليل الجذر."
   bookmark_service: 
     default_title: "بلا عنوان"
-  bucks_zero_activity_title: "النشاط الصفري لـ Bucks"
   bulk_course_migration: 
     export_failed: "حدث خطأ أثناء تصدير المساق ذي المعرف bb_lcid %{id} من Blackboard"
     export_failed_no_id: "حدث خطأ أثناء استيراد مساق"
@@ -2355,6 +2357,8 @@ ar:
     update: تحديث
     view_account_roster: "عرض كشف الحساب"
     view_course_roster: "عرض كشف المساق"
+  c_modal_form: 
+    close: إغلاق
   calculator: 
     buttons: 
       save: حفظ
@@ -2860,13 +2864,11 @@ ar:
     by_sa: "سمة CC المشاركة أيضًا"
     private: "خاص (محمي بموجب حقوق النشر)"
     public_domain: "المجال العام"
-  ccp_zero_activity_title: "النشاط الصفري لـ CCP"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
     titles: 
       update_assignment_points: "هل تريد تغيير النقاط الممكنة لمطابقة نموذج التقييم؟"
-  chcp_student_activity_title: "تقرير نشاط طلاب CHCP"
   collaboration: 
     default_title: "تعاون بدون تسمية"
   collaborations: 
@@ -3117,8 +3119,7 @@ ar:
     index: 
       buttons: 
         create: "إنشاء تصدير مساق"
-      crumbs: 
-        course_exports: "عمليات تصدير المساق"
+      content_exports: "عمليات تصدير المساق"
       export_type: "نوع التصدير"
       labels: 
         course: المساق
@@ -3128,7 +3129,6 @@ ar:
         download_qti: "تصدير QTI من %{date}: *انقر هنا للتنزيل*"
       message: 
         export_started: "بدأت عملية التصدير. قد يستغرق ذلك بعض الوقت مع المساقات الكبيرة. *يمكنك ترك الصفحة* وستتلقى بريدًا إلكترونيًا عند احجبال التصدير."
-      page_title: "عمليات تصدير المساق"
     labels: 
       new_export: "تصدير جديد:"
     links: 
@@ -4220,7 +4220,6 @@ ar:
   course_copy_name: "نسخ مساق Canvas"
   course_copy_no_course_error: "المساق المصدر غير موجود."
   course_copy_not_allowed_error: "غير مسموح لك بنسخ المساق المصدر."
-  course_enrollment_title: "عدد التسجيلات"
   course_exports: 
     errors: 
       assignment: "فشل تصدير \"%{title}\" المهمة"
@@ -4393,7 +4392,6 @@ ar:
       section_enrollments: "تسجيلات القسم"
   course_statistics: 
     unknown: "غير معروف"
-  course_status_title: "حالة قسم المساق"
   course_users: 
     greater_than_three: "يرجى إدخال مصطلح بحث يضم ثلاثة أحرف أو أكثر"
     unknown_error: "حدث خطأ في بحثك. يرجى إعادة المحاولة."
@@ -4416,6 +4414,7 @@ ar:
         other: "%{count} بحاجة للتصنيف"
         two: "%{count} بحاجة للتصنيف"
         zero: "%{count} بحاجة للتصنيف"
+      no_peer_review_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
       points_possible: "من %{points_possible}"
     canvasnet_instructor: 
       avatar_url: "صورة مجسمة"
@@ -4644,7 +4643,6 @@ ar:
         edit_sections_desc: "الأقسام هي وسيلة إضافية لتنظيم المستخدمين. فهي تتيح لك تدريس فئات متعددة من المساق نفسه، بحيث يتوفر لك محتوى المساق كله في مكان واحد. يمكنك أدناه نقل مستخدم إلى مقطع آخر مختلف، أو إضافة/إزالة تسجيلات القسم. يجب أن يكون المستخدمون في قسم واحد على الأقل في كل الأوقات."
       index: 
         cannot_add_users: "لا يمكن إضافة مستخدمين جدد بسبب انتهاء هذا المساق"
-        filter_field_description: "بينما تقوم بالكتابة في هذا الحقل، سيتم تصفية قائمة الأشخاص تلقائيا لتشمل فقط أولئك الذين تطابق أسماؤهم إدخالك."
         group_set: "مجموعة المجموعات"
         people: الأشخاص
         role_to_search: "تقييد البحث على الدور"
@@ -4705,6 +4703,7 @@ ar:
       course_open_enrollment: "في هذا المساق تم تمكين التسجيل المفتوح. فبإمكان الطلاب تسجيل أنفسهم بأنفسهم في المساق بمجرد أن تشاركهم رابط URL هذا *%{url}*. أو يمكنهم تسجيل الاشتراك في *%{url2}* واستخدام كود الانضمام التالي: *%{code}*"
       course_open_enrollment_without_code: "يعمل هذا المساق على تمكين التسجيل المفتوح. يمكن للطلاب التسجيل الذاتي في المساق بمجرد قيامك بمشاركة عنوان URL هذا معهم: *%{url}*"
       course_overrides_term: "سيتجاوز ذلك أي إعدادات إتاحة للفترة."
+      course_settings_title: "إعدادات المساق"
       date_restricted: "يمكن للمستخدمين المشاركة فقط في المساق بين هذه التواريخ"
       deatils: 
         move_course: "حدد حسابًا جذريًا جديدًا لهذا المساق. بعد نقل المساق سترغب في تحديد قسم جديد للمساق أيضًا."
@@ -4958,16 +4957,24 @@ ar:
     syllabus: 
       headers: 
         date: التاريخ
-        day: اليوم
         details: التفاصيل
       syllabus: 
         hide_specific_dates: "إخفاء التواريخ الخاصة بالشخص والمجموعة والقسم"
-        other_day: أخرى
         show_specific_dates: "عرض تواريخ خاصة بالشخص والمجموعة والقسم"
     titles: 
       rss_feed: "موجز %{course}"
     unauthorized: 
       invalid_link: "يبدو أن ارتباط التسجيل الذي تستخدمه لم يعد صالحًا.  الرجاء الاتصال بمعلم المساق والتأكد أنك ما زلت مسجلاً بشكل صحيح."
+  create_module_item: 
+    assignment_name: "اسم المهمة"
+  create_module_item_quiz: 
+    graded_quiz: "اختبار تم تقييم درجاته"
+    graded_survey: "استطلاع تم تقييم درجاته"
+    page_name: "اسم الصفحة"
+    practice_quiz: "أداء الاختبار"
+    quiz_name: "اسم الاختبار"
+    ungrded_survey: "استطلاع لم يتم تقييم درجاته"
+    url: URL
   create_users_view: 
     required: "الرجاء إدخال بعض عناوين البريد الإلكتروني"
   crumbs: 
@@ -5051,7 +5058,6 @@ ar:
       student: 
         count: "عدد الطلاب خاطئ"
         ratio: "نسبة الطلاب خاطئة"
-  current_grade_title: "الدرجة الحالية"
   curve_grades_dialog: 
     average_score: "متوسط الدرجات"
     buttons: 
@@ -5063,10 +5069,6 @@ ar:
       assign_blanks: "تخصيص الأصفار للطلاب الذين لم يتم إرسالهم"
     out_of_points_possible: "من %{assignment.points_possible}"
     this_is_permanent: "لا يمكن التراجع عن إنشاء منحنى للدرجات. ستتوفر محفزظات الدرجة التي تم إنشاء منحنى لها مسبقًا، إلا أنه لا يمكن التراجع عن إجراء إنشاء منحنى."
-  custom_grade_export_title: "تصدير درجة CampusVue"
-  custom_outcomes_title: "نتائج مخصصة"
-  cv_non_graded_data__title: "تقرير المهام التي لم يتم تقدير درجاتها لـ Campus Vue"
-  cv_submission_data__title: "بيانات الإرسال لـ Campus Vue"
   d2l_display: Desire2Learn
   d2l_file_description: "تصدير D2L بتنسيق zip."
   d2l_name: "محول D2L"
@@ -5575,6 +5577,8 @@ ar:
       current_page: الحالي
       first_page: أولاً
       last_page: أخيرًا
+    peer_reviews: 
+      due_date: "تاريخ الاستحقاق %{date}"
     points_possible_number: "النقاط الممكنة لابد أن تكون رقمًا"
     reply_count_tooltip: 
       one: "1 رد."
@@ -5780,7 +5784,6 @@ ar:
     screen_reader_tip: "مستخدمو قارئ الشاشة: أفضل طريقة سهلة لاستخدام هذا المحرر هي التبديل إلى طريقة العرض المتقدمة، ثم إما إدخال LaTeX مباشرةً أو استخدام شريط الأدوات لمساعدتك في فعل ذلك. ويمكن العثور على الارتباط للتبديل إلى طريقة العرض المتقدمة بالقرب من نهاية هذا الحوار، قبل حقل التحرير مباشرةً."
     search_flickr: "بحث flickr creative commons"
     switch_editor_html: "محرر HTML"
-    switch_editor_visual: "المحرر البصري"
     switch_to_mathjax: "تبديل العرض إلى الأساسي"
     switch_to_mathquill: "تبديل العرض إلى المتقدم"
     tabs: 
@@ -5836,7 +5839,6 @@ ar:
     student: الطالب
     teacher: المعلم
     teacher_assistant: "مساعد المعلم"
-  enrollment_summary_title: "ملخص التسجيل"
   enrollment_term: 
     errors: 
       not_unique: "معرف SIS \"%{sis_source_id}\" قيد الاستخدام بالفعل"
@@ -6105,8 +6107,6 @@ ar:
       submissions: 
         body1: "قد تلاحظ قائمة بالإرسالات الحديثة من الفصول أسفل هذه الصفحة (%{showme}). يمكنك إضافة الإرسالات سريعًا للصفحات الجديدة في المحفظة الخاصة بك من هذه الصفحة. ما عليك سوى النقر فوق الإرسال الذي تريد إضافته وسينبثق مربع حوار صغير."
         body2: "رائع! والآن لإنهاء إضافة الإرسال، يجب اختيار أي قسم تريد إضافته إليه وتسمية الصفحة. بعد النقر فوق \"إضافة صفحة\" ستنتقل إلى صفحة جديدة وبذلك يمكنك تحريرها بمزيد من التفاصيل إن رغبت."
-  error_messages: 
-    login_invalid: "الرجاء استخدام الحروف والأرقام والمسافات و .-_@ فقط."
   errors: 
     bad_navigation_config: "تكوين غير صالح لعلامة تبويب المساق"
     blank: مطلوب
@@ -6209,6 +6209,7 @@ ar:
     course_settings_sub_navigation_configured: "تم تكوين التنقل الفرعي لإعدادات المساق"
     delete: حذف
     dialog_title_add_app: "إضافة تطبيق"
+    dialog_title_add_tool: "إضافة تطبيق جديد"
     dialog_title_edit_tool: "تحرير أداة خارجية"
     dialog_title_rate_tool: "كيف تقيم هذه الأداة"
     edit_view: 
@@ -6253,6 +6254,8 @@ ar:
     external_tool_view: 
       delete_tool: "حذف الأداة"
       edit_tool: "تحرير الأداة"
+    external_tools_collection_view: 
+      app_headder: "التطبيقات الخارجية"
     finished: 
       load_failure_message: "حدثت مشكلة أثناء تحميل أداة معينة. الرجاء الاتصال بالمسؤول إذا استمرت هذه المشكلات."
       load_failure_title: "فشل تحميل الأداة"
@@ -6265,7 +6268,6 @@ ar:
       all: الكل
       app_headder: "التطبيقات الخارجية"
       external_tools_note: "إن التطبيقات تعتبر وسيلة سهلة لإضافة ميزات جديدة إلى Canvas. وذلك حيث يمكن إضافتها إلى المساقات الفردية أو إلى جميع المساقات في أي حساب. وبمجرد تكوينها، يمكنك الارتباط بها عبر وحدات المساق وأإنشاء مهام لأدوات التقييم."
-      external_tools_references: "انقر *هنا* لرؤية بعض أدوات LTI التي تعمل بشكل جيد مع Canvas. ويمكنك أيضًا التحقق من موضوعات مجتمع Canvas بشأن أدوات LTI **هنا**"
       installed: مثبت
       not_installed: "غير مثبت"
       search_filter: "تصفية حسب الاسم"
@@ -6338,7 +6340,6 @@ ar:
       notifications_config_notice: "يمكن إرسال إعلامات من Canvas تلقائيًا من خلال حساب Facebook الخاص بك. ستشاهد أدناه أنواع الإعلامات التي يمكنك إرسالها. يمكنك تغيير تفضيلات الإعلام في أي وقت، سواء هنا أو في Canvas."
       settings_title: "إعدادات إعلام Canvas"
       updating_preferences: "جارٍ تحديث التفضيلات..."
-  faculty_success_tile: "تقرير نجاح الكلية"
   feature_flags: 
     feature_flag: 
       allow: سماح
@@ -6351,7 +6352,6 @@ ar:
       ? "on"
       : تشغيل
       release_notes: "ملاحظات الإصدار"
-      toggle_feature_details: "تبديل وضع تفاصيل الميزات"
     feature_flag_admin_view: 
       feature_options: "خيارات الميزة"
       no_features_available: "لا توجد ميزات متاحة حاليًا."
@@ -6442,6 +6442,7 @@ ar:
       edit_html_warning: "يقوم محرر HTML بإجراء تغيرات في صفحات HTML الخاصة بك، فينبغي أن تقوم بتنزيل نسخة احتياطية "
       file_details: "تفاصيل الملف"
       file_list: "قائمة الملفات"
+      files_title: الملفات
       labels: 
         just_hide_file: "اسمح للطلاب بتنزيل الملف أو عرضه عند الارتباط به، لا تقم فقط بعرضه في قوائم الملفات الخاصة بالطلاب"
         just_hide_folder: "اسمح للطلاب بتنزيل الملف أو عرضه في هذا المجلد عند الارتباط به، لا تقم فقط بعرضه في قوائم الملفات الخاصة بالطلاب"
@@ -6585,7 +6586,6 @@ ar:
     invitation: دعوة
     question: سؤال
     warning: تحذير
-  google_doc_accounts_title: "حسابات Google Docs"
   google_docs_domain_restriction_description: "القيد على مجال Google Docs يسمح بقصر عمليات الإرسال والتعاون في Google Docs على نطاق واحد فقط. وبالنسبة للطلاب الذين يحاولون إرسال فروض دراسية أو المشاركة في عمليات تعاون في مجال غير معتمد، فسيتلقون رسالة خطأ تبلغهم بضرورة تحديث تكامل Google Docs."
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -6877,7 +6877,7 @@ ar:
       close_rubric: "إغلاق العنوان"
       close_score: إغلاق
       close_score_screenreader: "إغلاق تفاصيل الدرجات"
-      collapse: طي
+      collapse_title: طي
       comment_count: 
         few: "%{count} من التعليقات"
         many: "%{count} من التعليقات"
@@ -6888,7 +6888,7 @@ ar:
       comment_count_screenreader: "قراءة التعليقات"
       comments: التعليقات
       disabled_for_student_view: "درجات طلاب الاختبار غير مضمنة في إحصائيات الدرجة."
-      expand: توسيع
+      expand_title: توسيع
       faculty_journal: "دفتر الكلية من أجل %{user}"
       for_course: "بالنسبة للمساق،"
       headers: 
@@ -7798,7 +7798,6 @@ ar:
       بعض تغييرات الأنماط فقط، ولكن ستتم إضافة المزيد من الميزات الخاصة بالتعليم الأساسي والثانوي في المستقبل.
   labels: 
     lock_module_until: "تأمين الوحدة حتى تاريخ محدد"
-  last_submission_activity_title: "آخر نشاط إرسال"
   last_user_access_title: "أخر وصول للمستخدم"
   layouts: 
     application: 
@@ -7848,7 +7847,6 @@ ar:
   learning_outcome: 
     no_comment: "بلا تعليق"
     no_description: "بلا وصف"
-  learning_outcome_assignment_type_title: "نوع المهمة ونتيجة التعلم"
   lib: 
     angel: 
       failed_import_link: "فشل استيراد الارتباط"
@@ -7951,7 +7949,6 @@ ar:
     show_me_where: "إظهاري حيث"
   locales: 
     ar: العربية
-    en: الإنجليزية
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
   lti: 
     lti_message: 
@@ -7959,6 +7956,8 @@ ar:
       new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
       new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
       new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
+      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). بعض مستعرضات الإنترنت تمنع هذا المحتوى من التحميل."
+      tool_load_failure: "يبدو أن المحتوى لن يتمكن من التحميل. يمكنك استخدام هذا الزر لمحاولة تشغيله في علامة تبويب جديدة."
   lti2: 
     register_tool: "أداة التسجيل"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -10032,7 +10031,6 @@ ar:
   migration_issues: 
     errors: 
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
-  mississippi_sis_title: "بيانات SIS"
   module_item_types: 
     assignment: المهمة
     disuccsion: المناقشة
@@ -10083,6 +10081,13 @@ ar:
       back_to_modules: "العودة إلى صفحة الوحدات"
       no_students_found: "لم يتم العثور على طلاب"
       student_progress: "تقدم الطالب"
+  modules_item_controller: 
+    must_contribute_complete: "تمت المساهمة في محتوى الصفحة"
+    must_contribute_incomplete: "يجب المشاركة في محتوى الصفحة"
+    must_submit_complete: "تم إرسال المهمة"
+    must_submit_incomplete: "يجب إرسال المهمة"
+    must_view_complete: "تم عرض الصفحة"
+    must_view_incomplete: "يجب عرض الصفحة"
   moodle_dropdown_many_warning_title: "يوجد في هذا البنك %{count} من الأسئلة ذات القوائم المنسدلة المتعددة والتي ربما تم استيرادها بطريقة غير صحيحة"
   moodle_dropdown_warning_title: "ربما تم استيراد سؤال القوائم المنسدلة المتعددة بشكل غير صحيح"
   moodle_formula_many_warning_title: "يوجد في هذا البنك %{count} من أسئلةالصيغة والتي ربما تم استيرادها بطريقة غير صحيحة"
@@ -10094,7 +10099,6 @@ ar:
     where_to_move: "أين تريد نقل *%{name}*؟"
   move_dialog_select: 
     move_to_end: "-- في الأسفل --"
-  multi_student_progress_title: "تقدم متعدد الطلاب"
   mute_dialog: 
     curving_assignments: "المهام المنحنية"
     grade_change_notifications: "إعلامات تغيير الدرجات"
@@ -10580,10 +10584,8 @@ ar:
     view_more_link: "عرض المزيد"
   paginated_view: 
     loading_more_results: "تحميل مزيد من النتائج"
-  pasco_user_notes_title: "ملاحظات المستخدم"
   paypal: 
     exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
-  penn_harris_student_grade_title: "درجات طلاب Penn Harris"
   plugins: 
     academic_benchmark_importer: 
       description: "يقوم هذا بتمكين استيراد معايير القياس الأكاديمي إلى Canvas."
@@ -11469,7 +11471,7 @@ ar:
   qti_img_matching_question: "يشتمل سؤال المطابقة الذي تم استيراده على صور في كلا الجانبين، وهذا غير مدعوم"
   qti_img_matching_question_distractors: "يشتمل سؤال المطابقة الذي تم استيراده على صور ضمن الخيارات، ولا يمكن إصلاح ذلك لأنه يشتمل على عناصر تشتيت أيضًا"
   qti_name: "محول QTI"
-  qualified_locale: en-US
+  qualified_locale: ar-SA
   question_answered: "تمت الإجابة"
   question_bank: 
     align_outcomes: "محاذاة النتائج"
@@ -11630,7 +11632,6 @@ ar:
     time_limit_minutes: "%{limit} من الدقائق"
     warning: تحذير
     you_cannot_message_unpublished: "لا يمكنك مراسلة الطلاب حتى يتم نشر الاختبار."
-  quiz_data_title: "بيانات الاختبار"
   quiz_extend_time: 
     ending_time: "وقت النهاية"
     extend_time: "تمديد الوقت"
@@ -11734,7 +11735,6 @@ ar:
     unknown_answer: "شيء آخر"
   quiz_statistics_route: 
     quiz_statistics: إحصاءات
-  quiz_statistics_title: "إحصاءات الاختبار"
   quiz_submission_arrows: 
     answers: 
       correct: صحيح!
@@ -11800,6 +11800,9 @@ ar:
     default_response_to_essay: "الاستجابة لعرض الطالب بعد أن يرسل إجابة"
     default_response_to_file_upload: "الاستجابة لعرض الطالب بعد أن يرسل إجابة"
     download_all_quiz_file_upload_submissions: "تنزيل عمليات إرسال تحميل الملف لكل الاختبارات"
+    editor: 
+      keyboard_shortcuts: 
+        dialog_title: "اختصارات لوحة المفاتيح"
     enter_answer_variable_above: "[أدخل متغيرات الإجابة أعلاه]"
     errors: 
       adding_questions_failed: "فشل إضافة الأسئلة، الرجاء المحاولة مرة أخرى"
@@ -11867,6 +11870,7 @@ ar:
         manage_question_banks: "إدارة بنوك الأسئلة"
         publish_multiple_quizzes: "نشر اختبارات متعددة"
         settings: إعدادات
+      quizzes_title: الاختبارات
       search_for_quiz: "البحث عن اختبار"
       title_add_quiz: "إضافة اختبار"
     keep_highest: الأعلى
@@ -12928,7 +12932,12 @@ ar:
     upload_info: "إذا أجريت تغييرات في ملفات إرسال الطلاب التي قمت بتنزيلها من قبل، فما عليك سوى ضغطها مرة أخرى وتحميل الملف المضغوط مع النموذج أدناه. وسيرى الطلاب الملفات المعدلة في تعليقاتهم للإرسال."
     upload_warning: "تأكد من عدم تغيير أسماء ملفات الإرسال حتى نستطيع التعرف عليها."
   react_files: 
-    loading_more_results: "تحميل مزيد من النتائج"
+    aria_label: 
+      settings: إعدادات
+    errors: 
+      no_match: 
+        suggestions: "الاقتراحات:"
+    name: الاسم
     usage_details: "%{quota_used} من %{quota}"
   recent_student: 
     last_logged_in: "آخر تسجيل دخول في %{last_login}"
@@ -12958,7 +12967,6 @@ ar:
       other: "%{count} من الأقسام"
       two: "%{count} من الأقسام"
       zero: "%{count} من الأقسام"
-  registrar_tile: "تقرير المسجل"
   registration: 
     get_started: "بدء العمل"
     incomplete_registration_warning: 
@@ -12996,6 +13004,16 @@ ar:
         name: الاسم
     welcome_to_canvas: "مرحبًا بك في Canvas!"
   reply_from_name: "%{name} عبر إعلامات Canvas"
+  restrict_student_access: 
+    aria_label: 
+      availableFrom: "متوفر من"
+      availableUntil: حتى
+    button_text: 
+      cancel: إلغاء
+      update: تحديث
+    label: 
+      availableFrom: "متوفر من"
+      availableUntil: حتى
   retrieve_timeout: "تعذرت استعادة التكوين، انتهت مهلة استجابة الخادم"
   role_override: 
     permission: 
@@ -13184,8 +13202,6 @@ ar:
         are_you_sure_delete: "هل ترغب بالتأكيد في حذف هذا العنوان؟  أي مكان ما زال يستخدم العنوان حاليًا سيظل قادرًا على الوصول لهذا العنوان، لكن لن يستطيع أي شخص آخر استخدامه."
         are_you_sure_remove: "هل ترغب بالتأكيد في إزالة هذا العنوان من قائمتك؟"
       remove_rubric: "إزالة هذا العنوان من قائمتي"
-  safety_drill_title: "جدولة تدريبات السلامة"
-  scantron_quiz_title: "اختبار Scantron"
   scribd: 
     upgrade_flash: "مرحبًا، إصدار Adobe Flash Player الذي لديك قديم. لاستخدام iPaper (وكثير من المواد الأخرى على الويب) تحتاج إلى %{link_tag}get the latest Flash player%{end_link}."
   search: 
@@ -14173,9 +14189,7 @@ ar:
     not_available: "متوفر في"
     pending: "غير متوفر حتى"
   step: خطوة
-  student_access_title: "تقرير وصول الطلاب"
   student_assignment_outcome_map_title: "كفاءة الطلاب"
-  student_grades_title: "درجات الطلاب"
   student_groups: 
     group_join: "تم الانضمام إلى المجموعة %{group_name}"
     group_leave: "تمت مغادرة المجموعة %{group_name}"
@@ -14193,14 +14207,12 @@ ar:
       هذا يتيح تمكين صفحة مجموعة الطلاب الجديدة لحساب. وقد تم إنشاء الصفحة الجديدة لتوفر تجربة اشتراك في المجموعة
       تتميز بالحيوية
   student_id: "معرف الطالب"
-  student_ip_title: "عناوين IP للطلاب"
   student_name: "اسم الطالب"
   student_outcome_gradebook_description: |-
       يوفر "دفتر درجات إتقان التعلم للطلاب" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
       في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
       الطلاب كدرجة رقمية وكتقدير من بين إتقان/قريب من الإتقان/
       بحاجة إلى تحسين.
-  student_submissions_title: "إرسالات الطلاب"
   students_with_no_submissions_title: "الطلاب الذين بدون إرسالات"
   sub_accounts: 
     alerts: 
@@ -14257,11 +14269,9 @@ ar:
       unsubmitted: "لم يتم الإرسال"
   submission_comment: 
     unknown_author: "شخص ما"
-  submission_data_title: "بيانات الإرسال"
   submission_detail: 
     go_to_submission_url: "انتقال إلى عنوان URL الخاص بالإرسال"
     no_submission: "لا يوجد إرسال"
-    online_text_entry_see_details_in_the_speedgrader: "إدخال النص عبر الإنترنت، *راجع التفاصيل الواردة في SpeedGrader*."
     submitted_files: "الملفات المرسلة:"
   submission_details_dialog: 
     add_a_comment: "إضافة تعليق"
@@ -14408,7 +14418,6 @@ ar:
     syllabus: المناهج
     tab_location_error: "موقع علامة التبويب هذه غير صالح"
     tab_unmanagable_error: "%{css_class} غير قابل للإدارة"
-  tempe_grade_export_title: "تصدير درجات Tempe"
   terms: 
     index: 
       date: 
@@ -14571,13 +14580,14 @@ ar:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "إعادة الإرسال إلى Turnitin"
-  ungraded_submissions_tile: "إرسالات لم يتم تقييم درجاتها"
   unknown: "غير معروف"
   unknown_question_bank: "بنك الأسئلة غير معروف"
   unknown_quiz: "الاختبار غير معروف"
   unpublished_courses_title: "مساقات لم يتم نشرها"
   unsupported_package: "حزمة محتوى غير مدعومة"
   unused_courses_title: "مساقات غير مستخدمة"
+  upload_button: 
+    files: الملفات
   user: 
     default_user_name: المستخدم
     errors: 
@@ -14590,11 +14600,9 @@ ar:
     registration: 
       agree_to_terms_and_privacy_policy: "أنت توافق على *شروط الاستخدام* وتقر **بسياسة الخصوصية**."
       agree_to_terms_with_code_of_conduct: "أنت توافق على *شروط الاستخدام* و**مدونة قواعد السلوك**."
-  user_access_title: "تقرير وصول المستخدم"
   user_date_range_search: 
     cant_be_blank: "لا يمكن ترك معرف مستخدم Canvas فارغًا"
     cant_come_before_from: "لا يمكن أن يكون \"إلى تاريخ\" قبل \"من تاريخ\""
-  user_inactivity_title: "تقرير عدم نشاط المستخدم"
   user_lists: 
     add_n_users: 
       few: "حسنًا يبدو جيدًا، أضف هؤلاء الـ %{count} من المستخدمين"
@@ -15123,6 +15131,7 @@ ar:
       loading: "جارٍ التحميل ..."
       loading_more: "جارٍ تحميل المزيد ..."
       no_pages: "لم يتم إنشاء أي صفحات حتى الآن."
+      pages_title: الصفحات
     wiki_page_index_edit_dialog: 
       page_title: العنوان
     wiki_page_index_item: 
