@@ -1,5 +1,5 @@
 group :assets do
-  gem 'dress_code', '1.0.2'
+  gem 'dress_code', '1.0.2', :git => "git://github.com/colleenpalmer/dress_code.git"
     gem 'colored', '1.2'
     gem 'mustache', '0.99.5'
     gem 'pygments.rb', '0.5.4'

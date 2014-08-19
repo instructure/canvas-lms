@@ -30,27 +30,22 @@
 // color should use or be based off of one of these variables
 
 $canvas-primary:                  #05a6ee; // light blue
-@if $use_high_contrast { $canvas-primary: #0576A3 }
 
-$canvas-secondary:                #05a6ee; // dark blue
-@if $use_high_contrast { $canvas-secondary: #5F707B }
+$canvas-secondary:                #384a58; // dark blue
 
-$canvas-success:                  #05a6ee; // green
-@if $use_high_contrast { $canvas-success: #14881E }
+$canvas-success:                  #1aB92a; // green
 
-$canvas-neutral:                  #F7F7F7; // gray
+$canvas-neutral:                  #f7f7f7; // gray
 
 $canvas-action:                   #ba3fa5; // magenta
 
 $canvas-danger:                   #ad393a; // red
 
 $canvas-alert:                    #d89919; // gold
-@if $use_high_contrast { $canvas-alert: #926711 }
 
 $canvas-light:                    #ffffff; // white
 
-$canvas-dark:                     #7D8F9A; // gray/blue
-@if $use_high_contrast { $canvas-alert: #5F707B }
+$canvas-dark:                     #7d8f9a; // gray/blue
 
 // Bootstrap Color Variable Overwrites
 //=======================
