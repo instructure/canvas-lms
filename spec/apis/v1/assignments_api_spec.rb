@@ -280,8 +280,23 @@ describe AssignmentsApiController, type: :request do
     end
 
     describe "differentiated assignments" do
+
+      def setup_DA
+        @course_section = @course.course_sections.create
+        @student1, @student2, @student3 = create_users(3, return_type: :record)
+        @assignment = @course.assignments.create!(title: "title", only_visible_to_overrides: true)
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        @assignment2 = @course.assignments.create!(title: "title2", only_visible_to_overrides: true)
+        create_section_override_for_assignment(@assignment2, {course_section: @section2})
+        @course.reload
+      end
+
       before :once do
-        course_with_teacher(:active_all => true)
+        course_with_teacher_logged_in(:active_all => true)
         @assignment = @course.assignments.create :name => 'differentiated assignment'
       end
 
@@ -298,7 +313,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include visibility data if included" do
-        @course.account.enable_feature!(:differentiated_assignments)
+        @course.enable_feature!(:differentiated_assignments)
         json =  api_call(:get,
             "/api/v1/courses/#{@course.id}/assignments.json",
             {
@@ -309,6 +324,74 @@ describe AssignmentsApiController, type: :request do
           )
         json.each do |a|
           a.has_key?("assignment_visibility").should == true
+        end
+      end
+
+      it "should show all assignments" do
+        @course.enable_feature!(:differentiated_assignments)
+        setup_DA
+        count = @course.assignments.reload.length
+        json = api_get_assignments_index_from_course(@course)
+        json.length.should == count
+      end
+
+      context "as a student" do
+        before :once do
+          course(:active_all => true)
+          @course.enable_feature!(:differentiated_assignments)
+          setup_DA
+        end
+
+        it "should show visible assignments" do
+          user_session @student1
+          @user = @student1
+          json = api_get_assignments_index_from_course(@course)
+          json.length.should == 1
+          json.first["id"].should == @assignment.id
+        end
+
+        it "should not show non-visible assignments" do
+          user_session @student2
+          @user = @student2
+          json = api_get_assignments_index_from_course(@course)
+          json.should == []
+        end
+      end
+
+      context "as an observer" do
+        before :once do
+          course(:active_all => true)
+          @course.enable_feature!(:differentiated_assignments)
+          setup_DA
+          @observer = User.create
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+        end
+
+        it "should show assignments visible to observed student" do
+          @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+          user_session @observer
+          @user = @student1
+          json = api_get_assignments_index_from_course(@course)
+          json.length.should == 1
+          json.first["id"].should == @assignment.id
+        end
+
+        it "should not show assignments not visible to observed student" do
+          @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+          user_session @observer
+          @user = @student2
+          json = api_get_assignments_index_from_course(@course)
+          json.should == []
+        end
+
+        it "should show assignments visible to any of the observed students" do
+          @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student1.id})
+          user_session @observer
+          @user = @student1
+          json = api_get_assignments_index_from_course(@course)
+          json.length.should == 1
+          json.first["id"].should == @assignment.id
         end
       end
     end
@@ -1896,6 +1979,13 @@ describe AssignmentsApiController, type: :request do
         )
       end
 
+      it "returns any assignment" do
+        json1 = api_get_assignment_in_course @assignment1, @course
+        json1["id"].should == @assignment1.id
+        json2 = api_get_assignment_in_course @assignment2, @course
+        json2["id"].should == @assignment2.id
+      end
+
       it "includes assignment_visibility" do
         json = visibility_api_request @assignment1
         json.has_key?("assignment_visibility").should == true
@@ -1907,6 +1997,25 @@ describe AssignmentsApiController, type: :request do
         json = visibility_api_request @assignment2
         json["assignment_visibility"].include?(@student2.id).should == true
         json["assignment_visibility"].include?(@student3.id).should == true
+      end
+
+      context "as a student" do
+        it "should return a visible assignment" do
+          user_session @student1
+          @user = @student1
+          json = api_get_assignment_in_course @assignment1, @course
+          json["id"].should == @assignment1.id
+        end
+
+        it "should return an error for a non-visible assignment" do
+          user_session @student2
+          @user = @student2
+          json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}.json",
+            { :controller => "assignments_api", :action => "show",
+            :format => "json", :course_id => @course.id.to_s,
+            :id => @assignment1.id.to_s }, {}, {}, {:expected_status => 401})
+        end
       end
     end
   end

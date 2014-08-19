@@ -497,6 +497,20 @@ class AssignmentsApiController < ApplicationController
         scope = scope.published
       end
 
+      if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+        student_ids = [@current_user.id]
+
+        if @context.user_has_been_observer?(@current_user)
+          observed_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
+          student_ids.concat(observed_student_ids)
+          # if observer has no students, let them see any assignments already in the scope
+          # otherwise, filter assignments by observed student visibilities
+          scope = scope.visible_to_student_in_course_with_da(student_ids, @context.id) if observed_student_ids.any?
+        else
+          scope = scope.visible_to_student_in_course_with_da(student_ids, @context.id)
+        end
+      end
+
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 
       if Array(params[:include]).include?('submission')
@@ -543,6 +557,8 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.active_assignments.find(params[:id],
         :include => [:assignment_group, :rubric_association, :rubric])
     if authorized_action(@assignment, @current_user, :read)
+      return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
+
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       end
