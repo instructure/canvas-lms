@@ -64,9 +64,11 @@ module SFU
       end
 
       def associated_class_for_section(json_data, section_code)
+        associated_class = nil
         json_data.each do |info|
-          return info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section_code)
+          associated_class = info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section_code)
         end
+        associated_class
       end
 
       def section_tutorials(course_code, term_code, section_code)
