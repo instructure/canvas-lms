@@ -7,7 +7,9 @@ define [
   './RestrictedDialogForm'
   './DialogAdapter'
   'i18n!react_files'
-], (React, withReactDOM, preventDefault, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n) ->
+  './DialogContent'
+  './DialogButtons'
+], (React, withReactDOM, preventDefault, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n, DialogContent, DialogButtons) ->
 
   # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
@@ -40,7 +42,11 @@ define [
       div null,
 
         $DialogAdapter open: @state.restrictedDialogOpen, title: I18n.t("title.limit_student_access", "Limit student access"),
-          RestrictedDialogForm closeDialog: @closeRestrictedDialog
+          DialogContent {},
+            RestrictedDialogForm {}
+          DialogButtons {},
+            input type: 'button', onClick: @closeRestrictedDialog, className: "btn", value: I18n.t("button_text.cancel", "Cancel")
+            input type: "submit", className: "btn btn-primary", value: I18n.t("button_text.update", "Update")
 
         div className:'ef-hover-options',
           a href:'#', className: 'adminCog-download-link',

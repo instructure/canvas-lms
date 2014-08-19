@@ -9,9 +9,6 @@ define [
     getInitialState: ->
       calendarOption: false
 
-    propTypes:
-      closeDialog: React.PropTypes.func.isRequired
-
     handleSubmit: (event) ->
       event.preventDefault()
 
@@ -36,7 +33,7 @@ define [
 
     render: withReactDOM ->
 
-      form onSubmit: this.handleSubmit, className: 'form-horizontal form-dialog', title: I18n.t("title.limit_student_access", "Limit student access"),
+      form onSubmit: this.handleSubmit, className: 'form-horizontal', title: I18n.t("title.limit_student_access", "Limit student access"),
         div className: "radio",
           label {},
             input type: 'radio', name: 'restrict_access', value: 'true', onChange: @radioSelected, defaultChecked: true
@@ -48,10 +45,6 @@ define [
             I18n.t("options_2.description", "Schedule student availability")
 
         @displayOption()
-
-        div className:"form-controls",
-          input type: 'button', onClick: @props.closeDialog, className: "btn", value: I18n.t("button_text.cancel", "Cancel")
-          input type: "submit", className: "btn btn-primary", value: I18n.t("button_text.update", "Update")
 
     displayOption: ->
       if @state.calendarOption

@@ -18,7 +18,9 @@ define [
       @form = React.renderComponent(FileRenameForm(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@form.getDOMNode().parentNode)
+      #TODO: oddness with the current modal implementation makes teardown not work
+      #as the DOM has been mutated. Hopefully we can ease this pain with a react modal
+      #React.unmountComponentAtNode(@form.getDOMNode().parentNode)
 
   test 'switches to editing file name state with button click', ->
     Simulate.click(@form.refs.renameBtn.getDOMNode())

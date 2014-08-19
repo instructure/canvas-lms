@@ -2,7 +2,10 @@ define [
   'i18n!file_rename_form'
   'react'
   'compiled/react/shared/utils/withReactDOM'
-], (I18n, React, withReactDOM) ->
+  './DialogAdapter'
+  './DialogContent'
+  './DialogButtons'
+], (I18n, React, withReactDOM, DialogAdapter, DialogContent, DialogButtons) ->
 
   FileRenameForm = React.createClass
 
@@ -31,27 +34,54 @@ define [
     handleChangeClick: ->
       @props.onNameConflictResolved({file: @state.fileOptions.file, dup: 'rename', name: @refs.newName.getDOMNode().value})
 
+    handleFormSubmit: (e) ->
+      e.preventDefault()
+      @handleChangeClick()
 
-    getPrompt: withReactDOM ->
+    buildContent: withReactDOM ->
       nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
-      div {},
-        p {}, I18n.t('message','An item named "%{name}" already existings in this location. Do you want to replace the existing file?', {name: nameToUse})
-        button ref: 'renameBtn' ,onClick: @handleRenameClick, (I18n.t('change_name', 'Change Name'))
-        button ref: 'replaceBtn', onClick: @handleReplaceClick, (I18n.t('replace', 'Replace'))
+      if !@state.isEditing
+        div {},
+          p {}, I18n.t('message','An item named "%{name}" already existings in this location. Do you want to replace the existing file?', {name: nameToUse})
+      else
+        div {},
+          p {}, I18n.t('prompt', 'Changee "%{name}" to', {name: nameToUse})
+          form onSubmit: @handleFormSubmit,
+            label className: 'file-rename-form__form-label',
+              I18n.t('name', 'Name')
+            input type: 'text', defaultValue: nameToUse, ref: 'newName'
 
-    getForm: withReactDOM ->
-      nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
-      div {},
-        p {}, I18n.t('prompt', 'Changee "%{name}" to', {name: nameToUse})
-        label {}, I18n.t('name', 'Name')
-        input type: 'text', defaultValue: nameToUse, ref: 'newName'
-        button ref: 'backBtn', onClick: @handleBackClick, I18n.t('back', 'Back')
-        button ref: 'commitChangeBtn', onClick: @handleChangeClick, I18n.t('change', 'Change')
+    buildButtons: withReactDOM ->
+      if !@state.isEditing
+        div {},
+          button
+            ref: 'renameBtn'
+            className: 'btn'
+            onClick: @handleRenameClick,
+              (I18n.t('change_name', 'Change Name'))
+          button
+            ref: 'replaceBtn'
+            className: 'btn btn-primary'
+            onClick: @handleReplaceClick,
+              (I18n.t('replace', 'Replace'))
+      else
+        div {},
+          button
+            ref: 'backBtn'
+            className: 'btn'
+            onClick: @handleBackClick,
+              I18n.t('back', 'Back')
+          button
+            ref: 'commitChangeBtn'
+            className: 'btn btn-primary'
+            onClick: @handleChangeClick,
+              I18n.t('change', 'Change')
+
 
 
     render: withReactDOM ->
-      div {},
-        if !@state.isEditing
-          @getPrompt()
-        else
-          @getForm()
+      DialogAdapter open: @props.fileOptions?, title: I18n.t('rename_title', 'Copy'), onClose: @props.onClose,
+        DialogContent {},
+          @buildContent()
+        DialogButtons {},
+          @buildButtons()

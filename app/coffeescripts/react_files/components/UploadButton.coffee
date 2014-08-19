@@ -96,5 +96,4 @@ define [
         button className:'btn btn-primary', onClick: @handleAddFilesClick,
           i className:'icon-plus'
           I18n.t('files', 'Files')
-        DialogAdapter open: @state.nameCollisions[0]?, title: I18n.t('rename_title', 'Copy'), onClose: @onClose,
-          FileRenameForm fileOptions: @state.nameCollisions[0], onNameConflictResolved: @onNameConflictResolved
+        FileRenameForm fileOptions: @state.nameCollisions[0], onNameConflictResolved: @onNameConflictResolved, onClose: @onClose
