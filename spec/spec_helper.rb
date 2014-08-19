@@ -1144,7 +1144,7 @@ RSpec.configure do |config|
 
       BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
         # overridden by Attachment anyway; don't re-overwrite it
-        next if Attachment.instance_method(method).owner == Attachment
+        next if base.instance_method(method).owner == base
         if method.to_s[-1..-1] == '='
           base.class_eval <<-CODE
           def #{method}(arg)
@@ -1171,13 +1171,20 @@ RSpec.configure do |config|
   end
 
   def s3_storage!(opts = {:stubs => true})
-    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
-    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+    [Attachment, Thumbnail].each do |model|
+      model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
+      model.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
 
-    Attachment.stubs(:s3_storage?).returns(true)
-    Attachment.stubs(:local_storage?).returns(false)
+      model.stubs(:s3_storage?).returns(true)
+      model.stubs(:local_storage?).returns(false)
+    end
+
     if opts[:stubs]
       conn = mock('AWS::S3::Client')
+
+      AWS::S3::S3Object.any_instance.stubs(:read).returns("i am stub data from spec helper. nom nom nom")
+      AWS::S3::S3Object.any_instance.stubs(:write).returns(true)
+      AWS::S3::S3Object.any_instance.stubs(:create_temp_file).returns(true)
       AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
       AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
       AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
@@ -1192,11 +1199,14 @@ RSpec.configure do |config|
   end
 
   def local_storage!
-    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
-    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+    [Attachment, Thumbnail].each do |model|
+      model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
+      model.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
 
-    Attachment.stubs(:s3_storage?).returns(false)
-    Attachment.stubs(:local_storage?).returns(true)
+      model.stubs(:s3_storage?).returns(false)
+      model.stubs(:local_storage?).returns(true)
+    end
+
     Attachment.local_storage?.should eql(true)
     Attachment.s3_storage?.should eql(false)
     Attachment.local_storage?.should eql(true)

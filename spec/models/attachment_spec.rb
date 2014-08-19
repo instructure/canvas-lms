@@ -1324,6 +1324,43 @@ describe Attachment do
     end
   end
 
+  context "s3 storage with sharding" do
+
+    let(:sz) { "640x>" }
+    specs_require_sharding
+
+    before :each do
+      s3_storage!
+      attachment_model(:uploaded_data => stub_png_data, :filename => 'profile.png')
+    end
+
+    it "should have namespaced thumb" do
+
+      @shard1.activate do
+
+        @attachment.thumbnail || @attachment.build_thumbnail.save!
+        thumb = @attachment.thumbnail
+
+        # i can't seem to get a s3 url so I am just going to make sure the thumbnail namespace was inherited from the attachment
+        thumb.namespace.should == @attachment.namespace
+        thumb.authenticated_s3_url.should be_include @attachment.namespace
+      end
+    end
+
+    it "shouldn't have namespaced thumb when namespace is nil" do
+
+      @shard1.activate do
+
+        @attachment.thumbnail || @attachment.build_thumbnail.save!
+        thumb = @attachment.thumbnail
+
+        # nil out namespace so we can make sure the url generating is working properly
+        thumb.namespace = nil
+        thumb.authenticated_s3_url.should_not be_include @attachment.namespace
+      end
+    end
+  end
+
   context "dynamic thumbnails" do
     let(:sz) { "640x>" }
 
