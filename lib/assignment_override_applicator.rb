@@ -78,7 +78,9 @@ module AssignmentOverrideApplicator
   # returned in priority order; the first override to contain an overridden
   # value for a particular field is used for that field
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
-    Rails.cache.fetch([user, assignment_or_quiz, 'overrides'].cache_key) do
+    cache_key = [user, assignment_or_quiz, 'overrides'].cache_key
+    Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
+    Rails.cache.fetch(cache_key) do
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
       overrides = []
@@ -232,7 +234,9 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    Rails.cache.fetch([assignment_or_quiz, self.overrides_hash(overrides)].cache_key) do
+    cache_key = [assignment_or_quiz, self.overrides_hash(overrides)].cache_key
+    Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
+    Rails.cache.fetch(cache_key) do
       overridden_data = {}
       # clone the assignment_or_quiz, apply overrides, and freeze
       [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
