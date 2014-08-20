@@ -111,10 +111,8 @@ describe ActiveRecord do
 
       it "should prefer custom finder_sql if provided" do
         NormalContext.class_eval do 
-          has_many :things, :as => :context, :finder_sql => case RAILS2  
-            when true then 'SELECT * FROM things WHERE context_id = #{id} AND context_type = "#{self.class.base_class.name.to_s}"' 
-            else proc{ "SELECT * FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
-          end
+          has_many :things, :as => :context, :finder_sql =>
+            proc{ "SELECT * FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
         end
 
         @namespaced_context.reload.things.should == [@thing_a, @thing_b]
@@ -123,10 +121,8 @@ describe ActiveRecord do
 
       it "should prefer custom counter_sql if provided" do
         NormalContext.class_eval do 
-          has_many :things, :as => :context, :counter_sql => case RAILS2  
-            when true then 'SELECT COUNT(*) FROM things WHERE context_id = #{id} AND context_type = "#{self.class.base_class.name.to_s}"' 
-            else proc{ "SELECT COUNT(*) FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
-          end
+          has_many :things, :as => :context, :counter_sql =>
+            proc{ "SELECT COUNT(*) FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
         end
 
         @namespaced_context.reload.things.count.should == 2
@@ -136,17 +132,13 @@ describe ActiveRecord do
       it "should count/find correctly with additional where/find scopes" do
         @normal_context.things.find(@thing_a.id).should == @thing_a
         @normal_context.things.find_by_context_type("Namespaced::ParaNormalContext").should == @thing_b
-        unless RAILS2
-          scope = @normal_context.things.where(context_type: "Namespaced::ParaNormalContext")
-          scope.count.should == 1
-          scope.should == [@thing_b]
-        end
+        scope = @normal_context.things.where(context_type: "Namespaced::ParaNormalContext")
+        scope.count.should == 1
+        scope.should == [@thing_b]
       end
 
-      unless RAILS2
-        it "should work with pluck" do
-          @normal_context.things.pluck(:id).should == [@thing_a.id, @thing_b.id]
-        end
+      it "should work with pluck" do
+        @normal_context.things.pluck(:id).should == [@thing_a.id, @thing_b.id]
       end
 
       it "should work with build_associations" do
