@@ -374,11 +374,12 @@ class ContextModulesController < ApplicationController
               @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each{|p| p.evaluate }
             end
           end
-          render :json => @progressions
-        else
+        elsif @context.grants_right?(@current_user, session, :participate_as_student)
           @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user) }
-          render :json => @progressions
+        else
+          @progressions = []
         end
+        render :json => @progressions
       elsif !@context.feature_enabled?(:draft_state)
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
       elsif !@context.grants_right?(@current_user, session, :view_all_grades)
