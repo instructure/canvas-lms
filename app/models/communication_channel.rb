@@ -310,7 +310,7 @@ class CommunicationChannel < ActiveRecord::Base
   workflow do
     state :unconfirmed do
       event :confirm, :transitions_to => :active do
-        self.set_confirmation_code(true)
+        self.set_confirmation_code
       end
       event :retire, :transitions_to => :retired
     end
