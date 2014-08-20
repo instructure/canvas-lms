@@ -29,6 +29,10 @@ define [
 
       if props.open
         @dialog.open()
+        #focus the close button after one tick (let render happen first)
+        setTimeout =>
+          $(@node).parents('.ui-dialog').find('.ui-dialog-titlebar-close').focus()
+        , 1
       else
         @dialog.close()
 
