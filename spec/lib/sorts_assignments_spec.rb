@@ -115,15 +115,19 @@ describe SortsAssignments do
     let(:assignment2) { stub }
     let(:assignment3) { stub }
     let(:assignments) { [ assignment1, assignment2, assignment3 ] }
+    let(:one_count_query){ stub(count: 1)}
+    let(:zero_count_query){ stub(count: 0) }
+    let(:bad_count_query){ stub(count: -1) }
 
     before :each do
       assignments.each { |assignment|
         assignment.stubs(
           :grants_right? => true,
-          :expects_submission? => true,
-          :needs_grading_count_for_user => 1
+          :expects_submission? => true
         )
       }
+
+      Assignments::NeedsGradingCountQuery.stubs(new: one_count_query)
     end
 
     it "only includes assignments that current user has permission to view" do
@@ -140,8 +144,8 @@ describe SortsAssignments do
     end
 
     it "only includes assignments that have a grading_count_for_user > 0" do
-      assignment2.expects(:needs_grading_count_for_user).with(user).returns(-1)
-      assignment3.expects(:needs_grading_count_for_user).with(user).returns(0)
+      Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment2, user).returns(bad_count_query)
+      Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment3, user).returns(zero_count_query)
       SortsAssignments.ungraded_for_user_and_session(assignments,user,session).
         should =~ [ assignment1 ]
     end

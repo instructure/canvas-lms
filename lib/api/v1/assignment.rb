@@ -61,7 +61,8 @@ module Api::V1::Assignment
     opts.reverse_merge!(
       include_discussion_topic: true,
       include_all_dates: false,
-      override_dates: true
+      override_dates: true,
+      needs_grading_count_by_section: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -114,7 +115,11 @@ module Api::V1::Assignment
     end
 
     if assignment.grants_right?(user, :grade)
-      hash['needs_grading_count'] = assignment.needs_grading_count_for_user user
+      query = Assignments::NeedsGradingCountQuery.new(assignment, user)
+      if opts[:needs_grading_count_by_section]
+        hash['needs_grading_count_by_section'] = query.count_by_section
+      end
+      hash['needs_grading_count'] = query.count
     end
 
     if assignment.context.grants_any_right?(user, :read_sis, :manage_sis)

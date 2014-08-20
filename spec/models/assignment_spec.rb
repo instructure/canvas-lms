@@ -234,47 +234,6 @@ describe Assignment do
     end
   end
 
-  context "needs_grading_count_for_user" do
-    it "should only count submissions in the user's visible section(s)" do
-      @section = @course.course_sections.create!(:name => 'section 2')
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-      @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
-
-      # enroll a section-limited TA
-      @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
-      ta_enrollment = @course.enroll_ta(@ta)
-      ta_enrollment.limit_privileges_to_course_section = true
-      ta_enrollment.workflow_state = 'active'
-      ta_enrollment.save!
-
-      # make a submission in each section
-      @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
-      @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
-      @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
-      @assignment.reload
-
-      # check the teacher sees both, the TA sees one
-      @assignment.needs_grading_count_for_user(@teacher).should eql(2)
-      @assignment.needs_grading_count_for_user(@ta).should eql(1)
-
-      # grade an assignment
-      @assignment.grade_student(@user1, :grade => "1")
-      @assignment.reload
-
-      # check that the numbers changed
-      @assignment.needs_grading_count_for_user(@teacher).should eql(1)
-      @assignment.needs_grading_count_for_user(@ta).should eql(0)
-
-      # test limited enrollment in multiple sections
-      @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
-                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
-      @assignment.reload
-      @assignment.needs_grading_count_for_user(@ta).should eql(1)
-    end
-  end
-
   context "differentiated_assignment visibility" do
     describe "students_with_visibility" do
       before :once do

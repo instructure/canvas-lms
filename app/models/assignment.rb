@@ -1865,34 +1865,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def needs_grading_count_for_user(user)
-    vis = self.context.section_visibilities_for(user)
-    self.shard.activate do
-      # the needs_grading_count trigger should change self.updated_at, invalidating the cache
-      Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
-        case self.context.enrollment_visibility_level_for(user, vis)
-          when :full, :limited
-            self.needs_grading_count
-          when :sections
-            self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
-                where(<<-SQL, self, self.context, vis.map {|v| v[:course_section_id]}).count(:id, :distinct => true)
-              submissions.assignment_id = ?
-                AND e.course_id = ?
-                AND e.course_section_id in (?)
-                AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-                AND e.workflow_state = 'active'
-                AND submissions.submission_type IS NOT NULL
-                AND (submissions.workflow_state = 'pending_review'
-                  OR (submissions.workflow_state = 'submitted'
-                    AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
-              SQL
-          else
-            0
-        end
-      end
-    end
-  end
-
   def update_cached_due_dates
     if due_at_changed? || workflow_state_changed?
       DueDateCacher.recompute(self)

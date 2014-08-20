@@ -413,6 +413,8 @@ describe AssignmentsApiController, type: :request do
       assign['submission'].should ==
         json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
     end
+
+
     it "returns due dates as they apply to the user" do
         course_with_student(:active_all => true)
         @user = @student
@@ -745,6 +747,47 @@ describe AssignmentsApiController, type: :request do
       @section_override.set.should == @course.default_section
       @section_override.due_at_overridden.should be_true
       @section_override.due_at.to_i.should == @section_due_at.to_i
+    end
+
+    it 'accepts configuration argument to split needs grading by section' do
+      student_in_course(:course => @course, :active_enrollment => true)
+      @user = @teacher
+
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments.json",
+        { :controller => 'assignments_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s },
+        { :assignment => {
+            'name' => 'some assignment',
+            'assignment_overrides' => {
+              '0' => {
+                'student_ids' => [@student.id],
+                'title' => 'some title'
+              },
+              '1' => {
+                  'course_section_id' => @course.default_section.id
+                }
+            }
+          }
+        })
+
+      assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments.json",
+        { controller: 'assignments_api',
+          action: 'index',
+          format: 'json',
+          course_id: @course.id.to_s }, {needs_grading_count_by_section: 'true'})
+      assignments_json[0].keys.should include("needs_grading_count_by_section")
+
+      assignment_id = assignments_json[0]['id']
+      show_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}.json",
+        { controller: 'assignments_api',
+          action: 'show',
+          format:'json',
+          course_id: @course.id.to_s,
+          id: assignment_id.to_s 
+        }, {needs_grading_count_by_section: 'true'})
+      show_json.keys.should include("needs_grading_count_by_section")
     end
 
     it "takes overrides into account in the assignment-created notification " +

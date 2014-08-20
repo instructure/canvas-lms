@@ -312,6 +312,14 @@
 #           "example": 17,
 #           "type": "integer"
 #         },
+#         "needs_grading_count_by_section": {
+#           "description": "if the requesting user has grading rights and the 'needs_grading_count_by_section' flag is specified, the number of submissions that need grading split out by section. NOTE: This key is NOT present unless you pass the 'needs_grading_count_by_section' argument as true.  ANOTHER NOTE: it's possible to be enrolled in multiple sections, and if a student is setup that way they will show an assignment that needs grading in multiple sections (effectively the count will be duplicated between sections)",
+#           "example": [
+#             {"section_id":"123456","needs_grading_count":5},
+#             {"section_id":"654321","needs_grading_count":0}
+#           ],
+#           "type": "array"
+#         },
 #         "position": {
 #           "description": "the sorting order of the assignment in the group",
 #           "example": 1,
@@ -479,6 +487,8 @@ class AssignmentsApiController < ApplicationController
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
+  # @argument needs_grading_count_by_section [Boolean]
+  #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
@@ -534,11 +544,15 @@ class AssignmentsApiController < ApplicationController
 
       include_visibility = Array(params[:include]).include?('assignment_visibility')
 
+      needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
+      needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
+
       hashes = assignments.map do |assignment|
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
                         submission: submission, override_dates: override_dates,
-                        include_visibility: include_visibility)
+                        include_visibility: include_visibility,
+                        needs_grading_count_by_section: needs_grading_count_by_section)
       end
 
       render :json => hashes
@@ -552,6 +566,8 @@ class AssignmentsApiController < ApplicationController
   #   requires that the Differentiated Assignments course feature be turned on.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
+  # @argument needs_grading_count_by_section [Boolean]
+  #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
   # @returns Assignment
   def show
     @assignment = @context.active_assignments.find(params[:id],
@@ -568,11 +584,15 @@ class AssignmentsApiController < ApplicationController
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
 
+      needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
+      needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
+
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
       render :json => assignment_json(@assignment, @current_user, session,
-                                      submission: submission,
-                                      override_dates: override_dates,
-                                      include_visibility: include_visibility)
+                  submission: submission,
+                  override_dates: override_dates,
+                  include_visibility: include_visibility,
+                  needs_grading_count_by_section: needs_grading_count_by_section)
     end
   end
 

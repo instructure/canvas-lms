@@ -10,7 +10,7 @@
         <% if key == :assignments_needing_submitting %>
           <%= before_label :due, "due" %> <%= datetime_string(menu_assignment.due_at, :due_date, nil, true) %>
         <% elsif key == :assignments_needing_grading %>
-          <%= t :needs_grading_count, { :one => "1 needs grading", :other => "%{count} need grading"}, :count => menu_assignment.needs_grading_count_for_user(@current_user) %>
+          <%= t :needs_grading_count, { one: "1 needs grading", other: "%{count} need grading"}, count: Assignments::NeedsGradingCountQuery.new(menu_assignment, @current_user).count %>
         <% elsif key == :assignments_recently_graded %>
           <% if menu_assignment.grading_type == 'points' %>
               <%= "#{menu_assignment.score}/#{menu_assignment.points_possible}" %>

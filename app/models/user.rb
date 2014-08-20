@@ -1423,7 +1423,7 @@ class User < ActiveRecord::Base
               not_ignored_by(self, 'grading').
               need_grading_info(limit)
             Assignment.send :preload_associations, as, :context
-            as.reject{|a| a.needs_grading_count_for_user(self) == 0}
+            as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
