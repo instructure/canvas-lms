@@ -189,9 +189,9 @@ class ContextModulesController < ApplicationController
     raise ActiveRecord::RecordNotFound if id !~ Api::ID_REGEX
     type = code.join("_").classify
     if type == 'ContentTag'
-      @tag = @context.context_module_tags.active.find_by_id(id)
+      @tag = @context.context_module_tags.active.where(id: id).first
     else
-      @tag = @context.context_module_tags.active.find_by_context_module_id_and_content_id_and_content_type(params[:context_module_id], id, type)
+      @tag = @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
     end
     @module = @context.context_modules.active.find(params[:context_module_id])
     @progression = @module.evaluate_for(@current_user)

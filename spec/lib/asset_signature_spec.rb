@@ -29,19 +29,19 @@ describe AssetSignature do
   describe '.find_by_signature' do
 
     it 'finds the model if the hmac matches' do
-      SomeModel.expects(:find_by_id).with(24).once
+      SomeModel.expects(:where).with(id: 24).once.returns(stub(first: nil))
       AssetSignature.find_by_signature(SomeModel, "24-#{example_encode('SomeModel',24)}")
     end
 
     it 'returns nil if the signature does not check out' do
-      SomeModel.expects(:find_by_id).times(0)
+      SomeModel.expects(:where).never
       AssetSignature.find_by_signature(SomeModel, '24-not-the-sig').should be_nil
     end
 
     #TODO: Remove this after the next release cycle
     # its just here for temporary backwards compatibility
     it 'will also find the model by the old id method' do
-      SomeModel.expects(:find_by_id).with('24').once
+      SomeModel.expects(:where).with(id: '24').once.returns(stub(first: nil))
       AssetSignature.find_by_signature(SomeModel, '24')
     end
     ################################################

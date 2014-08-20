@@ -54,7 +54,7 @@ class WikiPagesController < ApplicationController
     js_env(hash)
 
     unless is_authorized_action?(@page, @current_user, [:update, :update_content]) || @page.is_front_page?
-      wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url) if @page.new_record?
+      wiki_page = @wiki.wiki_pages.deleted_last.where(url: @page.url).first if @page.new_record?
       if wiki_page && wiki_page.deleted?
         flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         return redirect_to named_context_url(@context, :context_wiki_page_url, @wiki.get_front_page_url)
@@ -193,7 +193,7 @@ class WikiPagesController < ApplicationController
         redirect_to polymorphic_url([@context, :edit_named_page], :wiki_page_id => @page_name || @page, :titleize => params[:titleize])
         return
       else
-        wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url)
+        wiki_page = @wiki.wiki_pages.deleted_last.where(url: @page.url).first
         if wiki_page && wiki_page.deleted?
           flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         else

@@ -947,7 +947,7 @@ class DiscussionTopicsController < ApplicationController
   def child_topic
     extra_params = {:headless => 1} if params[:headless]
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-    @topic = @context.discussion_topics.find_or_initialize_by_root_topic_id(params[:root_discussion_topic_id])
+    @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
     @topic.message = @root_topic.message
     @topic.title = @root_topic.title
     @topic.assignment_id = @root_topic.assignment_id

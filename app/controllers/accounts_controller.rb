@@ -265,7 +265,7 @@ class AccountsController < ApplicationController
       search_term = params[:search_term]
 
       is_id = search_term.to_s =~ Api::ID_REGEX
-      if is_id && course = @courses.find_by_id(search_term)
+      if is_id && course = @courses.where(id: search_term).first
         @courses = [course]
       elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
         @courses = []
@@ -536,7 +536,7 @@ class AccountsController < ApplicationController
     @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
       @context = @root_account
-      @user = @root_account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
+      @user = @root_account.all_users.where(id: params[:user_id]).first if params[:user_id].present?
       if !@user
         flash[:error] = t(:no_user_message, "No user found with that id")
         redirect_to account_url(@account)
@@ -547,7 +547,7 @@ class AccountsController < ApplicationController
   def remove_user
     @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
-      @user = UserAccountAssociation.find_by_account_id_and_user_id(@root_account.id, params[:user_id]).user rescue nil
+      @user = UserAccountAssociation.where(account_id: @root_account.id, user_id: params[:user_id]).first.user rescue nil
       # if the user is in any account other then the
       # current one, remove them from the current account
       # instead of deleting them completely

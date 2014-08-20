@@ -486,7 +486,7 @@ class OutcomeGroupsApiController < ApplicationController
   def unlink
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
-      @outcome_link = @outcome_group.child_outcome_links.active.find_by_content_id(params[:outcome_id])
+      @outcome_link = @outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
       raise ActiveRecord::RecordNotFound unless @outcome_link
       begin
         @outcome_link.destroy
@@ -604,7 +604,7 @@ class OutcomeGroupsApiController < ApplicationController
       @outcome_group = context_outcome_groups.find(params[:id])
 
       # source has to exist
-      @source_outcome_group = LearningOutcomeGroup.active.find_by_id(params[:source_outcome_group_id])
+      @source_outcome_group = LearningOutcomeGroup.active.where(id: params[:source_outcome_group_id]).first
       unless @source_outcome_group
         render :json => 'error'.to_json, :status => :bad_request
         return
@@ -666,7 +666,7 @@ class OutcomeGroupsApiController < ApplicationController
     if @context
       @context.available_outcome(outcome_id, :allow_global => true)
     else
-      LearningOutcome.global.find_by_id(outcome_id)
+      LearningOutcome.global.where(id: outcome_id).first
     end
   end
 

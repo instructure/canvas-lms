@@ -120,7 +120,7 @@ class UsersController < ApplicationController
   before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
-    @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
+    @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
       current_active_enrollments = @user.current_enrollments.with_each_shard { |scope| scope.includes(:course) }
@@ -199,12 +199,12 @@ class UsersController < ApplicationController
   def oauth_success
     oauth_request = nil
     if params[:oauth_token]
-      oauth_request = OauthRequest.find_by_token_and_service(params[:oauth_token], params[:service])
+      oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
     elsif params[:state] && params[:service] == 'facebook'
       key,salt = params[:state].split('.', 2)
       request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
 
-      oauth_request = OauthRequest.find_by_id(request_id)
+      oauth_request = OauthRequest.where(id: request_id).first
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -215,8 +215,7 @@ class UsersController < ApplicationController
       redirect_to url
     else
       if params[:service] == "facebook"
-        service = UserService.find_by_user_id_and_service(@current_user.id, 'facebook')
-        service ||= UserService.new(:user => @current_user, :service => 'facebook')
+        service = UserService.where(user_id: @current_user, service: 'facebook').first_or_initialize
         service.token = params[:access_token]
         data = Facebook::Connection.get_service_user_info(service.token)
 
@@ -863,7 +862,7 @@ class UsersController < ApplicationController
   end
 
   def bookmark_search
-    @service = @current_user.user_services.find_by_type_and_service('BookmarkService', params[:service_type]) rescue nil
+    @service = @current_user.user_services.where(type: 'BookmarkService', service: params[:service_type]).first rescue nil
     res = nil
     res = @service.find_bookmarks(params[:q]) if @service
     render :json => res
@@ -1005,7 +1004,7 @@ class UsersController < ApplicationController
   # @returns User
   def create
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
+    @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
@@ -1336,7 +1335,7 @@ class UsersController < ApplicationController
   def merge
     @user_about_to_go_away = User.find(params[:user_id])
 
-    if params[:new_user_id] && @true_user = User.find_by_id(params[:new_user_id])
+    if params[:new_user_id] && @true_user = User.where(id: params[:new_user_id]).first
       if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
         @user_that_will_still_be_around = @true_user
       else
@@ -1366,7 +1365,7 @@ class UsersController < ApplicationController
   def admin_merge
     @user = User.find(params[:user_id])
     pending_other_error = get_pending_user_and_error(params[:pending_user_id])
-    @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
+    @other_user = User.where(id: params[:new_user_id]).first if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
       flash[:error] = pending_other_error if pending_other_error.present?
 
@@ -1425,7 +1424,7 @@ class UsersController < ApplicationController
       if !session["reported_#{@user.id}".to_sym]
         if params[:context_code]
           @context = Context.find_by_asset_string(params[:context_code]) rescue nil
-          @context = nil unless context.respond_to?(:users) && context.users.find_by_id(@user.id)
+          @context = nil unless context.respond_to?(:users) && context.users.where(id: @user).first
         end
         @user.report_avatar_image!(@context)
       end
@@ -1555,7 +1554,7 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.includes(:course).all
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
-                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
+                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
@@ -1598,7 +1597,7 @@ class UsersController < ApplicationController
     user_shard ||= Shard.current
     url = user_shard.activate do
       Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
-        user = User.find_by_id(user_id) if user_id.present?
+        user = User.where(id: user_id).first if user_id.present?
         if user
           user.avatar_url(nil, account_avatar_setting, "%{fallback}")
         else

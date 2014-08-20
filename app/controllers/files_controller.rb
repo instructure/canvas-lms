@@ -543,7 +543,7 @@ class FilesController < ApplicationController
     file_id = nil unless file_id.to_s =~ Api::ID_REGEX
 
     #if the relative path matches the given file id use that file
-    if file_id && @attachment = @context.attachments.find_by_id(file_id)
+    if file_id && @attachment = @context.attachments.where(id: file_id).first
       unless @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
         @attachment = nil
       end
@@ -715,7 +715,7 @@ class FilesController < ApplicationController
       @attachment.workflow_state = workflow_state
       if @context.respond_to?(:folders)
         if params[:attachment][:folder_id].present?
-          @folder = @context.folders.active.find_by_id(params[:attachment][:folder_id])
+          @folder = @context.folders.active.where(id: params[:attachment][:folder_id]).first
         end
         @folder ||= Folder.unfiled_folder(@context)
         @attachment.folder_id = @folder.id
@@ -741,7 +741,7 @@ class FilesController < ApplicationController
   def s3_success
     if params[:id].present?
       verify_api_id
-      @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+      @attachment = Attachment.where(id: params[:id], workflow_state: 'unattached', uuid: params[:uuid]).first
     end
     details = @attachment.s3object.head rescue nil
     if @attachment && details
@@ -771,7 +771,7 @@ class FilesController < ApplicationController
   end
 
   def api_create_success
-    @attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid])
+    @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first
     return render(:nothing => true, :status => :bad_request) unless @attachment.try(:file_state) == 'deleted'
     duplicate_handling = check_duplicate_handling_option(request.params)
     return unless duplicate_handling
@@ -797,7 +797,7 @@ class FilesController < ApplicationController
   end
 
   def api_file_status
-    @attachment = Attachment.find_by_id_and_uuid!(params[:id], params[:uuid])
+    @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first!
     if @attachment.file_state == 'available'
       render :json => { :upload_status => 'ready', :attachment => attachment_json(@attachment, @current_user) }
     elsif @attachment.file_state == 'deleted'
@@ -809,7 +809,7 @@ class FilesController < ApplicationController
 
   def create
     if (folder_id = params[:attachment].delete(:folder_id)) && folder_id.present?
-      @folder = @context.folders.active.find_by_id(folder_id)
+      @folder = @context.folders.active.where(id: folder_id).first
     end
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
@@ -819,7 +819,7 @@ class FilesController < ApplicationController
     params[:attachment].delete :context_type
     duplicate_handling = params.delete :duplicate_handling
     if (unattached_attachment_id = params[:attachment].delete(:unattached_attachment_id)) && unattached_attachment_id.present?
-      @attachment = @context.attachments.find_by_id_and_workflow_state(unattached_attachment_id, 'unattached')
+      @attachment = @context.attachments.where(id: unattached_attachment_id, workflow_state: 'unattached').first
     end
     @attachment ||= @context.attachments.build
     if authorized_action(@attachment, @current_user, :create)
@@ -834,7 +834,7 @@ class FilesController < ApplicationController
         success = nil
         if params[:attachment] && params[:attachment][:source_attachment_id]
           a = Attachment.find(params[:attachment].delete(:source_attachment_id))
-          if a.root_attachment_id && att = @folder.attachments.find_by_id(a.root_attachment_id)
+          if a.root_attachment_id && att = @folder.attachments.where(id: a.root_attachment_id).first
             @attachment = att
             success = true
           elsif a.grants_right?(@current_user, session, :download)
@@ -1005,7 +1005,7 @@ class FilesController < ApplicationController
   def image_thumbnail
     cancel_cache_buster
     url = Rails.cache.fetch(['thumbnail_url', params[:uuid], params[:size]].cache_key, :expires_in => 30.minutes) do
-      attachment = Attachment.active.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
+      attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = attachment.thumbnail_url(thumb_opts) rescue nil
       url ||= '/images/no_pic.gif'
@@ -1019,7 +1019,7 @@ class FilesController < ApplicationController
   def show_thumbnail
     if Attachment.local_storage?
       cancel_cache_buster
-      thumbnail = Thumbnail.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
+      thumbnail = Thumbnail.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       raise ActiveRecord::RecordNotFound unless thumbnail
       send_file thumbnail.full_filename, :content_type => thumbnail.content_type
     else

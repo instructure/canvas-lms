@@ -978,14 +978,14 @@ class ConversationsController < ApplicationController
   def infer_tags
     tags = param_array(:tags).concat(param_array(:recipients)).concat([params[:context_code]])
     tags = SimpleTags.normalize_tags(tags)
-    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
+    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
     @tags = tags.uniq
   end
 
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
     scope = scope.where('message_count>0') unless allow_deleted
-    @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+    @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first
     raise ActiveRecord::RecordNotFound unless @conversation
   end
 

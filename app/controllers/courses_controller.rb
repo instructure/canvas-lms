@@ -1135,7 +1135,7 @@ class CoursesController < ApplicationController
     end
 
     if session[:accepted_enrollment_uuid].present? &&
-      enrollment = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid])
+      enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first
 
       success = false
       if enrollment.invited?
@@ -1166,7 +1166,7 @@ class CoursesController < ApplicationController
     if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
       params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
 
-      enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited")
+      enrollment = @context.enrollments.where(uuid: session[:enrollment_uuid], workflow_state: "invited").first
     end
 
     # Look for enrollments to matching temporary users
@@ -1247,7 +1247,7 @@ class CoursesController < ApplicationController
     return unless session[:claimed_course_uuids] && session[:claimed_enrollment_uuids]
     if session[:claimed_course_uuids].include?(@context.uuid)
       session[:claimed_enrollment_uuids].each do |uuid|
-        e = @context.enrollments.find_by_uuid(uuid)
+        e = @context.enrollments.where(uuid: uuid).first
         @pending_teacher = e.user if e
       end
     end
@@ -1606,7 +1606,7 @@ class CoursesController < ApplicationController
       if account.grants_right?(@current_user, session, :manage_courses)
         root_account = account.root_account
         enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
-        args[:enrollment_term] = root_account.enrollment_terms.find_by_id(enrollment_term_id) if enrollment_term_id
+        args[:enrollment_term] = root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
       end
       args[:enrollment_term] ||= @context.enrollment_term
       args[:abstract_course] = @context.abstract_course
@@ -1783,7 +1783,7 @@ class CoursesController < ApplicationController
         standard_id = params[:course].delete :grading_standard_id
         if @course.grants_right?(@current_user, session, :manage_grades)
           if standard_id.present?
-            grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
+            grading_standard = GradingStandard.standards_for(@course).where(id: standard_id).first
             @course.grading_standard = grading_standard if grading_standard
           else
             @course.grading_standard = nil

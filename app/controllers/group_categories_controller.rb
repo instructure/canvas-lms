@@ -240,7 +240,7 @@ class GroupCategoriesController < ApplicationController
   # @returns GroupCategory
   def update
     if authorized_action(@context, @current_user, :manage_groups)
-      @group_category ||= @context.group_categories.find_by_id(params[:category_id])
+      @group_category ||= @context.group_categories.where(id: params[:category_id]).first
       if api_request?
         if populate_group_category_from_params
           includes = ['progress_url']
@@ -269,7 +269,7 @@ class GroupCategoriesController < ApplicationController
   #
   def destroy
     if authorized_action(@context, @current_user, :manage_groups)
-      @group_category = @group_category || @context.group_categories.find_by_id(params[:category_id])
+      @group_category = @group_category || @context.group_categories.where(id: params[:category_id]).first
       return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
       return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
       if @group_category.destroy
@@ -336,7 +336,7 @@ class GroupCategoriesController < ApplicationController
     search_params = params.slice(:search_term)
     search_params[:enrollment_type] = "student" if @context.is_a? Course
 
-    @group_category ||= @context.group_categories.find_by_id(params[:category_id])
+    @group_category ||= @context.group_categories.where(id: params[:category_id]).first
     exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 

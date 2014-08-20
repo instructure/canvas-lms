@@ -22,7 +22,7 @@ class FacebookController < ApplicationController
   before_filter :require_facebook_user, :only => [:settings, :notification_preferences, :hide_message]
 
   def notification_preferences
-    @cc = @user.communication_channels.find_by_path_type('facebook')
+    @cc = @user.communication_channels.where(path_type: 'facebook').first
     if @cc
       @old_policies = @cc.notification_policies.to_a
       @policies = []
@@ -71,7 +71,7 @@ class FacebookController < ApplicationController
   
   def settings
     @notification_categories = Notification.dashboard_categories
-    @cc = @user && @user.communication_channels.find_by_path_type('facebook')
+    @cc = @user && @user.communication_channels.where(path_type: 'facebook').first
     @policies = @cc.try(:notification_policies)
     respond_to do |format|
       format.html { render :action => 'settings', :layout => 'facebook' }
@@ -109,7 +109,7 @@ class FacebookController < ApplicationController
       if data && sig
         if @facebook_user_id = data['user_id']
           Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do
-            @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+            @service = UserService.where(service: 'facebook', service_user_id: @facebook_user_id).first
             break if @service
           end
         end
@@ -126,7 +126,7 @@ class FacebookController < ApplicationController
       end
     elsif session[:facebook_canvas_user_id]
       @user = User.find(session[:facebook_canvas_user_id])
-      @service = @user.user_services.find_by_service('facebook')
+      @service = @user.user_services.where(service: 'facebook').first
     elsif session[:facebook_user_id]
       @facebook_user_id = session[:facebook_user_id]
       Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do

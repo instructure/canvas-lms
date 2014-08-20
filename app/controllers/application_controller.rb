@@ -441,20 +441,20 @@ class ApplicationController < ActionController::Base
           end
           session[:enrollment_uuid_count] += 1
         end
-        @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
+        @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
         params[:context_type] = "Account"
-        @context_enrollment = @context.account_users.find_by_user_id(@current_user.id) if @context && @current_user
+        @context_enrollment = @context.account_users.where(user_id: @current_user.id).first if @context && @current_user
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
         @context = api_find(Group.active, params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
-        @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user
+        @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
         @context = api_find(User, params[:user_id])
@@ -709,7 +709,7 @@ class ApplicationController < ActionController::Base
     @context = nil
     @problem = nil
     if pieces[0] == "enrollment"
-      @enrollment = Enrollment.find_by_uuid(pieces[1]) if pieces[1]
+      @enrollment = Enrollment.where(uuid: pieces[1]).first if pieces[1]
       @context_type = "Course"
       if !@enrollment
         @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
@@ -719,7 +719,7 @@ class ApplicationController < ActionController::Base
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
     elsif pieces[0] == 'group_membership'
-      @membership = GroupMembership.active.find_by_uuid(pieces[1]) if pieces[1]
+      @membership = GroupMembership.active.where(uuid: pieces[1]).first if pieces[1]
       @context_type = "Group"
       if !@membership
         @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
@@ -732,7 +732,7 @@ class ApplicationController < ActionController::Base
       @context_type = pieces[0].classify
       if Context::ContextTypes.const_defined?(@context_type)
         @context_class = Context::ContextTypes.const_get(@context_type)
-        @context = @context_class.find_by_uuid(pieces[1]) if pieces[1]
+        @context = @context_class.where(uuid: pieces[1]).first if pieces[1]
       end
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
@@ -863,7 +863,7 @@ class ApplicationController < ActionController::Base
       # it's not an update because if the page_view already existed, we don't want to
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.find_or_initialize_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
+        @access = AssetUserAccess.where(user_id: @current_user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
         access_context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.log access_context, @accessed_asset
@@ -1139,9 +1139,9 @@ class ApplicationController < ActionController::Base
     return if @page || !@page_name
 
     if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s) ||
-              @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s.to_url) ||
-              @wiki.wiki_pages.not_deleted.find_by_id(@page_name.to_i)
+      @page = @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s).first ||
+              @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s.to_url).first ||
+              @wiki.wiki_pages.not_deleted.where(id: @page_name.to_i).first
     end
 
     unless @page
@@ -1484,7 +1484,7 @@ class ApplicationController < ActionController::Base
   helper_method :user_content
 
   def find_bank(id, check_context_chain=true)
-    bank = @context.assessment_question_banks.active.find_by_id(id) || @current_user.assessment_question_banks.active.find_by_id(id)
+    bank = @context.assessment_question_banks.active.where(id: id).first || @current_user.assessment_question_banks.active.where(id: id).first
     if bank
       (block_given? ?
         authorized_action(bank, @current_user, :read) :
@@ -1493,7 +1493,7 @@ class ApplicationController < ActionController::Base
       (block_given? ?
         authorized_action(@context, @current_user, :read_question_banks) :
         @context.grants_right?(@current_user, session, :read_question_banks)) or return nil
-      bank = @context.inherited_assessment_question_banks.find_by_id(id)
+      bank = @context.inherited_assessment_question_banks.where(id: id).first
     end
     yield if block_given? && (@bank = bank)
     bank
@@ -1791,7 +1791,7 @@ class ApplicationController < ActionController::Base
     ## docs for masqueraders earlier in the request
     if logged_in_user
       service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', logged_in_user].cache_key) do
-        service = logged_in_user.user_services.find_by_service("google_docs")
+        service = logged_in_user.user_services.where(service: "google_docs").first
         service && [service.token, service.secret]
       end
       raise GoogleDocs::NoTokenError unless service_token && service_secret
@@ -1805,7 +1805,7 @@ class ApplicationController < ActionController::Base
 
   def twitter_connection
     if @current_user
-      service = @current_user.user_services.find_by_service("twitter")
+      service = @current_user.user_services.where(service: "twitter").first
       return Twitter::Connection.new(service.token, service.secret)
     else
       return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])

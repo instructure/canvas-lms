@@ -34,7 +34,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("twitter").returns(mock(token: "current_user_token", secret: "current_user_secret"))
+      mock_user_services.expects(:where).with(service: "twitter").returns(stub(first: mock(token: "current_user_token", secret: "current_user_secret")))
 
       Twitter::Connection.expects(:new).with("current_user_token", "current_user_secret")
 
@@ -90,7 +90,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(mock(token: "user_service_token", secret: "user_service_secret"))
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
 
       GoogleDocs::Connection.expects(:new).with("user_service_token", "user_service_secret")
 
@@ -117,7 +117,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(nil)
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: nil))
 
       expect {
         controller.send(:google_docs_connection)

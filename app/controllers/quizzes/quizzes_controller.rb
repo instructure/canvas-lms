@@ -331,7 +331,7 @@ class Quizzes::QuizzesController < ApplicationController
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey'
         params[:quiz][:assignment_group_id] ||= @context.assignment_groups.first.id
         if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
-          @assignment_group = @context.assignment_groups.active.find_by_id(assignment_group_id)
+          @assignment_group = @context.assignment_groups.active.where(id: assignment_group_id).first
         end
         if @assignment_group
           @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
@@ -369,7 +369,7 @@ class Quizzes::QuizzesController < ApplicationController
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
         if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
-          @assignment_group = @context.assignment_groups.active.find_by_id(assignment_group_id)
+          @assignment_group = @context.assignment_groups.active.where(id: assignment_group_id).first
         end
         @assignment_group ||= @context.assignment_groups.first
         # The code to build an assignment for a quiz used to be here, but it's
@@ -596,7 +596,7 @@ class Quizzes::QuizzesController < ApplicationController
         @submission = @quiz.quiz_submissions.find(params[:quiz_submission_id])
       else
         user_id = params[:user_id].presence || @current_user.id
-        @submission = @quiz.quiz_submissions.find_by_user_id(user_id, :order => 'created_at') rescue nil
+        @submission = @quiz.quiz_submissions.where(user_id: user_id).order(:created_at).first
       end
       if @submission && !@submission.user_id && logged_out_index = params[:u_index]
         @logged_out_user_index = logged_out_index
@@ -720,10 +720,10 @@ class Quizzes::QuizzesController < ApplicationController
   private
 
   def get_submission
-    submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
+    submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first
     if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
       user_code = temporary_user_code
-      submission = @quiz.quiz_submissions.find_by_temporary_user_code(user_code)
+      submission = @quiz.quiz_submissions.where(temporary_user_code: user_code).first
     end
 
     submission

@@ -236,7 +236,7 @@ class SubmissionsController < ApplicationController
       @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
-    @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
+    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first rescue nil
     if authorized_action(@submission, @current_user, :read)
 
       if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
@@ -277,8 +277,8 @@ class SubmissionsController < ApplicationController
           else
             @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
             prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
-            @attachment ||= Attachment.find_by_id(prior_attachment_id) if prior_attachment_id
-            @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
+            @attachment ||= Attachment.where(id: prior_attachment_id).first if prior_attachment_id
+            @attachment ||= @submission.attachments.where(id: params[:download]).first if params[:download].present?
             @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
           end
           raise ActiveRecord::RecordNotFound unless @attachment
@@ -414,8 +414,8 @@ class SubmissionsController < ApplicationController
       attachment_ids = attachment_ids.select(&:present?)
       params[:submission][:attachments] = []
       attachment_ids.each do |id|
-        params[:submission][:attachments] << @current_user.attachments.active.find_by_id(id) if @current_user
-        params[:submission][:attachments] << @group.attachments.active.find_by_id(id) if @group
+        params[:submission][:attachments] << @current_user.attachments.active.where(id: id).first if @current_user
+        params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
         params[:submission][:attachments].compact!
       end
       if !api_request? && params[:attachments] && params[:submission][:submission_type] == 'online_upload'
@@ -545,7 +545,7 @@ class SubmissionsController < ApplicationController
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
+    @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
       url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
@@ -563,7 +563,7 @@ class SubmissionsController < ApplicationController
 
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
+      @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
       @submission.resubmit_to_turnitin
       respond_to do |format|
         format.html {
@@ -598,7 +598,7 @@ class SubmissionsController < ApplicationController
         params[:submission][:comment_attachments] = attachments#.map{|a| a.id}.join(",")
       end
       unless @submission.grants_right?(@current_user, session, :submit)
-        @request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) if @current_user
+        @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
         params[:submission] = {
           :comment => params[:submission][:comment],
           :comment_attachments => params[:submission][:comment_attachments],

@@ -417,4 +417,9 @@ class CommunicationChannel < ActiveRecord::Base
       end
     end
   end
+
+  def self.find_by_confirmation_code(code)
+    where(confirmation_code: code).first
+
+  end
 end
