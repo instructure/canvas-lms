@@ -71,7 +71,7 @@
           <table class="formtable">
             <tr>
               <td><%= f.blabel :name, :en => "Account Name" %></td>
-              <td><%= f.text_field :name %></td>
+              <td><%= f.text_field :name, :class => 'same-width-as-select' %></td>
             </tr>
             <% if !@account.root_account? && (@context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis)) %>
               <tr>
@@ -132,6 +132,21 @@ TEXT
                         ], :selected => @account.settings[:self_enrollment] %>
                     </td>
                   </tr>
+
+                  <% unless @account.account_authorization_config
+                    #if the account has a account_authorization_config, we'll use it's login_handle_name, and this is irrelevant
+                  %>
+                    <tr>
+                      <td><%= settings.blabel :login_handle_name, :en => "Login Label" %></td>
+                      <td>
+                        <%= settings.text_field :login_handle_name,
+                                                :value => @account.settings[:login_handle_name],
+                                                :class => 'same-width-as-select',
+                                                :placeholder => t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
+                      </td>
+                    </tr>
+                  <% end %>
+
                   <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
                     <%= settings.label :prevent_course_renaming_by_teachers, :en => "Don't let teachers rename their courses" %>
