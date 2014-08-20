@@ -166,6 +166,7 @@ class Account < ActiveRecord::Base
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
+  add_setting :login_handle_name, :root_only => true
   add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -696,14 +697,28 @@ class Account < ActiveRecord::Base
     self.account_authorization_configs.first
   end
 
+  # If an account uses an authorization_config, it's login_handle_name is used.
+  # Otherwise they can set it on the account settings page.
   def login_handle_name_is_customized?
-    self.account_authorization_config && self.account_authorization_config.login_handle_name.present?
+    if self.account_authorization_config
+      self.account_authorization_config.login_handle_name.present?
+    else
+      settings[:login_handle_name].present?
+    end
   end
 
   def login_handle_name
-    login_handle_name_is_customized? ? self.account_authorization_config.login_handle_name :
-        (self.delegated_authentication? ? AccountAuthorizationConfig.default_delegated_login_handle_name :
-            AccountAuthorizationConfig.default_login_handle_name)
+    if login_handle_name_is_customized?
+      if account_authorization_config
+        account_authorization_config.login_handle_name
+      else
+        settings[:login_handle_name]
+      end
+    elsif self.delegated_authentication?
+      AccountAuthorizationConfig.default_delegated_login_handle_name
+    else
+      AccountAuthorizationConfig.default_login_handle_name
+    end
   end
 
   def self_and_all_sub_accounts
