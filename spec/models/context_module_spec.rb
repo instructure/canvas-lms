@@ -442,6 +442,34 @@ describe ContextModule do
       @module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true).should be_false
     end
 
+    it "should be available to observers" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.save!
+      @student = User.create!(:name => "some name")
+      @course.enroll_student(@student)
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.prerequisites = "module_#{@module.id}"
+      @assignment2 = @course.assignments.create!(:title => 'a2')
+      @tag2 = @module2.add_item({:id => @assignment2.id, :type => 'assignment'})
+      @module2.completion_requirements = {@tag2.id => {:type => 'must_view'}}
+      @module2.save!
+
+      @module2.prerequisites.should_not be_empty
+      @module2.available_for?(@student, :tag => @tag2, :deep_check_if_needed => true).should be_false
+
+      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      user_session(@user)
+
+      @module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true).should be_true
+
+      @module2.update_attribute(:require_sequential_progress, true)
+      @module2.available_for?(@user, :tag => @tag2).should be_true
+    end
+
     it "should create an unlocked progression if there are prerequisites that are met" do
       course_module
       @user = User.create!(:name => "some name")
