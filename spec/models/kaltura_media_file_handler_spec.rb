@@ -31,7 +31,7 @@ describe KalturaMediaFileHandler do
 
     before do
       CanvasKaltura::ClientV3.stubs(:config).returns(kaltura_config)
-      CanvasKaltura::ClientV3.expects(:new).returns(kaltura_client)
+      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
       kaltura_client.stubs(:startSession)
       kaltura_client.stubs(:bulkUploadAdd).with do |files|
         files_sent_to_kaltura.concat(files)
