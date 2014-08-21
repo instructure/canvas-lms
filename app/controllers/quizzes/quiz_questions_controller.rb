@@ -260,6 +260,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if params[:existing_questions]
         return add_questions
       end
+
       question_data = params[:question]
       question_data ||= {}
 
@@ -267,10 +268,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
 
-      @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
-      @quiz.did_edit if @quiz.created?
-
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
 
     end
   end
@@ -345,10 +347,12 @@ class Quizzes::QuizQuestionsController < ApplicationController
         end
       end
 
-      @question.question_data = question_data
-      @question.save
-      @quiz.did_edit if @quiz.created?
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question.question_data = question_data
+        @question.save
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
     end
   end
 
@@ -373,6 +377,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   private
+
+  def guard_against_big_fields
+    begin
+      yield
+    rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
+      raise ex unless request.xhr?
+      render_xhr_exception(ex, ex.message)
+    end
+  end
 
   def require_question
     unless @question = @quiz.quiz_questions.active.find(params[:id])

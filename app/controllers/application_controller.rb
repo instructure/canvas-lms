@@ -940,18 +940,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def render_xhr_exception(error, message = nil, status = "500 Internal Server Error", status_code = 500)
+    message ||= "Unexpected error, ID: #{error.id rescue "unknown"}"
+    render status: status_code, json: {
+      errors: {
+        base: message
+      },
+      status: status
+    }
+  end
+
   def render_rescue_action(exception, error, status, status_code)
     clear_crumbs
     @headers = nil
     load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
-      render :status => status_code, :json => {
-        :errors => {
-          :base => "Unexpected error, ID: #{error.id rescue "unknown"}"
-        },
-        :status => status
-      }
+      render_xhr_exception(error, nil, status, status_code)
     else
       request.format = :html
       erbfile = "#{status.to_s[0,3]}_message.html.erb"
