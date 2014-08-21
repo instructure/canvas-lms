@@ -301,6 +301,7 @@ describe ContentMigration do
     end
 
     it "should copy course attributes" do
+      Account.default.allow_self_enrollment!
       #set all the possible values to non-default values
       @copy_from.start_at = 5.minutes.ago
       @copy_from.conclude_at = 1.month.from_now

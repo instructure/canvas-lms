@@ -294,7 +294,7 @@ TEXT
       </tr><tr>
         <td></td>
         <td colspan="3">
-          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
+          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">
             <% if @context.root_account.self_registration? %>
               <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can

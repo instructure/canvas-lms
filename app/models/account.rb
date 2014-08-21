@@ -1071,6 +1071,11 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def allow_self_enrollment!(setting='any')
+    settings[:self_enrollment] = setting
+    self.save!
+  end
+
   TAB_COURSES = 0
   TAB_STATISTICS = 1
   TAB_PERMISSIONS = 2

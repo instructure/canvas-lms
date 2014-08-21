@@ -430,6 +430,8 @@ describe Course do
     end
 
     it "should clear content" do
+      @course.root_account.allow_self_enrollment!
+
       @course.discussion_topics.create!
       @course.quizzes.create!
       @course.assignments.create!
@@ -475,6 +477,22 @@ describe Course do
       @course.uuid.should_not == @new_course.uuid
       @course.wiki_id.should_not == @new_course.wiki_id
       @course.replacement_course_id.should == @new_course.id
+    end
+
+    it "should not have self enrollment enabled if account setting disables it" do
+      @course.self_enrollment = true
+      @course.save!
+      @course.self_enrollment_enabled?.should == false
+
+      account = @course.root_account
+      account.allow_self_enrollment!
+      @course.self_enrollment = true
+      @course.save!
+      @course.reload.self_enrollment_enabled?.should == true
+
+      account.settings.delete(:self_enrollment)
+      account.save!
+      @course.reload.self_enrollment_enabled?.should == false
     end
 
     it "should retain original course profile" do
@@ -3218,7 +3236,10 @@ end
 
 describe Course do
   describe "self_enrollment" do
-    let_once(:c1) { course }
+    let_once(:c1) do
+      Account.default.allow_self_enrollment!
+      course
+    end
     it "should generate a unique code" do
       c1.self_enrollment_code.should be_nil # normally only set when self_enrollment is enabled
       c1.update_attribute(:self_enrollment, true)

@@ -101,7 +101,7 @@
       <% end %>
     <% end %>
 
-    <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
+    <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
       <div class="rs-margin-lr rs-margin-top">
         <a href="<%= enroll_url(@context.self_enrollment_code) %>" title="<%= t('links.join_course', %{Join this Course}) %>" class="btn button-sidebar-wide self_enrollment_link" data-open-as-dialog><i class="icon-user-add"></i>  <%= t('links.join_course', %{Join this Course}) %></a>
       </div>

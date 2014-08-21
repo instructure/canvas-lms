@@ -490,6 +490,7 @@ describe CoursesController, type: :request do
 
     context "an account admin" do
       it "should be able to update a course" do
+        @course.root_account.allow_self_enrollment!
         Auditors::Course.expects(:record_updated).once
 
         json = api_call(:put, @path, @params, @new_values)

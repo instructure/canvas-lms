@@ -777,12 +777,16 @@ class Course < ActiveRecord::Base
     !!(self.account && self.account.self_enrollment_allowed?(self))
   end
 
+  def self_enrollment_enabled?
+    self.self_enrollment? && self.self_enrollment_allowed?
+  end
+
   def self_enrollment_code
     read_attribute(:self_enrollment_code) || set_self_enrollment_code
   end
 
   def set_self_enrollment_code
-    return if !self_enrollment? || read_attribute(:self_enrollment_code)
+    return if !self_enrollment_enabled? || read_attribute(:self_enrollment_code)
 
     # subset of letters and numbers that are unambiguous
     alphanums = 'ABCDEFGHJKLMNPRTWXY346789'
