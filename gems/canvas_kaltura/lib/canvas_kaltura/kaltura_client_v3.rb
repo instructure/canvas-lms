@@ -172,7 +172,7 @@ module CanvasKaltura
       }.merge(opts)
 
         "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
-        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_]/, '')}" +
+        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, '')}" +
         "/width/#{opts[:width].to_i}" +
         "/height/#{opts[:height].to_i}" +
         "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, '')}" +
