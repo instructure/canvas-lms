@@ -549,7 +549,8 @@ class GroupsController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/invite \
-  #          -F 'invitees[]=leonard@example.com&invitees[]=sheldon@example.com' \
+  #          -F 'invitees[]=leonard@example.com' \
+  #          -F 'invitees[]=sheldon@example.com' \
   #          -H 'Authorization: Bearer <token>'
   def invite
     find_group
