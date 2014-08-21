@@ -62,7 +62,7 @@ describe ArgumentView do
   end
 
   context "with optional arg" do
-    let(:view) { ArgumentView.new %{arg [Optional, String]} }
+    let(:view) { ArgumentView.new %{arg [String]} }
 
     it "is optional" do
       view.optional?.should be_true
@@ -70,7 +70,7 @@ describe ArgumentView do
   end
 
   context "with required arg" do
-    let(:view) { ArgumentView.new %{arg [String]} }
+    let(:view) { ArgumentView.new %{arg [Required, String]} }
 
     it "is required" do
       view.required?.should be_true
