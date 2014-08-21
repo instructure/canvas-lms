@@ -27,6 +27,7 @@ module Lti
     belongs_to :context, :polymorphic => true
 
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
+    has_one :tool_setting, :class_name => 'Lti::ToolSetting', as: :settable
 
     serialize :raw_data
 

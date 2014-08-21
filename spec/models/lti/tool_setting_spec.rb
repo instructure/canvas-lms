@@ -16,19 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 module Lti
-  class ResourceHandler < ActiveRecord::Base
-
-    attr_accessible :resource_type_code, :placements, :name, :description, :icon_info, :tool_proxy
-
-    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
-    has_many :message_handlers, class_name: 'Lti::MessageHandler', :foreign_key => :resource_handler_id
-    has_many :placements, class_name: 'Lti::ResourcePlacement'
-    has_many :tool_links, :class_name => 'Lti::ToolLink'
-
-    serialize :icon_info
-
-    validates_presence_of :resource_type_code, :name, :tool_proxy
+  describe ToolSetting do
 
   end
 end

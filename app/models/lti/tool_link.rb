@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -17,18 +16,13 @@
 #
 
 module Lti
-  class ResourceHandler < ActiveRecord::Base
+  class ToolLink < ActiveRecord::Base
+    belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
+    has_one :tool_setting, :class_name => 'Lti::ToolSetting', as: :settable
 
-    attr_accessible :resource_type_code, :placements, :name, :description, :icon_info, :tool_proxy
+    attr_accessible :uuid
 
-    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
-    has_many :message_handlers, class_name: 'Lti::MessageHandler', :foreign_key => :resource_handler_id
-    has_many :placements, class_name: 'Lti::ResourcePlacement'
-    has_many :tool_links, :class_name => 'Lti::ToolLink'
-
-    serialize :icon_info
-
-    validates_presence_of :resource_type_code, :name, :tool_proxy
+    after_initialize { self.uuid = SecureRandom::uuid}
 
   end
 end
