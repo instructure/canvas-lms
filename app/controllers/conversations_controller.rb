@@ -231,21 +231,22 @@ class ConversationsController < ApplicationController
       @current_user.reset_unread_conversations_counter
       @current_user.reload
 
-      notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
-        :NOTES_ENABLED => notes_enabled,
       }
 
-      if notes_enabled
-        unless hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, :manage_students) }
-          course_note_permissions = {}
-          @current_user.enrollments.of_instructor_type.each do |enrollment|
-            course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
-          end
-          hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
+      notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)
+
+      hash[:NOTES_ENABLED] = notes_enabled_accounts.any?
+      hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = notes_enabled_accounts.any? {|a| a.grants_right?(@current_user, :manage_students) }
+
+      if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT]
+        course_note_permissions = {}
+        @current_user.enrollments.active.of_instructor_type.includes(:course).each do |enrollment|
+          course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
         end
+        hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
       js_env(CONVERSATIONS: hash)
       return render :template => 'conversations/index_new'
