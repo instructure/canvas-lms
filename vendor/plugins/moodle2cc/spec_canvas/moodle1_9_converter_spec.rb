@@ -2,32 +2,34 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Moodle::Converter do
 
-  before(:all) do
+  before :once do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_1_9.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "moodle_#{File.basename(archive_file_path, '.zip')}", 'oi')
     converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     converter.export
-    @base_course_data = converter.course.with_indifferent_access
+
+    @course_data = converter.course.with_indifferent_access
+    @course = Course.create(:name => "test course")
+    @cm = ContentMigration.create(:context => @course)
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
+
     converter.delete_unzipped_archive
     if File.exists?(unzipped_file_path)
       FileUtils::rm_rf(unzipped_file_path)
     end
   end
 
-  before(:each) do
-    # make a deep copy
-    @course_data = Marshal.load(Marshal.dump(@base_course_data))
-    @course = Course.create(:name => "test course")
-    @cm = ContentMigration.create(:context => @course)
-  end
-
   it "should successfully import the course" do
-    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content"]
     @cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}.should == true
+  end
+
+  it "should import files" do
+    @course.attachments.count.should == 1
+    @course.attachments.first.full_display_path.should == "course files/images/facepalm.png"
   end
 
   it "should add at most 2 warnings per bank for problematic questions" do
@@ -61,12 +63,6 @@ describe Moodle::Converter do
   end
 
   context "discussion topics" do
-    before(:each) do
-      #These need to be ran twice because they can reference each other
-      Importers::DiscussionTopicImporter.process_migration(@course_data, @cm)
-      Importers::DiscussionTopicImporter.process_migration(@course_data, @cm)
-    end
-
     it "should convert discussion topics" do
       @course.discussion_topics.count.should == 2
 
@@ -81,12 +77,6 @@ describe Moodle::Converter do
   end
 
   context "assignments" do
-    before(:each) do
-      #These need to be ran twice because they can reference each other
-      Importers::AssignmentImporter.process_migration(@course_data, @cm)
-      Importers::AssignmentImporter.process_migration(@course_data, @cm)
-    end
-
     it "should convert assignments" do
       @course.assignments.count.should == 6
 
@@ -107,12 +97,6 @@ describe Moodle::Converter do
   end
 
   context "wiki pages" do
-    before(:each) do
-      #These need to be ran twice because they can reference each other
-      Importers::WikiPageImporter.process_migration(@course_data, @cm)
-      Importers::WikiPageImporter.process_migration(@course_data, @cm)
-    end
-
     it "should convert wikis" do
       wiki = @course.wiki
       wiki.should_not be_nil
@@ -138,14 +122,6 @@ describe Moodle::Converter do
   context "quizzes" do
     before(:each) do
       pending if !Qti.qti_enabled?
-      question_data = Importers::AssessmentQuestionImporter.process_migration(@course_data, @cm)
-      Importers::GroupImporter.process_migration(@course_data, @cm)
-      Importers::LearningOutcomeImporter.process_migration(@course_data, @cm)
-      Importers::RubricImporter.process_migration(@course_data, @cm)
-      Importers::AssignmentGroupImporter.process_migration(@course_data, @cm)
-      Importers::ExternalFeedImporter.process_migration(@course_data, @cm)
-      Importers::GradingStandardImporter.process_migration(@course_data, @cm)
-      Importers::QuizImporter.process_migration(@course_data, @cm, question_data)
     end
 
     it "should convert quizzes" do

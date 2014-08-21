@@ -100,11 +100,20 @@
     <li><a href="#outcomes"><%= t :learning_outcomes, "Learning Mastery" %></a></li>
   </ul>
   <div class="outcome-toggles">
-    <a class="btn btn-small icon-collapse" title="<%= t :collapse, "Collapse" %>" href="#">
-      <span class="screenreader-only"><%= t :collapse, "Collapse" %></span>
+    <a class="btn btn-small icon-collapse"
+       title="<%= t :collapse_title, "Collapse" %>"
+       disabled='disabled'
+       aria-disabled='true'
+       aria-controls='groups'
+       href="#">
+      <span class="screenreader-only"><%= t :collapse, "Collapse all learning mastery outcome groups." %></span>
     </a>
-    <a class="btn btn-small icon-expand" title="<%= t :expand, "Expand" %>" href="#">
-      <span class="screenreader-only"><%= t :expand, "Expand" %></span>
+    <a class="btn btn-small icon-expand"
+       title="<%= t :expand_title, "Expand" %>"
+       aria-controls='groups'
+       aria-disabled='false'
+       href="#">
+      <span class="screenreader-only"><%= t :expand, "Expand all learning mastery outcome groups." %></span>
     </a>
   </div>
   <div id="outcomes"></div>

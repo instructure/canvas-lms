@@ -61,6 +61,14 @@ describe Folder do
     f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }.should be_present
   end
 
+  it "should not allow root folders to have their names changed" do
+    f1 = Folder.root_folders(@course).first
+    f1.reload
+    f1.update_attributes(:name => "something")
+    f1.save.should == false
+    f1.errors.detect { |e| e.first.to_s == 'name' }.should be_present
+  end
+
   it "files without an explicit folder_id should be inferred" do
     f = @course.folders.create!(:name => "unfiled")
     a = f.active_file_attachments.build

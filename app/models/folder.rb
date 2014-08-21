@@ -58,7 +58,21 @@ class Folder < ActiveRecord::Base
   before_save :infer_hidden_state
   validates_presence_of :context_id, :context_type
   validates_length_of :name, :maximum => maximum_string_length
+  validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
+
+  def protect_root_folder_name
+    if self.parent_folder_id.blank? && self.name != Folder.root_folder_name_for_context(context)
+      if self.new_record?
+        root_folder = Folder.root_folders(context).first
+        self.parent_folder_id = root_folder.id
+        return true
+      else
+        errors.add(:name, t("errors.invalid_root_folder_name", "Root folder name cannot be changed"))
+        return false
+      end
+    end
+  end
 
   def reject_recursive_folder_structures
     return true if !self.parent_folder_id_changed?
@@ -121,11 +135,6 @@ class Folder < ActiveRecord::Base
   def default_values
     self.last_unlock_at = self.unlock_at if self.unlock_at
     self.last_lock_at = self.lock_at if self.lock_at
-
-    if self.parent_folder_id.blank? && ![ROOT_FOLDER_NAME, MY_FILES_FOLDER_NAME, 'files'].include?(self.name)
-      root_folder = Folder.root_folders(context).first
-      self.parent_folder_id = root_folder.id
-    end
   end
 
   def infer_hidden_state
@@ -255,15 +264,18 @@ class Folder < ActiveRecord::Base
     !self.parent_folder_id
   end
 
-  def self.root_folders(context)
+  def self.root_folder_name_for_context(context)
     if context.is_a? Course
-      name = ROOT_FOLDER_NAME
+      ROOT_FOLDER_NAME
     elsif context.is_a? User
-      name = MY_FILES_FOLDER_NAME
+      MY_FILES_FOLDER_NAME
     else
-      name = "files"
+      "files"
     end
+  end
 
+  def self.root_folders(context)
+    name = root_folder_name_for_context(context)
     root_folders = []
     # something that doesn't have folders?!
     return root_folders unless context.respond_to?(:folders)
