@@ -102,6 +102,7 @@ tr:
         auth_base: "CAS URL"
         auth_type: Tür
         login_handle_name: "Oturum Açma Etiketi"
+        unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
       login_handle_name_description: "Etiket herkese özel oturum açma tanımlamaları için kullanılır. Örneğin: Oturum Aç, Kullanıcı Adı, Öğrenci ID, vs."
       save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
     index: 
@@ -210,6 +211,7 @@ tr:
         login_handle_name: "Oturum Açma Etiketi"
         position: Pozisyon
         requested_authn_context: "Kimlik Doğrulama Bağlamı"
+        unkown_user_url: "Bilinmeyen Kullanıcı URL'si"
       log_in_url: "Hesap Oluşturma URL'si"
       log_out_url: "Oturum Kapatma URL'si"
       login_attribute: "Oturum Açma Özelliği"
@@ -4828,6 +4830,8 @@ tr:
   create_module_item_quiz: 
     graded_quiz: "Değerlendirilmiş Kısa Sınav"
     graded_survey: "Değerlendirilmiş Anket"
+    header_name: "Başlık Adı"
+    link_title: "Link Başlığı"
     page_name: "Sayfa Adı"
     practice_quiz: "Kısa Sınav Pratiği"
     quiz_name: "Kısa Sınav Adı"
@@ -5529,6 +5533,8 @@ tr:
     screen_reader_tip: "Ekran okuyucu kullanıcıları: Bu editörü en erişilebilir şekilde kullanmanın yolu gelişmiş görünüme geçmektir. Daha sonra LaTeX'i doğrudan girebilir veya araç çubuğundan yararlanabilirsiniz. Gelişmiş görünüme geçiş bağlantısı bu metnin sonlarına doğru düzenleme alanından hemen önce bulunabilir."
     search_flickr: "Flickr creative commons lisansı ara"
     switch_editor_html: "HTML Düzenleyici"
+    switch_editor_rich_text: "Zengin İçerik Editörü"
+    switch_editor_visual: "Zengin İçerik Editörü"
     switch_to_mathjax: "Sade Görünüme Geç"
     switch_to_mathquill: "İleri Düzey Görünüme Geç"
     tabs: 
@@ -6081,6 +6087,7 @@ tr:
       ? "on"
       : Açık
       release_notes: "kararlı sürüm notları"
+      toggle_feature_details: "Özellik seçeneklerini değiştir"
     feature_flag_admin_view: 
       feature_options: "Özellik Seçenekleri"
       no_features_available: "Şu anda kullanılabilir özellik yok"
@@ -6474,6 +6481,8 @@ tr:
       url: "Bağlantı Adresi Şeklinde Gönderim"
     total: Toplam
     total_column_header: 
+      move_to_end: "Sona taşı"
+      move_to_front: "Öne taşı"
       options: Seçenekler
       switch_to_percent: "Yüzdeye geç"
       switch_to_points: "Puanlara geç"
@@ -9910,7 +9919,9 @@ tr:
       decimal_units: 
         format: "%n %u"
         units: 
+          billion: Milyar
           million: Milyon
+          quadrillion: Katrilyon
           thousand: Bin
           trillion: Trilyon
       storage_units: 
@@ -9927,6 +9938,7 @@ tr:
     add_observee_button: "Öğrenci Ekle"
     new_observee_password: Şifre
     new_observee_username: "Kullanıcı Adı"
+    observing: Gözlem
   options: 
     ? "no"
     : Hayır
@@ -9956,7 +9968,6 @@ tr:
     confirm: 
       delete: "Silmek istediğinize emin misiniz?"
       import_group: "\"%{group}\" grubunu \"%{target}\" grubuna aktarsın mı ? "
-      import_outcome: "\"%{outcome}\" öğrenme çıktısı \"%{outcome}\" grubuna aktarılsın mı?"
     criteria: 
       does_not_meet_expectations: "Beklentileri Karşılamıyor"
       exceeds_expectations: "Beklentilerin Üstünde"
@@ -9995,8 +10006,10 @@ tr:
           manage: 
             description: "*Öğrenme çıktıları bir dersteki yeterlilikleri izlemek için oluşturulur. İlk olarak üst sıradaki menü çubuğuna göz gezidirin. Yeni bir öğrenme çıktısı oluşturmak için Yeni Öğrenme Çıktısı butonuna tıklayın ya da öğrenme çıktılarınızı düzenleyeceğiniz bir grup oluşturmak için Yeni Grup butonuna tıklayın. Ara butonu sayesinde bölgeniz ya da kurumunuz tarafından oluşturulmuş öğrenme çıktılarını kullanabilirsiniz. Öğrenme çıktılarını oluşturup kullandıkça bu çıktılar arasında gezinmek için soldaki paneli kullanabileceksiniz. Farklı seviyelerdeki öğrenme çıktılarını sürükle bırak yaparak kendi yapınızı oluşturabilirsiniz.* *Daha da önemlisi, Canvas'ta notlandırma listelerine öğrenme çıktıları ekleyerek ödevleri notlandırırken yeterliliği değerlendirebilirsiniz. Öğrenme çıktılarını oluşturduktan sonra bunları notlandırmada kullanmaya başlamak için Değerlendirme Listelerini Yönet'e tıklayın.*"
             title: "Öğrenme Çıktılarını Ayarlama"
+    mastery: Ustalık
     mastery_error: "Daha büyük ceya 0'a eşit olmalıdır"
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
+    near: Kalfalık
     new_outcome: "Yeni Öğrenme Çıktısı"
     new_outcome_group: "Yeni Öğrenme Çıktısı Grubu"
     outcome: 
@@ -10018,6 +10031,7 @@ tr:
       criterion_dialog: "Öğrenme çıktıları belirli ödevler için belirlenmiş çıktıların yeterliliğini kolay bir şekilde değerlendirme amacıyla ödev değerlendirme listelerinde kullanılabilir. Bir öğrenme çıktısı tanımladığınızda ödev değerlendirme listelerini oluşturmada kullanılabilecek bir kriter de tanımlamalısınız. İstediğiniz kadar değerlendirme listesi sütunu oluşturup bu öğrenme çıktısının yeterliliğini belirleme kullanılabilecek eşik puan değeri belirleyin."
       criterion_info_link: "Kriter oranları hakkında bilgi almak için tıklayın"
       description: "Öğrenme çıktısını açıklayın"
+      display_name: "Takma ad (opsiyonal)"
       mastery: "Yeterlilik düzeyi"
       points: "%{points_possible} Puan"
       title: "Bu öğrenme çıktısına isim verin"
@@ -10034,6 +10048,7 @@ tr:
       attempt_info: "#%{attempt_number}. giriş , %{attempt_date}"
       outcome_mastered: "yeterlilik sağlandı"
       scoring: "%{possible_points} üzerinden %{points}"
+    remedial: İyileştirici
     show: 
       no_aligned_items: "Öğeler düzenlenmedi"
       no_artifacts: "Çalışma yok"
@@ -10104,7 +10119,6 @@ tr:
     notices: 
       delete_failed: "\"%{title}\" sayfası silinemiyor."
       page_deleted: "\"%{title}\" sayfası silindi."
-    reload_editing_page: "Siz düzenlemeye başladığınızdan beri bu sayfa değişti. * Tekrar yüklemenizde * tüm değişiklikleri kaybedersiniz."
     reload_viewing_page: "Siz incelemeye başladığınızdan beri bu sayfa değişti.  *Tekrar Yükle*"
     restore_failed: "Sayfa gözden geçirmeyi geri yükleme başarısız"
     save_button: Kaydet
@@ -10471,6 +10485,10 @@ tr:
         access_key: "Access Key"
         api_url: "Api Url"
         secret_key: "Secret Key"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "Ders zorunludur."
   post_grades_description: |-
       Notları Gönder özelliği öğretmenlerin şu örnektekiler gibi etkinleştirilmiş ÖBS sistemlerine
        notları tekrar göndermelerini sağlar: Powerschool, Aspire (SIS2000), JMC, ve SIF öğeleri Notlandırma Kategorisini,
@@ -10516,6 +10534,7 @@ tr:
       unregister_service: "Bu serviste kayıtlanmamak istediğinize emin misiniz? "
     crumb: "%{user}'nın ayarları"
     crumbs: 
+      observees: İnceleme
       settings_frd: "%{user}'nın ayarları"
     done_resending: "Tamamlandı! Mesaj gönderme biraz zaman alabilir."
     email_select: 
@@ -11193,6 +11212,8 @@ tr:
     students_have_taken: "%{total} öğrenciden %{complete} kişi kısa sınavı tamamladı"
   quiz_moderate_route: 
     moderate: Yönet
+  quiz_overview_route: 
+    overview: "Genel Bakış"
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "%{report_name} indir"
@@ -11203,8 +11224,6 @@ tr:
   quiz_route: 
     that_quiz_doesnt_exist: "Bu sınav bulunamadı"
     that_quiz_has_been_deleted: "Kısa sınav silindi"
-  quiz_show: 
-    time_limit_minutes: "%{complete} dakika"
   quiz_statistics: 
     attempts: "Deneme: %{count} / %{total}"
     errors: 
@@ -12306,7 +12325,10 @@ tr:
     errors: 
       no_match: 
         suggestions: "Öneriler:"
+    loading_more_results: "Daha fazla sonuç yükleniyor..."
     name: İsim
+    search: "Dosyaları ara"
+    this_folder_is_empty: "Bu klasör boş"
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
   recently_deleted_courses_title: "Son Silinen Kurslar"
@@ -12369,6 +12391,8 @@ tr:
     label: 
       availableFrom: Kullanılabilen
       availableUntil: "Şu zamana kadar"
+    title: 
+      default_title: Diyalog
   retrieve_timeout: "ayarlar alınamıyor, sunucu cevabı zaman aşımına uğradı"
   role_override: 
     permission: 
@@ -13469,6 +13493,7 @@ tr:
     online_text_entry: "Çevrimiçi metin girişi"
     online_upload: "Çevrimiçi yükleme"
     online_url: "Çevrimiçi URL"
+    previous_object: "Önceki %{type}"
     student_hidden_name: "Öğrenci %{position}"
   statistics: 
     csv_columns: 
@@ -13682,6 +13707,7 @@ tr:
     grades: Notlar
     home: "Ana Sayfa"
     modules: Modüller
+    observees: İnceleme
     outcomes: Çıktılar
     pages: Sayfalar
     people: Katılımcılar
@@ -14041,6 +14067,7 @@ tr:
       roles_student: "Öğrenci olarak kayıtlı."
       roles_ta: "Öğretmen yardımcısı olarak kayıtlı."
       roles_teacher: "Öğretmen olarak kayıtlı."
+      unenrollr: "Kayıt İptal"
       unpublished: Yayınlanmadı
     errors: 
       no_teacher_courses: "Öğretmen ve öğrenci arasında paylaşılan ders bulunamadı"
@@ -14492,6 +14519,11 @@ tr:
     cannot_update_title: "Wiki sayfasının başlığını güncellemenize izin verilmiyor"
     invalid_editing_roles: "Verilen düzenleme rolleri geçersiz"
   will_paginate: 
+    page_entries_info: 
+      single_page: 
+        zero: "%{model} bulunamadı"
+      single_page_html: 
+        zero: "%{model} bulunamadı"
     page_gap: "&hellip;"
     previous_label: "&#8592; Önceki"
   wimba_conference: 
