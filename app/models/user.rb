@@ -1004,6 +1004,14 @@ class User < ActiveRecord::Base
       )
     end
     can :manage_user_details and can :manage_logins and can :rename
+
+    given do |user|
+      user && (
+        self.grants_right?(user, :manage_logins) ||
+          (self.grants_right?(user, :manage) && self.pseudonyms.none? {|p| p.system_created?})
+      )
+    end
+    can :delete
   end
 
   def can_masquerade?(masquerader, account)

@@ -1437,11 +1437,9 @@ class UsersController < ApplicationController
   def delete
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      if @user.pseudonyms.any? {|p| p.managed_password? }
-        unless @user.grants_right?(@current_user, session, :manage_logins)
-          flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-          redirect_to user_profile_url(@current_user)
-        end
+      unless @user.grants_right?(@current_user, :delete)
+        flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
+        redirect_to user_profile_url(@current_user)
       end
     end
   end
@@ -1461,8 +1459,8 @@ class UsersController < ApplicationController
   # @returns User
   def destroy
     @user = api_find(User, params[:id])
-    if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
+    if authorized_action(@user, @current_user, :delete)
+      @user.destroy(true)
       if @user == @current_user
         logout_current_user
       end

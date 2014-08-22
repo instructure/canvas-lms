@@ -195,7 +195,16 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      assert_status(500)
+      assert_status(401)
+      @student.reload.workflow_state.should_not == 'deleted'
+    end
+
+    it "should fail when the user has a SIS ID and uses canvas authentication" do
+      user_with_pseudonym
+      course_with_student_logged_in user: @user
+      @student.pseudonym.update_attribute :sis_user_id, 'kzarn'
+      post 'destroy', id: @student.id
+      assert_status(401)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 

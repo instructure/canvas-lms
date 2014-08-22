@@ -965,6 +965,27 @@ describe "Users API", type: :request do
         response.code.should eql '401'
       end
     end
+
+    context 'a student with no SIS ID' do
+      it 'should be able to delete itself' do
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
+        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param))
+        @student.reload.should be_deleted
+      end
+    end
+
+    context 'a student with SIS ID' do
+      before(:once) do
+        @student.pseudonym.update_attribute(:sis_user_id, '12345')
+      end
+
+      it 'should not be able to delete itself' do
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
+        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param),
+                                {}, {}, {expected_status: 401})
+        @student.reload.should_not be_deleted
+      end
+    end
   end
 
   context "user files" do
