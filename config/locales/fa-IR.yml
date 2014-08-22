@@ -1752,9 +1752,6 @@ fa-IR:
       speed_grader: "برنامه نمره گذاری سریع™"
       titles: 
         related_items: "موردهای مرتبط"
-    grade_gpa_scale_screenreader: "نمره: {grade}%"
-    grade_letter_grade_screenreader: "نمره: {grade}%"
-    grade_pass_fail_screenreader: "نمره: {grade}%"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "نمره: %{grade}%"
     grading_type_selector: 
@@ -2402,7 +2399,6 @@ fa-IR:
       loading: "در حال بارگذاری"
       no_events: "بعد از این تاریخ رویدادی وجود ندارد."
       starts_at: "شروع می شود از"
-    agenda_view_displaying_start_end: "اکنون در حال نمایش از {start}% تا {end}%"
     appointment_group_deletion_details: "با حذف کردن آن، هر گونه قرار ملاقات که دانشجویان در آن ثبت نام کرده اند، حذف خواهد شد."
     appointment_group_list: 
       delete: حذف
@@ -6146,6 +6142,7 @@ fa-IR:
       ? "on"
       : فعال
       release_notes: "انتشار یادداشت ها"
+      toggle_feature_details: "فعال سازی اطلاعات ویژگی"
     feature_flag_admin_view: 
       feature_options: "گزینه‌های ویژگی"
       no_features_available: "هیچ ویژگی در حال حاضر در دسترس نیست."
@@ -6524,8 +6521,6 @@ fa-IR:
     students_who: 
       havent_been_graded: "نمره گذاری نشده است"
       havent_submitted_yet: "هنوز ارسال نکرده است"
-      no_grade_for: "نمره ای برای {assignment}% وجود ندارد"
-      no_submission_for: "مورد ارسالی برای {assignment}% وجود ندارد"
       not_submitted_yet: "هنوز ارسال نکرده است"
       scored_less_than: "نمره گذاری شده کمتر از"
       scored_less_than_on: "نمره کمتر از  %{cutoff} در %{assignment} "
@@ -7282,8 +7277,6 @@ fa-IR:
     titles: 
       add_group_category: "افزودن مجموعه گروه ها"
       self_signup_help: "گروه های ثبت نام شخصی"
-    unassigned_students: "دانشجویان تخصیص داده نشده ({count}%)"
-    unassigned_users: "کاربران تخصیص داده نشده ({count}%)"
   help_dialog: 
     Back: بازگشت
     Help: راهنما
@@ -9718,7 +9711,6 @@ fa-IR:
       Save: "ذخیره سازی"
       cancel: لغو
       creating: "در حال ایجاد..."
-    dialog_title: "افزودن مورد به {moduleName}%"
     module_collection_view: 
       button: 
         preview: "پیش نمایش"
