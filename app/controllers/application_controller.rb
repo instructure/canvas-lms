@@ -184,15 +184,23 @@ class ApplicationController < ActionController::Base
       infer_locale :context => @context,
                    :user => @current_user,
                    :root_account => @domain_root_account,
+                   :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
     }
   end
 
   def set_locale
+    store_session_locale
     assign_localizer
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def store_session_locale
+    return unless locale = params[:session_locale]
+    supported_locales = I18n.available_locales.map(&:to_s)
+    session[:locale] = locale if supported_locales.include? locale
   end
 
   def init_body_classes
