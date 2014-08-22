@@ -6112,6 +6112,7 @@ de:
       ? "on"
       : Ein
       release_notes: Versionshinweise
+      toggle_feature_details: "Funktionsdetails ein/aus"
     feature_flag_admin_view: 
       feature_options: Funktionsoptionen
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
@@ -10006,7 +10007,6 @@ de:
     confirm: 
       delete: "Möchten Sie den Löschvorgang wirklich durchführen?"
       import_group: "Gruppe \"%{group}\" in Gruppe \"%{target}\" importieren?"
-      import_outcome: "Ergebnis \"%{group}\" in Gruppe \"%{target}\" importieren?"
     criteria: 
       does_not_meet_expectations: "Erfüllt nicht die Erwartungen"
       exceeds_expectations: "Übertrifft die Erwartungen"
