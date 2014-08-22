@@ -184,6 +184,16 @@
         }
     });
     // END CANVAS-246
+
+    // CANVAS-252 Temporarily make full/sortable names read-only
+    utils.onPage(/^\/profile\/settings\/?$/, function () {
+        $(document).ready(function () {
+            var $fields = $('.full_name.display_data, .sortable_name.display_data');
+            $fields.removeClass('display_data').addClass('edit_or_show_data');
+            $fields.siblings('input').remove();
+        });
+    });
+    // END CANVAS-252
 })(jQuery);
 
 // google analytics
