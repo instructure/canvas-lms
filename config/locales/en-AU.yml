@@ -6146,6 +6146,7 @@ en-AU:
       ? "on"
       : "On"
       release_notes: "release notes"
+      toggle_feature_details: "Toggle feature details"
     feature_flag_admin_view: 
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
@@ -7363,7 +7364,6 @@ en-AU:
     text_entry_submission: "Text Entry Submission"
   images: 
     error_checking_color: "Error checking image colour"
-    invalid_background_color: "Background colour must be %{colour}"
     invalid_dimensions: "Invalid image dimensions (got %{actual}, expected: %{expected})"
     invalid_file_size: "Image file size is too large (max %{max} bytes, got %{actual})"
     invalid_file_type: "Invalid file type %{type}. Allowed types include: %{type_list}"
