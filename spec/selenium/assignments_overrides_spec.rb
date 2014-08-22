@@ -108,22 +108,5 @@ describe "assignment groups" do
       tooltip.should include_text 'New Section'
       tooltip.should include_text 'Everyone else'
     end
-
-    it "should show a vdd tooltip summary on the global assignments page" do
-      assignment = create_assignment!
-      get "/assignments"
-      f('.group_assignment .date_text').should_not include_text "Multiple Due Dates"
-      add_due_date_override(assignment)
-
-      get "/assignments"
-      f('.group_assignment .date_text').should include_text "Multiple Due Dates"
-      driver.mouse.move_to f(".group_assignment .date_text a")
-      wait_for_ajaximations
-
-      tooltip = fj('.vdd_tooltip_content:visible')
-      tooltip.should include_text 'New Section'
-      tooltip.should include_text 'Everyone else'
-    end
-
   end
 end

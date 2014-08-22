@@ -59,52 +59,6 @@
           <%= render(:partial => 'shared/home_menu') %>
         </li>
         <%- end -%>
-        <li id="assignments_menu_item" class="menu-item">
-        <%
-        # this will cache the assignments menu for 3 minutes.  the way it is right now it does 3 really expensive queries every page load.
-        # to do this better we would either figure a better way to find needing_submitting, needing_grading, and recently_graded
-        # or use delayed_job and memcache together to compute and cache it outside of the scope of a request
-        # so by just caching this stupidly for 3 minutes, if there is a new thing that should show up in the last 3 minutes, it wont show up.
-        cache([@current_user, 'assignments_menu'], :expires_in => 3.minutes) do %>
-          <%# if there is anything inside the assignments drop down %>
-        <%-
-          max_to_show = 8
-          assignment_sets = {
-            :assignments_needing_submitting => t('menu.assignments_needing_submitting', "To Turn In"),
-            :assignments_needing_grading    => t('menu.assignments_needing_grading', "To Grade"),
-            :assignments_recently_graded    => t('menu.assignments_recently_graded', "Recently Graded")
-          }
-          total_shown = 0
-          if assignment_sets.any?{ |k, v| @current_user.send(k).length > 0 }
-        -%>
-          <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i></a>
-          <div class="menu-item-drop">
-            <table cellspacing="0">
-              <tr>
-                <% assignment_sets.each do |k,v|
-                    if (set = @current_user.send(k)).length > 0
-                      set = set[0,(max_to_show - total_shown)]
-                      total_shown += set.length
-                     %><%= render(:partial => "shared/menu_section", :locals => {
-                                  :max_to_show => max_to_show,
-                                  :more_link_for_over_max => assignments_path,
-                                  :collection => set,
-                                  :collection_size => total_shown >= max_to_show ? @current_user.send(k, limit: nil).size : set.length,
-                                  :partial => "shared/menu_assignment",
-                                  :key => k,
-                                  :title => v })  %>
-                    <%
-                    end
-                  end
-                %>
-              </tr>
-            </table>
-          </div>
-          <%- else #there is not anything to show in the assignments drop down  -%>
-          <a href="/assignments" class="menu-item-no-drop"><%= t('menu.assignments', 'Assignments') %></a>
-          <%- end -%>
-        <% end %>
-        </li>
         <li id="grades_menu_item" class="menu-item">
           <%= link_to(t('menu.grades', 'Grades'), :grades, :class=>"menu-item-no-drop") %>
         </li>

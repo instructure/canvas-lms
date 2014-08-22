@@ -66,7 +66,8 @@ class AssignmentsController < ApplicationController
   end
 
   def old_index
-    if @context == @current_user || authorized_action(@context, @current_user, :read)
+    return redirect_to(dashboard_url) if @context == @current_user
+    if authorized_action(@context, @current_user, :read)
       get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
       get_sorted_assignments
       add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
