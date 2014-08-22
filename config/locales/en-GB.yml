@@ -6142,6 +6142,7 @@ en-GB:
       ? "on"
       : "On"
       release_notes: "release notes"
+      toggle_feature_details: "Toggle feature details"
     feature_flag_admin_view: 
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
