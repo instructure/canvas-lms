@@ -19,10 +19,19 @@
 module ContextModulesHelper
   def cache_if_module(context_module, editable, draft_state, &block)
     if context_module
-      cache(['context_module_render_11_', context_module.cache_key, editable, draft_state].join('/'), nil, &block)
+      cache_key = ['context_module_render_11_', context_module.cache_key, editable, draft_state].join('/')
+      cache_key = add_menu_tools_to_cache_key(cache_key)
+      cache(cache_key, nil, &block)
     else
       yield
     end
+  end
+
+  def add_menu_tools_to_cache_key(cache_key)
+    tool_key = @menu_tools && @menu_tools.values.flatten.map(&:cache_key).join("/")
+    cache_key += Digest::MD5.hexdigest(tool_key) if tool_key.present?
+    # should leave it alone if there are no tools
+    cache_key
   end
 
   def module_item_published?(item)

@@ -445,9 +445,10 @@ class ExternalToolsController < ApplicationController
     #contstruct query params for the export endpoint
     query_params = {"export_type" => "common_cartridge"}
     media_types = []
-    [:assignments, :modules, :pages, :quizzes].each do |type|
+    [:assignments, :modules, :module_items, :pages, :quizzes].each do |type|
       if params[type]
-        query_params[type] = params[type]
+        query_params['select'] ||= {}
+        query_params['select'][type] = params[type]
         media_types << (params[type].size == 1 ? type : :course)
       end
     end
@@ -463,6 +464,19 @@ class ExternalToolsController < ApplicationController
         title = @context.wiki.wiki_pages.where(id: params[:pages].first).first.title
       when 'quiz'
         title = @context.quizzes.where(id: params[:quizzes].first).first.title
+      when 'module_item'
+        tag = @context.context_module_tags.where(id: params[:module_items].first).first
+
+        case tag.content
+        when Assignment
+          media_type = 'assignment'
+        when Quizzes::Quiz
+          media_type = 'quiz'
+        when WikiPage
+          media_type = 'page'
+        end
+
+        title = tag.title
       when 'course'
         title = @context.name
     end

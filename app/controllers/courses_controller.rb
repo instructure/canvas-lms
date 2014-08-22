@@ -1270,6 +1270,8 @@ class CoursesController < ApplicationController
   end
   protected :check_for_xlist
 
+  include ContextModulesController::ModuleIndexHelper
+
   # @API Get a single course
   # Return information on a single course.
   #
@@ -1368,8 +1370,7 @@ class CoursesController < ApplicationController
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
-        @modules = @context.modules_visible_to(@current_user)
-        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
+        load_modules
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @syllabus_body = api_user_content(@context.syllabus_body, @context)

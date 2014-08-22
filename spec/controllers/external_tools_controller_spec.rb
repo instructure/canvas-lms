@@ -103,7 +103,7 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "assignments%5B%5D=#{assignment.id}"
+        params.should include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.assignment'
         placement['placementOf']['title'].should == 'an assignment'
       end
@@ -117,7 +117,7 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "quizzes%5B%5D=#{quiz.id}"
+        params.should include "select%5Bquizzes%5D%5B%5D=#{quiz.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
         placement['placementOf']['title'].should == 'a quiz'
       end
@@ -131,9 +131,26 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "modules%5B%5D=#{context_module.id}"
+        params.should include "select%5Bmodules%5D%5B%5D=#{context_module.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.module'
         placement['placementOf']['title'].should == 'a module'
+      end
+
+      it "sends content item json for a module item" do
+        user_session(@teacher)
+        context_module = @course.context_modules.create!(name: 'a module')
+        quiz = @course.quizzes.create!(title: 'a quiz')
+        tag = context_module.add_item(:id => quiz.id, :type => 'quiz')
+
+        get :show, :course_id => @course.id, id: @tool.id, :module_items => [tag.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "select%5Bmodule_items%5D%5B%5D=#{tag.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
+        placement['placementOf']['title'].should == 'a quiz'
       end
 
       it "sends content item json for a page" do
@@ -145,7 +162,7 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "pages%5B%5D=#{page.id}"
+        params.should include "select%5Bpages%5D%5B%5D=#{page.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.page'
         placement['placementOf']['title'].should == 'a page'
       end
@@ -159,9 +176,9 @@ describe ExternalToolsController do
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
         params.should include 'export_type=common_cartridge'
-        params.should include 'pages%5B%5D=1'
-        params.should include 'pages%5B%5D=6'
-        params.should include 'assignments%5B%5D=6'
+        params.should include "select%5Bpages%5D%5B%5D=1"
+        params.should include "select%5Bpages%5D%5B%5D=6"
+        params.should include "select%5Bassignments%5D%5B%5D=6"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
         placement['placementOf']['title'].should == 'a course'
       end
