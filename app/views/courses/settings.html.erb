@@ -89,9 +89,15 @@
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>
           <span class="course_form">
-            <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
+            <%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
           </span>
-          <span class="course_info time_zone"><%= @context.time_zone.name %></span>
+          <span class="course_info time_zone">
+            <% if name = @context.time_zone.try(:name) %>
+              <%= I18n.send(:translate, I18nTimeZone[name].keyify, name) %>
+            <% else %>
+              <%= t(:none, "None") %>
+            <% end %>
+          </span>
         </td>
       <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>

@@ -85,8 +85,14 @@
   <tr>
     <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
     <td>
-      <span class="time_zone display_data"><%= @user.time_zone.try(:name) || t(:none, "None") %></span>
-      <span class="edit_data"><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :model => I18nTimeZone, :default => ((@domain_root_account && @domain_root_account.default_time_zone.name) || "Mountain Time (US & Canada)") %><%# that default time zone is a value, not text %></span>
+      <span class="time_zone display_data">
+        <% if name = @user.time_zone.try(:name) %>
+          <%= I18n.send(:translate, I18nTimeZone[name].keyify, name) %>
+        <% else %>
+          <%= t(:none, "None") %>
+        <% end %>
+      </span>
+      <span class="edit_data"><%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => (@domain_root_account.try(:default_time_zone) || "Mountain Time (US & Canada)") %></span>
     </td>
   </tr>
   <% if @domain_root_account == Account.default %>
