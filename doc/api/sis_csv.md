@@ -209,9 +209,6 @@ interface, this is called the SIS ID.</td>
 </tr>
 </table>
 
-Any account that will have child accounts must be listed in the csv before any child account
-references it.
-
 Sample:
 
 <pre>
