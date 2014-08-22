@@ -104,16 +104,18 @@
   .user_name
     @if $is-k12 == false
       margin-right: 15px
-    a
-      @if $is-k12 == false
-        text-decoration: none !important
   a
     @if $is-k12
       color: $k12-header-text
+      text-decoration: none
       &:hover, &:focus
         text-decoration: underline
     @else
       color: $identity_link_color
+      @if $use_high_contrast
+        text-decoration: none
+      &:hover, &:focus
+        text-decoration: underline
 
   .emphasize-name
     color: $masquerade-link-color
@@ -160,6 +162,8 @@
   .menu-item-title, .menu-item-no-drop
     position: relative
     z-index: 100
+    text-decoration: none
+
     @if $is-k12
       +border-box
       transition: background 0.2s linear
@@ -178,26 +182,13 @@
       display: block
       padding: 6px 17px 5px
       height: 29px
-      text-decoration: none
       color: #fff
       font-size: 15px
   
-  .menu-item-title
-    @if $is-k12
-      &:focus
-        outline: none
-        box-shadow: inset 0 0 0 2px $orange
-      @if $use_high_contrast == false
-        &:hover, &:focus
-          text-decoration: none
-
-  .menu-item-no-drop
+  .menu-item-no-drop, .menu-item-title
     &:hover, &:focus
       text-decoration: underline
     @if $is-k12
-      &:focus
-        outline: none
-        box-shadow: inset 0 0 0 2px $orange
       &:hover, &:focus
         background: rgba($k12-header-text, 0.15)
         @if $use_high_contrast == false
@@ -211,7 +202,8 @@
       @if $is-k12
         background: rgba($k12-header-text, 0.1)
         color: $k12-header-text
-        text-decoration: none
+        @if $use_high_contrast == false
+          text-decoration: none
       @else
         color: $menu-text-color
         border-top-color: $menu-border-color

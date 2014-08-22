@@ -69,9 +69,9 @@
       & > a {
         display: block;
         color: ensure-contrast($gray, $lightBackground);
-        &:hover { text-decoration: none; }
-        &:focus { text-decoration: underline; }
+        text-decoration: none;
         
+        // K-12 styles
         @if $is-k12 { 
           padding: ($k12-sp - 4) $k12-sp;
           border-radius: $k12-sp/2;
@@ -85,12 +85,15 @@
           @else { &:hover, &:focus { background: #f2f2f2; } }
         }
         
+        // Default UI styles
         @else {
           padding: 4px 8px;
-          &:hover {
+
+          &:hover, &:focus {
             @if $use_high_contrast {
               background: #333;
               color: #fff;
+              text-decoration: underline; 
             } 
             @else { background: $white; }
           }
@@ -173,10 +176,9 @@
     box-shadow: 0 1px 0px rgba(255, 255, 255, 0.85);
     padding: 8px 0;
 
-    &:hover {
-      text-decoration: none;
-      color: $blue;
-    }
+    &:hover, &:focus { color: $blue; }
+
+    @if $use_high_contrast { text-decoration: none; }
 
     &:active {
       color: $grayLight;
