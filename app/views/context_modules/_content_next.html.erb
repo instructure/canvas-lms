@@ -145,6 +145,34 @@
   border: none !important;
 }
 
+input.move-module-label-spacer {
+  margin-right: 10px;
+}
+.move-module-or {
+  display: inline-block;
+  width: 60px;
+  margin-left: 20px;
+
+}
+.move-module-select-spacer {
+  margin-top: 10px;
+}
+
+.drag_and_drop_warning {
+  display: none;
+  color: #fff;
+  background-color: #DC3F3F;
+  border: 1px dashed #fff;
+  font-size: 12px;
+  padding: 1px;
+  z-index: 2;
+  position: absolute;
+  top: -20px;
+  left: -1px;
+}
+
+
+
 </style>
 
 <% if course_home %>
@@ -162,15 +190,9 @@
   <% end %>
 </div>
 
-<div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
-  <%= t('modules_keyboard_hint',
-        'To change the order of the course modules and module items,
-        first turn the cursor off on your screen reader. Insert-z in JAWS.
-        Press tab to select the first module.
-        Press up and down to choose a module or module item.
-        Press space to select the module or module item to start dragging.
-        Then press up and down to select a destination.
-        Then press space a second time to drop selection after destination.') %>
+<div class="hidden-readable screenreader-only" tabindex="0" aria-label="keyboard instructions">
+  <%= t('modules_keyboard_hint_updated',
+        'Warning: For improved accessibility, please use the Move To Dialog option found in the menu.') %>
 </div>
 
 <% keyboard_navigation([
@@ -215,6 +237,26 @@ TEXT
 <%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable} %>
 
 <% if can_do(@context, @current_user, :manage_content) %>
+  <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
+    <div class="form-dialog-content">
+      <h2>Place <span id="move_module_name"> </span></h2>
+      <div class="move-module-before-after-container">
+        <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t('move_module.before', "Before") %></label>
+          <strong class="move-module-or">OR</strong>
+        <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t('move_module.after', "After") %></label>
+      </div>
+      <div class="move-module-select-spacer">
+        <select name="move_context_module_select" id="move_context_module_select"></select>
+      </div>
+
+    </div>
+    <div class="form-controls">
+      <button type="button" id="move_module_cancel_btn" class="btn">Cancel</button>
+      <button type="submit" class="btn btn-primary">Move</button>
+    </div>
+  </form>
+
+
   <%= form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
       <tr>
@@ -377,8 +419,8 @@ TEXT
       <tr>
         <td class="left">
           <div style="display: none;">
-            <%= before_label('sort_by', %{Sort By}) %> 
-            <a href="#"><%= t('links.sort_by_name', %{Name}) %></a> | 
+            <%= before_label('sort_by', %{Sort By}) %>
+            <a href="#"><%= t('links.sort_by_name', %{Name}) %></a> |
             <a href="#"><%= t('links.sort_by_progress', %{Progress}) %></a>
           </div>
           <ul class="side_tabs student_list">

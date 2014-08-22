@@ -126,7 +126,7 @@ define([
             .find(".progression_complete").showIf(data.progression_complete_count > 0).end()
             .find(".progression_started").showIf(data.progression_started_count > 0);
         });
-        
+
         $(".context_module .progression_complete").showIf($(".context_module .prerequisites_footer:visible,.context_module_item .criterion img.not_blank").length > 0);
         if(show_links) {
           $(".loading_module_progressions_link").remove();
@@ -176,7 +176,7 @@ define([
             var progression = data.context_module_progression;
             if(progression.user_id == current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
-  
+
               if($user_progression.length === 0 && $user_progression_list.length > 0) {
                 $user_progression = $user_progression_list.find(".progression_blank").clone(true);
                 $user_progression.removeClass('progression_blank').addClass('progression_' + progression.context_module_id);
@@ -248,6 +248,61 @@ define([
           $this.attr('title', content_tag.title);
         });
       },
+      showMoveModule: function ($module) {
+        var $form = $('#move_context_module_form');
+        $form.data('current_module', $module);
+        // Set the module name
+        $('#move_module_name').text($module.children('.header').children('.collapse_module_link').children('.name').text());
+
+        // Get current module ordering
+        var currentOrdering = [];
+        var selectOptions = [];
+
+        $("#context_modules .context_module").each(function() {
+          var id = $(this).attr('id').substring('context_module_'.length);
+          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
+          currentOrdering.push({
+            'id': id,
+            'name': name
+          });
+          selectOptions.push('<option value="' + id + '">' + name + '</option>');
+        });
+
+        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
+        $('#move_context_module_select').append(selectOptions.join(''));
+        //$form.fillFormData(data, {object_name: 'context_module'});
+        $form.dialog({
+          autoOpen: false,
+          modal: true,
+          width: 600,
+          height: 300,
+          close: function () {
+            modules.hideMoveModule(true);
+          }
+        }).dialog('open');
+        $module.removeClass('dont_remove');
+        // $form.find('.ui-dialog-titlebar-close').focus();
+
+      },
+      hideMoveModule: function (remove) {
+        $('#move_context_module_form:visible').dialog('close');
+      },
+      submitMoveModule: function () {
+        var beforeOrAfterVal = $('[name="move_location"]:checked').val();
+        var currentModule = $('#move_context_module_form').data('current_module');
+        var relativeToId = $('#move_context_module_select').val();
+
+        if (beforeOrAfterVal === 'before') {
+          $('#context_module_' + relativeToId).before(currentModule);
+        }
+        if (beforeOrAfterVal === 'after') {
+          $('#context_module_' + relativeToId).after(currentModule);
+        }
+        modules.hideMoveModule();
+        modules.updateModulePositions();
+
+      },
+
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
@@ -420,7 +475,7 @@ define([
             }
           });
         });
-        
+
         for (var val in result.to_visit) {
           if (result.to_visit.hasOwnProperty(val)) {
             var ids = val.split("_");
@@ -480,10 +535,10 @@ define([
       }
     };
   })();
-  
+
 
   modules.initModuleManagement = function() {
-    // Create the context modules backbone view to manage the publish button. 
+    // Create the context modules backbone view to manage the publish button.
     var context_modules_view = new ContextModulesView({
       el: $("#content"),
       modules: modules
@@ -731,6 +786,8 @@ define([
         $(this).remove();
       });
     });
+
+
     $(".delete_module_link").live('click', function(event) {
       event.preventDefault();
       $(this).parents(".context_module").confirmDelete({
@@ -814,6 +871,27 @@ define([
           });
         }
       });
+    });
+
+    $('.move_module_link').on('click keyclick', function (event) {
+      event.preventDefault();
+      modules.showMoveModule($(this).parents('.context_module'));
+    });
+
+    $('#move_context_module_form').on('submit', function (event) {
+      event.preventDefault();
+      modules.submitMoveModule();
+    });
+
+    $('#move_module_cancel_btn').on('click keyclick', function (event) {
+      modules.hideMoveModule();
+    });
+
+    $('.icon-drag-handle').on('focus', function (event) {
+      $(event.currentTarget).siblings('.drag_and_drop_warning').show();
+    });
+    $('.icon-drag-handle').on('blur', function (event) {
+      $(event.currentTarget).siblings('.drag_and_drop_warning').hide();
     });
 
     $(".edit_module_link").live('click', function(event) {
@@ -1202,11 +1280,11 @@ define([
     if($("#context_modules").hasClass('editable')) {
       setTimeout(modules.initModuleManagement, 1000);
     }
-    
+
     modules.updateProgressions();
     modules.refreshProgressions();
     modules.updateAssignmentData();
-    
+
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click', function(event, goSlow) {
       event.preventDefault();
       var expandCallback = null;
@@ -1304,7 +1382,7 @@ define([
         var $module = $(this);
         var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
         var $row = $("#student_progression_dialog .module_" + moduleData.id);
-        
+
         moduleData.progress = $studentWithProgressions.find(".progression_" + moduleData.id + ":first").getTemplateData({textValues: ['workflow_state']}).workflow_state;
         moduleData.progress = moduleData.progress || "no information";
         var type = "nothing";
@@ -1387,12 +1465,12 @@ define([
         var $module = $(this);
         var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
         var $template = $dialog.find(".module.blank:first").clone(true).removeClass('blank');
-        
+
         $template.addClass('module_' + moduleData.id);
         $template.fillTemplateData({data: moduleData});
         $dialog.find(".side_tabs_content tbody").append($template.show());
       });
-  
+
       $("#student_progression_dialog").dialog({
         width: 800,
         open: function() {
