@@ -44,9 +44,9 @@ ja:
   qualified_locale: ja-JP
 nl:
   locales:
-    nl: Nederlands (crowd-sourced)
+    nl: Nederlands
   qualified_locale: nl-NL
-  crowdsourced: true
+  crowdsourced: false
 nb:
   locales:
     nb: Norwegian (Bokmål)
