@@ -6131,6 +6131,7 @@ nb:
       ? "on"
       : På
       release_notes: versjonsmerknader
+      toggle_feature_details: "Vis/skjul funksjonsdetaljer"
     feature_flag_admin_view: 
       feature_options: Funksjonsvalg
       no_features_available: "Ingen funksjoner er tilgjengelige for tiden."
