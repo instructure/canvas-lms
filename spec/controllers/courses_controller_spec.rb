@@ -1556,4 +1556,25 @@ describe CoursesController do
       end
     end
   end
+
+  describe "DELETE 'test_student'" do
+    before :once do
+      @account = Account.default
+      course_with_teacher(:account => @account, :active_all => true)
+      @quiz = @course.quizzes.create!
+      @quiz.workflow_state = "available"
+      @quiz.save
+    end
+
+    it "removes existing quiz submissions created by the test student" do
+      user_session(@teacher)
+      post 'student_view', course_id: @course.id
+      test_student = @course.student_view_student
+      Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_student)
+      test_student.quiz_submissions.size.should_not be_zero
+      delete 'reset_test_student', course_id: @course.id
+      test_student.reload
+      test_student.quiz_submissions.size.should be_zero
+    end
+  end
 end

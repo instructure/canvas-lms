@@ -2000,6 +2000,10 @@ class CoursesController < ApplicationController
     if @current_user.fake_student? && authorized_action(@context, @real_current_user, :use_student_view)
       # destroy the exising student
       @fake_student = @context.student_view_student
+      # but first, remove all existing quiz submissions / submissions
+      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.quiz_submissions.destroy_all
+
       @fake_student.destroy
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
       enter_student_view
