@@ -6145,6 +6145,7 @@ ja:
       ? "on"
       : オン
       release_notes: "リリース ノート"
+      toggle_feature_details: 機能詳細の切り替え
     feature_flag_admin_view: 
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
