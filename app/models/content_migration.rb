@@ -610,10 +610,24 @@ class ContentMigration < ActiveRecord::Base
   # (usually it's just .singularize; weird names needing special casing go here :P)
   def self.asset_string_prefix(key)
     case key
-      when 'quizzes'
-        'quizzes:quiz'
-      else
-        key.singularize
+    when 'quizzes'
+      'quizzes:quiz'
+    else
+      key.singularize
+    end
+  end
+
+  def self.collection_name(key)
+    key = key.to_s
+    case key
+    when 'modules'
+      'context_modules'
+    when 'module_items'
+      'content_tags'
+    when 'pages'
+      'wiki_pages'
+    else
+      key
     end
   end
 
@@ -629,6 +643,7 @@ class ContentMigration < ActiveRecord::Base
     new_hash = {}
 
     hash.each do |key, value|
+      key = collection_name(key)
       case value
       when Hash # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
         new_sub_hash = {}

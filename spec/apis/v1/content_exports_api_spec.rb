@@ -337,6 +337,51 @@ describe ContentExportsApiController, type: :request do
                                 { :select => {:quizzes => [quiz_to_copy.id]} })
         export = t_course.content_exports.find_by_id(json['id'])
         export.settings['selected_content']['quizzes'].should == {CC::CCHelper.create_key(quiz_to_copy) => "1"}
+        export.export_object?(quiz_to_copy).should be_true
+      end
+
+      it "should select using shortened collection names" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:modules => [mod.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.export_object?(mod).should be_true
+
+        tag = mod.content_tags.first
+        json2 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:module_items => [tag.id]} })
+        export2 = t_course.content_exports.find_by_id(json2['id'])
+        export2.export_object?(tag).should be_true
+
+        json3 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                 { :select => {:pages => [page_to_copy.id]} })
+        export3 = t_course.content_exports.find_by_id(json3['id'])
+        export3.export_object?(page_to_copy).should be_true
+      end
+
+      it "should export by module item id" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:module_items => [mod.content_tags.first.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        run_jobs
+
+        export.reload
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
+
+        run_jobs
+
+        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        copied_page.should_not be_nil
+        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
       end
     end
   end
