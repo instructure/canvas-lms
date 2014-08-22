@@ -1675,11 +1675,9 @@ fr:
       would_you_like: "Souhaitez-vous :"
     drop_highest_rule: 
       one: "Ôter la note la plus élevée"
-      other: "Ôter les %{number} notes les plus élevées"
     drop_highest_scores: "Ôter les %{number} notes les plus hautes"
     drop_lowest_rule: 
       one: "Ôter la note la plus faible"
-      other: "Ôter les %{number} notes les plus faibles"
     drop_lowest_scores: "Ôter les %{number} notes les plus basses"
     due_date_override: 
       overrides: 
@@ -6137,6 +6135,7 @@ fr:
       ? "on"
       : Activer
       release_notes: "notes de publication"
+      toggle_feature_details: "Alterner entre les détails de la fonction"
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
@@ -11383,7 +11382,7 @@ fr:
     answer_comments: "Commentaires pour la réponse"
     answer_text: "Texte de la réponse"
     assignment_points_possible: 
-      one: "%{count} point"
+      one: "%{count} points"
       other: "%{count} points"
     assignments_label: "Questionnaires sur les travaux – Afficher/masquer les questionnaires"
     buttons: 
@@ -11578,7 +11577,7 @@ fr:
     practices_label: "Questionnaires d’entraînement – Afficher/masquer les questionnaires"
     question_colon: "Question :"
     question_count: 
-      one: "%{count} question"
+      one: "%{count} questions"
       other: "%{count} questions"
     question_limit_reached: "Vous avez atteint le nombre maximum de questions autorisées pour un quizz (%{count}/%{limit}).\\n\\nPour contourner ce problème, vous pouvez répartir le contenu sur plusieurs quizz."
     quiz: 
