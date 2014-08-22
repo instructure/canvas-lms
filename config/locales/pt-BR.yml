@@ -55,7 +55,7 @@ pt-BR:
     default_site_administrator_account_name: "Administrador do site"
     default_term_name: "Período padrão"
     errors: 
-      invalid_discovery_url: "A URL de descoberta não é válido"
+      invalid_discovery_url: "A URL de descoberta não é válida"
     feedback_coach: "Pedir à comunidade"
     feedback_coach_sub: "Obter ajuda de um Expert em Canvas"
     feedback_feature_request: "Solcitar recurso"
@@ -102,8 +102,10 @@ pt-BR:
         auth_base: "URL do CAS"
         auth_type: Tipo
         login_handle_name: "Rótulo de login"
+        unknown_user_url: "URL de usuário desconhecido"
       login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
       save_button: "Salvar configurações de autenticação"
+      unknown_user_url_description: "A URL para redirecionar quando um usuário autenticado não é encontrado no Canvas"
     index: 
       add_auth_desc: "Adicionar um provedor de identidade a esta conta:"
       canvas_login_tip: |-
@@ -210,6 +212,7 @@ pt-BR:
         login_handle_name: "Rótulo de login"
         position: Posição
         requested_authn_context: "Contexto da autenticação"
+        unkown_user_url: "URL de usuário desconhecido"
       log_in_url: "URL de log on"
       log_out_url: "URL de log out"
       login_attribute: "Atributo do Login"
@@ -224,6 +227,7 @@ pt-BR:
       save_button: "Salvar configurações de autenticação"
       start_debugging: "Iniciar Depuração"
       stop_debugging: "Parar Depuração"
+      unkown_user_url_description: "A URL para redirecionar quando um usuário autenticado não é encontrado no Canvas"
     saml_testing: 
       auth_request_to_idp: "AuthnRequest enviado para ldP"
       auth_response_from_idp: "AuthnResponse de ldP"
@@ -1210,6 +1214,12 @@ pt-BR:
         header: 
           one: "1 erro impediu este %{model} de ser salvo"
           other: "%{count} erros impediram este %{model} de ser salvo"
+  add_module_item: 
+    add_assignment_to: "Adicionar uma tarefa a %{module}"
+    add_file_to: "Adicionar arquivos a %{module}"
+    add_page_to: "Adicionar páginas ao %{module}"
+    add_quiz_to: "Adicionar quizzes ao %{module}"
+    add_topic_to: "Adicionar tópicos de discussão ao %{module}"
   ajax_errors: 
     error_heading: "Erro Ajax: %{status_code}"
     errors: 
@@ -1261,6 +1271,8 @@ pt-BR:
       criteria_required: "É obrigatório pelo menos um disparador"
       recipients_required: "É obrigatório pelo menos um destinatário"
       threshold_should_be_numeric: "Este valor deve ser um número positivo."
+  allow_lor_tools: "Permitir que usuários visualizem e usem as ferramentas externas para LOR."
+  allow_opt_out_of_inbox: "Permitir que usuários optem fora da caixa de entrada Conversa. Isso fará com que todas as mensagens de conversas e notificações sejam enviadas como notificações ASAP para o email principal do usuário, ocultem os emblemas de mensagens não lidas da caixa de entrada de Conversas na Caixa de entrada e ocultem as preferências de notificação da Conversa."
   analytics: 
     course: 
       analytics: Análise
@@ -1878,6 +1890,7 @@ pt-BR:
     non_number: "Você deve usar um número"
     notices: 
       assignment_delete: "Esta tarefa foi excluída"
+      assignment_not_availible: "A tarefa que você solicitou não está disponível para sua seção de curso."
       created: "Tarefa criada com sucesso."
       updated: "Tarefa atualizada com sucesso."
     number_of_assignments: 
@@ -2158,6 +2171,7 @@ pt-BR:
         wizard_box: "Eu gostaria de:"
   assignments_api: 
     invalid_date_time: "Datetime inválido para %{attribute}"
+    invalid_submission_types: "Tipos de envio inválido"
   attachment: 
     default_filename: Arquivo
     errors: 
@@ -3065,9 +3079,13 @@ pt-BR:
         quiz: Teste
       links: 
         download: "Exportação de curso de %{date}: *Clique aqui para fazer download*"
+        download_file_export: "Exportação de arquivo de %{date}: *Clique aqui para fazer download*"
         download_qti: "Exportação em QTI de %{date}: *Clique aqui para fazer o download*"
+        download_user_export: "Exportação de dados do usuário de %{date}: *Clique aqui para download*"
       message: 
         export_started: "O processo de exportação foi iniciado. Isso pode levar algum tempo para cursos grandes. *Você pode sair da página* e receberá um email quando a exportação for concluída."
+      no_submissions: "Você atualmente não tem envios para exportar."
+      user_data_exports: "Exportações de dados do usuário"
     labels: 
       new_export: "Nova exportação:"
     links: 
@@ -3130,6 +3148,7 @@ pt-BR:
   content_migration: 
     bad_attachment: "O arquivo não foi enviado com sucesso."
     errors: 
+      cannot_shift_and_remove: "não é possível especificar shift_dates e remove_dates simultaneamente"
       import_error: "Erro de importação:"
     missing_content_links_message: "As seguintes referências não podem ser resolvidas:"
     missing_content_links_title: "Links desaparecidos foram encontrados no conteúdo importado"
@@ -3214,6 +3233,7 @@ pt-BR:
         beginning_change_to: "alterar para"
         beginning_date: "Data de início"
         checkbox_label: "Ajustar eventos e datas de conclusão"
+        date_adjustment: "Ajuste de data"
         ending_change_to: "alterar para"
         ending_date: "Data de término"
         new_end_date_label: "Alterar data de edição para"
@@ -3224,6 +3244,8 @@ pt-BR:
         old_end_date_title: "Data de término"
         old_start_date_label: "Data de início"
         old_start_date_title: "Data de início"
+        remove_dates: "Datas de remoção"
+        shift_dates: "Trocar datas"
         substitution: Substituição
       day_substitution: 
         move_from: "Mover de"
@@ -3654,6 +3676,7 @@ pt-BR:
         modules: 
           before_students_view: "Antes que os alunos possam ver este módulo"
         new_tab: "Carregar em uma nova guia"
+        publish_final_grade: "Publicar nota final para estudantes quando este módulo estiver concluído"
         require_sequential_progress: "Os alunos devem passar pelos requisitos nesse módulo na ordem sequencial"
         sort_by: "Ordenar por"
         title: Título
@@ -4245,7 +4268,6 @@ pt-BR:
       sis_source_id: "ID de origem SIS"
       start_at: "Início em"
       storage_quota: "Cota de armazenamento"
-      syllabus_body: corpo_do_programa
       tab_configuration: "Configuração de guia"
       template_course_id: "ID de curso modelo"
       turnitin_comments: "Comentários Turnitin"
@@ -4326,10 +4348,12 @@ pt-BR:
         show_more: "%{count} mais..."
         title: 
           ignore: "Ignorar esta tarefa"
+          ignore_review: "Ignorar essa revisão"
       need_grading_count: 
         one: "1 precisa ser avaliado"
         other: "%{count} precisam ser avaliados"
       no_peer_review_due_date: "vencimento: Sem data de entrega"
+      peer_review_due_date: "vencimento: %{peer_review_due_at}"
       points_possible: "de %{points_possible}"
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4558,6 +4582,7 @@ pt-BR:
         edit_sections_desc: "As seções são uma maneira adicional de organizar usuários. Isto permite que você dê várias aulas a partir do mesmo curso, de modo que você tenha todo o conteúdo do curso em um único lugar. Abaixo você pode mover um usuário para uma seção diferente ou adicionar/remover inscrições de seção. Os usuários devem estar, pelo menos, em uma seção o tempo todo."
       index: 
         cannot_add_users: "Novos usuários não podem ser adicionados, pois este curso está concluído"
+        filter_field_description: "Pesquisar pessoas. Na medida em que você digita nesse campo, a lista de pessoas será automaticamente preenchida para incluir somente aqueles nomes que correspondem à sua entrada."
         group_set: "Conjunto de grupo"
         people: Pessoas
         role_to_search: "Limitar pesquisa para função"
@@ -4611,6 +4636,7 @@ pt-BR:
       alerts_title: Alertas
       buttons: 
         add_section: "Adicionar turma"
+        edit_section_name: "Editar nome de seção"
         move_course: "Mover curso"
         update_course: "Atualizar detalhes do curso"
       course_conclude_at_warning_message: "O curso está configurado atualmente para encerrar à meia noite, o que significa que o dia anterior será o último dia no qual o curso esteve ativo."
@@ -4873,11 +4899,17 @@ pt-BR:
       rss_feed: "%{course} Feed"
     unauthorized: 
       invalid_link: "O link de inscrição usado parece não ser mais válido.  Entre em contato com o instrutor do curso e verifique se você ainda está inscrito corretamente."
+  create_item_base: 
+    there_was_an_error: "Houve um erro ao salvar \"%{title}\", tente novamente."
   create_module_item: 
     assignment_name: "Nome da tarefa"
   create_module_item_quiz: 
+    discussion_name: "Nome da discussão"
+    file_to_upload: "Arquivo para upload"
     graded_quiz: "Teste avaliado"
     graded_survey: "Questionário avaliado"
+    header_name: "Nome do cabeçalho"
+    link_title: "Título do link"
     page_name: "Nome da página"
     practice_quiz: "Praticar teste"
     quiz_name: "Nome do teste"
@@ -5010,6 +5042,7 @@ pt-BR:
     show_more_link: 
       show_less: "Exibir menos"
       show_more: "Exibir mais"
+  data_exports: "exportações de dados"
   date: 
     abbr_day_names: 
       - Dom
@@ -5391,6 +5424,7 @@ pt-BR:
       last_page: Última
     peer_reviews: 
       due_date: "entrega %{date}"
+      peer_review_alert: "Você teve uma tarefa de revisão de ponto para %{person}"
     points_possible_number: "Pontos possíveis devem ser um número"
     reply_count_tooltip: 
       one: "1 resposta."
@@ -6143,6 +6177,7 @@ pt-BR:
       ? "on"
       : Ligada
       release_notes: "liberar notas"
+      toggle_feature_details: "ligar detalhes de recurso"
     feature_flag_admin_view: 
       feature_options: "Opções de recurso"
       no_features_available: "Nenhum recurso está disponível no momento."
