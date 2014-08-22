@@ -1365,7 +1365,7 @@ describe Quizzes::Quiz do
   describe "#restrict_answers_for_concluded_course?" do
     let(:account){Account.new}
     let(:enrollment_term){EnrollmentTerm.new}
-    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term)}
+    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term, restrict_enrollments_to_course_dates: true)}
     let(:quiz){Quizzes::Quiz.new(context: course)}
 
     before {account.settings[:restrict_quiz_questions] = restrict_quiz_settings}
