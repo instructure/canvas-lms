@@ -4206,7 +4206,6 @@ es:
       sis_source_id: "ID de fuente SIS"
       start_at: "Comienza el"
       storage_quota: "Cuota de almacenamiento"
-      syllabus_body: cuerpo_programa_de_estudios
       tab_configuration: "Configuración de pestañas"
       template_course_id: "ID del curso modelo"
       turnitin_comments: "Comentarios en Turnitin"
@@ -6099,6 +6098,7 @@ es:
       ? "on"
       : Activado
       release_notes: "notas de la versión"
+      toggle_feature_details: "Alternar detalles de la función"
     feature_flag_admin_view: 
       feature_options: "Opciones de características"
       no_features_available: "No hay funciones disponibles actualmente"
