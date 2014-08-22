@@ -318,13 +318,12 @@ class ContextModule < ActiveRecord::Base
     array_filter = Proc.new{|tags, user_ids, course_id, opts|
       visible_assignments = opts[:assignment_visibilities] || AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
       visible_discussions = opts[:discussion_visibilities] || DiscussionTopic.where(context_id: course_id).visible_to_students_with_da_enabled(user_ids).pluck(:id)
-      # TODO: uncomment once quiz visibilities sql view makes it into master
-      # visible_quizzes = opts[:quiz_visibilities] || QuizStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
+      visible_quizzes = opts[:quiz_visibilities] || Quizzes::QuizStudentVisibility.where(user_id: user_ids, course_id: course_id).pluck(:quiz_id)
       tags.select{|tag|
         case tag.content_type;
         when 'Assignment'; visible_assignments.include?(tag.content_id);
         when 'DiscussionTopic'; visible_discussions.include?(tag.content_id);
-        # when 'Quizzes::Quiz'; visible_quizzes.include?(tag.content_id);
+        when *Quizzes::Quiz.class_names; visible_quizzes.include?(tag.content_id);
         else; true; end
       }
     }

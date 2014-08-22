@@ -56,6 +56,12 @@ class Quizzes::QuizzesController < ApplicationController
     # overrides later using the API:
     scope = scope.available unless can_manage
 
+    if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+        scope.visible_to_students_in_course_with_da(user_ids,@context.id)
+      end
+    end
+
     quizzes = scope.sort_by do |quiz|
       due_date = quiz.assignment ? quiz.assignment.due_at : quiz.lock_at
       [
@@ -189,6 +195,14 @@ class Quizzes::QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, :read)
       # optionally force auth even for public courses
       return if value_to_boolean(params[:force_user]) && !force_user
+
+      if @current_user && !@quiz.visible_to_user?(@current_user)
+        respond_to do |format|
+          flash[:error] = t 'notices.quiz_not_availible', "You do not have access to the requested quiz."
+          format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        end
+        return
+      end
 
       @quiz = @quiz.overridden_for(@current_user)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))

@@ -926,6 +926,22 @@ describe ContextModule do
         @module.content_tags_visible_to(@student_1).map(&:content).include?(@topic).should be_true
         @module.content_tags_visible_to(@student_2).map(&:content).include?(@topic).should be_false
       end
+      it "should filter differentiated quizzes" do
+        @quiz = Quizzes::Quiz.create!({
+          context: @course,
+          description: 'descript foo',
+          only_visible_to_overrides: true,
+          points_possible: rand(1000),
+          title: "differentiated quiz title"
+        })
+        @quiz.publish
+        @quiz.save!
+        create_section_override_for_quiz(@quiz, {course_section: @overriden_section})
+        @module.add_item({id: @quiz.id, type: 'quiz'})
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@quiz).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@quiz).should be_true
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@quiz).should be_false
+      end
       it "should work for observers" do
         @observer = User.create
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @overriden_section, :enrollment_state => 'active')

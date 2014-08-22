@@ -417,15 +417,16 @@ class ContentTag < ActiveRecord::Base
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
 
-  # TODO: add quizzes to this scope once the quiz visibilities view makes it into master
   scope :visible_to_students_with_da_enabled, lambda { |user_ids|
     joins("LEFT JOIN discussion_topics ON discussion_topics.id = content_tags.content_id AND content_type = 'DiscussionTopic'").
+    joins("LEFT JOIN quiz_student_visibilities ON quiz_student_visibilities.quiz_id = content_tags.content_id AND content_type IN ('Quiz','Quizzes::Quiz')").
     joins("LEFT JOIN assignment_student_visibilities ON ((assignment_student_visibilities.assignment_id = content_tags.content_id AND content_type = 'Assignment')
                 OR (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id AND content_type = 'DiscussionTopic'))").
-    where("content_tags.content_type NOT IN ('Assignment','DiscussionTopic')
+    where("content_tags.content_type NOT IN ('Assignment','DiscussionTopic', ? )
            OR ((discussion_topics.id IS NOT NULL AND discussion_topics.assignment_id IS NULL)
                OR (assignment_student_visibilities.assignment_id IS NOT NULL AND assignment_student_visibilities.user_id IN (?))
-              )", user_ids).
+               OR (quiz_student_visibilities.quiz_id IS NOT NULL AND quiz_student_visibilities.user_id IN (?))
+              )",Quizzes::Quiz.class_names, user_ids, user_ids).
     uniq
    }
 

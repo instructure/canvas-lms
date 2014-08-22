@@ -210,6 +210,12 @@ class User < ActiveRecord::Base
     where(:assignment_student_visibilities => { :assignment_id => assignment_id, :course_id => course_id })
   }
 
+  def assignment_and_quiz_visibilities(opts = {})
+     opts = {user_id: self.id}.merge(opts)
+     {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
+      quiz_ids: Quizzes::QuizStudentVisibility.where(opts).order('quiz_id desc').pluck(:quiz_id)}
+  end
+
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending

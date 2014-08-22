@@ -1445,4 +1445,43 @@ describe Quizzes::QuizzesController do
     end
   end
 
+  describe 'differentiated assignments' do
+    before do
+      course_with_teacher(active_all: true)
+      @student1, @student2 = n_students_in_course(2,:active_all => true, :course => @course)
+      @course.enable_feature!(:draft_state)
+      @course.enable_feature!(:differentiated_assignments)
+      @course_section = @course.course_sections.create!
+      course_quiz(active = true)
+      @quiz.only_visible_to_overrides = true
+      @quiz.save!
+      student_in_section(@course_section, user: @student1)
+      create_section_override_for_quiz(@quiz, course_section: @course_section)
+    end
+    context 'index' do
+      it 'shows the quiz to students with visibility' do
+        user_session(@student1)
+        get 'index', :course_id => @course.id
+        controller.js_env[:QUIZZES][:assignment].count.should == 1
+      end
+      it 'hides the quiz to students with visibility' do
+        user_session(@student2)
+        get 'index', :course_id => @course.id
+        controller.js_env[:QUIZZES][:assignment].should == []
+      end
+    end
+    context 'show' do
+      it 'shows the page to students with visibility' do
+        user_session(@student1)
+        get 'show', :course_id => @course.id, :id => @quiz.id
+        response.should_not be_redirect
+      end
+      it 'redirect for students without visibility' do
+        user_session(@student2)
+        get 'show', :course_id => @course.id, :id => @quiz.id
+        response.should be_redirect
+        flash[:error].should match(/You do not have access to the requested quiz/)
+      end
+    end
+  end
 end

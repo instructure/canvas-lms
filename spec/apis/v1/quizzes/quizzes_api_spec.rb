@@ -578,4 +578,122 @@ describe Quizzes::QuizzesApiController, type: :request do
       order.should == [@question1.id]
     end
   end
+
+  describe "differentiated assignments" do
+    def calls_display_quiz(quiz, opts={except: []})
+      get_index(quiz.context)
+      JSON.parse(response.body).to_s.should include("#{quiz.title}")
+      get_show(quiz)
+      JSON.parse(response.body).to_s.should include("#{quiz.title}")
+    end
+
+    def calls_do_not_show_quiz(quiz)
+      get_index(quiz.context)
+      JSON.parse(response.body).to_s.should_not include("#{quiz.title}")
+      get_show(quiz)
+      assert_status(401)
+    end
+
+    def get_index(course)
+      raw_api_call(:get, "/api/v1/courses/#{course.id}/quizzes",
+                   :controller => "quizzes/quizzes_api",
+                   :action => "index",
+                   :format => "json",
+                   :course_id => "#{course.id}")
+    end
+
+    def get_show(quiz)
+      raw_api_call(:get, "/api/v1/courses/#{quiz.context.id}/quizzes/#{quiz.id}",
+                        :controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{quiz.context.id}", :id => "#{quiz.id}")
+    end
+
+    def create_quiz_for_da(opts={})
+      @quiz = Quizzes::Quiz.create!({
+        context: @course,
+        description: 'descript foo',
+        only_visible_to_overrides: opts[:only_visible_to_overrides],
+        points_possible: rand(1000),
+        title: opts[:title]
+      })
+      @quiz.publish
+      @quiz.save!
+      @assignment = @quiz.assignment
+      @quiz
+    end
+
+    before(:once) do
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @student_with_override, @student_without_override= create_users(2, return_type: :record)
+
+      @quiz_with_restricted_access = create_quiz_for_da(title: "only visible to student one", only_visible_to_overrides: true)
+      @quiz_visible_to_all = create_quiz_for_da(title: "assigned to all", only_visible_to_overrides: false)
+
+      @course.enroll_student(@student_without_override, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student_with_override)
+      create_section_override_for_quiz(@quiz_with_restricted_access, {course_section: @section})
+
+      @observer = User.create
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active')
+      @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+    end
+
+    context "feature flag on" do
+      before {@course.enable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all quizzes" do
+        @user = @teacher
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "lets students with visibility see quizzes" do
+        @user = @student_with_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it 'gives observers the same visibility as their student' do
+        @user = @observer
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it 'observers without students see all' do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q)}
+      end
+
+      it "restricts access to students without visibility" do
+        @user = @student_without_override
+        calls_do_not_show_quiz(@quiz_with_restricted_access)
+        calls_display_quiz(@quiz_visible_to_all)
+      end
+
+      it "doesnt show extra assignments with overrides in the index" do
+        @quiz_assigned_to_empty_section = create_quiz_for_da(title: "assigned to none", only_visible_to_overrides: true)
+        @unassigned_section = @course.course_sections.create!(name: "unassigned section")
+        create_section_override_for_quiz(@quiz_assigned_to_empty_section, {course_section: @unassigned_section})
+
+        @user = @student_with_override
+        get_index(@course)
+        JSON.parse(response.body).to_s.should_not include("#{@quiz_assigned_to_empty_section.title}")
+      end
+    end
+
+    context "feature flag off" do
+      before {@course.disable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all quizzes" do
+        @user = @teacher
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "lets students with visibility see quizzes" do
+        @user = @student_with_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "does not restrict access to students without visibility" do
+        @user = @student_without_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+    end
+  end
 end

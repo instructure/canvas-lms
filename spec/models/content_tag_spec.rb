@@ -570,6 +570,24 @@ describe ContentTag do
         ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
       end
     end
+    context "quizzes" do
+      before do
+        @quiz = @course.quizzes.create!(only_visible_to_overrides: true)
+        @module = @course.context_modules.create!(:name => "module")
+        @tag = @module.add_item({
+          :type => 'quiz',
+          :title => 'some quiz',
+          :id => @quiz.id
+        })
+      end
+      it "returns a quiz if there is visibility" do
+        create_section_override_for_quiz(@quiz, course_section: @section)
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+      end
+      it "does not return quiz if there is visibility" do
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+      end
+    end
     context "other" do
       it "it properly returns wiki pages" do
         @page = @course.wiki.wiki_pages.create!(:title => "some page")

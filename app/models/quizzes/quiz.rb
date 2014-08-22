@@ -48,6 +48,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :quiz_statistics, :class_name => 'Quizzes::QuizStatistics', :order => 'created_at'
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
+  has_many :quiz_student_visibilities
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :assignment
@@ -1105,6 +1106,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
 
+  scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|
+    joins(:quiz_student_visibilities).
+    where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
+  }
+
   def teachers
     context.teacher_enrollments.map(&:user)
   end
@@ -1271,6 +1277,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   # override for draft state
   def available?
     feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
+  end
+
+  def visible_to_user?(user)
+    return true unless self.context.feature_enabled?(:differentiated_assignments)
+    visible_quizzes = AssignmentStudentVisibility.filter_for_differentiated_assignments([self],user,self.context) do |quiz_id, user_ids|
+      # note: quiz_id is an array
+      Quizzes::QuizStudentVisibility.where(user_id: user_ids, quiz_id: quiz_id)
+    end
+    visible_quizzes.any?
   end
 
   delegate :feature_enabled?, to: :context

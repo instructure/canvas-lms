@@ -266,6 +266,7 @@ class Quizzes::QuizzesApiController < ApplicationController
 
   before_filter :require_context
   before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
+  before_filter :check_differentiated_assignments, :only => [:show]
 
   # @API List quizzes in a course
   #
@@ -290,6 +291,13 @@ class Quizzes::QuizzesApiController < ApplicationController
       json = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+
+        if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+          scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+            scope.visible_to_students_in_course_with_da(user_ids, @context.id)
+          end
+        end
+
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           scope = scope.available
         end
@@ -509,5 +517,10 @@ class Quizzes::QuizzesApiController < ApplicationController
 
   def quiz_params
     filter_params params[:quiz]
+  end
+
+  def check_differentiated_assignments
+    return true unless @context.feature_enabled?(:differentiated_assignments)
+    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user)
   end
 end

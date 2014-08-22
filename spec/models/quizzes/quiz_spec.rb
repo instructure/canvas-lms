@@ -1761,4 +1761,114 @@ describe Quizzes::Quiz do
       lambda { quiz.context_module_tags.loaded? }.should_not raise_error
     end
   end
+
+  describe 'differentiated assignments' do
+    context 'visible_to_user?' do
+      before :once do
+        course_with_teacher_logged_in(active_all: true, course: @course)
+        @course_section = @course.course_sections.create
+        @student1, @student2 = create_users(2, return_type: :record)
+        @quiz = Quizzes::Quiz.create!({
+          context: @course,
+          description: 'descript foo',
+          only_visible_to_overrides: true,
+          points_possible: rand(1000),
+          title: "I am a quiz"
+        })
+        @quiz.publish
+        @quiz.save!
+        @assignment = @quiz.assignment
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        @course.reload
+      end
+      context 'DA feature on' do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        context 'student with override' do
+          it 'should show the quiz if there is an override' do
+            @quiz.visible_to_user?(@student1).should be_true
+          end
+        end
+        context 'student without override' do
+          it 'should hide the quiz there is no override' do
+            @quiz.visible_to_user?(@student2).should be_false
+          end
+          it 'should show the quiz if it is not only visible to overrides' do
+            @quiz.only_visible_to_overrides = false
+            @quiz.save!
+            @quiz.visible_to_user?(@student2).should be_true
+          end
+        end
+        context 'observer' do
+          before do
+            @observer = User.create
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          end
+          context 'with students' do
+            it 'should show the quiz if there is an override' do
+              @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+            it 'should hide the quiz there is no override' do
+              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+              @quiz.visible_to_user?(@observer).should be_false
+            end
+            it 'should show the quiz if it is not only visible to overrides' do
+              @quiz.only_visible_to_overrides = false
+              @quiz.save!
+              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+          end
+          context 'without sutdents' do
+            it 'should show the quiz if there is an override' do
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+            it 'should show the quiz even if there is no override' do
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+          end
+        end
+        context 'teacher' do
+          it 'should show the quiz' do
+            @quiz.visible_to_user?(@teacher).should be_true
+          end
+        end
+      end
+      context 'DA feature off' do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        context 'student' do
+          it 'should show the quiz even if there is no override' do
+            @quiz.visible_to_user?(@student1).should be_true
+            @quiz.visible_to_user?(@student2).should be_true
+          end
+        end
+        context 'observer' do
+          before do
+            @observer = User.create
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          end
+          context 'with students' do
+            it 'should show the quiz even if there is no override' do
+              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+          end
+          context 'without sutdents' do
+            it 'should show the quiz' do
+              @quiz.visible_to_user?(@observer).should be_true
+            end
+          end
+        end
+        context 'teacher' do
+          it 'should show the quiz' do
+            @quiz.visible_to_user?(@teacher).should be_true
+          end
+        end
+      end
+    end
+  end
 end
