@@ -17,12 +17,12 @@ pl:
       removed: "Grupa została pomyślnie usunięta."
     student_count: 
       few: "%{count} uczestników"
-      one: "%{count} uczestnik"
+      one: "%{count} uczestników"
       other: "%{count} uczestników"
     student_count_max: "%{count} / %{max} uczestników"
     user_count: 
       few: "%{count} użytkowników"
-      one: "%{count} użytkownik"
+      one: "%{count} użytkowników"
       other: "%{count} użytkowników"
     user_count_max: "%{count} / %{max} użytkowników"
   GroupUserCollection: 
@@ -1679,13 +1679,9 @@ pl:
       would_you_like: "Czy chcesz:"
     drop_highest_rule: 
       few: "Liczba najwyższych wyników punktowych do pominięcia: %{number}"
-      one: "Liczba najwyższych wyników punktowych do pominięcia: %{number}"
-      other: "Liczba najwyższych wyników punktowych do pominięcia: %{number}"
     drop_highest_scores: "Liczba najwyższych wyników punktowych do pominięcia: %{number}"
     drop_lowest_rule: 
       few: "Liczba najniższych wyników punktowych do pominięcia: %{number}"
-      one: "Liczba najniższych wyników punktowych do pominięcia: %{number}"
-      other: "Liczba najniższych wyników punktowych do pominięcia: %{number}"
     drop_lowest_scores: "Liczba najniższych wyników punktowych do pominięcia: %{number}"
     due_date_override: 
       overrides: 
@@ -6185,6 +6181,7 @@ pl:
       ? "on"
       : Wł.
       release_notes: "uwagi dotyczące opublikowania"
+      toggle_feature_details: "Przełącz szczegóły funkcji"
     feature_flag_admin_view: 
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
