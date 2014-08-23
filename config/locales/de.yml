@@ -10009,6 +10009,7 @@ de:
     confirm: 
       delete: "Möchten Sie den Löschvorgang wirklich durchführen?"
       import_group: "Gruppe \"%{group}\" in Gruppe \"%{target}\" importieren?"
+      import_outcome: "Ergebnis \"%{outcome}\" in Gruppe \"%{target}\" importieren?"
     criteria: 
       does_not_meet_expectations: "Erfüllt nicht die Erwartungen"
       exceeds_expectations: "Übertrifft die Erwartungen"
