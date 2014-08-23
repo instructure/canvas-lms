@@ -1,6 +1,10 @@
 require 'net/http'
 require 'cgi'
 
+require 'academic_benchmark/api'
+require 'academic_benchmark/engine'
+require 'academic_benchmark/standard'
+
 module AcademicBenchmark
   def self.config
     Canvas::Plugin.find('academic_benchmark_importer').settings || {}
@@ -60,9 +64,4 @@ module AcademicBenchmark
   def self.common_core_setting_key
     "common_core_outcome_group_id:#{Shard.current.id}"
   end
-
 end
-
-require 'academic_benchmark/api'
-require 'academic_benchmark/converter'
-require 'academic_benchmark/standard'
