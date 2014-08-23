@@ -134,7 +134,7 @@ END
       display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },
       description: -> { I18n.t('high_contrast_description', <<-END) },
 If you would prefer a higher-contrast version of the Canvas user interface, enable this.
-This might be useful for people with impaired vision or dificulty reading.
+This might be useful for people with impaired vision or difficulty reading.
 END
       applies_to: 'User',
       state: 'allowed',
