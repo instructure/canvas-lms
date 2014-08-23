@@ -25,6 +25,9 @@ nl:
       one: "1 gebruiker"
       other: "%{count} gebruikers"
     user_count_max: "%{count} / %{max} gebruikers"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "WAARSCHUWING: %{user} is al lid van %{group}"
   LongTextEditor: 
     cancel: Annuleren
     save: Opslaan
@@ -4858,7 +4861,7 @@ nl:
     url: URL
   create_users_view: 
     required: "Enkele e-mailadressen invoeren"
-  crowdsourced: true
+  crowdsourced: false
   crumbs: 
     access_report: Toegangsrapport
     announcements: Aankondigingen
@@ -6475,6 +6478,7 @@ nl:
       mastery_set_at: "Bekwaam vastgesteld op"
       no_results: "(geen resultaten)"
       view_more_details: "meer details bekijken"
+    percent_of_grade: "%{percentage} van cijfer"
     points_out_of: "van %{points_possible}"
     remedial: verbetering
     resubmitted: "Opnieuw ingezonden sinds laatste beoordeling"
@@ -7047,6 +7051,7 @@ nl:
       group_limit: "Groepslimiet moet leeg of groter dan 1 zijn"
       unknown: "Er is een onverwachte fout opgetreden."
       update_failed: "Bijwerken mislukt, probeer het opnieuw"
+    everyone: "Iedereen (%{count})"
     feed_title: "%{course_or_account_name}-feed"
     flash: 
       removeError: "Kan de groepsreeks niet verwijderen. Probeer het later opnieuw."
@@ -7642,7 +7647,7 @@ nl:
     help: Help
     show_me_where: "Aan mij tonen waar"
   locales: 
-    nl: "Nederlands (crowd-sourced)"
+    nl: Nederlands
   logged_out_user: "Uitgelogde gebruiker %{user_counter}"
   lti: 
     lti_message: 
@@ -7689,6 +7694,8 @@ nl:
       save_failed: "Opslaan schijnt mislukt te zijn. De pop-up sluiten om het opnieuw te proberen."
       save_failed_try_again: "Het is mislukt om vermelding op te slaan. Probeer het opnieuw."
       upload_failed: "Uploaden mislukt met de volgende fout:"
+    file_size_error: "Grootte van %{file} is meer dan de maximale %{max} toegestane bestandsgrootte"
+    file_type_error: "%{file} is geen acceptabel %{type} bestand"
     links: 
       minimize_embedded_kaltura_content: "Ingesloten inhoud minimaliseren "
     loading: "Bezig met het laden van media..."
@@ -11225,6 +11232,7 @@ nl:
       regrade_options: "Opties voor het herberekenen *(voor cursisten die deze vraag al hebben beantwoord):*"
       some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige cursisten kunnen verlaagd worden*)"
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
+    regrade_count_affected: "Deze toets is herberekend; jouw nieuwe score weerspiegelt %{num} vragen die aangepast zijn."
     regrade_score_affected: "Deze toets is herberekend; jouw score is aangepast."
     resume_the_quiz: "Toets hervatten"
     resume_the_survey: "Enquête hervatten"
@@ -11258,8 +11266,10 @@ nl:
     edit_quiz: "Bewerk toets"
     points: 
       one: "1 punt"
+      other: "%{count} punten"
     questions: 
       one: "1 vraag"
+      other: "%{count} vragen"
   quiz_message_students: 
     and_num_more_students: "en %{num} meer cursisten"
     message_not_sent_because_empty: "Bericht niet verzonden omdat het blanco was gelaten"
