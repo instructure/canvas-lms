@@ -68,6 +68,8 @@ define(function(require) {
 
       return svg;
     },
+
+    render: ChartMixin.defaults.render
   });
 
   var DiscriminationIndex = React.createClass({
@@ -145,7 +147,9 @@ define(function(require) {
 
             <Dialog
               tagName="i"
+              title={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
               content={Help}
+              width={550}
               className="chart-help-trigger icon-question" />
           </p>
 

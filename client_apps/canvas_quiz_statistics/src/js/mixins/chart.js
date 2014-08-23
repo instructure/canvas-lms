@@ -1,11 +1,20 @@
 define(function(require) {
   var React = require('react');
 
+  var getChartNode = function(component) {
+    var ref = (component.refs || {}).chart || component;
+    return ref.getDOMNode();
+  };
+
   var ChartMixin = {
     defaults: {
       updateChart: function(props) {
         this.removeChart();
-        this.__svg = this.createChart(this.getDOMNode(), props);
+        this.__svg = this.createChart(getChartNode(this), props);
+      },
+
+      render: function() {
+        return React.DOM.svg({ className: "chart" });
       },
 
       removeChart: function() {
@@ -32,7 +41,7 @@ define(function(require) {
       },
 
       componentDidMount: function() {
-        this.__svg = this.createChart(this.getDOMNode(), this.props);
+        this.__svg = this.createChart(getChartNode(this), this.props);
       },
 
       shouldComponentUpdate: function(nextProps/*, nextState*/) {
@@ -44,9 +53,6 @@ define(function(require) {
         this.removeChart();
       },
 
-      render: function() {
-        return React.DOM.svg({ className: "chart" });
-      }
     }
   };
 

@@ -10,7 +10,7 @@ define(function(require) {
     it('should render', function() {});
     it('should register markup', function() {
       setProps({
-        scope: 'quiz_statistics.test',
+        phrase: 'quiz_statistics.test',
         children: React.DOM.p({ children: 'Hello world!' })
       });
 

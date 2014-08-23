@@ -100,7 +100,19 @@ define(function(require) {
        * @property {String} [className=""]
        * CSS classes to add to the dialog toggle element.
        */
-      className: React.PropTypes.string
+      className: React.PropTypes.string,
+
+      /**
+       * @property {String} title
+       * A string to display in the dialog's titlebar.
+       */
+      title: React.PropTypes.string,
+
+      /**
+       * @property {Number} [width=300]
+       * How wide the dialog should start out, in pixels.
+       */
+      width: React.PropTypes.number
     },
 
     getInitialState: function() {
@@ -115,7 +127,9 @@ define(function(require) {
       return {
         children: [],
         autoOpen: false,
-        tagName: 'div'
+        tagName: 'div',
+        title: null,
+        width: 300
       };
     },
 
@@ -179,7 +193,9 @@ define(function(require) {
       var renderedContent = React.renderComponent(content(), container);
 
       $(container).dialog({
-        autoOpen: props.autoOpen
+        autoOpen: props.autoOpen,
+        title: props.title,
+        width: props.width
       });
 
       this.setState({

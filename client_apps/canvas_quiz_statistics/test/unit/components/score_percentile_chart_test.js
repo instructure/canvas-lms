@@ -65,5 +65,19 @@ define(function(require) {
         { i: 25, x: 277, y: -2, h: 182 },
       ]);
     });
+
+    it('should render scores for the 0th and 100th percentiles', function() {
+      setProps({
+        scores: {
+          0: 1,
+          100: 5
+        }
+      });
+
+      testRects([
+        { i: 0, x: 52, y: 142, h: 38 },
+        { i: 100, x: 952, y: -2, h: 182 },
+      ]);
+    });
   });
 });

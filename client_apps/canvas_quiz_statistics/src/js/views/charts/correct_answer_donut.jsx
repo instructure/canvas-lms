@@ -46,6 +46,8 @@ define(function(require) {
 
       return svg;
     },
+
+    render: ChartMixin.defaults.render
   });
 
   var CorrectAnswerDonut = React.createClass({

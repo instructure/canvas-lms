@@ -4,13 +4,23 @@ define(function(require) {
   var d3 = require('d3');
   var _ = require('lodash');
   var ChartMixin = require('../../mixins/chart');
+  var ChartInspectorMixin = require('../../mixins/components/chart_inspector');
+  var I18n = require('i18n!quiz_statistics');
 
   var mapBy = _.map;
   var findWhere = _.findWhere;
   var compact = _.compact;
 
   var Chart = React.createClass({
-    mixins: [ ChartMixin.mixin ],
+    mixins: [ ChartMixin.mixin, ChartInspectorMixin.mixin ],
+
+    tooltipOptions: {
+      position: {
+        my: 'center+15 bottom',
+        at: 'center top-8'
+      }
+    },
+
     getDefaultProps: function() {
       return {
         answers: [],
@@ -33,7 +43,6 @@ define(function(require) {
         linearScale: true,
         width: 'auto',
         height: 120
-
       };
     },
 
@@ -84,7 +93,7 @@ define(function(require) {
       x.domain(data.map(function(d, i) { return d.label || i; }));
       y.domain([ 0, sz ]);
 
-      svg.selectAll('.bar')
+      var bars = svg.selectAll('.bar')
         .data(data)
         .enter().append('rect')
           .attr("class", function(d) {
@@ -100,6 +109,8 @@ define(function(require) {
           .attr("height", function(d) {
             return height - y(d.y) + visibilityThreshold;
           });
+
+      ChartInspectorMixin.makeInspectable(bars, this);
 
       // If the special "No Answer" is present, we represent it as a diagonally-
       // striped bar, but to do that we need to render the <svg:pattern> that
@@ -157,6 +168,18 @@ define(function(require) {
       } else {
         return 'bar';
       }
+    },
+
+    updateChart: ChartMixin.mixin.updateChart,
+    removeChart: ChartMixin.mixin.removeChart,
+
+    render: function() {
+      return (
+        <div>
+          <div ref="inspector" />
+          <svg ref="chart" className="chart"></svg>
+        </div>
+      );
     }
   });
 
@@ -182,13 +205,43 @@ define(function(require) {
 
       return (
         <div>
-          <Chart answers={chartData} />
+          <Chart ref="chart" answers={chartData} onInspect={this.getAnswerTooltip} />
 
-          <div className="auxiliary">
-            {this.props.children}
+          <div className="auxiliary" style={{display:'none'}}>
+            {this.props.answers.map(this.renderAnswerTooltip)}
           </div>
         </div>
       );
+    },
+
+    renderAnswerTooltip: function(answer) {
+      return (
+        <div
+          key={'answer-' + answer.id}
+          ref={'answer_' + answer.id}
+          className="answer-distribution-tooltip-content">
+          <p>
+            <span className="answer-response-ratio">{answer.ratio}%</span>
+            <span className="answer-response-count">
+              {I18n.t('response_student_count', {
+                zero: 'Nobody',
+                one: '1 student',
+                other: '%{count} students'
+              }, { count: answer.responses })}
+            </span>
+          </p>
+
+          <hr />
+
+          <div className="answer-text">
+            {answer.text}
+          </div>
+        </div>
+      );
+    },
+
+    getAnswerTooltip: function(answerId) {
+      return this.refs['answer_' + answerId].getDOMNode();
     }
   });
 

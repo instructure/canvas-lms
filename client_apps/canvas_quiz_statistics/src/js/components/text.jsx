@@ -39,7 +39,7 @@ define(function(require) {
 
     getDefaultProps: function() {
       return {
-        scope: null,
+        phrase: null,
       };
     },
 
@@ -47,7 +47,7 @@ define(function(require) {
     componentWillReceiveProps: function(nextProps) {
       var markup;
 
-      if (nextProps.scope) {
+      if (nextProps.phrase) {
         markup = React.renderComponentToStaticMarkup(InterpolatedText(nextProps));
         markup = markup.replace(/<\/?div>/g, '');
 

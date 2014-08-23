@@ -29,7 +29,9 @@ define(function(require) {
     },
 
     createChart: function(node, props) {
-      var height, highest, svg, width, x, xAxis, y;
+      var svg, width, height, x, y, xAxis;
+      var heighest;
+      var visibilityThreshold
       var data = this.chartData(props);
 
       width = WIDTH - MARGIN_L - MARGIN_R;
@@ -62,16 +64,6 @@ define(function(require) {
         .attr('transform', "translate(0," + height + ")")
         .call(xAxis);
 
-      this.renderPercentileChart(svg, data, x, y, height);
-
-      return svg;
-    },
-
-    renderPercentileChart: function(svg, data, x, y, height) {
-      var highest, visibilityThreshold;
-
-      highest = y.domain()[1];
-
       visibilityThreshold = Math.min(highest / 100, 0.5);
 
       svg.selectAll('rect.bar')
@@ -86,6 +78,8 @@ define(function(require) {
             }).attr('height', function(d) {
               return height - y(d + visibilityThreshold);
             });
+
+      return svg;
     },
 
     chartData: function(props) {
@@ -96,7 +90,7 @@ define(function(require) {
         return parseInt(score, 10);
       }));
 
-      upperBound = max([100, highest]);
+      upperBound = max([101, highest]);
 
       for (percentile = 0; percentile < upperBound; ++percentile) {
         set[percentile] = scores[''+percentile] || 0;
@@ -106,7 +100,9 @@ define(function(require) {
       set[100] = sum(set.splice(100, set.length));
 
       return set;
-    }
+    },
+
+    render: ChartMixin.defaults.render
   });
 
   return ScorePercentileChart;

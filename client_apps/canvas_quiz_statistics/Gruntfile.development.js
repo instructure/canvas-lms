@@ -16,7 +16,7 @@ grunt.loadNpmTasks('grunt-newer');
 grunt.loadNpmTasks('grunt-sass');
 
 grunt.registerTask('default', [
-  'server',
+  'server:background',
   'connect:tests',
   'watch'
 ]);

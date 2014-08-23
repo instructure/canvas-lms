@@ -26,11 +26,40 @@ define([], function() {
       var t = function(__key__, defaultValue, options) {
         var value;
 
-        if (arguments.length === 2 && typeof defaultValue === 'string') {
-          options = { defaultValue: defaultValue };
+        if (arguments.length === 2) {
+          if (typeof defaultValue === 'string') {
+            options = { defaultValue: defaultValue };
+          }
+          else if (typeof defaultValue === 'object') {
+            options = defaultValue;
+          }
+          else {
+            throw new Error("Bad I18n.t() call, expected an options object or a defaultValue string.");
+          }
         }
         else if (arguments.length === 3 && !options.defaultValue) {
           options.defaultValue = defaultValue;
+        }
+
+        if (options.hasOwnProperty('count') && typeof defaultValue === 'object') {
+          switch(options.count) {
+            case 0:
+              if (defaultValue.zero) {
+                options.defaultValue = defaultValue.zero;
+              }
+            break;
+
+            case 1:
+              if (defaultValue.one) {
+                options.defaultValue = defaultValue.one;
+              }
+            break;
+
+            default:
+              if (defaultValue.other) {
+                options.defaultValue = defaultValue.other;
+              }
+          }
         }
 
         value = i18n.interpolate(''+options.defaultValue, options);

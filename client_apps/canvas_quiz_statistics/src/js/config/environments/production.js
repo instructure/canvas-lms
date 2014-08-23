@@ -21,7 +21,7 @@ define([], function() {
      *
      * Number of decimals to round to when displaying floats.
      */
-    precision: 2,
+    precision: 0,
 
     /**
      * @cfg {Function} ajax

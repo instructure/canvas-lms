@@ -6,20 +6,6 @@ define(function(require) {
   var Status = require('jsx!./report/status');
   var I18n = require('i18n!quiz_reports');
 
-  var Static = React.createClass({
-    shouldComponentUpdate: function(nextProps, nextState) {
-      return false;
-    },
-
-    render: function() {
-      return (
-        <div>
-          <div data-title="">{this.props.children}</div>
-        </div>
-      );
-    }
-  });
-
   var Report = React.createClass({
     mixins: [ React.addons.ActorMixin ],
 
