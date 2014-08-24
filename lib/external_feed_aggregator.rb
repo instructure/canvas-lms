@@ -30,7 +30,7 @@ class ExternalFeedAggregator
   end
   
   def process
-    ExternalFeed.to_be_polled.each do |feed|
+    ExternalFeed.to_be_polled.find_each do |feed|
       next if feed.context.root_account.deleted?
       process_feed(feed)
     end
