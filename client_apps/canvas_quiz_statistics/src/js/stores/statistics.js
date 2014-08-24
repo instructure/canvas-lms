@@ -4,6 +4,7 @@ define(function(require) {
   var QuizStats = require('../collections/quiz_statistics');
   var populateCollection = require('./common/populate_collection');
   var quizStats = new QuizStats([]);
+  var expanded = [];
 
   /**
    * @class Stores.Statistics
@@ -42,9 +43,27 @@ define(function(require) {
     },
 
     get: function() {
+      var props;
+
       if (quizStats.length) {
-        return quizStats.first().toJSON();
+        props = quizStats.first().toJSON();
+        props.expanded = expanded;
+        props.expandingAll = this.isExpandingAll();
       }
+
+      return props;
+    },
+
+    getExpandedSet: function() {
+      return expanded;
+    },
+
+    isExpandingAll: function() {
+      if (quizStats.length) {
+        return expanded.length === quizStats.first().get('questionStatistics').length;
+      }
+
+      return false;
     },
 
     getSubmissionStatistics: function() {
@@ -63,10 +82,43 @@ define(function(require) {
     },
 
     actions: {
+      expandQuestion: function(questionId, onChange) {
+        if (expanded.indexOf(questionId) === -1) {
+          expanded.push(questionId);
+          onChange();
+        }
+      },
+
+      collapseQuestion: function(questionId, onChange) {
+        var index = expanded.indexOf(questionId);
+        if (index !== -1) {
+          expanded.splice(index, 1);
+          onChange();
+        }
+      },
+
+      expandAll: function(_payload, onChange) {
+        if (quizStats.length) {
+          expanded = quizStats.first().toJSON().questionStatistics.map(function(question) {
+            return question.id;
+          });
+
+          onChange();
+        }
+      },
+
+      collapseAll: function(_payload, onChange) {
+        if (expanded.length) {
+          expanded = [];
+          onChange();
+        }
+      }
     },
 
     __reset__: function() {
       quizStats.reset();
+      expandingAll = false;
+      expanded = [];
       return Store.prototype.__reset__.call(this);
     }
   });

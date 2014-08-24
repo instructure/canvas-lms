@@ -60,6 +60,7 @@ require([ 'core/dispatcher' ], function(Dispatcher) {
         _onError = _onError || onError;
 
         svc.promise.then(_onChange, _onError);
+        this.flush();
 
         return svc.promise;
       };

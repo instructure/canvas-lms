@@ -4,6 +4,7 @@ define(function(require) {
   var Summary = require('jsx!./summary');
   var I18n = require('i18n!quiz_statistics');
   var _ = require('lodash');
+  var ToggleDetailsButton = require('jsx!./questions/toggle_details_button');
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
 
@@ -14,6 +15,8 @@ define(function(require) {
   };
 
   var Statistics = React.createClass({
+    mixins: [ React.addons.ActorMixin ],
+
     getDefaultProps: function() {
       return {
         quizStatistics: {
@@ -51,7 +54,11 @@ define(function(require) {
                 {I18n.t('question_breakdown', 'Question Breakdown')}
               </h3>
 
-              <aside className="pull-right">
+              <aside className="all-question-controls pull-right">
+                <ToggleDetailsButton
+                  onClick={this.toggleAllDetails}
+                  expanded={quizStatistics.expandingAll}
+                  controlsAll />
               </aside>
             </header>
 
@@ -63,12 +70,37 @@ define(function(require) {
 
     renderQuestion: function(participantCount, question) {
       var renderer = Renderers[question.questionType] || QuestionRenderer;
+      var stats = this.props.quizStatistics;
       var questionProps = extend({}, question, {
         key: 'question-' + question.id,
-        participantCount: participantCount
+        participantCount: participantCount,
+        expanded: stats.expanded.indexOf(question.id) > -1,
+        onToggleDetails: this.toggleDetails.bind(null, question.id)
       });
 
       return renderer(questionProps);
+    },
+
+    toggleDetails: function(questionId, e) {
+      e.preventDefault();
+
+      if (this.props.quizStatistics.expanded.indexOf(questionId) !== -1) {
+        this.sendAction('statistics:collapseQuestion', questionId);
+      }
+      else {
+        this.sendAction('statistics:expandQuestion', questionId);
+      }
+    },
+
+    toggleAllDetails: function(e) {
+      e.preventDefault();
+
+      if (this.props.quizStatistics.expandingAll) {
+        this.sendAction('statistics:collapseAll');
+      }
+      else {
+        this.sendAction('statistics:expandAll');
+      }
     }
   });
 

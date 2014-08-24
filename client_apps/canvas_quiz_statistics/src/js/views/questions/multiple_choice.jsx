@@ -1,11 +1,13 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('../../ext/react');
   var I18n = require('i18n!quiz_statistics');
   var Question = require('jsx!../question');
   var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');
   var AnswerBars = require('jsx!../charts/answer_bars');
   var DiscriminationIndex = require('jsx!../charts/discrimination_index');
+  var Answers = require('jsx!./multiple_choice/answers');
+  var ToggleDetailsButton = require('jsx!./toggle_details_button');
   var RatioCalculator = require('../../models/ratio_calculator');
   var round = require('../../util/round');
 
@@ -13,15 +15,8 @@ define(function(require) {
     getInitialState: function() {
       return {
         participantCount: 0,
-        showingDetails: false,
         correctResponseRatio: 0
       };
-    },
-
-    isShowingDetails: function() {
-      return this.props.showDetails === undefined ?
-        this.state.showingDetails :
-        this.props.showDetails;
     },
 
     componentDidMount: function() {
@@ -61,16 +56,13 @@ define(function(require) {
       });
 
       return(
-        <Question>
-          <header>
+        <Question expanded={this.props.expanded}>
+          <header key="header">
             <span className="question-attempts">{attemptsLabel}</span>
             <aside className="pull-right">
-              <button onClick={this.toggleDetails} className="btn">
-                {this.isShowingDetails() ?
-                  <i className="icon-collapse" /> :
-                  <i className="icon-expand" />
-                }
-              </button>
+              <ToggleDetailsButton
+                onClick={this.props.onToggleDetails}
+                expanded={this.props.expanded} />
             </aside>
 
             <div
@@ -79,7 +71,7 @@ define(function(require) {
               />
           </header>
 
-          <div>
+          <div key="charts">
             <section className="correct-answer-ratio-section">
               <CorrectAnswerDonut
                 correctResponseRatio={this.state.correctResponseRatio}>
@@ -102,19 +94,12 @@ define(function(require) {
                 correctBottomStudentCount={this.props.correctBottomStudentCount}
                 />
             </section>
-
           </div>
+
+          {this.props.expanded && <Answers answers={this.props.answers} />}
         </Question>
       );
     },
-
-    toggleDetails: function(e) {
-      e.preventDefault();
-
-      this.setState({
-        showingDetails: !this.state.showingDetails
-      });
-    }
   });
 
   return MultipleChoice;

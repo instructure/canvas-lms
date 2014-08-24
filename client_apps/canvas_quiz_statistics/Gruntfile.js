@@ -23,7 +23,11 @@ var loadTasks = function(path) {
     taskRunner = task.runner;
 
     if (taskRunner instanceof Function) {
-      taskRunner = taskRunner.bind(null, grunt);
+      taskRunner = function() {
+        var params = [].slice.call(arguments);
+        params.unshift(grunt);
+        return task.runner.apply(this, params);
+      };
     }
 
     grunt.registerTask(taskName, task.description, taskRunner);

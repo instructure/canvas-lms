@@ -35,18 +35,27 @@
   }
 
   aside {
-    opacity: 0;
+    button {
+      opacity: 0;
+    }
+
     pointer-events: none;
-    transition: opacity 0.25s ease-in-out 0.1s;
   }
 
   &:hover, &.with-details {
     background-color: #f4f4f4;
 
     aside {
-      opacity: 1;
       pointer-events: inherit;
     }
+  }
+
+  // Make sure the control buttons are visible when we hover over the question
+  // box or we reach them by keyboard.
+  aside button:focus,
+  &:hover aside button,
+  &.with-details aside button {
+    opacity: 1
   }
 
   .correct-answer-ratio-section {

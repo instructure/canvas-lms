@@ -251,7 +251,6 @@ define(function(require) {
 
         this.sendAction('quizReports:generate', 'student_analysis');
         expect(this.requests.length).toBe(0);
-        this.flush();
         expect(onError).toHaveBeenCalled();
       });
 
@@ -268,7 +267,6 @@ define(function(require) {
 
         this.sendAction('quizReports:generate', 'student_analysis');
         expect(this.requests.length).toBe(0);
-        this.flush();
         expect(onError).toHaveBeenCalled();
       });
     });

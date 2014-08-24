@@ -30,5 +30,60 @@ define(function(require) {
         expect(onChange).toHaveBeenCalled();
       });
     });
+
+    describe('statistics:expandQuestion', function() {
+      it('should work', function() {
+        subject.populate(quizStatisticsFixture);
+        this.sendAction('statistics:expandQuestion', '11');
+
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet()).toEqual(['11']);
+      });
+    });
+
+    describe('statistics:collapseQuestion', function() {
+      it('should work', function() {
+        subject.populate(quizStatisticsFixture);
+        this.sendAction('statistics:collapseQuestion', '11');
+
+        expect(onChange).not.toHaveBeenCalled();
+
+        this.sendAction('statistics:expandQuestion', '11');
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet()).toEqual(['11']);
+
+        onChange.calls.reset();
+
+        this.sendAction('statistics:collapseQuestion', '11');
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet()).toEqual([]);
+      });
+    });
+
+    describe('statistics:expandAll', function() {
+      it('should work', function() {
+        subject.populate(quizStatisticsFixture);
+        this.sendAction('statistics:expandAll');
+
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet().length).toEqual(13);
+      });
+    });
+
+    describe('statistics:collapseAll', function() {
+      it('should work', function() {
+        subject.populate(quizStatisticsFixture);
+
+        this.sendAction('statistics:expandQuestion', '11');
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet()).toEqual(['11']);
+
+        onChange.calls.reset();
+
+        this.sendAction('statistics:collapseAll');
+        expect(onChange).toHaveBeenCalled();
+        expect(subject.getExpandedSet().length).toEqual(0);
+      });
+    });
   });
 });
