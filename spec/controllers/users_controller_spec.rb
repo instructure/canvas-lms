@@ -388,8 +388,8 @@ describe UsersController do
 
       context "self enrollment" do
         before(:once) do
+          Account.default.allow_self_enrollment!
           course(:active_all => true)
-          @course.root_account.allow_self_enrollment!
           @course.update_attribute(:self_enrollment, true)
         end
 

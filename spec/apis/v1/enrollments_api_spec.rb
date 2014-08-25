@@ -471,8 +471,8 @@ describe EnrollmentsApiController, type: :request do
 
     context "self enrollment" do
       before :once do
+        Account.default.allow_self_enrollment!
         course(active_all: true)
-        @course.root_account.allow_self_enrollment!
         @course.update_attribute(:self_enrollment, true)
         @unenrolled_user = user_with_pseudonym
         @path = "/api/v1/courses/#{@course.id}/enrollments"

@@ -225,8 +225,8 @@ describe "users" do
     end
 
     it "should register a student with a join code" do
+      Account.default.allow_self_enrollment!
       course(:active_all => true)
-      @course.root_account.allow_self_enrollment!
       @course.update_attribute(:self_enrollment, true)
 
       get '/register'
