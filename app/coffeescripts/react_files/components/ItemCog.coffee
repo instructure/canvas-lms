@@ -1,15 +1,17 @@
 define [
+  'i18n!react_files'
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/models/Folder'
-  'compiled/models/File'
+  'compiled/models/FilesystemObject'
   './RestrictedDialogForm'
+  './MoveDialog'
   './DialogAdapter'
-  'i18n!react_files'
   './DialogContent'
   './DialogButtons'
-], (React, withReactDOM, preventDefault, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n, DialogContent, DialogButtons) ->
+  'jquery'
+  'jqueryui/dialog'
+], (I18n, React, withReactDOM, preventDefault, FilesystemObject, RestrictedDialogForm, MoveDialog, $DialogAdapter, DialogContent, DialogButtons, $) ->
 
   # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
@@ -18,12 +20,7 @@ define [
       restrictedDialogOpen: false
 
     propTypes:
-      model: React.PropTypes.oneOfType([
-        React.PropTypes.instanceOf(File),
-        React.PropTypes.instanceOf(Folder)
-      ])
-
-    isAFolderCog: -> @props.model instanceof Folder
+      model: React.PropTypes.instanceOf(FilesystemObject)
 
     openRestrictedDialog: preventDefault ->
       @setState restrictedDialogOpen: true
@@ -33,10 +30,23 @@ define [
 
     deleteItem: ->
       message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
-        name: @props.model.get('name') || @props.model.get('display_name')
+        name: @props.model.displayName()
       })
       if confirm message
         @props.model.destroy()
+
+    openMoveDialog: ->
+      $dialog = $('<div>').dialog
+        width: 600
+        height: 300
+        close: -> $dialog.remove()
+
+      React.renderComponent(MoveDialog({
+        thingsToMove: [@props.model]
+        closeDialog: -> $dialog.dialog('close')
+        setTitle: (title) -> $dialog.dialog('option', 'title', title)
+      }), $dialog[0])
+
 
     render: withReactDOM ->
       div null,
@@ -65,11 +75,10 @@ define [
                 li {},
                   a onClick: preventDefault(@openRestrictedDialog), href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
                 li {},
+                  a onClick: preventDefault(@openMoveDialog), href:'#', id:'content-4', tabIndex:'-1', role:'menuitem', title:'Move', 'Move'
+                li {},
                   a ref: 'deleteLink', onClick: preventDefault(@deleteItem), href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
-
-                (li {},
-                  a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download as Zip',
-                    'Download as Zip'
-                ) if @isAFolderCog()
+                li {},
+                  a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download', 'Download'
 
 

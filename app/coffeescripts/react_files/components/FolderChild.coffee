@@ -48,7 +48,7 @@ define [
                 ref:'newName',
                 className: 'input-block-level',
                 placeholder: I18n.t('name', 'Name'),
-                defaultValue: @props.model.get('name') || @props.model.get('display_name')
+                defaultValue: @props.model.displayName()
                 onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
               }),
               button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,

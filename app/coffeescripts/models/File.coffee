@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'Backbone'
+  'compiled/models/FilesystemObject'
   'jquery.ajaxJSON'
-], ($, _, {Model}) ->
+], ($, _, FilesystemObject) ->
 
   # Simple model for creating an attachment in canvas
   #
@@ -12,7 +12,7 @@ define [
   # 1. you need to pass a preflightUrl in the options
   # 2. at some point, you need to do: `model.set('file', <input>)`
   #    where <input> is the DOM node (not $-wrapped) of the file input
-  class File extends Model
+  class File extends FilesystemObject
 
     url: ->
       if @isNew()
@@ -52,7 +52,7 @@ define [
       @set @uploadParams
       el.name = data.file_param
       @url = -> data.upload_url
-      Model::save.call this, null,
+      FilesystemObject::save.call this, null,
         multipart: true
         success: (data) =>
           dfrd.resolve(data)
