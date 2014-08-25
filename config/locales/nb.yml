@@ -9995,12 +9995,12 @@ nb:
   number: 
     currency: 
       format: 
-        delimiter: ","
+        delimiter: ", "
         format: "%u%n"
         separator: "."
         unit: $
     format: 
-      delimiter: ","
+      delimiter: ", "
       separator: "."
     human: 
       decimal_units: 
