@@ -15,10 +15,8 @@ define [
     onProgress: (percentComplete, file) ->
       #noop will be set up a level
 
-    onError: (e) ->
-      #noop will be set up a level
-
-    createFormData: (data) ->
+    createFormData: () ->
+      data = @uploadData.upload_params
       formData = new FormData()
       Object.keys(data).forEach (key) ->
         formData.append(key, data[key])
@@ -27,40 +25,36 @@ define [
 
     # kickoff / preflight upload process
     upload: ->
-      deferred = $.Deferred()
+      @deferred = $.Deferred()
       params =
         name: @options.name || @file.name
         size: @file.size
         content_type: @file.type
         on_duplicate: @options.dup || 'rename'
         parent_folder_id: @folder.id
+        no_redirect: true
 
       preflightUrl = "/api/v1/folders/#{@folder.id}/files"
       $.ajaxJSON preflightUrl, 'POST', params, (data) =>
-        @_actualUpload(data, deferred)
-      deferred
+        @uploadData = data
+        @_actualUpload()
+      @deferred
 
     #actual upload based on kickoff / preflight
-    _actualUpload: (uploadData, deferred) ->
-
+    _actualUpload: () ->
       xhr = new XMLHttpRequest
-      xhr.upload.onprogress = @trackProgress
-      xhr.open 'POST', uploadData.upload_url, true
-      xhr.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+      xhr.upload.addEventListener('progress', @trackProgress, false)
+      xhr.upload.addEventListener('load', @onUploadPosted, false)
+      xhr.open 'POST', @uploadData.upload_url, true
+      xhr.send @createFormData()
 
-      formData = @createFormData(uploadData.upload_params)
+    onUploadPosted: (uploadResults) =>
+      $.getJSON(@uploadData.upload_params.success_url).then (results) =>
+        f = @addFileToCollection(results)
+        @deferred.resolve(f)
 
-      xhr.onload = (event) =>
-        if event.target.status isnt 200
-          return @handleContentError(event)
-        response = $.parseJSON(event.target.response)
-        f = @onUploadComplete(response)
-        deferred.resolve(f)
-
-      xhr.send formData
-
-    onUploadComplete: (results) ->
-      uploadedFile = new BBFile(results, 'no/url/needed/') #we've already done the upload, no preflight needed
+    addFileToCollection: (attrs) =>
+      uploadedFile = new BBFile(attrs, 'no/url/needed/') #we've already done the upload, no preflight needed
       @folder.files.add(uploadedFile)
 
       #remove old version if it was just overwritten
@@ -70,9 +64,6 @@ define [
         @folder.files.remove(previous) if previous
 
       uploadedFile
-
-    handleContentError: (e) =>
-      @onError(e)
 
     trackProgress: (e) =>
       @onProgress((e.loaded / e.total), @file)

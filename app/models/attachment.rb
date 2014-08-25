@@ -622,6 +622,7 @@ class Attachment < ActiveRecord::Base
     extras = []
     if options[:no_redirect]
       extras << {'success_action_status' => '201'}
+      extras << {'success_url' => res[:success_url]}
     elsif res[:success_url]
       extras << {'success_action_redirect' => res[:success_url]}
     end

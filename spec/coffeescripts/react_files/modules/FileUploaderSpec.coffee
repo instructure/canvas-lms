@@ -27,19 +27,23 @@ define [
     $.ajaxJSON.restore()
 
 
-  test 'uploads file with data returned from files endpoint', ->
+  test 'stores params from preflight for actual upload', ->
     server = sinon.fakeServer.create()
     server.respondWith('POST',
                        '/api/v1/folders/1/files',
                        [ 200,
                          {"Content-Type": "application/json"},
-                         '{"upload_url": "/upload/url", "upload_params": [{"key": "value"}] }'
+                         '{"upload_url": "/upload/url", "upload_params": {"key": "value"}}'
                        ]
     )
 
     uploadStub = sinon.stub(@uploader, '_actualUpload')
     @uploader.upload()
-    server.respond()
-    ok uploadStub.calledWithMatch({upload_url: '/upload/url', upload_params: [{key: 'value'}]})
 
+    server.respond()
+
+    equal @uploader.uploadData.upload_url, '/upload/url'
+    equal @uploader.uploadData.upload_params.key, 'value'
+
+    uploadStub.restore()
     server.restore()
