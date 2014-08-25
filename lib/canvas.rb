@@ -90,8 +90,8 @@ module Canvas
           # the only options currently supported in redis-cache are the list of
           # servers, not key prefix or database names.
           config = (ConfigFile.load('redis', env) || {}).merge(config)
-          config['key_prefix'] ||= config['key']
-          servers = config['servers']
+          config_options = config.symbolize_keys.except(:key, :servers, :database)
+          servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
           @cache_stores[env] = :redis_store, servers
         when 'memory_store'
           @cache_stores[env] = :memory_store
