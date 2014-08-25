@@ -612,4 +612,27 @@ describe Group do
       @group.max_membership.should be_nil
     end
   end
+
+  describe '#destroy' do
+    before :once do
+      @gc = GroupCategory.create! name: "groups"
+      @group = @gc.groups.create! name: "group1", context: @course
+    end
+
+    it "should soft delete" do
+      @group.deleted_at.should be_nil
+      @group.destroy
+      @group.deleted_at.should_not be_nil
+    end
+
+    it "should not delete memberships" do
+      student_in_course active_all: true
+      @group.users << @student
+      @group.save!
+
+      @group.users.should == [@student]
+      @group.destroy
+      @group.users(true).should == [@student]
+    end
+  end
 end

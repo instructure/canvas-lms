@@ -451,7 +451,7 @@ class ApplicationController < ActionController::Base
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
-        @context = api_find(Group, params[:group_id])
+        @context = api_find(Group.active, params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user

@@ -2652,4 +2652,26 @@ describe User do
     user.reset_unread_conversations_counter
     user.reload.unread_conversations_count.should == 5
   end
+
+  describe 'group_memberships' do
+    before :once do
+      course_with_student active_all: true
+      @group = Group.create! context: @course, name: "group"
+      @group.users << @student
+      @group.save!
+    end
+
+    it "doesn't include deleted groups in current_group_memberships" do
+      @student.current_group_memberships.size.should == 1
+      @group.destroy
+      @student.current_group_memberships.size.should == 0
+    end
+
+    it "doesn't include deleted groups in group_memberships_for" do
+      @student.group_memberships_for(@course).size.should == 1
+      @group.destroy
+      @student.group_memberships_for(@course).size.should == 0
+    end
+
+  end
 end
