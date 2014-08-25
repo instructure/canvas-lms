@@ -23,8 +23,17 @@ define(['jquery', 'str/htmlEscape', 'jqueryui/dialog-unpatched'], function($, h,
           this.options.title = '';
       }
       this.options.title = fixTitle(this.options.title);
+      this._on({
+        dialogopen: function() {
+          $('#application').attr('aria-hidden', 'true');
+        },
+        dialogclose: function() {
+          $('#application').attr('aria-hidden', 'false');
+        }
+      });
       return create.apply(this, arguments);
     },
+
     _setOption: function(key, value) {
       if (key == "title") value = fixTitle(value);
       return setOption.call(this, key, value);
