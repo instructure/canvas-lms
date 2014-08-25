@@ -31,6 +31,7 @@ define [
       super
 
     save: (attrs = {}, options = {}) ->
+      return super unless @get('file')
       @set attrs
       dfrd = $.Deferred()
       el = @get('file')
@@ -61,6 +62,7 @@ define [
           options.error?(error)
 
     toJSON: ->
+      return super unless @get('file')
       _.pick(@attributes, 'file', _.keys(@uploadParams ? {})...)
 
     present: ->
