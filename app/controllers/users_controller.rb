@@ -1034,7 +1034,11 @@ class UsersController < ApplicationController
     @user = @pseudonym && @pseudonym.user
     @user ||= User.new
     if params[:user]
-      params[:user].delete(:self_enrollment_code) unless self_enrollment
+      if self_enrollment && params[:user][:self_enrollment_code]
+        params[:user][:self_enrollment_code].strip!
+      else
+        params[:user].delete(:self_enrollment_code)
+      end
       if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
           params[:user][:birthdate] !~ Api::DATE_REGEX
         return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
