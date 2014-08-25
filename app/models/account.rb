@@ -731,7 +731,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.all_site_admin_account_users_copies
-    Setting.get('all_site_admin_account_users_copies', 1).to_i
+    [Setting.get('all_site_admin_account_users_copies', 1).to_i, 1].max
   end
 
   def account_users_for(user)
