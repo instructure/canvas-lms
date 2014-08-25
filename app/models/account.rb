@@ -730,12 +730,16 @@ class Account < ActiveRecord::Base
     state :deleted
   end
 
+  def self.all_site_admin_account_users_copies
+    Setting.get('all_site_admin_account_users_copies', 1).to_i
+  end
+
   def account_users_for(user)
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user.global_id] ||= Rails.cache.fetch('all_site_admin_account_users') do
+        @account_users_cache[user.global_id] ||= Rails.cache.fetch("all_site_admin_account_users#{rand(Account.all_site_admin_account_users_copies)}") do
           self.account_users.all
         end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
       end
