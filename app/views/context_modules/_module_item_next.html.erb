@@ -138,8 +138,14 @@
             <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent_item', %{Decrease indent}) %>"><%= @module_item_image_tags['outdent'] %> <%= t('links.outdent', %{Decrease indent}) %></a></li>
             <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent_item', %{Increase indent}) %>"><%= @module_item_image_tags['indent'] %> <%= t('links.indent', %{Increase indent}) %></a></li>
             <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item_details', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %> <%= t('links.edit_item', %{Edit}) %></a></li>
+            <li>
+              <a href="#<%= tag ? tag.id : "{{ id }}" %>"
+                 aria-label="<%= t('links.move_item_label', %{Move this item}) %>"
+                 class="move_module_item_link icon-updown"
+                 title="<%= t('links.move_item', %{Move this item}) %>"
+              ><%= t('modules_item_move_to', "Move to...") %></a>
+            </li>
             <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item_from_module', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %> <%= t('links.remove_item', %{Remove}) %></a></li>
-
             <% menu_type_to_class = {
                 :assignment_menu => Assignment,
                 :quiz_menu => Quizzes::Quiz,

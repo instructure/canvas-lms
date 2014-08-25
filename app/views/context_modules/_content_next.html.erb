@@ -241,10 +241,10 @@ TEXT
 <% if can_do(@context, @current_user, :manage_content) %>
   <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
     <div class="form-dialog-content">
-      <h2>Place <span id="move_module_name"> </span></h2>
+      <h2><%= t('move_module.place', "Place ") %> <span id="move_module_name"> </span></h2>
       <div class="move-module-before-after-container">
         <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t('move_module.before', "Before") %></label>
-          <strong class="move-module-or">OR</strong>
+          <strong class="move-module-or"><%= t('move_module.or', "OR") %></strong>
         <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t('move_module.after', "After") %></label>
       </div>
       <div class="move-module-select-spacer">
@@ -254,6 +254,27 @@ TEXT
     </div>
     <div class="form-controls">
       <button type="button" id="move_module_cancel_btn" class="btn">Cancel</button>
+      <button type="submit" class="btn btn-primary">Move</button>
+    </div>
+  </form>
+
+  <form id="move_module_item_form" style="display:none" class="form-dialog" title="Move Item">
+    <div class="form-dialog-content">
+      <h2><%= t('move_module_item.place', "Place ") %><span id="move_module_item_name"> </span></h2>
+      <p><%= t('move_module_item.into', "into") %>
+      <select name="move_module_item_module_select" id="move_module_item_module_select"></select>
+      <div class="move-module-before-after-container">
+        <input type="radio" name="item_move_location" value="before" id="item_move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_before"><%= t('move_module.before', "Before") %></label>
+          <strong class="move-module-or"><%= t('move_module_item.or', "OR") %></strong>
+        <input type="radio" name="item_move_location" value="after" id="item_move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_after"><%= t('move_module.after', "After") %></label>
+      </div>
+      <div class="move-module-select-spacer">
+        <select name="move_module_item_select" id="move_module_item_select"></select>
+      </div>
+
+    </div>
+    <div class="form-controls">
+      <button type="button" id="move_module_item_cancel_btn" class="btn">Cancel</button>
       <button type="submit" class="btn btn-primary">Move</button>
     </div>
   </form>
