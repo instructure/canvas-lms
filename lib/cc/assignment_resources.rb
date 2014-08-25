@@ -73,7 +73,7 @@ module CC
                             "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                             "xsi:schemaLocation"=> "#{CCHelper::ASSIGNMENT_NAMESPACE} #{CCHelper::ASSIGNMENT_XSD_URI}"
         ) do |a|
-          AssignmentResources.create_cc_assignment(a, assignment, migration_id)
+          AssignmentResources.create_cc_assignment(a, assignment, migration_id, @manifest)
         end
       end
 
@@ -108,7 +108,7 @@ module CC
                           "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                           "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |a|
-        AssignmentResources.create_canvas_assignment(a, assignment)
+        AssignmentResources.create_canvas_assignment(a, assignment, @manifest)
       end
       assignment_file.close
 
@@ -128,7 +128,7 @@ module CC
         "online_upload" => "file"
     }.freeze
 
-    def self.create_cc_assignment(node, assignment, migration_id)
+    def self.create_cc_assignment(node, assignment, migration_id, manifest = nil)
       node.title(assignment.title)
       node.text(assignment.description, texttype: 'text/html')
       if assignment.points_possible
@@ -149,20 +149,20 @@ module CC
                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                        "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
         ) do |a|
-          AssignmentResources.create_canvas_assignment(a, assignment)
+          AssignmentResources.create_canvas_assignment(a, assignment, manifest)
         end
       end
     end
 
-    def self.create_canvas_assignment(node, assignment)
+    def self.create_canvas_assignment(node, assignment, manifest = nil)
       node.title assignment.title
       node.due_at CCHelper::ims_datetime(assignment.due_at) if assignment.due_at
       node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
-      node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group)
-      node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard
+      node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
+      node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard && (!manifest || manifest.export_object?(assignment.grading_standard))
       node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association

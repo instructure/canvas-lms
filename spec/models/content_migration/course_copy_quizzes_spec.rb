@@ -580,5 +580,34 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       qq2.assessment_question_id.should == aqb2.assessment_questions.first.id
       qq2.question_data['points_possible'].should == qq.question_data['points_possible']
     end
+
+    it "should copy the assignment group in selective copy" do
+      pending unless Qti.qti_enabled?
+
+      group = @copy_from.assignment_groups.create!(:name => "new group")
+      quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
+      quiz.publish!
+      @cm.copy_options = { 'everything' => '0', 'quizzes' => { mig_id(quiz) => "1" } }
+      run_course_copy
+      dest_quiz = @copy_to.quizzes.find_by_migration_id mig_id(quiz)
+      dest_quiz.assignment_group.migration_id.should eql mig_id(group)
+    end
+
+    it "should not copy the assignment group in selective export" do
+      pending unless Qti.qti_enabled?
+
+      group = @copy_from.assignment_groups.create!(:name => "new group")
+      quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
+      quiz.publish!
+      # test that we neither export nor reference the assignment group
+      decoy_assignment_group = @copy_to.assignment_groups.create!(:name => "decoy")
+      decoy_assignment_group.update_attribute(:migration_id, mig_id(group))
+      run_export_and_import do |export|
+        export.selected_content = { 'quizzes' => { mig_id(quiz) => "1" } }
+      end
+      dest_quiz = @copy_to.quizzes.find_by_migration_id mig_id(quiz)
+      dest_quiz.assignment_group.migration_id.should_not eql decoy_assignment_group
+      decoy_assignment_group.reload.name.should_not eql group.name
+    end
   end
 end

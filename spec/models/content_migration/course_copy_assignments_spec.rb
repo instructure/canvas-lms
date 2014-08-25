@@ -54,6 +54,29 @@ describe ContentMigration do
       to_assign.assignment_group.should == @copy_to.assignment_groups.find_by_migration_id(mig_id(g))
     end
 
+    it "should link assignments to assignment groups on complete export" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      run_export_and_import
+      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
+      to_assign.assignment_group.should == @copy_to.assignment_groups.find_by_migration_id(mig_id(g))
+    end
+
+    it "should not link assignments to assignment groups on selective export" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      # test that we neither export nor reference the assignment group
+      unrelated_group = @copy_to.assignment_groups.create! name: 'unrelated group with coincidentally matching migration id'
+      unrelated_group.update_attribute :migration_id, mig_id(g)
+      run_export_and_import do |export|
+        export.selected_content = { 'assignments' => { mig_id(from_assign) => "1" } }
+      end
+      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
+      to_assign.assignment_group.should_not == unrelated_group
+      unrelated_group.reload.name.should_not eql g.name
+    end
+
+
     it "should copy assignment attributes" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.turnitin_enabled = true
@@ -312,6 +335,31 @@ describe ContentMigration do
         run_course_copy
         @copy_to.grading_standards.map(&:title).should eql %w(Two)
         @copy_to.assignments.first.grading_standard.title.should eql 'Two'
+      end
+
+      it "should copy referenced grading standards in complete export" do
+        gs = make_grading_standard(@copy_from, title: 'GS')
+        assign = @copy_from.assignments.build
+        assign.grading_standard = gs
+        assign.save!
+        run_export_and_import
+        @copy_to.assignments.first.grading_standard.title.should eql gs.title
+      end
+
+      it "should not copy referenced grading standards in selective export" do
+        gs = make_grading_standard(@copy_from, title: 'One')
+        assign = @copy_from.assignments.build
+        assign.grading_standard = gs
+        assign.save!
+        # test that we neither export nor reference the grading standard
+        unrelated_grading_standard = make_grading_standard(@copy_to, title: 'unrelated grading standard with coincidentally matching migration id')
+        unrelated_grading_standard.update_attribute :migration_id, mig_id(gs)
+        run_export_and_import do |export|
+          export.selected_content = { 'assignments' => { mig_id(assign) => "1" } }
+        end
+        @copy_to.assignments.count.should eql 1
+        @copy_to.assignments.first.grading_standard.should be_nil
+        unrelated_grading_standard.reload.title.should_not eql gs.title
       end
     end
   end

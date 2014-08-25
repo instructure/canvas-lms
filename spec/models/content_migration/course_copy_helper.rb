@@ -33,6 +33,26 @@ shared_examples_for "course copy" do
     @copy_to.reload
   end
 
+  def run_export_and_import
+    export = @copy_from.content_exports.build
+    export.export_type = ContentExport::COMMON_CARTRIDGE
+    export.user = @teacher
+    yield(export) if block_given?
+    export.save
+    export.export_course
+    export.workflow_state.should == 'exported'
+    export.attachment_id.should_not be_nil
+
+    @cm.set_default_settings
+    @cm.migration_type = 'canvas_cartridge_importer'
+    worker = Canvas::Migration::Worker::CCWorker.new
+    @cm.attachment_id = export.attachment_id
+    @cm.skip_job_progress = true
+    worker.perform(@cm)
+    @cm.workflow_state.should == 'imported'
+    @copy_to.reload
+  end
+
   def make_grading_standard(context, opts = {})
     gs = context.grading_standards.new
     gs.title = opts[:title] || "Standard eh"
