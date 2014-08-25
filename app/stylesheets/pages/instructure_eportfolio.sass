@@ -234,14 +234,12 @@ ul.submission_list.instTree li.submission.leaf
       font-size: 14px
       padding: 5px 0 5px 25px
       border-bottom: 1px solid lighten(#C6C6C6, 4%)
-      text-shadow: 1px 2px 3px #CBCBCB
               
       &:hover, &:focus
         background-color: darken(#e4e7e9, 2%)
         // color: #fff
         z-index: 0
-        position: static
-        // +text-shadow(1px, 2px, 3px, #54646C)
+        position: static        
         text-decoration: none
       a.name
         display: block
@@ -253,19 +251,28 @@ ul.submission_list.instTree li.submission.leaf
       position: relative
       z-index: 11
       padding: 7px 0 7px 23px
-      // +text-shadow(1px, 2px, 3px, #CBCBCB)
       // color: #2C4C5E
   li.hidden
     .section_url
       color: #AAAAAA
 
 .eportfolio-name
-  padding: 10px
+  padding: 10px  
   h3, .h3
     font-size: 14px
     margin: 0
-  a
-    font-style: italic
+    line-height: normal
+    padding: 0
+  a    
+    // in order for the .ellipsis to work
+    // we need to make the span a block    
+    display: block 
+  span
+    color: $eportfolio-name--disabled
+    // in order for the .ellipsis to work
+    // we need to make the span a block    
+    display: block 
+
 
 #section_list
   .remove_section_link

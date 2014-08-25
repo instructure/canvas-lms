@@ -79,6 +79,8 @@ $canvas-dark:                     #7d8f9a; // gray/blue
 //    $link-color: $canvas-primary;
 //    $submit_button--on: $canvas-secondary;
 
+$eportfolio-name--disabled: #777;
+@if $use_high_contrast {$eportfolio-name--disabled: #686868;}
 
 // Legacy Variables
 //=======================

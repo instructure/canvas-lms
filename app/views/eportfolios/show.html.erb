@@ -16,7 +16,11 @@
 <% content_for :left_side do %>
   <div class="eportfolio-name">
     <h3><%= @portfolio.name %></h3>
-    <a href="<%= url_for(@portfolio.user) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></a>
+    <% if @owner_url %>
+      <a href="<%= @owner_url %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></a>
+    <% else %>
+      <span id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></span>
+    <% end %>
   </div>
   <%= render :partial => "eportfolios/section_list" %>
 <% end %>
