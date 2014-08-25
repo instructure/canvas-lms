@@ -108,7 +108,7 @@ class DiscussionTopicsApiController < ApplicationController
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
         User.find(shard_ids)
-        end
+      end
 
       participant_info = participants.map do |participant|
         user_display_json(participant, @context.is_a_context? && @context)
