@@ -72,9 +72,9 @@ describe "differentiated_assignments" do
     ao.save!
   end
 
-  def give_section_foo_due_date(assignment)
+  def give_section_due_date(assignment, section)
     create_override_for_assignment(assignment) do |ao|
-      ao.set = @section_foo
+      ao.set = section
       ao.due_at = 3.weeks.from_now
     end
   end
@@ -94,7 +94,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
       assignment_with_true_only_visible_to_overrides
-      give_section_foo_due_date(@assignment)
+      give_section_due_date(@assignment, @section_foo)
       enroller_user_in_section(@section_foo)
       # at this point there should be an entry in the table
       @visibility_object = AssignmentStudentVisibility.first
@@ -131,7 +131,7 @@ describe "differentiated_assignments" do
     context "assignment only visibile to overrides" do
       before do
         assignment_with_true_only_visible_to_overrides
-        give_section_foo_due_date(@assignment)
+        give_section_due_date(@assignment, @section_foo)
       end
 
       context "user in section with override who then changes sections" do
@@ -184,6 +184,12 @@ describe "differentiated_assignments" do
           @assignment.assignment_overrides.all.each(&:destroy!)
           ensure_user_does_not_see_assignment
         end
+        it "should not return duplicate visibilities with multiple visible sections" do
+          enroller_user_in_section(@section_bar, {user: @user})
+          give_section_due_date(@assignment, @section_bar)
+          visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
+          visibile_assignment_ids.count.should == 1
+        end
       end
       context "user in section with no override" do
         before{enroller_user_in_section(@section_bar)}
@@ -203,7 +209,7 @@ describe "differentiated_assignments" do
     context "assignment with false only_visible_to_overrides" do
       before do
         assignment_with_false_only_visible_to_overrides
-        give_section_foo_due_date(@assignment)
+        give_section_due_date(@assignment, @section_foo)
       end
       context "user in default section" do
         it "should show the assignment to the user" do
@@ -234,7 +240,7 @@ describe "differentiated_assignments" do
     context "assignment with null only_visible_to_overrides" do
       before do
         assignment_with_null_only_visible_to_overrides
-        give_section_foo_due_date(@assignment)
+        give_section_due_date(@assignment, @section_foo)
       end
       context "user in default section" do
         it "should show the assignment to the user" do
