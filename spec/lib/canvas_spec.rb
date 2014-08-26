@@ -132,8 +132,13 @@ describe Canvas do
     end
 
     it "should pass through string links" do
-      ConfigFile.stubs(:load).returns('other' => { 'cache_store' => 'redis_store' }, 'db1' => 'other')
-      Canvas.cache_stores.should == { 'other' => [ :redis_store, nil ], 'db1' => 'other', 'test' => :null_store }
+      ConfigFile.stubs(:load).returns('other' => { 'cache_store' => 'redis_store', 'servers' => ['localhost:6379'] }, 'db1' => 'other')
+      stores = Canvas.cache_stores
+      stores.keys.sort.should == ['db1', 'other', 'test']
+      stores['other'].should be_a(Array)
+      stores['other'].first.should == :redis_store
+      stores['db1'].should == 'other'
+      stores['test'].should == :null_store
     end
 
   end
