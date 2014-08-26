@@ -95,8 +95,11 @@ module Canvas
           # servers, not key prefix or database names.
           config = (ConfigFile.load('redis', env) || {}).merge(config)
           config_options = config.symbolize_keys.except(:key, :servers, :database)
-          servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
-          @cache_stores[env] = :redis_store, servers
+          servers = config['servers']
+          if servers
+            servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
+            @cache_stores[env] = :redis_store, servers
+          end
         when 'memory_store'
           @cache_stores[env] = :memory_store
         when 'nil_store'
