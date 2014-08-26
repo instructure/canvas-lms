@@ -243,16 +243,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
-      # handle if it has already come due, but has not yet been auto_peer_reviewed
-      if overdue?
-        # do_auto_peer_review
-      elsif due_at
-        self.send_later_enqueue_args(:do_auto_peer_review, {
-          :run_at => due_at,
-          :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-        })
-      end
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+      self.send_later_enqueue_args(:do_auto_peer_review, {
+        :run_at => due_at,
+        :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
+      })
     end
     true
   end
@@ -357,6 +352,8 @@ class Assignment < ActiveRecord::Base
     end
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
+    # have to use peer_reviews_due_at here because it's the column name
+    self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     self.points_possible = nil if self.submission_types == 'not_graded'
   end
   protected :default_values

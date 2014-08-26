@@ -866,12 +866,10 @@ describe Assignment do
 
     context "basic assignment" do
       before :once do
-        @submissions = []
-        @users = []
         @users = create_users_in_course(@course, 10.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
         @a.reload
-        @users.each do |u|
-          @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        @submissions = @users.map do |u|
+          @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
         end
       end
 
@@ -897,6 +895,32 @@ describe Assignment do
           res.map{|a| a.assessor_asset}.should be_include(s)
         end
       end
+    end
+
+    it "should schedule auto_assign when variables are right" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.due_at = Time.zone.now
+
+      expects_job_with_tag('Assignment#do_auto_peer_review') {
+        @a.save!
+      }
+    end
+
+    it "should reset peer_reviews_assigned when the assign_at time changes" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.due_at = 1.day.ago
+      @a.peer_reviews_assigned = true
+      @a.save!
+
+      @a.assign_peer_reviews
+      @a.peer_reviews_assigned.should be_true
+
+      @a.peer_reviews_assign_at = 1.day.from_now
+      @a.save!
+
+      @a.peer_reviews_assigned.should be_false
     end
 
     it "should allow setting peer_reviews_assign_at" do
@@ -1012,8 +1036,6 @@ describe Assignment do
         end
       end
     end
-
-
   end
 
   context "grading scales" do

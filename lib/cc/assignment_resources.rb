@@ -186,7 +186,7 @@ module CC
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       atts = [:points_possible, :grading_type,
               :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
-              :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,
+              :peer_reviews, :automatic_peer_reviews,
               :anonymous_peer_reviews, :grade_group_students_individually, :freeze_on_copy, :muted]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
