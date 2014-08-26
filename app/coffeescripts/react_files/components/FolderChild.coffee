@@ -9,7 +9,8 @@ define [
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
-], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
+  './PublishCloud'
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud) ->
 
 
   FolderChild = React.createClass
@@ -75,12 +76,6 @@ define [
         div className:'ef-size-col',
           friendlyBytes(@props.model.get('size')),
         div( {className:'ef-links-col'},
-          span( {'data-module-type':'assignment', 'data-content-id':'6', 'data-id':'6', 'data-course-id':'4', 'data-module-id':'3', 'data-module-item-id':'3', 'data-published':'true', 'data-publishable':'true', 'data-unpublishable':'true', className:'publish-icon published publish-icon-published', role:'button', tabIndex:'0', 'aria-pressed':'true', title:'Published', 'aria-describedby':'ui-tooltip-1', 'aria-label':'Published. Click to unpublish.'}, i( {className:'icon-publish'}),
-            span( {className:'publish-text', tabIndex:'-1'}, ' Published'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.')
-          ),
-
+          PublishCloud(model: @props.model),
           ItemCog(model: @props.model, startEditingName: @startEditingName)
         )
