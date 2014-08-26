@@ -1493,9 +1493,9 @@ class Course < ActiveRecord::Base
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+
     assignments = calc.assignments
     groups = calc.groups
-
 
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
@@ -1557,12 +1557,20 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
+      if da_enabled = feature_enabled?(:differentiated_assignments)
+        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments.map(&:user_id), course_id: id)
+      end
+
       student_enrollments.each do |student_enrollment|
         student = student_enrollment.user
         student_sections = student_section_names[student.id].sort.to_sentence
         student_submissions = assignments.map do |a|
-          submission = submissions[[student.id, a.id]]
-          submission.try(:score)
+          if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+            "N/A"
+          else
+            submission = submissions[[student.id, a.id]]
+            submission.try(:score)
+          end
         end
         #Last Row
         row = [student.last_name_first, student.id]

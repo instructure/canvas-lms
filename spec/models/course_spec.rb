@@ -1125,6 +1125,51 @@ describe Course, "gradebook_to_csv" do
     rows.length.should == 3
     rows[2][1].should == @user2.id.to_s
   end
+
+  context "differentiated assignments" do
+    def setup_DA
+      @course_section = @course.course_sections.create
+      @student1, @student2, @student3 = create_users(3, return_type: :record)
+      @student1.name = "Bob"
+      @student1.save
+      @student2.name = "Lyra"
+      @student2.save
+      @student3.name = "Serena"
+      @student3.save
+      @assignment = @course.assignments.create!(title: "a1", only_visible_to_overrides: true)
+      @course.enroll_student(@student3, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "section1")
+      @section2 = @course.course_sections.create!(name: "section2")
+      student_in_section(@section, user: @student1)
+      student_in_section(@section2, user: @student2)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+      @assignment2 = @course.assignments.create!(title: "a2", only_visible_to_overrides: true)
+      create_section_override_for_assignment(@assignment2, {course_section: @section2})
+      @course.reload
+    end
+
+    before :once do
+      course_with_teacher(:active_all => true)
+      @course.enable_feature!(:differentiated_assignments)
+      setup_DA
+      @assignment.grade_student(@student1, :grade => "3")
+      @assignment2.grade_student(@student2, :grade => "3")
+    end
+
+    it "should insert N/A for non-visible assignments" do
+      csv = @course.gradebook_to_csv(:user => @teacher)
+      csv.should_not be_nil
+      rows = CSV.parse(csv)
+      rows[2][3].should == "3"
+      rows[2][4].should == "N/A"
+
+      rows[3][3].should == "N/A"
+      rows[3][4].should == "3"
+
+      rows[4][3].should == nil
+      rows[4][4].should == nil
+    end
+  end
 end
 
 describe Course, "update_account_associations" do
