@@ -365,7 +365,7 @@ RSpec.configure do |config|
   # things to play nicely with its caching
   Onceler.configure do |c|
     c.before :record do
-      Account.clear_special_account_cache!
+      Account.clear_special_account_cache!(true)
       AdheresToPolicy::Cache.clear
       Folder.reset_path_lookups!
     end
@@ -386,7 +386,7 @@ RSpec.configure do |config|
   Notification.after_create { Notification.reset_cache! }
   config.before :all do
     # so before(:all)'s don't get confused
-    Account.clear_special_account_cache!
+    Account.clear_special_account_cache!(true)
     AdheresToPolicy::Cache.clear
 
     # allow tests to still run in non-draft state even though it's hard-coded on
@@ -404,7 +404,8 @@ RSpec.configure do |config|
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
-    Account.clear_special_account_cache!
+    LoadAccount.force_special_account_reload = true
+    Account.clear_special_account_cache!(true)
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
