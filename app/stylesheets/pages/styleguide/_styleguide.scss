@@ -1,3 +1,22 @@
+// Hide/show new styles vs old styles
+@if $use_new_styles { 
+  .style-guide-nav .canvasSidebar--menu__item {
+    a[href*=_-_legacy] {display: none;}
+    a[href*=_-_new] {display: block;}
+  }  
+
+  [id*=_-_legacy].styleguide-section__component-doc { display: none;}
+  [id*=_-_new].styleguide-section__component-doc { display: block;}
+}
+@else {
+  #style-guide-nav li {
+    a[href*=_-_legacy] {display: block;}
+    a[href*=_-_new] {display: none;}
+  }
+
+  .styleguide-section__component > [id*=_-_legacy] { display: block;}
+  .styleguide-section__component > [id*=_-_new] { display: none;}
+}
 @if $use_new_styles { 
 // Styleguide Typography
 //===============
@@ -45,6 +64,7 @@
   border-bottom: 1px solid $canvas-neutral;
 }
 .highlight {  
+  height: 100%;
   pre {
     padding: 10px;
     background: lighten($canvas-primary, 60%);
@@ -170,4 +190,80 @@
   border-left: solid 4px #0088cc;
   padding-left: 8px;
 }
+}// end @else legacy styles
+
+/////
+////// Styles for Colors
+/////
+.Colorguide-title {
+  width: 101%;
+  font-size: 15px;
+  padding: 0;
+  text-align: left;    
+}
+.Colorguide-container {
+  @extend %flex;
+  flex-flow: row wrap;    
+  justify-content: space-around;
+}
+.Colorguide-container--hc-theme {
+  margin-bottom: 30px;
+}
+.Colorguide-color {  
+  height: 100px;
+  padding: 25px;
+  @if $use_new_styles {
+    width: 300px;
+  }
+  @else {
+    float: left;
+    width: 150px;
+  }
+  color: $base-font-color-light;
+  margin-bottom: 5px;
+  
+ &.Colorguide-color--light,
+ &.Colorguide-color--neutral {
+  color: $base-font-color-dark;
+ }
+ .Colorguide-hex {  
+  display: block;
+ }
+}
+@mixin colorguide ($bg-color) {
+  background: $bg-color;
+  border: 1px solid darken($bg-color, 10%);
+}
+.Colorguide-color--primary    {@include colorguide($canvas-primary);}
+.Colorguide-color--secondary  {@include colorguide($canvas-secondary);}
+.Colorguide-color--success    {@include colorguide($canvas-success);}
+.Colorguide-color--neutral    {@include colorguide($canvas-neutral);}
+.Colorguide-color--action     {@include colorguide($canvas-action);}
+.Colorguide-color--danger     {@include colorguide($canvas-danger);}
+.Colorguide-color--alert      {@include colorguide($canvas-alert);}
+.Colorguide-color--light      {@include colorguide($canvas-light);}
+.Colorguide-color--dark       {@include colorguide($canvas-dark);}
+@if $use_new_styles {
+  .Colorguide-container--hc-theme {
+    .Colorguide-color--primary    {@include colorguide(#0078c4);}
+    .Colorguide-color--secondary  {@include colorguide(#58646d);}
+    .Colorguide-color--success    {@include colorguide(#008a14);}
+    .Colorguide-color--neutral    {@include colorguide(#ffffff);}
+    .Colorguide-color--action     {@include colorguide(#a23891);}
+    .Colorguide-color--danger     {@include colorguide(#a03536);}
+    .Colorguide-color--alert      {@include colorguide(#9e6b05);}
+    .Colorguide-color--dark       {@include colorguide(#405360);}  
+  }
+} 
+@else {
+.Colorguide-container--hc-theme {
+  .Colorguide-color--primary    {@include colorguide(#0073ac);}
+  .Colorguide-color--secondary  {@include colorguide(#0074af);}
+  .Colorguide-color--success    {@include colorguide(#33802a);}
+  .Colorguide-color--neutral    {@include colorguide(#6d6d6d); color: $canvas-light;}
+  .Colorguide-color--action     {@include colorguide(#a23891);}
+  .Colorguide-color--danger     {@include colorguide(#ad393a);}
+  .Colorguide-color--alert      {@include colorguide(#845a04);}
+  .Colorguide-color--dark       {@include colorguide(#333333);}  
+}  
 }
