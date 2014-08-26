@@ -306,6 +306,7 @@ module Api::V1::Assignment
     online_text_entry
     online_url
     media_recording
+    not_graded
   )
 
   def valid_submission_types?(assignment, assignment_params)
