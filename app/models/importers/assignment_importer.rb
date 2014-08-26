@@ -152,7 +152,7 @@ module Importers
         item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
       end
 
-      [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+      [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count, :muted
