@@ -64,7 +64,7 @@ module Lti
       let (:account) { Account.create }
       let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
       let (:resource_handler) { ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy) }
-      let (:message_handler) { MessageHandler.create(message_type: 'message_type', launch_path:'https://samplelaunch/blti', resource: resource_handler)}
+      let(:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
       let (:tool_proxy) { ToolProxy.create(
         shared_secret: 'shared_secret',
         guid: 'guid',
@@ -77,12 +77,13 @@ module Lti
       ) }
 
       context 'account' do
-        before :each do
-          @tool_proxy_binding = ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
+
+        before do
+          ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
         end
 
         it 'returns the signed params' do
-          get 'basic_lti_launch_request', account_id: account.id, lti_message_handler_id: message_handler.id
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
           response.code.should == "200"
 
           lti_launch = assigns[:lti_launch]
@@ -97,8 +98,28 @@ module Lti
         end
 
         it 'returns a 404 when when no handler is found' do
-          get 'basic_lti_launch_request', account_id: account.id, lti_message_handler_id: 0
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: 0
           response.code.should == "404"
+        end
+
+        it 'does custom variable expansion for tool settings' do
+          parameters = %w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ).map do |key|
+            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
+          end
+          message_handler.parameters = parameters.as_json
+          message_handler.save
+
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          response.code.should == "200"
+
+          params = assigns[:lti_launch].params.with_indifferent_access
+          params['custom_lti_link.custom.url'].should include('api/lti/tool_settings/')
+          params['custom_tool_proxy_binding.custom.url'].should include('api/lti/tool_settings/')
+          params['custom_tool_proxy.custom.url'].should include('api/lti/tool_settings/')
+        end
+
+        it 'uses the correct binding' do
+
         end
 
       end

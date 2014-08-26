@@ -285,7 +285,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
 
 
@@ -548,7 +548,7 @@ CanvasRails::Application.routes.draw do
     end
 
 
-    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
 
 
@@ -1595,7 +1595,13 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/tool_consumer_profile', action: 'show', :as => "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", :controller => 'lti/tool_proxy', :action => :create, :path_name => "create_#{context}_lti_tool_proxy"
     end
+    #Tool Setting Services
+    get "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :show, as: 'show_lti_tool_settings'
+    put "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :update, as: 'update_lti_tool_settings'
+
+    #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", :controller => 'lti/tool_proxy', :action => :show, :path_name => "show_lti_tool_proxy"
+
   end
 
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)

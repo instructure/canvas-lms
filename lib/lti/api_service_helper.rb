@@ -1,4 +1,5 @@
-# Copyright (C) 2014 Instructure, Inc.
+#
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,14 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Filters added to this controller apply to all controllers in the application.
+# Likewise, all the methods added will be available for all controllers.
+
 module Lti
-  class ToolLink < ActiveRecord::Base
-    belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
-    has_one :tool_setting, :class_name => 'Lti::ToolSetting', as: :settable
+  module ApiServiceHelper
 
-    attr_accessible :uuid
+    def oauth_authenticated_request?(secret)
+      !!OAuth::Signature.build(request, :consumer_secret => secret).verify()
+    end
 
-    after_initialize { self.uuid = SecureRandom::uuid}
+    def oauth_consumer_key
+      @oauth_consumer_key ||= OAuth::Helper.parse_header(request.authorization)['oauth_consumer_key']
+    end
 
   end
 end

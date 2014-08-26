@@ -18,16 +18,15 @@
 module Lti
   class ToolProxyBinding < ActiveRecord::Base
 
-    attr_accessible :context, :tool_proxy
+    attr_accessible :context, :tool_proxy, :enabled
 
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
-    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+
     belongs_to :context, :polymorphic => true
-    has_one :tool_setting, :class_name => 'Lti::ToolSetting', as: :settable
+    has_many :links, :class_name => 'Lti::LtiLink', foreign_key: 'tool_proxy_binding_id'
 
-    validates_presence_of :tool_proxy, :context
-
-    after_save :touch_context
+    validates_presence_of :tool_proxy, :context, :enabled
+    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
 
   end
 end

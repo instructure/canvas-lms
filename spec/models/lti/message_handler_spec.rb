@@ -25,7 +25,7 @@ module Lti
       before(:each) do
         subject.message_type = 'message_type'
         subject.launch_path = 'launch_path'
-        subject.resource = ResourceHandler.new
+        subject.resource_handler = ResourceHandler.new
       end
 
       it 'requires the message type' do
@@ -41,9 +41,9 @@ module Lti
       end
 
       it 'requires a resource_handler' do
-        subject.resource = nil
+        subject.resource_handler = nil
         subject.save
-        subject.errors.first.should == [:resource, "can't be blank"]
+        subject.errors.first.should == [:resource_handler, "can't be blank"]
       end
 
     end

@@ -45,14 +45,14 @@ module Lti
 
       if @context.is_a? Course
         substitutions.merge!(
-            {
-                '$Canvas.course.id' => @context.id,
-                '$Canvas.course.sisSourceId' => @context.sis_source_id,
-                '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
-                '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
-                #This is a list of IMS LIS roles should have a different key
-                '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
-            }
+          {
+            '$Canvas.course.id' => @context.id,
+            '$Canvas.course.sisSourceId' => @context.sis_source_id,
+            '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
+            '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
+            #This is a list of IMS LIS roles should have a different key
+            '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
+          }
         )
       end
 

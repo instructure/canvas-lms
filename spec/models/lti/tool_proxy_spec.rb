@@ -102,24 +102,6 @@ module Lti
         subject.errors[:raw_data].should include("can't be blank")
       end
 
-      context 'tool_settings' do
-        subject { ToolProxy.create(
-          shared_secret: 'shared_secret',
-          guid: 'guid',
-          product_version: '1.0beta',
-          lti_version: 'LTI-2p0',
-          product_family: product_family,
-          context: account,
-          workflow_state: 'active',
-          raw_data: 'some raw data'
-        ) }
-        it 'can have a tool setting' do
-          subject.create_tool_setting(custom: {name: :foo})
-          subject.tool_setting[:custom].should == {name: :foo}
-
-        end
-      end
-
     end
 
   end

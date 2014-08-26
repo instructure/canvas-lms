@@ -27,13 +27,12 @@ module Lti
     belongs_to :context, :polymorphic => true
 
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
-    has_one :tool_setting, :class_name => 'Lti::ToolSetting', as: :settable
 
     serialize :raw_data
 
     validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context
     validates_uniqueness_of :guid
-    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+    validates_inclusion_of :workflow_state, in: ['active', 'deleted', 'disabled']
 
   end
 end

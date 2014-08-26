@@ -73,7 +73,7 @@ module Lti
       message_handler.launch_path = "#{base_path}#{mh.path}"
       message_handler.capabilities = create_json(mh.enabled_capability)
       message_handler.parameters = create_json(mh.parameter.as_json)
-      message_handler.resource = resource
+      message_handler.resource_handler = resource
       message_handler.save!
       message_handler
     end
