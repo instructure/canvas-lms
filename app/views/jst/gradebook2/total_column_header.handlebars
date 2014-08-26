@@ -1,8 +1,8 @@
-{{#unless weightedGroups}}
-  <a id=total_dropdown class=gradebook-header-drop href="#" role=button>
-    {{#t "options"}}Options{{/t}}
-  </a>
-  <ul class=gradebook-header-menu>
+<a id=total_dropdown class=gradebook-header-drop href="#" role=button>
+  {{#t "options"}}Options{{/t}}
+</a>
+<ul class=gradebook-header-menu>
+  {{#unless weightedGroups}}
     <li><a class=toggle_percent href="#">
       {{#if showingPoints}}
         {{#t "switch_to_percent"}}Switch to percent{{/t}}
@@ -10,12 +10,12 @@
         {{#t "switch_to_points"}}Switch to points{{/t}}
       {{/if}}
     </a></li>
-    <li><a class=move_column href=#>
-      {{#if totalColumnInFront}}
-        {{#t "move_to_end"}}Move to end{{/t}}
-      {{else}}
-        {{#t "move_to_front"}}Move to front{{/t}}
-      {{/if}}
-    </a></li>
-  </ul>
-{{/unless}}
+  {{/unless}}
+  <li><a class=move_column href=#>
+    {{#if totalColumnInFront}}
+      {{#t "move_to_end"}}Move to end{{/t}}
+    {{else}}
+      {{#t "move_to_front"}}Move to front{{/t}}
+    {{/if}}
+  </a></li>
+</ul>
