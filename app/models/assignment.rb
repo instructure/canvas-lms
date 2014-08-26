@@ -674,7 +674,7 @@ class Assignment < ActiveRecord::Base
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
       passed = if points_possible && points_possible > 0
-                 score > 0
+                 score.to_f > 0
                elsif given_grade
                  given_grade == "complete" || given_grade == "pass"
                end
