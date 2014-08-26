@@ -45,11 +45,23 @@ module Canvas::Redis
 
   def self.handle_redis_failure(failure_retval, redis_name)
     return failure_retval if redis_failure?(redis_name)
-    yield
-  rescue Redis::BaseConnectionError, SystemCallError => e
+    reply = yield
+    raise reply if reply.is_a?(Exception)
+    reply
+  rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
     CanvasStatsd::Statsd.increment("redis.errors.all")
     CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
+
+    # We want to rescue errors such as "max number of clients reached", but not
+    # actual logic errors such as trying to evalsha a script that doesn't
+    # exist.
+    # These are both CommandErrors, so we can only differentiate based on the
+    # exception message.
+    if e.is_a?(::Redis::CommandError) && e.message !~ /\bERR\b/
+      raise
+    end
+
     if self.ignore_redis_failures?
       ErrorReport.log_exception(:redis, e)
       last_redis_failure[redis_name] = Time.now
