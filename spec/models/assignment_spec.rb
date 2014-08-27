@@ -2379,6 +2379,10 @@ describe Assignment do
       @assignment.touch
       @topic.reload.should be_deleted
     end
+    it 'should raise an error on validation error' do
+      assignment = Assignment.new
+      lambda {assignment.destroy}.should raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   describe "speed_grader_json" do

@@ -1346,6 +1346,10 @@ describe Quizzes::Quiz do
       quiz.destroy
       assignment.deleted?.should be_true
     end
+    it 'should raise an error on validation error' do
+      quiz = Quizzes::Quiz.new
+      lambda {quiz.destroy}.should raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   context "draft_state" do

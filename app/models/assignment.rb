@@ -552,7 +552,7 @@ class Assignment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
-    self.save
+    self.save!
 
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
     self.quiz.destroy if self.quiz && !self.quiz.deleted?
