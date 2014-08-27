@@ -26,6 +26,8 @@ class EventStream::Stream
   attr_config :time_to_live, :type => Fixnum, :default => 1.year
   attr_config :read_consistency_level, :default => nil
 
+  attr_accessor :raise_on_error
+
   def initialize(&blk)
     instance_exec(&blk) if blk
     attr_config_validate
@@ -44,12 +46,8 @@ class EventStream::Stream
   end
 
   def insert(record)
-    if available?
-      execute(:insert, record)
-      record
-    else
-      nil
-    end
+    execute(:insert, record)
+    record
   end
 
   def on_update(&callback)
@@ -57,12 +55,12 @@ class EventStream::Stream
   end
 
   def update(record)
-    if available?
-      execute(:update, record)
-      record
-    else
-      nil
-    end
+    execute(:update, record)
+    record
+  end
+
+  def on_error(&callback)
+    add_callback(:error, callback)
   end
 
   def fetch(ids)
@@ -125,7 +123,14 @@ class EventStream::Stream
     @callbacks[operation] ||= []
   end
 
+  class Unavailable < Exception; end
+
   def execute(operation, record)
+    unless available?
+      run_callbacks(:error, operation, record, Unavailable.new)
+      return
+    end
+
     ttl_seconds = self.ttl_seconds(record.created_at)
     return if ttl_seconds < 0
 
@@ -134,16 +139,17 @@ class EventStream::Stream
       run_callbacks(operation, record)
     end
   rescue Exception => exception
-    EventStream::Failure.log!(operation, self, record, exception)
+    run_callbacks(:error, operation, record, exception)
+    raise if raise_on_error
   end
 
   def add_callback(operation, callback)
     callbacks_for(operation) << callback
   end
 
-  def run_callbacks(operation, record)
+  def run_callbacks(operation, *args)
     callbacks_for(operation).each do |callback|
-      instance_exec(record, &callback)
+      instance_exec(*args, &callback)
     end
   end
 end
