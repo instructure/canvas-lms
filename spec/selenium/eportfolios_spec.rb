@@ -138,7 +138,7 @@ describe "eportfolios" do
         attachment_model(:context => @student)
         get "/eportfolios/#{@eportfolio.id}"
         expect_new_page_load { f(".icon-arrow-right").click }
-        f(".edit_content_link").click
+        f("#right-side .edit_content_link").click
         wait_for_ajaximations
       end
 
@@ -223,7 +223,7 @@ describe "eportfolios" do
 
         it "should delete the html content" do
           add_html
-          f(".edit_content_link").click
+          f("#right-side .edit_content_link").click
           hover_and_click("#page_section_1 .delete_page_section_link")
           try_to_close_modal
           wait_for_ajaximations
@@ -299,7 +299,7 @@ describe "eportfolios file upload" do
     get "/eportfolios/#{@eportfolio.id}"
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }
-    f(".edit_content_link").click
+    f("#right-side .edit_content_link").click
     wait_for_ajaximations
     driver.execute_script "$('.add_file_link').click()"
     fj(".file_upload:visible").send_keys(fullpath)

@@ -86,7 +86,7 @@ def should_pick_the_lower_value_when_splitting_without_room_for_an_integer
 end
 
 def import_outcome
-  f('.edit_rubric_link').click
+  f('#right-side .edit_rubric_link').click
   wait_for_ajaximations
   f('.rubric.editing tr.criterion .delete_criterion_link').click
   wait_for_ajaximations

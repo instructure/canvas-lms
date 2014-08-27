@@ -24,7 +24,7 @@ define([
       if(alignments.length == 0) {
         params['assessment_question_bank[alignments]'] = '';
       }
-      var url = $(".edit_bank_link").attr('href');
+      var url = $(".edit_bank_link:last").attr('href');
       $.ajaxJSON(url, 'PUT', params, function(data) {
         var alignments = data.assessment_question_bank.learning_outcome_alignments.sort(function(a, b) {
           var a_name = ((a.content_tag && a.content_tag.learning_outcome && a.content_tag.learning_outcome.short_description) || 'none').toLowerCase();

@@ -117,16 +117,16 @@
         <div id="not_right_side">
           <div id="content-wrapper">
             <%= render_crumbs %>
-      <div id="right-side-wrapper">
-        <aside id="right-side" role="complementary">
-          <%= right_side %>
-        </aside>
-      </div>
             <%= render :partial => 'shared/content_notices' if @context && @context.respond_to?(:content_notices) %>
             <div id="content" role="main" class="container-fluid">
               <%= yield %>
             </div>
           </div>
+        </div>
+        <div id="right-side-wrapper">
+          <aside id="right-side" role="complementary">
+            <%= right_side %>
+          </aside>
         </div>
       </div>
       <footer role="contentinfo" id="footer">

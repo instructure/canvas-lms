@@ -14,7 +14,7 @@ describe "external tool assignments" do
 
     #create assignment
     click_option('#right-side select.assignment_groups_select', 'Assignments')
-    f('.add_assignment_link').click
+    f('#right-side .add_assignment_link').click
     f('#assignment_title').send_keys('test1')
     f('.ui-datepicker-trigger').click
     datepicker = datepicker_next

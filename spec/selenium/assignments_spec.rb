@@ -10,7 +10,7 @@ describe "assignments" do
 
     def manually_create_assignment(assignment_title = 'new assignment')
       get "/courses/#{@course.id}/assignments"
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       wait_for_ajaximations
       replace_content(f('#assignment_title'), assignment_title)
       expect_new_page_load { f('.more_options_link').click }
@@ -130,7 +130,7 @@ describe "assignments" do
 
       #create assignment
       click_option('#right-side select.assignment_groups_select', 'second group')
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       wait_for_ajaximations
       f('#assignment_title').send_keys(assignment_name)
       f('.ui-datepicker-trigger').click
@@ -213,7 +213,7 @@ describe "assignments" do
         group = @course.assignment_groups.first
         AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
-        f('.add_assignment_link').click
+        f('#right-side .add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
@@ -231,7 +231,7 @@ describe "assignments" do
 
     it "should verify that self sign-up link works in more options" do
       get "/courses/#{@course.id}/assignments"
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
       f('#has_group_category').click
@@ -269,7 +269,7 @@ describe "assignments" do
         group = @course.assignment_groups.first
         AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
-        f('.add_assignment_link').click
+        f('#right-side .add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
