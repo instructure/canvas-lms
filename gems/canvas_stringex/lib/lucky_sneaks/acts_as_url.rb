@@ -26,10 +26,18 @@ module LuckySneaks
       # <tt>:sync_url</tt>:: If set to true, the url field will be updated when changes are made to the
       #                      attribute it is based on. Default is false.
       def acts_as_url(attribute, options = {})
-        cattr_accessor :attribute_to_urlify
-        cattr_accessor :scope_for_url
-        cattr_accessor :url_attribute # The attribute on the DB
-        cattr_accessor :only_when_blank
+        cattr_reader :attribute_to_urlify
+        cattr_reader :scope_for_url
+        cattr_reader :url_attribute # The attribute on the DB
+        cattr_reader :only_when_blank
+        attr_writer :only_when_blank
+
+        self.class_eval do
+          def only_when_blank
+            return @only_when_blank unless @only_when_blank.nil? # can override only_when_blank temporarily
+            self.class.only_when_blank
+          end
+        end
 
         if options[:sync_url]
           before_validation :ensure_unique_url
@@ -37,10 +45,10 @@ module LuckySneaks
           before_validation(:ensure_unique_url, :on => :create)
         end
 
-        self.attribute_to_urlify = attribute
-        self.scope_for_url = options[:scope]
-        self.url_attribute = options[:url_attribute] || "url"
-        self.only_when_blank = options[:only_when_blank] || false
+        class_variable_set(:@@attribute_to_urlify, attribute)
+        class_variable_set(:@@scope_for_url, options[:scope])
+        class_variable_set(:@@url_attribute, options[:url_attribute] || "url")
+        class_variable_set(:@@only_when_blank, options[:only_when_blank] || false)
       end
 
       # Initialize the url fields for the records that need it. Designed for people who add
