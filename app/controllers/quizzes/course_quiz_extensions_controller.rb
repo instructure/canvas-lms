@@ -16,22 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Quiz Extensions
+# @API Course Quiz Extensions
 # @beta
 #
-# API for setting extensions on student quiz submissions
+# API for setting extensions on student quiz submissions at the course level
 #
-# @model QuizExtension
+# @model CourseQuizExtension
 #     {
-#       "id": "QuizExtension",
-#       "required": ["quiz_id", "user_id"],
+#       "id": "CourseQuizExtension",
+#       "required": ["user_id"],
 #       "properties": {
-#         "quiz_id": {
-#           "description": "The ID of the Quiz the quiz extension belongs to.",
-#           "example": 2,
-#           "type": "integer",
-#           "format": "int64"
-#         },
 #         "user_id": {
 #           "description": "The ID of the Student that needs the quiz extension.",
 #           "example": 3,
@@ -63,10 +57,9 @@
 #         }
 #       }
 #     }
-class Quizzes::QuizExtensionsController < ApplicationController
-  include Filters::Quizzes
+class Quizzes::CourseQuizExtensionsController < ApplicationController
 
-  before_filter :require_user, :require_context, :require_quiz
+  before_filter :require_user, :require_context
 
   # @API Set extensions for student quiz submissions
   # @beta
@@ -137,10 +130,10 @@ class Quizzes::QuizExtensionsController < ApplicationController
 
     # check permissions on all extensions before performing on submissions
     quiz_extensions = Quizzes::QuizExtension.build_extensions(
-       students, [@quiz], params[:quiz_extensions]) do |extension|
+      students, quizzes, params[:quiz_extensions]) do |extension|
 
       unless extension.quiz_submission.grants_right?(participant.user, :add_attempts)
-        reject! 'you are not allowed to change extension settings for this submission', 403
+        reject! 'you are not allowed to change extension settings for these submissions', 403
       end
     end
 
@@ -166,11 +159,15 @@ class Quizzes::QuizExtensionsController < ApplicationController
   end
 
   def participant
-    Quizzes::QuizParticipant.new(@current_user, temporary_user_code)
+    @participant ||= Quizzes::QuizParticipant.new(@current_user, temporary_user_code)
   end
 
   def students
     @context.students
+  end
+  
+  def quizzes
+    @context.quizzes
   end
 
 end
