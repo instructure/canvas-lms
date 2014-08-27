@@ -39,48 +39,47 @@ module Lti
           end
     end
 
-    def current_lis_roles
-      enrollments_to_lis_roles(course_enrollments + account_enrollments).join(',') || LtiOutbound::LTIRole::NONE
-    end
-
-    def concluded_lis_roles
-      enrollments_to_lis_roles(concluded_course_enrollments).join(',') || LtiOutbound::LTIRole::NONE
-    end
-
-    def current_canvas_roles
-      (lti_helper.course_enrollments.map(&:role) + lti_helper.account_enrollments.map(&:readable_type)).uniq.join(',')
-    end
-
     def enrollments_to_lis_roles(enrollments)
       enrollments.map { |enrollment| Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class] }.uniq
     end
 
     def course_enrollments
       return [] unless @context.is_a?(Course)
-      @current_course_enrollments ||= @user.current_enrollments.find_all_by_course_id(@context.id)
+      @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
     end
 
     def account_enrollments
       unless @current_account_enrollments
         @current_account_enrollments = []
         if @user && @context.respond_to?(:account_chain) && !@context.account_chain_ids.empty?
-          @current_account_enrollments = @user.account_users.find_all_by_account_id(@context.account_chain_ids).uniq
+          @current_account_enrollments = AccountUser.where(user_id: @user.id, account_id: @context.account_chain_ids).shard(@context.shard)
         end
       end
       @current_account_enrollments
     end
 
-    def concluded_course_enrollments
-      @concluded_course_enrollments ||=
-          @context.is_a?(Course) ? @user.concluded_enrollments.find_all_by_course_id(@context.id) : []
+    def current_lis_roles
+      enrollments = course_enrollments + account_enrollments
+      enrollments.size > 0 ? enrollments_to_lis_roles(enrollments).join(',') : LtiOutbound::LTIRole::NONE
     end
 
-    def currently_active_in_course?
-      course_enrollments.any? { |membership| membership.state_based_on_date == :active }
+    def concluded_course_enrollments
+      @concluded_course_enrollments ||=
+          @context.is_a?(Course) ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
+    end
+
+    def concluded_lis_roles
+      concluded_course_enrollments.size > 0 ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRole::NONE
+    end
+
+    def current_canvas_roles
+      (course_enrollments.map(&:role) + account_enrollments.map(&:readable_type)).uniq.join(',')
     end
 
     def enrollment_state
-      currently_active_in_course? ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
+      enrollments = @context.enrollments.where(user_id: @user.id)
+      return '' if enrollments.size == 0
+      enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end
   end
 end
