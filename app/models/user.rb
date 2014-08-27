@@ -1645,7 +1645,7 @@ class User < ActiveRecord::Base
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
-    self.shard.activate do
+    enrollments = self.shard.activate do
       res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
         res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
         if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
@@ -1655,6 +1655,10 @@ class User < ActiveRecord::Base
         res
       end
     end + temporary_invitations
+    if opts[:preload_courses]
+      Enrollment.send(:preload_associations, enrollments, [:course])
+    end
+    enrollments
   end
 
   def cached_not_ended_enrollments
@@ -1920,7 +1924,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     return @appointment_context_codes if @appointment_context_codes
     ret = {:primary => [], :secondary => []}
-    cached_current_enrollments.each do |e|
+    cached_current_enrollments(preload_courses: true).each do |e|
       next unless e.student? && e.active?
       ret[:primary] << "course_#{e.course_id}"
       ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2184,7 +2188,7 @@ class User < ActiveRecord::Base
     return @menu_data if @menu_data
     coalesced_enrollments = []
 
-    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_courses => true)
     cached_enrollments.each do |e|
 
       next if e.state_based_on_date == :inactive

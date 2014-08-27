@@ -353,8 +353,7 @@ class CoursesController < ApplicationController
           }.compact.join(" OR ")
           enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions)
         else
-          enrollments = @current_user.cached_current_enrollments
-          Enrollment.send(:preload_associations, enrollments, [:course])
+          enrollments = @current_user.cached_current_enrollments(preload_courses: true)
         end
 
         if params[:enrollment_role]
