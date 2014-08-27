@@ -10,7 +10,8 @@ define [
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
   './PublishCloud'
-], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud) ->
+  '../utils/downloadStuffAsAZip'
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud, downloadStuffAsAZip) ->
 
 
   FolderChild = React.createClass
@@ -77,5 +78,18 @@ define [
           friendlyBytes(@props.model.get('size')),
         div( {className:'ef-links-col'},
           PublishCloud(model: @props.model),
+
+          a (if @props.model instanceof Folder
+              href: '#'
+              onClick: preventDefault =>
+                downloadStuffAsAZip([@props.model], {
+                  contextType: @props.params.contextType
+                  contextId: @props.params.contextId
+                })
+            else
+              href: @props.model.get('url')
+            ),
+            i className:'icon-download'
+
           ItemCog(model: @props.model, startEditingName: @startEditingName)
         )

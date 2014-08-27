@@ -58,10 +58,9 @@ define [
         closeDialog: -> $dialog.dialog('close')
       }), @$dialog[0])
 
+
     render: withReactDOM ->
-      div className:'ef-hover-options',
-        a href:'#', className: 'adminCog-download-link',
-          i className:'icon-download'
+      span {},
 
         button className:'al-trigger al-trigger-gray btn btn-link', 'aria-label': I18n.t('settings', 'Settings'),
           i className:'icon-settings',
