@@ -131,7 +131,7 @@ describe AssignmentGroupsController, type: :request do
     compare_json(json, expected)
   end
 
-  context "differentiated assignments on" do
+  context "differentiated assignments" do
     it "should only return visible assignments when differentiated assignments is on" do
       set_up_groups
       set_up_four_assignments(only_visible_to_overrides: true)
@@ -166,6 +166,25 @@ describe AssignmentGroupsController, type: :request do
 
       json.each do |ag_json|
         ag_json["assignments"].length.should == 2
+      end
+    end
+
+    it "should allow designers to see unpublished assignments" do
+      set_up_groups
+      set_up_four_assignments(only_visible_to_overrides: true)
+      course_with_designer(course: @course)
+      [@a1,@a3].each(&:unpublish)
+      [:enable_feature!, :disable_feature!].each do |feature_toggle|
+        @course.send(feature_toggle, :differentiated_assignments)
+        json = api_call_as_user(@designer, :get,
+            "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+            { :controller => 'assignment_groups', :action => 'index',
+              :format => 'json', :course_id => @course.id.to_s,
+              :include => ['assignments'] })
+
+        json.each do |ag_json|
+          ag_json["assignments"].length.should == 2
+        end
       end
     end
 
