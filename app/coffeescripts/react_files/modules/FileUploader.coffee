@@ -66,4 +66,15 @@ define [
       uploadedFile
 
     trackProgress: (e) =>
-      @onProgress((e.loaded / e.total), @file)
+      @progress = (e.loaded/ e.total)
+      @onProgress(@progress, @file)
+
+    getProgress: ->
+      @progress
+
+    roundProgress: ->
+      value = @getProgress() || 0
+      Math.min(Math.round(value * 100), 100)
+
+    getFileName: ->
+      @options.name || @file.name

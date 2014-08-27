@@ -45,7 +45,7 @@ define [
           p {}, I18n.t('message','An item named "%{name}" already existings in this location. Do you want to replace the existing file?', {name: nameToUse})
       else
         div {},
-          p {}, I18n.t('prompt', 'Changee "%{name}" to', {name: nameToUse})
+          p {}, I18n.t('prompt', 'Change "%{name}" to', {name: nameToUse})
           form onSubmit: @handleFormSubmit,
             label className: 'file-rename-form__form-label',
               I18n.t('name', 'Name')

@@ -9,7 +9,8 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-], (_, React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder) ->
+  './CurrentUploads'
+], (_, React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads) ->
 
   ShowFolder = React.createClass
 
@@ -62,6 +63,7 @@ define [
       return div({}) unless @props.currentFolder
       div className:'ef-directory',
         ColumnHeaders(to: (if @props.params.splat then 'folder' else 'rootFolder'), subject: @props.currentFolder, params: @props.params, query: @props.query),
+        CurrentUploads({})
         if @props.currentFolder.isEmpty()
           div className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
         else

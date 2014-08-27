@@ -1,3 +1,5 @@
+@import "base/environment";
+
 @mixin hideForPhone {
   @media (max-width:767px){
     display: none;
@@ -253,4 +255,26 @@ $border: #e5e4e4;
   float: left;
   margin-top: 5px;
   padding-right: 5px;
+}
+.upload-progress-view__bar-container {
+  height: 3px;
+  margin-bottom: 12px;
+  background: $canvas-neutral;
+  width: 100%;
+}
+.upload-progress-view__label {
+  margin-left: 5px;
+  margin-top: 5px;
+  color: ensure-contrast(#000, $canvas-secondary);
+  font-size: 0.95em;
+}
+.upload-progress-view__indeterminate{
+  margin-left: 6px;
+  margin-bottom: 2px;
+}
+.upload-progress-view__bar {
+  position: relative;
+  background: $canvas-primary;
+  border: none;
+  height: 3px;
 }
