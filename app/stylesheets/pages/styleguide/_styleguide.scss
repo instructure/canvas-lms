@@ -28,10 +28,11 @@
   .highlight                            { @extend %flex-order-2;}
   .styleguide-section__component-notes  { @extend %flex-order-3;}
   // Sizing
-  .code-rendered                        { min-width: 101%;}
+  .code-rendered                        { width: 100%;}
   .highlight                            { @extend %flex-2;}
   .styleguide-section__component-notes  { @extend %flex-1;}
 }
+.styleguide-section__component-code-content { @extend %flex-1; }
 // end layout
 
 /// Styleguide element styles
@@ -66,6 +67,15 @@
     font-size: 14px;
   }
 }
+.styleguide-section__grid-demo-element {
+  padding: 8px 16px;
+  background: lighten($linkColor, 15%);
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  height: 16px;
+}
+
 /// Temporary styles for new nav till real styles
 /// are in there. These only show up on new_styles styleguide
 .style-guide-nav-container {
