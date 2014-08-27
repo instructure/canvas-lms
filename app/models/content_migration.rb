@@ -626,6 +626,8 @@ class ContentMigration < ActiveRecord::Base
       'content_tags'
     when 'pages'
       'wiki_pages'
+    when 'files'
+      'attachments'
     else
       key
     end

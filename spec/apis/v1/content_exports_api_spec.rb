@@ -359,6 +359,13 @@ describe ContentExportsApiController, type: :request do
                                  { :select => {:pages => [page_to_copy.id]} })
         export3 = t_course.content_exports.find_by_id(json3['id'])
         export3.export_object?(page_to_copy).should be_true
+
+        file = attachment_model(context: t_course)
+        json4 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                 { :select => {:files => [file.id]} })
+        export4 = t_course.content_exports.find_by_id(json4['id'])
+        export4.export_object?(file).should be_true
       end
 
       it "should export by module item id" do
@@ -463,6 +470,14 @@ describe ContentExportsApiController, type: :request do
         Zip::File.open(tf) do |zf|
           zf.entries.map(&:name).should =~ %w(teh_folder/file2.txt file3.txt)
         end
+      end
+
+      it "should support 'files' in addition to 'attachments'" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param },
+                                { export_type: 'zip', select: {'files' => [@file1.id]} })
+        ce = ContentExport.find(json['id'])
+        ce.export_object?(@file1).should be true
       end
 
       context "as a student" do

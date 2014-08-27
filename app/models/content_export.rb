@@ -217,6 +217,14 @@ class ContentExport < ActiveRecord::Base
     self.settings[:selected_content] ||= {}
   end
 
+  def select_content_key(obj)
+    if zip_export?
+      obj.asset_string
+    else
+      CC::CCHelper.create_key(obj)
+    end
+  end
+
   # Method Summary
   #   Takes in an ActiveRecord object. Determines if the item being 
   #   checked should be exported or not. 
@@ -231,7 +239,7 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content["all_#{asset_type}"])
 
     return false unless selected_content[asset_type]
-    return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
+    return true if is_set?(selected_content[asset_type][select_content_key(obj)])
 
     false
   end
@@ -253,7 +261,7 @@ class ContentExport < ActiveRecord::Base
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
-    selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
+    selected_content[asset_type][select_content_key(obj)] = true
   end
   
   def add_error(user_message, exception_or_info=nil)
