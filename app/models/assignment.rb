@@ -601,7 +601,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def visible_to_user?(user)
-    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades)
+    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
     visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
   end
 
