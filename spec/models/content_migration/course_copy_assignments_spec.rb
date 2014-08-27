@@ -31,6 +31,18 @@ describe ContentMigration do
       to_assign.learning_outcome_alignments.map(&:learning_outcome_id).should == [lo.id].sort
     end
 
+    it "should copy rubric outcomes in selective copy" do
+      @course = @copy_from
+      outcome_with_rubric
+      from_assign = @copy_from.assignments.create! title: 'some assignment'
+      @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
+      @cm.copy_options = {:assignments => {mig_id(from_assign) => true}}
+      run_course_copy
+      to_assign = @copy_to.assignments.find_by_migration_id!(mig_id(from_assign))
+      to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
+      to_outcomes.should eql [mig_id(@outcome)]
+    end
+
     it "should link assignments to assignment groups on selective copy" do
       g = @copy_from.assignment_groups.create!(:name => "group")
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
