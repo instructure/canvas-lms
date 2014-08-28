@@ -53,11 +53,15 @@ $border: #e5e4e4;
 .ef-main-buttons{
   display: flex;
   justify-content: flex-end;
-  flex: 2 2 0;
-
-  .btn{
-    margin-right: 5px;
+  flex: 3 3 0;
+  position: relative;
+  .ui-buttonset, .ui-button {
+    display: inline-block;
   }
+}
+.ef-selected-items-actions {
+  position: absolute;
+  left: 8px;
 }
 
 .ef-admin-cog{
@@ -175,8 +179,9 @@ $border: #e5e4e4;
 .ef-item-row{
   display: flex;
   padding: 5px;
+  user-select: none; /* so that we can shift-click to select */
 
-  &.currently-selected-item{
+  &.ef-item-selected{
     background-color: #d9edf9;
   }
 

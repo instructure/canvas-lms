@@ -41,7 +41,10 @@ define [
 
 
     render: withReactDOM ->
-      div className:'ef-item-row',
+      div className:"ef-item-row #{'ef-item-selected' if @props.isSelected}", onClick: @props.toggleSelected,
+        label className: 'screenreader-only',
+          input type: 'checkbox', defaultChecked: @props.isSelected, onChange: @props.toggleSelected,
+          I18n.t('labels.select', 'Select This Item')
         div className:'ef-name-col',
           if @state.editing
             form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),

@@ -66,7 +66,13 @@ define [
           div className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
         else
           @props.currentFolder.children(@props.query).map (child) =>
-            FolderChild key:child.cid, model: child, params: @props.params
+            FolderChild
+              key:child.cid
+              model: child
+              params: @props.params
+              isSelected: child in @props.selectedItems
+              toggleSelected: @props.toggleItemSelected.bind(null, child)
+
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 
 

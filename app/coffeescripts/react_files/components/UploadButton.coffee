@@ -84,7 +84,7 @@ define [
         @queueUploads()
 
     render: withReactDOM ->
-      div {},
+      span {},
         form
           ref: 'form'
           className: 'hidden',
@@ -94,6 +94,6 @@ define [
             onChange: @handleFilesInputChange
             multiple: true
         button className:'btn btn-primary', onClick: @handleAddFilesClick,
-          i className:'icon-plus'
-          I18n.t('files', 'Files')
+          i className: 'icon-upload'
+          I18n.t('upload', 'Upload')
         FileRenameForm fileOptions: @state.nameCollisions[0], onNameConflictResolved: @onNameConflictResolved, onClose: @onClose
