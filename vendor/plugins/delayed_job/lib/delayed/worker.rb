@@ -136,7 +136,7 @@ class Worker
         end
       end
     else
-      set_process_name("wait:#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
+      set_process_name("wait:#{Shard.current(:delayed_jobs).id}~#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
       sleep(sleep_delay + (rand * sleep_delay_stagger))
     end
   end
@@ -144,7 +144,7 @@ class Worker
   def perform(job)
     count = 1
     self.class.lifecycle.run_callbacks(:perform, self, job) do
-      set_process_name("run:#{job.id}:#{job.name}")
+      set_process_name("run:#{Shard.current(:delayed_jobs).id}~#{job.id}:#{job.name}")
       say("Processing #{log_job(job, :long)}", :info)
       runtime = Benchmark.realtime do
         if job.batch?
