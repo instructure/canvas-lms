@@ -1615,8 +1615,20 @@ describe Quizzes::Quiz do
   end
 
   describe "restore" do
-    it "should restore to unpublished state if draft_state is enabled" do
+    before do
       course(draft_state: true)
+    end
+
+    it "should restore to published state if there are student submissions" do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.stubs(:has_student_submissions?).returns true
+
+      @quiz.destroy
+      @quiz.restore
+      @quiz.reload.should be_published
+    end
+
+    it "should restore to unpublished state if no student submissions" do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
       @quiz.destroy
       @quiz.restore

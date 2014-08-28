@@ -299,7 +299,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
+    self.workflow_state = if self.has_student_submissions?
+      "available"
+    else
+      "unpublished"
+    end
     self.save
     self.assignment.restore(:quiz) if self.for_assignment?
   end
