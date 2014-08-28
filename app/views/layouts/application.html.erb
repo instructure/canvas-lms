@@ -42,32 +42,9 @@
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
       <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
       <b id="header-logo-secondary"></b>
-      <div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
-        <% if (identity = (yield :identity).presence) %>
-          <%= identity %>
-        <% else %>
-          <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
-            <%= render(:partial => 'shared/identity') %>
-          <%- end -%>
-        <% end %>
-      </div>
+      <%= render(:partial => "shared/user_header_navigation") %>
       <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-      <% if @current_user %>
-      <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
-        <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
-        <li id="courses_menu_item" class="menu-item">
-          <%= render(:partial => 'shared/home_menu') %>
-        </li>
-        <%- end -%>
-        <li id="grades_menu_item" class="menu-item">
-          <%= link_to(t('menu.grades', 'Grades'), :grades, :class=>"menu-item-no-drop") %>
-        </li>
-        <li id="calendar_menu_item" class="menu-item">
-          <a href="<%= calendar_path %>" class="menu-item-no-drop"><%= t('menu.calendar', 'Calendar') %></a>
-        </li>
-        <%= render(:partial => 'external_tools/global_nav_menu_items') %>
-      </ul>
-      <% end %>
+      <%= render(:partial => "shared/primary_header_navigation") %>
     </div>
   </div>
   <div id="instructure_ajax_error_box">
