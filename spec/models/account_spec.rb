@@ -1053,4 +1053,21 @@ describe Account do
       end
     end
   end
+
+  describe "#ensure_defaults" do
+    it "assigns an lti_guid postfixed by canvas-lms" do``
+      account = Account.new
+      account.uuid = '12345'
+      account.ensure_defaults
+      account.lti_guid.should == '12345:canvas-lms'
+    end
+
+    it "does not change existing an lti_guid" do
+      account = Account.new
+      account.lti_guid = '12345'
+      account.ensure_defaults
+      account.lti_guid.should == '12345'
+    end
+
+  end
 end

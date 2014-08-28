@@ -40,6 +40,7 @@ module Api::V1::QuizSubmission
     kept_score
     score
     score_before_regrade
+    has_seen_results
     validation_token
     workflow_state
   ].freeze

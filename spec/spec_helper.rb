@@ -26,12 +26,14 @@ if CANVAS_RAILS2
 end
 
 unless CANVAS_RAILS2
-  Spec.configure do |c|
-   c.treat_symbols_as_metadata_keys_with_true_values = true
+  begin
+    require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+  rescue LoadError
   end
 
   RSpec.configure do |c|
-    c.color_enabled = true
+    c.treat_symbols_as_metadata_keys_with_true_values = true
+    c.color = true
 
     c.around(:each) do |example|
       attempts = 0
@@ -409,13 +411,17 @@ end
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
 
-  ((config.debug = true) rescue nil) unless CANVAS_RAILS2
-
   config.include Helpers
 
   if CANVAS_RAILS2
-    require 'spec/onceler_noop'
+    require 'spec/support/onceler/noop'
     config.include Onceler::Noop
+
+    Onceler.instance_eval do
+      def self.base_transactions
+        1
+      end
+    end
   else
     config.include Onceler::BasicHelpers
 
@@ -475,6 +481,7 @@ end
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
+    $spec_api_tokens = {}
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -1407,14 +1414,19 @@ end
     end
   end
 
+  # frd class, not a mock, so we can once-ler WebConferences (need to Marshal.dump)
+  class WebConferencePluginMock
+    attr_reader :id, :settings
+    def initialize(id, settings)
+      @id = id
+      @settings = settings
+    end
+    def valid_settings?; true; end
+    def enabled?; true; end
+    def base; end
+  end
   def web_conference_plugin_mock(id, settings)
-    mock = mock("WebConferencePlugin")
-    mock.stubs(:id).returns(id)
-    mock.stubs(:settings).returns(settings)
-    mock.stubs(:valid_settings?).returns(true)
-    mock.stubs(:enabled?).returns(true)
-    mock.stubs(:base).returns(nil)
-    mock
+    WebConferencePluginMock.new(id, settings)
   end
 
   def dummy_io

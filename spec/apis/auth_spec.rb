@@ -596,6 +596,7 @@ describe "API Authentication", type: :request do
         'primary_email' => "blah@example.com",
         'integration_id' => nil,
         'time_zone' => 'Etc/UTC',
+        'locale' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
 
@@ -617,6 +618,7 @@ describe "API Authentication", type: :request do
           'primary_email' => "blah@example.com",
           'integration_id' => nil,
           'time_zone' => 'Etc/UTC',
+          'locale' => nil,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
 
@@ -636,6 +638,7 @@ describe "API Authentication", type: :request do
           'primary_email' => "blah@example.com",
           'integration_id' => nil,
           'time_zone' => 'Etc/UTC',
+          'locale' => nil,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
     end
@@ -663,6 +666,7 @@ describe "API Authentication", type: :request do
         'title' => nil,
         'primary_email' => "blah@example.com",
         'time_zone' => 'Etc/UTC',
+        'locale' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end
@@ -691,6 +695,7 @@ describe "API Authentication", type: :request do
           'title' => nil,
           'primary_email' => "blah@example.com",
           'time_zone' => 'Etc/UTC',
+          'locale' => nil,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

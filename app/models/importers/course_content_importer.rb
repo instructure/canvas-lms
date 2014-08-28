@@ -162,6 +162,11 @@ module Importers
             event.save_without_broadcasting!
           end
 
+          migration.imported_migration_items_by_class(Announcement).each do |event|
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.save_without_broadcasting!
@@ -212,7 +217,9 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       missing_links = []
-      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration, {:missing_links => missing_links})
+      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
       migration.add_missing_content_links(:class => course.class.to_s,
         :id => course.id, :field => "syllabus", :missing_links => missing_links,
         :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")
@@ -306,7 +313,7 @@ module Importers
         old_event_diff = old_date - old_start_date
         old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
         new_full_diff = new_end_date - new_start_date
-        new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
+        new_event_diff = (new_full_diff.to_f * old_event_percent).round
         new_date = new_start_date + new_event_diff
         options[:day_substitutions] ||= {}
         options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s

@@ -100,14 +100,6 @@ class Shard
   def self.yaml_new(klass, tag, val)
     default
   end
-
-  module RSpec
-    def self.included(klass)
-      klass.before do
-        pending "needs a sharding implementation"
-      end
-    end
-  end
 end
 
 ActiveRecord::Base.class_eval do

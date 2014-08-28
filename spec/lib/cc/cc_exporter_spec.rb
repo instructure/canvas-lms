@@ -7,7 +7,7 @@ describe "Common Cartridge exporting" do
     message = "fail"
     course.stubs(:wiki).raises(message)
     content_export = ContentExport.new
-    content_export.course = course
+    content_export.context = course
     content_export.user = user
     content_export.save!
     
@@ -25,9 +25,8 @@ describe "Common Cartridge exporting" do
 
     before do
       course_with_teacher
-      @ce = ContentExport.new
+      @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
-      @ce.course = @course
       @ce.user = @user
     end
 

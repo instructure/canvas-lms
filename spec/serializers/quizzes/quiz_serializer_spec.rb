@@ -491,4 +491,45 @@ describe Quizzes::QuizSerializer do
     output[:due_at].should == quiz.due_at
   end
 
+  describe "only_visible_to_overrides" do
+    context "as a teacher" do
+      before :once do
+        course_with_teacher_logged_in(active_all: true)
+        course_quiz(true)
+      end
+
+      it "returns the value when the feature flag is on" do
+        @quiz.context.stubs(:feature_enabled?).with(:differentiated_assignments).returns true
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz][:only_visible_to_overrides].should be_true
+
+        @quiz.only_visible_to_overrides = false
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz].should have_key :only_visible_to_overrides
+        json[:quiz][:only_visible_to_overrides].should be_false
+      end
+
+      it "is not in the hash when the feature flag is off" do
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz].should_not have_key :only_visible_to_overrides
+      end
+    end
+
+    context "as a student" do
+      before :once do
+        course_with_student_logged_in(active_all: true)
+        course_quiz(true)
+      end
+
+      it "is not in the hash" do
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @student).as_json
+        json[:quiz].should_not have_key :only_visible_to_overrides
+      end
+    end
+
+  end
+
 end

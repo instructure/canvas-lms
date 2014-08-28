@@ -58,10 +58,10 @@ if Qti.migration_executable
       @course.attachments.count.should == 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
-      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_path.should == "course files/#{dir}/#{@migration.id}/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_display_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
+      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path.should == "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do

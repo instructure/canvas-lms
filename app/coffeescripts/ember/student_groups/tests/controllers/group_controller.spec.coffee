@@ -44,9 +44,12 @@ define [
     equal @gc.get('memberCount'), @group.users.length
 
 
-  test 'toggleBody should change show body if the group has members', ->
-    @gc.send('toggleBody')
-    equal @gc.get('showBody'), true
+  asyncTest 'toggleBody should change show body if the group has members', ->
+    expect(1)
+    Ember.run this, ->
+      start()
+      @gc.send('toggleBody')
+      equal @gc.get('showBody'), true
 
   test 'leave should remove the current user from the group', ->
     ENV.current_user_id = 1

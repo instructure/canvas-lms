@@ -1033,6 +1033,46 @@ describe Submission do
       submission1.assign_assessor(submission2)
     end
   end
+
+  describe "assignment_visible_to_student?" do
+    before(:each) do
+      student_in_course(active_all: true)
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
+      @submission = @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+    end
+
+    it "submission should be visible with normal course" do
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+
+    it "submission should not be visible with DA and no override or grade" do
+      @course.enable_feature!(:differentiated_assignments)
+      @submission.assignment_visible_to_student?(@student.id).should be_false
+    end
+
+    it "submission should be visible with DA and an override" do
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy!)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      create_section_override_for_assignment(@submission.assignment, course_section: @section)
+      @submission.reload
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+
+    it "submission should be visible with DA and a grade" do
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy!)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      @assignment.grade_student(@user, {grade: 10})
+      @submission.reload
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+  end
+
+
 end
 
 def submission_spec_model(opts={})

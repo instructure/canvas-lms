@@ -38,7 +38,6 @@ environment_configuration(defined?(config) && config) do |config|
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.0.0'
       require 'byebug'
-      Kernel.send(:alias_method, :debugger, :byebug)
     else
       require "debugger"
     end
@@ -61,4 +60,8 @@ environment_configuration(defined?(config) && config) do |config|
     # Only use best-standards-support built into browsers
     config.action_dispatch.best_standards_support = :builtin
   end
+
+  # we use lots of db specific stuff - don't bother trying to dump to ruby
+  # (it also takes forever)
+  config.active_record.schema_format = :sql
 end

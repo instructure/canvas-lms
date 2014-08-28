@@ -1,0 +1,215 @@
+#media_record_option_holder .record_option
+  display: block
+  margin: 0 2px 2px 2px
+  padding: 4px
+  border: 2px solid #fff
+  border-radius: 3px
+
+#media_record_option_holder .record_option:hover
+  border: 2px solid #aaa
+  background: #eee
+
+#media_record_option_holder,#video_record_holder_holder,#audio_record_holder_holder
+  float: left
+
+#media_record_option_holder .record_option.selected_option
+  border: 2px solid #888
+  background: #ccc
+
+#audio_record_holder_holder,#video_record_holder_holder
+  overflow: hidden
+  position: relative
+  #audio_record_holder_message,#video_record_holder_message
+    width: 600px
+    height: 600px
+    z-index: 9999
+    background-color: #666666
+    position: absolute
+    display: none
+    .recorder_message
+      color: #eee
+      font-size: 1.5em
+      opacity: 1.0
+      margin: 120px 55px
+      width: 300px
+      text-align: center
+    &.saving
+      display: block
+
+#audio_upload_under button,#video_upload_under button
+  width: 180px
+  height: 50px
+  font-size: 1.2em
+  font-weight: bold
+
+#audio_upload,#video_upload
+  position: absolute
+  z-index: 9999
+
+div#audio_upload,div#video_upload
+  background: #fff
+  font-size: 1.2em
+
+.media_tab
+  height: 360px
+
+#media_upload_holder
+  height: 240px
+
+#media_upload_title
+  width: 200px
+
+#media_upload_holder .content
+  margin-top: 8px
+
+#media_upload_file_size
+  font-size: 0.8em
+  padding-left: 20px
+
+#media_upload_progress
+  width: 300px
+  height: 15px
+
+#media_upload_submit
+  font-size: 1.2em
+  font-weight: bold
+
+
+#audio_record_holder,#video_record_holder
+  width: 400px
+  height: 300px
+  overflow: hidden
+  position: relative
+  border: 0
+  background: #fff url(/images/ajax-loader-medium-444.gif) no-repeat 10px 10px
+  box-shadow: 0 0 10px rgba(0,0,0,1.0)
+  margin: 10px
+
+#audio_record,#video_record
+  border: 0px solid #888
+  height: 300px
+
+.volume_meter
+  width: 20px
+  height: 240px
+  float: right
+  border: 0px solid #888
+  border-left-width: 0
+  position: absolute
+  top: 0
+  left: 400px
+  z-index: 9999
+
+.volume_meter .audio_level
+  width: 14px
+  height: 14px
+  border: 1px solid #666
+  display: block
+  margin: 2px
+  background-color: #0f0
+  visibility: hidden
+  border-radius: 2px
+
+.volume_meter .level_6
+  background-color: #ff0
+
+.volume_meter .level_7
+  background-color: #ff0
+
+.volume_meter .level_8
+  background-color: #ff0
+
+.volume_meter .level_9
+  background-color: #f00
+
+.volume_meter.band_1 .level_0,
+.volume_meter.band_2 .level_0,
+.volume_meter.band_2 .level_1,
+.volume_meter.band_3 .level_0,
+.volume_meter.band_3 .level_1,
+.volume_meter.band_3 .level_2,
+.volume_meter.band_4 .level_0,
+.volume_meter.band_4 .level_1,
+.volume_meter.band_4 .level_2,
+.volume_meter.band_4 .level_3,
+.volume_meter.band_5 .level_0,
+.volume_meter.band_5 .level_1,
+.volume_meter.band_5 .level_2,
+.volume_meter.band_5 .level_3,
+.volume_meter.band_5 .level_4,
+.volume_meter.band_6 .level_0,
+.volume_meter.band_6 .level_1,
+.volume_meter.band_6 .level_2,
+.volume_meter.band_6 .level_3,
+.volume_meter.band_6 .level_4,
+.volume_meter.band_6 .level_5,
+.volume_meter.band_7 .level_0,
+.volume_meter.band_7 .level_1,
+.volume_meter.band_7 .level_2,
+.volume_meter.band_7 .level_3,
+.volume_meter.band_7 .level_4,
+.volume_meter.band_7 .level_5,
+.volume_meter.band_7 .level_6,
+.volume_meter.band_8 .level_0,
+.volume_meter.band_8 .level_1,
+.volume_meter.band_8 .level_2,
+.volume_meter.band_8 .level_3,
+.volume_meter.band_8 .level_4,
+.volume_meter.band_8 .level_5,
+.volume_meter.band_8 .level_6,
+.volume_meter.band_8 .level_7,
+.volume_meter.band_9 .level_0,
+.volume_meter.band_9 .level_1,
+.volume_meter.band_9 .level_2,
+.volume_meter.band_9 .level_3,
+.volume_meter.band_9 .level_4,
+.volume_meter.band_9 .level_5,
+.volume_meter.band_9 .level_6,
+.volume_meter.band_9 .level_7,
+.volume_meter.band_9 .level_8,
+.volume_meter.band_10 .level_0,
+.volume_meter.band_10 .level_1,
+.volume_meter.band_10 .level_2,
+.volume_meter.band_10 .level_3,
+.volume_meter.band_10 .level_4,
+.volume_meter.band_10 .level_5,
+.volume_meter.band_10 .level_6,
+.volume_meter.band_10 .level_7,
+.volume_meter.band_10 .level_8,
+.volume_meter.band_10 .level_9
+  visibility: visible
+
+
+.youtubed
+  display: block
+
+.media_comment_thumbnail
+  width: 140px
+  height: 100px
+  margin: 3px 5px
+  background: url(/images/blank.png) no-repeat center center
+  background-color: #222
+  border: 0px solid #000
+  display: block
+  padding: 2px
+
+  &.media_comment_thumbnail-small
+    width: 70px
+    height: 50px
+
+.media_comment_thumbnail_play_button
+  display: inline-block
+  height: image-height("play_overlay.png")
+  width: image-width("play_overlay.png")
+
+  // accessibly hide text
+  text-indent: -999px
+  overflow: hidden
+
+  background-image: url(/images/play_overlay.png)
+
+  .media_comment_thumbnail-small &
+    height: image-height("play_overlay_small.png")
+    width: image-width("play_overlay_small.png")
+
+    background-image: url(/images/play_overlay_small.png)

@@ -10,4 +10,5 @@ group :assets do
     gem 'pygments.rb', '0.5.4'
       gem 'posix-spawn', '0.3.8'
       gem 'yajl-ruby', '1.1.0'
+  gem 'fontcustom', '~> 1.3.3'      
 end

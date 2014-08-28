@@ -58,7 +58,7 @@ define [
     friendlyDatetime : (datetime, {hash: {pubdate, contextSensitive}}) ->
       return unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
-      fudged = $.fudgeDateForProfileTimezone(datetime)
+      fudged = $.fudgeDateForProfileTimezone(tz.parse(datetime))
       timeTitle = ""
       if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
         timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
@@ -66,6 +66,8 @@ define [
         timeTitle = $.datetimeString(datetime)
 
       new Handlebars.SafeString "<time data-tooltip title='#{timeTitle}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
+
+
 
     # expects: a Date object or an ISO string
     formattedDate : (datetime, format, {hash: {pubdate}}) ->

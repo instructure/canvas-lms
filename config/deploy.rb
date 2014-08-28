@@ -1,6 +1,6 @@
 # encoding: utf-8
 require "bundler/capistrano"
-set :stages,        %w(production staging testing vm cuttingedge)
+set :stages,        %w(production staging testing vm cuttingedge rails3)
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"

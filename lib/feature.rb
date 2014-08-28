@@ -195,16 +195,18 @@ END
       root_opt_in: true,
       development: true
     },
-    'quiz_stats' =>
+    'k12' =>
     {
-      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
-      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
-When Draft State is allowed/on, this enables the new quiz statistics page for an account.
+      display_name: -> { I18n.t('features.k12', 'K-12 specific features') },
+      description:  -> { I18n.t('k12_description', <<-END) },
+Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
+applies some style changes, but more K-12 specific things may be added in the future.
 END
-      applies_to: 'Course',
-      state: 'allowed',
-      development: true,
-      beta: true
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true,
+      development: true
     },
     'quiz_moderate' =>
     {
@@ -234,12 +236,22 @@ END
       description:  -> { I18n.t('better_file_browsing_description', <<-END) },
 A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
 then all of the users in that course will see the new interface.  To get it to show up when someone
-goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a memeber of.
+goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
 END
 
       applies_to: 'Course',
       state: 'hidden',
       development: true
+    },
+    'allow_opt_out_of_inbox' =>
+    {
+      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow users to opt out of the inbox") },
+      description:  -> { I18n.t('allow_opt_out_of_inbox', <<-END) },
+Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
     }
   )
 

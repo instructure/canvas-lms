@@ -31,6 +31,7 @@ module Api::V1::Quiz
       show_correct_answers
       show_correct_answers_at
       hide_correct_answers_at
+      one_time_results
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -144,6 +145,14 @@ module Api::V1::Quiz
     unless update_params.fetch('show_correct_answers', quiz.show_correct_answers)
       %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
         update_params.delete(key) if update_params.has_key?(key)
+      end
+    end
+
+    # one_time_results is valid if hide_results is null
+    if update_params.has_key?('one_time_results')
+      hide_results = update_params.fetch('hide_results', quiz.hide_results)
+      unless hide_results.blank?
+        update_params.delete 'one_time_results'
       end
     end
 

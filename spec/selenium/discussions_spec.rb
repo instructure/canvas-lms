@@ -657,11 +657,13 @@ describe "discussions" do
       let(:topic) { teacher_topic }
 
       before(:each) do
+        resize_screen_to_normal
         user_session(teacher)
       end
 
       describe "rubrics" do
         it "should change points when used for grading" do
+          resize_screen_to_default
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
           wait_for_ajax_requests
 

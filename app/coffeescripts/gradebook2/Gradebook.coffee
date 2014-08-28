@@ -174,17 +174,19 @@ define [
         event.preventDefault()
 
         pg = {
-          gradebook: ENV.GRADEBOOK_OPTIONS
           assignments: @assignments
+          course_id: ENV.GRADEBOOK_OPTIONS.context_id
         }
         if @sectionToShow
-          pg.section_id = @sections[@sectionToShow].integration_id
+          pg.integration_section_id = @sections[@sectionToShow].integration_id
         else
-          pg.course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
+          pg.integration_course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
 
         postGradesModel = new PostGradesModel(pg)
 
-        postGradesDialog = new PostGradesDialog(postGradesModel, ENV.GRADEBOOK_OPTIONS.sis_app_url)
+        postGradesDialog = new PostGradesDialog(postGradesModel,
+          ENV.GRADEBOOK_OPTIONS.sis_app_url,
+          ENV.GRADEBOOK_OPTIONS.sis_app_token)
         postGradesModel.reset_ignored_assignments()
         postGradesDialog.render().show()
         open = $('#post-grades-container').dialog('isOpen')

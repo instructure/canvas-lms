@@ -303,7 +303,7 @@
 #           "type": "datetime"
 #         },
 #         "group_category_id": {
-#           "description": "the ID of the assignment’s group set (if this is a group assignment)",
+#           "description": "The ID of the assignment’s group set, if this is a group assignment. For group discussions, set group_category_id on the discussion topic, not the linked assignment.",
 #           "example": 1,
 #           "type": "integer"
 #         },
@@ -475,11 +475,11 @@ class AssignmentsApiController < ApplicationController
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
-      @assignments = @context.active_assignments.
+      scope = @context.active_assignments.
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
-      @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
+      scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
       fake = @context.assignments.scoped.new
@@ -487,13 +487,17 @@ class AssignmentsApiController < ApplicationController
 
       if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
-        @assignments = @assignments.published
+        scope = scope.published
       end
+
+      # TODO temporary! remote this default_per_page parameter once dependent
+      # applications have had a change to start honoring the pagination
+      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context), default_per_page: Api.max_per_page)
 
       if Array(params[:include]).include?('submission')
         submissions = Hash[
           @context.submissions.
-            where(:assignment_id => @assignments.except(:order)).
+            where(:assignment_id => assignments).
             for_user(@current_user).
             map { |s| [s.assignment_id,s] }
         ]
@@ -504,14 +508,12 @@ class AssignmentsApiController < ApplicationController
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
       if override_dates
-        assignments_with_overrides = @assignments.joins(:assignment_overrides)
-          .select("assignments.id")
-        @assignments = @assignments.all
-        assignments_without_overrides = @assignments - assignments_with_overrides
-        assignments_without_overrides.each { |a| a.has_no_overrides = true }
+        Assignment.send(:preload_associations, assignments, :assignment_overrides)
+        assignments.select{ |a| a.assignment_overrides.size == 0 }.
+          each { |a| a.has_no_overrides = true }
       end
 
-      hashes = @assignments.map do |assignment|
+      hashes = assignments.map do |assignment|
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
                         submission: submission, override_dates: override_dates)
@@ -529,16 +531,9 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides to the assignment, defaults to true.
   # @returns Assignment
   def show
-    if authorized_action(@context, @current_user, :read)
-      @assignment = @context.active_assignments.find(params[:id],
-          :include => [:assignment_group, :rubric_association, :rubric])
-
-      if @context.feature_enabled?(:draft_state) && !@assignment.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        render_unauthorized_action
-        return
-      end
-
+    @assignment = @context.active_assignments.find(params[:id],
+        :include => [:assignment_group, :rubric_association, :rubric])
+    if authorized_action(@assignment, @current_user, :read)
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       end
@@ -836,7 +831,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Assignment
   def update
-    @assignment = @context.assignments.find(params[:id])
+    @assignment = @context.active_assignments.find(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end

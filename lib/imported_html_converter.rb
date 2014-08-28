@@ -22,6 +22,7 @@ class ImportedHtmlConverter
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 
+  # yields warnings
   def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
@@ -86,7 +87,8 @@ class ImportedHtmlConverter
           elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
             rel_path = $1
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
-              unless new_url = replace_media_comment_data(node, rel_path, context, opts)
+              new_url = replace_media_comment_data(node, rel_path, context, opts) {|warning, data| yield warning, data if block_given?}
+              unless new_url
                 unless new_url = replace_relative_file_url(rel_path, context)
                   missing_relative_url = rel_path
                 end
@@ -142,8 +144,8 @@ class ImportedHtmlConverter
 
           if new_url
             node[attr] = new_url
-          elsif opts[:missing_links]
-            opts[:missing_links] << node[attr]
+          else
+            yield :missing_link, node[attr] if block_given?
           end
         end
       end
@@ -227,13 +229,13 @@ class ImportedHtmlConverter
 
     if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
       link = "/media_objects/#{$1}"
-      opts[:missing_links] << link if opts[:missing_links]
+      yield :missing_link, link
       return link
     else
       node.delete('class')
       node.delete('id')
       node.delete('style')
-      opts[:missing_links] << rel_path if opts[:missing_links]
+      yield :missing_link, rel_path
       return nil
     end
   end

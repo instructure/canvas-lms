@@ -25,12 +25,12 @@ describe QuizzesHelper do
   include ERB::Util
 
   describe "#needs_unpublished_warning" do
-    before do
+    before :once do
       course_with_teacher
     end
 
     context "with draft state enabled" do
-      before do
+      before :once do
         @course.account.enable_feature!(:draft_state)
       end
 

@@ -1,8 +1,6 @@
 <div class="quiz-submission <%= "headless" if !@headers %>">
 <% if !(@current_submission || @submission).results_visible? %>
-  <h4><%= @quiz.hide_results == 'until_after_last_attempt' ?
-          t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt.") :
-          t(:quiz_results_protected, "Quiz results are protected for this quiz, and are not visible to students.") %></h4>
+  <h4><%= render_result_protection(@quiz, @current_submission || @submission) %></h4>
 <% end %>
 
 <% if correct_answers_protected? %>

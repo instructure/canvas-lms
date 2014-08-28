@@ -71,7 +71,6 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
-    hash['post_to_sis'] = assignment.post_to_sis
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
@@ -357,9 +356,8 @@ module Api::V1::Assignment
     end
 
     if assignment.context.grants_right?(user, :manage_sis)
-      if update_params['integration_data']
-        update_params['integration_data'] = JSON.parse(update_params['integration_data'])
-      end
+      data = update_params['integration_data']
+      update_params['integration_data'] = JSON.parse(data) if data.is_a?(String)
     else
       update_params.delete('integration_id')
       update_params.delete('integration_data')

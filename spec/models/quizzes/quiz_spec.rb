@@ -213,10 +213,10 @@ describe Quizzes::Quiz do
   end
 
   it "should update the assignment it is associated with" do
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :only_visible_to_overrides => false)
     a.points_possible.should eql(5.0)
     a.submission_types.should_not eql("online_quiz")
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10, :only_visible_to_overrides => true)
     q.workflow_state = 'available'
     q.save
     q.should be_available
@@ -1489,6 +1489,24 @@ describe Quizzes::Quiz do
 
       quiz.show_correct_answers_at.should be_nil
       quiz.hide_correct_answers_at.should be_nil
+    end
+
+    it "doesn't consider dates when one_time_results is on" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true,
+        show_correct_answers_at: 10.minutes.from_now,
+        one_time_results: false
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+
+      quiz.update_attributes({ one_time_results: true })
+      quiz.show_correct_answers?(@user, submission).should be_true
     end
   end
 

@@ -32,6 +32,10 @@ define [
   # track events in google analytics
   mejs.MepDefaults.features.push('googleanalytics')
 
+  # enable the playback speed selector
+  positionAfterSubtitleSelector = mejs.MepDefaults.features.indexOf('tracks') + 1
+  mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
+
   getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
     $.getJSON "/media_objects/#{id}/info", (data) ->

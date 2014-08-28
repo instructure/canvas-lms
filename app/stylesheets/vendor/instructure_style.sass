@@ -1,0 +1,24 @@
+@import "base/environment"
+
+@import "vendor/bootstrap/reset"
+@import "vendor/bootstrap/scaffolding"
+@import "vendor/bootstrap/type"
+@import "base/bootstrap_overrides"
+
+// the first line of public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/content.css
+// sets these to undesireable values, rather than modify that vendor file, we just override them here
+// to match the rest of the content in canvas
+body, td, pre
+  margin: 0
+  font-family: $baseFontFamily
+  font-size: $baseFontSize
+  color: $textColor
+
+.mceContentBody
+  margin: 11px
+  td
+    padding: 2px
+    min-width: 20px
+
+.mceItemTable, .mceItemTable td, .mceItemTable th, .mceItemTable caption, .mceItemVisualAid
+  border: 1px dashed #888

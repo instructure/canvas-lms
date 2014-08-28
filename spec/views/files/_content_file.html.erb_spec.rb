@@ -23,7 +23,9 @@ describe "/files/_content_file" do
   it "should render" do
     course_with_student
     view_context
-    render :partial => "files/content_file", :object => @course.attachments.create!(:uploaded_data => default_uploaded_data)
+    attachment = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+    attachment.reload
+    render :partial => "files/content_file", :object => attachment
     response.should_not be_nil
   end
 end

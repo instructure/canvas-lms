@@ -201,7 +201,7 @@ describe "course settings" do
         move_to(disabled_div).
         release(disabled_div).
         perform
-      f('#nav_disabled_list').should include_text(announcements_nav.text)
+      keep_trying_until { f('#nav_disabled_list').should include_text(announcements_nav.text) }
     end
   end
 

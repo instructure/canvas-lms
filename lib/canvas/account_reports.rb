@@ -25,7 +25,9 @@ module Canvas::AccountReports
 
   class Report < Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc)
     def title
-      super.call
+      title = super
+      title = title.call if title.respond_to?(:call)
+      title
     end
   end
 

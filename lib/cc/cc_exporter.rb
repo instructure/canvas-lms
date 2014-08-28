@@ -28,7 +28,8 @@ module CC
 
     def initialize(content_export, opts={})
       @content_export = content_export
-      @course = opts[:course] || @content_export.course 
+      @course = opts[:course] || @content_export.context
+      raise "CCExporter supports only Courses" unless @course.is_a?(Course) # a Course is a Course, of course, of course
       @user = opts[:user] || @content_export.user
       @export_dir = nil
       @manifest = nil

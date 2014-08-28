@@ -38,11 +38,11 @@
         <legend><%= t :export_type, "Export Type" %></legend>
         <div>
           <input type="radio" name="export_type" value="common_cartridge" id="cc_export_radio" checked>
-          <label for="cc_export_radio">Course</label>
+          <label for="cc_export_radio"><%= t 'labels.course', 'Course' %></label>
         </div>
         <div>
           <input type="radio" name="export_type" value="qti" id="qti_export_radio">
-          <label for="qti_export_radio">Quiz</label>
+          <label for="qti_export_radio"><%= t 'labels.quiz', 'Quiz' %></label>
           <div id="quiz_selection" style="display:none;">
             <%= render :partial => 'quiz_export_checklist' %>
           </div>

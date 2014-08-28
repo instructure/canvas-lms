@@ -109,17 +109,23 @@ class ExternalToolsController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
         return
       end
-      @resource_title = @tool.name
-      @resource_url = params[:url]
       add_crumb(@context.name, named_context_url(@context, :context_url))
-      @return_url = url_for(@context)
+
+      @lti_launch = Lti::Launch.new
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, launch_url: @resource_url)
-      @tool_settings = adapter.generate_post_payload
+      adapter.prepare_tool_launch(url_for(@context), resource_type: @resource_type, launch_url: params[:url])
+      @lti_launch.params = adapter.generate_post_payload
 
-      @tool_launch_type = 'self' if params['borderless']
-      render :template => 'external_tools/tool_show'
+      @lti_launch.resource_url = params[:url]
+      @lti_launch.link_text =  @tool.name
+
+      if params['borderless']
+        @lti_launch.launch_type = 'self'
+        render :template => 'lti/framed_launch', layout: 'bare'
+      else
+        render :template => 'lti/framed_launch'
+      end
     end
   end
 
@@ -193,8 +199,7 @@ class ExternalToolsController < ApplicationController
       if launch_url
         @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
       else
-        find_tool(tool_id, params[:launch_type])
-        return unless @tool
+        return unless find_tool(tool_id, params[:launch_type])
       end
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -299,9 +304,15 @@ class ExternalToolsController < ApplicationController
       end
     else
       selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
-      find_tool(params[:id], selection_type)
-      @active_tab = @tool.asset_string if @tool
-      @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
+      if find_tool(params[:id], selection_type)
+        if selection_type == 'course_home_sub_navigation' && @context.is_a?(Course)
+          @return_url = external_content_success_url('external_tool_redirect', :include_host => true)
+          @redirect_return = true
+          js_env(:course_id => @context.id)
+        end
+        @active_tab = @tool.asset_string
+        @show_embedded_chat = false if @tool.tool_id == 'chat'
+      end
       render tool_launch(@tool, selection_type) if @tool
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
@@ -315,7 +326,7 @@ class ExternalToolsController < ApplicationController
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url = external_content_success_url('external_tool')
+    @return_url = external_content_success_url('external_tool_dialog')
     @headers = false
     @tool_launch_type = 'self'
 
@@ -332,6 +343,8 @@ class ExternalToolsController < ApplicationController
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
+
+    @tool
   end
   protected :find_tool
 

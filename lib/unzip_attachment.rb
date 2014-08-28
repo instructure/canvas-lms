@@ -113,7 +113,9 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open(filename) do |f|
           begin
-            extract_entry(entry, f.path)
+            entry.extract(f.path, true) do |bytes|
+              zip_stats.charge_quota(bytes)
+            end
             # This is where the attachment actually happens.  See file_in_context.rb
             attachment = attach(f.path, entry, folder)
             id_positions[attachment.id] = path_positions[entry.name]
@@ -136,19 +138,6 @@ class UnzipAttachment
     queue_scribd_submissions(@attachments)
     @context.touch
     update_progress(1.0)
-  end
-
-  def extract_entry(entry, dest_path)
-    ::File.open(dest_path, "wb") do |os|
-      entry.get_input_stream do |is|
-        entry.set_extra_attributes_on_path(dest_path)
-        buf = ''
-        while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
-          os << buf
-          zip_stats.charge_quota(buf.size)
-        end
-      end
-    end
   end
 
   def zip_stats

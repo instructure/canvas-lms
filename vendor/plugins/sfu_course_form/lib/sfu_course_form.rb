@@ -1,4 +1,3 @@
-require 'sfu/course_form/routing'
 require 'sfu/course_form/csv_builder'
 
 module SFU

@@ -12,7 +12,7 @@ end
 require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
-Bundler.require(:rake_tasks)
+Bundler.require(:i18n_tools)
 
 if CANVAS_RAILS2
   Dir["#{RAILS_ROOT}/gems/**/tasks/*.rake"].each { |ext| load ext }

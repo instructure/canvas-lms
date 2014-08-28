@@ -129,6 +129,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  def k12?
+    @domain_root_account && @domain_root_account.feature_enabled?('k12')
+  end
+  helper_method 'k12?'
+
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #
@@ -560,7 +565,7 @@ class ApplicationController < ActionController::Base
       end
 
       @groups = @context.assignment_groups.active.includes(assignment_scope)
-      @assignments = @groups.flat_map(&assignment_scope)
+      @assignments = @groups.flat_map{|grp| grp.visible_assignments(@current_user)}
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
         [[Assignment.published.for_course(courses).all,
@@ -972,8 +977,7 @@ class ApplicationController < ActionController::Base
 
   if CANVAS_RAILS2
     rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
-  else
-    ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+    rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
   end
 
   def rescue_action_in_api(exception, error_report, response_code)
@@ -1075,9 +1079,10 @@ class ApplicationController < ActionController::Base
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
+  LTI_API_REQUEST_REGEX = %r{\A/api/lti/}
 
   def api_request?
-    @api_request ||= !!request.path.match(API_REQUEST_REGEX)
+    @api_request ||= !!request.path.match(API_REQUEST_REGEX) || !!request.path.match(LTI_API_REQUEST_REGEX)
   end
 
   def session_loaded?
