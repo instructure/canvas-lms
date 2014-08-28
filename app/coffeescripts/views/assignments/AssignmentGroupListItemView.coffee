@@ -33,6 +33,7 @@ define [
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
       '.move_group': '$moveGroupButton'
+      '.accessibility-warning' : '$accessibilityWarning'
     })
 
     events:
@@ -40,6 +41,8 @@ define [
       'keypress .element_toggler': 'toggleArrowWithKeyboard'
       'click .tooltip_link': preventDefault ->
       'keydown .assignment_group': 'handleKeys'
+      'focus .icon-drag-handle' : 'showAccessibilityWarning'
+      'blur .icon-drag-handle' : 'hideAccessibilityWarning'
 
     messages:
       toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
@@ -273,6 +276,13 @@ define [
     toggleArrowWithKeyboard: (ev) =>
       if ev.which == 13 || ev.which == 32
         @toggleArrow(ev)
+
+    showAccessibilityWarning: (ev) =>
+      @$accessibilityWarning.removeClass('screenreader-only')
+      @$accessibilityWarning.focus()
+
+    hideAccessibilityWarning: (ev) =>
+      @$accessibilityWarning.addClass('screenreader-only')
 
     resetNoToggleCache: (selector=null) ->
       if selector?
