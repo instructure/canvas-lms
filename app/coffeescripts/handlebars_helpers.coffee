@@ -243,6 +243,19 @@ define [
     eachProp: (context, options) ->
       (options.fn(property: prop, value: context[prop]) for prop of context).join ''
 
+    # runs block if the setting is set to the value
+    # usage:
+    # {{#ifSettingIs some_setting some_value}}
+    #   The setting is set to the thing!
+    # {{else}}
+    #   The setting is set to something else or doesn't exist
+    # {{/ifSettingIs}}
+    ifSettingIs: ->
+      [setting, value, {fn, inverse}] = arguments
+      settings = ENV.SETTINGS
+      return fn(this) if settings[setting] == value
+      inverse(this)
+
     # evaluates the block for each item in context and passes the result to $.toSentence
     toSentence: (context, options) ->
       results = _.map(context, (c) -> options.fn(c))
@@ -447,6 +460,7 @@ define [
     or: (args..., options) ->
       for arg in args when arg
         return arg
+
   }
 
   return Handlebars

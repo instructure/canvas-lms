@@ -159,6 +159,13 @@ describe ApplicationController do
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error
     end
 
+    it 'gets appropriate settings from the root account' do
+      root_account = stub(global_id: 1, open_registration?: true)
+      HostUrl.stubs(file_host: 'files.example.com')
+      controller.instance_variable_set(:@domain_root_account, root_account)
+      controller.js_env[:SETTINGS][:open_registration].should be_truthy
+    end
+
     context "sharding" do
       specs_require_sharding
 
