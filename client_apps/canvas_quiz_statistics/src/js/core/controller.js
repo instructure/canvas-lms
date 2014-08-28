@@ -1,12 +1,13 @@
 define(function(require) {
-  var statisticsStore = require('../stores/statistics');
+  var quizStatistics = require('../stores/statistics');
+  var quizReports = require('../stores/reports');
   var config = require('../config');
   var update;
 
   var onChange = function() {
     update({
-      quizStatistics: statisticsStore.getQuizStatistics(),
-      quizReports: statisticsStore.getQuizReports(),
+      quizStatistics: quizStatistics.get(),
+      quizReports: quizReports.getAll(),
     });
   };
 
@@ -38,7 +39,8 @@ define(function(require) {
      */
     start: function(onUpdate) {
       update = onUpdate;
-      statisticsStore.addChangeListener(onChange);
+      quizStatistics.addChangeListener(onChange);
+      quizReports.addChangeListener(onChange);
 
       if (config.loadOnStartup) {
         Controller.load();
@@ -50,7 +52,8 @@ define(function(require) {
      */
     load: function() {
       if (config.quizStatisticsUrl) {
-        statisticsStore.load();
+        quizStatistics.load();
+        quizReports.load();
       }
       else {
         console.warn(
@@ -64,7 +67,8 @@ define(function(require) {
      * Stop listening to data changes.
      */
     stop: function() {
-      statisticsStore.removeChangeListener(onChange);
+      quizStatistics.removeChangeListener(onChange);
+      quizReports.removeChangeListener(onChange);
       update = undefined;
     }
   };

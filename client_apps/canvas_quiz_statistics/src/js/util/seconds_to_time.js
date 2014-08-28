@@ -1,4 +1,4 @@
-define(function(require) {
+define(function() {
   var floor = Math.floor;
 
   var pad = function(duration) {

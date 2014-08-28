@@ -1,6 +1,6 @@
 define([ 'rsvp' ], function(RSVP) {
   RSVP.on('error', function(e) {
-    console.error('RSVP error:', e);
+    console.error('RSVP error:', JSON.stringify(e));
 
     if (e && e.message) {
       console.error(e.message);

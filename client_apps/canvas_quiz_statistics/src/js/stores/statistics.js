@@ -1,96 +1,72 @@
 define(function(require) {
   var Store = require('../core/store');
-  var Adapter = require('../core/adapter');
   var config = require('../config');
-  var K = require('../constants');
-  var RSVP = require('rsvp');
-  var QuizReports = require('../collections/quiz_reports');
   var QuizStats = require('../collections/quiz_statistics');
-  var onError = config.onError;
-  var quizReports = new QuizReports();
+  var populateCollection = require('./common/populate_collection');
   var quizStats = new QuizStats([]);
 
+  /**
+   * @class Stores.Statistics
+   * Load stats.
+   */
   var store = new Store('statistics', {
     /**
-     * Load quiz statistics and reports.
-     * Requires config.quizStatisticsUrl to be set.
+     * Load quiz statistics.
      *
+     * @needs_cfg quizStatisticsUrl
      * @async
-     * @emit change
+     * @fires change
+     *
+     * @return {RSVP.Promise}
+     *         Fulfills when the stats have been loaded and injected.
      */
     load: function() {
-      var stats, reports;
+      var onLoad = this.populate.bind(this);
 
       if (!config.quizStatisticsUrl) {
-        return onError('Missing configuration parameter "quizStatisticsUrl".');
-      }
-      else if (!config.quizReportsUrl) {
-        return onError('Missing configuration parameter "quizReportsUrl".');
+        return config.onError('Missing configuration parameter "quizStatisticsUrl".');
       }
 
-      stats = Adapter.request({
-        type: 'GET',
-        url: config.quizStatisticsUrl
-      }).then(function(quizStatisticsPayload) {
-        quizStats.reset(quizStatisticsPayload, { parse: true });
-      });
-
-      reports = Adapter.request({
-        type: 'GET',
-        url: config.quizReportsUrl
-      }).then(function(quizReportsPayload) {
-        quizReports.add(quizReportsPayload, { parse: true });
-      });
-
-      return RSVP.all([ stats, reports ]).then(function() {
-        store.emitChange();
-      });
+      return quizStats.fetch().then(onLoad);
     },
 
-    getQuizStatistics: function() {
+    /**
+     * Populate the store with pre-loaded statistics data you've received from
+     * the Canvas stats index endpoint (JSON-API or JSON).
+     *
+     * @fires change
+     */
+    populate: function(payload) {
+      populateCollection(quizStats, payload);
+      this.emitChange();
+    },
+
+    get: function() {
       if (quizStats.length) {
         return quizStats.first().toJSON();
       }
     },
 
     getSubmissionStatistics: function() {
-      if (quizStats.length) {
-        return quizStats.first().get('submissionStatistics');
+      var stats = this.get();
+      if (stats) {
+        return stats.submissionStatistics;
       }
     },
 
     getQuestionStatistics: function() {
-      if (quizStats.length) {
-        return quizStats.first().get('questionStatistics');
-      }
-    },
+      var stats = this.get();
 
-    getQuizReports: function() {
-      return quizReports.toJSON();
+      if (stats) {
+        return stats.questionStatistics;
+      }
     },
 
     actions: {
-      generateReport: function(reportType, onChange, onError) {
-        Adapter.request({
-          type: 'POST',
-          url: config.quizReportsUrl,
-          data: {
-            quiz_reports: [{
-              report_type: reportType,
-              includes_all_versions: true
-            }],
-            include: ['progress', 'file']
-          }
-        }).then(function(quizReportsPayload) {
-          quizReports.add(quizReportsPayload, { parse: true });
-          onChange();
-        }, onError);
-      }
     },
 
     __reset__: function() {
       quizStats.reset();
-      quizReports.reset();
       return Store.prototype.__reset__.call(this);
     }
   });

@@ -23,7 +23,7 @@
         "tag": "Quizzes::QuizStatistics",
         "updated_at": "2014-04-02T06:41:47Z",
         "user_id": null,
-        "workflow_state": "active",
+        "workflow_state": "running",
         "url": "http://localhost:3000/api/v1/progress/143"
       }
     },

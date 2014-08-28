@@ -5,8 +5,6 @@
 /*
 @styleguide Accordion
 
-We use the jQuery UI accordion instead of Bootstraps', however, instead of using the class `ui-accordion` just use `accordion`
-
 ```html
 <div class="accordion">
   <h3><a href="#">Section 1</a></h3>
@@ -23,6 +21,10 @@ We use the jQuery UI accordion instead of Bootstraps', however, instead of using
   </div>
 </div>
 ```
+<div class="styleguide-section__component-notes">
+  <h4 class="codeBlock__note-title">Notes</h4>
+  <p class="codeBlock__note-description">We use the jQuery UI accordion instead of Bootstraps', however, instead of using the class `ui-accordion` just use `accordion`</p>
+</div>
 
 */
 

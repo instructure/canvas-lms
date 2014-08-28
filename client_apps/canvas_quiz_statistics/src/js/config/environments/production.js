@@ -42,6 +42,13 @@ define([], function() {
     quizReportsUrl: undefined,
 
     /**
+     * @cfg {Boolean} [includesAllVersions=true]
+     * Whether we should get the statistics and quiz reports for all versions
+     * of the quiz, instead of the latest.
+     */
+    includesAllVersions: true,
+
+    /**
      * @cfg {Boolean} [loadOnStartup=true]
      *
      * Whether the app should query all the data it needs as soon as it is

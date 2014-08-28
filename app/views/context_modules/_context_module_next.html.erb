@@ -103,6 +103,16 @@
               class="delete_module_link icon-trash"
               title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
           </li>
+          <% @menu_tools[:module_menu].each do |tool| %>
+            <li>
+              <% tool_path = course_external_tool_path(@context, tool, launch_type: 'module_menu',
+                                                  :modules => [context_module ? context_module.id : "{{ id }}"]) %>
+              <a class="menu_tool_link" href="<%= tool_path %>">
+                <% if icon_url = tool.extension_setting(:module_menu, :icon_url) %><img class="icon" src="<%= icon_url %>" /><% end %>
+                <%= tool.label_for(:module_menu) %>
+              </a>
+            </li>
+          <% end %>
         </ul>
       <% end %>
       <span style="display: none;">

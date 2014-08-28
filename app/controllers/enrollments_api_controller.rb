@@ -307,18 +307,18 @@ class EnrollmentsApiController < ApplicationController
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
-  #     -F 'user_id=1' \
-  #     -F 'type=StudentEnrollment' \
-  #     -F 'enrollment_state=active' \
-  #     -F 'course_section_id=1' \
-  #     -F 'limit_privileges_to_course_section=true' \
-  #     -F 'notify=false'
+  #     -F 'enrollment[user_id]=1' \
+  #     -F 'enrollment[type]=StudentEnrollment' \
+  #     -F 'enrollment[enrollment_state]=active' \
+  #     -F 'enrollment[course_section_id]=1' \
+  #     -F 'enrollment[limit_privileges_to_course_section]=true' \
+  #     -F 'enrollment[notify]=false'
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
-  #     -F 'user_id=2' \
-  #     -F 'type=StudentEnrollment'
+  #     -F 'enrollment[user_id]=2' \
+  #     -F 'enrollment[type]=StudentEnrollment'
   #
   # @returns Enrollment
   def create

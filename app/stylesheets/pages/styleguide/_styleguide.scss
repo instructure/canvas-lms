@@ -1,6 +1,122 @@
-@import "base/environment";
+@if $use_new_styles { 
+// Styleguide Typography
+//===============
+.styleguide-subheader {
+  font-weight: normal;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 0;
+  border-bottom: 1px solid #ccc;
+  line-height: normal;
+}
 
-#main {
+// Styleguide Layout
+//===============
+// We're using flex to put these elements in the order that we
+// want them to appear in
+.styleguide-section__component {  
+  margin: 0 0 50px 0;
+}
+.styleguide-section__component-code {
+  @extend %flex;
+  flex-flow: row wrap;  
+  /* Then we define how is distributed the remaining space */
+  justify-content: space-around;
+  // Ordering
+  .code-rendered                        { @extend %flex-order-1;}
+  .highlight                            { @extend %flex-order-2;}
+  .styleguide-section__component-notes  { @extend %flex-order-3;}
+  // Sizing
+  .code-rendered                        { min-width: 101%;}
+  .highlight                            { @extend %flex-2;}
+  .styleguide-section__component-notes  { @extend %flex-1;}
+}
+// end layout
+
+/// Styleguide element styles
+//===============
+/// Note: some of these may become obsolete as we 
+/// continue to put in more styles to our typography
+.code-rendered {
+  margin-bottom: 20px;  
+  padding-bottom: 20px;
+  border-bottom: 1px solid $canvas-neutral;
+}
+.highlight {  
+  pre {
+    padding: 10px;
+    background: lighten($canvas-primary, 60%);
+    box-shadow: 0 0 8px lighten($canvas-dark, 10%);    
+    border-radius: 0;
+    color: $canvas-dark;
+  }  
+}
+.styleguide-section__component-notes {
+  padding: 0 0 0 25px;
+  .codeBlock__note-title {
+    font-size: 18px;
+    font-weight: 500;    
+    line-height: 29px;
+    padding: 0;
+    margin: 0;
+  }
+  .codeBlock__note-description {
+    line-height: 22px;
+    font-size: 14px;
+  }
+}
+/// Temporary styles for new nav till real styles
+/// are in there. These only show up on new_styles styleguide
+.style-guide-nav-container {
+  background: $canvas-secondary;
+}
+.style-guide-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  .canvasSidebar--menu__item {
+    &.canvasSidebar--menu__item-title {
+      font-weight: 500; 
+      text-transform: uppercase;
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+    & {
+      color: white;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      a {
+        display: block;
+        width: 100%;
+        color: #fff;
+        padding: 10px 20px;
+        font-weight: 300;
+        min-width: 180px;
+        transition: background 0.5s ease-in-out;
+        &:hover {
+          text-decoration: none;
+          background: lighten($canvas-secondary, 5%); 
+          transition: background 0.5s ease-in-out;
+        }
+      }        
+    }
+    &.canvasSidebar--menu__item--is-on {
+      a {
+        background: lighten($canvas-secondary, 5%); 
+        font-weight: 500; 
+        &:hover {
+          text-decoration: none;
+        }
+      }          
+    }
+  }
+}
+/// end nav
+} 
+@else {
+  #main {
   position: absolute;
   top: 70px;
   left: 0;
@@ -44,4 +160,4 @@
   border-left: solid 4px #0088cc;
   padding-left: 8px;
 }
-
+}

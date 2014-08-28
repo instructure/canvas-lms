@@ -414,7 +414,7 @@ class UsersController < ApplicationController
     js_env :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
+    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
@@ -1034,7 +1034,11 @@ class UsersController < ApplicationController
     @user = @pseudonym && @pseudonym.user
     @user ||= User.new
     if params[:user]
-      params[:user].delete(:self_enrollment_code) unless self_enrollment
+      if self_enrollment && params[:user][:self_enrollment_code]
+        params[:user][:self_enrollment_code].strip!
+      else
+        params[:user].delete(:self_enrollment_code)
+      end
       if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
           params[:user][:birthdate] !~ Api::DATE_REGEX
         return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
@@ -1433,11 +1437,9 @@ class UsersController < ApplicationController
   def delete
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      if @user.pseudonyms.any? {|p| p.managed_password? }
-        unless @user.grants_right?(@current_user, session, :manage_logins)
-          flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-          redirect_to user_profile_url(@current_user)
-        end
+      unless @user.grants_right?(@current_user, :delete)
+        flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
+        redirect_to user_profile_url(@current_user)
       end
     end
   end
@@ -1457,8 +1459,8 @@ class UsersController < ApplicationController
   # @returns User
   def destroy
     @user = api_find(User, params[:id])
-    if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
+    if authorized_action(@user, @current_user, :delete)
+      @user.destroy(true)
       if @user == @current_user
         logout_current_user
       end

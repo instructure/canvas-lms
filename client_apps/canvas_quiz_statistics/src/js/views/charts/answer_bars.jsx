@@ -160,7 +160,7 @@ define(function(require) {
     }
   });
 
-  var CorrectAnswerDonut = React.createClass({
+  var AnswerBars = React.createClass({
     propTypes: {
     },
 
@@ -192,5 +192,5 @@ define(function(require) {
     }
   });
 
-  return CorrectAnswerDonut;
+  return AnswerBars;
 });

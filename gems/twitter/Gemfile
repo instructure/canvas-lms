@@ -5,3 +5,7 @@ gemspec
 
 gem 'html_text_helper', path: '../html_text_helper'
 gem 'canvas_text_helper', path: '../canvas_text_helper'
+
+platforms :ruby_20, :ruby_21 do
+  gem 'iconv', '1.0.4'
+end

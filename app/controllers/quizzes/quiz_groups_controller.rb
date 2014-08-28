@@ -83,16 +83,16 @@ class Quizzes::QuizGroupsController < ApplicationController
   #
   # <b>201 Created</b> response code is returned if the creation was successful.
   #
-  # @argument quiz_groups[][name] [Optional, String]
+  # @argument quiz_groups[][name] [String]
   #   The name of the question group.
   #
-  # @argument quiz_groups[][pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_groups[][question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Integer]
   #   The number of points to assign to each question in the group.
   #
-  # @argument quiz_groups[][assessment_question_bank_id] [Optional, Integer]
+  # @argument quiz_groups[][assessment_question_bank_id] [Integer]
   #   The id of the assessment question bank to pull questions from.
   #
   # @example_response
@@ -123,13 +123,13 @@ class Quizzes::QuizGroupsController < ApplicationController
   #
   # Update a question group
   #
-  # @argument quiz_groups[][name] [Optional, String]
+  # @argument quiz_groups[][name] [String]
   #   The name of the question group.
   #
-  # @argument quiz_groups[][pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_groups[][question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Integer]
   #   The number of points to assign to each question in the group.
   #
   # @example_response
@@ -176,7 +176,7 @@ class Quizzes::QuizGroupsController < ApplicationController
   # @argument order[][id] [Required, Integer]
   #   The associated item's unique identifier
   #
-  # @argument order[][type] ["question"]
+  # @argument order[][type] [String, "question"]
   #   The type of item is always 'question' for a group
   #
   # <b>204 No Content<b> response code is returned if the reorder was successful.

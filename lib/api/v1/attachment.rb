@@ -29,6 +29,7 @@ module Api::V1::Attachment
 
   def attachment_json(attachment, user, url_options = {}, options = {})
     options.reverse_merge!(submission_attachment: false)
+    includes = options[:include] || []
 
     # it takes loads of queries to figure out that a teacher doesn't have
     # :update permission on submission attachments.  we'll handle the
@@ -82,7 +83,15 @@ module Api::V1::Attachment
       'thumbnail_url' => thumbnail_download_url,
     }
     locked_json(hash, attachment, user, 'file')
-    hash['user'] = user_display_json(attachment.user, attachment.context) if (options[:include] || []).include? 'user'
+
+    if includes.include? 'user'
+      hash['user'] = user_display_json(attachment.user, attachment.context)
+    end
+    if includes.include? 'preview_url'
+      hash['preview_url'] = attachment.crocodoc_url(user) ||
+                            attachment.canvadoc_url(user)
+    end
+
     hash
   end
 

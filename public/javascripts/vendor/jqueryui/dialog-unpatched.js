@@ -99,10 +99,6 @@ $.widget("ui.dialog", {
 
 			uiDialog = ( this.uiDialog = $( "<div>" ) )
 				.addClass( uiDialogClasses + options.dialogClass )
-				.attr({
-					role: "dialog",
-					"aria-hidden": true,
-				})
 				.css({
 					display: "none",
 					outline: 0, // TODO: move to stylesheet
@@ -249,7 +245,6 @@ $.widget("ui.dialog", {
 			this._trigger( "close", event );
 		}
 
-		this.uiDialog.attr('aria-hidden', true);
 		$.ui.dialog.overlay.resize();
 
 		// adjust the maxZ to allow other modal dialogs to continue to work (see #4309)

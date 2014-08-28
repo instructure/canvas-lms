@@ -5,7 +5,7 @@ module.exports = {
       'development',
       'configureRewriteRules',
       'configureProxies:www',
-      'connect:www'
+      'connect:www:keepalive'
     ]);
   }
 };

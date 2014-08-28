@@ -9,15 +9,22 @@ define([ '../config' ], function(config) {
    * @param  {Number|String} n
    *         Your number
    *
-   * @param  {Number} [digits=config.precision]
+   * @param  {Number} [digits=2]
+   *         Number of digits to round to.
+   *
+   * @param  {Number} [precision=config.precision]
    *         Precision of the returned float (number of digits after the
    *         decimal point.)
    *
-   * @return {Float}
+   * @return {Number}
    *         The rounded number, ready for human-consumption.
    */
-  return function round(n, precision) {
+  return function round(n, digits, precision) {
     var scale;
+
+    if (digits === undefined) {
+      digits = 0;
+    }
 
     if (precision === undefined) {
       precision = config.precision;
@@ -27,6 +34,10 @@ define([ '../config' ], function(config) {
       n = parseFloat(n);
     }
 
-    return n.toFixed(precision);
-  }
+    scale = Math.pow(10, parseInt(digits, 10));
+    n = Math.round(n * scale) / scale;
+    n = n.toFixed(parseInt(precision, 10));
+
+    return n;
+  };
 });

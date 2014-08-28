@@ -38,3 +38,9 @@ you want to speed things up and not hit the actual Canvas API. For example:
     quizReportsUrl: '/fixtures/quiz_reports.json',
   };
 ```
+
+## `test.js`
+
+This file will *not* be included in the built version, nor in the browser,but only when we're running tests.
+
+Useful for making timeouts very short and throwing errors when we may gracefully handle them in other environments. You have access to `jasmine` and other test frameworks at the time the script is run.

@@ -107,7 +107,7 @@ TEXT
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
                 <td>
-                  <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
+                  <%= f.time_zone_select :default_time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
                 </td>
               </tr>
               <%= f.fields_for :settings do |settings| %>

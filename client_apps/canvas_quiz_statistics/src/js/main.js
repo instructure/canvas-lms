@@ -31,9 +31,6 @@ requirejs.config({
     'canvas': '../../vendor/canvas/public/javascripts',
   },
 
-  shim: {
-  },
-
   jsx: {
     fileExtension: '.jsx'
   },

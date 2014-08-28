@@ -104,7 +104,7 @@ define [
     fetch: (options = {}) ->
       # TODO: we might want to merge options.data and options.params here instead
       options.data = @options.params if !options.data? and @options.params?
-      super(options).fail (xhr) => @trigger 'fetch:fail', xhr
+      super(options).then(null, (xhr) => @trigger 'fetch:fail', xhr)
 
     url: -> @_defaultUrl()
 

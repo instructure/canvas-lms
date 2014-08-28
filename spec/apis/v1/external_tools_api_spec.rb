@@ -396,7 +396,10 @@ describe ExternalToolsController, type: :request do
     et.course_home_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.course_settings_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course settings sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.global_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "global navigation", display_type: 'full_width', visibility: 'admins'}
-    et.content_export = {:url=>"http://www.example.com/ims/lti/resource", :text => "content export", display_type: 'full_width', visibility: 'admins'}
+    et.assignment_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment menu", display_type: 'full_width', visibility: 'admins'}
+    et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
+    et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
+    et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
     et.save!
     et
   end
@@ -530,9 +533,33 @@ describe ExternalToolsController, type: :request do
           "display_type"=>'full_width',
           "selection_height"=>400,
           "selection_width"=>800},
-     "content_export"=>
-         {"text"=>"content export",
-          "label"=>"content export",
+     "assignment_menu"=>
+         {"text"=>"assignment menu",
+          "label"=>"assignment menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "module_menu"=>
+         {"text"=>"module menu",
+          "label"=>"module menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "quiz_menu"=>
+         {"text"=>"quiz menu",
+          "label"=>"quiz menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "wiki_page_menu"=>
+         {"text"=>"wiki page menu",
+          "label"=>"wiki page menu",
           "url"=>"http://www.example.com/ims/lti/resource",
           "visibility"=>'admins',
           "display_type"=>'full_width',

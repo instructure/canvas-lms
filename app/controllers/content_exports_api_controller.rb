@@ -121,8 +121,8 @@ class ContentExportsApiController < ApplicationController
   # When the export completes, use the {api:ContentExportsApiController#show Show content export} endpoint
   # to retrieve a download URL for the exported content.
   #
-  # @argument export_type [String, "common_cartridge"|"qti"]
-  #   "common_cartridge":: Export the contents of a course in the Common Cartridge (.imscc) format
+  # @argument export_type [Required, String, "common_cartridge"|"qti"|"zip"]
+  #   "common_cartridge":: Export the contents of the course in the Common Cartridge (.imscc) format
   #   "qti":: Export quizzes from a course in the QTI format
   #   "zip":: Export files from a course, group, or user in a zip file
   #

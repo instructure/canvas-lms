@@ -67,12 +67,16 @@ module Canvas
         raise "Invalid config/cache_store.yml: Root is not a hash. See comments in config/cache_store.yml.example"
       end
 
-      unless configs.values.all? { |cfg| cfg.is_a?(Hash) }
-        broken = configs.keys.select{ |k| !configs[k].is_a?(Hash) }.map(&:to_s).join(', ')
-        raise "Invalid config/cache_store.yml: Some keys are not hashes: #{broken}. See comments in config/cache_store.yml.example"
-      end
+      non_hashes = configs.keys.select { |k| !configs[k].is_a?(Hash) }
+      non_hashes.reject! { |k| configs[k].is_a?(String) && configs[configs[k]].is_a?(Hash) }
+      raise "Invalid config/cache_store.yml: Some keys are not hashes: #{non_hashes.join(', ')}. See comments in config/cache_store.yml.example" unless non_hashes.empty?
 
       configs.each do |env, config|
+        if config.is_a?(String)
+          # switchman will treat strings as a link to another database server
+          @cache_stores[env] = config
+          next
+        end
         config = {'cache_store' => 'mem_cache_store'}.merge(config)
         case config.delete('cache_store')
         when 'mem_cache_store'
@@ -91,8 +95,11 @@ module Canvas
           # servers, not key prefix or database names.
           config = (ConfigFile.load('redis', env) || {}).merge(config)
           config_options = config.symbolize_keys.except(:key, :servers, :database)
-          servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
-          @cache_stores[env] = :redis_store, servers
+          servers = config['servers']
+          if servers
+            servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
+            @cache_stores[env] = :redis_store, servers
+          end
         when 'memory_store'
           @cache_stores[env] = :memory_store
         when 'nil_store'

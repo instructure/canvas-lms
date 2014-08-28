@@ -248,6 +248,44 @@ define([
           $this.attr('title', content_tag.title);
         });
       },
+      showMoveModuleItem: function ($item) {
+        var $currentModule = $item.closest(".context_module");
+        var $form = $('#move_module_item_form');
+        $form.data('current_module', $currentModule);
+        $form.data('current_item', $item);
+
+        // Set the name of the item being moved.
+        $('#move_module_item_name').text($item.children().find('span.title').text());
+
+        // Get all the modules
+        var moduleSelectOptions = [];
+        $("#context_modules .context_module").each(function() {
+          var id = $(this).attr('id').substring('context_module_'.length);
+          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
+          moduleSelectOptions.push('<option value="' + id + '">' + name + '</option>');
+        });
+        $('#move_module_item_module_select').empty();
+        $('#move_module_item_module_select').append(moduleSelectOptions.join(''));
+
+        // Trigger the change to make sure the list is initally populated.
+        $('#move_module_item_module_select').trigger('change');
+
+        // Make sure these fields are shown because they may be hidden from a previous use of the modal.
+        $('#move_module_item_form .move-module-before-after-container').show();
+        $('#move_module_item_select').show();
+
+        $form.dialog({
+          autoOpen: false,
+          modal: true,
+          width: 600,
+          height: 300,
+          close: function () {
+            modules.hideMoveModule(true);
+          }
+        }).dialog('open');
+
+
+      },
       showMoveModule: function ($module) {
         var $form = $('#move_context_module_form');
         $form.data('current_module', $module);
@@ -269,6 +307,7 @@ define([
         });
 
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
+        $('#move_context_module_select').empty();
         $('#move_context_module_select').append(selectOptions.join(''));
         //$form.fillFormData(data, {object_name: 'context_module'});
         $form.dialog({
@@ -284,8 +323,34 @@ define([
         // $form.find('.ui-dialog-titlebar-close').focus();
 
       },
+      hideMoveModuleItem: function (remove) {
+        $('#move_module_item_form:visible').dialog('close');
+      },
       hideMoveModule: function (remove) {
         $('#move_context_module_form:visible').dialog('close');
+      },
+      submitMoveModuleItem: function () {
+        var beforeOrAfterVal = $('[name="item_move_location"]:checked').val();
+        var currentItem = $('#move_module_item_form').data('current_item');
+        var relativeToId = $('#move_module_item_select').val();
+        var selectedModuleId = $('#move_module_item_module_select').val();
+
+
+        if (beforeOrAfterVal === 'before') {
+          $('#context_module_item_' + relativeToId).before(currentItem);
+        }
+        if (beforeOrAfterVal === 'after') {
+          $('#context_module_item_' + relativeToId).after(currentItem);
+        }
+        if ($('#move_module_item_select').children().length === 0) {
+          // In this case, we are moving it into a currently empty module.
+          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append(currentItem);
+        }
+
+        modules.hideMoveModuleItem();
+        modules.updateModuleItemPositions(null, {item: currentItem});
+
+
       },
       submitMoveModule: function () {
         var beforeOrAfterVal = $('[name="move_location"]:checked').val();
@@ -873,6 +938,36 @@ define([
       });
     });
 
+    $('#move_module_item_module_select').on('change', function (event) {
+      // Remove all existing items
+      $('#move_module_item_select').empty();
+      var moduleId = $(event.currentTarget.selectedOptions).val();
+      // Get all the items for the selected module.
+      var selectItemOptions = [];
+      $('#context_module_' + moduleId).children().find('.context_module_item').each(function (index, item) {
+        var id = $(item).attr('id').substring('context_module_item_'.length);
+        var name = $(item).children().find('span.title').text();
+        selectItemOptions.push('<option value="' + id + '">' + name + '</option>');
+      });
+      $('#move_module_item_select').append(selectItemOptions.join(''));
+
+      // The case where the module has no items.
+      if ($('#move_module_item_select').children().length === 0) {
+        $('#move_module_item_form .move-module-before-after-container').hide();
+        $('#move_module_item_select').hide();
+      }
+    });
+
+    $('.move_module_item_link').on('click keyclick', function (event) {
+      event.preventDefault();
+      modules.showMoveModuleItem($(this).parents(".context_module_item"));
+    });
+
+    $('#move_module_item_form').on('submit', function (event) {
+      event.preventDefault();
+      modules.submitMoveModuleItem();
+    })
+
     $('.move_module_link').on('click keyclick', function (event) {
       event.preventDefault();
       modules.showMoveModule($(this).parents('.context_module'));
@@ -885,6 +980,10 @@ define([
 
     $('#move_module_cancel_btn').on('click keyclick', function (event) {
       modules.hideMoveModule();
+    });
+
+    $('#move_module_item_cancel_btn').on('click keyclick', function (event) {
+      modules.hideMoveModuleItem();
     });
 
     $('.icon-drag-handle').on('focus', function (event) {

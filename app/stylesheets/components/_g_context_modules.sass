@@ -442,6 +442,21 @@ $context_module_bg_color: #f2f3f4
         .icon-lock
           display: block
 
+a.menu_tool_link img.icon
+  max-width: 16px
+
+.context_module_item:not(.assignment)
+  li.assignment_menu
+    display: none
+
+.context_module_item:not(.quiz)
+  li.quiz_menu
+    display: none
+
+.context_module_item:not(.wiki_page)
+  li.wiki_page_menu
+    display: none
+
 div.completion_criterion_option
   select.assignment_picker
     width: 160px

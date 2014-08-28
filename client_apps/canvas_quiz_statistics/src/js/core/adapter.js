@@ -9,10 +9,14 @@ define(function(require) {
 
       options.headers = options.headers || {};
       options.headers['Content-Type'] = 'application/json';
-      options.headers['Accept'] = 'application/vnd.api+json';
+      options.headers.Accept = 'application/vnd.api+json';
 
       if (config.apiToken) {
         options.headers.Authorization = 'Bearer ' + config.apiToken;
+      }
+
+      if (options.type !== 'GET' && options.data) {
+        options.data = JSON.stringify(options.data);
       }
 
       return RSVP.Promise.cast(ajax(options));

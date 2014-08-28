@@ -195,7 +195,16 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      assert_status(500)
+      assert_status(401)
+      @student.reload.workflow_state.should_not == 'deleted'
+    end
+
+    it "should fail when the user has a SIS ID and uses canvas authentication" do
+      user_with_pseudonym
+      course_with_student_logged_in user: @user
+      @student.pseudonym.update_attribute :sis_user_id, 'kzarn'
+      post 'destroy', id: @student.id
+      assert_status(401)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -388,9 +397,14 @@ describe UsersController do
 
       context "self enrollment" do
         before(:once) do
+          Account.default.allow_self_enrollment!
           course(:active_all => true)
-          @course.root_account.allow_self_enrollment!
           @course.update_attribute(:self_enrollment, true)
+        end
+
+        it "should strip the self enrollment code before validation" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code + ' ', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
+          response.should be_success
         end
 
         it "should ignore the password if self enrolling with an email pseudonym" do

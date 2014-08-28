@@ -4,3 +4,9 @@ source 'https://rubygems.org'
 gemspec
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
+
+require File.expand_path("../../../config/canvas_rails4", __FILE__)
+
+if CANVAS_RAILS3
+  gem 'rails', '~> 3.2.0'
+end

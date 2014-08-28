@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
-  var ChartMixin = require('../mixins/chart');
+  var ChartMixin = require('../../mixins/chart');
   var d3 = require('d3');
   var max = d3.max;
   var sum = d3.sum;

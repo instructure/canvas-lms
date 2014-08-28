@@ -84,6 +84,10 @@
 #         },
 #         "thumbnail_url": {
 #           "type": "string"
+#         },
+#         "preview_url": {
+#           "type": "string",
+#           "description": "optional: url to the document preview (only included in submission endpoints)"
 #         }
 #       }
 #     }
