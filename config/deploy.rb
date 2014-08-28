@@ -12,8 +12,8 @@ set :rails_env, "production"
 set :linked_dirs, %w{log tmp/pids public/system}
 #set :log_level, :info
 
-set :bundle_path, "/mnt/data/gems"
-set :bundle_without, 'sqlite'
+set :bundle_path, "vendor/bundle"
+set :bundle_without, nil
 set :bundle_flags,  ""
 
 set :ssh_options, {
