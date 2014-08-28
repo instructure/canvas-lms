@@ -130,6 +130,18 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  def external_tools_display_hashes(type)
+    tools = ContextExternalTool.all_tools_for(@context, :type => type,
+      :root_account => @domain_root_account, :current_user => @current_user)
+    tools.map do |tool|
+      {
+          :title => tool.label_for(type),
+          :icon_url => tool.extension_setting(type, :icon_url),
+          :base_url => course_external_tool_path(@context, tool, :launch_type => type)
+      }
+    end
+  end
+
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?('k12')
   end

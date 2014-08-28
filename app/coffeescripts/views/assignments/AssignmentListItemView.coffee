@@ -143,6 +143,10 @@ define [
         data.spanWidth      = 'span4'
         data.alignTextClass = 'align-right'
 
+      data.assignment_menu_tools = ENV.assignment_menu_tools
+      _.each data.assignment_menu_tools, (tool) =>
+        tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
+
       if modules = @model.get('modules')
         moduleName = modules[0]
         has_modules = modules.length > 0

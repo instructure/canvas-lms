@@ -101,6 +101,9 @@ class Quizzes::QuizzesController < ApplicationController
           end
           @submissions_hash[s.quiz_id] = s
         end
+
+        js_env :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+
         log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
       end
     end
@@ -185,6 +188,9 @@ class Quizzes::QuizzesController < ApplicationController
              :CONTEXT_ACTION_SOURCE => :quizzes  }
       append_sis_data(hash)
       js_env(hash)
+
+      @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
+
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)

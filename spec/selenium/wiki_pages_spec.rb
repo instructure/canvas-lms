@@ -39,4 +39,42 @@ describe "Navigating to wiki pages" do
       f('#wiki_body').should_not be_nil
     end
   end
+
+  context "menu tools" do
+    before do
+      course_with_teacher_logged_in(:draft_state => true)
+      Account.default.enable_feature!(:lor_for_account)
+
+      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
+      @tool.save!
+
+      @wiki_page = @course.wiki.front_page
+      @wiki_page.workflow_state = 'active'; @wiki_page.save!
+    end
+
+    it "should show tool launch links in the gear for items on the index" do
+      get "/courses/#{@course.id}/pages"
+      wait_for_ajaximations
+
+      gear = f(".collectionViewItems tr .al-trigger")
+      gear.click
+      link = f(".collectionViewItems tr li a.menu_tool_link")
+      link.should be_displayed
+      link.text.should match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
+      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+    end
+
+    it "should show tool launch links in the gear for items on the show page" do
+      get "/courses/#{@course.id}/pages/#{@wiki_page.url}"
+      wait_for_ajaximations
+
+      gear = f("#wiki_page_show .al-trigger")
+      gear.click
+      link = f("#wiki_page_show .al-options li a.menu_tool_link")
+      link.should be_displayed
+      link.text.should match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
+      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+    end
+  end
 end

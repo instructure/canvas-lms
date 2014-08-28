@@ -48,6 +48,14 @@
             {{#if CAN.READ_REVISIONS}}
               <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
             {{/if}}
+              {{#each wiki_page_menu_tools}}
+              <li role="presentation">
+                <a class="menu_tool_link" href="{{url}}">
+                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                  {{title}}
+                </a>
+              </li>
+              {{/each}}
             </ul>
           </div>
         {{/if}}

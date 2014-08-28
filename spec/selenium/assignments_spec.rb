@@ -575,5 +575,42 @@ describe "assignments" do
         end
       end
     end
+
+    context "menu tools" do
+      before do
+        course_with_teacher_logged_in(:draft_state => true)
+        Account.default.enable_feature!(:lor_for_account)
+
+        @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool.assignment_menu = {:url => "http://www.example.com", :text => "Export Assignment"}
+        @tool.save!
+
+        @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
+      end
+
+      it "should show tool launch links in the gear for items on the index" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        gear = f("#assignment_#{@assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{@assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
+      end
+
+      it "should show tool launch links in the gear for items on the show page" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        gear = f("#assignment_show .al-trigger")
+        gear.click
+        link = f("#assignment_show li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
+      end
+    end
   end
 end

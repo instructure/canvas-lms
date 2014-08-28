@@ -54,7 +54,9 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :assignment_menu_tools => external_tools_display_hashes(:assignment_menu)
       })
+
 
       respond_to do |format|
         format.html do
@@ -160,6 +162,8 @@ class AssignmentsController < ApplicationController
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
+      @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz

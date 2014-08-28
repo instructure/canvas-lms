@@ -105,6 +105,14 @@
             >{{#t "move"}}Move To…{{/t}}</a>
           </li>
           {{/if}}
+          {{#each assignment_menu_tools}}
+          <li role="presentation">
+            <a class="menu_tool_link" href="{{url}}">
+              {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+              {{title}}
+            </a>
+          </li>
+          {{/each}}
         </ul>
       </div>
     </div>

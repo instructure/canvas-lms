@@ -74,6 +74,10 @@ define [
 
     toJSON: ->
       base = _.extend(@model.toJSON(), @options)
+      base.quiz_menu_tools = ENV.quiz_menu_tools
+      _.each base.quiz_menu_tools, (tool) =>
+        tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
+
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")
         base.link_text = @messages.multipleDates

@@ -176,6 +176,7 @@ class WikiPagesController < ApplicationController
     end
 
     if authorized_action(@context.wiki, @current_user, :read)
+      js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       @padless = true
     end
   end
@@ -206,6 +207,8 @@ class WikiPagesController < ApplicationController
       add_crumb(@page.title)
       @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, 'wiki', @wiki)
+
+      js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
 
       @padless = true
       render
