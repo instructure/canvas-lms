@@ -339,7 +339,7 @@ end
 # Make sure extensions will work with dynamically created shards
 if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
     ActiveRecord::Base.connection.schema_search_path == 'public'
-  %w{pg_trgm pg_collkey}.each do |extension|
+  Canvas.possible_postgres_extensions.each do |extension|
     current_schema = ActiveRecord::Base.connection.select_value("SELECT nspname FROM pg_extension INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid WHERE extname='#{extension}'")
     if current_schema && current_schema == 'public'
       ActiveRecord::Base.connection.execute("ALTER EXTENSION #{extension} SET SCHEMA pg_catalog") rescue nil

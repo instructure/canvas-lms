@@ -14,6 +14,11 @@ module Canvas
   # Set this to :raise to raise an exception.
   mattr_accessor :dynamic_finder_nil_arguments_error
 
+  # defines extensions that could possibly be used, so that specs can move them to the
+  # correct schemas for sharding
+  mattr_accessor :possible_postgres_extensions
+  self.possible_postgres_extensions = [:pg_collkey, :pg_trgm]
+
   def self.active_record_foreign_key_check(name, type, options)
     if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
       raise ArgumentError, "All foreign keys need to be 8-byte integers. #{name} looks like a foreign key to me, please add this option: `:limit => 8`"
