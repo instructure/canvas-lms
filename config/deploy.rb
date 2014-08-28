@@ -1,4 +1,3 @@
-# config valid only for Capistrano 3.1
 lock '3.2.1'
 
 set :application,   'canvas'
@@ -8,9 +7,9 @@ set :branch,        ENV['branch'] || 'sfu-deploy'
 set :user,          'canvasuser'
 set :deploy_to,     '/var/rails/canvas'
 set :stats_server,  'stats.tier2.sfu.ca'
-set :rails_env, "production"
-set :linked_dirs, %w{log tmp/pids public/system}
-#set :log_level, :info
+set :rails_env,     'production'
+set :linked_dirs,   %w{log tmp/pids public/system}
+# set :log_level,     :info
 
 set :bundle_path, "vendor/bundle"
 set :bundle_without, nil
