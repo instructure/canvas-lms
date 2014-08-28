@@ -739,9 +739,21 @@ class Account < ActiveRecord::Base
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user.global_id] ||= Rails.cache.fetch("all_site_admin_account_users#{rand(Account.all_site_admin_account_users_copies)}") do
-          self.account_users.all
-        end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
+        @account_users_cache[user.global_id] ||= begin
+          all_site_admin_account_users_hash = Rails.cache.fetch("all_site_admin_account_users2:#{rand(Account.all_site_admin_account_users_copies)}") do
+            # this is a plain ruby hash to keep the cached portion as small as possible
+            self.account_users.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.membership_type]; result }
+          end
+          (all_site_admin_account_users_hash[user.id] || []).map do |(id, type)|
+            au = AccountUser.new
+            au.id = id
+            au.account = Account.site_admin
+            au.user = user
+            au.membership_type = type
+            au.readonly!
+            au
+          end
+        end
       end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
