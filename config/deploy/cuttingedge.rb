@@ -5,3 +5,7 @@ set :canvas_url, 'https://canvas-edge.sfu.ca'
 
 set :rails_env, "production"
 set :branch, ENV['branch'] || 'edge'
+
+set :default_env, {
+  'PATH' => '/usr/pgsql-9.1/bin:$PATH'
+}
