@@ -10,6 +10,7 @@ set :stats_server,  'stats.tier2.sfu.ca'
 set :rails_env,     'production'
 set :linked_dirs,   %w{log tmp/pids public/system}
 # set :log_level,     :info
+set :pty,           true
 
 set :bundle_path, "vendor/bundle"
 set :bundle_without, nil
