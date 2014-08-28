@@ -2,7 +2,7 @@ define(function(require) {
   var React = require('react');
   var d3 = require('d3');
   var $ = require('canvas_packages/jquery');
-  var Tooltip = require('canvas_packages/tooltip');
+  var jQuery_qTip = require('qtip');
 
   var makeInspectable = function(selector, view) {
     selector
@@ -46,12 +46,32 @@ define(function(require) {
         var node = this.refs.inspector.getDOMNode();
 
         this.inspectorNode = node;
-        this.inspector = $(node).tooltip({
-          tooltipClass: 'center bottom vertical',
-          show: false,
-          hide: false,
-          items: $(node)
-        }).data('tooltip');
+        this.inspector = $(node).qtip({
+          prerender: false,
+          overwrite: false,
+          style: {
+            def: true
+          },
+          show: {
+            effect: false,
+            event: false
+          },
+          hide: {
+            effect: false,
+            event: false
+          },
+          content: {
+            text: ''
+          },
+          position: {
+            my: 'bottom center',
+            at: 'top center',
+            viewport: true,
+            adjust: {
+              method: 'flip'
+            }
+          }
+        }).qtip('api');
 
         return this.inspector;
       },
@@ -60,6 +80,7 @@ define(function(require) {
         var inspector, contentNode;
         var itemId = datapoint.id;
         var tooltipOptions = this.tooltipOptions || DEFAULT_TOOLTIP_OPTIONS;
+        var targetNode = d3.event.target;
 
         if (this.props.onInspect) {
           contentNode = this.props.onInspect(itemId);
@@ -70,23 +91,13 @@ define(function(require) {
         }
 
         inspector = this.inspector || this.buildInspector();
-        inspector.option({
-          content: function() {
-            return $(contentNode).clone();
-          },
-          position: {
-            my: tooltipOptions.position.my,
-            at: tooltipOptions.position.at,
-            of: d3.event.target,
-            collision: 'fit fit'
-          }
-        });
-
-        inspector.element.mouseover();
+        inspector.set('content.text', $(contentNode).clone());
+        inspector.set('position.target', targetNode);
+        inspector.show();
       },
 
       stopInspecting: function() {
-        this.inspector.element.mouseout();
+        this.inspector.hide();
       }
     }
   };

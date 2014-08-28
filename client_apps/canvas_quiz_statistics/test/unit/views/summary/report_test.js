@@ -43,7 +43,6 @@ define(function(require) {
 
     it('should mount a Status inside a tooltip', function() {
       var $node, $target;
-      var onTooltipOpen = jasmine.createSpy();
 
       setProps({
         generatable: true,
@@ -53,13 +52,7 @@ define(function(require) {
         }
       });
 
-      $node = $(subject.getDOMNode());
-      $node.on('tooltipopen', onTooltipOpen);
-      $target = $(find('button'));
-      $target.mouseover();
-
-      expect(onTooltipOpen).toHaveBeenCalled();
-      expect($('.ui-tooltip-content .quiz-report-status')[0]).toExist();
+      expect($('.qtip .quiz-report-status')[0]).toExist();
     });
   });
 });

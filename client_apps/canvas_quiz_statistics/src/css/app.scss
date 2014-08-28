@@ -3,6 +3,8 @@
 @import "./variables";
 @import "./summary_statistics";
 @import "./question_statistics";
+@import "../../vendor/css/jquery.qtip";
+@import "./ext/qtip";
 
 #canvas-quiz-statistics {
   border-top: 1px solid #CAD0D7;

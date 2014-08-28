@@ -3,6 +3,7 @@ define(function(require) {
   var $ = require('canvas_packages/jquery');
   var Adapter = require('../core/adapter');
   var K = require('../constants');
+  var config = require('../config');
 
   var fetchProgress = function(url) {
     return Adapter.request({
@@ -37,7 +38,7 @@ define(function(require) {
         } else if (data.workflowState === K.PROGRESS_COMPLETE) {
           service.resolve();
         } else {
-          poller = setTimeout(poll, options.interval || 1000);
+          poller = setTimeout(poll, options.interval || config.pollingFrequency);
         }
       }, function() {
         service.reject();

@@ -55,9 +55,9 @@ define(function(require) {
               {I18n.t('quiz_summary', 'Quiz Summary')}
             </h3>
 
-            <aside className="pull-right">
+            <div className="pull-right">
               {this.props.quizReports.map(this.renderReport)}
-            </aside>
+            </div>
           </header>
 
           <table className="text-left">

@@ -30,8 +30,8 @@ define(function(require) {
 
     createChart: function(node, props) {
       var svg, width, height, x, y, xAxis;
-      var heighest;
-      var visibilityThreshold
+      var highest;
+      var visibilityThreshold;
       var data = this.chartData(props);
 
       width = WIDTH - MARGIN_L - MARGIN_R;
