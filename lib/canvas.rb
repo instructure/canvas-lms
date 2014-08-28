@@ -145,11 +145,12 @@ module Canvas
   end
 
   def self.revision
-    return @revision unless @revision.nil?
-    if File.file?(Rails.root+"VERSION")
-      @revision = File.readlines(Rails.root+"VERSION").first.try(:strip)
+    return @revision if defined?(@revision)
+    @revision = if File.file?(Rails.root+"VERSION")
+      File.readlines(Rails.root+"VERSION").first.try(:strip)
+    else
+      nil
     end
-    @revision ||= I18n.t(:canvas_revision_unknown, "Unknown")
   end
 
   # protection against calling external services that could timeout or misbehave.
