@@ -47,7 +47,7 @@ describe "external tool assignments" do
   end
 
   it "should allow editing" do
-    a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
+    a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool', :due_at => Time.zone.now + 1.days)
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
 

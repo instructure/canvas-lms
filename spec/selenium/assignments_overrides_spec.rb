@@ -7,9 +7,9 @@ describe "assignment groups" do
 
   context "as a teacher" do
 
-    let(:due_at) { Time.zone.now }
-    let(:unlock_at) { Time.zone.now - 1.day }
-    let(:lock_at) { Time.zone.now + 4.days }
+    let(:due_at) { Time.zone.now + 3.days}
+    let(:unlock_at) { Time.zone.now + 1.day}
+    let(:lock_at) { Time.zone.now + 5.days }
 
     before(:each) do
       make_full_screen
@@ -64,8 +64,8 @@ describe "assignment groups" do
     it "should allow setting overrides" do
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
-      default_section_due = Time.zone.now + 1.days
-      other_section_due = Time.zone.now + 2.days
+      default_section_due = Time.zone.now + 2.days
+      other_section_due = Time.zone.now + 3.days
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)

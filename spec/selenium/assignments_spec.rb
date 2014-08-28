@@ -154,6 +154,40 @@ describe "assignments" do
       f('h1.title').should include_text(assignment_name)
     end
 
+    it "should allow a due date if no course start and end date is set" do
+      #course.end_at already nil by default
+      @course.start_at = nil
+      assignment_name = 'first assignment'
+      @course.assignment_groups.create!(:name => "first group")
+      @course.assignment_groups.create!(:name => "second group")
+      get "/courses/#{@course.id}/assignments"
+
+      #create assignment
+      click_option('#right-side select.assignment_groups_select', 'second group')
+      f('#right-side .add_assignment_link').click
+      wait_for_ajaximations
+      f('#assignment_title').send_keys(assignment_name)
+      f('.ui-datepicker-trigger').click
+      wait_for_ajaximations
+      datepicker = datepicker_next
+      datepicker.find_element(:css, '.ui-datepicker-ok').click
+      wait_for_ajaximations
+      submit_form('#add_assignment_form')
+
+      #make sure assignment was added to correct assignment group
+      wait_for_ajaximations
+      keep_trying_until do
+        first_group = f('#groups .assignment_group:nth-child(2)')
+        first_group.should include_text('second group')
+        first_group.should include_text(assignment_name)
+    end
+
+      #click on assignment link
+      f("#assignment_#{Assignment.last.id} .title").click
+      wait_for_ajaximations
+      f('h1.title').should include_text(assignment_name)
+    end
+
     %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
       it "should create assignment with #{grading_option} grading option" do
         assignment_title = 'grading options assignment'

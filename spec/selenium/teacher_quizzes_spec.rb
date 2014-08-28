@@ -114,7 +114,6 @@ describe "quizzes" do
       f('#quiz_details').should be_displayed
     end
 
-    
     it "should republish on save" do
       Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
@@ -245,7 +244,6 @@ describe "quizzes" do
       f('.attempts_left').text.should == '3'
     end
 
-    
     it "should indicate when it was last saved" do
       take_quiz do
         indicator = f('#last_saved_indicator')
@@ -551,8 +549,8 @@ describe "quizzes" do
       @quiz = create_quiz_with_default_due_dates
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
-      default_section_due = Time.zone.now + 1.days
-      other_section_due = Time.zone.now + 2.days
+      default_section_due = Time.zone.now + 2.days
+      other_section_due = Time.zone.now + 3.days
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       wait_for_ajaximations
       select_first_override_section(default_section.name)
