@@ -93,7 +93,6 @@ describe "accounts/settings.html.erb" do
       view_context(@account, admin)
       render
       response.should have_tag("input#account_settings_global_includes")
-      response.should have_tag("input#account_settings_enable_scheduler")
       response.should have_tag("input#account_settings_show_scheduler")
       response.should have_tag("input#account_settings_enable_profiles")
     end
@@ -103,7 +102,6 @@ describe "accounts/settings.html.erb" do
       view_context(@account, admin)
       render
       response.should_not have_tag("input#account_settings_global_includes")
-      response.should_not have_tag("input#account_settings_enable_scheduler")
       response.should_not have_tag("input#account_settings_show_scheduler")
       response.should_not have_tag("input#account_settings_enable_profiles")
     end
@@ -149,5 +147,18 @@ describe "accounts/settings.html.erb" do
       end
     end
   end
-  
+
+  context "admins" do
+    it "should not show add admin button if don't have permission to any roles" do
+      account_admin_user_with_role_changes(
+          :account => Account.site_admin,
+          :membership_type => 'CustomAdmin',
+          :role_changes => {manage_account_memberships: true})
+      view_context(Account.default, @user)
+      assigns[:account] = Account.default
+      assigns[:announcements] = []
+      render
+      response.should_not have_tag '#enroll_users_form'
+    end
+  end
 end

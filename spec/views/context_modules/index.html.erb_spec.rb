@@ -42,6 +42,26 @@ describe "/context_modules/index" do
     page.css("#context_module_item_#{content_tag.id}").length.should == 1
   end
 
+  it "should show unpublished content_tags" do
+    course_with_teacher(:active_all => true)
+    wiki_page = wiki_page_model(:course => @course)
+    wiki_page.workflow_state = 'unpublished'
+    wiki_page.save!
+
+    context_module = @course.context_modules.create!
+    content_tag = context_module.add_item(:type => 'wiki_page', :id => wiki_page.id)
+    content_tag.workflow_state.should == 'unpublished'
+
+    view_context(@course, @user)
+    assigns[:modules] = @course.context_modules.active
+    assigns[:collapsed_modules] = []
+    render 'context_modules/index'
+
+    response.should_not be_nil
+    page = Nokogiri('<document>' + response.body + '</document>')
+    page.css("#context_module_item_#{content_tag.id}").length.should == 1
+  end
+
   it "should not show deleted content_tags" do
     course
     context_module = @course.context_modules.create!

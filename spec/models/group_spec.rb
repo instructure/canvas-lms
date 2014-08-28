@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Group do
-  
-  before do
+
+  before :once do
     course_model
     group_model(:context => @course)
   end
@@ -30,11 +30,11 @@ describe Group do
       group_model
     end
   end
-  
+
   it "should have a wiki" do
     @group.wiki.should_not be_nil
   end
-  
+
   it "should be private by default" do
     @group.is_public.should be_false
   end
@@ -54,7 +54,13 @@ describe Group do
     @group.save.should be_false
     @group.reload.is_public.should be_true
   end
-  
+
+  it 'delegates time_zone through to its context' do
+    zone = ActiveSupport::TimeZone["America/Denver"]
+    @course.time_zone = zone
+    @group.time_zone.should =~ /Mountain Time/
+  end
+
   context "#peer_groups" do
     it "should find all peer groups" do
       context = course_model
@@ -70,7 +76,7 @@ describe Group do
       group1.peer_groups.should_not be_include(group1)
       group1.peer_groups.should_not be_include(group4)
     end
-    
+
     it "should not find peer groups for student organized groups" do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
@@ -79,19 +85,19 @@ describe Group do
       group1.peer_groups.should be_empty
     end
   end
-  
+
   context "atom" do
     it "should have an atom name as it's own name" do
       group_model(:name => 'some unique name')
       @group.to_atom.title.should eql('some unique name')
     end
-    
+
     it "should have a link to itself" do
       link = @group.to_atom.links.first.to_s
       link.should eql("/groups/#{@group.id}")
     end
   end
-  
+
   context "add_user" do
     it "should be able to add a person to the group" do
       user_model
@@ -99,7 +105,7 @@ describe Group do
       @group.add_user(@user)
       @group.users.should be_include(@user)
     end
-    
+
     it "shouldn't be able to add a person to the group twice" do
       user_model
       pseudonym_model(:user_id => @user.id)
@@ -111,7 +117,7 @@ describe Group do
       @group.users.should be_include(@user)
       @group.users.count.should == 1
     end
-    
+
     it "should remove that user from peer groups" do
       context = course_model
       group_category = context.group_categories.create!(:name => "worldCup")
@@ -121,7 +127,7 @@ describe Group do
       pseudonym_model(:user_id => @user.id)
       group1.add_user(@user)
       group1.users.should be_include(@user)
-      
+
       group2.add_user(@user)
       group2.users.should be_include(@user)
       group1.reload
@@ -176,12 +182,12 @@ describe Group do
     course = e.context
     teacher = e.user
     group = course.groups.create
-    course.grants_right?(teacher, nil, :manage_groups).should be_true
-    group.grants_right?(teacher, nil, :manage_wiki).should be_true
-    group.grants_right?(teacher, nil, :manage_files).should be_true
-    group.wiki.grants_right?(teacher, nil, :update_page).should be_true
+    course.grants_right?(teacher, :manage_groups).should be_true
+    group.grants_right?(teacher, :manage_wiki).should be_true
+    group.grants_right?(teacher, :manage_files).should be_true
+    group.wiki.grants_right?(teacher, :update_page).should be_true
     attachment = group.attachments.build
-    attachment.grants_right?(teacher, nil, :create).should be_true
+    attachment.grants_right?(teacher, :create).should be_true
   end
 
   it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
@@ -189,8 +195,8 @@ describe Group do
     student_in_course
     group = @course.groups.create
 
-    group.grants_right?(@teacher, nil, :moderate_forum).should be_true
-    group.grants_right?(@student, nil, :moderate_forum).should be_false
+    group.grants_right?(@teacher, :moderate_forum).should be_true
+    group.grants_right?(@student, :moderate_forum).should be_false
   end
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
@@ -199,18 +205,18 @@ describe Group do
 
     # default join_level == 'invitation_only' and default category is not self-signup
     group = @course.groups.create
-    group.grants_right?(@student, nil, :read_roster).should be_false
+    group.grants_right?(@student, :read_roster).should be_false
 
     # join_level allows requesting group membership
     group = @course.groups.create(:join_level => 'parent_context_request')
-    group.grants_right?(@student, nil, :read_roster).should be_true
+    group.grants_right?(@student, :read_roster).should be_true
 
     # category is self-signup
-    category = @course.group_categories.build
-    category.configure_self_signup(true, false)
+    category = @course.group_categories.build(name: 'category name')
+    category.self_signup = 'enabled'
     category.save
     group = @course.groups.create(:group_category => category)
-    group.grants_right?(@student, nil, :read_roster).should be_true
+    group.grants_right?(@student, :read_roster).should be_true
   end
 
   describe "root account" do
@@ -222,7 +228,7 @@ describe Group do
 
       new_root_acct = account_model
       new_sub_acct = new_root_acct.sub_accounts.create!(:name => 'sub acct')
-      group.account = new_sub_acct
+      group.context = new_sub_acct
       group.save!
       group.account.should == new_sub_acct
       group.root_account.should == new_root_acct
@@ -320,6 +326,22 @@ describe Group do
       @group.should be_full
     end
 
+    it "returns true when max_membership has been met" do
+      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category.group_limit = 0
+      @group.max_membership = 1
+      @group.add_user user_model, 'accepted'
+      @group.should be_full
+    end
+
+    it "returns false when max_membership has not been met" do
+      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category.group_limit = 0
+      @group.max_membership = 2
+      @group.add_user user_model, 'accepted'
+      @group.should_not be_full
+    end
+
     it "returns false when category group_limit has not been met" do
       # no category
       @group.should_not be_full
@@ -411,24 +433,6 @@ describe Group do
     group.group_category.should == group_category
   end
 
-  context "import_from_migration" do
-    it "should respect group_category from the hash" do
-      course_with_teacher
-      group = @course.groups.build
-      @course.imported_migration_items = []
-      Group.import_from_migration({:group_category => "random category"}, @course, group)
-      group.group_category.name.should == "random category"
-    end
-
-    it "should default group_category to imported if not in the hash" do
-      course_with_teacher
-      group = @course.groups.build
-      @course.imported_migration_items = []
-      Group.import_from_migration({}, @course, group)
-      group.group_category.should == GroupCategory.imported_for(@course)
-    end
-  end
-
   it "as_json should include group_category" do
     course()
     gc = group_category(name: "Something")
@@ -513,7 +517,7 @@ describe Group do
   end
 
   context "tabs_available" do
-    before do
+    before :once do
       course_with_teacher
       @teacher = @user
       @group = group(:group_context => @course)
@@ -567,7 +571,7 @@ describe Group do
   end
 
   describe "#feature_enabled?" do
-    before(:each) do
+    before(:once) do
       course_with_teacher(active_all: true)
       @course.root_account.allow_feature!(:draft_state)
     end
@@ -580,7 +584,7 @@ describe Group do
     end
 
     context "an account with :draft_state enabled" do
-      before do
+      before :once do
         @course.root_account.enable_feature!(:draft_state)
       end
 
@@ -591,6 +595,21 @@ describe Group do
       it "should pass its setting on to account groups" do
         group(group_context: @course.root_account).should be_feature_enabled(:draft_state)
       end
+    end
+  end
+
+  describe "#update_max_membership_from_group_category" do
+    it "should set max_membership if there is a group category" do
+      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category.group_limit = 1
+      @group.update_max_membership_from_group_category
+      @group.max_membership.should == 1
+    end
+
+    it "should do nothing if there is no group category" do
+      @group.max_membership.should be_nil
+      @group.update_max_membership_from_group_category
+      @group.max_membership.should be_nil
     end
   end
 end

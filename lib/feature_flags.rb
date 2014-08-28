@@ -99,7 +99,7 @@ module FeatureFlags
     is_site_admin = self.is_a?(Account) && self.site_admin?
 
     # inherit the feature definition as a default unless it's a hidden feature
-    retval = feature_def unless feature_def.hidden? && !is_site_admin && !(is_root_account && override_hidden)
+    retval = feature_def unless feature_def.hidden? && !is_site_admin && !override_hidden
 
     @feature_flag_cache ||= {}
     return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature)
@@ -117,11 +117,11 @@ module FeatureFlags
 
     # if this feature requires root account opt-in, reject a default or site admin flag
     # if the context is beneath a root account
-    if retval && retval.allowed? && feature_def.root_opt_in && !is_site_admin &&
+    if retval && (retval.allowed? || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
         (retval.default? || retval.context_type == 'Account' && retval.context_id == Account.site_admin.id)
       if is_root_account
         # create a virtual feature flag in "off" state
-        retval = self.feature_flags.build feature: feature, state: 'off'
+        retval = self.feature_flags.build feature: feature, state: 'off' unless retval.hidden?
       else
         # the feature doesn't exist beneath the root account until the root account opts in
         return @feature_flag_cache[feature] = nil

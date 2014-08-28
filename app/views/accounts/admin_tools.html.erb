@@ -1,7 +1,12 @@
-<% 
+<%
   @active_tab = "admin_tools"
   content_for :page_title, t(:page_title, "Admin Tools for %{account}", :account => @context.name)
   add_crumb t(:admin_tools_cumb, "Admin tools")
   js_bundle :account_admin_tools
   jammit_css :account_admin_tools
 %>
+
+<h1><%= t(:admin_tools_title, "Admin Tools") %></h1>
+
+<div id="admin-tools-app">
+</div>

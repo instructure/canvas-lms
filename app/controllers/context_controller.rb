@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,9 +19,9 @@
 class ContextController < ApplicationController
   include SearchHelper
 
-  before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
-  before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
-  before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :discussion_replies]
+  before_filter :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
+  before_filter :require_user, :only => [:inbox, :report_avatar_image]
+  before_filter :reject_student_view_student, :only => [:inbox]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
   def create_media_object
@@ -30,11 +30,11 @@ class ContextController < ApplicationController
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
         self.extend TextHelper
         @media_object = @context.media_objects.find_or_initialize_by_media_id_and_media_type(params[:id], params[:type])
-        @media_object.title = truncate_text(params[:title], :max_length => 255) if params[:title]
+        @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
       render :json => @media_object
@@ -46,15 +46,17 @@ class ContextController < ApplicationController
     @show_left_side = false
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first
+    js_env(MEDIA_OBJECT_ID: params[:id],
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
     render
   end
 
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
     mo.viewed! if mo
-    config = Kaltura::ClientV3.config
+    config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id])
+      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
       render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -70,9 +72,9 @@ class ContextController < ApplicationController
     width = params[:width]
     height = params[:height]
     type = (params[:type].presence || 2).to_i
-    config = Kaltura::ClientV3.config
+    config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
+      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
                                                       :width => width,
                                                       :height => height,
                                                       :type => type),
@@ -94,7 +96,7 @@ class ContextController < ApplicationController
     request_params.each do |k, v|
       str += k.to_s + v.to_s
     end
-    hash = Digest::MD5.hexdigest(Kaltura::ClientV3.config['secret_key'] + str)
+    hash = Digest::MD5.hexdigest(CanvasKaltura::ClientV3.config['secret_key'] + str)
     if hash == params[:sig]
       notifications = {}
       if params[:multi_notification] != 'true'
@@ -174,80 +176,8 @@ class ContextController < ApplicationController
     render :layout => false
   end
 
-  def inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
-    if !@item
-      flash[:error] = t(:message_removed, "The message you were trying to view has been removed")
-      redirect_to inbox_url
-      return
-    else
-      @item.mark_as_read
-      @asset = @item.asset
-    end
-    respond_to do |format|
-      format.html do
-        if @asset.is_a?(DiscussionEntry)
-          redirect_to named_context_url(@asset.discussion_topic.context, :context_discussion_topic_url, @asset.discussion_topic_id, :discussion_entry_id => @asset.id)
-        elsif @asset.is_a?(SubmissionComment)
-          redirect_to named_context_url(@asset.submission.context, :context_assignment_submission_url, @asset.submission.assignment_id, @asset.submission.user_id)
-        elsif @asset.nil?
-          flash[:notice] = t(:message_deleted, "This message has been deleted")
-          redirect_to inbox_url
-        else
-          flash[:notice] = t(:bad_message, "This message could not be displayed")
-          redirect_to inbox_url
-        end
-      end
-      format.json do
-        json_params = {
-          :include => [:attachments, :users],
-          :methods => :formatted_body,
-          :user_content => %w(formatted_body),
-        }
-        @asset[:is_student] = !!@item.context.enrollments.all_student.find_by_user_id(@item.sender_id) rescue false
-        render :json => @asset.as_json(json_params)
-      end
-    end
-  end
-
-  def destroy_inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
-    @asset = @item && @item.asset
-    @item && @item.destroy
-    render :json => @item
-  end
-
   def inbox
     redirect_to conversations_url, :status => :moved_permanently
-  end
-
-  def discussion_replies
-    add_crumb(t('#crumb.conversations', "Conversations"), conversations_url)
-    add_crumb(t('#crumb.discussion_replies', "Discussion Replies"), discussion_replies_url)
-    @messages = @current_user.inbox_items.active
-    log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
-    respond_to do |format|
-      format.html do
-        @messages = @messages.paginate(page: params[:page], per_page: 15)
-        render :action => :inbox
-      end
-      format.json do
-        @messages = Api.paginate(@messages, self, discussion_replies_url, default_per_page: 15)
-        render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) }
-      end
-    end
-  end
-
-  def mark_inbox_as_read
-    flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
-    if @current_user
-      InboxItem.where(:user_id => @current_user).update_all(:workflow_state => 'read')
-      User.where(:id => @current_user).update_all(:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0))
-    end
-    respond_to do |format|
-      format.html { redirect_to inbox_url }
-      format.json { render :json => {:marked_as_read => true} }
-    end
   end
 
   def roster
@@ -270,13 +200,14 @@ class ContextController < ApplicationController
         :permissions => {
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
-          :add_users => manage_students || manage_admins
+          :add_users => manage_students || manage_admins,
+          :read_reports => @context.grants_right?(@current_user, session, :read_reports)
         },
         :course => {
           :id => @context.id,
-          :completed => (completed = @context.completed?),
-          :soft_concluded => (soft_concluded = @context.soft_concluded?),
-          :concluded => completed || soft_concluded,
+          :completed => @context.completed?,
+          :soft_concluded => @context.soft_concluded?,
+          :concluded => @context.concluded?,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
           :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
@@ -297,9 +228,8 @@ class ContextController < ApplicationController
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
       @prior_users = @context.prior_users.
-        where(Enrollment.not_fake.proxy_options[:conditions]).
         select("users.*, NULL AS prior_enrollment").
-        by_top_enrollment.
+        by_top_enrollment.merge(Enrollment.not_fake).
         paginate(:page => params[:page], :per_page => 20)
 
       users = @prior_users.index_by(&:id)
@@ -320,11 +250,16 @@ class ContextController < ApplicationController
       @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
       @current_user.user_services.each{|s| @current_user_services[s.service] = s }
-      @services = UserService.for_user(@users.except(:select, :order)).sort_by{|s| @users_order_hash[s.user_id] || SortLast}
+      @services = UserService.for_user(@users.except(:select, :order)).sort_by{|s| @users_order_hash[s.user_id] || CanvasSort::Last}
       @services = @services.select{|service|
         !UserService.configured_service?(service.service) || feature_and_service_enabled?(service.service.to_sym)
       }
-      @services_hash = @services.to_a.clump_per{|s| s.service }
+      @services_hash = @services.to_a.inject({}) do |hash, item|
+        mapped = item.service
+        hash[mapped] ||= []
+        hash[mapped] << item
+        hash
+      end
     end
   end
 
@@ -335,6 +270,8 @@ class ContextController < ApplicationController
       respond_to do |format|
         format.html do
           @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+          js_env(context_url: context_url(@context, :context_user_usage_url, @user, :format => :json),
+                 accesses_total_pages: @accesses.total_pages)
         end
         format.json do
           @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
@@ -346,7 +283,17 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      user_id = Shard.relative_id_for(params[:id], @context.shard)
+      if params[:id] !~ Api::ID_REGEX
+        # todo stop generating an error report and fix the bad input
+        ErrorReport.log_error('invalid_user_id',
+                              {message: "invalid user_id in ContextController::roster_user",
+                               current_user_id: @current_user.id,
+                               current_user_name: @current_user.sortable_name}.
+                                merge(ErrorReport.useful_http_env_stuff_from_request(request))
+        )
+        raise ActiveRecord::RecordNotFound
+      end
+      user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(user_id)
         log_asset_access(@membership, "roster", "roster")

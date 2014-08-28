@@ -48,6 +48,9 @@ define [
             "label": "Khan Academy"
           },
           "homework_submission": null,
+          "migration_selection": null,
+          "course_home_sub_navigation": null,
+          "course_settings_sub_navigation": null,
           "icon_url": "https://www.edu-apps.org/tools/khan_academy/icon.png"
         }
       )

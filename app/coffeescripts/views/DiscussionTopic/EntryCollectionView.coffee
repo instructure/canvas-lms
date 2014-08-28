@@ -1,11 +1,12 @@
 define [
   'i18n!discussions'
+  'jquery'
   'compiled/arr/walk'
   'Backbone'
   'jst/discussions/EntryCollectionView'
   'jst/discussions/entryStats'
   'compiled/views/DiscussionTopic/EntryView'
-], (I18n, walk, {View}, template, entryStats, EntryView) ->
+], (I18n, $, walk, {View}, template, entryStats, EntryView) ->
 
   class EntryCollectionView extends View
 
@@ -68,10 +69,14 @@ define [
       @nestEntries()
 
     nestEntries: ->
-      $('.entry_content[data-should-position]').each ->
+      $('.entry-content[data-should-position]').each ->
         $el    = $(this)
-        offset = ($el.parents('li.entry').length - 1) * 30
+        level = $el.parents('li.entry').length
+        offset = (level - 1) * 30
         $el.css('padding-left', offset).removeAttr('data-should-position')
+        $el.find('.discussion-title').attr
+          'role': 'heading'
+          'aria-level': level + 1
 
     addNewView: (view) ->
       view.model.set 'new', false

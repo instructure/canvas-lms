@@ -5,13 +5,21 @@ class ConversationBatch < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_conversation_message, :class_name => 'ConversationMessage'
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :workflow_state, :user_id, :recipient_ids, :root_conversation_message_id, :conversation_message_ids, :tags, :created_at, :updated_at, :context_type,
+    :context_id, :subject, :group, :generate_user_note
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :root_conversation_message, :context]
 
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 
   validates_presence_of :user_id, :workflow_state, :root_conversation_message_id
 
-  scope :in_progress, where(:workflow_state => ['created', 'sending'])
+  scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
 
   attr_accessible
   attr_accessor :mode
@@ -32,9 +40,9 @@ class ConversationBatch < ActiveRecord::Base
           conversation = user.initiate_conversation([user_map[id]], !is_group,
             subject: subject, context_type: context_type, context_id: context_id)
           @conversations << conversation
-          message = conversation.add_message(root_conversation_message.clone,
-                                             update_for_sender: false,
-                                             tags: tags)
+          message = root_conversation_message.clone
+          message.generate_user_note = self.generate_user_note
+          conversation.add_message(message, update_for_sender: false, tags: tags)
           conversation_message_ids << message.id
         end
         # update it in chunks, not on every message
@@ -132,6 +140,7 @@ class ConversationBatch < ActiveRecord::Base
     user_map = recipients.index_by(&:id)
     user_map[batch.user_id] = batch.user
     batch.user_map = user_map
+    batch.generate_user_note = root_message.generate_user_note
     batch.save!
     batch
   end

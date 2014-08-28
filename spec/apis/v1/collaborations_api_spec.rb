@@ -18,8 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CollaborationsController, :type => :integration do
-  before do
+describe CollaborationsController, type: :request do
+  before :once do
     PluginSetting.new(:name => 'etherpad', :settings => {}).save!
     course_with_teacher(:active_all => true)
     @members = (1..5).map do

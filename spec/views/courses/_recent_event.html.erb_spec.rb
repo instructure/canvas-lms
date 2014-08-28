@@ -50,7 +50,7 @@ describe "/courses/_recent_event" do
       @quiz.assignment.should_not be_nil
 
       @quiz_submission = @quiz.generate_submission(@user)
-      @quiz_submission.grade_submission
+      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
       @submission = @quiz_submission.submission
       Submission.any_instance.stubs(:score).returns(1234567890987654400)

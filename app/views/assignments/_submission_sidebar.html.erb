@@ -1,4 +1,10 @@
-<% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
+<% cache([
+  'submission_sidebar_render',
+  @current_user_submission,
+  Time.zone.utc_offset,
+  @current_user_submission.assigned_assessments.count,
+  @current_user_submission.assigned_assessments.incomplete.count
+].cache_key) do %>
 <div class="details">
   <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
   <% if @assignment.expects_submission? %>
@@ -19,12 +25,10 @@
       <% end %>
     </span>
     <br/>
-    
+
     <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class='forward'><%= t 'links.submission.details', "Submission Details" %></a><br/>
     <% if @current_user_submission.submission_type == "online_url" %>
       <a href="<%= @current_user_submission.url %>" target="_new" class='link'><%= t 'links.submission.view_original_page', "View the Original Page" %></a><br/>
-    <% elsif @current_user_submission.submission_type == "online_text_entry" %>
-      <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" target="_new" class='text-entry'><%= t 'links.submission.view_original_entry', "View the Original Entry" %></a><br/>
     <% elsif @current_user_submission.submission_type == "online_upload" %>
       <% @current_user_submission.attachments.each do |attachment| %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>" class='file-big'><%= t 'links.submission.download_attachment', "Download %{attachment_display_name}", :attachment_display_name => attachment.display_name %></a><br/>
@@ -47,9 +51,7 @@
       <ul class="unstyled_list" style="margin: 5px 10px 10px;">
         <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
-          <li><a <%= assessment.completed? ? "class='pass' title='#{t 'tooltips.finished', "finished"}'" : "class='warning' title='#{t 'tooltips.incomplete', "incomplete"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
-            <%= assessment.asset_user_name %>
-          </a></li>
+          <li><%= student_peer_review_link_for @context, @assignment, assessment %></li>
         <% end %>
       </ul>
     <% end %>

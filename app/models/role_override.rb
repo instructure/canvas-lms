@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,11 +17,15 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true # only Account now; we dropped Course level role overrides
+  belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
 
   attr_accessible :context, :permission, :enrollment_type, :enabled, :applies_to_self, :applies_to_descendants
+
+  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
+  EXPORTABLE_ASSOCIATIONS = [:context]
 
   validate :must_apply_to_something
 
@@ -495,6 +499,16 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [ 'AccountAdmin' ]
       },
+      :view_course_changes => {
+        :label => lambda { t('permissions.view_course_changes', "View Course Change Logs") },
+        :admin_tool => true,
+        :account_only => true,
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [ 'AccountAdmin' ]
+      },
       :view_notifications => {
         :label => lambda { t('permissions.view_notifications', "View notifications") },
         :admin_tool => true,
@@ -546,7 +560,6 @@ class RoleOverride < ActiveRecord::Base
       :read_reports => {
         :label => lambda { t('permissions.read_reports', "View usage reports for the course") },
         :available_to => [
-          'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
@@ -581,6 +594,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => [
           'AccountAdmin'
         ]
+      },
+      :manage_user_observers => {
+        :label => lambda { t('permissions.manage_user_observers', "Manage observers for users") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
       },
       :manage_alerts => {
         :label => lambda { t('permissions.manage_announcements', "Manage global announcements") },
@@ -749,7 +768,7 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.css_class_for(context, permission, base_role, custom_role=nil)
-    generated_permission = self.permission_for(context, permission, base_role, custom_role)
+    generated_permission = self.permission_for(context, context, permission, base_role, custom_role)
 
     css = []
     if generated_permission[:readonly]
@@ -764,11 +783,11 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.readonly_for(context, permission, base_role, custom_role=nil)
-    self.permission_for(context, permission, base_role, custom_role)[:readonly]
+    self.permission_for(context, context, permission, base_role, custom_role)[:readonly]
   end
 
   def self.title_for(context, permission, base_role, custom_role=nil)
-    generated_permission = self.permission_for(context, permission, base_role, custom_role)
+    generated_permission = self.permission_for(context, context, permission, base_role, custom_role)
     if generated_permission[:readonly]
       t 'tooltips.readonly', "you do not have permission to change this."
     else
@@ -777,11 +796,11 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.locked_for(context, permission, base_role, custom_role=nil)
-    self.permission_for(context, permission, base_role, custom_role)[:locked]
+    self.permission_for(context, context, permission, base_role, custom_role)[:locked]
   end
 
   def self.hidden_value_for(context, permission, base_role, custom_role=nil)
-    generated_permission = self.permission_for(context, permission, base_role, custom_role)
+    generated_permission = self.permission_for(context, context, permission, base_role, custom_role)
     if !generated_permission[:readonly] && generated_permission[:explicit]
       generated_permission[:enabled] ? 'checked' : 'unchecked'
     else
@@ -798,7 +817,7 @@ class RoleOverride < ActiveRecord::Base
     @cached_permissions = {}
   end
 
-  def self.permission_for(role_context, permission, base_role, custom_role=nil)
+  def self.permission_for(role_context, context, permission, base_role, custom_role=nil)
     base_role = 'StudentEnrollment' if base_role == 'StudentViewEnrollment'
     custom_role = nil if base_role == NO_PERMISSIONS_TYPE
     if custom_role && custom_role == 'AccountAdmin'
@@ -810,8 +829,8 @@ class RoleOverride < ActiveRecord::Base
     custom_role ||= base_role
 
     @cached_permissions ||= {}
-    key = [role_context.cache_key, role_context.global_id, permission.to_s, custom_role.to_s].join
-    permissionless_key = [role_context.cache_key, role_context.global_id, custom_role.to_s].join
+    key = [role_context.cache_key, role_context.global_id, context.cache_key, context.global_id, permission.to_s, custom_role.to_s].join
+    permissionless_key = [context.cache_key, context.global_id, custom_role.to_s].join
     return @cached_permissions[key] if @cached_permissions[key]
 
     if !self.known_role_types.include?(base_role)
@@ -821,7 +840,7 @@ class RoleOverride < ActiveRecord::Base
     # Determine if the permission is able to be used for the account. A non-setting is 'true'.
     # Execute linked proc if given.
     account_allows = !!(default_data[:account_allows].nil? || (default_data[:account_allows].respond_to?(:call) &&
-        default_data[:account_allows].call(role_context.root_account)))
+        default_data[:account_allows].call(context.root_account)))
     generated_permission = {
       :account_allows => account_allows,
       :permission =>  default_data,
@@ -847,32 +866,44 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin
       role_context.shard.activate do
-        account_ids = role_context.account_chain_ids
-        case_string = ""
-        account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).order("CASE #{case_string} ELSE 9999 END DESC")
-        overrides.group_by(&:permission).freeze
+        account_ids = context.account_chain_ids(include_site_admin: true).reverse
+        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).group_by(&:permission)
+        # every context has to be represented so that we can't miss role_context below
+        overrides.each_key do |permission|
+          overrides_by_account = overrides[permission].index_by { |override| [override.context_id, override.context.class.base_class.name] }
+          overrides[permission] = account_ids.map do |account_id|
+            overrides_by_account[[account_id, 'Account']] || RoleOverride.new { |ro| ro.context_id = account_id; ro.context_type = 'Account' }
+          end
+        end
+        overrides
       end
     end
 
-    # walk the overrides from most general (root account) to most specific (the role's account)
+    # walk the overrides from most general (site admin, root account) to most specific (the role's account)
     # and apply them; short-circuit once someone has locked it
     last_override = false
+    hit_role_context = false
     (overrides[permission.to_s] || []).each do |override|
       # set the flag that we have an override for the context we're on
-      last_override = override.context_id == role_context.id && override.context_type == role_context.class.base_class.name
+      last_override = override.context_id == context.id && override.context_type == context.class.base_class.name
 
-      generated_permission[:context_id] = override.context_id
+      generated_permission[:context_id] = override.context_id unless override.new_record?
       generated_permission[:locked] = override.locked?
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
       unless override.enabled.nil?
         generated_permission[:explicit] = true if last_override
-        generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
+        if hit_role_context
+          generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil
+        else
+          generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
+        end
       end
+      hit_role_context ||= override.context_id == role_context.id && override.context_type == role_context.class.base_class.name
 
       break if override.locked?
+      break if generated_permission[:enabled] && hit_role_context
     end
 
     # there was not an override matching this context, so do a half loop
@@ -888,7 +919,7 @@ class RoleOverride < ActiveRecord::Base
   # returns just the :enabled key of permission_for, adjusted for applying it to a certain
   # context
   def self.enabled_for?(role_context, context, permission, base_role, custom_role = nil)
-    permission = permission_for(role_context, permission, base_role, custom_role)
+    permission = permission_for(role_context, context, permission, base_role, custom_role)
     return [] unless permission[:enabled]
 
     # this override applies to self, and we are self; no adjustment necessary

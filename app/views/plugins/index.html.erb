@@ -1,8 +1,7 @@
 <% content_for :page_title do %><%= t :page_title, "Canvas Plugins" %><% end %>
 
-<% 
+<%
   add_crumb t('#crumbs.plugins', "Plugins")
-  jammit_css 'plugins'
 %>
 
 <span class="small pull-right">
@@ -37,7 +36,7 @@
         <td class='tag'><%= h plugin.tag %></td>
         <td class='website'>
           <% if plugin.website.present? %>
-            <a href="<%= plugin.website %>" class="icon-link"></a>
+            <a href="<%= plugin.website %>" class="icon-link not_external"></a>
           <% end %>
       </td>
         <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>

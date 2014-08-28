@@ -29,8 +29,8 @@ class TestUserApi
   end
 end
 
-describe "User Profile API", :type => :integration do
-  before do
+describe "User Profile API", type: :request do
+  before :once do
     @admin = account_admin_user
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
@@ -50,7 +50,7 @@ describe "User Profile API", :type => :integration do
     new_user = user(:name => 'new guy')
     @user = @me
     @course.enroll_user(new_user, 'ObserverEnrollment')
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
              :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
     json.should == {
@@ -59,11 +59,13 @@ describe "User Profile API", :type => :integration do
       'sortable_name' => 'guy, new',
       'short_name' => 'new guy',
       'login_id' => nil,
+      'integration_id' => nil,
       'primary_email' => nil,
       'title' => nil,
       'bio' => nil,
-      'avatar_url' => "https://secure.gravatar.com/avatar/000?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => new_user.gravatar_url,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
     }
 
     get("/courses/#{@course.id}/students")
@@ -77,13 +79,38 @@ describe "User Profile API", :type => :integration do
       'name' => 'User',
       'sortable_name' => 'User',
       'short_name' => 'User',
+      'integration_id' => nil,
       'primary_email' => 'nobody@example.com',
       'login_id' => 'nobody@example.com',
-      'avatar_url' => "https://secure.gravatar.com/avatar/8c5548eb0b2b80924f237953392df5e7?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => @admin.gravatar_url,
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
+    }
+  end
+
+  it 'should return the correct locale if not using the system default' do
+    @user = @student
+    @student.locale = 'es'
+    @student.save!
+    json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+    json.should == {
+      'id' => @student.id,
+      'name' => 'Student',
+      'sortable_name' => 'Student',
+      'short_name' => 'Student',
+      'integration_id' => nil,
+      'primary_email' => 'pvuser@example.com',
+      'login_id' => 'pvuser@example.com',
+      'avatar_url' => @student.gravatar_url,
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+      'title' => nil,
+      'bio' => nil,
+      'time_zone' => 'Etc/UTC',
+      'locale' => 'es'
     }
   end
 
@@ -96,13 +123,15 @@ describe "User Profile API", :type => :integration do
       'name' => 'Student',
       'sortable_name' => 'Student',
       'short_name' => 'Student',
+      'integration_id' => nil,
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "https://secure.gravatar.com/avatar/7f2ba69d483b221f7bea6145425a19c1?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => @student.gravatar_url,
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
     }
   end
 
@@ -118,11 +147,11 @@ describe "User Profile API", :type => :integration do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
              :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   context "user_services" do
-    before do
+    before :once do
       @student.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => false
       @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => true
     end

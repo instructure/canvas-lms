@@ -1,25 +1,25 @@
 <div class="rs-margin-lr rs-margin-top">
   <% if @context.is_a?(Course) %>
     <% if can_do(@context, @current_user, :read_roster) %>
-      <% sidebar_button context_url(@context, :context_groups_url),
+      <%= sidebar_button context_url(@context, :context_groups_url),
                         t('links.view_user_groups', 'View User Groups'),
                         'group' %>
     <% end %>
 
     <% if can_do(@context, @current_user, :manage_students && @context.enable_user_notes) %>
-      <% sidebar_button course_user_notes_path(@context),
+      <%= sidebar_button course_user_notes_path(@context),
                         t('links.view_faculty_journals', 'View Faculty Journals') %>
     <% end %>
 
     <% if can_do(@context, @current_user, :manage_admin_users, :manage_students, :read_prior_roster) %>
-      <% sidebar_button course_prior_users_path(@context),
+      <%= sidebar_button course_prior_users_path(@context),
                         t('links.view_prior_enrollments', 'View Prior Enrollments'),
                         'clock' %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read_roster) %>
-    <% sidebar_button context_url(@context, :context_user_services_url),
+    <%= sidebar_button context_url(@context, :context_user_services_url),
                       t('links.view_services', 'View Registered Services'),
                       'link' %>
   <% end %>

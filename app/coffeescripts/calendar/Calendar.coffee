@@ -159,6 +159,13 @@ define [
         viewDisplay: @viewDisplay
         windowResize: @windowResize
         drop: @drop
+
+        dragRevertDuration: { month: 0 }
+        dragHelper: { month: 'clone' }
+        dragAppendTo: { month: '#calendar-drag-and-drop-container' }
+        dragZIndex: { month: 350 }
+        dragCursorAt: { month: {top: -5, left: -5} }
+
         , calendarDefaults)
 
     today: =>
@@ -294,6 +301,7 @@ define [
           view
 
     eventDragStart: (event, jsEvent, ui, view) =>
+      @lastEventDragged = event
       @closeEventPopups()
 
     eventResizeStart: (event, jsEvent, ui, view) =>
@@ -301,8 +309,10 @@ define [
 
     # event triggered by items being dropped from within the calendar
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
+      @_eventDrop(event, minuteDelta, allDay, revertFunc)
 
-      if event.eventType == "assignment" && allDay
+    _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
+      if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
@@ -320,6 +330,7 @@ define [
         event.end = new Date(event.start.getTime() + originalDuration)
 
       event.saveDates null, revertFunc
+      return true
 
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       # assignments can't be resized
@@ -365,7 +376,10 @@ define [
       changed = false
       for k, v of opts
         changed = true if data[k] != v
-        data[k] = v
+        if v
+          data[k] = v
+        else
+          delete data[k]
       location.href = "#" + $.param(data) if changed
 
     viewDisplay: (view) =>
@@ -406,31 +420,33 @@ define [
     drop: (date, allDay, jsEvent, ui) =>
       eventId    = $(ui.helper).data('event-id')
       event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
+      return unless event
+      event.start = date
+      event.addClass 'event_pending'
       revertFunc = -> console.log("could not save date on undated event")
 
-      if event
-        event.start = date
-        event.addClass 'event_pending'
+      return unless @_eventDrop(event, 0, allDay, revertFunc)
+      @calendar.fullCalendar('renderEvent', event)
 
-        if event.eventType == "assignment" && allDay
-          revertFunc()
-          return
+    # callback from minicalendar telling us an event from here was dragged there
+    dropOnMiniCalendar: (date, allDay, jsEvent, ui) ->
+      event = @lastEventDragged
+      return unless event
+      originalStart = new Date(event.start.getTime())
+      originalEnd = new Date(event.end?.getTime())
+      @copyYMD(event.start, date)
+      @copyYMD(event.end, date)
+      @_eventDrop(event, 0, false, =>
+        event.start = originalStart
+        event.end = originalEnd
+        @calendar.fullCalendar('updateEvent', event)
+      )
 
-        # isDueAtMidnight() will read cached midnightFudged property
-        if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
-          event.start.setMinutes(59)
-
-        # set event as an all day event if allDay
-        if event.eventType == "calendar_event" && allDay
-          event.allDay = true
-
-        # if a short event gets dragged, we don't want to change its duration
-        if event.end && event.endDate()
-          originalDuration = event.endDate().getTime() - event.startDate().getTime()
-          event.end = new Date(event.start.getTime() + originalDuration)
-
-        @calendar.fullCalendar('renderEvent', event)
-        event.saveDates null, revertFunc
+    copyYMD: (target, source) ->
+      return unless target
+      target.setFullYear(source.getFullYear())
+      target.setMonth(source.getMonth())
+      target.setDate(source.getDate())
 
     # DOM callbacks
 
@@ -542,7 +558,7 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: $.dateToISO8601UTC(d)
+      @updateFragment view_start: d.toISOString()
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->
@@ -635,16 +651,8 @@ define [
     # <style> node in ie8
     $styleContainer = $('<div />').appendTo('body')
 
-    # these represent a base hue to get color values from
-    # they are combined with standard saturations and brigness to color-code events for each contex
-    hues = [43, 5, 205, 85, 289, 63, 230, 186, 115, 330]
-
-    cssColor = (h,s,b) ->
-      rgbArray = hsvToRgb(h,s,b)
-      "rgb(#{rgbArray.join ' ,'})"
-
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length)
+      colors = colorSlicer.getColors(@contextCodes.length, 275)
       html = for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{

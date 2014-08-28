@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,7 +21,14 @@ class CourseSection < ActiveRecord::Base
 
   attr_protected :sis_source_id, :sis_batch_id, :course_id,
       :root_account_id, :enrollment_term_id, :integration_id
-  
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :sis_source_id, :sis_batch_id, :course_id, :root_account_id, :enrollment_term_id, :name, :default_section, :accepting_enrollments, :can_manually_enroll, :start_at,
+    :end_at, :created_at, :updated_at, :workflow_state, :restrict_enrollments_to_section_dates, :nonxlist_course_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:course, :nonxlist_course, :root_account, :enrollments, :users, :calendar_events, :assignment_overrides]
+
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
@@ -81,26 +88,26 @@ class CourseSection < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_sections) }
+    given { |user, session| self.course.grants_right?(user, session, :manage_sections) }
     can :read and can :create and can :update and can :delete
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
+    given { |user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
     can :read
 
-    given { |user, session| self.course.account_membership_allows(user, session, :read_roster) }
+    given { |user| self.course.account_membership_allows(user, :read_roster) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }
+    given { |user, session| self.course.grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
     given { |user, session|
       user &&
       self.course.sections_visible_to(user).scoped.where(:id => self).exists? &&
-      self.cached_context_grants_right?(user, session, :read_roster)
+      self.course.grants_right?(user, session, :read_roster)
     }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.course.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
   end
 
@@ -173,15 +180,15 @@ class CourseSection < ActiveRecord::Base
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
-    user_ids = self.enrollments.map(&:user_id).uniq
+    user_ids = self.all_enrollments.map(&:user_id).uniq
 
     old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
     if self.root_account_id_changed?
       self.save!
-      self.enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
+      self.all_enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
     else
       self.save!
-      self.enrollments.update_all :course_id => course
+      self.all_enrollments.update_all :course_id => course
     end
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
@@ -239,7 +246,7 @@ class CourseSection < ActiveRecord::Base
     save!
   end
 
-  scope :active, where("course_sections.workflow_state<>'deleted'")
+  scope :active, -> { where("course_sections.workflow_state<>'deleted'") }
 
   scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 

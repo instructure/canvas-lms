@@ -22,18 +22,20 @@ include Api::V1::Conferences
 include Api::V1::Json
 include Api
 
-describe "Conferences API", :type => :integration do
-  before do
+describe "Conferences API", type: :request do
+  before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.find_or_create_by_name('wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     @category_path_options = { :controller => "conferences", :format => "json" }
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+    @user = @teacher
   end
 
   describe "GET list of conferences" do
 
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       @user = nil
       raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
@@ -41,7 +43,6 @@ describe "Conferences API", :type => :integration do
     end
 
     it "should list all the conferences" do
-      course_with_teacher(:active_all => true)
       @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
                                                                       :duration => 60,
                                                                       :user => @teacher,
@@ -52,8 +53,22 @@ describe "Conferences API", :type => :integration do
       json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
     end
 
+    it "should not list conferences for disabled plugins" do
+      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
+      @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
+                                                                                         :duration => 60,
+                                                                                         :user => @teacher,
+                                                                                         :title => ct)}
+      plugin.disabled = true
+      plugin.save!
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
+        merge(action: 'index', course_id: @course.to_param))
+      json.should == api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
+    end
+
     it "should only list conferences the user is a participant of" do
-      course_with_student(:active_all => true)
+      @user = @student
       @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
                                                                       :duration => 60,
                                                                       :user => @teacher,
@@ -66,7 +81,7 @@ describe "Conferences API", :type => :integration do
     end
 
     it 'should get a conferences for a group' do
-      course_with_student(:active_all => true)
+      @user = @student
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
       @conferences = (1..2).map { |i| @group.web_conferences.create!(:conference_type => 'Wimba',

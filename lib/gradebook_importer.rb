@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'csv'
+
 class GradebookImporter
   
   class NegativeId
@@ -46,12 +49,15 @@ class GradebookImporter
     @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
     @all_assignments = @context.assignments.active.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
-    @all_students = @context.students.select(['users.id', :name, :sortable_name]).index_by(&:id)
+    @all_students = @context.all_students.select(['users.id', :name, :sortable_name]).index_by(&:id)
 
     csv = CSV.new(self.contents, :converters => :nil)
     header = csv.shift
     @assignments = process_header(header)
 
+    @root_accounts = {}
+    @pseudonyms_by_sis_id = {}
+    @pseudonyms_by_login_id = {}
     @students = []
     csv.each do |row|
       if row[0] =~ /Points Possible/
@@ -72,7 +78,7 @@ class GradebookImporter
     @missing_students = @all_students.values - @students if @missing_student
 
     # look up existing score for everything that was provided
-    @original_submissions = @context.submissions.except(:includes).
+    @original_submissions = @context.submissions.
         select([:assignment_id, :user_id, :score]).
         where(:assignment_id => (@missing_assignment ? @all_assignments.values : @assignments),
               :user_id => (@missing_student ? @all_students.values : @students)).
@@ -116,26 +122,35 @@ class GradebookImporter
       @students = [] if @assignments.empty?
     end
 
+    # remove concluded enrollments
+    prior_enrollment_ids = (
+      @all_students.keys - @context.students.pluck(:user_id).map(&:to_i)
+    ).to_set
+    @students.delete_if { |s| prior_enrollment_ids.include? s.id }
+
     @original_submissions = [] unless @missing_student || @missing_assignment
   end
-  
+
   def process_header(row)
     if row.length < 3 || row[0] !~ /Student/ || row[1] !~ /ID/
       raise "Couldn't find header row"
     end
 
-    if row[2] !~ /Section/
-      if row[4] !~ /Section/ || row[2] !~ /SIS\s+User\s+ID/ || row[3] !~ /SIS\s+Login\s+ID/
-        raise "Couldn't find header row"
-      else
-        @sis_user_id_column = 2
-        @sis_login_id_column = 3
-        @student_columns += 2
+    if row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
+      @sis_user_id_column = 2
+      @sis_login_id_column = 3
+      @student_columns += 2
+      if row[4] =~ /Root\s+Account/
+        @root_account_column = 4
+        @student_columns += 1
       end
+    end
+    if row[@student_columns - 1] !~ /Section/
+      raise "Couldn't find header row"
     end
 
     row.shift(@student_columns)
-    while row.last =~ /Current Score|Final Score|Final Grade/
+    while row.last =~ /Current Score|Current Points|Final Score|Final Points|Final Grade/
       row.pop
     end
     
@@ -161,8 +176,17 @@ class GradebookImporter
     student_id = row[1] # the second column in the csv should have the student_id for each row
     student = @all_students[student_id.to_i] if student_id.present?
     unless student
-      pseudonym = pseudonyms_by_sis_id[row[@sis_user_id_column]] if @sis_user_id_column && row[@sis_user_id_column].present?
-      pseudonym ||= pseudonyms_by_login_id[row[@sis_login_id_column]] if @sis_login_id_column && row[@sis_login_id_column].present?
+      ra_sis_id = row[@root_account_column].presence if @root_account_column
+      if !@root_accounts.key?(ra_sis_id)
+        ra = ra_sis_id.nil? ? @context.root_account : Account.find_by_domain(ra_sis_id)
+        add_root_account_to_pseudonym_cache(ra) if ra
+        @root_accounts[ra_sis_id] = ra
+      end
+      ra = @root_accounts[ra_sis_id]
+      sis_user_id = [ra.id, row[@sis_user_id_column]] if ra && @sis_user_id_column && row[@sis_user_id_column].present?
+      sis_login_id = [ra.id, row[@sis_login_id_column]] if ra && @sis_login_id_column && row[@sis_login_id_column].present?
+      pseudonym = @pseudonyms_by_sis_id[sis_user_id] if sis_user_id
+      pseudonym ||= @pseudonyms_by_login_id[sis_login_id] if sis_login_id
       student = @all_students[pseudonym.user_id] if pseudonym
     end
     student ||= @all_students.detect { |id, s| s.name == row[0] || s.sortable_name == row[0] }.try(:last) if row[0].present?
@@ -198,16 +222,14 @@ class GradebookImporter
   end
   
   protected
-    def all_pseudonyms
-      @all_pseudonyms ||= @context.root_account.pseudonyms.active.select([:id, :unique_id, :sis_user_id, :user_id]).where(:user_id => @all_students.values).all
-    end
-
-    def pseudonyms_by_sis_id
-      @pseudonyms_by_sis_id ||= all_pseudonyms.inject({}) { |r, p| r[p.sis_user_id] = p if p.sis_user_id; r }
-    end
-
-    def pseudonyms_by_login_id
-      @pseudonyms_by_login_id ||= all_pseudonyms.inject({}) { |r, p| r[p.unique_id] = p; r }
+    def add_root_account_to_pseudonym_cache(root_account)
+      pseudonyms = root_account.shard.activate do
+        root_account.pseudonyms.active.select([:id, :unique_id, :sis_user_id, :user_id]).where(:user_id => @all_students.values).to_a
+      end
+      pseudonyms.each do |pseudonym|
+        @pseudonyms_by_sis_id[[root_account.id, pseudonym.sis_user_id]] = pseudonym
+        @pseudonyms_by_login_id[[root_account.id, pseudonym.unique_id]] = pseudonym
+      end
     end
 
     def student_to_hash(user)

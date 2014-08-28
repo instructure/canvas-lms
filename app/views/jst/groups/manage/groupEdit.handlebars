@@ -5,6 +5,7 @@
            placeholder="{{#t "group_name"}}Group Name{{/t}}">
   </div>
 </div>
+{{#unless nameOnly}}
 {{#ifEqual role "student_organized"}}
 <div class="control-group">
   <label class="control-label" for="group_join_level">{{#t "group_join_level"}}Joining{{/t}}</label>
@@ -15,7 +16,17 @@
     </select>
   </div>
 </div>
+{{else}}
+<div class="control-group">
+  <label class="control-label" for="group_max_membership">{{#t "group_max_membership"}}Limit groups to{{/t}}</label>
+  <div class="controls">
+    <input type="number" id="group_max_membership" name='max_membership' value="{{max_membership}}" class="input-mini">
+    <span>{{#t "group_max_membership_members"}}members{{/t}}</span>
+    <span class="hint-text">{{#t "group_max_membership_help"}}(Leave blank to use group set max){{/t}}</span>
+  </div>
+</div>
 {{/ifEqual}}
+{{/unless}}
 
 <div class="form-controls">
   <button class="btn dialog_closer" type="button"

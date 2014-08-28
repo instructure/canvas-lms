@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe QuizzesController do
+describe Quizzes::QuizzesController do
   def create_section_override(section, due_at)
     override = assignment_override_model(:quiz => @quiz)
     override.set = section
@@ -54,8 +54,10 @@ describe QuizzesController do
         get "courses/#{@course.id}/quizzes"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
-        doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
+        description_text = doc.css("div.description").text
+        description_text.include?("Due: Multiple Dates").should_not be_true
+        description_text.include?("Due:").should be_true
+        description_text.include?(due_at.strftime('%b %-d')).should be_true
       end
 
       it "should only use the sections the user is restricted to" do
@@ -171,7 +173,7 @@ describe QuizzesController do
     end
   end
 
-  context "show_student" do 
+  context "show_student" do
     before :each do
       course_with_student_logged_in(:active_all => true)
       course_quiz true
@@ -225,7 +227,7 @@ describe QuizzesController do
       end
 
       it "should display message about the quiz changing significantly" do
-        Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
+        Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
         mkquiz
         @quiz_submission.update_if_needs_review
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
@@ -236,7 +238,7 @@ describe QuizzesController do
       end
 
       it "should display both messages" do
-        Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
+        Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
         mkquiz
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
         response.body.should match(%r{The following questions need review})

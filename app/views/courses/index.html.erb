@@ -18,47 +18,52 @@
   <% end %>
 <% end %>
 
-<% jammit_css :context_list %>
-
+<% jammit_css :context_list, :course_list %>
+<% js_bundle :course_list %>
+<% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
+<% @show_star_column = true %>
 <% unless @current_enrollments.empty? %>
   <h2><%= t('headings.my_courses', %{My Courses}) %></h2>
-  <ul class="unstyled_list context_list current_enrollments">
+  <table id="my_courses_table" class="table table-bordered current_enrollments course-list-table">
     <% @current_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
     <% end %>
-  </ul>
+  </table>
 <% end %>
 
+<% @show_star_column = false %>
 <% unless @current_user.current_groups.empty? %>
   <h2><%= t('headings.my_groups', %{My Groups}) %></h2>
-  <ul class="unstyled_list context_list current_groups">
+  <table id="my_groups_table" class="table table-bordered current_groups course-list-table">
     <% @current_user.current_groups.each do |group| %>
       <% group_name = group.name %>
-      <li>
+      <tr>
+        <td>
         <a href=<%= group_path(group) %>>
         <span class="name ellipsis" title=<%= group_name %>>
           <%= group_name %>
         </span>
         </a>
-      </li>
+        </td>
+      </tr>
     <% end %>
-  </ul>
+  </table>
 <% end %>
 
 <% unless @past_enrollments.empty? %>
   <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
-  <ul class="unstyled_list context_list past_enrollments">
+  <table id="past_enrollments_table" class="table table-bordered past_enrollments course-list-table">
     <% @past_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
     <% end %>
-  </ul>
+  </table>
 <% end %>
 
 <% unless @future_enrollments.empty? %>
   <h2><%= t('headings.future_enrollments', 'Future Enrollments') %></h2>
-  <ul class="unstyled_list context_list future_enrollments">
+  <table id="future_enrollments_table" class="table table-bordered future_enrollments course-list-table">
     <% @future_enrollments.each do |enrollment| %>
       <%= render :partial => 'shared/current_enrollment', :object => enrollment %>
     <% end %>
-  </ul>
+  </table>
 <% end %>

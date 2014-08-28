@@ -21,8 +21,9 @@ class ContentImportsController < ApplicationController
   before_filter :require_context
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
-  
+
   include Api::V1::Course
+  include ContentImportsHelper
 
   COPY_TYPES = %w{assignment_groups assignments context_modules learning_outcomes
                 quizzes assessment_question_banks folders attachments wiki_pages discussion_topics
@@ -39,6 +40,8 @@ class ContentImportsController < ApplicationController
   # current files UI uses this page for .zip uploads
   def files
     authorized_action(@context, @current_user, [:manage_content, :manage_files])
+    js_env(return_or_context_url: return_or_context_url,
+           return_to: params[:return_to])
   end
 
   # @API Get course copy status
@@ -72,8 +75,8 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
-  
+
+
   # @API Copy course content
   #
   # DEPRECATED: Please use the {api:ContentMigrationsController#create Content Migrations API}
@@ -99,7 +102,7 @@ class ContentImportsController < ApplicationController
     if api_request?
       @context = api_find(Course, params[:course_id])
     end
-    
+
     if authorized_action(@context, @current_user, :manage_content)
       if api_request?
         @source_course = api_find(Course, params[:source_course])
@@ -122,18 +125,19 @@ class ContentImportsController < ApplicationController
       end
 
       # make sure the user can copy from the source course
-      return render_unauthorized_action unless @source_course.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+      return render_unauthorized_action unless @source_course.grants_all_rights?(@current_user, :read, :read_as_admin)
       cm = ContentMigration.create!(:context => @context,
                                     :user => @current_user,
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
-                                    :migration_type => 'course_copy_importer')
+                                    :migration_type => 'course_copy_importer',
+                                    :initiated_source => api_request? ? :api : :manual)
       cm.queue_migration
       cm.workflow_state = 'created'
       render :json => copy_status_json(cm, @context, @current_user, session)
     end
   end
-  
+
   private
 
   def process_migration_params

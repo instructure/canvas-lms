@@ -18,9 +18,14 @@
 
 class EnrollmentDatesOverride < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   belongs_to :enrollment_term
 
   attr_accessible :context, :enrollment_type, :enrollment_term, :start_at, :end_at
+
+  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_term_id, :enrollment_type, :context_id, :context_type, :start_at, :end_at, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:context, :enrollment_term]
+
   before_save :touch_all_courses
 
   def touch_all_courses

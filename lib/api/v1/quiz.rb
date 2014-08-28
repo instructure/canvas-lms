@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 module Api::V1::Quiz
   include Api::V1::Json
   include Api::V1::AssignmentOverride
@@ -32,6 +31,7 @@ module Api::V1::Quiz
       show_correct_answers
       show_correct_answers_at
       hide_correct_answers_at
+      one_time_results
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -42,6 +42,10 @@ module Api::V1::Quiz
       lock_at
       unlock_at
       published
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      require_lockdown_browser_monitor
+      lockdown_browser_monitor_data
       )
   }
 
@@ -52,23 +56,45 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    QuizSerializer.new(quiz,
-                       scope: user,
-                       session: session,
-                       root: false,
-                       controller: self).as_json
+    if accepts_jsonapi?
+      Canvas::APIArraySerializer.new([quiz],
+                         scope: user,
+                         session: session,
+                         root: :quizzes,
+                         each_serializer: Quizzes::QuizSerializer,
+                         controller: self).as_json
+    else
+      Quizzes::QuizSerializer.new(quiz,
+                         scope: user,
+                         session: session,
+                         root: false,
+                         controller: self).as_json
+
+    end
   end
 
   def jsonapi_quizzes_json(options)
     scope = options.fetch(:scope)
     api_route = options.fetch(:api_route)
     @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
+    @quiz_submissions = Quizzes::QuizSubmission.where(quiz_id: @quizzes, user_id: @current_user.id).index_by(&:quiz_id)
     meta[:primaryCollection] = 'quizzes'
-    ActiveModel::ArraySerializer.new(@quizzes,
+    add_meta_permissions!(meta)
+    Canvas::APIArraySerializer.new(@quizzes,
                           scope: @current_user,
                           controller: self,
                           root: :quizzes,
-                          meta: meta).as_json
+                          self_quiz_submissions: @quiz_submissions,
+                          meta: meta,
+                          each_serializer: Quizzes::QuizSerializer,
+                          include_root: false).as_json
+  end
+
+  def add_meta_permissions!(meta)
+    meta[:permissions] ||= {}
+    meta[:permissions][:quizzes] = {
+      create: context.grants_right?(@current_user, session, :manage_assignments)
+    }
   end
 
   def filter_params(quiz_params)
@@ -77,7 +103,7 @@ module Api::V1::Quiz
 
   def update_api_quiz(quiz, params, save = true)
     quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
-    return nil unless quiz.is_a?(Quiz) && quiz_params.is_a?(Hash)
+    return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(Hash)
     update_params = filter_params(quiz_params)
 
     # make sure assignment_group_id belongs to context
@@ -122,6 +148,14 @@ module Api::V1::Quiz
       end
     end
 
+    # one_time_results is valid if hide_results is null
+    if update_params.has_key?('one_time_results')
+      hide_results = update_params.fetch('hide_results', quiz.hide_results)
+      unless hide_results.blank?
+        update_params.delete 'one_time_results'
+      end
+    end
+
     # scoring_policy is valid if allowed_attempts > 1
     if update_params.has_key?('scoring_policy')
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
@@ -153,7 +187,11 @@ module Api::V1::Quiz
       if quiz.new_record?
         quiz.save
       end
-      quiz.workflow_state = Canvas::Plugin.value_to_boolean(published) ? 'available' : 'unpublished'
+      if Canvas::Plugin.value_to_boolean(published)
+        quiz.publish
+      else
+        quiz.unpublish
+      end
     end
     quiz.save if save
 

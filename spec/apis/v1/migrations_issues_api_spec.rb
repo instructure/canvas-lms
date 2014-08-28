@@ -18,9 +18,9 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe MigrationIssuesController, :type => :integration do
-  before do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+describe MigrationIssuesController, type: :request do
+  before :once do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @migration = @course.content_migrations.create!
     @issue_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/migration_issues"
     @params = { :controller => 'migration_issues', :format => 'json', :course_id => @course.id.to_param, :content_migration_id => @migration.id.to_param}
@@ -76,7 +76,7 @@ describe MigrationIssuesController, :type => :integration do
     end
 
     it "should return error messages to site admins" do
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       json = api_call(:get, @issue_url, @params)
       json['error_message'].should == 'secret error'
       json['error_report_html_url'].should == "http://www.example.com/error_reports/0"

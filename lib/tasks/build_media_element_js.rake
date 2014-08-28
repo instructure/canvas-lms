@@ -1,7 +1,11 @@
 
-desc "Builds mediaelementjs from it's git repo into a form canvas_lms can use with AMD"
+desc "Builds mediaelementjs from it's git repo into a form canvas_lms can use with AMD and inject instructure-specific customizations"
 task :build_media_element_js do
   require 'fileutils'
+
+  def remove_console(text)
+    text.gsub(/console.(log|debug)\((.*)\);?/, '')
+  end
 
   repo_path = '../mediaelement'
   public_path = 'public'
@@ -29,7 +33,8 @@ task :build_media_element_js do
     'me-plugindetector.js',
     'me-featuredetection.js',
     'me-mediaelements.js',
-    'me-shim.js'
+    'me-shim.js',
+    'me-i18n.js'
   ]
   me_chunks = me_files.map { |file| File.read "#{repo_path}/src/js/#{file}" }
 
@@ -44,29 +49,37 @@ task :build_media_element_js do
     'mep-feature-time.js',
     'mep-feature-volume.js',
     'mep-feature-fullscreen.js',
-    'mep-feature-tracks.js',
+    'public/javascripts/mediaelement/mep-feature-tracks-instructure.js',
     # 'mep-feature-contextmenu.js',
-    # 'mep-feature-sourcechooser.js',
+    'public/javascripts/mediaelement/mep-feature-speed-instructure.js',
+    'public/javascripts/mediaelement/mep-feature-sourcechooser-instructure.js',
     'mep-feature-googleanalytics.js'
   ]
-  mep_chunks = mep_files.map { |file| File.read "#{repo_path}/src/js/#{file}" }
+  mep_chunks = mep_files.map { |path|
+    resolved_path = (path.include? '/') ? path : "#{repo_path}/src/js/#{path}"
+    File.read resolved_path
+  }
 
   puts "Combining scripts"
 
   chunks = [rev_msg, "define(['jquery'], function (jQuery){"] + me_chunks + mep_chunks + ["return mejs;\n});\n"]
-  File.open("#{public_path}/javascripts/vendor/mediaelement-and-player.js", 'w') {|f| f.write(chunks.join("\n")) }
+  File.open("#{public_path}/javascripts/vendor/mediaelement-and-player.js", 'w') {|f|
+    f.write(remove_console(chunks.join("\n")))
+  }
 
   puts "Copying CSS"
   css = File.read "#{repo_path}/src/css/mediaelementplayer.css"
   # fix urls to background images
   css = css.gsub('url(', 'url(/images/mediaelement/')
-  File.open("#{public_path}/stylesheets/static/mediaelementplayer.css", 'w') {|f| f.write(rev_msg + css) }
+  File.open("app/stylesheets/vendor/_mediaelementplayer.scss", 'w') {|f| f.write(rev_msg + css) }
 
   puts 'Copying Skin Files'
   img_path = "#{public_path}/images/mediaelement"
   FileUtils.mkdir_p img_path
   [ 'src/css/controls.png',
+    'src/css/controls.svg',
     'src/css/bigplay.png',
+    'src/css/bigplay.svg',
     'src/css/loading.gif',
     'build/flashmediaelement.swf',
     'build/silverlightmediaelement.xap'

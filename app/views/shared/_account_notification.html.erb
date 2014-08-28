@@ -1,17 +1,11 @@
 <%
   notification = account_notification
-  icon_type = notification.icon || "warning"
-
-  # map legacy icon types to new types
-  icon_type = "question" if icon_type == "help"
-  icon_type = "calendar" if icon_type == "calendar_icon"
-  icon_type = "information" if icon_type == "people" || icon_type == "file" || icon_type == "group"
 %>
 <div class="global-message image-block">
   <div class="image-block-image">
-    <i class="<%= "#{icon_type}-icon"%>"></i>
+    <i class="<%=  notification_icon_classname(notification)  %>"></i>
     <span class="hidden-inline-text">
-      <%= accessible_message_icon_text(icon_type) %>
+      <%= accessible_message_icon_text(notification_icon_type(notification)) %>
     </span>
   </div>
   <div class="image-block-content">
@@ -20,7 +14,9 @@
       <%= notification.subject %>
     </div>
     <div class="message user_content">
-      <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port)) unless notification.message.nil? %>
+      <% # I don't see a problem with using gsub given that there are only potential substituations%>
+      <% #    but if you found this comment while looking to add a third, it might be time to consider being smarter about this :p %>
+      <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port).gsub(/(({{)|(%7B%7B))CANVAS_USER_ID((}})|(%7D%7D))/,@current_user.global_id.to_s)) unless notification.message.nil? %>
     </div>
   </div>
 </div>

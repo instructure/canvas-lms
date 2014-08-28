@@ -33,7 +33,8 @@ describe FeatureFlags do
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
       'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
-      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true)
+      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true),
+      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden')
   })
   end
 
@@ -186,13 +187,15 @@ describe FeatureFlags do
           t_root_account.lookup_feature_flag('hidden_feature').should be_nil
           t_sub_account.lookup_feature_flag('hidden_feature').should be_nil
           t_course.lookup_feature_flag('hidden_feature').should be_nil
+          t_user.lookup_feature_flag('hidden_user_feature').should be_nil
         end
 
-        it "should not find the feature beneath the root account with override_hidden" do
+        it "should find hidden features if override_hidden is given" do
           t_site_admin.lookup_feature_flag('hidden_feature', true).should be_default
           t_root_account.lookup_feature_flag('hidden_feature', true).should be_default
-          t_sub_account.lookup_feature_flag('hidden_feature', true).should be_nil
-          t_course.lookup_feature_flag('hidden_feature', true).should be_nil
+          t_sub_account.lookup_feature_flag('hidden_feature', true).should be_default
+          t_course.lookup_feature_flag('hidden_feature', true).should be_default
+          t_user.lookup_feature_flag('hidden_user_feature', true).should be_default
         end
 
         it "should not create the implicit-off root_opt_in flag" do
@@ -200,11 +203,18 @@ describe FeatureFlags do
           flag.should be_default
           flag.should be_hidden
         end
+
+        it "override_hidden should not trump root_opt_in" do
+          t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', true).should be_default
+          t_sub_account.lookup_feature_flag('hidden_root_opt_in_feature', true).should be_nil
+          t_course.lookup_feature_flag('hidden_root_opt_in_feature', true).should be_nil
+        end
       end
 
       context "with site admin feature flag" do
         before do
           t_site_admin.feature_flags.create! feature: 'hidden_feature'
+          t_site_admin.feature_flags.create! feature: 'hidden_user_feature'
         end
 
         it "should find the feature beneath site admin" do
@@ -212,6 +222,7 @@ describe FeatureFlags do
           t_root_account.lookup_feature_flag('hidden_feature').context.should eql t_site_admin
           t_sub_account.lookup_feature_flag('hidden_feature').context.should eql t_site_admin
           t_course.lookup_feature_flag('hidden_feature').context.should eql t_site_admin
+          t_user.lookup_feature_flag('hidden_user_feature').context.should eql t_site_admin
         end
 
         it "should create the implicit-off root_opt_in flag" do

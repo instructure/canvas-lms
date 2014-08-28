@@ -20,90 +20,177 @@ require 'action_controller_test_process'
 
 # @API Submissions
 #
-# @object Submission
+# @model MediaComment
 #     {
-#       // The submission's assignment id
-#       "assignment_id": 23,
-#
-#       // The submission's assignment (see the assignments API) (optional)
-#       "assignment": "Assignment",
-#
-#       // The submission's course (see the course API) (optional)
-#       "course": "Course",
-#
-#       // This is the submission attempt number.
-#       "attempt": 1,
-#
-#       // The content of the submission, if it was submitted directly in a
-#       // text field.
-#       "body": "There are three factors too...",
-#
-#       // The grade for the submission, translated into the assignment grading
-#       // scheme (so a letter grade, for example).
-#       "grade": "A-",
-#
-#       // A boolean flag which is false if the student has re-submitted since
-#       // the submission was last graded.
-#       "grade_matches_current_submission": true,
-#
-#       // URL to the submission. This will require the user to log in.
-#       "html_url": "http://example.com/courses/255/assignments/543/submissions/134",
-#
-#       // URL to the submission preview. This will require the user to log in.
-#       "preview_url": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
-#
-#       // The raw score
-#       "score": 13.5,
-#
-#       // Associated comments for a submission (optional)
-#       "submission_comments": [
-#         {
-#           "id": 37,
-#           "author_id": 134,
-#           "author_name": "Toph Beifong",
-#           "comment": "Well here's the thing...",
-#           "created_at": "2012-01-01T01:00:00Z",
-#           "media_comment": {
-#             "content-type": "audio/mp4",
-#             "display_name": "something",
-#             "media_id": "3232",
-#             "media_type": "audio",
-#             "url":  "http://example.com/media_url"
-#           }
+#       "id": "MediaComment",
+#       "description": "",
+#       "properties": {
+#         "content-type": {
+#           "example": "audio/mp4",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "example": "something",
+#           "type": "string"
+#         },
+#         "media_id": {
+#           "example": "3232",
+#           "type": "string"
+#         },
+#         "media_type": {
+#           "example": "audio",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://example.com/media_url",
+#           "type": "string"
 #         }
-#       ],
+#       }
+#     }
 #
-#       // The types of submission
-#       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
-#       "submission_type": "online_text_entry",
+# @model SubmissionComment
+#     {
+#       "id": "SubmissionComment",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "example": 37,
+#           "type": "integer"
+#         },
+#         "author_id": {
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "author_name": {
+#           "example": "Toph Beifong",
+#           "type": "string"
+#         },
+#         "comment": {
+#           "example": "Well here's the thing...",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "media_comment": {
+#           "$ref": "MediaComment"
+#         }
+#       }
+#     }
 #
-#       // The timestamp when the assignment was submitted
-#       "submitted_at": "2012-01-01T01:00:00Z",
-#
-#       // The URL of the submission (for "online_url" submissions).
-#       "url": null,
-#
-#       // The id of the user who created the submission
-#       "user_id": 134,
-#
-#       // The id of the user who graded the submission
-#       "grader_id": 86,
-#
-#       // The submissions user (see user API) (optional)
-#       "user": "User",
-#
-#       // Whether the submission was made after the applicable due date
-#       "late": false
+# @model Submission
+#     {
+#       "id": "Submission",
+#       "description": "",
+#       "properties": {
+#         "assignment_id": {
+#           "description": "The submission's assignment id",
+#           "example": 23,
+#           "type": "integer"
+#         },
+#         "assignment": {
+#           "description": "The submission's assignment (see the assignments API) (optional)",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "course": {
+#           "description": "The submission's course (see the course API) (optional)",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "attempt": {
+#           "description": "This is the submission attempt number.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "body": {
+#           "description": "The content of the submission, if it was submitted directly in a text field.",
+#           "example": "There are three factors too...",
+#           "type": "string"
+#         },
+#         "grade": {
+#           "description": "The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).",
+#           "example": "A-",
+#           "type": "string"
+#         },
+#         "grade_matches_current_submission": {
+#           "description": "A boolean flag which is false if the student has re-submitted since the submission was last graded.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "html_url": {
+#           "description": "URL to the submission. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134",
+#           "type": "string"
+#         },
+#         "preview_url": {
+#           "description": "URL to the submission preview. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#           "type": "string"
+#         },
+#         "score": {
+#           "description": "The raw score",
+#           "example": 13.5,
+#           "type": "float"
+#         },
+#         "submission_comments": {
+#           "description": "Associated comments for a submission (optional)",
+#           "type": "array",
+#           "items": { "$ref": "SubmissionComment" }
+#         },
+#         "submission_type": {
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "example": "online_text_entry",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "online_text_entry",
+#               "online_url",
+#               "online_upload",
+#               "media_recording"
+#             ]
+#           }
+#         },
+#         "submitted_at": {
+#           "description": "The timestamp when the assignment was submitted",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "url": {
+#           "description": "The URL of the submission (for 'online_url' submissions).",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The id of the user who created the submission",
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "grader_id": {
+#           "description": "The id of the user who graded the submission",
+#           "example": 86,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The submissions user (see user API) (optional)",
+#           "example": "User",
+#           "type": "string"
+#         },
+#         "late": {
+#           "description": "Whether the submission was made after the applicable due date",
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
 #
 class SubmissionsController < ApplicationController
-  include GoogleDocs
   include KalturaHelper
   before_filter :get_course_from_section, :only => :create
   before_filter :require_context
 
   include Api::V1::Submission
-  
+
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -116,7 +203,7 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
@@ -139,15 +226,23 @@ class SubmissionsController < ApplicationController
     js_env(hash)
 
     @submission = @assignment.submissions.where(user_id: @user).first
+
+    if @submission && !@assignment.visible_to_user?(@current_user)
+      respond_to do |format|
+        flash[:error] = t 'notices.submission_not_availible', "The assignment you requested is no longer availible to your course section. Prior submissions will not count towards your grade."
+        format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+      end
+      return
+    end
+
     @submission ||= @assignment.submissions.build(:user => @user)
-    @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
     # can't just check the permission, because peer reviewiers can never read the grade
     if @assignment.muted? && !@submission.grants_right?(@current_user, :read_grade)
       @visible_rubric_assessments = []
     else
-      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? SortFirst : SortLast, Canvas::ICU.collation_key(a.assessor_name)] }
+      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
@@ -201,7 +296,7 @@ class SubmissionsController < ApplicationController
           format.html
         end
         if !json_handled
-          format.json { 
+          format.json {
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
             render :json => @submission.as_json(
@@ -238,13 +333,13 @@ class SubmissionsController < ApplicationController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
   #   The submission_type given determines which of the following parameters is
-  #   used. For instance, to submit a URL, submission[submission_type] must be
-  #   set to "online_url", otherwise the submission[url] parameter will be
+  #   used. For instance, to submit a URL, submission [submission_type] must be
+  #   set to "online_url", otherwise the submission [url] parameter will be
   #   ignored.
   #
   # @argument submission[body] [String]
@@ -268,7 +363,7 @@ class SubmissionsController < ApplicationController
   #
   #   Requires a submission_type of "online_upload".
   #
-  # @argument submission[media_comment_id] [Integer]
+  # @argument submission[media_comment_id] [String]
   #   The media comment id to submit. Media comment ids can be submitted via
   #   this API, however, note that there is not yet an API to generate or list
   #   existing media comments, so this functionality is currently of limited use.
@@ -283,7 +378,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, :submit)
-          if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
+      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
         flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
@@ -386,7 +481,6 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
-          generate_new_page_view
           format.html {
             flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
             redirect_to course_assignment_url(@context, @assignment)
@@ -412,7 +506,8 @@ class SubmissionsController < ApplicationController
   # Internal: Submit a Google Doc.
   def submit_google_doc(document_id)
     # fetch document from google
-    document_response, display_name, file_extension = google_docs_download(document_id)
+    google_docs = google_docs_connection
+    document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK)
@@ -438,7 +533,7 @@ class SubmissionsController < ApplicationController
     end
 
     @attachment = @assignment.attachments.new(
-      uploaded_data: ActionController::TestUploadedFile.new(path, document_response.content_type, true),
+      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
       display_name: display_name, user: @current_user
     )
     @attachment.save!
@@ -502,7 +597,7 @@ class SubmissionsController < ApplicationController
         end
         params[:submission][:comment_attachments] = attachments#.map{|a| a.id}.join(",")
       end
-      unless @submission.grants_rights?(@current_user, session, :submit)[:submit]
+      unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) if @current_user
         params[:submission] = {
           :comment => params[:submission][:comment],
@@ -523,7 +618,7 @@ class SubmissionsController < ApplicationController
       end
       respond_to do |format|
         if @submissions
-          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_rights?(@current_user, session, :submit)[:submit] }
+          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit) }
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
 
@@ -534,10 +629,10 @@ class SubmissionsController < ApplicationController
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
-          format.json { 
+          format.json {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
-          format.text { 
+          format.text {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else

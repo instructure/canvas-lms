@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/models/File'
   'Backbone'
-], (File, {Model}) ->
+], ($, File, {Model}) ->
 
   server = null
   model = null

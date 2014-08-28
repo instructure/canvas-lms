@@ -1,0 +1,197 @@
+@import 'base/environment';
+@import 'pages/shared/registration_dialog';
+
+body {
+  background: #333;
+}
+
+a {
+  color: #2ca4e9;
+  &:hover {
+    color: #1873c8;
+  }
+}
+
+.registration-content {
+  width: 960px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#registration_header {
+  background: #fff;
+  height: 122px;
+  padding-top: 12px;
+  h1, .h1 {
+    padding: 50px 0 0 0px;
+    a {
+      display: block;
+      width: 175px;
+      height: 41px;
+      background: transparent url(/images/registration/logo.png) 0 0 no-repeat;
+      text-indent: -9999em;
+    }
+  }
+  #registration_login {
+    color: #30536e;
+    position: absolute;
+    right: 73px;
+    top: 55px;
+    padding: 0 22px 0 0;
+    border: 5px solid transparent;
+    font-size: 1.1em;
+    background: transparent url(/images/registration/down-arrow.png) right center no-repeat;
+  }
+}
+#registration_video {
+  margin: 0;
+  a {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    display: block;
+    width: 300px;
+    height: 200px;
+    background: transparent url(/images/registration/watch-video-ribbon.png) 0 -18px no-repeat;
+    text-indent: -9999em;
+  }
+}
+
+#registration_options {
+  margin: 20px auto 0;
+  width: 495px;
+  text-align: center;
+  padding-top: 200px;
+  height: 90px;
+  background: transparent url(/images/registration/signup_bg.png) 0 0 no-repeat;
+  position: relative;
+  h2, .h2 {
+    text-indent: -9999em;
+    margin: 0;
+    height: 30px;
+  }
+}
+
+#registration_content:before {
+  display: block;
+  width: 100%;
+  height: 100px;
+  position: absolute;
+  content: " ";
+  @include gradient-vertical(#ffffff, rgba(255, 255, 255, 0));
+  background-color: transparent;
+  opacity: 0.5;
+}
+
+#registration_content {
+  background: #fff url(/images/registration/page-background.png) 0 0 repeat;
+  padding-bottom: 40px;
+}
+
+#registration_footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  min-height: 30px;
+  padding: 10px 0 40px;
+  color: #999;
+  font-size: 11px;
+  a {
+    margin-left: 5px;
+    color: #999;
+    &:hover, &:active {
+      color: #2ca4e9;
+    }
+  }
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+#signup_teacher, #signup_student {
+  position: absolute;
+  background-image: url(/images/registration/landing_buttons.png);
+  background-repeat: no-repeat;
+  background-position: 5px 5px;
+  position: absolute;
+  top: 157px;
+  width: 180px;
+  height: 65px;
+  text-indent: -9999em;
+}
+
+#signup_teacher {
+  &:hover, &:focus {
+    background-position: 5px -60px;
+    outline: none;
+  }
+  left: 67px;
+}
+
+#signup_student {
+  right: 67px;
+  background-position: 5px -125px;
+  &:hover, &:focus {
+    background-position: 5px -190px;
+    outline: none;
+  }
+}
+
+#login_form {
+  position: absolute;
+  right: 0;
+  top: 95px;
+  background: #fff;
+  border: 1px solid #bbb;
+  padding: 11px 11px 8px;
+  z-index: 2;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  .login-input {
+    width: 125px;
+    position: relative; /* so that it's over the caret */
+  }
+  button {
+    width: 100%;
+    display: block;
+    line-height: 1.75em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1em;
+    background-image: none;
+    @include gradient-vertical(#0abcfe, #0090d7);
+    border-width: 1px;
+    border-style: solid;
+    border-color: #0abcfe #238fe4 #1974c9 #238fe4;
+    border-radius: 3px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 1px rgba(0, 0, 0, 0.3);
+    &:hover, &:focus {
+      @include gradient-vertical(#09aae5, #0080c0);
+      outline: none;
+    }
+  }
+  &:before {
+    content: ' ';
+    display: block;
+    height: 16px;
+    width: 16px;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    margin-left: -11px;
+    @include rotate(45deg);
+    border: 1px solid #bbb;
+    border-right: none;
+    border-bottom: none;
+    background: $white;
+    .ie & {
+      display: none;
+    }
+  }
+}

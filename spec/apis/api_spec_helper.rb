@@ -18,12 +18,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-unless CANVAS_RAILS2
-  RSpec::configure do |c|
-    c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
-        :file_path => c.escaped_path(%w[spec apis])
-    }
-  end
+RSpec::configure do |c|
+  c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
+      :file_path => c.escaped_path(%w[spec apis])
+  }
 end
 
 class HashWithDupCheck < Hash
@@ -44,7 +42,7 @@ end
 def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   raw_api_call(method, path, params, body_params, headers, opts)
   if opts[:expected_status]
-    response.status.to_i.should == opts[:expected_status]
+    assert_status(opts[:expected_status])
   else
     response.should be_success, response.body
   end
@@ -55,7 +53,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   end
 
   if jsonapi_call?(headers) && method == :delete
-    response.status.should == '204 No Content'
+    assert_status(204)
     return
   end
 
@@ -136,8 +134,7 @@ end
 
 def params_from_with_nesting(method, path)
   path, querystring = path.split('?')
-  params = CANVAS_RAILS2 ? ActionController::Routing::Routes.recognize_path(path, :method => method) :
-    CanvasRails::Application.routes.recognize_path(path, :method => method)
+  params = CanvasRails::Application.routes.recognize_path(path, :method => method)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
 
@@ -239,11 +236,13 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
     required_keys << 'meta'
   end
 
+  # test key values instead of nr. of keys so we get meaningful failures
+  json.keys.sort.should == required_keys.sort
+
   required_keys.each do |key|
     json.should be_has_key(key)
     json[key].is_a?(Array).should be_true unless key == 'meta'
   end
-  json.size.should == required_keys.size
 
   if associations.any?
     json['meta']['primaryCollection'].should == primary_set

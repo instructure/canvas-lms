@@ -45,6 +45,7 @@ describe "context_modules" do
 
       @module_3 = create_context_module('Module Three')
       @quiz_1 = @course.quizzes.create!(:title => "some quiz")
+      @quiz_1.publish!
       @tag_3 = @module_3.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_3.completion_requirements = {@tag_3.id => {:type => 'must_view'}}
       @module_3.prerequisites = "module_#{@module_2.id}"
@@ -68,6 +69,24 @@ describe "context_modules" do
 
       context_modules[1].find_element(:css, '.context_module_criterion').should include_text(@module_1.name)
       context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
+    end
+
+    it "should not lock modules for observers" do
+      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      user_session(@user)
+
+      go_to_modules
+
+      # shouldn't show the teacher's "show student progression" button
+      ff('.module_progressions_link').should_not be_present
+
+      context_modules = ff('.context_module')
+      #initial check to make sure everything was setup correctly
+      ff('.context_module .progression_container').each do |item|
+        item.text.strip.should be_blank
+      end
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      f('#content').should_not include_text("hasn't been unlocked yet")
     end
 
     it "should show overridden due dates for assignments" do
@@ -137,7 +156,7 @@ describe "context_modules" do
       @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
       @module_1.save!
       @module_1.completion_requirements.map{|h| h[:id]}.should include(@tag_1.id)
-      @module_1.completion_requirements.map{|h| h[:id]}.should_not include(module1_unpublished_tag.id)
+      @module_1.completion_requirements.map{|h| h[:id]}.should include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
       module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_2.save!

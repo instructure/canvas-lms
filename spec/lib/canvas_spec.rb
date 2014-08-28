@@ -79,4 +79,45 @@ describe Canvas do
       end
     end
   end
+
+  if Canvas.redis_enabled?
+    describe ".short_circuit_timeout" do
+      it "should wrap the block in a timeout" do
+        Timeout.expects(:timeout).with(15).yields
+        ran = false
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, 2, 1) { ran = true }
+        ran.should == true
+      end
+
+      it "should raise Timeout::Error on timeout" do
+        Timeout.expects(:timeout).raises(Timeout::Error)
+        lambda { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, 2, 1) {} }.should raise_error(Timeout::Error)
+      end
+
+      it "should skip calling the block after X failures" do
+        Timeout.expects(:timeout).with(15).twice.raises(Timeout::Error)
+        lambda { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) {} }.should raise_error(Timeout::Error)
+        lambda { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) {} }.should raise_error(Timeout::Error)
+        ran = false
+        # third time, won't call timeout
+        lambda { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true } }.should raise_error(Timeout::Error)
+        ran.should == false
+        # verify the redis key has a ttl
+        key = "timeouts:spec"
+        Canvas.redis.get(key).should == "2"
+        Canvas.redis.ttl(key).should be_present
+        # delete the redis key and it'll try again
+        Canvas.redis.del(key)
+        Timeout.expects(:timeout).with(15).yields
+        Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true }
+        ran.should == true
+      end
+
+      it "should raise TimeoutCutoff when the cutoff is reached" do
+        Canvas.redis.set("timeouts:spec", 42)
+        lambda { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true} }.should raise_error(Canvas::TimeoutCutoff)
+        Canvas.redis.get("timeouts:spec").should == "42"
+      end
+    end
+  end
 end

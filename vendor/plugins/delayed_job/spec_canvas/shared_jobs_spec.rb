@@ -6,10 +6,10 @@ require File.expand_path('../stats_spec', __FILE__)
 require File.expand_path('../worker_spec', __FILE__)
 
 shared_examples_for 'a delayed_jobs implementation' do
-  it_should_behave_like 'a backend'
-  it_should_behave_like 'Delayed::Batch'
-  it_should_behave_like 'random ruby objects'
-  it_should_behave_like 'Delayed::PerformableMethod'
-  it_should_behave_like 'Delayed::Stats'
-  it_should_behave_like 'Delayed::Worker'
+  include_examples 'a backend'
+  include_examples 'Delayed::Batch'
+  include_examples 'random ruby objects'
+  include_examples 'Delayed::PerformableMethod'
+  include_examples 'Delayed::Stats'
+  include_examples 'Delayed::Worker'
 end

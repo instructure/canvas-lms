@@ -18,14 +18,13 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CommMessagesApiController, :type => :integration do
+describe CommMessagesApiController, type: :request do
   describe "index" do
     context "a site admin" do
       context "with permission" do
-        before do
+        before :once do
           @test_user = user(:active_all => true)
           site_admin_user
-          user_session(@admin)
         end
 
         it "should be able to see all messages" do
@@ -95,7 +94,6 @@ describe CommMessagesApiController, :type => :integration do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.site_admin,
                                                :role_changes => {:read_messages => false})
-          user_session(@admin)
         end
 
         it "should receive unauthorized" do
@@ -109,11 +107,10 @@ describe CommMessagesApiController, :type => :integration do
 
     context "an account admin" do
       context "with permission" do
-        before do
+        before :once do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => true})
-          user_session(@admin)
         end
 
         it "should receive unauthorized if account setting disabled" do
@@ -143,7 +140,6 @@ describe CommMessagesApiController, :type => :integration do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => false})
-          user_session(@admin)
         end
 
         it "should receive unauthorized" do
@@ -159,7 +155,6 @@ describe CommMessagesApiController, :type => :integration do
       before do
         @test_user = user(:active_all => true)
         @user = user(:active_all => true)
-        user_session(@user)
       end
 
       it "should receive unauthorized" do

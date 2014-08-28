@@ -5,9 +5,10 @@ describe "manage groups students" do
   include_examples "in-process server selenium tests"
 
   before (:each) do
-    course_with_teacher_logged_in
-    Account.default.settings[:enable_manage_groups2] = false
-    Account.default.save!
+    pending
+		#course_with_teacher_logged_in
+    #Account.default.settings[:enable_manage_groups2] = false
+    #Account.default.save!
   end
 
   context "misc" do
@@ -384,7 +385,8 @@ describe "manage groups students" do
       loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
       loading.text.should == 'Assigning Students...'
       lock.unlock
-      GroupsController.filter_chain.pop
+      UsersController._process_action_callbacks.pop
+
       # make sure we wait before moving on
       wait_for_ajax_requests
     end

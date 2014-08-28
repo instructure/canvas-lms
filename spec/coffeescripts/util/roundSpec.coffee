@@ -18,3 +18,6 @@ require ['compiled/util/round'], (round) ->
 
   test "round.DEFAULT is 2", ->
     ok round.DEFAULT == 2
+
+  test "round will convert non-numbers to a Number and round it", ->
+    equal round("#{x}"), 1235

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextExternalTool do
-  before(:each) do
+  before(:once) do
     course_model
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
@@ -67,14 +67,13 @@ describe ContextExternalTool do
                 :selection_width => 50,
                 :selection_height => 50
         }
-        @tool.save!
-        launch = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type)
-        launch.resource_type.should == type
+
+        launch_url = @tool.extension_setting(type, :url)
 
         if nav_url
-          launch.url.should == nav_url
+          launch_url.should == nav_url
         else
-          launch.url.should == @tool.url
+          launch_url.should == @tool.url
         end
       end
     end
@@ -93,14 +92,14 @@ describe ContextExternalTool do
                 :text => "Example"
       }
       @tool.save!
-      @tool.has_course_navigation.should == false
+      @tool.has_placement?(:course_navigation).should == false
     end
 
     it "should not validate with no domain or url setting" do
       @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.should be_new_record
-      @tool.errors['url'].should == "Either the url or domain should be set."
-      @tool.errors['domain'].should == "Either the url or domain should be set."
+      @tool.errors['url'].should == ["Either the url or domain should be set."]
+      @tool.errors['domain'].should == ["Either the url or domain should be set."]
     end
 
     it "should accept both a domain and a url" do
@@ -116,7 +115,7 @@ describe ContextExternalTool do
               :enabled => "true"
     }
     @tool.save!
-    @tool.has_course_navigation.should == true
+    @tool.has_placement?(:course_navigation).should == true
   end
 
   it "should clear disabled extensions" do
@@ -125,7 +124,7 @@ describe ContextExternalTool do
               :enabled => "false"
     }
     @tool.save!
-    @tool.has_course_navigation.should == false
+    @tool.has_placement?(:course_navigation).should == false
   end
 
   describe "find_external_tool" do
@@ -332,14 +331,16 @@ describe ContextExternalTool do
         }
         @tool.save!
 
-        hash = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type).generate
+        hash = {}
+        @tool.set_custom_fields(hash, type)
         hash["custom_a"].should == "1"
         hash["custom_b"].should == "5"
         hash["custom_c"].should == "3"
 
+        hash = {}
         @tool.settings[type.to_sym][:custom_fields] = nil
-        @tool.save!
-        hash = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type).generate
+        @tool.set_custom_fields(hash, type)
+
         hash["custom_a"].should == "1"
         hash["custom_b"].should == "2"
         hash.has_key?("custom_c").should == false
@@ -357,6 +358,35 @@ describe ContextExternalTool do
       @tools << @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tools << @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       ContextExternalTool.all_tools_for(@course).should eql(@tools.sort_by(&:name))
+    end
+  end
+
+  describe "find_integration_for" do
+    it "should return nil if there are no matching integrations" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.should be_nil
+    end
+
+    it "should find the integration in the specified context" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.id.should == cit.id
+    end
+
+    it "should find the integration in the nearest context" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      rt  = @root_account.context_external_tools.create!(name: 'rt', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      rit = @root_account.context_external_tools.create!(name: 'rit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.id.should == ait.id
     end
   end
   
@@ -418,44 +448,44 @@ describe ContextExternalTool do
       tool.editor_button.should_not be_nil
     end
     
-    it "should set has_user_navigation if navigation configured" do
+    it "should set user_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
-      tool.has_user_navigation.should be_false
+      tool.has_placement?(:user_navigation).should be_false
       tool.save
-      tool.has_user_navigation.should be_true
+      tool.has_placement?(:user_navigation).should be_true
     end
     
-    it "should set has_course_navigation if navigation configured" do
+    it "should set course_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
-      tool.has_course_navigation.should be_false
+      tool.has_placement?(:course_navigation).should be_false
       tool.save
-      tool.has_course_navigation.should be_true
+      tool.has_placement?(:course_navigation).should be_true
     end
 
-    it "should set has_account_navigation if navigation configured" do
+    it "should set account_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:account_navigation => {:url => "http://www.example.com"}}
-      tool.has_account_navigation.should be_false
+      tool.has_placement?(:account_navigation).should be_false
       tool.save
-      tool.has_account_navigation.should be_true
+      tool.has_placement?(:account_navigation).should be_true
     end
 
-    it "should set has_resource_selection if selection configured" do
+    it "should set resource_selection if selection configured" do
       tool = new_external_tool
       tool.settings = {:resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
-      tool.has_resource_selection.should be_false
+      tool.has_placement?(:resource_selection).should be_false
       tool.save
-      tool.has_resource_selection.should be_true
+      tool.has_placement?(:resource_selection).should be_true
     end
 
-    it "should set has_editor_button if button configured" do
+    it "should set editor_button if button configured" do
       tool = new_external_tool
       tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
-      tool.has_editor_button.should be_false
+      tool.has_placement?(:editor_button).should be_false
       tool.save
-      tool.has_editor_button.should be_true
+      tool.has_placement?(:editor_button).should be_true
     end
 
     it "should allow setting tool_id and icon_url" do
@@ -508,6 +538,28 @@ describe ContextExternalTool do
       tool.user_navigation.should_not == nil
       tool.resource_selection.should_not == nil
       tool.editor_button.should_not == nil
+    end
+
+    describe "display_type" do
+      it "should be 'in_context' by default" do
+        tool.display_type(:course_navigation).should == 'in_context'
+        tool.course_navigation = {enabled: true}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'in_context'
+      end
+
+      it "should be configurable by a property" do
+        tool.course_navigation = { enabled: true }
+        tool.settings[:display_type] = "custom_display_type"
+        tool.save!
+        tool.display_type(:course_navigation).should == 'custom_display_type'
+      end
+
+      it "should be configurable in extension" do
+        tool.course_navigation = {display_type: 'other_display_type'}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'other_display_type'
+      end
     end
   end
 
@@ -623,12 +675,15 @@ describe ContextExternalTool do
   end
   
   describe "find_for" do
+    before :once do
+      course_model
+    end
+
     def new_external_tool(context)
       context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
     end
     
     it "should find the tool if it's attached to the course" do
-      course_model
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -636,11 +691,7 @@ describe ContextExternalTool do
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
     end
     
-    it "should find the tool if it's attached to the account" do
-    end
-    
     it "should find the tool if it's attached to the course's account" do
-      course_model
       tool = new_external_tool @course.account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -649,7 +700,6 @@ describe ContextExternalTool do
     end
     
     it "should find the tool if it's attached to the course's root account" do
-      course_model
       tool = new_external_tool @course.root_account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -658,7 +708,6 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's attached to a sub-account" do
-      course_model
       @account = @course.account.sub_accounts.create!(:name => "sub-account")
       tool = new_external_tool @account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -667,7 +716,7 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's attached to another course" do
-      @course2 = course_model
+      @course2 = @course
       @course = course_model
       tool = new_external_tool @course2
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -676,27 +725,112 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's not enabled for the correct navigation type" do
-      course_model
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
     end
-  end
-  
-  describe "import_from_migration" do
-    it "should work for course-level tools" do
-      course_model
-      tool = ContextExternalTool.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course)
-      tool.should_not be_nil
-      tool.context.should == @course
+
+    it "should raise RecordNotFound if the id is invalid" do
+      expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
-    it "should work for account-level tools" do
-      course_model
-      tool = ContextExternalTool.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account)
-      tool.should_not be_nil
-      tool.context.should == @course.account
+  end
+
+  describe "opaque_identifier_for" do
+    it "should create lti_context_id for asset" do
+      @course.lti_context_id.should == nil
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = @tool.opaque_identifier_for(@course)
+      @course.reload
+      @course.lti_context_id.should == context_id
+    end
+
+    it "should not create new lti_context for asset if exists" do
+      @course.lti_context_id =  'dummy_context_id'
+      @course.save!
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = @tool.opaque_identifier_for(@course)
+      @course.reload
+      @course.lti_context_id.should == 'dummy_context_id'
+    end
+  end
+
+  describe "global navigation" do
+    before(:once) do
+      @account = account_model
+    end
+
+    it "should let account admins see admin tools" do
+      account_admin_user(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+    end
+
+    it "should let teachers see admin tools" do
+      course_with_teacher(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+    end
+
+    it "should not let students see admin tools" do
+      course_with_student(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+    end
+
+    it "should update the visibility cache if enrollments are updated or user is touched" do
+      time = Time.now
+      enable_cache do
+        Timecop.freeze(time) do
+          course_with_student(:account => @account, :active_all => true)
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+        end
+
+        Timecop.freeze(time + 1.second) do
+          course_with_teacher(:account => @account, :active_all => true, :user => @user)
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+        end
+
+        Timecop.freeze(time + 2.second) do
+          @user.teacher_enrollments.update_all(:workflow_state => 'deleted')
+          # should not have affected the earlier cache
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+
+          @user.touch
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+        end
+      end
+    end
+
+    it "should update the global navigation menu cache key when the global navigation tools are updated (or removed)" do
+      time = Time.now
+      enable_cache do
+        Timecop.freeze(time) do
+          @admin_tool = @account.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @admin_tool.global_navigation = {:visibility => 'admins', :url => "http://www.example.com", :text => "Example URL"}
+          @admin_tool.save!
+          @member_tool = @account.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @member_tool.global_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+          @member_tool.save!
+          @other_tool = @account.context_external_tools.create!(:name => "c", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+          @admin_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins')
+          @member_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'members')
+        end
+
+        Timecop.freeze(time + 1.second) do
+          @other_tool.save!
+          # cache keys should remain the same
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins').should == @admin_cache_key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'members').should == @member_cache_key
+        end
+
+        Timecop.freeze(time + 2.second) do
+          @admin_tool.global_navigation = nil
+          @admin_tool.save!
+          # should update the admin key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins').should_not == @admin_cache_key
+          # should not update the members key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'members').should == @member_cache_key
+        end
+      end
     end
   end
 end

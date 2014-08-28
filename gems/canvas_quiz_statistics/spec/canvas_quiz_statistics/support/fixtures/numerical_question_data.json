@@ -1,0 +1,55 @@
+{
+  "id": 21,
+  "position": 11,
+  "quiz_group_id": null,
+  "quiz_id": 8,
+  "question_name": "Question",
+  "question_type": "numerical_question",
+  "question_text": "<p>[Numerical:Exact] What's 9 plus 3, 2.5 minus 1, or 4 minus zero?</p>",
+  "points_possible": 4,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "answers": [
+    {
+      "id": 4343,
+      "text": "",
+      "comments": "",
+      "weight": 100,
+      "numerical_answer_type": "exact_answer",
+      "exact": 12,
+      "margin": 0
+    },
+    {
+      "id": 6959,
+      "text": "",
+      "comments": "",
+      "weight": 100,
+      "numerical_answer_type": "range_answer",
+      "start": 3,
+      "end": 6
+    },
+    {
+      "id": 8617,
+      "text": "",
+      "comments": "",
+      "weight": 100,
+      "numerical_answer_type": "exact_answer",
+      "exact": 4,
+      "margin": 0
+    },
+    {
+      "id": 6704,
+      "text": "",
+      "comments": "",
+      "weight": 100,
+      "numerical_answer_type": "exact_answer",
+      "exact": 1.5,
+      "margin": 1
+    }
+  ],
+  "variables": null,
+  "formulas": null,
+  "matches": null,
+  "matching_answer_incorrect_matches": null
+}

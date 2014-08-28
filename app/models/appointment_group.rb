@@ -19,16 +19,24 @@
 class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include HtmlTextHelper
 
-  has_many :appointments, opts = {:class_name => 'CalendarEvent', :as => :context, :order => :start_at, :include => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'"}
+  has_many :appointments, opts = {:class_name => 'CalendarEvent', :as => :context, :order => :start_at, :include => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :context }
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./,
-      CANVAS_RAILS2 ? 'calendar_events_join.' : '_appointments_appointments_participants_join.'))
+  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, '_appointments_appointments_participants_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, :include => :sub_context
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :description, :location_name, :location_address, :context_id, :context_type, :context_code, :sub_context_id, :sub_context_type,
+    :sub_context_code, :workflow_state, :created_at, :updated_at, :start_at, :end_at, :participants_per_appointment, :max_appointments_per_participant,
+    :min_appointments_per_participant, :participant_visibility
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:appointments, :appointment_participants, :appointment_group_contexts, :appointment_group_sub_contexts]
 
   def context
     appointment_group_contexts.first.context
@@ -92,7 +100,6 @@ class AppointmentGroup < ActiveRecord::Base
   end
   attr_accessor :validation_event_override
   attr_accessor :cancel_reason
-  attr_accessor :context
 
   def reload
     remove_instance_variable :@new_appointments if @new_appointments
@@ -219,14 +226,19 @@ class AppointmentGroup < ActiveRecord::Base
         )
         COND
   }
-  scope :current, lambda { where("end_at>=?", Time.zone.now.midnight) }
-  scope :current_or_undated, lambda { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
+  scope :current, -> { where("end_at>=?", Time.zone.now.midnight) }
+  scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
   scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
-    given { |user, session|
+    given { |user|
+      active? && participant_for(user)
+    }
+    can :reserve and can :read
+
+    given { |user|
       next false if deleted?
-      next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
+      next false unless active_contexts.all? { |c| c.grants_right? user, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_sections = sub_context_ids & contexts.map { |c|
@@ -239,14 +251,8 @@ class AppointmentGroup < ActiveRecord::Base
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete
 
-    given { |user, session|
-      active? &&
-      participant_for(user)
-    }
-    can :reserve and can :read
-
-    given { |user, session|
-      participant_visibility == 'protected' && grants_right?(user, session, :reserve)
+    given { |user|
+      participant_visibility == 'protected' && grants_right?(user, :reserve)
     }
     can :read_appointment_participants
   end
@@ -340,8 +346,8 @@ class AppointmentGroup < ActiveRecord::Base
 
   def participant_for(user)
     @participant_for ||= {}
-    return @participant_for[user.id] if @participant_for.has_key?(user.id)
-    @participant_for[user.id] = begin
+    return @participant_for[user.global_id] if @participant_for.has_key?(user.global_id)
+    @participant_for[user.global_id] = begin
       participant = if participant_type == 'User'
           user
         else
@@ -452,18 +458,18 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts_for_user(user)
     @contexts_for_user ||= {}
-    return @contexts_for_user[user.id] if @contexts_for_user.has_key?(user.id)
-    @contexts_for_user[user.id] = begin
+    return @contexts_for_user[user.global_id] if @contexts_for_user.has_key?(user.global_id)
+    @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
       course_ids = appointment_group_contexts.select{|agc| context_codes.include? agc.context_code }.map(&:context_id)
-    Course.where(:id => course_ids).all
+      Course.where(:id => course_ids).all
     end
   end
 
   def context_codes_for_user(user)
     @context_codes_for_user ||= {}
-    @context_codes_for_user[user.id] if @context_codes_for_user.has_key?(user.id)
-    @context_codes_for_user[user.id] = begin
+    @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
+    @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes
       user_codes = user.appointment_context_codes[:primary] |
         manageable_codes[:full] | manageable_codes[:limited]

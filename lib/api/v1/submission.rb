@@ -53,7 +53,7 @@ module Api::V1::Submission
       end
     end
 
-    if includes.include?("rubric_assessment") && submission.rubric_assessment
+    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.grants_right?(user, :read_grade)
       ra = submission.rubric_assessment.data
       hash['rubric_assessment'] = {}
       ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }
@@ -139,7 +139,7 @@ module Api::V1::Submission
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
-      if assignment.has_group_category?
+      if assignment.discussion_topic.has_group_category?
         entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)

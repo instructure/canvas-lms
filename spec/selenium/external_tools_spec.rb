@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/external_tools_common')
 
 describe "external tools" do
-  it_should_behave_like "external tools tests"
+  include_examples "external tools tests"
 
   describe "app center" do
     before (:each) do
@@ -73,7 +73,7 @@ describe "external tools" do
       fj('button.btn-primary[role="button"]').click
       wait_for_ajaximations
 
-      ff('td.external_tool').size.should > 0
+      ff('th.external_tool').size.should > 0
       fj('.view_app_center_link').click
       wait_for_ajaximations
 
@@ -97,7 +97,7 @@ describe "external tools" do
   end
 
   describe "editing external tools" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
 
     before (:each) do
       course_with_teacher_logged_in
@@ -483,14 +483,16 @@ describe "external tools" do
         @assignment = @course.assignments.create!(:title => "test assignment", :submission_types => "online_upload,online_url")
       end
 
-      def homework_submission_tool
-        @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-        @tool.homework_submission = {
-            :url => "http://#{HostUrl.default_host}/selection_test",
-            :selection_width => 400,
-            :selection_height => 400
-        }
-        @tool.save!
+      def homework_submission_tool(count=4)
+        count.times do |i|
+          @tool = @course.context_external_tools.new(:name => "bob-#{i}", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
+          @tool.homework_submission = {
+              :url => "http://#{HostUrl.default_host}/selection_test",
+              :selection_width => 400,
+              :selection_height => 400
+          }
+          @tool.save!
+        end
       end
 
       def pick_submission_tool(iframe_link_selector)
@@ -530,7 +532,7 @@ describe "external tools" do
         wait_for_dom_ready
         f(".submit_assignment_link").click
         wait_for_ajax_requests
-        f(".submit_from_external_tool_option").should_not be_displayed
+        ff(".submit_from_external_tool_option").length.should == 0
         ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
       end
 
@@ -540,9 +542,20 @@ describe "external tools" do
         wait_for_dom_ready
         f(".submit_assignment_link").click
         wait_for_ajax_requests
+        ff("li a.external-tool").length.should == 3
         f(".submit_from_external_tool_option").should be_displayed
         ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
         # TODO: make sure the 'submit' button isn't enabled yed
+      end
+
+      it "should show tabs for two tools and not display the 'more' tab'" do
+        homework_submission_tool(2)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_dom_ready
+        f(".submit_assignment_link").click
+        wait_for_ajax_requests
+        ff("li a.external-tool").length.should == 2 
+        ff(".submit_from_external_tool_option").length.should == 0
       end
 
       it "should allow submission for a tool that returns a file URL for a file assignment" do
@@ -673,6 +686,279 @@ describe "external tools" do
       end
     end
 
+  end
+
+  describe 'showing external tools' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @tool = @course.context_external_tools.create!(
+        name: "new tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://#{HostUrl.default_host}/selection_test",
+      )
+
+    end
+
+    it "assumes course navigation launch type" do
+      @tool.course_navigation = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+      in_frame('tool_content') do
+        keep_trying_until { ff("#basic_lti_link").size.should > 0 }
+      end
+    end
+
+    it "accepts an explicit launch type" do
+      @tool.migration_selection = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=migration_selection"
+      in_frame('tool_content') do
+        keep_trying_until { ff("#basic_lti_link").size.should > 0 }
+      end
+    end
+
+    it "validates the launch type" do
+      @tool.course_navigation = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=bad_type"
+      assert_flash_error_message(/couldn't find valid settings/i)
+    end
+
+    describe "display type" do
+      before do
+        @tool.course_navigation = {}
+        @tool.save!
+      end
+
+      it "defaults to normal display type" do
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should be_displayed
+        f('#left-side').should_not be_nil
+        f('#breadcrumbs').should_not be_nil
+        f('body').attribute('class').should_not include('full-width')
+      end
+
+      it "shows full width if top level property specified" do
+        @tool.settings[:display_type] = "full_width"
+        @tool.save!
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should_not be_displayed
+        f('#left-side').should be_nil
+        f('#breadcrumbs').should be_nil
+        f('body').attribute('class').should include('full-width')
+      end
+
+      it "shows full width if extension property specified" do
+        @tool.course_navigation[:display_type] = "full_width"
+        @tool.save!
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should_not be_displayed
+        f('#left-side').should be_nil
+        f('#breadcrumbs').should be_nil
+        f('body').attribute('class').should include('full-width')
+      end
+    end
+
+  end
+
+  describe 'content migration launch through full-width redirect' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @course.root_account.enable_feature!(:lor_for_account)
+      @tool = @course.context_external_tools.create!(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.course_home_sub_navigation = {
+          url: "http://#{HostUrl.default_host}/selection_test",
+          text: "tool text",
+          icon_url: "/images/add.png",
+          display_type: 'full_width'
+      }
+      @tool.save!
+    end
+
+    it "should queue a content migration with content returned from the external tool" do
+      get "/courses/#{@course.id}"
+      tool_link = f('a.course-home-sub-navigation-lti')
+      expect_new_page_load { tool_link.click }
+      wait_for_ajaximations
+
+      expect_new_page_load do
+        in_frame('tool_content') do
+          keep_trying_until { ff("#file_link").length > 0 }
+          f("#file_link").click
+        end
+      end
+
+      # should redirect to the content_migration page on success
+      driver.current_url.should match %r{/courses/\d+/content_migrations}
+      @course.content_migrations.count.should == 1
+    end
+
+    it "should not show the link if the LOR feature flag is not enabled" do
+      @course.root_account.disable_feature!(:lor_for_account)
+      get "/courses/#{@course.id}"
+      tool_link = f('a.course-home-sub-navigation-lti')
+      tool_link.should be_nil
+    end
+  end
+
+  describe 'return url redirection' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @tool = @course.context_external_tools.create!(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+    end
+
+    def return_from_tool
+      ff("#tool_content").length.should == 1
+      keep_trying_until { f("#tool_content").should be_displayed }
+
+      expect_new_page_load do
+        in_frame('tool_content') do
+          keep_trying_until { ff("#basic_lti_link").length > 0 }
+          f("#basic_lti_link").click
+        end
+      end
+    end
+
+    context "for external assignments" do
+      before do
+        assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points', :description => "fluffy ponies!")
+        tag = @assignment.build_external_tool_tag(:url => @tool.url)
+        tag.content_type = 'ContextExternalTool'
+        tag.save!
+        @mod = @course.context_modules.create! name: 'TestModule'
+        @mod_item = @mod.add_item(:id => @assignment.id, :type => 'assignment')
+      end
+
+      it "should redirect back to the assignments page by default for an assignment tool" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f('.description').text.should match_ignoring_whitespace(@assignment.description)
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/assignments$}
+      end
+
+      it "should redirect back to the modules page if following a standard module item url" do
+        next_item = @mod.add_item(:type => 'external_url', :url => "http://#{HostUrl.default_host}", :title => 'pls view')
+        get "/courses/#{@course.id}/modules/items/#{@mod_item.id}"
+
+        f('#sequence_footer a.next')['href'].should end_with "/courses/#{@course.id}/modules/items/#{next_item.id}"
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/modules$}
+      end
+    end
+
+    context "for course navigation links" do
+      before do
+        settings = {
+            url: "http://#{HostUrl.default_host}/selection_test",
+            text: "tool text",
+            icon_url: "/images/add.png",
+            display_type: 'full_width'
+        }
+        [:course_navigation, :course_settings_sub_navigation].each do |type|
+          @tool.send(:"#{type}=", settings)
+        end
+        @tool.save!
+      end
+
+      it "should return to course settings page for course_settings_sub_navigation launches" do
+        Account.default.enable_feature!(:lor_for_account)
+        get "/courses/#{@course.id}/settings"
+        expect_new_page_load { f('.course-settings-sub-navigation-lti').click }
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/settings$}
+      end
+
+      it "should return to course home for course_navigation launches" do
+        get "/courses/#{@course.id}"
+        expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+$}
+      end
+    end
+
+    it "should return to the modules page for external tool module items" do
+      @mod = @course.context_modules.create! name: 'TestModule'
+      @mod_item = @mod.add_item(:id => @tool.id, :type => 'external_tool', :url => @tool.url)
+
+      get "/courses/#{@course.id}/modules/items/#{@mod_item.id}"
+
+      return_from_tool
+
+      driver.current_url.should match %r{/courses/\d+/modules$}
+    end
+
+    it "should return to the dashboard for global navigation" do
+      Account.default.enable_feature!(:lor_for_account)
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.global_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/"
+      expect_new_page_load {f("##{@tool.asset_string}_menu_item a").click }
+
+      return_from_tool
+      driver.current_url.should == "http://#{HostUrl.default_host}/"
+    end
+
+    it "should return to the account home page for account navigation" do
+      user_session(site_admin_user)
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.account_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/accounts/#{Account.default.id}"
+      expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+      return_from_tool
+
+      driver.current_url.should match %r{/accounts/\d+$}
+    end
+
+    it "should return to the user settings page for user navigation" do
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.user_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/profile/settings"
+      expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+      return_from_tool
+
+      driver.current_url.should match %r{/about/\d+$}
+    end
   end
 
   private

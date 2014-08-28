@@ -19,7 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
-  before do
+  before(:record) { stub_plugins }
+  before(:each)   { stub_plugins }
+
+  def stub_plugins
     WebConference.stubs(:plugins).returns(
         [web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
          web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
@@ -43,8 +46,11 @@ describe WebConference do
   end
 
   context "user settings" do
-    it "should ignore invalid user settings" do
+    before :once do
       user_model
+    end
+
+    it "should ignore invalid user settings" do
       email = "email@email.com"
       @user.stubs(:email).returns(email)
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
@@ -52,7 +58,6 @@ describe WebConference do
     end
 
     it "should not expose internal settings to users" do
-      user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
       conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course)
@@ -65,11 +70,20 @@ describe WebConference do
   end
 
   context "starting and ending" do
-    it "should not set start and end times by default" do
+    before :once do
       user_model
+    end
+
+    let_once(:conference) do
+      WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+    end
+
+    before :each do
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+    end
+
+    it "should not set start and end times by default" do
       conference.start_at.should be_nil
       conference.end_at.should be_nil
       conference.started_at.should be_nil
@@ -77,10 +91,6 @@ describe WebConference do
     end
     
     it "should set start and end times when a paricipant is added" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at.should_not be_nil
       conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
@@ -89,10 +99,6 @@ describe WebConference do
     end
     
     it "should not set ended_at if the conference is still active" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -101,10 +107,6 @@ describe WebConference do
     end
     
     it "should not set ended_at if the conference is no longer active but end_at has not passed" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.ended_at.should be_nil
@@ -113,10 +115,6 @@ describe WebConference do
     end
     
     it "should set ended_at if the conference is no longer active and end_at has passed" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.start_at = 30.minutes.ago
@@ -129,10 +127,6 @@ describe WebConference do
     end
     
     it "should set ended_at if it's more than 15 minutes past end_at" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -146,10 +140,6 @@ describe WebConference do
     end
     
     it "should be restartable if end_at has not passed" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.should_not be_finished
@@ -157,10 +147,6 @@ describe WebConference do
     end
     
     it "should not be restartable if end_at has passed" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
@@ -171,9 +157,6 @@ describe WebConference do
     end
 
     it "should not be restartable if it's long running" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
@@ -185,7 +168,7 @@ describe WebConference do
   end
 
   context "notifications" do
-    before do
+    before :once do
       Notification.create!(:name => 'Web Conference Invitation', :category => "TestImmediately")
       course_with_student(:active_all => 1)
       @student.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email").confirm
@@ -211,7 +194,7 @@ describe WebConference do
   end
 
   context "scheduled conferences" do
-    before do
+    before :once do
       course_with_student(:active_all => 1)
       @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
     end

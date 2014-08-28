@@ -17,9 +17,10 @@
  */
 
 define([
+  'compiled/editor/stocktiny',
   'jquery',
   'media_comments'
-], function($) {
+], function(tinymce,$) {
 
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {

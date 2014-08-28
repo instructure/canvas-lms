@@ -12,7 +12,12 @@
          maxlength="255" />
 
   <div class="clearfix">
-    <a href="#" class="switch_event_description_view pull-right">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
+    <a href="#" class="switch_event_description_view pull-right">
+      {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+    </a>
+    <a href="#" class="switch_event_description_view pull-right" style="display:none;">
+      {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+    </a>
   </div>
   <textarea class="input-block-level"
             name="description"
@@ -20,7 +25,7 @@
             style="width: 100%">{{description}}</textarea>
 
   {{#if course_sections}}
-    <label class="label_with_checkbox">
+    <label class="label_with_checkbox" for="use_section_dates">
       {{checkbox "use_section_dates"}}
       {{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
     </label>
@@ -58,6 +63,24 @@
                    {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
                    aria-label="{{#t "end_time"}}End Time{{/t}}"
                    placeholder="{{#t "end_time"}}End Time{{/t}}" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <table id="calendar_event_location_info">
+      <tbody>
+        <tr>
+          <td>
+            <label for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
+            <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="calendar_event_location_address">{{#t "location_address"}}Address:{{/t}}</label>
+            <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
           </td>
         </tr>
       </tbody>
@@ -112,7 +135,7 @@
       <button type="button" class="btn delete_link">{{#t "delete"}}Delete{{/t}}</button>
     {{/if}}
     {{#if return_to_url}}
-      <a href="{{return_to_url}}" class="btn">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
+      <a href="{{return_to_url}}" class="btn" role="button">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
     {{/if}}
     <button type="submit" class="btn btn-primary">
       {{#if newRecord}}

@@ -19,6 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GradebooksController do
+  before :once do
+    course_with_teacher active_all: true
+    @teacher_enrollment = @enrollment
+    student_in_course active_all: true
+    @student_enrollment = @enrollment
+
+    user(:active_all => true)
+    @observer = @user
+    @oe = @course.enroll_user(@user, 'ObserverEnrollment')
+    @oe.accept
+    @oe.update_attribute(:associated_user_id, @student.id)
+  end
 
   it "should use GradebooksController" do
     controller.should be_an_instance_of(GradebooksController)
@@ -32,53 +44,41 @@ describe GradebooksController do
 
   describe "GET 'grade_summary'" do
     it "should redirect teacher to gradebook" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      user_session(@teacher)
+      get 'grade_summary', :course_id => @course.id, :id => nil
+      response.should redirect_to(:action => 'show')
     end
 
     it "should render for current user" do
-      course_with_student_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      user_session(@student)
+      get 'grade_summary', :course_id => @course.id, :id => nil
       response.should render_template('grade_summary')
     end
 
     it "should render with specified user_id" do
-      course_with_student_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id, :id => @user.id
+      user_session(@student)
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
       assigns[:presenter].courses_with_grades.should_not be_nil
     end
 
     it "should not allow access for wrong user" do
-      course_with_student(:active_all => true)
-      @student = @user
       user(:active_all => true)
       user_session(@user)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assert_unauthorized
     end
 
-    it" should allow access for a linked observer" do
-      course_with_student(:active_all => true)
-      @student = @user
-      user(:active_all => true)
-      user_session(@user)
-      @oe = @course.enroll_user(@user, 'ObserverEnrollment')
-      @oe.accept
-      @oe.update_attribute(:associated_user_id, @student.id)
-      @user.reload
+    it "should allow access for a linked observer" do
+      user_session(@observer)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
       assigns[:courses_with_grades].should be_nil
     end
 
     it "should not allow access for a linked student" do
-      course_with_student(:active_all => true)
-      @student = @user
       user(:active_all => true)
       user_session(@user)
       @se = @course.enroll_student(@user)
@@ -90,29 +90,19 @@ describe GradebooksController do
     end
 
     it "should not allow access for an observer linked in a different course" do
-      course_with_student(:active_all => true)
       @course1 = @course
-      @student = @user
       course(:active_all => true)
       @course2 = @course
 
-      user(:active_all => true)
-      user_session(@user)
-      @oe = @course1.enroll_user(@user, 'ObserverEnrollment')
-      @oe.accept
-      @oe.update_attribute(:associated_user_id, @student.id)
+      user_session(@observer)
 
-      @user.reload
       get 'grade_summary', :course_id => @course2.id, :id => @student.id
       assert_unauthorized
     end
 
     it "should allow concluded teachers to see a student grades pages" do
-      course_with_teacher_logged_in(:active_all => true)
-      @enrollment.conclude
-      @student = user_model
-      @enrollment = @course.enroll_student(@student)
-      @enrollment.accept
+      user_session(@teacher)
+      @teacher_enrollment.conclude
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should be_success
       response.should render_template('grade_summary')
@@ -120,75 +110,65 @@ describe GradebooksController do
     end
 
     it "should allow concluded students to see their grades pages" do
-      course_with_student_logged_in(:active_all => true)
-      @enrollment.conclude
-      get 'grade_summary', :course_id => @course.id, :id => @user.id
+      user_session(@student)
+      @student_enrollment.conclude
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
     end
-    
+
     it "give a student the option to switch between courses" do
-      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
-      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      user_session(student)
-      get 'grade_summary', :course_id => @course.id, :id => student.id
+      pseudonym(@teacher, :username => 'teacher@example.com')
+      pseudonym(@student, :username => 'student@example.com')
+      course1 = @course
+      course2 = course_with_teacher(:user => @teacher, :active_all => 1).course
+      student_in_course :user => @student, :active_all => 1
+      user_session(@student)
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should be_success
       assigns[:presenter].courses_with_grades.should_not be_nil
       assigns[:presenter].courses_with_grades.length.should == 2
     end
-    
+
     it "should not give a teacher the option to switch between courses when viewing a student's grades" do
-      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
-      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      user_session(teacher)
-      get 'grade_summary', :course_id => @course.id, :id => student.id
+      pseudonym(@teacher, :username => 'teacher@example.com')
+      pseudonym(@student, :username => 'student@example.com')
+      course1 = @course
+      course2 = course_with_teacher(:user => @teacher, :active_all => 1).course
+      student_in_course :user => @student, :active_all => 1
+      user_session(@teacher)
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should be_success
       assigns[:courses_with_grades].should be_nil
     end
-    
+
     it "should not give a linked observer the option to switch between courses when viewing a student's grades" do
-      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
-      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+      pseudonym(@teacher, :username => 'teacher@example.com')
+      pseudonym(@student, :username => 'student@example.com')
       observer = user_with_pseudonym(:username => 'parent@example.com', :active_all => 1)
 
-      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      oe = course1.enroll_user(observer, 'ObserverEnrollment')
-      oe.associated_user = student
+      course1 = @course
+      course2 = course_with_teacher(:user => @teacher, :active_all => 1).course
+      student_in_course :user => @student, :active_all => 1
+      oe = course2.enroll_user(@observer, 'ObserverEnrollment')
+      oe.associated_user = @student
       oe.save!
       oe.accept
 
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      oe = course2.enroll_user(observer, 'ObserverEnrollment')
-      oe.associated_user = student
-      oe.save!
-      oe.accept
-
-      user_session(observer)
-      get 'grade_summary', :course_id => course1.id, :id => student.id
+      user_session(@observer)
+      get 'grade_summary', :course_id => course1.id, :id => @student.id
       response.should be_success
       assigns[:courses_with_grades].should be_nil
     end
 
     it "should assign values for grade calculator to ENV" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
+      user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assigns[:js_env][:submissions].should_not be_nil
       assigns[:js_env][:assignment_groups].should_not be_nil
     end
 
     it "should not include assignment discussion information in grade calculator ENV data" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
+      user_session(@teacher)
       assignment1 = @course.assignments.create(:title => "Assignment 1")
       assignment1.submission_types = "discussion_topic"
       assignment1.save!
@@ -198,7 +178,7 @@ describe GradebooksController do
     end
 
     it "doesn't leak muted scores" do
-      course_with_student_logged_in
+      user_session(@student)
       a1, a2 = 2.times.map { |i|
         @course.assignments.create! name: "blah#{i}", points_possible: 10
       }
@@ -206,17 +186,17 @@ describe GradebooksController do
       a1.grade_student(@student, grade: 10)
       a2.grade_student(@student, grade: 5)
       get 'grade_summary', course_id: @course.id, id: @student.id
+      expected =
       assigns[:js_env][:submissions].sort_by { |s|
-        s[:assignment_id]
+        s['assignment_id']
       }.should == [
-        {score: nil, assignment_id: a1.id},
-        {score: 5, assignment_id: a2.id}
+        {'score' => nil, 'assignment_id' => a1.id},
+        {'score' => 5, 'assignment_id' => a2.id}
       ]
     end
 
     it "should sort assignments by due date (null last), then title" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
+      user_session(@teacher)
       assignment1 = @course.assignments.create(:title => "Assignment 1")
       assignment2 = @course.assignments.create(:title => "Assignment 2", :due_at => 3.days.from_now)
       assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
@@ -226,16 +206,7 @@ describe GradebooksController do
     end
 
     context "with assignment due date overrides" do
-      before :each do
-        course_with_teacher(:active_all => true)
-        student_in_course(:active_all => true)
-
-        user(:active_all => true)
-        @observer = @user
-        oe = @course.enroll_user(@observer, 'ObserverEnrollment')
-        oe.accept
-        oe.update_attribute(:associated_user_id, @student.id)
-
+      before :once do
         @assignment = @course.assignments.create(:title => "Assignment 1")
         @due_at = 4.days.from_now
       end
@@ -331,140 +302,93 @@ describe GradebooksController do
         check_grades_page(@due_at + 1.day)
       end
     end
+
+    it "should raise an exception on a non-integer :id" do
+      user_session(@teacher)
+      assert_page_not_found do
+        get 'grade_summary', :course_id => @course.id, :id => "lqw"
+      end
+    end
   end
 
   describe "GET 'show'" do
-    describe "gradebook_init_json" do
-      it "should include group_category in rendered json for assignments" do
-        course_with_teacher_logged_in(:active_all => true)
-        group_category1 = @course.group_categories.create(:name => 'Category 1')
-        group_category2 = @course.group_categories.create(:name => 'Category 2')
-        assignment1 = @course.assignments.create(:title => "Assignment 1", :group_category => group_category1)
-        assignment2 = @course.assignments.create(:title => "Assignment 2", :group_category => group_category2)
-        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'json'
-        response.should be_success
-        data = json_parse
-        data.should_not be_nil
-        data.size.should == 4 # 2 assignments + an assignment group + a total
-        data.first(2).sort_by{ |a| a['assignment']['title'] }.map{ |a| a['assignment']['group_category'] }.
-          should == [assignment1, assignment2].map{ |a| a.group_category.name }
-      end
-
-      context "draft state" do
-        it "should should not return unpublished assignments" do
-          course_with_teacher_logged_in(:active_all => true)
-          @course.account.enable_feature!(:draft_state)
-          ag = @course.assignment_groups.create! group_weight: 100
-          a1 = ag.assignments.create! :submission_types => 'online_upload',
-                                      :points_possible  => 10,
-                                      :context  => @course
-          a2 = ag.assignments.build :title => "unpub assign",
-                                    :submission_types => 'online_upload',
-                                    :points_possible  => 10,
-                                    :context  => @course
-          a2.workflow_state = 'unpublished'
-          a2.save!
-
-          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'json'
-          response.should be_success
-          data = json_parse
-          data.should_not be_nil
-          data.size.should == 3 # 1 assignment (no unpublished) + an assignment group + a total
-          data.map{|a| a['assignment']['title']}.include?(a2.title).should be_false
-        end
-      end
-    end
-
     describe "csv" do
-      it "should not re-compute enrollment grades" do
-        course_with_teacher_logged_in(:active_all => true)
-        student_in_course(:active_all => true)
+      before :once do
         assignment1 = @course.assignments.create(:title => "Assignment 1")
         assignment2 = @course.assignments.create(:title => "Assignment 2")
-        Enrollment.expects(:recompute_final_score).never
-        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
-        response.should be_success
-        response.body.should match(/\AStudent,/)
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      shared_examples_for "working download" do
+        it "should successfully return data" do
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          response.should be_success
+          response.body.should match(/\AStudent,/)
+        end
+        it "should not recompute enrollment grades" do
+          Enrollment.expects(:recompute_final_score).never
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+        end
+      end
+
+      context "with teacher that prefers Grid View" do
+        before do
+          @user.preferences[:gradebook_version] = "2"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers Individual View" do
+        before do
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        include_examples "working download"
       end
     end
 
-    describe "draft state" do
-      it "should properly filter unpublished assignments" do
-        course_with_teacher_logged_in(:active_all => true)
-        @course.account.enable_feature!(:draft_state)
-        assignment1 = @course.assignments.build(:title => "Assignment 1")
-        assignment1.unpublish
-        assignment2 = @course.assignments.create!(:title => "Assignment 2")
-
-        get 'show', :course_id => @course.id
-        assign_ids = assigns[:assignments].map(&:id)
-        assign_ids.include?(assignment1.id).should be_false
-        assign_ids.include?(assignment2.id).should be_true
-        assign_ids.include?("group-#{assignment2.assignment_group.id}").should be_true
-        assign_ids.include?("final-grade").should be_true
-
-        ag_assign_ids = assigns[:js_env][:assignment_groups].first['assignments'].map{|a| a['id']}
-        ag_assign_ids.include?(assignment1.id).should be_false
-        ag_assign_ids.include?(assignment2.id).should be_true
+    context "Individual View" do
+      before do
+        user_session(@teacher)
       end
+
+      it "redirects to Grid View with a friendly URL" do
+        @teacher.preferences[:gradebook_version] = "2"
+        get "show", :course_id => @course.id
+        response.should render_template("gradebook2")
+      end
+
+      it "redirects to Individual View with a friendly URL" do
+        @teacher.preferences[:gradebook_version] = "srgb"
+        get "show", :course_id => @course.id
+        response.should render_template("screenreader")
+      end
+    end
+
+    it "renders the unauthorized page without gradebook authorization" do
+      get "show", :course_id => @course.id
+      response.should render_template("shared/unauthorized")
     end
   end
 
   describe "GET 'change_gradebook_version'" do
-    it 'should switch to gradebook2 if clicked and back to gradebook1 if clicked with reset=true' do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+    it 'should switch to gradebook2 if clicked' do
+      user_session(@teacher)
+      get 'grade_summary', :course_id => @course.id, :id => nil
 
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
-
-      # reset back to showing the old gradebook
-      get 'change_gradebook_version', :course_id => @course.id, :version => 1
       response.should redirect_to(:action => 'show')
 
       # tell it to use gradebook 2
       get 'change_gradebook_version', :course_id => @course.id, :version => 2
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
-    end
-
-    context "large roster courses" do
-      before do
-        course_with_teacher_logged_in(:active_all => true)
-        @user.preferences[:use_gradebook2] = false
-        @user.save!
-        @user.prefers_gradebook2?.should == false
-        @course.large_roster = true
-        @course.save!
-        @course.reload
-        @course.large_roster?.should == true
-      end
-
-      it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
-        get 'grade_summary', :course_id => @course.id
-        response.should be_redirect
-        response.should redirect_to(:controller => 'gradebook2', :action => 'show')
-      end
-
-      it 'should not render gb1 json' do
-        get 'show', :course_id => @course.id, :format => :json
-        response.status.to_i.should == 404
-      end
-
-      it 'should not prevent you from getting gradebook.csv' do
-        get 'show', :course_id => @course.id, :format => 'csv'
-        response.should be_success
-      end
+      response.should redirect_to(:action => 'show')
     end
   end
 
   describe "POST 'update_submission'" do
-    it "should have a route for update_submission" do
-      params_from(:post, "/courses/20/gradebook/update_submission").should ==
-        {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
-    end
-
     it "should allow adding comments for submission" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
@@ -477,11 +401,10 @@ describe GradebooksController do
     end
 
     it "should allow attaching files to comments for submission" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      require 'action_controller_test_process'
-      data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
+      data = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
       post 'update_submission', :course_id => @course.id, :attachments => {"0" => {:uploaded_data => data}}, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
       response.should be_redirect
       assigns[:assignment].should eql(@assignment)
@@ -494,8 +417,8 @@ describe GradebooksController do
     end
 
     it "should not allow updating submissions for concluded courses" do
-      course_with_teacher_logged_in(:active_all => true)
-      @enrollment.complete
+      user_session(@teacher)
+      @teacher_enrollment.complete
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
@@ -503,8 +426,8 @@ describe GradebooksController do
     end
 
     it "should not allow updating submissions in other sections when limited" do
-      course_with_teacher_logged_in(:active_all => true)
-      @enrollment.update_attribute(:limit_privileges_to_course_section, true)
+      user_session(@teacher)
+      @teacher_enrollment.update_attribute(:limit_privileges_to_course_section, true)
       s1 = submission_model(:course => @course)
       s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"), :assignment => @assignment)
 
@@ -518,28 +441,26 @@ describe GradebooksController do
   end
 
   describe "GET 'speed_grader'" do
-    it "should have a route for speed_grader" do
-      params_from(:get, "/courses/20/gradebook/speed_grader").should ==
-        {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
-    end
-
     it "should redirect user if course's large_roster? setting is true" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       assignment = @course.assignments.create!(:title => 'some assignment')
 
       Course.any_instance.stubs(:large_roster?).returns(true)
 
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
       response.should be_redirect
-      response.flash[:notice].should == 'SpeedGrader is disabled for this course'
+      flash[:notice].should == 'SpeedGrader is disabled for this course'
     end
 
     context "draft state" do
 
-      before do
-        course_with_teacher_logged_in(active_all: true)
+      before :once do
         @assign = @course.assignments.create!(title: 'Totally')
         @assign.unpublish
+      end
+
+      before :each do
+        user_session(@teacher)
       end
 
       it "redirects if draft state is enabled and the assignment is unpublished" do
@@ -549,7 +470,7 @@ describe GradebooksController do
 
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         response.should be_redirect
-        response.flash[:notice].should == I18n.t(
+        flash[:notice].should == I18n.t(
           :speedgrader_enabled_only_for_published_content,
                            'Speedgrader is enabled only for published content.')
 
@@ -569,7 +490,7 @@ describe GradebooksController do
 
   describe "POST 'speed_grader_settings'" do
     it "lets you set your :enable_speedgrader_grade_by_question preference" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @teacher.preferences[:enable_speedgrader_grade_by_question].should_not be_true
 
       post 'speed_grader_settings', course_id: @course.id,
@@ -584,16 +505,21 @@ describe GradebooksController do
 
   describe '#light_weight_ags_json' do
     it 'should return the necessary JSON for GradeCalculator' do
-      course_with_student
       ag = @course.assignment_groups.create! group_weight: 100
       a  = ag.assignments.create! :submission_types => 'online_upload',
                                   :points_possible  => 10,
                                   :context  => @course
+      AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
+      @controller.instance_variable_set(:@current_user, @user)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
-          rules: {},
+          rules: {
+            'never_drop' => [
+              a.id.to_s
+            ]
+          },
           group_weight: 100,
           assignments: [
             {
@@ -608,7 +534,7 @@ describe GradebooksController do
 
     context 'draft state' do
       it 'should not return unpublished assignments' do
-        course_with_teacher(:active_all => true)
+        course_with_student
         @course.account.enable_feature!(:draft_state)
         ag = @course.assignment_groups.create! group_weight: 100
         a1 = ag.assignments.create! :submission_types => 'online_upload',
@@ -621,6 +547,7 @@ describe GradebooksController do
         a2.save!
 
       @controller.instance_variable_set(:@context, @course)
+      @controller.instance_variable_set(:@current_user, @user)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,

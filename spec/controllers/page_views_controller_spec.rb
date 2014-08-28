@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
+require 'csv'
+
 describe PageViewsController do
 
   # Factory-like thing for page views.
@@ -41,9 +43,13 @@ describe PageViewsController do
   end
 
   shared_examples_for "GET 'index' as csv" do
-    before do
-      user_session(account_admin_user)
+    before :once do
+      account_admin_user
+    end
+
+    before :each do
       student_in_course
+      user_session(@admin)
     end
 
     it "should succeed" do
@@ -63,14 +69,14 @@ describe PageViewsController do
   end
 
   context "with db page views" do
-    before :each do
+    before :once do
       Setting.set('enable_page_views', true)
     end
-    it_should_behave_like "GET 'index' as csv"
+    include_examples "GET 'index' as csv"
   end
 
   context "with cassandra page views" do
-    it_should_behave_like 'cassandra page views'
-    it_should_behave_like "GET 'index' as csv"
+    include_examples 'cassandra page views'
+    include_examples "GET 'index' as csv"
   end
 end

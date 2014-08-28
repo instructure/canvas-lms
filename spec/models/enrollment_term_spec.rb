@@ -24,25 +24,27 @@ describe EnrollmentTerm do
       account_model
       term = @account.default_enrollment_term
       
-      I18n.backend.store_translations 'test_locale', {
-        :account => {
-          :default_term_name => "mreT tluafeD"
+      translations = {
+        :test_locale => {
+          :account => {
+            :default_term_name => "mreT tluafeD"
+          }
         }
       }
-      old_locale, I18n.locale = I18n.locale, :test_locale
-    
-      term.name.should == "mreT tluafeD"
-      term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
-      term.name = "my term name"
-      term.save!
-      term.read_attribute(:name).should == "my term name"
-      term.name.should == "my term name"
-      term.name = "mreT tluafeD"
-      term.save!
-      term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
-      term.name.should == "mreT tluafeD"
-    ensure
-      I18n.locale = old_locale
+      I18n.backend.stub(translations) do
+        I18n.locale = :test_locale
+
+        term.name.should == "mreT tluafeD"
+        term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
+        term.name = "my term name"
+        term.save!
+        term.read_attribute(:name).should == "my term name"
+        term.name.should == "my term name"
+        term.name = "mreT tluafeD"
+        term.save!
+        term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
+        term.name.should == "mreT tluafeD"
+      end
     end
   end
 end

@@ -3,6 +3,8 @@ require_dependency 'qti/respondus_settings'
 module Qti
 class Converter < Canvas::Migration::Migrator
 
+  include CC::Importer::Canvas::QuizMetadataConverter
+
   MANIFEST_FILE = "imsmanifest.xml"
   QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
   QTI_2_0_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p0'
@@ -11,6 +13,8 @@ class Converter < Canvas::Migration::Migrator
   QTI_2_NAMESPACES = %w[
     http://www.imsglobal.org/xsd/imsqti_v2p0
     http://www.imsglobal.org/xsd/imsqti_v2p1
+    http://www.imsglobal.org/xsd/qti/qtiv2p0
+    http://www.imsglobal.org/xsd/qti/qtiv2p1
   ]
   IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
   QTI_2_OUTPUT_PATH = "qti_2_1"
@@ -39,6 +43,13 @@ class Converter < Canvas::Migration::Migrator
     path_map = @course[:file_map].values.inject({}){|h, v| h[v[:path_name]] = v[:migration_id]; h }
     @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
     @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
+
+    original_manifest_path = File.join(@unzipped_file_path, MANIFEST_FILE)
+    if File.exists?(original_manifest_path)
+      @manifest = Nokogiri::XML(File.open(original_manifest_path))
+      post_process_assessments # bring in canvas metadata if available
+    end
+
     @course[:files_import_root_path] = unique_quiz_dir
 
     if settings[:apply_respondus_settings_file]
@@ -54,7 +65,11 @@ class Converter < Canvas::Migration::Migrator
   def self.is_qti_2(manifest_path)
     if File.exists?(manifest_path)
       xml = Nokogiri::XML(File.open(manifest_path))
-      return xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.include?(v) }
+      if xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.any?{|ns| v.to_s.start_with?(ns)} }
+        return true
+      elsif (xml.at_css('metadata schema') ? xml.at_css('metadata schema').text : '') =~ /QTIv2\./i
+        return true
+      end
     end
     false
   end

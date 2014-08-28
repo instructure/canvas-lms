@@ -43,8 +43,8 @@ module SearchHelper
             :term => term_for_course.call(course),
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
-            :permissions => course.grants_rights?(@current_user),
-            :default_section_id => course.default_section.id
+            :permissions => course.rights_status(@current_user).select { |key, value| value },
+            :default_section_id => course.default_section(no_create: true).try(:id)
           }
         end
       end
@@ -66,7 +66,10 @@ module SearchHelper
       end
 
       add_groups = lambda do |groups|
+        Group.send(:preload_associations, groups, :group_category)
+        Group.send(:preload_associations, groups, :group_memberships, conditions: { group_memberships: { user_id: @current_user }})
         groups.each do |group|
+          group.can_participate = true
           contexts[:groups][group.id] = {
             :id => group.id,
             :name => group.name,
@@ -75,7 +78,7 @@ module SearchHelper
             :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
             :context_name => group.context.name,
             :category => group.category,
-            :permissions => group.grants_rights?(@current_user)
+            :permissions => group.rights_status(@current_user).select { |key, value| value }
           }
         end
       end

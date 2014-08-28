@@ -3,7 +3,7 @@ define [
   'compiled/models/Submission'
   'compiled/models/DateGroup'
   'helpers/fakeENV'
-], (Assignment, Submission, DateGroup) ->
+], (Assignment, Submission, DateGroup, fakeENV) ->
 
   module "Assignment"
 
@@ -215,17 +215,17 @@ define [
   module "Assignment#submissionType"
 
   test "returns 'none' if record's submission_types is ['none']", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '12'
     assignment.set 'submission_types', [ 'none' ]
     deepEqual assignment.submissionType(), 'none'
 
   test "returns 'on_paper' if record's submission_types includes on_paper", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '13'
     assignment.set 'submission_types', [ 'on_paper' ]
     deepEqual assignment.submissionType(), 'on_paper'
 
   test "returns online submission otherwise", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '14'
     assignment.set 'submission_types', [ 'online_upload' ]
     deepEqual assignment.submissionType(), 'online'
 
@@ -386,10 +386,12 @@ define [
     assignment = new Assignment
     deepEqual assignment.allDates(), []
 
-  module "Assignment#singleSectionDueDate"
+  module "Assignment#singleSectionDueDate",
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test "gets the due date for section instead of null", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     assignment = new Assignment all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
@@ -494,7 +496,7 @@ define [
     deepEqual json.acceptsMediaRecording, true
 
   test "includes submissionType", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '16'
     assignment.set 'submission_types', [ 'on_paper' ]
     json = assignment.toView()
     deepEqual json.submissionType, 'on_paper'
@@ -538,7 +540,7 @@ define [
     equal json.allDates.length, 2
 
   test "includes singleSectionDueDate", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     assignment = new Assignment all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}

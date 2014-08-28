@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,23 +17,29 @@
 #
 
 class EportfolioEntry < ActiveRecord::Base
-  attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url, :content
+  attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio
   belongs_to :eportfolio_category
+
+  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id, :position, :name, :artifact_type, :attachment_id, :allow_comments, :show_comments, :slug, :url, :content, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:eportfolio, :eportfolio_category]
+
   acts_as_list :scope => :eportfolio_category
   before_save :infer_unique_slug
   before_save :infer_comment_visibility
   after_save :update_portfolio
   validates_presence_of :eportfolio_id
   validates_presence_of :eportfolio_category_id
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
+  validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   has_many :page_comments, :as => :page, :include => :user, :order => 'page_comments.created_at DESC'
   
 
   serialize :content
 
   set_policy do
-    given {|user, session| user && self.allow_comments }
+    given {|user| user && self.allow_comments }
     can :comment
   end
   
@@ -97,7 +103,7 @@ class EportfolioEntry < ActiveRecord::Base
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
       new_obj = {:section_type => obj[:section_type]}
       if obj[:section_type] == 'rich_text' || obj[:section_type] == 'html'
-        config = Instructure::SanitizeField::SANITIZE
+        config = CanvasSanitize::SANITIZE
         new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
         new_obj = nil if new_obj[:content].empty?
       elsif obj[:section_type] == 'submission'

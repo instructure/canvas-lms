@@ -145,13 +145,41 @@
   border: none !important;
 }
 
+input.move-module-label-spacer {
+  margin-right: 10px;
+}
+.move-module-or {
+  display: inline-block;
+  width: 60px;
+  margin-left: 20px;
+
+}
+.move-module-select-spacer {
+  margin-top: 10px;
+}
+
+.drag_and_drop_warning {
+  display: none;
+  color: #fff;
+  background-color: #DC3F3F;
+  border: 1px dashed #fff;
+  font-size: 12px;
+  padding: 1px;
+  z-index: 2;
+  position: absolute;
+  top: -20px;
+  left: -1px;
+}
+
+
+
 </style>
 
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>
 <% end %>
 
-<h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
+<h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
 
 <div class="header-bar">
   <% if can_do(@context, @current_user, :manage_content) %>
@@ -162,15 +190,9 @@
   <% end %>
 </div>
 
-<div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
-  <%= t('modules_keyboard_hint',
-        'To change the order of the course modules and module items,
-        first turn the cursor off on your screen reader. Insert-z in JAWS.
-        Press tab to select the first module.
-        Press up and down to choose a module or module item.
-        Press space to select the module or module item to start dragging.
-        Then press up and down to select a destination.
-        Then press space a second time to drop selection after destination.') %>
+<div class="hidden-readable screenreader-only" tabindex="0" aria-label="keyboard instructions">
+  <%= t('modules_keyboard_hint_updated',
+        'Warning: For improved accessibility, please use the Move To Dialog option found in the menu.') %>
 </div>
 
 <% keyboard_navigation([
@@ -182,7 +204,7 @@
 <div class="item-group-container" id="context_modules_sortable_container">
 
   <div id="no_context_modules_message" style="display:none; clear: both;">
-    <% if can_do(@context.context_modules.new, @current_user, :create) %>
+    <% if can_do(@context.context_modules.scoped.new, @current_user, :create) %>
       <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
   Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
@@ -202,7 +224,7 @@ TEXT
     class="ig-list <%= 'editable' if can_do(@context, @current_user, :manage_content) %>"
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% cache([@context.cache_key, editable, 'all_context_modules_draft', collection_cache_key(@modules)].join('/')) do %>
+    <% cache([@context.cache_key, editable, 'all_context_modules_draft_6', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable } %>
@@ -212,10 +234,30 @@ TEXT
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable} %>
 
 <% if can_do(@context, @current_user, :manage_content) %>
-  <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
+  <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
+    <div class="form-dialog-content">
+      <h2>Place <span id="move_module_name"> </span></h2>
+      <div class="move-module-before-after-container">
+        <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t('move_module.before', "Before") %></label>
+          <strong class="move-module-or">OR</strong>
+        <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t('move_module.after', "After") %></label>
+      </div>
+      <div class="move-module-select-spacer">
+        <select name="move_context_module_select" id="move_context_module_select"></select>
+      </div>
+
+    </div>
+    <div class="form-controls">
+      <button type="button" id="move_module_cancel_btn" class="btn">Cancel</button>
+      <button type="submit" class="btn btn-primary">Move</button>
+    </div>
+  </form>
+
+
+  <%= form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
       <tr>
         <td colspan="2">
@@ -223,18 +265,22 @@ TEXT
             <%= f.text_field :name, :placeholder => t('module_name', %{Module Name}), :class => 'input-block-level' %>
           </div>
         </td>
-      </tr><tr>
+      </tr>
+
+      <tr>
         <td colspan="2">
           <input type="checkbox" id="unlock_module_at"/>
-          <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{lock module until a given date}) %></label>
+          <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{Lock module until a given date}) %></label>
         </td>
       </tr><tr class="unlock_module_at_details">
         <td>
           <%= before_label('unlock_at', %{Unlock At}) %>
         </td><td>
-          <%= f.text_field :unlock_at, :class => "datetime_field" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :'aria-label' => t('#aria_labels.unlock_at_date', "Unlock at date") %>
         </td>
-      </tr><tr>
+      </tr>
+
+      <tr>
         <td colspan="2">
         <div class="prerequisites_entry">
           <b><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
@@ -249,16 +295,16 @@ TEXT
                 </span>
               </div>
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link dim-till-hover"><i class="icon-end standalone-icon" title="Delete"></i></a>
+                <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>"><i class="icon-end standalone-icon" ></i></button>
               </div>
               <div class="clear"></div>
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
+              <a class="add_prerequisite_link"><i class="icon-add"></i><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
             </div>
           </div>
         </div>
-        <div class="completion_entry">
+        <div class="completion_entry" style="margin-top:10px;">
           <b><%= before_label('module_complete_when', %{This module is complete when}) %></b>
           <div class="completion_criteria_list">
             <div class="no_items_message"><%= t('prerequisites_need_item', %{You'll need to add items before you can specify how a user will complete this module}) %></div>
@@ -270,13 +316,22 @@ TEXT
             </div>
           </div>
         </div>
-      </td>
-    </tr><tr>
+        </td>
+      </tr>
+      <% if Canvas::Plugin.find!('grade_export').enabled? %>
+       <tr>
+        <td colspan="2">
+         <%= f.check_box :publish_final_grade, :id => "publish_final_grade" %>
+         <%= f.label :publish_final_grade, :en => "Publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
+        </td>
+       </tr>
+      <% end %>
+      <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
-          <%= f.label :require_sequential_progress, :en => "students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
+          <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
         </td>
-    </tr><tr>
+      </tr><tr>
       <td colspan="2">
         <div class="button-container">
           <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
@@ -284,8 +339,8 @@ TEXT
         </div>
         <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
       </td>
-    </tr>
-  </table>
+      </tr>
+    </table>
   <% end %>
   <div id="add_module_prerequisite_dialog" style="display: none;">
     <span class="context_module_id" style="display: none;">&nbsp;</span>
@@ -301,7 +356,7 @@ TEXT
   </div>
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
   <div id="edit_item_dialog" style="display: none;">
-    <% form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
+    <%= form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
       <table class="formtable">
         <tr>
           <td><%= f.blabel :title, :en => "Title" %></td>
@@ -321,10 +376,10 @@ TEXT
             </select>
           </td>
         </tr>
-        <tr class="external_tool">
+        <tr class="external">
           <td colspan="2">
             <%= f.check_box :new_tab %>
-            <%= f.label :new_tab, :en => "Load this tool in a new tab" %>
+            <%= f.label :new_tab, :en => "Load in a new tab" %>
           </td>
         </tr>
         <tr>
@@ -364,8 +419,8 @@ TEXT
       <tr>
         <td class="left">
           <div style="display: none;">
-            <%= before_label('sort_by', %{Sort By}) %> 
-            <a href="#"><%= t('links.sort_by_name', %{Name}) %></a> | 
+            <%= before_label('sort_by', %{Sort By}) %>
+            <a href="#"><%= t('links.sort_by_name', %{Name}) %></a> |
             <a href="#"><%= t('links.sort_by_progress', %{Progress}) %></a>
           </div>
           <ul class="side_tabs student_list">
@@ -465,9 +520,9 @@ TEXT
     <span style="padding: 0 4px;">
       <select class="type assignment_requirement_picker">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
-        <option class="assignment wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>
-        <option class="assignment quiz" value="must_submit"><%= t('requirements.must_submit', %{submit the assignment}) %></option>
-        <option class="assignment quiz" value="min_score"><%= t('requirements.must_score_at_least', %{score at least}) %></option>
+        <option class="wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>
+        <option class="assignment quiz graded" value="must_submit"><%= t('requirements.must_submit', %{submit the assignment}) %></option>
+        <option class="assignment quiz graded" value="min_score"><%= t('requirements.must_score_at_least', %{score at least}) %></option>
       </select>
     </span>
     <% } %>
@@ -538,12 +593,12 @@ TEXT
     <li>
       <span class="keycode"><%= t('keycodes.indent', %{i}) %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.indent', %{Indent Current Item}) %></span>
+      <span class="description"><%= t('key.description.indent', %{Increase Indent}) %></span>
     </li>
     <li>
       <span class="keycode"><%= t('keycodes.outdent', %{o}) %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.outdent', %{Outdent Current Item}) %></span>
+      <span class="description"><%= t('key.description.outdent', %{Decrease Indent}) %></span>
     </li>
     <li>
       <span class="keycode"><%= t('keycodes.new', %{n}) %></span>

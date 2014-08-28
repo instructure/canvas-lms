@@ -58,7 +58,6 @@ shared_examples_for "statistics basic tests" do
     pseudonym = student.pseudonyms.create!(:unique_id => 'student@example.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf')
     course.enroll_user(student, 'StudentEnrollment').accept!
     login_as(pseudonym.unique_id, 'asdfasdf')
-    driver.navigate.to(app_host + '/logout')
     admin_logged_in
     get url
     validate_item_list(list_css[:logged_in], student.name)

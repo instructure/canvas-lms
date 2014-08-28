@@ -30,11 +30,7 @@ class ErrorReport < ActiveRecord::Base
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
   # Setup callback to default behavior.
-  if CANVAS_RAILS2
-    on_send_to_external :send_via_email_or_post
-  else
-    set_callback :on_send_to_external, :send_via_email_or_post
-  end
+  set_callback :on_send_to_external, :send_via_email_or_post
 
   attr_accessible
 
@@ -48,14 +44,20 @@ class ErrorReport < ActiveRecord::Base
 
     attr_reader :opts, :exception
 
+    def self.hostname
+      @cached_hostname ||= Socket.gethostname
+    end
+
     def log_error(category, opts)
       opts[:category] = category.to_s.presence || 'default'
       @opts = opts
       # sanitize invalid encodings
-      @opts[:message] = TextHelper.strip_invalid_utf8(@opts[:message]) if @opts[:message]
-      @opts[:exception_message] = TextHelper.strip_invalid_utf8(@opts[:exception_message]) if @opts[:exception_message]
-      Canvas::Statsd.increment("errors.all")
-      Canvas::Statsd.increment("errors.#{category}")
+      @opts[:message] = Utf8Cleaner.strip_invalid_utf8(@opts[:message]) if @opts[:message]
+      @opts[:exception_message] = Utf8Cleaner.strip_invalid_utf8(@opts[:exception_message]) if @opts[:exception_message]
+      @opts[:hostname] = self.class.hostname
+      @opts[:pid] = Process.pid
+      CanvasStatsd::Statsd.increment("errors.all")
+      CanvasStatsd::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
       create_error_report(opts)
     end
@@ -107,7 +109,9 @@ class ErrorReport < ActiveRecord::Base
       if respond_to?(:"#{k}=")
         self.send(:"#{k}=", v)
       else
-        self.data[k.to_s] = v
+        # dup'ing because some strings come in from Rack as frozen sometimes,
+        # depending on the web server, and our invalid utf-8 stripping breaks on that
+        self.data[k.to_s] = v.is_a?(String) ? v.dup : v
       end
     end
   end
@@ -131,7 +135,7 @@ class ErrorReport < ActiveRecord::Base
   def url=(val)
     write_attribute(:url, LoggingFilter.filter_uri(val))
   end
-  
+
   def guess_email
     self.email = nil if self.email && self.email.empty?
     self.email ||= self.user.email rescue nil
@@ -169,7 +173,7 @@ class ErrorReport < ActiveRecord::Base
     stuff = request.env.slice(*USEFUL_ENV)
     stuff['REMOTE_ADDR'] = request.remote_ip # ActionController::Request#remote_ip has proxy smarts
     stuff['QUERY_STRING'] = LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
-    stuff['REQUEST_URI'] = LoggingFilter.filter_uri(stuff['REQUEST_URI'])
+    stuff['REQUEST_URI'] = LoggingFilter.filter_uri(request.url)
     stuff['path_parameters'] = LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
     stuff['query_parameters'] = LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
     stuff['request_parameters'] = LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms

@@ -1,0 +1,44 @@
+{
+  "id": 1,
+  "regrade_option": false,
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "multiple_choice_question",
+  "question_name": "MC Question",
+  "name": "MC Question",
+  "question_text": "<p>[MC] A, B, C, or D?</p>",
+  "answers": [
+    {
+      "id": 3023,
+      "text": "A",
+      "html": "",
+      "comments": "",
+      "weight": 100
+    },
+    {
+      "id": 8899,
+      "text": "B",
+      "html": "",
+      "comments": "",
+      "weight": 0
+    },
+    {
+      "id": 7907,
+      "text": "C",
+      "html": "",
+      "comments": "",
+      "weight": 0
+    },
+    {
+      "id": 5646,
+      "text": "D",
+      "html": "",
+      "comments": "",
+      "weight": 0
+    }
+  ],
+  "text_after_answers": "",
+  "assessment_question_id": null
+}

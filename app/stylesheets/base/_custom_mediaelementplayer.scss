@@ -1,0 +1,103 @@
+// customizations to vendored mediaelementplayer css
+
+/* make subtitle text bigger when it's in fullscreen */
+.mejs-container-fullscreen .mejs-captions-layer {
+  font-size: 28px;
+}
+
+/* wider and more opaque source chooser */
+.mejs-sourcechooser-selector {
+  width: 150px !important;
+  background: rgba(50, 50, 50, 0.9);
+
+  label {
+    width: inherit !important;
+  }
+}
+
+//
+// Playback speed control is based on code from an as-yet-unmerged pull request to mediaelement.js
+// See: https://github.com/matthillman/mediaelement/commit/e9efc9473ca38c240b712a11ba4c035651c204d4
+// And: https://github.com/johndyer/mediaelement/pull/1249
+//
+
+/* Start: Speed */
+div.mejs-speed-button {
+  width: 46px !important;
+  position: relative;
+}
+
+.mejs-controls .mejs-button.mejs-speed-button button {
+  background: transparent;
+  width: 36px;
+  font-size: 11px;
+  line-height: normal;
+  color: #ffffff;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector {
+  visibility: hidden;
+  position: absolute;
+  top: -100px;
+  left: -10px;
+  width: 60px;
+  height: 100px;
+  background: url(background.png);
+  background: rgba(50, 50, 50, 0.7);
+  border: solid 1px transparent;
+  padding: 0;
+  overflow: hidden;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+.mejs-controls .mejs-speed-button:hover > .mejs-speed-selector {
+  visibility: visible;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li label.mejs-speed-selected {
+  color: rgba(33, 248, 248, 1);
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul {
+  margin: 0;
+  padding: 0;
+  display: block;
+  list-style-type: none !important;
+  overflow: hidden;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li {
+  margin: 0 0 6px 0;
+  padding: 0 10px;
+  list-style-type: none !important;
+  display: block;
+  color: #fff;
+  overflow: hidden;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li input {
+  clear: both;
+  float: left;
+  margin: 3px 3px 0 5px;
+  display: none;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li label {
+  width: 60px;
+  float: left;
+  padding: 4px 0 0 0;
+  line-height: 15px;
+  font-family: helvetica, arial;
+  font-size: 11.5px;
+  color: white;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li:hover {
+  background-color: rgb(200, 200, 200) !important;
+  background-color: rgba(255,255,255,.4) !important;
+}
+/* End: Speed */

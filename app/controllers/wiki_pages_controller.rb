@@ -44,13 +44,14 @@ class WikiPagesController < ApplicationController
 
   def show
     if @context.feature_enabled?(:draft_state)
-      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page_name || @page, :titleize => params[:titleize], :module_item_id => params[:module_item_id])
       return
     end
-    hash = { :CONTEXT_ACTION_SOURCE => :wiki }
+    @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
+    hash = { :CONTEXT_ACTION_SOURCE => :wiki,
+             :WIKI_PAGE_EDITING => @editing}
     append_sis_data(hash)
     js_env(hash)
-    @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
 
     unless is_authorized_action?(@page, @current_user, [:update, :update_content]) || @page.is_front_page?
       wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url) if @page.new_record?
@@ -119,7 +120,6 @@ class WikiPagesController < ApplicationController
       end
 
       log_asset_access(@page, "wiki", @wiki, 'participate')
-      generate_new_page_view
       @page.context_module_action(@current_user, @context, :contributed)
       flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
       respond_to do |format|
@@ -182,14 +182,14 @@ class WikiPagesController < ApplicationController
 
   def show_page
     if !@context.feature_enabled?(:draft_state)
-      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page)
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page_name || @page, :titleize => params[:titleize])
       return
     end
 
     if @page.new_record?
       if is_authorized_action?(@page, @current_user, [:update, :update_content])
         flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
-        redirect_to polymorphic_url([@context, :edit_named_page], :wiki_page_id => @page)
+        redirect_to polymorphic_url([@context, :edit_named_page], :wiki_page_id => @page_name || @page, :titleize => params[:titleize])
         return
       else
         wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url)

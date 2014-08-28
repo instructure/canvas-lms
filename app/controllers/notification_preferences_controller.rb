@@ -20,21 +20,39 @@
 #
 # API for managing notification preferences
 #
-# @object NotificationPreference
+# @model NotificationPreference
 #     {
-#       "href": "https://canvas.instructure.com/users/1/communication_channels/email/student@example.edu/notification_preferences/new_announcement",
-#
-#       // The notification this preference belongs to
-#       "notification": "new_announcement",
-#
-#       // The category of that notification
-#       "category": "announcement",
-#
-#       // How often to send notifications to this communication channel
-#       // for the given notification. Possible values are "immediately",
-#       // "daily", "weekly", and "never"
-#       "frequency": "daily"
-#
+#       "id": "NotificationPreference",
+#       "description": "",
+#       "properties": {
+#         "href": {
+#           "example": "https://canvas.instructure.com/users/1/communication_channels/email/student@example.edu/notification_preferences/new_announcement",
+#           "type": "string"
+#         },
+#         "notification": {
+#           "description": "The notification this preference belongs to",
+#           "example": "new_announcement",
+#           "type": "string"
+#         },
+#         "category": {
+#           "description": "The category of that notification",
+#           "example": "announcement",
+#           "type": "string"
+#         },
+#         "frequency": {
+#           "description": "How often to send notifications to this communication channel for the given notification. Possible values are 'immediately', 'daily', 'weekly', and 'never'",
+#           "example": "daily",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "immediately",
+#               "daily",
+#               "weekly",
+#               "never"
+#             ]
+#           }
+#         }
+#       }
 #     }
 #
 class NotificationPreferencesController < ApplicationController
@@ -59,7 +77,7 @@ class NotificationPreferencesController < ApplicationController
 
   # @API Update a preference
   # Change the preference for a single notification for a single communication channel
-  # @argument notification_preferences[frequency] The desired frequency for this notification
+  # @argument notification_preferences[frequency] [Required] The desired frequency for this notification
   def update
     return render_unauthorized_action unless @user == @current_user
     # support both JSON API style (notification preferences is an array) and Canvas API style (it's a hash)
@@ -69,7 +87,7 @@ class NotificationPreferencesController < ApplicationController
 
   # @API Update multiple preferences
   # Change the preferences for multiple notifications for a single communication channel at once
-  # @argument notification_preferences[<X>][frequency] The desired frequency for <X> notification
+  # @argument notification_preferences[<X>][frequency] [Required] The desired frequency for <X> notification
   def update_all
     return render_unauthorized_action unless @user == @current_user
     policies = []

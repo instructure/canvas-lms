@@ -22,12 +22,22 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :assign_unassigned_members
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
 
+  EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
+    :deleted_at, :self_signup, :group_limit, :auto_leader
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
+
   after_save :auto_create_groups
+  after_update :update_groups_max_membership
+
+  delegate :time_zone, :to => :context
 
   validates_each :name do |record, attr, value|
     next unless record.name_changed? || value.blank?
@@ -62,7 +72,15 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  scope :active, where(:deleted_at => nil)
+  validates_each :auto_leader do |record, attr, value|
+    next unless record.auto_leader_changed?
+    next if value.blank?
+    unless ['first', 'random'].include?(value)
+      record.errors.add attr, t(:invalid_auto_leader, "AutoLeader type needs to be one of the following values: %{values}", values: "null, 'first', 'random'")
+    end
+  end
+
+  scope :active, -> { where(:deleted_at => nil) }
 
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
@@ -117,7 +135,7 @@ class GroupCategory < ActiveRecord::Base
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.find_by_role(role) ||
                  context.group_categories.build(:name => name_for_role(role), :role => role)
-      category.save(CANVAS_RAILS2 ? false : {:validate => false}) if category.new_record?
+      category.save({:validate => false}) if category.new_record?
       category
     end
   end
@@ -146,13 +164,14 @@ class GroupCategory < ActiveRecord::Base
   # self_signup directly to anything other than nil (or ''), 'restricted', or
   # 'enabled', it will behave as if you used 'enabled'.
   def configure_self_signup(enabled, restricted)
-    if !enabled
-      self.self_signup = nil
-    elsif restricted
-      self.self_signup = 'restricted'
-    else
-      self.self_signup = 'enabled'
-    end
+    args = {enable_self_signup: enabled, restrict_self_signup: restricted}
+    self.self_signup = GroupCategories::Params.new(args).self_signup
+    self.save!
+  end
+
+  def configure_auto_leader(enabled, auto_leader_type)
+    args = {enable_auto_leader: enabled, auto_leader_type: auto_leader_type}
+    self.auto_leader = GroupCategories::Params.new(args).auto_leader
   end
 
   def self_signup?
@@ -333,6 +352,10 @@ class GroupCategory < ActiveRecord::Base
       sprinkle_count -= 1
     end
 
+    if self.auto_leader
+      groups.each{|group| GroupLeadership.new(group).auto_assign!(auto_leader) }
+    end
+
     if !groups.empty?
       Group.where(:id => groups.map(&:id)).update_all(:updated_at => Time.now.utc)
       if context_type == 'Course'
@@ -403,4 +426,9 @@ class GroupCategory < ActiveRecord::Base
     current_progress.reload
   end
 
+  def update_groups_max_membership
+    if group_limit_changed?
+      groups.update_all(:max_membership => group_limit)
+    end
+  end
 end

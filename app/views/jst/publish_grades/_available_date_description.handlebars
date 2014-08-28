@@ -1,0 +1,13 @@
+{{#if pending}}
+  <span class="status-description">{{#t "not_available_until"}}Not available until{{/t}}</span>
+  {{strftime unlockAt "%b %-d"}}
+{{/if}}
+
+{{#if open}}
+  <span class="status-description">{{#t "available_until"}}Available until{{/t}}</span>
+  {{strftime lockAt "%b %-d"}}
+{{/if}}
+
+{{#if closed}}
+  <span class="status-description">{{#t "closed"}}Closed{{/t}}</span>
+{{/if}}

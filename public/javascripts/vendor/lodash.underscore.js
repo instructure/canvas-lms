@@ -1,7 +1,7 @@
 /**
  * @license
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
- * Build: `lodash underscore exports="amd,commonjs,global,node" -o ./dist/lodash.underscore.js`
+ * Build: `lodash underscore plus="cloneDeep" exports="amd,global"`
  * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
  * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -12,6 +12,9 @@
   /** Used as a safe reference for `undefined` in pre ES5 environments */
   var undefined;
 
+  /** Used to pool arrays and objects used internally */
+  var arrayPool = [];
+
   /** Used to generate unique IDs */
   var idCounter = 0;
 
@@ -20,6 +23,12 @@
 
   /** Used to prefix keys to avoid issues with `__proto__` and properties on `Object.prototype` */
   var keyPrefix = +new Date + '';
+
+  /** Used as the max size of the `arrayPool` and `objectPool` */
+  var maxPoolSize = 40;
+
+  /** Used to match regexp flags from their coerced string values */
+  var reFlags = /\w*$/;
 
   /** Used to match "interpolate" template delimiters */
   var reInterpolate = /<%=([\s\S]+?)%>/g;
@@ -40,6 +49,14 @@
       objectClass = '[object Object]',
       regexpClass = '[object RegExp]',
       stringClass = '[object String]';
+
+  /** Used to identify object classifications that `_.clone` supports */
+  var cloneableClasses = {};
+  cloneableClasses[funcClass] = false;
+  cloneableClasses[argsClass] = cloneableClasses[arrayClass] =
+  cloneableClasses[boolClass] = cloneableClasses[dateClass] =
+  cloneableClasses[numberClass] = cloneableClasses[objectClass] =
+  cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true;
 
   /** Used to determine if values are of the language type Object */
   var objectTypes = {
@@ -64,15 +81,6 @@
 
   /** Used as a reference to the global object */
   var root = (objectTypes[typeof window] && window) || this;
-
-  /** Detect free variable `exports` */
-  var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
-
-  /** Detect free variable `module` */
-  var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
-
-  /** Detect the popular CommonJS extension `module.exports` */
-  var moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
 
   /** Detect free variable `global` from Node.js or Browserified code and use it as `root` */
   var freeGlobal = objectTypes[typeof global] && global;
@@ -154,6 +162,29 @@
   }
 
   /**
+   * Gets an array from the array pool or creates a new one if the pool is empty.
+   *
+   * @private
+   * @returns {Array} The array from the pool.
+   */
+  function getArray() {
+    return arrayPool.pop() || [];
+  }
+
+  /**
+   * Releases the given array back to the array pool.
+   *
+   * @private
+   * @param {Array} [array] The array to release.
+   */
+  function releaseArray(array) {
+    array.length = 0;
+    if (arrayPool.length < maxPoolSize) {
+      arrayPool.push(array);
+    }
+  }
+
+  /**
    * Slices the `collection` from the `start` index up to, but not including,
    * the `end` index.
    *
@@ -223,6 +254,17 @@
       nativeMax = Math.max,
       nativeMin = Math.min,
       nativeRandom = Math.random;
+
+  /** Used to lookup a built-in constructor by [[Class]] */
+  var ctorByClass = {};
+  ctorByClass[arrayClass] = Array;
+  ctorByClass[boolClass] = Boolean;
+  ctorByClass[dateClass] = Date;
+  ctorByClass[funcClass] = Function;
+  ctorByClass[objectClass] = Object;
+  ctorByClass[numberClass] = Number;
+  ctorByClass[regexpClass] = RegExp;
+  ctorByClass[stringClass] = String;
 
   /*--------------------------------------------------------------------------*/
 
@@ -419,6 +461,98 @@
       return func.apply(thisArg, args || arguments);
     }
     return bound;
+  }
+
+  /**
+   * The base implementation of `_.clone` without argument juggling or support
+   * for `thisArg` binding.
+   *
+   * @private
+   * @param {*} value The value to clone.
+   * @param {boolean} [isDeep=false] Specify a deep clone.
+   * @param {Function} [callback] The function to customize cloning values.
+   * @param {Array} [stackA=[]] Tracks traversed source objects.
+   * @param {Array} [stackB=[]] Associates clones with source counterparts.
+   * @returns {*} Returns the cloned value.
+   */
+  function baseClone(value, isDeep, callback, stackA, stackB) {
+    if (callback) {
+      var result = callback(value);
+      if (typeof result != 'undefined') {
+        return result;
+      }
+    }
+    // inspect [[Class]]
+    var isObj = isObject(value);
+    if (isObj) {
+      var className = toString.call(value);
+      if (!cloneableClasses[className]) {
+        return value;
+      }
+      var ctor = ctorByClass[className];
+      switch (className) {
+        case boolClass:
+        case dateClass:
+          return new ctor(+value);
+
+        case numberClass:
+        case stringClass:
+          return new ctor(value);
+
+        case regexpClass:
+          result = ctor(value.source, reFlags.exec(value));
+          result.lastIndex = value.lastIndex;
+          return result;
+      }
+    } else {
+      return value;
+    }
+    var isArr = isArray(value);
+    if (isDeep) {
+      // check for circular references and return corresponding clone
+      var initedStack = !stackA;
+      stackA || (stackA = getArray());
+      stackB || (stackB = getArray());
+
+      var length = stackA.length;
+      while (length--) {
+        if (stackA[length] == value) {
+          return stackB[length];
+        }
+      }
+      result = isArr ? ctor(value.length) : {};
+    }
+    else {
+      result = isArr ? slice(value) : assign({}, value);
+    }
+    // add array properties assigned by `RegExp#exec`
+    if (isArr) {
+      if (hasOwnProperty.call(value, 'index')) {
+        result.index = value.index;
+      }
+      if (hasOwnProperty.call(value, 'input')) {
+        result.input = value.input;
+      }
+    }
+    // exit for shallow clone
+    if (!isDeep) {
+      return result;
+    }
+    // add the source value to the stack of traversed objects
+    // and associate it with its clone
+    stackA.push(value);
+    stackB.push(result);
+
+    // recursively populate clone (susceptible to call stack limits)
+    (isArr ? forEach : forOwn)(value, function(objValue, key) {
+      result[key] = baseClone(objValue, isDeep, callback, stackA, stackB);
+    });
+
+    if (initedStack) {
+      releaseArray(stackA);
+      releaseArray(stackB);
+    }
+    return result;
   }
 
   /**
@@ -1089,10 +1223,60 @@
    * clone.childNodes.length;
    * // => 0
    */
-  function clone(value) {
-    return isObject(value)
-      ? (isArray(value) ? slice(value) : assign({}, value))
-      : value;
+  function clone(value, isDeep, callback, thisArg) {
+    // allows working with "Collections" methods without using their `index`
+    // and `collection` arguments for `isDeep` and `callback`
+    if (typeof isDeep != 'boolean' && isDeep != null) {
+      thisArg = callback;
+      callback = isDeep;
+      isDeep = false;
+    }
+    return baseClone(value, isDeep, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
+  }
+
+  /**
+   * Creates a deep clone of `value`. If a callback is provided it will be
+   * executed to produce the cloned values. If the callback returns `undefined`
+   * cloning will be handled by the method instead. The callback is bound to
+   * `thisArg` and invoked with one argument; (value).
+   *
+   * Note: This method is loosely based on the structured clone algorithm. Functions
+   * and DOM nodes are **not** cloned. The enumerable properties of `arguments` objects and
+   * objects created by constructors other than `Object` are cloned to plain `Object` objects.
+   * See http://www.w3.org/TR/html5/infrastructure.html#internal-structured-cloning-algorithm.
+   *
+   * @static
+   * @memberOf _
+   * @category Objects
+   * @param {*} value The value to deep clone.
+   * @param {Function} [callback] The function to customize cloning values.
+   * @param {*} [thisArg] The `this` binding of `callback`.
+   * @returns {*} Returns the deep cloned value.
+   * @example
+   *
+   * var characters = [
+   *   { 'name': 'barney', 'age': 36 },
+   *   { 'name': 'fred',   'age': 40 }
+   * ];
+   *
+   * var deep = _.cloneDeep(characters);
+   * deep[0] === characters[0];
+   * // => false
+   *
+   * var view = {
+   *   'label': 'docs',
+   *   'node': element
+   * };
+   *
+   * var clone = _.cloneDeep(view, function(value) {
+   *   return _.isElement(value) ? value.cloneNode(true) : undefined;
+   * });
+   *
+   * clone.node == view.node;
+   * // => false
+   */
+  function cloneDeep(value, callback, thisArg) {
+    return baseClone(value, true, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
   }
 
   /**
@@ -4839,6 +5023,7 @@
 
   // add functions that return unwrapped values when chaining
   lodash.clone = clone;
+  lodash.cloneDeep = cloneDeep;
   lodash.contains = contains;
   lodash.escape = escape;
   lodash.every = every;
@@ -4960,17 +5145,6 @@
     define(function() {
       return lodash;
     });
-  }
-  // check for `exports` after `define` in case a build optimizer adds an `exports` object
-  else if (freeExports && freeModule) {
-    // in Node.js or RingoJS
-    if (moduleExports) {
-      (freeModule.exports = lodash)._ = lodash;
-    }
-    // in Narwhal or Rhino -require
-    else {
-      freeExports._ = lodash;
-    }
   }
   else {
     // in a browser or Rhino

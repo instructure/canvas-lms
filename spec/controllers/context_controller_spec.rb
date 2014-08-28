@@ -19,32 +19,35 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ContextController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+  end
+
   describe "GET 'roster'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       get 'roster', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should work when the context is a group in a course" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @group = @course.groups.create!
       @group.add_user(@student, 'accepted')
       get 'roster', :group_id => @group.id
       assigns[:primary_users].each_value.first.collect(&:id).should == [@student.id]
-      assigns[:secondary_users].each_value.first.collect(&:id).should == [@teacher.id]
+      assigns[:secondary_users].each_value.first.collect(&:id).should == @course.admins.map(&:id)
     end
   end
 
   describe "GET 'roster_user'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       get 'roster_user', :course_id => @course.id, :id => @user.id
       assert_unauthorized
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @enrollment = @course.enroll_student(user(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
@@ -74,7 +77,7 @@ describe ContextController do
         UserMerge.from(user1).into(@user2)
 
         admin = user_model
-        Account.site_admin.add_user(admin)
+        Account.site_admin.account_users.create!(user: admin)
         user_session(admin)
 
         get 'roster_user', :course_id => course1.id, :id => @user2.id
@@ -93,7 +96,7 @@ describe ContextController do
 
     it "should require a valid HMAC" do
       post 'object_snippet', :object_data => @data, :s => 'DENIED'
-      response.status.should == '400 Bad Request'
+      assert_status(400)
     end
 
     it "should render given a correct HMAC" do
@@ -105,8 +108,8 @@ describe ContextController do
 
   describe "GET '/media_objects/:id/thumbnail" do
     it "should redirect to kaltura even if the MediaObject does not exist" do
-      Kaltura::ClientV3.stubs(:config).returns({})
-      Kaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
+      CanvasKaltura::ClientV3.stubs(:config).returns({})
+      CanvasKaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
       get :media_object_thumbnail,
         :id => '0_notexist',
         :width => 100,
@@ -119,7 +122,7 @@ describe ContextController do
 
   describe "POST '/media_objects'" do
     before :each do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
     end
 
     it "should match the create_media_object route" do
@@ -180,9 +183,9 @@ describe ContextController do
 
   describe "GET 'prior_users" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
-      100.times { student_in_course(:active_all => true).conclude }
-      @user = @teacher
+      user_session(@teacher)
+      create_users_in_course(@course, 21)
+      @course.student_enrollments.update_all(workflow_state: "completed")
     end
 
     it "should paginate" do

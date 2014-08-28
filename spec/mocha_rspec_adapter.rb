@@ -13,6 +13,6 @@ module MochaRspecAdapter
   end
 end
 
-(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
+RSpec.configure do |config|
   config.mock_with MochaRspecAdapter
 end

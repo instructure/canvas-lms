@@ -25,11 +25,15 @@
 #  created_at :datetime
 #  updated_at :datetime
 #
-  
+
 class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+
+  EXPORTABLE_ATTRIBUTES = [:id, :title, :created_at, :updated_at, :front_page_url, :has_no_front_page]
+  EXPORTABLE_ASSOCIATIONS = [:wiki_pages]
+
   before_save :set_has_no_front_page_default
   after_save :update_contexts
 
@@ -51,11 +55,11 @@ class Wiki < ActiveRecord::Base
       entry.title     = self.title
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "/wikis/#{self.id}")
     end
   end
-  
+
   def update_default_wiki_page_roles(new_roles, old_roles)
     return if new_roles == old_roles
     self.wiki_pages.each do |p|
@@ -74,7 +78,7 @@ class Wiki < ActiveRecord::Base
     self.front_page_url = url unless self.has_no_front_page
     self.save
   end
-  
+
   def front_page
     url = self.get_front_page_url
     return nil if url.nil?
@@ -87,7 +91,7 @@ class Wiki < ActiveRecord::Base
 
     # return an implicitly created page if a page could not be found
     unless page
-      page = self.wiki_pages.new(:title => url.titleize, :url => url)
+      page = self.wiki_pages.scoped.new(:title => url.titleize, :url => url)
       page.wiki = self
     end
     page
@@ -140,13 +144,16 @@ class Wiki < ActiveRecord::Base
     given {|user| self.context.is_public}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read)}
+    given {|user, session| self.context.grants_right?(user, session, :read)}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
+    can :view_unpublished_items
+
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki)}
+    given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
     can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
   end
 
@@ -162,7 +169,7 @@ class Wiki < ActiveRecord::Base
       t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
       self.extend TextHelper
-      name = truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+      name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
 
       context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
       context.save!

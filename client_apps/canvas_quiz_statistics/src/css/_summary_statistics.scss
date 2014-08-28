@@ -1,0 +1,75 @@
+#summary-statistics {
+  $baseFontSize: 24px;
+  $baseLineHeight: 32px;
+
+  .report-generator {
+    .auxiliary {
+      display: none;
+    }
+
+    &+ .report-generator {
+      margin-left: $whitespace;
+    }
+  }
+
+  table {
+    width: 100%;
+    margin: 20px 40px;
+  }
+
+  th {
+    font-weight: normal;
+    color: $muteTextColor;
+    width: 20%;
+    font-size: $baseFontSize * 0.75;
+    line-height: $baseLineHeight * 0.75;
+    text-align: left;
+  }
+
+  td {
+    font-size: $baseFontSize;
+    line-height: $baseLineHeight;
+
+    &.emphasized {
+      font-size: $baseFontSize * 1.25;
+      line-height: $baseLineHeight * 1.25;
+      font-weight: bold;
+    }
+  }
+
+  .chart {
+    margin-top: 60px;
+    width: 100%;
+
+    .bar {
+      fill: #bedff1;
+    }
+
+    path.median-dist-graph {
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+      stroke-width: 2;
+      stroke: #2894d1;
+      fill: none;
+      opacity: 0.1;
+    }
+
+    .x.axis {
+      fill: $muteTextColor;
+
+      line, path {
+        display: none;
+      }
+    }
+  }
+
+  .report-generator.busy {
+    .btn {
+      background-color: transparent;
+      color: #333;
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: none;
+    }
+  }
+}

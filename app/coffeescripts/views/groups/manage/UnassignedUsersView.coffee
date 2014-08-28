@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/views/groups/manage/Scrollable'
   'compiled/views/Filterable'
   'jst/groups/manage/groupUsers'
-], (_, GroupUsersView, AssignToGroupMenu, Scrollable, Filterable, template) ->
+], ($, _, GroupUsersView, AssignToGroupMenu, Scrollable, Filterable, template) ->
 
   class UnassignedUsersView extends GroupUsersView
 
@@ -34,6 +35,7 @@ define [
 
     attach: ->
       @collection.on 'reset', @render
+      @collection.on 'remove', @render
       @collection.on 'moved', @highlightUser
       @collection.on 'filterOut', _(=> @checkScroll()).debounce(50)
 

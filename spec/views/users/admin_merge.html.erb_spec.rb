@@ -24,7 +24,7 @@ describe "/users/admin_merge" do
     user
     @account = Account.create!(:name => "My Root Account")
     @account2 = @account.sub_accounts.create!(:name => "Sub-Account")
-    @account.add_user(@user)
+    @account.account_users.create!(user: @user)
     @course1 = Course.create!(:account => Account.default)
     @course2 = Course.create!(:account => @account2)
     @course1.enroll_teacher(@user)

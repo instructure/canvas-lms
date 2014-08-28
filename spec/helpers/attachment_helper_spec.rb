@@ -30,9 +30,12 @@ describe AttachmentHelper do
     "expected_scribd_render_url"
   end
 
-  before do
+  before :once do
     course_with_student
     @att = attachment_model(:context => @user)
+  end
+
+  before :each do
     @att.stubs(:scribdable?).returns(true)
     @att.stubs(:scribd_doc).returns({})
   end

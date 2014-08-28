@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
+
 
 describe "account admin question bank" do
   include_examples "in-process server selenium tests"
@@ -87,6 +89,14 @@ describe "account admin question bank" do
     verify_added_question(name, question_text, multiple_choice_value)
   end
 
+  it "should add bank and multiple choice question" do
+    report_test(71462) do
+      question_bank2 = create_question_bank('question bank 2')
+      get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
+      add_multiple_choice_question
+    end
+  end
+
   it "should add a multiple choice question" do
     add_multiple_choice_question
   end
@@ -129,7 +139,7 @@ describe "account admin question bank" do
     wait_for_ajaximations
     @question_bank.reload
     @question_bank.bookmarked_for?(User.last).should be_true
-    f("#right-side .disabled").should include_text "Already Bookmarked"
+    f("#right-side .bookmark_bank_link").should include_text "Already Bookmarked"
   end
 
   it "should edit bank details" do
@@ -185,7 +195,7 @@ describe "account admin question bank" do
       new_question_bank.should be_present
       new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
-      new_questions.should == questions
+      new_questions.should =~ questions
     end
 
     it "should move multiple questions to a new bank" do

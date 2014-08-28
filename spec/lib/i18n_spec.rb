@@ -100,12 +100,33 @@ describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
       pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18n::Utils::CORE_KEYS)}
+      translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...
       # it probably means you added a format or a new language
       File.read('public/javascripts/translations/_core_en.js').should ==
-        I18n::Utils.dump_js(translations)
+          I18nTasks::Utils.dump_js(translations)
+    end
+  end
+
+  context "interpolation" do
+    before { I18n.locale = I18n.default_locale }
+    after { I18n.locale = I18n.default_locale }
+
+    it "should fall back to en if the current locale's interpolation is broken" do
+      I18n.locale = :es
+      I18n.backend.stub es: {__interpolation_test: "Hola %{mundo}"} do
+        I18n.t(:__interpolation_test, "Hello %{mundo}", {mundo: "WORLD"}).
+          should == "Hola WORLD"
+        I18n.t(:__interpolation_test, "Hello %{world}", {world: "WORLD"}).
+          should == "Hello WORLD"
+      end
+    end
+
+    it "should raise an error if the the en interpolation is broken" do
+      lambda {
+        I18n.t(:__interpolation_test, "Hello %{world}", {foo: "bar"})
+      }.should raise_error(I18n::MissingInterpolationArgument)
     end
   end
 end

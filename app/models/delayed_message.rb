@@ -17,9 +17,17 @@
 #
 
 class DelayedMessage < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   belongs_to :notification
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
+    'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
+    'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
+    'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
+    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel']
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,
@@ -66,11 +74,11 @@ class DelayedMessage < ActiveRecord::Base
   
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  scope :to_summarize, lambda {
+  scope :to_summarize, -> {
     where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
   }
   
-  scope :next_to_summarize, lambda {
+  scope :next_to_summarize, -> {
     where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
   

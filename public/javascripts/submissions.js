@@ -22,7 +22,7 @@ define([
   'jquery',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
@@ -48,7 +48,7 @@ define([
         var comment = comments[idx].submission_comment;
         if($("#submission_comment_" + comment.id).length > 0) { continue; }
         var $comment = $("#comment_blank").clone(true).removeAttr('id');
-        comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+        comment.posted_at = $.datetimeString(comment.created_at);
         $comment.fillTemplateData({
           data: comment,
           id: 'submission_comment_' + comment.id
@@ -74,6 +74,7 @@ define([
         $(".comments .comment_list").append($comment.show()).scrollTop(10000);
       }
       $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
+      $(".save_comment_button").attr('disabled',null);
       if(submission) {
         showGrade(submission);
         $(".submission_details").fillTemplateData({
@@ -118,7 +119,7 @@ define([
       $(document).triggerHandler('grading_change');
     });
     $(document).bind('grading_change', function(event) {
-//    $(".grading_value,.grading_comment").bind('change', function(event) {
+      $(".save_comment_button").attr('disabled','disabled');
       $(".submission_header").loadingImage();
       var url = $(".update_submission_url").attr('href');
       var method = $(".update_submission_url").attr('title');

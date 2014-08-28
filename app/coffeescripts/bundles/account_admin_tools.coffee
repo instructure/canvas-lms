@@ -55,15 +55,17 @@ require [
 
   messages = new CommMessageCollection null,
     params: {perPage: 10}
-  users = new AccountUserCollection null,
+  messagesUsers = new AccountUserCollection null,
+    account_id: ENV.ACCOUNT_ID
+  loggingUsers = new AccountUserCollection null,
     account_id: ENV.ACCOUNT_ID
   messagesContentView = new CommMessagesContentPaneView
     searchForm: new UserDateRangeSearchFormView
       formName: 'messages'
       inputFilterView: new InputFilterView
-        collection: users
+        collection: messagesUsers
       usersView: new PaginatedCollectionView
-        collection: users
+        collection: messagesUsers
         itemView: UserView
         buffer: 1000
         template: usersTemplate
@@ -76,7 +78,7 @@ require [
 
     # Render tabs
   @app = new AdminToolsView
-    el: "#content"
+    el: "#admin-tools-app"
     tabs:
       courseRestore: ENV.PERMISSIONS.restore_course
       viewMessages: ENV.PERMISSIONS.view_messages
@@ -89,6 +91,6 @@ require [
     messageContentPaneView: messagesContentView
     loggingContentPaneView: new LoggingContentPaneView
                               permissions: ENV.PERMISSIONS.logging
-                              users: users
+                              users: loggingUsers
 
   @app.render()

@@ -20,39 +20,74 @@
 #
 # API for querying the progress of asynchronous API operations.
 #
-# @object Progress
+# @model Progress
 #     {
-#       // the ID of the Progress object
-#       "id": 1,
-#
-#       // the context owning the job.
-#       "context_id": 1,
-#       "context_type": "Account",
-#
-#       // the id of the user who started the job
-#       "user_id": 123,
-#
-#       // the type of operation
-#       "tag": "course_batch_update",
-#
-#       // percent completed
-#       "completion": 100,
-#
-#       // the state of the job
-#       // one of 'queued', 'running', 'completed', 'failed'
-#       "workflow_state": "completed",
-#
-#       // the time the job was created
-#       "created_at": "2013-01-15T15:00:00Z",
-#
-#       // the time the job was last updated
-#       "updated_at": "2013-01-15T15:04:00Z",
-#
-#       // optional details about the job
-#       "message": "17 courses processed",
-#
-#       // url where a progress update can be retrieved
-#       "url": "https://canvas.example.edu/api/v1/progress/1"
+#       "id": "Progress",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the Progress object",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "context_id": {
+#           "description": "the context owning the job.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "example": "Account",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "the id of the user who started the job",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "tag": {
+#           "description": "the type of operation",
+#           "example": "course_batch_update",
+#           "type": "string"
+#         },
+#         "completion": {
+#           "description": "percent completed",
+#           "example": 100,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "the state of the job one of 'queued', 'running', 'completed', 'failed'",
+#           "example": "completed",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "queued",
+#               "running",
+#               "completed",
+#               "failed"
+#             ]
+#           }
+#         },
+#         "created_at": {
+#           "description": "the time the job was created",
+#           "example": "2013-01-15T15:00:00Z",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "the time the job was last updated",
+#           "example": "2013-01-15T15:04:00Z",
+#           "type": "datetime"
+#         },
+#         "message": {
+#           "description": "optional details about the job",
+#           "example": "17 courses processed",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "url where a progress update can be retrieved",
+#           "example": "https://canvas.example.edu/api/v1/progress/1",
+#           "type": "string"
+#         }
+#       }
 #     }
 #
 class ProgressController < ApplicationController

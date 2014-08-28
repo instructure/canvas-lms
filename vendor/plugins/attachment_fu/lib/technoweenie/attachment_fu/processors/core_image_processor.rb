@@ -22,7 +22,6 @@ module Technoweenie # :nodoc:
               self.width  = img.extent.size.width  if respond_to?(:width)
               self.height = img.extent.size.height if respond_to?(:height)
               resize_image_or_thumbnail! img
-              callback_with_args :after_resize, img
             end if image?
           end
 

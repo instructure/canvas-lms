@@ -23,8 +23,8 @@ class AssignmentsController < ApplicationController
   include Api::V1::AssignmentOverride
   include Api::V1::AssignmentGroup
   include Api::V1::Outcome
+  include Api::V1::ExternalTools
 
-  include GoogleDocs
   include KalturaHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
@@ -36,12 +36,13 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
 
-      permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
+      permissions = @context.rights_status(@current_user, :manage_assignments, :manage_grades)
       permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {
@@ -79,7 +80,7 @@ class AssignmentsController < ApplicationController
           else
             format.html { redirect_to root_url }
           end
-        elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
+        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
           format.html {
             render :action => :index
           }
@@ -87,6 +88,7 @@ class AssignmentsController < ApplicationController
           @current_user_submissions ||= @current_user && @current_user.submissions.
               select([:id, :assignment_id, :score, :workflow_state]).
               where(:assignment_id => @upcoming_assignments)
+          js_env(:submissions_hash => @submissions_hash)
           format.html { render :action => :student_index }
         end
         # TODO: eager load the rubric associations
@@ -105,18 +107,35 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+
+      if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
+        respond_to do |format|
+          flash[:error] = t 'notices.assignment_not_availible', "The assignment you requested is not availible to your course section."
+          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+        end
+        return
+      end
+
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
+
+      if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :homework_submission)
+      else
+        @external_tools = []
+      end
+
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
-        :ASSIGNMENT_ID => @assignment.id
+        :ASSIGNMENT_ID => @assignment.id,
+        :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
-      @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
+      @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
 
       if @assignment.grants_right?(@current_user, session, :grade)
@@ -132,8 +151,9 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        @google_docs_token = google_docs_retrieve_access_token
-      rescue NoTokenError
+        google_docs = google_docs_connection
+        @google_docs_token = google_docs.retrieve_access_token
+      rescue GoogleDocs::NoTokenError
         #do nothing
       end
 
@@ -148,7 +168,8 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'attendance'
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
           format.html { render :action => 'show' }
         end
@@ -163,8 +184,9 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
-      rescue NoTokenError
+        google_docs = google_docs_connection
+        docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
+      rescue GoogleDocs::NoTokenError
         #do nothing
       rescue => e
         ErrorReport.log_exception(:oauth, e)
@@ -255,7 +277,14 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
+
+      student_scope = if @assignment.differentiated_assignments_applies?
+                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
+                      else
+                        @context.students_visible_to(@current_user)
+                      end
+
+      @students = student_scope.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
     respond_to do |format|
@@ -323,6 +352,7 @@ class AssignmentsController < ApplicationController
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
+    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -343,12 +373,12 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment ||= @context.assignments.new
+    @assignment ||= @context.assignments.scoped.new
     @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
-      redirect_to new_polymorphic_url([@context, :quiz], index_edit_params)
+      redirect_to new_course_quiz_url(@context, index_edit_params)
     elsif params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
     else
@@ -365,9 +395,9 @@ class AssignmentsController < ApplicationController
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       @assignment.ensure_assignment_group(false)
-
+      @assignment.post_to_sis = params[:post_to_sis] if params[:post_to_sis]
       if @assignment.submission_types == 'online_quiz' && @assignment.quiz
-        return redirect_to edit_polymorphic_url([@context, @assignment.quiz], index_edit_params)
+        return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
         return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
       end
@@ -385,12 +415,16 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
+        :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {:id => section.id, :name => section.name }
         }),
         :ASSIGNMENT_OVERRIDES =>
-          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user))),
+          (assignment_overrides_json(
+            @assignment.overrides_for(@current_user)
+            )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments)
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
@@ -411,6 +445,7 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :update)
       params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
       params[:assignment] ||= {}
+      @assignment.post_to_sis = params[:assignment][:post_to_sis]
       @assignment.updating_user = @current_user
       if params[:assignment][:default_grade]
         params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
@@ -438,7 +473,6 @@ class AssignmentsController < ApplicationController
         @assignment.assignment_group = group if group
         if @assignment.update_attributes(params[:assignment])
           log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
-          generate_new_page_view
           @assignment.context_module_action(@current_user, :contributed)
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
@@ -457,8 +491,8 @@ class AssignmentsController < ApplicationController
   # Delete the given assignment.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id> \ 
-  #          -X DELETE \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id> \
+  #          -X DELETE \
   #          -H 'Authorization: Bearer <token>'
   # @returns Assignment
   def destroy

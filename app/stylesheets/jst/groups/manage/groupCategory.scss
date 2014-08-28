@@ -1,4 +1,4 @@
-@import 'environment';
+@import 'base/environment';
 
 .progress-title {
   text-align: center;
@@ -80,8 +80,6 @@ a.group-heading:hover {
   }
 
   input[type=text] {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
     height: $baseLineHeight + 8; // adjust default for box-sizing
     width: 100%;

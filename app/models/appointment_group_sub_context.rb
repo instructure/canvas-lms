@@ -19,8 +19,12 @@
 class AppointmentGroupSubContext < ActiveRecord::Base
   belongs_to :appointment_group
   belongs_to :sub_context, :polymorphic => true
+  validates_inclusion_of :sub_context_type, :allow_nil => true, :in => ['GroupCategory', 'CourseSection']
 
   attr_accessible :appointment_group, :sub_context, :sub_context_code
+  EXPORTABE_ATTRIBUTES = [:id, :appointment_group_id, :sub_context_id, :sub_context_type, :sub_context_code, :created_at, :updated_at]
+
+  EXPORTABLE_ASSOCIATIONS = [:appointment_group, :sub_context]
 
   validates_each :sub_context do |record, attr, value|
     if record.participant_type == 'User'

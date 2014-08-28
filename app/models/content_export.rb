@@ -18,24 +18,27 @@
 
 class ContentExport < ActiveRecord::Base
   include Workflow
-  belongs_to :course
+  belongs_to :context, :polymorphic => true
+
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :course
-  validates_presence_of :course_id, :workflow_state
-  has_one :job_progress, :class_name => 'Progress', :as => :context
+  attr_accessible :context
+  validates_presence_of :context_id, :workflow_state
+  validates_inclusion_of :context_type, :in => ['Course', 'Group', 'User']
 
-  alias_method :context, :course
+  has_one :job_progress, :class_name => 'Progress', :as => :context
 
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
   QTI = 'qti'
-  
+  USER_DATA = 'user_data'
+  ZIP = 'zip'
+
   workflow do
     state :created
     state :exporting
@@ -45,24 +48,60 @@ class ContentExport < ActiveRecord::Base
     state :deleted
   end
 
+  def send_notification?
+    context_type == 'Course' &&
+            export_type != ZIP &&
+            content_migration.blank? &&
+            !settings[:skip_notifications]
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:exported) && self.content_migration.blank?
+      record.changed_state(:exported) && record.send_notification?
     }
     
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:failed) && self.content_migration.blank?
+      record.changed_state(:failed) && record.send_notification?
     }
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage_files) }
+    # file managers (typically course admins) can read all course exports (not zip or user-data exports)
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) && [ZIP, USER_DATA].exclude?(self.export_type) }
     can :manage_files and can :read
+
+    # admins can create exports of any type
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :create
+
+    # all users can read exports they created (in contexts they retain read permission)
+    given { |user, session| self.user == user && self.context.grants_right?(user, session, :read) }
+    can :read
+
+    # non-admins can create zip or user-data exports, but not other types
+    given { |user, session| [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
+    can :create
   end
+
+  def course
+    raise "Use context instead"
+  end
+
+  def export(opts={})
+    case export_type
+    when ZIP
+      export_zip(opts)
+    when USER_DATA
+      export_user_data(opts)
+    else
+      export_course(opts)
+    end
+  end
+  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
   def export_course(opts={})
     self.workflow_state = 'exporting'
@@ -90,9 +129,49 @@ class ContentExport < ActiveRecord::Base
       self.save
     end
   end
-  handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
-  def queue_api_job
+  def export_user_data(opts)
+    self.workflow_state = 'exporting'
+    self.save
+    begin
+      self.job_progress.try :start!
+
+      if exported_attachment = Exporters::UserDataExporter.create_user_data_export(self.context)
+        self.attachment = exported_attachment
+        self.progress = 100
+        self.job_progress.try :complete!
+        self.workflow_state = 'exported'
+      end
+    rescue
+      add_error("Error running user_data export.", $!)
+      self.workflow_state = 'failed'
+      self.job_progress.try :fail!
+    ensure
+      self.save
+    end
+  end
+
+  def export_zip(opts={})
+    self.workflow_state = 'exporting'
+    self.save
+    begin
+      self.job_progress.try :start!
+      if attachment = Exporters::ZipExporter.create_zip_export(self, opts)
+        self.attachment = attachment
+        self.progress = 100
+        self.job_progress.try :complete!
+        self.workflow_state = 'exported'
+      end
+    rescue
+      add_error("Error running zip export.", $!)
+      self.workflow_state = 'failed'
+      self.job_progress.try :fail!
+    ensure
+      self.save
+    end
+  end
+
+  def queue_api_job(opts)
     if self.job_progress
       p = self.job_progress
     else
@@ -103,8 +182,7 @@ class ContentExport < ActiveRecord::Base
     p.completion = 0
     p.user = self.user
     p.save!
-
-    export_course
+    export(opts)
   end
 
   def referenced_files
@@ -117,6 +195,10 @@ class ContentExport < ActiveRecord::Base
 
   def qti_export?
     self.export_type == QTI
+  end
+
+  def zip_export?
+    self.export_type == ZIP
   end
   
   def error_message
@@ -164,12 +246,12 @@ class ContentExport < ActiveRecord::Base
     is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
-  def add_item_to_export(obj)
-    return unless obj && obj.class.respond_to?(:table_name)
+  def add_item_to_export(obj, type=nil)
+    return unless obj && (type || obj.class.respond_to?(:table_name))
     return if selected_content.empty?
     return if is_set?(selected_content[:everything])
 
-    asset_type = obj.class.table_name
+    asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
     selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
@@ -185,7 +267,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   def root_account
-    self.course.root_account
+    self.context.try_rescue(:root_account)
   end
   
   def running?
@@ -210,12 +292,14 @@ class ContentExport < ActiveRecord::Base
     self.job_progress.try(:update_completion!, val)
   end
   
-  scope :active, where("workflow_state<>'deleted'")
-  scope :not_for_copy, where("export_type<>?", COURSE_COPY)
-  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
-  scope :qti, where(:export_type => QTI)
-  scope :course_copy, where(:export_type => COURSE_COPY)
-  scope :running, where(:workflow_state => ['created', 'exporting'])
+  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :not_for_copy, -> { where("export_type<>?", COURSE_COPY) }
+  scope :common_cartridge, -> { where(:export_type => COMMON_CARTRIDGE) }
+  scope :qti, -> { where(:export_type => QTI) }
+  scope :course_copy, -> { where(:export_type => COURSE_COPY) }
+  scope :running, -> { where(:workflow_state => ['created', 'exporting']) }
+  scope :admin, ->(user) { where("export_type NOT IN (?) OR user_id=?", [ZIP, USER_DATA], user) }
+  scope :non_admin, ->(user) { where("export_type IN (?) AND user_id=?", [ZIP, USER_DATA], user) }
 
   private
 

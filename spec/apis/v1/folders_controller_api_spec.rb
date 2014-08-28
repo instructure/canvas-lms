@@ -18,8 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Folders API", :type => :integration do
-  before do
+describe "Folders API", type: :request do
+  before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @root = Folder.root_folders(@course).first
 
@@ -344,7 +344,7 @@ describe "Folders API", :type => :integration do
   end
 
   describe "#update" do
-    append_before do
+    before :once do
       @sub1 = @root.sub_folders.create!(:name => "sub1", :context => @course)
       @update_url = @folders_path + "/#{@sub1.id}"
       @folders_path_options = { :controller => "folders", :action => "update", :format => "json", :id => @sub1.id.to_param }
@@ -383,6 +383,97 @@ describe "Folders API", :type => :integration do
         :name => "with_path.txt")
       attachment = Attachment.order(:id).last
       attachment.folder_id.should == @root_folder.id
+    end
+  end
+
+  describe "#resolve_path" do
+    before :once do
+      @params_hash = { controller: 'folders', action: 'resolve_path', format: 'json' }
+    end
+
+    context "course" do
+      before :once do
+        course active_all: true
+        @root_folder = Folder.root_folders(@course).first
+        @request_path = "/api/v1/courses/#{@course.id}/folders/by_path"
+        @params_hash.merge!(course_id: @course.to_param)
+      end
+
+      it "should check permissions" do
+        user
+        api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 401 })
+      end
+
+      it "should operate on an empty path" do
+        student_in_course
+        json = api_call(:get, @request_path, @params_hash)
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id]
+      end
+
+      describe "with full_path" do
+        before :once do
+          @folder = @course.folders.create! parent_folder: @root_folder, name: 'a folder'
+          @sub_folder = @course.folders.create! parent_folder: @folder, name: 'locked subfolder', locked: true
+          @path = [@folder.name, @sub_folder.name].join('/')
+          @request_path += "/#{URI.encode(@path)}"
+          @params_hash.merge!(full_path: @path)
+        end
+
+        it "should return a list of path components" do
+          teacher_in_course
+          json = api_call(:get, @request_path, @params_hash)
+          json.map { |folder| folder['id'] }.should eql [@root_folder.id, @folder.id, @sub_folder.id]
+        end
+
+        it "should 404 on an invalid path" do
+          teacher_in_course
+          json = api_call(:get, @request_path + "/nonexistent", @params_hash.merge(full_path: @path + "/nonexistent"),
+                          {}, {}, { expected_status: 404 })
+        end
+
+        it "should not traverse hidden or locked paths for students" do
+          student_in_course
+          api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 404 })
+        end
+      end
+    end
+
+    context "group" do
+      before :once do
+        group_with_user
+        @root_folder = Folder.root_folders(@group).first
+        @params_hash.merge!(group_id: @group.id)
+      end
+
+      it "should accept an empty path" do
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/", @params_hash)
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id]
+      end
+
+      it "should accept a non-empty path" do
+        @folder = @group.folders.create! parent_folder: @root_folder, name: 'some folder'
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id, @folder.id]
+      end
+    end
+
+    context "user" do
+      before :once do
+        user active_all: true
+        @root_folder = Folder.root_folders(@user).first
+        @params_hash.merge!(user_id: @user.id)
+      end
+
+      it "should accept an empty path" do
+        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/", @params_hash)
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id]
+      end
+
+      it "should accept a non-empty path" do
+        @folder = @user.folders.create! parent_folder: @root_folder, name: 'some folder'
+        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id, @folder.id]
+      end
     end
   end
 end

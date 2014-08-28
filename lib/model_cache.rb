@@ -102,10 +102,7 @@ module ModelCache
     return {} if records.empty?
 
     keys[records.first.class.name].inject({}) do |h, k|
-      h[k] = records.inject({}) do |h2, v|
-        h2[v.send(k)] = v
-        h2
-      end
+      h[k] = records.index_by(&k)
       h
     end
   end
@@ -117,12 +114,6 @@ module ModelCache
 
     orig_method = "super"
     alias_method = nil
-
-    if (options[:type] == :instance ? klass.instance_methods : klass.methods).map(&:to_s).include?(method.to_s)
-      orig_method = "#{method}_without_cache(*args)"
-      alias_method = "alias_method_chain #{method.inspect}, :cache"
-      method = "#{method}_with_cache"
-    end
 
     key_value = options[:key_method] || "args.first"
     # if extra args are provided, we should clear out the current value

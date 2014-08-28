@@ -24,53 +24,51 @@ describe NotificationPolicy do
     notification_policy_model
   end
   
-  it "should default broadcast to true" do
-    notification_policy_model
-    @notification_policy.broadcast.should be_true
-  end
-  
-  it "should not have a communication_preference if broadcast is set to false." do
-    notification_policy_model(:broadcast => false)
-    @notification_policy.communication_preference.should be_nil
-  end
+  context "channels" do
+    before(:once) do
+      @course = factory_with_protected_attributes(Course, :name => "test course", :workflow_state => "available")
+      @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
+      e = @course.enroll_student(@student)
+      e.accept!
+      Notification.all.each{|n| n.destroy }
+      @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
+    end
 
-  it "should cause message dispatch to specified channel on triggered policies" do
-    policy_setup
-    @default_cc = @student.communication_channels.create(:path => "default@example.com")
-    @default_cc.confirm!
-    @cc = @student.communication_channels.create(:path => "secondary@example.com")
-    @cc.confirm!
-    @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
-    @assignment = @course.assignments.create!(:title => "test assignment")
-    @assignment.messages_sent.should be_include("Assignment Created")
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-    m.should be_nil
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-    m.should_not be_nil
-  end
-  
-  it "should prevent message dispatches if set to 'never' on triggered policies" do
-    policy_setup
-    @cc = @student.communication_channels.create(:path => "secondary@example.com")
-    @cc.confirm!
-    @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
-    @assignment = @course.assignments.create!(:title => "test assignment")
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-    m.should be_nil
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-    m.should be_nil
-  end
+    it "should cause message dispatch to specified channel on triggered policies" do
+      @default_cc = @student.communication_channels.create(:path => "default@example.com")
+      @default_cc.confirm!
+      @cc = @student.communication_channels.create(:path => "secondary@example.com")
+      @cc.confirm!
+      @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
+      @assignment = @course.assignments.create!(:title => "test assignment")
+      @assignment.messages_sent.should be_include("Assignment Created")
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m.should be_nil
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m.should_not be_nil
+    end
+    
+    it "should prevent message dispatches if set to 'never' on triggered policies" do
+      @cc = @student.communication_channels.create(:path => "secondary@example.com")
+      @cc.confirm!
+      @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
+      @assignment = @course.assignments.create!(:title => "test assignment")
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m.should be_nil
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m.should be_nil
+    end
 
-  it "should prevent message dispatches if no policy setting exists" do
-    policy_setup
-    @cc = @student.communication_channels.create(:path => "secondary@example.com")
-    @cc.confirm!
-    NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
-    @assignment = @course.assignments.create!(:title => "test assignment")
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-    m.should be_nil
-    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-    m.should be_nil
+    it "should prevent message dispatches if no policy setting exists" do
+      @cc = @student.communication_channels.create(:path => "secondary@example.com")
+      @cc.confirm!
+      NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
+      @assignment = @course.assignments.create!(:title => "test assignment")
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m.should be_nil
+      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m.should be_nil
+    end
   end
 
   it "should pass 'data' to the message" do
@@ -112,34 +110,34 @@ describe NotificationPolicy do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
       notification_policy_model(:communication_channel => @cc)
-      NotificationPolicy.for(@user).should eql([@notification_policy])
+      NotificationPolicy.for(@user).should == [@notification_policy]
     end
 
     it "should have a named scope for notifications" do
       notification_model
       notification_policy_model(:notification => @notification)
-      NotificationPolicy.for(@notification).should eql([@notification_policy])
+      NotificationPolicy.for(@notification).should == [@notification_policy]
     end
     
     it "should not slow down from other kinds of input on the *for* named scope" do
       notification_policy_model
-      NotificationPolicy.for(:anything_else).should eql(NotificationPolicy.all)
+      NotificationPolicy.for(:anything_else).should == NotificationPolicy.all
     end
     
     context "by" do
-      before do
+      before :once do
         user_with_pseudonym(:active_all => 1)
-        @n1 = notification_policy_model(:frequency => 'immediately', :communication_channel => @cc)
-        @n2 = notification_policy_model(:frequency => 'daily', :communication_channel => @cc)
-        @n3 = notification_policy_model(:frequency => 'weekly', :communication_channel => @cc)
-        @n4 = notification_policy_model(:frequency => 'never', :communication_channel => @cc)
+        @n1 = notification_policy_model(:frequency => 'immediately', :communication_channel => @cc, notification: notification_model(name: 'N1'))
+        @n2 = notification_policy_model(:frequency => 'daily', :communication_channel => @cc, notification: notification_model(name: 'N2'))
+        @n3 = notification_policy_model(:frequency => 'weekly', :communication_channel => @cc, notification: notification_model(name: 'N3'))
+        @n4 = notification_policy_model(:frequency => 'never', :communication_channel => @cc, notification: notification_model(name: 'N4'))
       end
       
       it "should have a scope to differentiate by frequency" do
-        NotificationPolicy.by(:immediately).should eql([@n1])
-        NotificationPolicy.by(:daily).should eql([@n2])
-        NotificationPolicy.by(:weekly).should eql([@n3])
-        NotificationPolicy.by(:never).should eql([@n4])
+        NotificationPolicy.by(:immediately).should == [@n1]
+        NotificationPolicy.by(:daily).should == [@n2]
+        NotificationPolicy.by(:weekly).should == [@n3]
+        NotificationPolicy.by(:never).should == [@n4]
       end
     
       it "should be able to differentiate by several frequencies at once" do
@@ -148,19 +146,9 @@ describe NotificationPolicy do
       end
       
       it "should be able to combine an array of frequencies with a for scope" do
-        user_with_pseudonym(:active_all => 1)
-        n1 = notification_policy_model(
-          :communication_channel => @cc,
-          :frequency => 'daily'
-        )
-        n2 = notification_policy_model(
-            :communication_channel => @cc,
-          :frequency => 'weekly'
-        )
-        n3 = notification_policy_model(:communication_channel => @cc)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n1)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n2)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(n3)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n2)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n3)
+        NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(@n1)
       end
     end
     
@@ -177,17 +165,21 @@ describe NotificationPolicy do
       }
       
       n1 = notification_policy_model
-      n2 = notification_policy_model({:frequency => "immediately"}.merge(trifecta_opts) )
-      n3 = notification_policy_model({:frequency => "daily"}.merge(trifecta_opts) )
-      n4 = notification_policy_model({:frequency => "weekly"}.merge(trifecta_opts) )
-      
+
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should_not be_include(n1)
-      policies.should_not be_include(n2)
-      policies.should be_include(n3)
-      policies.should be_include(n4)
-      policies.size.should eql(2)
-      
+      policies.should == []
+
+      n1.update_attribute(:frequency, 'never')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == []
+
+      n1.update_attribute(:frequency, 'daily')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == [n1]
+
+      n1.update_attribute(:frequency, 'weekly')
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies.should == [n1]
     end
     
   end
@@ -223,13 +215,31 @@ describe NotificationPolicy do
       n1.frequency.should == Notification::FREQ_IMMEDIATELY
       n2.frequency.should == Notification::FREQ_IMMEDIATELY
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create records on the correct shard" do
+        user_with_pseudonym(active_all: true)
+        NotificationPolicy.delete_all
+        notification_model
+        @shard1.activate do
+          @user.notification_policies.scoped.exists?.should be_false
+          NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
+          @user.notification_policies.scoped.exists?.should be_true
+        end
+      end
+    end
   end
 
   describe "setup_with_default_policies" do
-    before :each do
+    before :once do
       @user = User.create!
       @communication_channel = @user.communication_channels.create!(path: 'email@example.com')
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
+    end
+
+    before :each do
       Notification.stubs(:all).returns([@notification])
     end
 
@@ -304,36 +314,3 @@ describe NotificationPolicy do
     end
   end
 end
-
-def policy_setup
-  @course = factory_with_protected_attributes(Course, :name => "test course", :workflow_state => "available")
-  @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
-  e = @course.enroll_student(@student)
-  e.accept!
-  Notification.all.each{|n| n.destroy }
-  @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
-end
-
-describe NotificationPolicy, "communication_preference" do
-  
-  before(:each) do
-    @cc1 = mock('CommunicationChannel')
-    @cc2 = mock('CommunicationChannel')
-    @user = User.create!
-    @user.stubs(:communication_channel).returns(@cc1)
-    notification_policy_model
-    @notification_policy.stubs(:user).returns(@user)
-  end
-  
-  it "should use the channel defined, if one is given" do
-    @notification_policy.stubs(:communication_channel).returns(@cc2)
-    @notification_policy.communication_preference.should eql(@cc2)
-  end
-
-  it "should use the users default communication channel if one isn't given" do
-    @notification_policy.stubs(:communication_channel).returns(nil)
-    @notification_policy.communication_preference.should eql(@cc1)
-  end
-  
-end
-  

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 
-describe UsersController, :type => :integration do
+describe UsersController, type: :request do
   include Api
   include Api::V1::Assignment
   def update_assignment_json
@@ -27,7 +27,7 @@ describe UsersController, :type => :integration do
     @a2_json['assignment'] = controller.assignment_json(@a2,@user,session)
   end
 
-  before do
+  before :once do
     @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
     @student_course = course(:active_all => true)
@@ -43,6 +43,9 @@ describe UsersController, :type => :integration do
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
     @a2.reload
+  end
+
+  before :each do
     @a1_json = 
       {
         'type' => 'submitting',
@@ -79,12 +82,12 @@ describe UsersController, :type => :integration do
 
   it "should check for auth" do
     get("/api/v1/users/self/todo")
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/todo",
                 :controller => "courses", :action => "todo_items", :format => "json", :course_id => @course.to_param)
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
 
   it "should return a global user todo list" do

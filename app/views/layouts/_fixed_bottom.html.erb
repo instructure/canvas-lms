@@ -1,7 +1,7 @@
 <div id="fixed_bottom">
   <% if @fixed_warnings.present? %>
     <% @fixed_warnings.each_with_index do |warning, index| %>
-      <div id="element_toggler_<%= index %>" class="element_toggler fixed_warning" role="button" aria-controls="element_toggler_<%= index %>">
+      <div id="element_toggler_<%= index %>" class="element_toggler fixed_warning" role="button" aria-controls="element_toggler_<%= index %>" tabindex="0">
         <i class=<%= "icon-#{warning[:icon]}" %>></i>
         <b><%= warning[:title] %></b>
         <div style="float: right;"><%= warning[:message] %></div>
@@ -28,7 +28,7 @@
     <div id="masquerade_bar" class="ui-widget ui-state-default">
       <% if service_enabled?(:avatars) %>
         <div class="masquerading_avatar">
-          <%= avatar_image(@current_user, 32) %>
+          <%= avatar(@current_user, url: nil) %>
         </div>
       <% end %>
       <b><%= t('masquerading.warning_title', "You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %></b>

@@ -18,8 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe PseudonymsController, :type => :integration do
-  before do
+describe PseudonymsController, type: :request do
+  before :once do
     course_with_student(:active_all => true)
     account_admin_user
     @account = @user.account
@@ -100,7 +100,7 @@ describe PseudonymsController, :type => :integration do
     end
 
     context "An unauthorized user" do
-      before do
+      before :once do
         @user = user_with_pseudonym
       end
 
@@ -191,10 +191,20 @@ describe PseudonymsController, :type => :integration do
         response.code.should eql '401'
       end
     end
+
+    it "should not allow user to add their own pseudonym to an arbitrary account" do
+      user_with_pseudonym(active_all: true)
+      raw_api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/logins",
+                   { account_id: Account.site_admin.id.to_param, controller: 'pseudonyms',
+                     action: 'create', format: 'json'},
+                   user: { id: @user.id },
+                   login: { unique_id: 'user'} )
+      response.code.should eql '401'
+    end
   end
 
   describe "pseudonym updates" do
-    before do
+    before :once do
       @student.pseudonyms.create!(:unique_id => 'student@example.com')
       @admin.pseudonyms.create!(:unique_id => 'admin@example.com')
       @teacher.pseudonyms.create!(:unique_id => 'teacher@example.com')
@@ -241,6 +251,13 @@ describe PseudonymsController, :type => :integration do
         json['sis_user_id'].should eql 'old-12345'
       end
 
+      it "should return 200 if changing only sis id" do
+        json = api_call(:put, @path, @path_options, {
+            :login => { :sis_user_id => 'old-12345' }
+        })
+        json['sis_user_id'].should eql 'old-12345'
+      end
+
       it "should not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(:unique_id => 'other@example.com')
@@ -268,7 +285,7 @@ describe PseudonymsController, :type => :integration do
   end
 
   describe "pseudonym deletion" do
-    before do
+    before :once do
       @student.pseudonyms.create!(:unique_id => 'student@example.com')
       @path = "/api/v1/users/#{@student.id}/logins/#{@student.pseudonym.id}"
       @path_options = { :controller => 'pseudonyms',

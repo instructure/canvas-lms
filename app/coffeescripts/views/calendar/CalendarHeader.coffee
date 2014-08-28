@@ -1,9 +1,10 @@
 define [
   'i18n!calendar',
+  'jquery'
   'Backbone',
   'jst/calendar/calendarHeader'
   'compiled/views/calendar/CalendarNavigator'
-], (I18n, Backbone, template, CalendarNavigator) ->
+], (I18n, $, Backbone, template, CalendarNavigator) ->
 
   class CalendarHeader extends Backbone.View
     template: template

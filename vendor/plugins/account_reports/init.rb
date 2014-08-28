@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,9 +20,9 @@ require 'canvas/account_reports'
 require 'canvas/account_reports/default'
 
 Rails.configuration.to_prepare do
-  Canvas::AccountReports.add_account_reports 'default', 'Default', {
-    'grade_export_csv'=> {
-      :title => 'Grade Export',
+  Canvas::AccountReports.configure_account_report 'Default', {
+    'grade_export_csv' => {
+      :title => proc { I18n.t(:grade_export_title, 'Grade Export') },
       :description_partial => true,
       :parameters_partial => true,
       :parameters => {
@@ -36,8 +36,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'last_user_access_csv'=> {
-      :title => 'Last User Access',
+    'last_user_access_csv' => {
+      :title => proc { I18n.t(:last_user_access_title, 'Last User Access') },
       :description_partial => true,
       :parameters_partial => 'term_selector_parameters',
       :parameters => {
@@ -51,8 +51,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'outcome_results_csv'=> {
-      :title => 'Outcome Results',
+    'outcome_results_csv' => {
+      :title => proc { I18n.t(:outcome_results_title, 'Outcome Results') },
       :parameters_partial => true,
       :description_partial => true,
       :parameters => {
@@ -70,8 +70,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'provisioning_csv'=> {
-      :title => 'Provisioning',
+    'provisioning_csv' => {
+      :title => proc { I18n.t(:provisioning_title, 'Provisioning') },
       :parameters_partial => 'sis_export_csv_parameters',
       :description_partial => true,
       :parameters => {
@@ -111,8 +111,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'recently_deleted_courses_csv'=> {
-      :title => 'Recently Deleted Courses',
+    'recently_deleted_courses_csv' => {
+      :title => proc { I18n.t(:recently_deleted_courses_title, 'Recently Deleted Courses') },
       :description_partial => true,
       :parameters_partial => 'term_selector_parameters',
       :parameters => {
@@ -122,8 +122,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'sis_export_csv'=> {
-      :title => 'SIS Export',
+    'sis_export_csv' => {
+      :title => proc { I18n.t(:sis_export_title, 'SIS Export') },
       :parameters_partial => true,
       :description_partial => true,
       :parameters => {
@@ -163,8 +163,8 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'student_assignment_outcome_map_csv'=> {
-      :title => 'Student Competency',
+    'student_assignment_outcome_map_csv' => {
+      :title => proc { I18n.t(:student_assignment_outcome_map_title, 'Student Competency') },
       :parameters_partial => 'grade_export_csv_parameters',
       :description_partial => true,
       :parameters => {
@@ -178,10 +178,10 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'students_with_no_submissions_csv'=> {
-      :title => 'Students with no submissions',
+    'students_with_no_submissions_csv' => {
+      :title => proc { I18n.t(:students_with_no_submissions_title, 'Students with no submissions') },
       :description_partial => true,
-      :parameters_partial => 'term_and_date_pickers_parameters',
+      :parameters_partial => true,
       :parameters => {
         :enrollment_term_id => {
           :required => false,
@@ -198,22 +198,41 @@ Rails.configuration.to_prepare do
         :end_at => {
           :required => true,
           :description => 'The end date for submissions. Max time range is 2 weeks.'
+        },
+        :include_enrollment_state => {
+          :required => false,
+          :description => 'Include enrollment state.'
+        },
+        :enrollment_state => {
+          :required => false,
+          :description => "Enrollment states to include, defaults to 'all', Options 'active'|'invited'|'creation_pending'|'deleted'|'rejected'|'completed'|'inactive'"
         }
       }
     },
-    'unpublished_courses_csv'=> {
-      :title => 'Unpublished Courses',
+    'unpublished_courses_csv' => {
+      :title => proc { I18n.t(:unpublished_courses_title, 'Unpublished Courses') },
       :description_partial => true,
       :parameters_partial => 'term_selector_parameters',
       :parameters => {
         :enrollment_term_id => {
           :required => false,
-          :description => 'The canvas id of the term to get grades from'
+          :description => 'The canvas id of the term to get unpublished courses from'
         }
       }
     },
-    'unused_courses_csv'=> {
-      :title => 'Unused Courses',
+    'public_courses_csv' => {
+      :title => proc { I18n.t(:public_courses_title, 'Public Courses') },
+      :description_partial => true,
+      :parameters_partial => 'term_selector_parameters',
+      :parameters => {
+        :enrollment_term_id => {
+          :required => false,
+          :description => 'The canvas id of the term to get public courses from'
+        }
+      }
+    },
+    'unused_courses_csv' => {
+      :title => proc { I18n.t(:unused_courses_title, 'Unused Courses') },
       :description_partial => true,
       :parameters_partial => 'term_selector_parameters',
       :parameters => {
@@ -223,14 +242,18 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'zero_activity_csv'=> {
-      :title => 'Zero Activity',
+    'zero_activity_csv' => {
+      :title => proc { I18n.t(:zero_activity_title, 'Zero Activity') },
       :description_partial => true,
       :parameters_partial => 'term_and_date_picker_parameters',
       :parameters => {
         :enrollment_term_id => {
           :required => false,
           :description => 'The canvas id of the term to get grades from'
+        },
+        :start_at => {
+          :required => false,
+          :description => 'The first date in the date range, the second date is the time the report is run.'
         },
         :course_id => {
           :required => false,

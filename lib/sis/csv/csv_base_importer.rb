@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 require_dependency 'sis/common'
 
 module SIS
@@ -59,7 +61,8 @@ module SIS
       end
 
       def importer_opts
-        { :batch_id => @batch.try(:id),
+        { :batch => @batch,
+          :batch_user => @batch.try(:user),
           :logger => @sis.logger,
           :override_sis_stickiness => @sis.override_sis_stickiness,
           :add_sis_stickiness => @sis.add_sis_stickiness,

@@ -23,7 +23,7 @@ module Canvas
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
     @redis ||= begin
-      settings = Setting.from_config('redis')
+      settings = ConfigFile.load('redis')
       Canvas::RedisConfig.from_settings(settings).redis
     end
   end
@@ -36,7 +36,7 @@ module Canvas
   end
 
   def self.redis_enabled?
-    @redis_enabled ||= Setting.from_config('redis').present?
+    @redis_enabled ||= ConfigFile.load('redis').present?
   end
 
   def self.reconnect_redis
@@ -48,52 +48,60 @@ module Canvas
     end
   end
 
-  def self.cache_store_config(rails_env = :current, nil_is_nil = false)
-    # this method is called really early in the bootup process, and autoloading
-    # might not be available yet, so we need to manually require Setting
-    require_dependency "app/models/setting"
-    cache_store_config = {
-      'cache_store' => 'mem_cache_store',
-    }.merge(Setting.from_config('cache_store', rails_env) || {})
-    config = nil
-    case cache_store_config.delete('cache_store')
-    when 'mem_cache_store'
-      cache_store_config['namespace'] ||= cache_store_config['key']
-      servers = cache_store_config['servers'] || (Setting.from_config('memcache', rails_env))
-      if servers
-        config = :mem_cache_store, servers, cache_store_config
+  def self.cache_store_config(rails_env = :current, nil_is_nil = true)
+    rails_env = Rails.env if rails_env == :current
+    cache_stores[rails_env]
+  end
+
+  def self.cache_stores
+    unless @cache_stores
+      # this method is called really early in the bootup process, and
+      # autoloading might not be available yet, so we need to manually require
+      # Config
+      require_dependency 'lib/config_file'
+      @cache_stores = {}
+      configs = ConfigFile.load('cache_store', nil) || {}
+
+      # sanity check the file
+      unless configs.is_a?(Hash)
+        raise "Invalid config/cache_store.yml: Root is not a hash. See comments in config/cache_store.yml.example"
       end
-    when 'redis_store'
-      Bundler.require 'redis'
-      require_dependency 'canvas/redis'
-      Canvas::Redis.patch
-      # merge in redis.yml, but give precedence to cache_store.yml
-      #
-      # the only options currently supported in redis-cache are the list of
-      # servers, not key prefix or database names.
-      cache_store_config = (Setting.from_config('redis', rails_env) || {}).merge(cache_store_config)
-      cache_store_config['key_prefix'] ||= cache_store_config['key']
-      servers = cache_store_config['servers']
-      config = :redis_store, servers
-    when 'memory_store'
-      config = :memory_store
-    when 'nil_store'
-      if CANVAS_RAILS2
-        require 'nil_store'
-        config = NilStore.new
-      else
-        config = :null_store
+
+      unless configs.values.all? { |cfg| cfg.is_a?(Hash) }
+        broken = configs.keys.select{ |k| !configs[k].is_a?(Hash) }.map(&:to_s).join(', ')
+        raise "Invalid config/cache_store.yml: Some keys are not hashes: #{broken}. See comments in config/cache_store.yml.example"
       end
+
+      configs.each do |env, config|
+        config = {'cache_store' => 'mem_cache_store'}.merge(config)
+        case config.delete('cache_store')
+        when 'mem_cache_store'
+          config['namespace'] ||= config['key']
+          servers = config['servers'] || (ConfigFile.load('memcache', env))
+          if servers
+            @cache_stores[env] = :mem_cache_store, servers, config
+          end
+        when 'redis_store'
+          Bundler.require 'redis'
+          require_dependency 'canvas/redis'
+          Canvas::Redis.patch
+          # merge in redis.yml, but give precedence to cache_store.yml
+          #
+          # the only options currently supported in redis-cache are the list of
+          # servers, not key prefix or database names.
+          config = (ConfigFile.load('redis', env) || {}).merge(config)
+          config_options = config.symbolize_keys.except(:key, :servers, :database)
+          servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
+          @cache_stores[env] = :redis_store, servers
+        when 'memory_store'
+          @cache_stores[env] = :memory_store
+        when 'nil_store'
+          @cache_stores[env] = :null_store
+        end
+      end
+      @cache_stores[Rails.env] ||= :null_store
     end
-    if !config && !nil_is_nil
-      if CANVAS_RAILS2
-        require 'nil_store'
-        config = NilStore.new
-      else
-        config = :null_store
-      end
-    end
-    config
+    @cache_stores
   end
 
   # `sample` reports KB, not B
@@ -147,33 +155,49 @@ module Canvas
   #
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
-  def self.timeout_protection(service_name, options={})
-    redis_key = "service:timeouts:#{service_name}"
-    if Canvas.redis_enabled?
-      cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
-      error_count = Canvas.redis.get(redis_key)
-      if error_count.to_i >= cutoff
-        Rails.logger.error("Skipping service call due to error count: #{service_name} #{error_count}")
-        raise(Timeout::Error, "timeout_protection cutoff triggered") if options[:raise_on_timeout]
-        return
-      end
-    end
-
+  def self.timeout_protection(service_name, options={}, &block)
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
+
+    if Canvas.redis_enabled?
+      redis_key = "service:timeouts:#{service_name}"
+      cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
+      error_ttl = (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+      short_circuit_timeout(Canvas.redis, redis_key, timeout, cutoff, error_ttl, &block)
+    else
+      Timeout.timeout(timeout, &block)
+    end
+  rescue TimeoutCutoff => e
+    Rails.logger.error("Skipping service call due to error count: #{service_name} #{e.error_count}")
+    raise if options[:raise_on_timeout]
+    return nil
+  rescue Timeout::Error => e
+    ErrorReport.log_exception(:service_timeout, e)
+    raise if options[:raise_on_timeout]
+    return nil
+  end
+
+  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl)
+    error_count = redis.get(redis_key)
+    if error_count.to_i >= cutoff
+      raise TimeoutCutoff.new(error_count)
+    end
 
     begin
       Timeout.timeout(timeout) do
         yield
       end
     rescue Timeout::Error => e
-      ErrorReport.log_exception(:service_timeout, e)
-      if Canvas.redis_enabled?
-        error_ttl = (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
-        Canvas.redis.incrby(redis_key, 1)
-        Canvas.redis.expire(redis_key, error_ttl)
-      end
-      raise if options[:raise_on_timeout]
-      return nil
+      redis.incrby(redis_key, 1)
+      redis.expire(redis_key, error_ttl)
+      raise
+    end
+  end
+
+  class TimeoutCutoff < Timeout::Error
+    attr_accessor :error_count
+
+    def initialize(error_count)
+      @error_count = error_count
     end
   end
 end

@@ -16,7 +16,8 @@ Rails.configuration.to_prepare do
             :requires_file_upload => true,
             :provides =>{:qti=>Qti::Converter, 
                          :webct=>Qti::Converter, # It can import WebCT Quizzes
-            }
+            },
+            :valid_contexts => %w{Account Course}
           },
           :validator => 'QtiPluginValidator'
   }

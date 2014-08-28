@@ -46,7 +46,7 @@ describe Account do
   # end
 
   context "course lists" do
-    before(:each) do
+    before :once do
       @account = Account.create!
       process_csv_data_cleanly([
         "user_id,login_id,first_name,last_name,email,status",
@@ -184,7 +184,7 @@ describe Account do
   end
 
   context "services" do
-    before(:each) do
+    before do
       @a = Account.new
     end
     it "should be able to specify a list of enabled services" do
@@ -428,41 +428,40 @@ describe Account do
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
     account_enabled_access = [ :view_notifications ]
-    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access
-    index = full_access.index(:manage_courses)
-    full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
+    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access + [:create_courses]
+    siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      account.check_policy(hash[:site_admin][:user]).should == limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:admin]).should =~ full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should =~ siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
-    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:admin]).should =~ [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should =~ [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_root_access
-      account.check_policy(hash[:root][:user]).should == limited_access
+      account.check_policy(hash[:root][:admin]).should =~ full_root_access
+      account.check_policy(hash[:root][:user]).should =~ limited_access
     end
 
     # sub account has access to sub and sub_sub
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:admin]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_sub_access
-      account.check_policy(hash[:sub][:user]).should == limited_access
+      account.check_policy(hash[:sub][:admin]).should =~ full_sub_access
+      account.check_policy(hash[:sub][:user]).should =~ limited_access
     end
 
     # Grant 'Restricted Admin' a specific permission, and re-check everything
@@ -476,32 +475,32 @@ describe Account do
     RoleOverride.clear_cached_contexts
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      account.check_policy(hash[:site_admin][:user]).should == some_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:admin]).should =~ full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should =~ siteadmin_access + some_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
-    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:admin]).should =~ [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should =~ [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_root_access
-      account.check_policy(hash[:root][:user]).should == some_access
+      account.check_policy(hash[:root][:admin]).should =~ full_root_access
+      account.check_policy(hash[:root][:user]).should =~ some_access
     end
 
     # sub account has access to sub and sub_sub
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:admin]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_sub_access
-      account.check_policy(hash[:sub][:user]).should == some_access
+      account.check_policy(hash[:sub][:admin]).should =~ full_sub_access
+      account.check_policy(hash[:sub][:user]).should =~ some_access
     end
   end
 
@@ -535,7 +534,7 @@ describe Account do
     a.user_count.should == 0
 
     u = User.create!
-    a.add_user(u)
+    a.account_users.create!(user: u)
     a.all_users.count.should == a.user_count
     a.user_count.should == 1
 
@@ -599,7 +598,7 @@ describe Account do
   end
 
   context "users_not_in_groups" do
-    before :each do
+    before :once do
       @account = Account.default
       @user1 = account_admin_user(:account => @account)
       @user2 = account_admin_user(:account => @account)
@@ -637,6 +636,10 @@ describe Account do
   end
 
   context "tabs_available" do
+    before :once do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+    end
+
     it "should include 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(:account => Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
@@ -647,7 +650,6 @@ describe Account do
     end
 
     it "should not include 'Developer Keys' for non-site_admin accounts" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
 
@@ -656,17 +658,15 @@ describe Account do
     end
 
     it "should not include external tools if not configured for course navigation" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_account_navigation.should == false
+      tool.has_placement?(:account_navigation).should == false
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
 
     it "should include active external tools if configured on the account" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tools = []
       2.times do |n|
         t = @account.context_external_tools.new(
@@ -685,7 +685,7 @@ describe Account do
       tool1, tool2 = tools
       tool2.destroy
 
-      tools.each { |t| t.has_account_navigation.should == true }
+      tools.each { |t| t.has_placement?(:account_navigation).should == true }
 
       tabs = @account.tabs_available
       tab_ids = tabs.map{|t| t[:id] }
@@ -698,11 +698,10 @@ describe Account do
     end
 
     it "should include external tools if configured on the root account" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_account_navigation.should == true
+      tool.has_placement?(:account_navigation).should == true
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
       tab = tabs.detect{|t| t[:id] == tool.asset_string }
@@ -730,19 +729,18 @@ describe Account do
   end
 
   describe "user_list_search_mode_for" do
+    let_once(:account) { Account.default }
     it "should be preferred for anyone if open registration is turned on" do
-      account = Account.default
       account.settings = { :open_registration => true }
       account.user_list_search_mode_for(nil).should == :preferred
       account.user_list_search_mode_for(user).should == :preferred
     end
 
     it "should be preferred for account admins" do
-      account = Account.default
       account.user_list_search_mode_for(nil).should == :closed
       account.user_list_search_mode_for(user).should == :closed
       user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       account.user_list_search_mode_for(@user).should == :preferred
     end
   end
@@ -768,23 +766,25 @@ describe Account do
       enable_cache do
         user
         site_admin = Account.site_admin
-        site_admin.add_user(@user)
+        site_admin.account_users.create!(user: @user)
 
         @shard1.activate do
-          site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
+          site_admin.grants_right?(@user, :manage_site_settings).should be_true
         end
-        site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
+        site_admin.grants_right?(@user, :manage_site_settings).should be_true
 
         user
         @shard1.activate do
-          site_admin.grants_right?(@user, nil, :manage_site_settings).should be_false
+          site_admin.grants_right?(@user, :manage_site_settings).should be_false
         end
-        site_admin.grants_right?(@user, nil, :manage_site_settings).should be_false
+        site_admin.grants_right?(@user, :manage_site_settings).should be_false
       end
     end
   end
 
   context "permissions" do
+    before(:once) { Account.default }
+
     it "should grant :read_sis to teachers" do
       user_with_pseudonym(:active_all => 1)
       Account.default.grants_right?(@user, :read_sis).should be_false
@@ -883,7 +883,7 @@ describe Account do
         sa = Account.site_admin
         sa.account_users_for(@user).should == []
 
-        au = sa.add_user(@user)
+        au = sa.account_users.create!(user: @user)
         # out-of-proc cache should clear, but we have to manually clear
         # the in-proc cache
         sa = Account.find(sa)
@@ -906,7 +906,7 @@ describe Account do
           @shard1.activate do
             sa.account_users_for(@user).should == []
 
-            au = sa.add_user(@user)
+            au = sa.account_users.create!(user: @user)
             # out-of-proc cache should clear, but we have to manually clear
             # the in-proc cache
             sa = Account.find(sa)
@@ -923,7 +923,7 @@ describe Account do
   end
 
   describe "available_course_roles_by_name" do
-    before do
+    before :once do
       account_model
       @roleA = @account.roles.create :name => 'A'
       @roleA.base_role_type = 'StudentEnrollment'
@@ -978,8 +978,8 @@ describe Account do
   end
 
   describe "#can_see_admin_tools_tab?" do
+    let_once(:account) { Account.create! }
     it "returns false if no user is present" do
-      account = Account.create!
       account.can_see_admin_tools_tab?(nil).should be_false
     end
 
@@ -989,14 +989,12 @@ describe Account do
     end
 
     it "doesn't have permission, it returns false" do
-      account = Account.create!
       account.stubs(:grants_right?).returns(false)
       account_admin_user(:account => account)
       account.can_see_admin_tools_tab?(@admin).should be_false
     end
 
     it "does have permission, it returns true" do
-      account = Account.create!
       account.stubs(:grants_right?).returns(true)
       account_admin_user(:account => account)
       account.can_see_admin_tools_tab?(@admin).should be_true
@@ -1016,24 +1014,60 @@ describe Account do
     end
   end
 
-  describe ":enable_fabulous_quizzes setting" do
+  describe "default_time_zone" do
+    context "root account" do
+      before :once do
+        @account = Account.create!
+      end
 
-    it "is false by default" do
-      account = Account.create!
-      account.enable_fabulous_quizzes?.should == false
+      it "should use provided value when set" do
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should have a sensible default if not set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
+      end
+    end
+
+    context "sub account" do
+      before :once do
+        @root_account = Account.create!
+        @account = @root_account.sub_accounts.create!
+        @account.root_account = @root_account
+      end
+
+      it "should use provided value when set, regardless of root account setting" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should default to root account value if not set" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
+      end
+
+      it "should have a sensible default if neither is set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
+      end
     end
   end
 
-  describe "disable/enable_fabulous_quizzes!" do
-
-    it "toggles the enable_fabulous_quizzes setting appropriately" do
-      account = Account.create!
-      account.enable_fabulous_quizzes!
-      account.enable_fabulous_quizzes?.should == true
-
-      account.disable_fabulous_quizzes!
-      account.enable_fabulous_quizzes?.should == false
+  describe "#ensure_defaults" do
+    it "assigns an lti_guid postfixed by canvas-lms" do``
+      account = Account.new
+      account.uuid = '12345'
+      account.ensure_defaults
+      account.lti_guid.should == '12345:canvas-lms'
     end
-  end
 
+    it "does not change existing an lti_guid" do
+      account = Account.new
+      account.lti_guid = '12345'
+      account.ensure_defaults
+      account.lti_guid.should == '12345'
+    end
+
+  end
 end

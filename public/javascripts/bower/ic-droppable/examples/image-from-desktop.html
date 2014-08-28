@@ -1,0 +1,75 @@
+<!doctype html public "display of affection">
+<title>ic-Droppable demo</title>
+
+<style>
+x-image-drop {
+  display: block;
+  padding: 50px;
+  border: solid 1px;
+  text-align: center;
+  width: 80%;
+  margin: 50px auto;
+}
+
+x-image-drop.accepts-drag {
+  border: dashed 1px;
+  background: hsl(200, 50%, 80%);
+}
+
+img {
+  vertical-align: top;
+}
+</style>
+
+<script type="text/x-handlebars">
+{{#x-image-drop images=userImages}}
+  Drop one or many jpegs on me (and only jpegs)
+{{/x-image-drop}}
+
+<br>
+
+{{#each image in userImages}}
+  <img {{bind-attr src=image.src title=image.name}}>
+{{/each}}
+</script>
+
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/handlebars/handlebars.js"></script>
+<script src="../bower_components/ember/ember.js"></script>
+<script src="../dist/globals/main.js"></script>
+<script>
+var Droppable = ic.Droppable.default;
+App = Ember.Application.create();
+App.XImageDropComponent = Ember.Component.extend(Droppable, {
+
+  tagName: 'x-image-drop',
+
+  setImages: function() {
+    this.set('images', []);
+  }.on('init'),
+
+  validateDragEvent: function(event) {
+    var files = event.dataTransfer.files;
+    return [].reduce.call(files, function(accept, file) {
+      if (!accept) return false;
+      return file.type == 'image/jpeg';
+    }, true);
+  },
+
+  acceptDrop: function(event) {
+    event.preventDefault();
+    var files = event.dataTransfer.files;
+    var images = this.get('images');
+    [].forEach.call(files, function(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        file.src = e.target.result;
+        images.addObject(file);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+});
+</script>
+
+

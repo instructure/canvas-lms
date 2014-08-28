@@ -23,6 +23,7 @@ class CourseImport < ActiveRecord::Base
   serialize :parameters
   belongs_to :course
   belongs_to :source, :class_name => 'Course'
+
   validates_presence_of :course_id, :source_id, :import_type, :workflow_state
   validates_length_of :added_item_codes, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   

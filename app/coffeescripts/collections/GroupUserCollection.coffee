@@ -1,9 +1,10 @@
 define [
   'i18n!GroupUserCollection'
+  'jquery'
   'compiled/collections/PaginatedCollection'
   'compiled/models/GroupUser'
   'str/htmlEscape'
-], (I18n, PaginatedCollection, GroupUser, h) ->
+], (I18n, $, PaginatedCollection, GroupUser, h) ->
 
   class GroupUserCollection extends PaginatedCollection
 
@@ -18,8 +19,8 @@ define [
     initialize: (models) ->
       super
       @loaded = @loadedAll = models?
-      @on 'change:groupId', @onChangeGroupId
-      @model = GroupUser.extend defaults: {groupId: @group.id, @category}
+      @on 'change:group', @onChangeGroup
+      @model = GroupUser.extend defaults: {group: @group, @category}
 
     load: (target = 'all') ->
       @loadAll = target is 'all'
@@ -27,9 +28,9 @@ define [
       @fetch() if target isnt 'none'
       @load = ->
 
-    onChangeGroupId: (model, groupId) =>
+    onChangeGroup: (model, group) =>
       @removeUser model
-      @groupUsersFor(groupId)?.addUser model
+      @groupUsersFor(group)?.addUser model
 
     membershipsLocked: ->
       false
@@ -63,11 +64,11 @@ define [
     removeUser: (user) ->
       return if @membershipsLocked()
       @increment -1
+      @group.set('leader', null) if @group?.get('leader')?.id == user.id
       @remove user if @loaded
 
     increment: (amount) ->
       @group.increment 'members_count', amount
 
-    groupUsersFor: (id) ->
-      @category?.groupUsersFor(id)
-
+    groupUsersFor: (group) ->
+      @category?.groupUsersFor(group)

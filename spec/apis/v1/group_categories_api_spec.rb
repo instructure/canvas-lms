@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe "Group Categories API", :type => :integration do
+describe "Group Categories API", type: :request do
   def category_json(category)
     {
       'id' => category.id,
@@ -36,13 +36,13 @@ describe "Group Categories API", :type => :integration do
     }
   end
 
-  before do
+  before :once do
     @account = Account.default
     @category_path_options = {:controller => "group_categories", :format => "json"}
   end
 
   describe "course group categories" do
-    before do
+    before :once do
       @course = course(:course_name => 'Math 101', :account => @account, :active_course => true)
       @category = GroupCategory.student_organized_for(@course)
     end
@@ -58,7 +58,7 @@ describe "Group Categories API", :type => :integration do
         }
       end
 
-      before do
+      before :once do
         @user = user(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
 
@@ -67,8 +67,11 @@ describe "Group Categories API", :type => :integration do
 
 
         6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
 
+        @user = @course.teacher_enrollments.first.user
+      end
+
+      before :each do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -129,10 +132,18 @@ describe "Group Categories API", :type => :integration do
           @category_unassigned_users.map(&:id).should include(user['id'])
         end
       end
+
+      it "should include custom student roles in search" do
+        teacher = @user
+        custom_student = user(name: "blah")
+        @course.enroll_user(custom_student, 'StudentEnrollment', role_name: 'CustomStudent')
+        json = api_call_as_user(teacher, :get, api_url, api_route)
+        json.map{|u|u['id']}.should be_include custom_student.id
+      end
     end
 
     describe "teacher actions with no group" do
-      before do
+      before :once do
         @name = 'some group name'
         @user = user(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
@@ -150,8 +161,7 @@ describe "Group Categories API", :type => :integration do
       end
 
       it "should allow a teacher to update a category and distribute students to new groups" do
-        6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
+        create_users_in_course(@course, 6)
         json = api_call :put, "/api/v1/group_categories/#{@category.id}",
                         @category_path_options.merge(:action => 'update',
                                                      :group_category_id => @category.to_param),
@@ -165,8 +175,7 @@ describe "Group Categories API", :type => :integration do
       end
 
       it "should create group category/groups and split students between groups" do
-        6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
+        create_users_in_course(@course, 6)
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -236,7 +245,7 @@ describe "Group Categories API", :type => :integration do
       end
 
       describe "teacher actions with a group" do
-        before do
+        before :once do
           @study_group = group_model(:name => @name, :group_category => @category,
                                      :context => @course)
         end
@@ -324,7 +333,7 @@ describe "Group Categories API", :type => :integration do
     end
 
     describe "student actions" do
-      before do
+      before :once do
         @user = user(:name => "derrik hans")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
       end
@@ -385,12 +394,11 @@ describe "Group Categories API", :type => :integration do
         student = @course.enroll_student(user_model).user
         category = @course.group_categories.create(:name => "Group Category")
 
-        user_session(student)
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it "should require valid group :category_id" do
@@ -401,7 +409,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => (category.id + 1).to_param),
                      {'sync' => true}
-        response.status.should == '404 Not Found'
+        assert_status(404)
       end
 
       it "should fail for student organized groups" do
@@ -412,7 +420,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
       end
 
       it "should fail for restricted self signup groups" do
@@ -425,7 +433,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
 
         category.configure_self_signup(true, false)
         category.save
@@ -478,12 +486,12 @@ describe "Group Categories API", :type => :integration do
   end
 
   describe "account group categories" do
-    before do
+    before :once do
       @communities = GroupCategory.communities_for(@account)
     end
 
     describe "admin actions" do
-      before do
+      before :once do
         @user = account_admin_user(:account => @account)
       end
 

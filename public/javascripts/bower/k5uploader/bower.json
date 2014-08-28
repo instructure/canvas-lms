@@ -1,0 +1,25 @@
+{
+  "name": "k5uploader",
+  "version": "0.0.3",
+  "authors": [
+    "Jason Madsen <knomedia@gmail.com>"
+  ],
+  "dependencies": {
+    "jquery": "2.0.3"
+  },
+  "devDependencies": {
+    "requirejs": null
+  },
+  "main": "main.js",
+  "license": "MIT",
+  "ignore": [
+    "bower_components",
+    "node_modules",
+    "test",
+    "config.js",
+    "example.html",
+    "example.js",
+    "package.json",
+    "testem.json"
+  ]
+}

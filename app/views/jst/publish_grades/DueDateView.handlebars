@@ -1,0 +1,32 @@
+<form>
+  {{#with assignment_override}}
+  <select class="section-list input-small" name="course_section_id" aria-labelledby="overrides_course_section">
+  </select>
+
+  <div class="date_field_container">
+    <input value="{{datetimeFormatted due_at}}" name="due_at" type="text"
+    class="input-small date_field" aria-labelledby="overrides_due_date">
+  </div>
+
+  <div class="date_field_container">
+    <input name="unlock_at" value="{{datetimeFormatted unlock_at}}" type="text"
+    class="date_field" aria-labelledby="overrides_unlock_at">
+  </div>
+
+  <div class="date_field_container to">
+    <input name="lock_at" value="{{datetimeFormatted lock_at}}" type="text"
+    class="date_field" aria-labelledby="overrides_lock_at">
+  </div>
+
+  <div>
+    <a
+      href="#"
+      class="remove-link"
+      role="button"
+      title='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
+      aria-label='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
+    ><i class="icon-end"></i>
+    </a>
+  </div>
+  {{/with}}
+</form>

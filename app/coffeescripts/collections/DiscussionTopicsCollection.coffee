@@ -1,7 +1,9 @@
 define [
+  'jquery'
   'compiled/collections/PaginatedCollection'
   'compiled/models/DiscussionTopic'
-], (PaginatedCollection, DiscussionTopic) ->
+  'compiled/util/NumberCompare'
+], ($, PaginatedCollection, DiscussionTopic, numberCompare) ->
 
   class DiscussionTopicsCollection extends PaginatedCollection
 
@@ -23,10 +25,13 @@ define [
     @positionComparator: (a, b) ->
       aPosition = a.get('position')
       bPosition = b.get('position')
+      numberCompare(aPosition, bPosition)
 
-      if aPosition < bPosition
-        -1
-      else if aPosition is bPosition
-        0
-      else
-        1
+    reorderURL: -> @url()+'/reorder'
+
+    reorder: ->
+      @each (model, i) ->
+        model.set(position: i+1)
+      ids = @pluck('id')
+      $.post @reorderURL(), order: ids
+      @reset @models

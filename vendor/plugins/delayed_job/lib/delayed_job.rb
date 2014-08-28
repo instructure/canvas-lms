@@ -12,6 +12,7 @@ require File.expand_path(File.dirname(__FILE__) + '/delayed/performable_method')
 require File.expand_path(File.dirname(__FILE__) + '/delayed/backend/base')
 require File.expand_path(File.dirname(__FILE__) + '/delayed/backend/active_record')
 require File.expand_path(File.dirname(__FILE__) + '/delayed/worker')
+require File.expand_path(File.dirname(__FILE__) + '/delayed/lifecycle')
 require File.expand_path(File.dirname(__FILE__) + '/delayed/yaml_extensions')
 
 Object.send(:include, Delayed::MessageSending)

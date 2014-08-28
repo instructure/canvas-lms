@@ -28,7 +28,14 @@ class PageView < ActiveRecord::Base
   before_save :ensure_account
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User', 'UserProfile']
 
+  EXPORTABLE_ATTRIBUTES = [
+    :request_id, :session_id, :user_id, :url, :context_id, :context_type, :asset_id, :asset_type, :controller, :action, :interaction_seconds, :created_at, :updated_at,
+    :user_request, :render_time, :user_agent, :asset_user_access_id, :participated, :summarized, :account_id, :real_user_id, :http_method, :remote_ip
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :account, :real_user, :asset_user_access, :context]
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
@@ -44,9 +51,9 @@ class PageView < ActiveRecord::Base
   def self.generate(request, attributes={})
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
-      p.http_method = request.method.to_s
-      p.controller = request.path_parameters['controller']
-      p.action = request.path_parameters['action']
+      p.http_method = request.request_method.downcase
+      p.controller = request.path_parameters[:controller]
+      p.action = request.path_parameters[:action]
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
       p.user_agent = request.user_agent
       p.remote_ip = request.remote_ip
@@ -92,7 +99,7 @@ class PageView < ActiveRecord::Base
   end
 
   # the list of columns we display to users, export to csv, etc
-  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip)
+  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip)
 
   def self.page_views_enabled?
     !!page_view_method
@@ -101,11 +108,13 @@ class PageView < ActiveRecord::Base
   def self.page_view_method
     enable_page_views = Setting.get('enable_page_views', 'false')
     return false if enable_page_views == 'false'
-    enable_page_views = 'db' if %w[true queue].include?(enable_page_views) # backwards compat
+    enable_page_views = 'db' if %w[true cache].include?(enable_page_views) # backwards compat
     enable_page_views.to_sym
   end
 
-  def after_initialize
+  after_initialize :initialize_shard
+
+  def initialize_shard
     # remember the page view method selected at the time of creation, so that
     # we use the right method when saving
     if PageView.cassandra? && new_record?
@@ -121,17 +130,18 @@ class PageView < ActiveRecord::Base
     self.page_view_method == :cassandra
   end
 
-  EventStream = ::EventStream.new do
-    database_name :page_views
+  EventStream = EventStream::Stream.new do
+    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:page_views) }
     table :page_views
     id_column :request_id
     record_type PageView
+    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:page_views) }
 
     add_index :user do
       table :page_views_history_by_context
       id_column :request_id
       key_column :context_and_time_bucket
-      scrollback_setting 'page_views_scrollback_limit:users'
+      scrollback_limit -> { Setting.get('page_views_scrollback_limit:users', 52.weeks) }
 
       # index by the page view's user, but use the user's global_asset_string
       # when writing the index
@@ -140,51 +150,26 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_by_id(id, options={})
-    find_all_by_id([id], options).first
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_one(id, options={})
-    self.find_by_id(id, options) || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_all_by_id(ids, options={})
-    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-    return PageView::EventStream.fetch(ids) if PageView.cassandra?
-    PageView.where(request_id: ids).all
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_some(ids, options={})
+  def self.find(ids, options={})
     return super unless PageView.cassandra?
     raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
 
-    result = self.find_all_by_id(ids, options)
-    if result.size == ids.length
+    case ids
+    when Array
+      result = PageView::EventStream.fetch(ids)
+      raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.length} results, but was looking for #{ids.length})" unless ids.length == result.length
       result
     else
-      raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.size} results, but was looking for #{ids.length})"
+      find([ids]).first
     end
   end
 
-  def self.find_every(options={})
-    return super unless PageView.cassandra?
-    raise(NotImplementedError, "find_every not implemented")
+  def self.find_all_by_id(ids)
+    PageView.cassandra? ? PageView::EventStream.fetch(ids) : where(request_id: ids).to_a
+  end
+
+  def self.find_by_id(id)
+    PageView.cassandra? ? PageView::EventStream.fetch([id]).first : where(request_id: id).first
   end
 
   def self.from_attributes(attrs, new_record=false)
@@ -192,7 +177,7 @@ class PageView < ActiveRecord::Base
     shard = PageView.cassandra? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
-        new{ |pv| pv.send(:attributes=, attrs, false) }
+        new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
       else
         instantiate(@blank_template.merge(attrs))
       end
@@ -228,7 +213,6 @@ class PageView < ActiveRecord::Base
     shard.activate do
       updated_at = params['updated_at'] || self.updated_at || Time.now
       updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
-      self.contributed ||= params['page_view_contributed'] || params['contributed']
       seconds = self.interaction_seconds || 0
       if params['interaction_seconds'].to_i > 0
         seconds += params['interaction_seconds'].to_i
@@ -242,21 +226,25 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def create_without_callbacks
+  def create
+    return super unless PageView.cassandra?
+    self.created_at ||= Time.zone.now
     user.shard.activate do
-      return super unless PageView.cassandra?
-      self.created_at ||= Time.zone.now
-      PageView::EventStream.insert(self)
-      @new_record = false
-      self.id
+      run_callbacks(:create) do
+        PageView::EventStream.insert(self)
+        @new_record = false
+        self.id
+      end
     end
   end
 
-  def update_without_callbacks
+  def update
+    return super unless PageView.cassandra?
     user.shard.activate do
-      return super unless PageView.cassandra?
-      PageView::EventStream.update(self)
-      true
+      run_callbacks(:update) do
+        PageView::EventStream.update(self)
+        true
+      end
     end
   end
 
@@ -282,12 +270,27 @@ class PageView < ActiveRecord::Base
   class << self
     def transaction_with_cassandra_check(*args)
       if PageView.cassandra?
-        yield
+        # Rails 3 autosave associations re-assign the attributes;
+        # for sharding to work, the page view's shard has to be
+        # active at that point, but it's not cause it's normally
+        # done by the transaction, which we're skipping. so
+        # manually do that here
+        if current_scope
+          current_scope.activate do
+            yield
+          end
+        else
+          yield
+        end
       else
         self.transaction_without_cassandra_check(*args) { yield }
       end
     end
     alias_method_chain :transaction, :cassandra_check
+  end
+
+  def add_to_transaction
+    super unless PageView.cassandra?
   end
 
   def self.user_count_bucket_for_time(time)
@@ -372,7 +375,8 @@ class PageView < ActiveRecord::Base
 
       inserted = rows.count do |attrs|
         begin
-          created_at = Time.zone.parse(attrs['created_at'])
+          created_at = attrs['created_at']
+          created_at = Time.zone.parse(created_at) unless created_at.is_a?(Time)
           # if the created_at is the same as the last_created_at,
           # we may have already inserted this page view
           # use to_i here to avoid sub-second precision problems
@@ -401,7 +405,7 @@ class PageView < ActiveRecord::Base
       logger.info "account #{Shard.current.id}~#{account_id}: added #{inserted} page views starting at #{last_created_at}"
 
       last_created_at = rows.last['created_at']
-      last_created_at = Time.zone.parse(last_created_at)
+      last_created_at = Time.zone.parse(last_created_at) unless last_created_at.is_a?(Time)
       cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
       data['last_created_at'] = last_created_at
       return inserted > 0

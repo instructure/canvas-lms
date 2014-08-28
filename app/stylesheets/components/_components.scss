@@ -1,0 +1,134 @@
+.toolbar {
+  @include ui-widget-header-bg-and-text;
+  padding: $contentBoxPadding / 2;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
+
+  .header {
+    font-size: 16px;
+  }
+}
+
+// List View
+.list-view {
+  background-color: $lightBackground;
+  overflow: auto;
+
+  & > header,
+  // oldskool compat
+  #section-tabs-header {
+    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
+    margin-top: 0;
+    padding: 4px 12px;
+    font-weight: bold;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    border-bottom: 1px solid $listBorderColor;
+    @include bevelText;
+    border-top: 1px solid $listBorderColor;
+
+    // oldskool overrides
+    font-size: $baseFontSize;
+    font-weight: normal;
+    margin-bottom: 0;
+    line-height: 19px;
+    height: inherit;
+  }
+  #section-tabs-header-subtitle {
+    display: block;
+    font-size: 11px;
+    font-style: italic;
+    color: inherit;
+  }
+
+  & > *:first-child {
+    border-top: 0 !important; // oldskool important
+  }
+
+  & > ul,
+  // oldskool overrides
+  & > nav > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & > li {
+      padding: 0;
+
+      & > a {
+        display: block;
+        border-top: 1px solid $white;
+        border-bottom: 1px solid lighten($borderColor, 22%);
+        padding: 4px 12px;
+        color: ensure-contrast($gray, $lightBackground);
+
+        & > span {
+          white-space: nowrap;
+        }
+
+        &:hover {
+          text-decoration: none;
+          background: $white;
+        }
+      }
+
+      &:last-child > a {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  // lists w/o headers still need a strong border
+  & > ul + ul {
+    border-top: 1px solid $listBorderColor;
+  }
+
+  a.active {
+    background-color: $activeBG;
+    border-bottom-color: lighten($borderColor, 15%);
+    border-top-color: lighten($activeBG, 2%);
+    &:hover {
+      background-color: $activeBG;
+    }
+  }
+}
+.image-block {
+  @include clearfix;
+
+  .image-block-image {
+    float: left;
+    margin-right: $contentBoxPadding;
+  }
+
+  .image-block-content {
+    display: table-cell;
+    vertical-align: top;
+    width: 10000px;
+  }
+}
+
+.box-shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,.25)
+}
+
+.page-action-list {
+  @include reset-list;
+  a {
+    display: block;
+    color: $gray;
+    font-weight: bold;
+    border-bottom: solid 1px lighten($grayLight, 10%);
+    box-shadow: 0 1px 0px rgba(255, 255, 255, 0.85);
+    padding: 8px 0;
+
+    &:hover {
+      text-decoration: none;
+      color: $blue;
+    }
+
+    &:active {
+      color: $grayLight;
+    }
+  }
+}
+
+

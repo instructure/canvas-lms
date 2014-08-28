@@ -17,8 +17,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Modules API", :type => :integration do
-  before do
+describe "Modules API", type: :request do
+  before :once do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
@@ -56,7 +56,7 @@ describe "Modules API", :type => :integration do
   end
 
   context "as a teacher" do
-    before :each do
+    before :once do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
@@ -112,12 +112,30 @@ describe "Modules API", :type => :integration do
         json.map { |mod| mod['items'].size }.should == [5, 2, 0]
       end
 
-      it "should include item content details if requested" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",
-                        :controller => "context_modules_api", :action => "index", :format => "json",
-                        :course_id => "#{@course.id}", :include => %w(items content_details))
-        json.find{|h| h['id'] == @module1.id}['items'].find{|h| h['id'] == @assignment_tag.id
-          }['content_details'].should == {'points_possible' => @assignment.points_possible}
+      context 'index including content details' do
+        let(:json) do
+          api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",
+            :controller => "context_modules_api", :action => "index", :format => "json",
+            :course_id => "#{@course.id}", :include => %w(items content_details))
+        end
+        let(:assignment_details) { json.find{|mod| mod['id'] == @module1.id}['items'].find{|item| item['id'] == @assignment_tag.id}['content_details'] }
+        let(:wiki_page_details) { json.find{|mod| mod['id'] == @module2.id}['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
+
+        it 'should include user specific details' do
+          assignment_details.should include(
+            'points_possible' => @assignment.points_possible,
+          )
+        end
+
+        it 'sould include lock information' do
+          assignment_details.should include(
+            'locked_for_user' => false,
+          )
+
+          wiki_page_details.should include(
+            'locked_for_user' => false,
+          )
+        end
       end
 
       it "should skip items for modules that have too many" do
@@ -208,12 +226,35 @@ describe "Modules API", :type => :integration do
         }
       end
 
-      it "should include item content details if requested" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
-                        :controller => "context_modules_api", :action => "show", :format => "json",
-                        :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
-        json['items'].find{|h| h['id'] == @assignment_tag.id}['content_details'].should ==
-          {'points_possible' => @assignment.points_possible}
+      context 'show including content details' do
+        let(:module1_json) do
+          api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
+            :controller => "context_modules_api", :action => "show", :format => "json",
+            :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
+        end
+        let(:module2_json) do
+          api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}?include[]=items&include[]=content_details",
+            :controller => "context_modules_api", :action => "show", :format => "json",
+            :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module2.id}")
+        end
+        let(:assignment_details) { module1_json['items'].find{|item| item['id'] == @assignment_tag.id}['content_details'] }
+        let(:wiki_page_details) { module2_json['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
+
+        it 'should include user specific details' do
+          assignment_details.should include(
+            'points_possible' => @assignment.points_possible,
+          )
+        end
+
+        it 'sould include lock information' do
+          assignment_details.should include(
+            'locked_for_user' => false,
+          )
+
+          wiki_page_details.should include(
+            'locked_for_user' => false,
+          )
+        end
       end
 
       it "should show a single unpublished module" do
@@ -251,7 +292,7 @@ describe "Modules API", :type => :integration do
     end
 
     describe "batch update" do
-      before do
+      before :once do
         @path = "/api/v1/courses/#{@course.id}/modules"
         @path_opts = { :controller => "context_modules_api", :action => "batch_update", :format => "json",
                        :course_id => @course.to_param }
@@ -350,8 +391,8 @@ describe "Modules API", :type => :integration do
     end
 
     describe "update" do
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
+      before :once do
+        course_with_teacher(:active_all => true)
 
         @module1 = @course.context_modules.create(:name => "unpublished")
         @module1.workflow_state = 'unpublished'
@@ -481,8 +522,8 @@ describe "Modules API", :type => :integration do
     end
 
     describe "create" do
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
+      before :once do
+        course_with_teacher(:active_all => true)
       end
 
       it "should create a module with attributes" do
@@ -598,8 +639,8 @@ describe "Modules API", :type => :integration do
   end
   
   context "as a student" do
-    before :each do
-      course_with_student_logged_in(:course => @course, :active_all => true)
+    before :once do
+      course_with_student(:course => @course, :active_all => true)
     end
 
     it "should show locked state" do
@@ -632,6 +673,43 @@ describe "Modules API", :type => :integration do
                       :course_id => "#{@course.id}", :id => "#{@module1.id}")
       json['state'].should == 'completed'
       json['completed_at'].should_not be_nil
+    end
+
+    context 'show including content details' do
+      let(:module1_json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
+          :controller => "context_modules_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
+      end
+      let(:module2_json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}?include[]=items&include[]=content_details",
+          :controller => "context_modules_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module2.id}")
+      end
+      let(:assignment_details) { module1_json['items'].find{|item| item['id'] == @assignment_tag.id}['content_details'] }
+      let(:wiki_page_details) { module2_json['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
+
+      it 'should include user specific details' do
+        assignment_details.should include(
+          'points_possible' => @assignment.points_possible,
+        )
+      end
+
+      it 'sould include lock information' do
+        assignment_details.should include(
+          'locked_for_user' => false,
+        )
+
+        wiki_page_details.should include(
+          'lock_info',
+          'lock_explanation',
+          'locked_for_user' => true,
+        )
+        wiki_page_details['lock_info'].should include(
+          'asset_string' => @wiki_page.asset_string,
+          'unlock_at' => @christmas.as_json,
+        )
+      end
     end
 
     it "should not list unpublished modules" do

@@ -97,6 +97,18 @@ describe "grades" do
       end
     end
 
+    it "should show the student outcomes report if enabled" do
+      @outcome_group ||= @course.root_outcome_group
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome_group.add_outcome(@outcome)
+      Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
+      get "/courses/#{@course.id}/grades/#{@student_1.id}"
+      f('#navpills').should_not be_nil
+      f('a[href="#outcomes"]').click
+      wait_for_ajaximations
+      ff('#outcomes li.outcome').count.should == @course.learning_outcome_links.count
+    end
+
     context 'student view' do
       it "should be available to student view student" do
         @fake_student = @course.student_view_student
@@ -122,7 +134,7 @@ describe "grades" do
       Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
-      f('#submission_final-grade .assignment_score .grade').text.should == '33.3'
+      f('#submission_final-grade .assignment_score .grade').text.should == '33.3%'
 
       edit_grade = lambda do |field, score|
         field.click
@@ -140,14 +152,14 @@ describe "grades" do
       # test changing existing scores
       first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
       edit_grade.(first_row_grade, 4)
-      assert_grade.(40)
+      assert_grade.("40%")
 
       #using find with jquery to avoid caching issues
 
       # test changing unsubmitted scores
       third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
       edit_grade.(third_grade, 10)
-      assert_grade.(97)
+      assert_grade.("97%")
 
       driver.execute_script '$("#grade_entry").blur()'
     end

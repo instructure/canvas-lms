@@ -6,6 +6,12 @@
   <%= before_label asset.title %> <%= asset.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "View announcement" %>
+  </a>
+<% end %>
+
 <%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 
 <% if asset.attachment %>
@@ -17,5 +23,3 @@
   </ul>
 </div>
 <% end %>
-
-<p><a href="<%= content :link %>"><%= t :link, "View announcement" %></a></p>

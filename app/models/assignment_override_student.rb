@@ -20,9 +20,12 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_override
   belongs_to :user
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
 
   attr_accessible :user
+  EXPORTABLE_ATTRIBUTES = [:id, :created_at, :updated_at, :assignment_id, :assignment_override_id, :user_id, :quiz_id]
+
+  EXPORTABLE_ASSOCIATIONS = [:assignment, :assignment_override, :user, :quiz]
 
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id]
@@ -53,8 +56,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   def context_id
     if quiz
+      quiz.reload if quiz.id != quiz_id
       quiz.context_id
     elsif assignment
+      assignment.reload if assignment.id != assignment_id
       assignment.context_id
     end
   end
@@ -63,7 +68,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   def default_values
     if assignment_override
       self.assignment_id = assignment_override.assignment_id
-      self.quiz_id       = assignment_override.quiz_id
+      self.quiz_id = assignment_override.quiz_id
     end
   end
   protected :default_values

@@ -24,7 +24,7 @@ describe 'ruby_version_compat' do
 
   describe "force_utf8_params" do
     it "should allow null filenames through" do
-      testfile = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/txt.txt"), "text/plain", true)
+      testfile = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
       controller.stubs(:params).returns({ :upload => { :file1 => testfile } })
@@ -55,6 +55,46 @@ describe 'ruby_version_compat' do
       end
       stdout.should == ''
       stderr.should == ''
+    end
+  end
+
+  describe "unserialize_attribute_with_utf8_check" do
+    it "should strip out invalid utf-8 when deserializing a column" do
+      # non-binary invalid utf-8 can't even be inserted into the db in this environment,
+      # so we only test the !binary case here
+      yaml_blob = %{
+---
+ answers:
+ - !map:HashWithIndifferentAccess
+   weight: 0
+   id: 2
+   html: ab&ecirc;cd.
+   valid_ascii: !binary |
+     oHRleHSg
+   migration_id: QUE_2
+ question_text: What is the answer
+ position: 2
+      }.force_encoding('binary').strip
+      # now actually insert it into an AR column
+      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+      AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
+      text = aq.reload.question_data['answers'][0]['valid_ascii']
+      text.should == "text"
+      text.encoding.should == Encoding::UTF_8
+    end
+
+    it "should not strip columns not on the list" do
+      Utf8Cleaner.expects(:recursively_strip_invalid_utf8!).never
+      a = Account.find(Account.default.id)
+      a.settings # deserialization is lazy, trigger it
+    end
+
+    it "should strip columns on the list" do
+      Utf8Cleaner.unstub(:recursively_strip_invalid_utf8!)
+      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+      Utf8Cleaner.expects(:recursively_strip_invalid_utf8!).with(instance_of(HashWithIndifferentAccess), true)
+      aq = AssessmentQuestion.find(aq)
+      aq.question_data
     end
   end
 end

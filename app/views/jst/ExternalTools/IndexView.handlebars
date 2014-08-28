@@ -11,15 +11,15 @@
 </h2>
 
 <p class="well well-small">
-  {{#t "external_tools_note"}}Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.{{/t}}<br/><br/>{{#t "external_tools_references"}}Click <a href="https://www.edu-apps.org">here</a> to see some LTI tools that work great with Canvas. You can also check out the Canvas Community topics about LTI tools <a href="http://help.instructure.com/entries/20878626-lti-tools-and-examples"> here</a>{{/t}}
+  {{#t "external_tools_note"}}Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.{{/t}}<br/><br/>{{#t "external_tools_references"}}<a href="https://www.eduappcenter.com/">See some LTI tools</a> that work great with Canvas. You can also check out the <a href="http://help.instructure.com/entries/20878626-lti-tools-and-examples"> Canvas Community topics about LTI tools</a>{{/t}}
 </p>
 
 <div class="clearfix" id="app_center_filter_wrapper">
   <input type="text" id="app_center_filter" class="input-large search-query pull-right" placeholder="{{#t "search_filter"}}Filter by name{{/t}}">
   <ul class="nav nav-pills" id="target-installed-state-items">
-    <li data-installed-state="all" class="active"><a href="#" data-toggle-installed-state="all">{{#t "all"}}All{{/t}}</a></li>
-    <li data-installed-state="not_installed"><a href="#" data-toggle-installed-state="not_installed">{{#t "not_installed"}}Not Installed{{/t}}</a></li>
-    <li data-installed-state="installed"><a href="#" data-toggle-installed-state="installed">{{#t "installed"}}Installed{{/t}}</a></li>
+    <li data-installed-state="all" class="active"><a href="#" data-toggle-installed-state="all" role="tab" aria-selected="true" >{{#t "all"}}All{{/t}}</a></li>
+    <li data-installed-state="not_installed"><a href="#" data-toggle-installed-state="not_installed" role="tab" aria-selected="false">{{#t "not_installed"}}Not Installed{{/t}}</a></li>
+    <li data-installed-state="installed"><a href="#" data-toggle-installed-state="installed" role="tab" aria-selected="false">{{#t "installed"}}Installed{{/t}}</a></li>
   </ul>
 </div>
 

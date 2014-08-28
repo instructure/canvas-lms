@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,15 +18,14 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SisImportsApiController, :type => :integration do
-  before do
+describe SisImportsApiController, type: :request do
+  before :once do
     @user = user_with_pseudonym :active_all => true
-    user_session @user
     @account = Account.default
     @account.allow_sis_import = true
     @account.save
-    @account.add_user(@user, 'AccountAdmin')
-    Account.site_admin.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
+    Account.site_admin.account_users.create!(user: @user)
 
     @user_count = User.count
     @batch_count = SisBatch.count
@@ -46,7 +45,7 @@ describe SisImportsApiController, :type => :integration do
         { :controller => "sis_imports_api", :action => "create",
           :format => "json", :account_id => @account.id.to_s },
         opts.merge({ :import_type => "instructure_csv",
-          :attachment => ActionController::TestUploadedFile.new(path)}))
+          :attachment => Rack::Test::UploadedFile.new(path)}))
     json.has_key?("created_at").should be_true
     json.delete("created_at")
     json.has_key?("updated_at").should be_true
@@ -69,7 +68,7 @@ describe SisImportsApiController, :type => :integration do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
           { :controller => 'sis_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s }, 
+            :format => 'json', :account_id => @account.id.to_s },
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
     }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(1)
@@ -92,7 +91,7 @@ describe SisImportsApiController, :type => :integration do
     run_jobs
     User.count.should == @user_count + 1
     User.last.name.should == "Jamie Kennedy"
-    
+
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
           { :controller => 'sis_imports_api', :action => 'show', :format => 'json',
             :account_id => @account.id.to_s, :id => batch.id.to_s })
@@ -103,7 +102,7 @@ describe SisImportsApiController, :type => :integration do
     json.delete("updated_at")
     json.has_key?("ended_at").should be_true
     json.delete("ended_at")
-    json.should == { 
+    json.should == {
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
                       "counts" => { "abstract_courses" => 0,
@@ -128,7 +127,7 @@ describe SisImportsApiController, :type => :integration do
       api_call(:post,
             "/api/v1/accounts/#{@account.id}/sis_imports.json",
             { :controller => 'sis_imports_api', :action => 'create',
-              :format => 'json', :account_id => @account.id.to_s }, 
+              :format => 'json', :account_id => @account.id.to_s },
             { :import_type => 'instructure_csv',
               :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
     }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(0)
@@ -138,7 +137,7 @@ describe SisImportsApiController, :type => :integration do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
           { :controller => 'sis_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s }, 
+            :format => 'json', :account_id => @account.id.to_s },
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :batch_mode => '1',
@@ -148,12 +147,30 @@ describe SisImportsApiController, :type => :integration do
     batch.batch_mode_term.should == @account.default_enrollment_term
   end
 
+  it "should enable batch mode and require selecting a valid term" do
+    json = api_call(:post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { controller: 'sis_imports_api', action: 'create',
+        format: 'json', account_id: @account.id.to_s },
+      { import_type: 'instructure_csv',
+        attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+        batch_mode: 'true',
+        clear_sis_stickiness: 'true',
+        override_sis_stickiness: 'true',
+        batch_mode_term_id: @account.default_enrollment_term.id })
+    batch = SisBatch.find(json["id"])
+    batch.batch_mode.should be_true
+    batch.options[:override_sis_stickiness].should be_true
+    batch.options[:clear_sis_stickiness].should be_true
+    batch.batch_mode_term.should == @account.default_enrollment_term
+  end
+
   it "should error if batch mode and the term can't be found" do
     expect {
       json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
           { :controller => 'sis_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s }, 
+            :format => 'json', :account_id => @account.id.to_s },
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :batch_mode => '1' }, {}, :expected_status => 400)
@@ -400,6 +417,18 @@ describe SisImportsApiController, :type => :integration do
     end
   end
 
+  it "should allow raw post without content-type" do
+    # In the current API docs, we specify that you need to send a content-type to make raw
+    # post work. However, long ago we added code to make it work even without the header,
+    # so we are going to maintain that behavior.
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", "\xffab=\xffcd", { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+
+    batch = SisBatch.last
+    batch.attachment.filename.should == "sis_import.zip"
+    batch.attachment.content_type.should == "application/x-www-form-urlencoded"
+    batch.attachment.size.should == 7
+  end
+
   it "should allow raw post without charset" do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
@@ -407,7 +436,7 @@ describe SisImportsApiController, :type => :integration do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv' })
+          { 'CONTENT_TYPE' => 'text/csv' })
     batch = SisBatch.last
     batch.attachment.filename.should == "sis_import.csv"
     batch.attachment.content_type.should == "text/csv"
@@ -420,7 +449,7 @@ describe SisImportsApiController, :type => :integration do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv; charset=utf-8' })
+          { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last
     batch.attachment.filename.should == "sis_import.csv"
     batch.attachment.content_type.should == "text/csv"
@@ -433,18 +462,17 @@ describe SisImportsApiController, :type => :integration do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
-    response.status.should match(/400/)
+          { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
+    assert_status(400)
     SisBatch.count.should == 0
   end
 
   it "should list sis imports for an account" do
     @user = user_with_pseudonym :active_all => true
-    user_session @user
     @account = Account.create(name: 'sis account')
     @account.allow_sis_import = true
     @account.save!
-    @account.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
     batch = post_csv(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"

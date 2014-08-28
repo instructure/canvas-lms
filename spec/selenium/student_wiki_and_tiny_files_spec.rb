@@ -6,9 +6,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
   def add_file_to_rce
     wiki_page_tools_file_tree_setup
     wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     wiki_page_body = clear_wiki_rce
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     root_folders = @tree1.find_elements(:css, 'li.folder')
     root_folders.first.find_element(:css, '.sign.plus').click
@@ -19,7 +19,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     in_frame "wiki_page_body_ifr" do
       f('#tinymce').should include_text('txt')
     end
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     find_css_in_string(wiki_page_body[:value], '.instructure_file_link').should_not be_empty
     submit_form('#new_wiki_page')
     wait_for_ajax_requests

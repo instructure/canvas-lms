@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/collections/PaginatedCollection'
   'helpers/getFakePage'
-], (Backbone, PaginatedCollection, getFakePage) ->
+], ($, Backbone, PaginatedCollection, getFakePage) ->
 
   module 'PaginatedCollection',
     setup: ->

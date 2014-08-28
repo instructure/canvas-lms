@@ -32,6 +32,8 @@ describe "page views" do
 
     pv = PageView.last
     pv.context.should == @course
+    pv.controller.should == 'discussion_topics_api'
+    pv.action.should == 'add_entry'
   end
 
 end

@@ -167,10 +167,10 @@ module CanvasExpected
                      :question_name=>"Oi!",
                      :points_possible=>10.3,
                      :migration_id=>"if87ef626591c52375b6a4f16cdab8bd0",
-                     :question_text=>"Ole"}
+                     :question_text=>"Ole\n<br/>\n<a>Test Page</a>\n<br/>\nWhy would you link to a wiki page from a quiz question? That doesn't seem right."}
 
   TRUE_FALSE = {:points_possible=>10,
-                :question_text=>"Generating QTI is \n<strong>super</strong> awesome!",
+                :question_text=>"Generating QTI is \n<strong>super</strong> awesome!\n<br/>\noh, and &amp;amp;",
                 :answers=>
                         [{:weight=>0, :migration_id=>"RESPONSE_5309", :text=>"True"},
                          {:comments=>"You're an idiot.", :weight=>100, :migration_id=>"RESPONSE_239",:text=>"False"}],
@@ -191,7 +191,7 @@ module CanvasExpected
                                {:comments=>"I don't know!",
                                 :weight=>100,
                                 :migration_id=>"RESPONSE_6878",
-                                :text=>"I'll do that!"},
+                                :text=>"Ill do that!"},
                                {:comments=>"baby.",
                                 :weight=>0,
                                 :migration_id=>"RESPONSE_491",
@@ -352,7 +352,7 @@ module CanvasExpected
                    {:scale=>3, :min=>1, :max=>10, :name=>"brian"}],
           :incorrect_comments=>"Calculated incorrect. (idiot)",
           :question_name=>"Formula 2",
-          :answer_tolerance=>0.1,
+          :answer_tolerance=>'0.1%',
           :correct_comments=>"Calculated Correct",
           :formulas=>[{:formula=>"temp = 1 + x"}, {:formula=>"temp + x + y + brian"}],
           :points_possible=>15,

@@ -21,12 +21,16 @@ class AccountUser < ActiveRecord::Base
   belongs_to :user
   has_many :role_overrides, :as => :context
   has_a_broadcast_policy
-  before_save :infer_defaults
+  before_validation :infer_defaults
   after_save :touch_user
   after_destroy :touch_user
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
   attr_accessible :account, :user, :membership_type
+
+  EXPORTABLE_ATTRIBUTES = [:id, :account_id, :user_id, :membership_type, :created_at, :updated_at]
+
+  EXPORTABLE_ASSOCIATIONS = [:account, :user]
 
   validates_presence_of :account_id, :user_id, :membership_type
 
@@ -69,7 +73,12 @@ class AccountUser < ActiveRecord::Base
     p.to {|record| record.user }
     p.whenever {|record| @account_user_notification }
   end
-  
+
+  set_policy do
+    given { |user| self.account.grants_right?(user, :manage_account_memberships) && is_subset_of?(user) }
+    can :create and can :destroy
+  end
+
   def readable_type
     AccountUser.readable_type(self.membership_type)
   end
@@ -88,7 +97,7 @@ class AccountUser < ActiveRecord::Base
 
   def enabled_for?(context, action)
     @permission_lookup ||= {}
-    @permission_lookup[[context, action]] ||= RoleOverride.enabled_for?(account, context, action, base_role_name, membership_type)
+    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(account, context, action, base_role_name, membership_type)
   end
 
   def has_permission_to?(context, action)

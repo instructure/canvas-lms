@@ -21,17 +21,14 @@
 
 <% js_env :folder_id => @user.profile_pics_folder.id,
           :PASSWORD_POLICY => @domain_root_account.password_policy,
-          :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
+          :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
+          :PROFILE => @user_data
 %>
 <% js_bundle :profile %>
 <% jammit_css :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
-  <a href="#" class="profile_pic_link <%= @user.avatar_state %>" title="<%= t('titles.click_to_change_profile_pic', "Click to change profile pic") %>" style="float: left; margin-right: 5px; min-width: 50px; min-height: 50px; display: inline-block;">
-    <%= avatar_image(@user) %>
-
-    <i class="icon-edit"></i>
-  </a>
+  <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
 <div class="clear"></div>
@@ -90,15 +87,6 @@
     <td>
       <span class="time_zone display_data"><%= @user.time_zone.try(:name) || t(:none, "None") %></span>
       <span class="edit_data"><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :model => I18nTimeZone, :default => ((@domain_root_account && @domain_root_account.default_time_zone.name) || "Mountain Time (US & Canada)") %><%# that default time zone is a value, not text %></span>
-    </td>
-  </tr>
-  <tr>
-    <td><%= f.blabel :enabled_theme, :en => "Enabled Theme" %></td>
-    <td>
-      <span class="display_data"><%= @user.enabled_theme.titleize %></span>
-      <span class="edit_data">
-        <%= f.select :enabled_theme, [["Default", "default"], ["High Contrast (Beta)", "high_contrast"]], :selected => @user.enabled_theme %>
-      </span>
     </td>
   </tr>
   <% if @domain_root_account == Account.default %>
@@ -184,6 +172,14 @@
 </div>
 </div>
 
+<% if @user.associated_root_accounts.with_each_shard.any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
+<h2><%= t('headers.inbox_opt_out', "Conversations Inbox Opt-out" ) %></h2>
+<p>
+  <input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>
+  <label for="disable_inbox"><%= t('labels.disable_inbox', "Disable the Conversation's Inbox unread messages badge and send all conversation messages and notifications via email, ASAP.") %></label>
+</p>
+<% end %>
+
 <% unless (@domain_root_account && @domain_root_account.service_enabled?(:none)) %>
 <a name="registered_web_services"></a>
 <h2><%= t('headers.web_services', "Web Services") %></h2>
@@ -216,7 +212,7 @@ TEXT
               <% elsif service.has_readable_user_name? %>
                 <span><%= service.service_user_name %></span>
               <% end %>
-              <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook.config['canvas_name'] %>
+              <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook::Connection.config['canvas_name'] %>
                 <div style="line-height: 2.0em;">
                   <a href="<%= service.service_access_link %>"><%= t('links.view_facebook_app', "view the Facebook app") %></a>
                 </div>
@@ -551,7 +547,7 @@ TEXT
   </div>
 </div>
 
-<h3><%= t(:feature_options, 'Feature options') %></h3>
+<h3><%= t(:feature_options, 'Feature Options') %></h3>
 <div class="feature-flag-wrapper">
   <!-- this is populated by FeatureFlagAdminView -->
 </div>

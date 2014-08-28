@@ -24,62 +24,45 @@ describe DelayedMessage do
   end
   
   context "named scopes" do
-    
-    it "should have scope for :daily" do
+    before :once do
       DelayedMessage.delete_all
+    end
+
+    it "should have scope for :daily" do
       delayed_message_model(:frequency => 'daily')
-      DelayedMessage.for(:daily).should eql([@delayed_message])
+      DelayedMessage.for(:daily).should == [@delayed_message]
     end
     
     it "should scope for :weekly" do
-      DelayedMessage.delete_all
       delayed_message_model(:frequency => 'weekly')
-      DelayedMessage.for(:weekly).should eql([@delayed_message])
+      DelayedMessage.for(:weekly).should == [@delayed_message]
     end
     
     it "should scope for notification" do
-      DelayedMessage.delete_all
       notification_model
       delayed_message_model
-      DelayedMessage.for(@notification).should eql([@delayed_message])
+      DelayedMessage.for(@notification).should == [@delayed_message]
     end
     
     it "should scope for notification_policy" do
-      DelayedMessage.delete_all
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
       @notification_policy.should be_is_a(NotificationPolicy)
-      DelayedMessage.for(@notification_policy).should eql([@delayed_message])
+      DelayedMessage.for(@notification_policy).should == [@delayed_message]
     end
     
     it "should scope for communication_channel" do
-      DelayedMessage.delete_all
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
       @communication_channel.should be_is_a(CommunicationChannel)
-      DelayedMessage.for(@communication_channel).should eql([@delayed_message])
+      DelayedMessage.for(@communication_channel).should == [@delayed_message]
     end
     
     it "should scope for context" do
       delayed_message_model
       @delayed_message.context = assignment_model
       @delayed_message.save!
-      DelayedMessage.for(@assignment).should eql([@delayed_message])
-    end
-
-    it "should have a scope to order the messages by a field" do
-      notification = notification_model
-      cc = user.communication_channels.create!(:path => 'path@example.com')
-      nps = (1..3).inject([]) do |list, e|
-        list << cc.notification_policies.create!(:notification => notification, :frequency => Notification::FREQ_IMMEDIATELY)
-      end
-      dms = nps.map do |np|
-        DelayedMessage.create!(:notification => notification,
-                               :notification_policy => np,
-                               :context => cc,
-                               :communication_channel => cc)
-      end
-      DelayedMessage.by(:notification_policy_id).map(&:id).should eql(dms.map(&:id).sort)
+      DelayedMessage.for(@assignment).should == [@delayed_message]
     end
     
     it "should have a scope to filter by the state" do
@@ -97,7 +80,7 @@ describe DelayedMessage do
   end
   
   context "workflow" do
-    before do
+    before :once do
       delayed_message_model
     end
     
@@ -154,7 +137,7 @@ describe DelayedMessage do
   end
 
   describe "set_send_at" do
-    before :each do
+    before :once do
       # shouldn't be used, but to make sure it's not equal to any of the other
       # time zones in play
       Time.zone = 'UTC'
@@ -172,7 +155,9 @@ describe DelayedMessage do
       @user.time_zone = @central.name
       @user.pseudonym.update_attribute(:account, @account)
       @user.save
+    end
 
+    before :each do
       # build the delayed message
       @dm = DelayedMessage.new(:context => @account, :communication_channel => @user.communication_channel)
     end
@@ -316,6 +301,20 @@ describe DelayedMessage do
         actual_diffs.sort.should == expected_diffs
         windows.uniq.size.should == 1
       end
+    end
+  end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz submission' do
+      message = delayed_message_model
+      submission = quiz_model.quiz_submissions.create!
+      message.context = submission
+      message.save
+      message.context_type.should == 'Quizzes::QuizSubmission'
+
+      DelayedMessage.where(id: message).update_all(context_type: 'QuizSubmission')
+
+      DelayedMessage.find(message.id).context_type.should == 'Quizzes::QuizSubmission'
     end
   end
 end

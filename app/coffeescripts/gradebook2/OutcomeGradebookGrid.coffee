@@ -1,11 +1,13 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
+  'compiled/util/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, HeaderFilterView, OutcomeColumnView, cellTemplate, studentCellTemplate) ->
+], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
@@ -22,7 +24,8 @@ define [
       syncColumnCellResize   : true
       showHeaderRow          : true
       explicitInitialization : true
-      fullWidthRows:           true
+      fullWidthRows          : true
+      numberOfColumnsToFreeze: 1
 
     Events:
       # Public: Draw header cell contents.
@@ -42,10 +45,10 @@ define [
         Grid.View.headerCell(options)
 
       init: (grid) ->
-        header       = $(grid.getHeaderRow()).parent()
-        columnHeader = header.prev()
-
-        header.insertBefore(columnHeader)
+        headers = $('.outcome-gradebook-wrapper .slick-header')
+        headerRows = $('.outcome-gradebook-wrapper .slick-headerrow')
+        _.each(_.zip(headers, headerRows), ([header, headerRow]) ->
+          $(headerRow).insertBefore($(header)))
 
       # Public: Generate a section change callback for the given grid.
       #
@@ -59,9 +62,66 @@ define [
           Grid.View.redrawHeader(grid)
           grid.invalidate()
 
+      # Public: Sort and rerender the grid.
+      #
+      # e - jQuery event object.
+      # grid - SlickGrid instance.
+      # sortAsc - Boolean to determine if sort is ascending or descending.
+      # sortCol - The column object to sort on.
+      #
+      # Returns nothing.
+      sort: (e, {grid, sortAsc, sortCol}) ->
+        sortFn = if sortCol.field == 'student' then '_sortStudents' else '_sortResults'
+        rows = grid.getData().sort((a, b) -> Grid.Events[sortFn].call(null, a, b, sortAsc, sortCol.field))
+        grid.setData(rows)
+        grid.invalidate()
+
+      # Internal: Sort the grid by student names.
+      #
+      # a - Object to sort.
+      # b - Object to compare a against.
+      # sortAsc - Boolean to determine if the sort is ascending or descending.
+      #
+      # Returns a number used to sort with.
+      _sortStudents: (a, b, sortAsc) ->
+        if ''.localeCompare
+          nameA = a.student.sortable_name
+          nameB = b.student.sortable_name
+          n     = if sortAsc then 1 else -1
+          nameA.localeCompare(nameB, window.I18n.locale or 'en', sensitivity: 'accent', ignorePunctuation: true, numeric: true) * n
+        else
+          nameA = a.student.sortable_name.toLowerCase()
+          nameB = b.student.sortable_name.toLowerCase()
+          f     = if sortAsc then 1 else -1
+          if nameA < nameB
+            -1 * f
+          else if nameB < nameA
+            1 * f
+          else
+            0
+
+      # Internal: Sort the grid by outcome result.
+      #
+      # a - Object to sort.
+      # b - Object to compare a against.
+      # sortAsc - Boolean to determine if the sort is ascending or descending.
+      # field - The name of the field to sort on (e.g. "outcome_6").
+      #
+      # Returns a number used to sort with.
+      _sortResults: (a, b, sortAsc, field) ->
+        scoreA = a[field]
+        scoreB = b[field]
+        val = numberCompare(scoreA, scoreB, descending: !sortAsc)
+        if val == 0
+          Grid.Events._sortStudents(a, b, sortAsc)
+        else
+          val
+
     Util:
       COLUMN_OPTIONS:
-        width: 121
+        width    : 121
+        minWidth : 50
+        sortable : true
 
       # Public: Translate an API response to columns and rows that can be used by SlickGrid.
       #
@@ -109,7 +169,8 @@ define [
       #
       # Returns an array of rows.
       toRows: (rollups, options = {}) ->
-        _.reject(_.map(rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
+        rows = _.reject(_.map(rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
+        rows.sort((a, b) -> Grid.Events._sortStudents(a, b, true))
 
       # Internal: Generate a toRow function that filters by the given section.
       #
@@ -125,7 +186,14 @@ define [
       # Returns an object.
       _toRow: (rollup, section) ->
         return null unless Grid.Util.sectionFilter(section, rollup)
-        row = { student: Grid.Util.lookupStudent(rollup.links.user), section: rollup.links.section }
+        student = Grid.Util.lookupStudent(rollup.links.user)
+        section = Grid.Util.lookupSection(rollup.links.section)
+        row =
+          student: _.extend(
+            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}#tab-outcomes" # probably should get this from the enrollment api
+            section: if _.keys(Grid.sections).length > 1 then section else null
+            student)
+          section: rollup.links.section
         _.each rollup.scores, (score) ->
           row["outcome_#{score.links.outcome}"] = score.score
         row
@@ -147,12 +215,17 @@ define [
       # Returns nothing.
       saveOutcomes: (outcomes) ->
         [type, id] = ENV.context_asset_string.split('_')
-        url = "/#{type}s/#{id}/outcomes/"
+        url = "/#{type}s/#{id}/outcomes"
         Grid.outcomes = _.reduce(outcomes, (result, outcome) ->
           outcome.url = url
           result["outcome_#{outcome.id}"] = outcome
           result
         , {})
+
+      saveOutcomePaths: (outcomePaths) ->
+        outcomePaths.forEach (path) ->
+          pathString = _.pluck(path.parts, 'name').join(' > ')
+          Grid.outcomes["outcome_#{path.id}"].path = pathString
 
       # Public: Look up an outcome in the current outcome list.
       #
@@ -175,11 +248,30 @@ define [
 
       # Public: Look up a student in the current student list.
       #
-      # name - The id for the student to look for.
+      # id - The id for the student to look for.
       #
-      # Returns an student or null.
+      # Returns a student or null.
       lookupStudent: (id) ->
         Grid.students[id]
+
+      # Public: Parse and store a list of section from the outcome rollups API (actually just from the gradebook's list for now)
+      #
+      # sections - An array of section objects.
+      #
+      # Returns nothing.
+      saveSections: (sections) ->
+        Grid.sections = _.reduce(sections, (result, section) ->
+          result[section.id] = section
+          result
+        , {})
+
+      # Public: Look up a section in the current section list.
+      #
+      # id - The id for the section to look for.
+      #
+      # Returns a section or null.
+      lookupSection: (id) ->
+        Grid.sections[id]
 
     Math:
       mean: (values, round = false) ->
@@ -211,6 +303,12 @@ define [
         mode = _.reject(counts, (n) -> n[0] < max)
         mode = Grid.Math.mean(_.map(mode, _.last), true)
 
+      max: (values) -> Math.max(values...)
+
+      min: (values) -> Math.min(values...)
+
+      cnt: (values) -> values.length
+
     View:
       # Public: Render a SlickGrid cell.
       #
@@ -222,11 +320,21 @@ define [
       #
       # Returns cell HTML.
       cell: (row, cell, value, columnDef, dataContext) ->
+        Grid.View.cellHtml(value, columnDef, true)
+
+      # Internal: Determine HTML for a cell.
+      #
+      # value - The proposed value for the cell
+      # columnDef - The object for the current column
+      # applyFilter - Wheter filtering should be applied
+      #
+      # Returns cell HTML
+      cellHtml: (value, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
-        return unless outcome and !(_.isNull(value) or _.isUndefined(value))
+        return unless outcome and _.isNumber(value)
         className   = Grid.View.masteryClassName(value, outcome)
-        return '' unless _.include(Grid.filter, className)
-        cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
+        return '' if shouldFilter and !_.include(Grid.filter, className)
+        cellTemplate(score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
         studentCellTemplate(value)
@@ -244,22 +352,26 @@ define [
         return 'near-mastery' if score >= nearMastery
         'remedial'
 
+      getColumnResults: (data, column) ->
+        _.chain(data)
+          .pluck(column.field)
+          .filter(_.isNumber)
+          .value()
+
       headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
         return Grid.View.studentHeaderRowCell(node, column, grid) if column.field == 'student'
 
-        results = _.chain(grid.getData())
-          .pluck(column.field)
-          .reject((value) -> _.isNull(value) or _.isUndefined(value))
-          .value()
+        results = Grid.View.getColumnResults(grid.getData(), column)
         return $(node).empty() unless results.length
         value = Grid.Math[fn].call(this, (results))
-        $(node).empty().append(Grid.View.cell(null, null, value, column, null))
+        $(node).empty().append(Grid.View.cellHtml(value, column, false))
 
       redrawHeader: (grid, fn = Grid.averageFn) ->
-        header = grid.getHeaderRow().childNodes
-        cols   = grid.getColumns()
         Grid.averageFn = fn
-        _.each(header, (node, i) -> Grid.View.headerRowCell(node: node, column: cols[i], grid: grid, fn))
+        cols = grid.getColumns()
+        _.each(cols, (col) ->
+          header = grid.getHeaderRowColumn(col.id)
+          Grid.View.headerRowCell(node: header, column: col, grid: grid, fn))
 
       studentHeaderRowCell: (node, column, grid) ->
         $(node).addClass('average-filter')
@@ -269,6 +381,16 @@ define [
 
       headerCell: ({node, column, grid}, fn = Grid.averageFn) ->
         return if column.field == 'student'
-        # TODO: calculate outcome statistics when opening the popup
-        view = new OutcomeColumnView(el: node, attributes: column.outcome)
+        totalsFn = _.partial(Grid.View.calculateRatingsTotals, grid, column)
+        view = new OutcomeColumnView(el: node, attributes: column.outcome, totalsFn: totalsFn)
         view.render()
+
+      calculateRatingsTotals: (grid, column) ->
+        results = Grid.View.getColumnResults(grid.getData(), column)
+        ratings = column.outcome.ratings
+        ratings.result_count = results.length
+        points = _.pluck ratings, 'points'
+        counts = _.countBy results, (result) ->
+          _.find points, (x) -> x <= result
+        _.each ratings, (rating) ->
+          rating.percent = Math.round((counts[rating.points] || 0) / results.length * 100)

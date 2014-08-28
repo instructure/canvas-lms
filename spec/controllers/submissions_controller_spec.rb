@@ -67,9 +67,8 @@ describe SubmissionsController do
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      require 'action_controller_test_process'
-      data1 = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
-      data2 = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/xls.xls"), "application/vnd.ms-excel", true)
+      data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
+      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
       post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should_not be_nil
@@ -185,10 +184,16 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
+        mock_user_service = mock()
+        @user.expects(:user_services).returns(mock_user_service)
+        mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
       end
 
       it "should not save if domain restriction prevents it" do
-        SubmissionsController.any_instance.stubs(:google_docs_download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
+        google_docs = mock
+        GoogleDocs::Connection.expects(:new).returns(google_docs)
+
+        google_docs.expects(:download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
         post(:create, course_id: @course.id, assignment_id: @assignment.id,
              submission: { submission_type: 'google_doc' },
              google_doc: { document_id: '12345' })
@@ -262,7 +267,7 @@ describe SubmissionsController do
       @u1 = @user
       student_in_course(:course => @course)
       @u2 = @user
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "discussion_topic", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
       @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       @group.users << @u1
       @group.users << @user
@@ -279,9 +284,8 @@ describe SubmissionsController do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
-      require 'action_controller_test_process'
-      data1 = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
-      data2 = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/xls.xls"), "application/vnd.ms-excel", true)
+      data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
+      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id, :submission => {:comment => "some comment"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should eql(@submission)
@@ -348,7 +352,7 @@ describe SubmissionsController do
 
       get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
       response.should be_success
-      response['content-type'].should == 'test/file'
+      response.content_type.should == 'test/file'
     end
   end
 

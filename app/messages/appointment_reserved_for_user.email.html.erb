@@ -6,6 +6,12 @@
   <%= t('subject', 'You have been signed up for "%{appointment_name}"', :appointment_name => asset.title) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_text, 'Sign up for a different time slot' %>
+  </a>
+<% end %>
+
 <p><%= t :message, '%{user} has signed you up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %></p>
 
 <p><strong><%= t :details, 'Appointment Details' %>:</strong></p>
@@ -44,13 +50,3 @@
       </tr>
     <% end %>
 </table>
-
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'Sign up for a different time slot' %></a></p>

@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'jst/profiles/notifications/privacyNotice'
   'compiled/jquery/fixDialogButtons'
-], (privacyNoticeTpl) ->
+], ($, privacyNoticeTpl) ->
 
   ->
     return if ENV.READ_PRIVACY_INFO or !ENV.ACCOUNT_PRIVACY_NOTICE

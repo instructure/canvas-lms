@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,7 +21,7 @@ module Api::V1::Group
   include Api::V1::Context
 
   API_GROUP_JSON_OPTS = {
-    :only => %w(id name description is_public join_level group_category_id),
+    :only => %w(id name description is_public join_level group_category_id max_membership),
     :methods => %w(members_count storage_quota_mb),
   }
 
@@ -38,18 +38,22 @@ module Api::V1::Group
 
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
     hash.merge!(context_data(group))
-    followed = ::UserFollow.followed_by_user([group], user)
-    hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     hash['role'] = group.group_category.role if group.group_category
-    
+    #hash['leader_id'] = group.leader_id
+    hash['leader'] = group.leader ? user_display_json(group.leader, group) : nil
+
     if includes.include?('users')
       # TODO: this should be switched to user_display_json
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
+    if includes.include?('group_category')
+      hash['group_category'] = group_category_json(group.group_category, user, session)
+    end
     hash['html_url'] = group_url(group) if includes.include? 'html_url'
-    hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_rights?(user, session, :read_sis, :manage_sis).values.any?
+    hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)
+    hash['sis_import_id'] = group.sis_batch_id if group.context_type == 'Account' && group.root_account.grants_right?(user, session, :manage_sis)
     hash
   end
 
@@ -58,6 +62,9 @@ module Api::V1::Group
     hash = api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
     if includes.include?('just_created')
       hash['just_created'] = membership.just_created || false
+    end
+    if membership.group.context_type == 'Account' && membership.group.root_account.grants_right?(user, session, :manage_sis)
+      hash['sis_import_id'] = membership.sis_batch_id
     end
     hash
   end

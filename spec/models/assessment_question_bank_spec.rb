@@ -19,13 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentQuestionBank do
-  before(:each) do
+  before :once do
     course
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 
   describe "#select_for_submission" do
-    before do
+    before :once do
       # create a bunch of questions to make it more likely that they'll shuffle randomly
       @q1  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 1',  'answers' => [{'id' => 1}, {'id' => 2}]})
       @q2  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 2',  'answers' => [{'id' => 3}, {'id' => 4}]})
@@ -80,5 +80,24 @@ describe AssessmentQuestionBank do
     @bank.assessment_question_bank_users.create!(:user => user)
     @course.grants_right?(@user, :manage_assignments).should be_false
     @bank.grants_right?(@user, :read).should be_true
+  end
+
+  it "should remove outcome alignments when deleted" do
+    outcome_model(:context => @course)
+    @bank.alignments = { @outcome.id => 0.5 }
+
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_present
+    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+
+    # regular save shouldn't mess with alignments
+    @bank.save!
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_present
+    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+
+    @bank.destroy
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_empty
   end
 end

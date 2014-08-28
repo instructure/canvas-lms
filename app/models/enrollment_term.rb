@@ -27,6 +27,13 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :courses
   has_many :enrollments, :through => :courses
   has_many :course_sections
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :root_account_id, :name, :term_code, :sis_source_id, :sis_batch_id, :start_at, :end_at, :accepting_enrollments, :can_manually_enroll, :created_at,
+    :updated_at, :workflow_state, :ignore_term_date_restrictions
+  ]
+  EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
+
   validates_presence_of :root_account_id, :workflow_state
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
@@ -106,11 +113,7 @@ class EnrollmentTerm < ActiveRecord::Base
   def users_count
     scope = Enrollment.active.joins(:course).
       where(root_account_id: root_account_id, courses: {enrollment_term_id: self})
-    if CANVAS_RAILS2
-      scope.count(:distinct => true, :select => "enrollments.user_id")
-    else
-      scope.select(:user_id).uniq.count
-    end
+    scope.select(:user_id).uniq.count
   end
   
   workflow do
@@ -133,5 +136,5 @@ class EnrollmentTerm < ActiveRecord::Base
     save!
   end
   
-  scope :active, where("enrollment_terms.workflow_state<>'deleted'")
+  scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
 end

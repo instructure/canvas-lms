@@ -24,7 +24,7 @@ module Api::V1::FeatureFlag
     hash = feature.as_json.slice('feature', 'applies_to', 'enable_at', 'root_opt_in', 'beta', 'development', 'release_notes_url')
     add_localized_attr(hash, feature, 'display_name')
     add_localized_attr(hash, feature, 'description')
-    hash['hidden'] = true if feature.hidden? && Account.site_admin.grants_right?(current_user, session, :manage_feature_flags)
+    hash['hidden'] = true if feature.hidden? && Account.site_admin.grants_right?(current_user, session, :read)
     hash
   end
 
@@ -42,6 +42,7 @@ module Api::V1::FeatureFlag
       keys = %w(feature context_id context_type state locking_account_id)
       api_json(feature_flag, current_user, session, only: keys)
     end
+    hash['transitions'] = Feature.transitions(feature_flag.feature, current_user, context, feature_flag.state)
     hash['locked'] = feature_flag.locked?(context, current_user)
     hash
   end

@@ -228,7 +228,9 @@ define [
 
   test 'rejects a letter for points_possible', ->
     view = createView(@assignment3)
-    data = points_possible: 'a'
+    data =
+      name: "foo"
+      points_possible: 'a'
     errors = view.validateBeforeSave(data, [])
     ok errors["points_possible"]
     equal errors['points_possible'][0]['message'], 'Points possible must be a number'

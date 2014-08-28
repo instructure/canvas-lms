@@ -5,5 +5,9 @@
   display: none
 
 #section-tabs .section-tab-hidden a
-  color: #bbb
+  @if $use_high_contrast
+    color: #555
+    background-color: #fff
+  @else
+    color: #bbb
 

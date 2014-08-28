@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe PseudonymSessionsController do
+
+  before :once do
+    user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_all => 1, :password => 'qwerty')
+  end
 
   describe 'mobile layout decision' do
     let(:mobile_agents) do
@@ -42,7 +46,7 @@ describe PseudonymSessionsController do
 
     it "should render normal layout if not iphone/ipod" do
       get 'new'
-      response.should render_template("pseudonym_sessions/new.html.erb")
+      response.should render_template('new')
     end
 
     it "should render special iPhone/iPod layout if coming from one of those" do
@@ -57,28 +61,25 @@ describe PseudonymSessionsController do
 
   it "should re-render if no user" do
     post 'create'
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if incorrect password" do
-    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
-    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'dvorak'}
-    response.status.should == '400 Bad Request'
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'dvorak'}
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if no password given" do
-    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
-    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => ''}
-    response.status.should == '400 Bad Request'
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}
+    assert_status(400)
     response.should render_template('new')
     flash[:error].should match(/no password/i)
   end
 
   it "password auth should work" do
-    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
-    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
     response.should be_redirect
     response.should redirect_to(dashboard_url(:login_success => 1))
     assigns[:user].should == @user
@@ -87,8 +88,7 @@ describe PseudonymSessionsController do
   end
 
   it "password auth should work with extra whitespace around unique id " do
-    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
-    post 'create', :pseudonym_session => { :unique_id => ' jt@instructure.com ', :password => 'qwerty'}
+    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty'}
     response.should be_redirect
     response.should redirect_to(dashboard_url(:login_success => 1))
     assigns[:user].should == @user
@@ -117,7 +117,7 @@ describe PseudonymSessionsController do
       aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.should render_template('new')
     end
 
@@ -191,7 +191,6 @@ describe PseudonymSessionsController do
 
   context "merging" do
     it "should set merge params correctly in the session" do
-      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
       get 'new', :confirm => @cc.confirmation_code, :expected_user_id => @user.id
       response.should render_template 'new'
@@ -200,18 +199,21 @@ describe PseudonymSessionsController do
     end
 
     it "should redirect back to merge users" do
-      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty' }
+      post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty' }
       response.should redirect_to(registration_confirmation_url(@cc.confirmation_code, :login_success => 1, :enrollment => nil, :confirm => 1))
     end
   end
 
   context "saml" do
+    before do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+    end
+
     it "should scope logins to the correct domain root account" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account1 = account_with_saml
@@ -232,10 +234,10 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      session.clear
 
       controller.stubs(:saml_response).returns(
         stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
@@ -245,13 +247,38 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "bar"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
-
-      Setting.set_config("saml", nil)
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
 
+    it "should redirect when a user is authenticted but is not found in canvas" do
+      ConfigFile.stub('saml', {})
+      unique_id = 'foo@example.com'
+
+      account = account_with_saml
+
+      controller.stubs(:saml_response).returns(
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+      )
+
+      # We dont want to log them out of everything.
+      controller.expects(:logout_user_action).never
+      controller.request.env['canvas.domain_root_account'] = account
+
+      # Default to Login url
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(login_url(:no_auto => 'true'))
+      session[:saml_unique_id].should be_nil
+
+      # Redirect to a specifiec url
+      unknown_user_url = "https://example.com/unknown_user"
+      account.account_authorization_config.unknown_user_url = unknown_user_url
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(unknown_user_url)
+      session[:saml_unique_id].should be_nil
+   end
+
     context "multiple authorization configs" do
-      before do
+      before :once do
         @account = Account.create!
         @unique_id = 'foo@example.com'
         @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
@@ -284,12 +311,12 @@ describe PseudonymSessionsController do
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
 
-        response.should redirect_to(:action => :destroy)
+        response.should redirect_to(login_url)
       end
     end
 
     context "multiple SAML configs" do
-      before do
+      before :once do
         @account = account_with_saml(:saml_log_in_url => "https://example.com/idp1/sli")
         @unique_id = 'foo@example.com'
         @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
@@ -409,7 +436,7 @@ describe PseudonymSessionsController do
 
         context '/destroy' do
           it "should forward to correct IdP" do
-            get 'destroy'
+            delete 'destroy'
 
             response.headers['Location'].starts_with?(@aac2.log_out_url + "?SAMLRequest=").should be_true
           end
@@ -417,14 +444,14 @@ describe PseudonymSessionsController do
           it "should fail gracefully if AAC id gone" do
             session[:saml_aac_id] = 0
 
-            get 'destroy'
+            delete 'destroy'
             flash[:message].should == "Canvas was unable to log you out at your identity provider"
             response.should redirect_to(login_url(:no_auto=>'true'))
           end
         end
 
         context '/saml_logout' do
-          def get_saml_consume
+          def get_saml_logout
             controller.stubs(:saml_logout_response).returns(
                     stub('response', @stub_hash)
             )
@@ -435,29 +462,48 @@ describe PseudonymSessionsController do
 
           it "should find the correct AAC" do
             @aac1.any_instantiation.expects(:saml_settings).never
-            @aac2.any_instantiation.expects(:saml_settings)
+            @aac2.any_instantiation.expects(:saml_settings).at_least_once
+            controller.expects(:logout_user_action)
 
-            get_saml_consume
-
-            response.should redirect_to(:action => :destroy)
+            get_saml_logout
           end
 
           it "should still logout if AAC config not found" do
             @aac1.any_instantiation.expects(:saml_settings).never
             @aac2.any_instantiation.expects(:saml_settings).never
+            controller.expects(:logout_user_action)
 
             @stub_hash[:issuer] = "nobody eh"
-            get_saml_consume
+            get_saml_logout
+          end
 
-            response.should redirect_to(:action => :destroy)
+          it "should return bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
+            controller.expects(:logout_user_action).never
+            get 'saml_logout'
+            response.status.should == 400
+          end
+
+          it "should logout with a SAMLResponse or SAMLRequest parameter" do
+            controller.expects(:logout_user_action).once
+            controller.expects(:saml_logout_response).never
+            controller.request.env['canvas.domain_root_account'] = @account
+            get 'saml_logout', :SAMLRequest => "foo", :RelayState => "/courses"
           end
         end
       end
     end
 
+    context "/saml_logout" do
+      it "should return bad request if SAML is not configured for account" do
+        controller.expects(:logout_user_action).never
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
+        response.status.should == 400
+      end
+    end
+
     context "login attributes" do
-      before(:each) do
-        Setting.set_config("saml", {})
+      before :once do
         @unique_id = 'foo'
 
         @account = account_with_saml
@@ -466,6 +512,10 @@ describe PseudonymSessionsController do
         @pseudonym.save!
 
         @aac = @account.account_authorization_config
+      end
+
+      before :each do
+        ConfigFile.stub('saml', {})
       end
 
       it "should use the eduPersonPrincipalName attribute with the domain stripped" do
@@ -499,9 +549,9 @@ describe PseudonymSessionsController do
         session[:saml_unique_id].should == @unique_id
       end
     end
-    
+
     it "should use the eppn saml attribute if configured" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo'
 
       account = account_with_saml
@@ -527,7 +577,7 @@ describe PseudonymSessionsController do
     end
 
     it "should redirect to RelayState relative urls" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account = account_with_saml
@@ -546,7 +596,7 @@ describe PseudonymSessionsController do
     end
 
     it "should decode an actual saml response" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'student@example.edu'
 
       account_with_saml
@@ -673,9 +723,42 @@ describe PseudonymSessionsController do
       cas_client = use_mock ? stub_everything(:cas_client) : controller.cas_client
       cas_client.instance_variable_set(:@stub_response, stub_response)
       def cas_client.validate_service_ticket(st)
-        st.response = CASClient::ValidationResponse.new(@stub_response)
+        response = CASClient::ValidationResponse.new(@stub_response)
+        st.user = response.user
+        st.success = response.is_success?
+        return st
       end
       PseudonymSessionsController.any_instance.stubs(:cas_client).returns(cas_client) if use_mock
+    end
+
+    it "should accept extra attributes" do
+      account = account_with_cas
+      user_with_pseudonym(active_all: true, account: account)
+
+      response_text = <<-RESPONSE_TEXT
+        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+          <cas:authenticationSuccess>
+            <cas:user>#{@user.email}</cas:user>
+            <cas:attributes>
+              <cas:name>#{@user.name}</cas:name>
+              <cas:email><![CDATA[#{@user.email}]]></cas:email>
+              <cas:yaml><![CDATA[--- true]]></cas:yaml>
+              <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
+            </cas:attributes>
+          </cas:authenticationSuccess>
+        </cas:serviceResponse>
+      RESPONSE_TEXT
+
+      cas_client = controller.cas_client(account)
+      cas_client.instance_variable_set(:@stub_response, response_text)
+      def cas_client.request_cas_response(uri, type, options={})
+        type.new(@stub_response, @conf_options)
+      end
+
+      controller.request.env['canvas.domain_root_account'] = account
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      session[:cas_session].should == 'ST-abcd'
     end
 
     it "should scope logins to the correct domain root account" do
@@ -697,10 +780,10 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-abcd'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      session.clear
 
       stubby("yes\n#{unique_id}\n")
 
@@ -708,12 +791,89 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-efgh'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-efgh'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
+    end
+
+    it "should redirect when a user is authorized but not found in canvas" do
+      unique_id = 'foo@example.com'
+
+      account = account_with_cas
+      stubby("yes\n#{unique_id}\n")
+
+      # We dont want to log them out of everything.
+      controller.expects(:logout_user_action).never
+      controller.request.env['canvas.domain_root_account'] = account
+
+      # Default to Login url
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(cas_login_url(:no_auto => 'true'))
+      session[:cas_session].should be_nil
+
+      # Redirect to a specific url
+      unknown_user_url = "https://example.com/unknown_user"
+      account.account_authorization_config.unknown_user_url = unknown_user_url
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(unknown_user_url)
+      session[:cas_session].should be_nil
+    end
+
+    it "should log out correctly if the user is from a different account" do
+      account = account_with_cas
+      user_with_pseudonym(active_all: true, account: account)
+
+      # *don't* stub domain_root_account
+      user_session(@user, @pseudonym)
+      PseudonymSession.find.stubs(:destroy)
+      session[:cas_session] = true
+      delete 'destroy'
+      response.should be_redirect
+      response.location.should match %r{^https://localhost/cas/logout}
+    end
+
+    it "should set a cookie for site admin login" do
+      user_with_pseudonym(account: Account.site_admin)
+      stubby("yes\n#{@pseudonym.unique_id}\n")
+      account_with_cas(account: Account.site_admin)
+
+      controller.request.env['canvas.domain_root_account'] = Account.site_admin
+      get 'new', :ticket => 'ST-efgh'
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      session[:cas_session].should == 'ST-efgh'
+      cookies['canvas_sa_delegated'].should == '1'
+    end
+
+    it "should redirect to site admin CAS if cookie set" do
+      user_with_pseudonym(account: Account.site_admin)
+      stubby("yes\n#{@pseudonym.unique_id}\n")
+      account_with_cas(account: Account.site_admin)
+      controller.cas_client.expects(:add_service_to_login_url).returns('someurl')
+
+      cookies['canvas_sa_delegated'] = '1'
+      # *don't* stub domain_root_account
+      get 'new'
+      response.should be_redirect
+    end
+
+    it "should not force otp reconfiguration on succesful login" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      account_with_cas(account: Account.default)
+
+      user_with_pseudonym(active_all: 1, username: 'user')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+
+      stubby("yes\nuser\n")
+
+      get 'new', :ticket => 'ST-efgh'
+      response.should render_template('otp_login')
+      session[:cas_session].should == 'ST-efgh'
+      session[:pending_otp_secret_key].should be_nil
     end
   end
 
   context "otp login cookie" do
-    before do
+    before :once do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
 
@@ -722,8 +882,12 @@ describe PseudonymSessionsController do
       @user.save!
     end
 
+    before :each do
+      ActionController::TestRequest.any_instance.stubs(:remote_ip).returns('myip')
+    end
+
     it "should skip otp verification for a valid cookie" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc)
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'myip')
       post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
       response.should redirect_to dashboard_url(:login_success => 1)
     end
@@ -735,13 +899,13 @@ describe PseudonymSessionsController do
     end
 
     it "should ignore an expired cookie" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, 'myip')
       post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
       response.should render_template('otp_login')
     end
 
     it "should ignore a cookie from an old secret_key" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, 'myip')
 
       @user.otp_secret_key = ROTP::Base32.random_base32
       @user.save!
@@ -749,15 +913,24 @@ describe PseudonymSessionsController do
       post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
       response.should render_template('otp_login')
     end
+
+    it "should ignore a cookie for a different IP" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'otherip')
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
   end
 
   describe 'create' do
     context 'otp' do
+      before :once do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      end
+
       it "should show enrollment for unenrolled, required user" do
         Account.default.settings[:mfa_settings] = :required
         Account.default.save!
 
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
         post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
         response.should render_template('otp_login')
         session[:pending_otp_secret_key].should_not be_nil
@@ -767,7 +940,6 @@ describe PseudonymSessionsController do
         Account.default.settings[:mfa_settings] = :optional
         Account.default.save!
 
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
         @user.otp_secret_key = ROTP::Base32.random_base32
         @user.save!
 
@@ -780,8 +952,6 @@ describe PseudonymSessionsController do
         Account.default.settings[:mfa_settings] = :optional
         Account.default.save!
 
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
-
         post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
         response.should redirect_to dashboard_url(:login_success => 1)
       end
@@ -792,7 +962,6 @@ describe PseudonymSessionsController do
         Account.default.settings[:mfa_settings] = :required
         Account.default.save!
 
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
         @user.otp_secret_key = ROTP::Base32.random_base32
         cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
         @user.save!
@@ -803,10 +972,71 @@ describe PseudonymSessionsController do
         assigns[:cc].should == cc
       end
     end
+
+    context "oauth" do
+      before :once do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      end
+
+      before :each do
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        redis.stubs(:hmget)
+        redis.stubs(:del)
+        Canvas.stubs(:redis => redis)
+      end
+
+      let_once(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+      let(:params) { {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' } } }
+
+      it 'should redirect to the confirm url if the user has no token' do
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should redirect to the redirect uri with the provided state' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash.merge(state: "supersekrit")
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+        response.location.should match(/state=supersekrit/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+    end
   end
 
   describe 'otp_login' do
-    before do
+    before :once do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
 
@@ -814,11 +1044,10 @@ describe PseudonymSessionsController do
     end
 
     context "verification" do
-      before do
-        CommunicationChannel.any_instance.expects(:send_otp!).never
-
+      before :each do
         @user.otp_secret_key = ROTP::Base32.random_base32
         @user.save!
+        CommunicationChannel.any_instance.expects(:send_otp!).never
         user_session(@user, @pseudonym)
         session[:pending_otp] = true
       end
@@ -828,13 +1057,23 @@ describe PseudonymSessionsController do
         post 'otp_login', :otp_login => { :verification_code => code }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should be_nil
-        Canvas.redis.get("otp_used:#{code}").should == '1' if Canvas.redis_enabled?
+        Canvas.redis.get("otp_used:#{@user.global_id}:#{code}").should == '1' if Canvas.redis_enabled?
       end
 
       it "should set a cookie" do
         post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should_not be_nil
+      end
+
+      it "should add the current ip to existing ips" do
+        cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
+        ActionController::Request.any_instance.stubs(:remote_ip).returns('ip2')
+        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
+        response.should redirect_to dashboard_url(:login_success => 1)
+        cookies['canvas_otp_remember_me'].should_not be_nil
+        _, ips, _ = @user.parse_otp_remember_me_cookie(cookies['canvas_otp_remember_me'])
+        ips.sort.should == ['ip1', 'ip2']
       end
 
       it "should fail for an incorrect token" do
@@ -862,7 +1101,7 @@ describe PseudonymSessionsController do
       it "should not allow the same code to be used multiple times" do
         pending "needs redis" unless Canvas.redis_enabled?
 
-        Canvas.redis.set("otp_used:123456", '1')
+        Canvas.redis.set("otp_used:#{@user.global_id}:123456", '1')
         ROTP::TOTP.any_instance.expects(:verify_with_drift).never
         post 'otp_login', :otp_login => { :verification_code => '123456' }
         response.should render_template('otp_login')
@@ -960,8 +1199,8 @@ describe PseudonymSessionsController do
           session[:pending_otp_communication_channel_id] = @cc.id
           code = ROTP::TOTP.new(@secret_key).now
           # make sure we get 5 minutes of drift
-          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
-          post 'otp_login', :otp_login => { :verification_code => code }
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code.to_s, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code.to_s }
           response.should redirect_to settings_profile_url
           @user.reload.otp_secret_key.should == @secret_key
           @user.otp_communication_channel.should == @cc
@@ -987,7 +1226,7 @@ describe PseudonymSessionsController do
   end
 
   describe 'disable_otp_login' do
-    before do
+    before :once do
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
 
@@ -995,6 +1234,9 @@ describe PseudonymSessionsController do
       @user.otp_secret_key = ROTP::Base32.random_base32
       @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
       @user.save!
+    end
+
+    before :each do
       user_session(@user)
     end
 
@@ -1047,7 +1289,7 @@ describe PseudonymSessionsController do
 
       @other_user = @user
       @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
-      Account.default.add_user(@admin)
+      Account.default.account_users.create!(user: @admin)
       user_session(@admin)
       post 'disable_otp_login', :user_id => @other_user.id
       response.should be_success
@@ -1057,18 +1299,17 @@ describe PseudonymSessionsController do
   end
 
   describe 'GET oauth2_auth' do
-    let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
-    let(:user) { User.create! }
+    let_once(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders 400 on a bad redirect_uri' do
       get :oauth2_auth, :client_id => key.id
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid redirect_uri/
     end
 
@@ -1081,11 +1322,56 @@ describe PseudonymSessionsController do
       get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :canvas_login => 1
       response.should redirect_to(login_url(:canvas_login => 1))
     end
+
+    context 'with a user logged in' do
+      before :once do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      end
+
+      before :each do
+        user_session(@user)
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        Canvas.stubs(:redis => redis)
+      end
+
+      it 'should redirect to the confirm url if the user has no token' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'redirects to login_url with ?force_login=1' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :force_login => 1
+        response.should redirect_to(login_url(:force_login => 1))
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com'
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+    end
   end
 
   describe 'GET oauth2_token' do
-    let(:key) { DeveloperKey.create! }
-    let(:user) { User.create! }
+    let_once(:key) { DeveloperKey.create! }
+    let_once(:user) { User.create! }
     let(:valid_code) {"thecode"}
     let(:valid_code_redis_key) {"#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}"}
     let(:redis) do
@@ -1098,20 +1384,20 @@ describe PseudonymSessionsController do
 
     it 'renders a 400 if theres no client_id' do
       get :oauth2_token
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders a 400 if the secret is invalid' do
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key + "123"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_secret/
     end
 
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid code/
     end
 
@@ -1125,8 +1411,8 @@ describe PseudonymSessionsController do
   end
 
   describe 'POST oauth2_accept' do
-    let(:user) { User.create! }
-    let(:key) { DeveloperKey.create! }
+    let_once(:user) { User.create! }
+    let_once(:key) { DeveloperKey.create! }
     let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI  } } }
     let(:oauth_accept) { post :oauth2_accept, {}, session_hash }
 

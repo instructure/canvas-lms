@@ -93,6 +93,9 @@ define [
       event.preventDefault()
       event.stopPropagation()
       @$textarea.editorBox('toggle')
+      # hide the clicked link, and show the other toggle link.
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
     subscribeTopic: (event) ->
       event.preventDefault()

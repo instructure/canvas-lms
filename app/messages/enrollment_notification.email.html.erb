@@ -1,9 +1,19 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "Course Enrollment" %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <% if !asset.user.registered? && asset.user.communication_channel %>
+    <a href="<%= registration_confirmation_url(asset.user.communication_channel.confirmation_code, :host => HostUrl.context_host(asset.course)) %>">
+      <%= t :complete_registration_link, "Click here to complete registration" %>
+    </a>
+  <% end %>
+<% end %>
+
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 <% course = "<a href=\"#{content :link}\">#{h asset.course.name}</a>".html_safe %>
 <p>
@@ -41,7 +51,3 @@
       </tr>
     <% end %>
 </table>
-
-<% if !asset.user.registered? && asset.user.communication_channel %>
-<p><a href="<%= registration_confirmation_url(asset.user.communication_channel.confirmation_code, :host => HostUrl.context_host(asset.course)) %>"><%= t :complete_registration_link, "Click here to complete registration" %></a></p>
-<% end %>

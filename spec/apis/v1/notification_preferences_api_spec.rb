@@ -18,8 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe NotificationPreferencesController, :type => :integration do
-  before do
+describe NotificationPreferencesController, type: :request do
+  before :once do
     user_with_pseudonym
     Notification.delete_all
     Notification.create!(name: 'New Announcement', category: 'Announcements')

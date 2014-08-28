@@ -27,6 +27,13 @@ module AttachmentHelper
       rescue => e
         ErrorReport.log_exception('crocodoc', e)
       end
+    elsif attachment.canvadocable?
+      blob = {
+        user_id: @current_user.global_id,
+        attachment_id: attachment.global_id,
+      }.to_json
+      hmac = Canvas::Security.hmac_sha1(blob)
+      attrs[:canvadoc_session_url] = canvadoc_session_path(blob: blob, hmac: hmac)
     elsif attachment.scribdable? && scribd_doc = attachment.scribd_doc
       begin
         attrs[:scribd_doc_id] = scribd_doc.doc_id
@@ -59,5 +66,12 @@ module AttachmentHelper
     attrs[:type] = attachment.content_type.match(/video/) ? 'video' : 'audio'
     attrs[:download_url] = context_url(attachment.context, :context_file_download_url, attachment.id)
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
+  end
+
+  def doc_preview_json(attachment, user)
+    {
+      canvadoc_session_url: attachment.canvadoc_url(@current_user),
+      crocodoc_session_url: attachment.crocodoc_url(@current_user),
+    }
   end
 end

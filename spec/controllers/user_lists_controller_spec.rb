@@ -24,7 +24,7 @@ describe UserListsController do
     account_admin_user_with_role_changes(:membership_type => 'myadmin', :role_changes => { :manage_students => true })
     user_session(@user)
 
-    post 'create', :course_id => @course.id, :user_list => ''
+    post 'create', :course_id => @course.id, :user_list => '', :format => "json"
     response.should be_success
   end
 end

@@ -3,7 +3,8 @@ define [
   'compiled/collections/PaginatedCollection'
   'compiled/views/PaginatedCollectionView'
   'helpers/getFakePage'
-], ($, PaginatedCollection, PaginatedCollectionView, fakePage) ->
+  'helpers/fakeENV'
+], ($, PaginatedCollection, PaginatedCollectionView, fakePage, fakeENV) ->
 
   server = null
   clock = null
@@ -32,6 +33,7 @@ define [
 
   module 'PaginatedCollectionView',
     setup: ->
+      fakeENV.setup()
       fixtures.css height: 500, overflow: 'auto'
       createServer()
       clock = sinon.useFakeTimers()
@@ -44,6 +46,7 @@ define [
       view.render()
 
     teardown: ->
+      fakeENV.teardown()
       server.restore()
       clock.restore()
       fixtures.attr 'style', ''

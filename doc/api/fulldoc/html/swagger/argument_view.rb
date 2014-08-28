@@ -112,7 +112,8 @@ class ArgumentView < HashView
   end
 
   def optional?
-    enum_and_types.last.map{ |t| t.downcase }.include?('optional')
+    types = enum_and_types.last.map{ |t| t.downcase }
+    types.include?('optional') && !types.include?('required')
   end
 
   def required?

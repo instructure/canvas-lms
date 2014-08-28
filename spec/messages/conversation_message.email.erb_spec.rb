@@ -21,13 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'conversation_message.email' do
   it "should render" do
-    course_with_teacher
-    student_in_course
+    teacher_enrollment = course_with_teacher
+    user_enrollment = student_in_course
     conversation = @teacher.initiate_conversation([@user])
     message = conversation.add_message("this
 is
 a
 message")
+    account = User.find(user_enrollment.user_id).account
+    message.context_type = account.class.to_s
+    message.context_id = account.id
     generate_message(:conversation_message, :email, message)
   end
 end

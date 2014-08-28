@@ -25,7 +25,7 @@ module Canvas::Plugins::Validators::TwitterValidator
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
-        res = Twitter.config_check(settings)
+        res = Twitter::Connection.config_check(settings)
         if res
           plugin_setting.errors.add(:base, res)
           false

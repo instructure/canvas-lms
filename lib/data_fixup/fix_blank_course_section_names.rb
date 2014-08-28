@@ -1,8 +1,8 @@
 module DataFixup
   class FixBlankCourseSectionNames
 
-    def time_format(section)
-      Time.use_zone(section.root_account.default_time_zone) do
+    def self.time_format(section)
+      Time.use_zone(section.root_account.try(:default_time_zone) || 'UTC') do
         section.created_at.strftime("%Y-%m-%d").to_s
       end
     end

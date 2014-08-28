@@ -13,19 +13,24 @@ require [
     students.urls = null
   else
     students = new UserCollection null,
-      per_page: 50
       params:
+        per_page: 50
         enrollment_type: 'student'
-
-    students.fetch()
 
   indexView = new PaginatedCollectionView
     collection: students
     itemView: ProgressionStudentView
     template: progressionsIndexTemplate
     modules_url: ENV.MODULES_URL
+    autoFetch: true
+
+  unless ENV.RESTRICTED_LIST
+    # attach the view's scroll container once it's populated
+    students.fetch success: ->
+      indexView.resetScrollContainer(indexView.$el.find('#progression_students .collectionViewItems'))
 
   indexView.render()
   if ENV.RESTRICTED_LIST && ENV.VISIBLE_STUDENTS.length == 1
     indexView.$el.find('#progression_students').hide()
   indexView.$el.appendTo($('#content'))
+

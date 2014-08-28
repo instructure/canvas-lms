@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/CollectionView'
   'jst/DiscussionTopics/discussionList'
   'compiled/views/DiscussionTopics/DiscussionView'
   'jqueryui/draggable'
   'jqueryui/sortable'
-], (_, CollectionView, template, itemView) ->
+], ($, _, CollectionView, template, itemView) ->
 
   class DiscussionListView extends CollectionView
     # Public: Template function (discussionList)
@@ -169,8 +170,10 @@ define [
     _updateSort: (e, ui) =>
       model = @collection.get(ui.item.data('id'))
       return unless model?.get('pinned')
-      model.updateOneAttribute('position_at', ui.item.index() + 1)
-      @_updatePositions()
+      pos = ui.item.index()
+      @collection.remove(model)
+      @collection.add(model, at: pos)
+      @collection.reorder()
 
       # FF 15+ will also fire a click event on the dropped object,
       # and we want to eat that. This is hacky.
@@ -179,13 +182,6 @@ define [
       setTimeout =>
         model.set('preventClick', false)
       , 0
-
-    # Internal: Update the position attributes of all models in the collection
-    # to match their DOM position. Do not mirror changes to server.
-    #
-    # Returns nothing.
-    _updatePositions: ->
-      @collection.each((model, index) -> model.set('position', index + 1))
 
     # Internal: Enable drag/drop on a list item and the list given in
     # @options.destination.
@@ -213,4 +209,4 @@ define [
       [newGroup, currentGroup] = [$(e.currentTarget).data('view'), this]
       pinned = !!newGroup.options.pinned
       locked = !!newGroup.options.locked
-      model.save(pinned: pinned, locked: locked)
+      model.updateBucket(pinned: pinned, locked: locked)

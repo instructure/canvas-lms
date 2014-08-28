@@ -22,7 +22,7 @@ describe Api::V1::PageView do
   include Api::V1::PageView
 
   before do
-    @request_id = UUIDSingleton.instance.generate
+    @request_id = CanvasUUID.generate
     RequestContextGenerator.stubs( :request_id => @request_id )
 
     @domain_root_account = Account.default
@@ -33,7 +33,7 @@ describe Api::V1::PageView do
     @page_views = []
     (1..5).each do |i|
       @page_views << PageView.new { |p|
-        p.send(:attributes=, {
+        p.assign_attributes({
           :request_id => @request_id,
           :remote_ip => '10.10.10.10',
           :user => @student,
@@ -48,11 +48,10 @@ describe Api::V1::PageView do
           :participated => false,
           :user_request => true,
           :interaction_seconds => 7.21,
-          :contributed => false,
           :action => "index",
           :controller => "controller",
           :account_id => @domain_root_account.id
-        }, false)
+        }, :without_protection => true)
       }
     end
     @page_view = @page_views.first
@@ -76,12 +75,12 @@ describe Api::V1::PageView do
     page_view[:participated].should == @page_view.participated
     page_view[:user_request].should == @page_view.user_request
     page_view[:interaction_seconds].should == @page_view.interaction_seconds
-    page_view[:contributed].should == @page_view.contributed
+    page_view[:contributed].should == false
     page_view[:action].should == @page_view.action
     page_view[:controller].should == @page_view.controller
 
-    page_view[:links][:user].should == Shard.relative_id_for(@page_view.user)
-    page_view[:links][:real_user].should == Shard.relative_id_for(@page_view.real_user)
+    page_view[:links][:user].should == Shard.relative_id_for(@page_view.user, Shard.current, Shard.current)
+    page_view[:links][:real_user].should == Shard.relative_id_for(@page_view.real_user, Shard.current, Shard.current)
     page_view[:links][:context].should == @page_view.context_id
     page_view[:links][:asset].should == @page_view.asset_id
     page_view[:links][:account].should == @page_view.account_id

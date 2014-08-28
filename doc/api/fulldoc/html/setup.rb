@@ -88,11 +88,11 @@ module YARD::Templates::Helpers::BaseHelper
   alias_method :linkify_without_api, :linkify
   alias_method :linkify, :linkify_with_api
 
-  def lookup_topic(controller_name)
+  def lookup_topic(controller_path)
     controller = nil
     topic = options[:resources].find { |r,cs|
       cs.any? { |c|
-        controller = c if c.name.to_s == controller_name
+        controller = c if c.path.to_s == controller_path
         !controller.nil?
       }
     }
@@ -233,7 +233,7 @@ end
 def generate_assets
   require 'pathname'
   asset_root = Pathname.new(File.dirname(__FILE__))
-  (Dir[asset_root + "css/**/*.css"] + Dir[asset_root + "js/**/*.js"]).each do |file|
+  (Dir[asset_root + "css/**/*.css"] + Dir[asset_root + "js/**/*.js"] + [asset_root + "live.html"]).each do |file|
     file = Pathname.new(file).relative_path_from(asset_root).to_s
     asset(file, file(file, true))
   end

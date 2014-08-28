@@ -1,4 +1,8 @@
-<div class="form-dialog-content"></div>
+<ul role="tree" tabindex="0" aria-label='{{#t "select_content_label"}}Select content, Use the up and down arrow keys to navigate through the tree. Press right to expand and left to collapse.{{/t}}'>
+  <li class="form-dialog-content">
+</ul>
+
 <div class="form-controls">
-  <input class="btn btn-primary" type="submit" value="{{#t "select_content_btn"}}Select Content{{/t}}"/>
+  <input id="cancelSelect" class="btn btn-default" type="button" value='{{#t "cancel_btn"}}Cancel{{/t}}'/>
+  <input id="selectContentBtn" class="btn btn-primary" type="submit" value='{{#t "select_content_btn"}}Select Content{{/t}}' disabled/>
 </div>

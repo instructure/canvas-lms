@@ -52,15 +52,4 @@
 
 <%= will_paginate(@users, :style=>"margin-top: 1em;") %>
 
-<% js_block do %>
-<script type="text/javascript">
-require([
-  'jquery' /* $ */
-], function($) {
-
-  $(document).ready(function() {
-      $('#enrollment_term_id').change(function() { $(this).closest('form').submit(); });
-  });
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/users_index' %>

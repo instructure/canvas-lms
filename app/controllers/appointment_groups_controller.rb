@@ -23,106 +23,186 @@
 # (e.g. "Office Hours" or "Meet with professor about Final Project"). Both time
 # slots and reservations of time slots are stored as Calendar Events.
 #
-# @object AppointmentGroup
+# @model Appointment
 #     {
-#       // The ID of the appointment group
-#       "id": 543,
-#
-#       // The title of the appointment group
-#       "title": "Final Presentation",
-#
-#       // The start of the first time slot in the appointment group
-#       "start_at": "2012-07-20T15:00:00-06:00",
-#
-#       // The end of the last time slot in the appointment group
-#       "end_at": "2012-07-20T17:00:00-06:00",
-#
-#       // The text description of the appointment group
-#       "description": "Es muy importante",
-#
-#       // The location name of the appointment group
-#       "location_name": "El Tigre Chino's office",
-#
-#       // The address of the appointment group's location
-#       "location_address": "Room 234",
-#
-#       // The number of participant who have reserved slots
-#       // (see include[] argument)
-#       "participant_count": 2,
-#
-#       // The start and end times of slots reserved by the current user as
-#       // well as the id of the calendar event for the reservation (see
-#       // include[] argument)
-#       "reserved_times": [{"id": 987,
-#                         "start_at": "2012-07-20T15:00:00-06:00",
-#                         "end_at": "2012-07-20T15:00:00-06:00"}],
-#
-#       // The context codes (i.e. courses) this appointment group belongs to.
-#       // Only people in these courses will be eligible to sign up.
-#       "context_codes": ["course_123"],
-#
-#       // The sub-context codes (i.e. course sections and group categories)
-#       // this appointment group is restricted to
-#       "sub_context_codes": ["course_section_234"],
-#
-#       // Current state of the appointment group ("pending", "active" or
-#       // "deleted"). "pending" indicates that it has not been published yet
-#       // and is invisible to participants.
-#       "workflow_state": "active",
-#
-#       // Boolean indicating whether the current user needs to sign up for
-#       // this appointment group (i.e. it's reservable and the
-#       // min_appointments_per_participant limit has not been met by this
-#       // user).
-#       "requiring_action": true,
-#
-#       // Number of time slots in this appointment group
-#       "appointments_count": 2,
-#
-#       // Calendar Events representing the time slots (see include[] argument)
-#       // Refer to the Calendar Events API for more information
-#       "appointments": [],
-#
-#       // Newly created time slots (same format as appointments above). Only
-#       // returned in Create/Update responses where new time slots have been
-#       // added
-#       "new_appointments": [],
-#
-#       // Maximum number of time slots a user may register for, or null if no
-#       // limit
-#       "max_appointments_per_participant": 1,
-#
-#       // Minimum number of time slots a user must register for. If not set,
-#       // users do not need to sign up for any time slots
-#       "min_appointments_per_participant": 1,
-#
-#       // Maximum number of participants that may register for each time slot,
-#       // or null if no limit
-#       "participants_per_appointment": 1,
-#
-#       // "private" means participants cannot see who has signed up for a
-#       // particular time slot, "protected" means that they can
-#       "participant_visibility": "private",
-#
-#       // Indicates how participants sign up for the appointment group, either
-#       // as individuals ("User") or in student groups ("Group"). Related to 
-#       // sub_context_codes (i.e. "Group" signups always have a single group
-#       // category)
-#       "participant_type": "User",
-#
-#       // URL for this appointment group (to update, delete, etc.)
-#       "url": "https://example.com/api/v1/appointment_groups/543",
-#
-#       // URL for a user to view this appointment group
-#       "html_url": "http://example.com/appointment_groups/1",
-#
-#       // When the appointment group was created
-#       "created_at": "2012-07-13T10:55:20-06:00",
-#
-#       // When the appointment group was last updated
-#       "updated_at": "2012-07-13T10:55:20-06:00"
+#       "id": "Appointment",
+#       "description": "Date and time for an appointment",
+#       "properties": {
+#         "id": {
+#           "description": "The appointment identifier.",
+#           "example": 987,
+#           "type": "integer"
+#         },
+#         "start_at": {
+#           "description": "Start time for the appointment",
+#           "example": "2012-07-20T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "End time for the appointment",
+#           "example": "2012-07-20T15:00:00-06:00",
+#           "type": "datetime"
+#         }
+#       }
 #     }
-
+#
+# @model AppointmentGroup
+#     {
+#       "id": "AppointmentGroup",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the appointment group",
+#           "example": 543,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "The title of the appointment group",
+#           "example": "Final Presentation",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "The start of the first time slot in the appointment group",
+#           "example": "2012-07-20T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The end of the last time slot in the appointment group",
+#           "example": "2012-07-20T17:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "description": "The text description of the appointment group",
+#           "example": "Es muy importante",
+#           "type": "string"
+#         },
+#         "location_name": {
+#           "description": "The location name of the appointment group",
+#           "example": "El Tigre Chino's office",
+#           "type": "string"
+#         },
+#         "location_address": {
+#           "description": "The address of the appointment group's location",
+#           "example": "Room 234",
+#           "type": "string"
+#         },
+#         "participant_count": {
+#           "description": "The number of participant who have reserved slots (see include[] argument)",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "reserved_times": {
+#           "description": "The start and end times of slots reserved by the current user as well as the id of the calendar event for the reservation (see include[] argument)",
+#           "example": "[{\"id\"=>987, \"start_at\"=>\"2012-07-20T15:00:00-06:00\", \"end_at\"=>\"2012-07-20T15:00:00-06:00\"}]",
+#           "type": "array",
+#           "items": {"$ref": "Appointment"}
+#         },
+#         "context_codes": {
+#           "description": "The context codes (i.e. courses) this appointment group belongs to. Only people in these courses will be eligible to sign up.",
+#           "example": "[course_123]",
+#           "type": "array",
+#           "items": {"type": "string"}
+#         },
+#         "sub_context_codes": {
+#           "description": "The sub-context codes (i.e. course sections and group categories) this appointment group is restricted to",
+#           "example": "[course_section_234]",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the appointment group ('pending', 'active' or 'deleted'). 'pending' indicates that it has not been published yet and is invisible to participants.",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "pending",
+#               "active",
+#               "deleted"
+#             ]
+#           }
+#         },
+#         "requiring_action": {
+#           "description": "Boolean indicating whether the current user needs to sign up for this appointment group (i.e. it's reservable and the min_appointments_per_participant limit has not been met by this user).",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "appointments_count": {
+#           "description": "Number of time slots in this appointment group",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "appointments": {
+#           "description": "Calendar Events representing the time slots (see include[] argument) Refer to the Calendar Events API for more information",
+#           "example": "[]",
+#           "type": "array",
+#           "items": {"$ref": "CalendarEvent"}
+#         },
+#         "new_appointments": {
+#           "description": "Newly created time slots (same format as appointments above). Only returned in Create/Update responses where new time slots have been added",
+#           "example": "[]",
+#           "type": "array",
+#           "items": {"$ref": "CalendarEvent"}
+#         },
+#         "max_appointments_per_participant": {
+#           "description": "Maximum number of time slots a user may register for, or null if no limit",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "min_appointments_per_participant": {
+#           "description": "Minimum number of time slots a user must register for. If not set, users do not need to sign up for any time slots",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "participants_per_appointment": {
+#           "description": "Maximum number of participants that may register for each time slot, or null if no limit",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "participant_visibility": {
+#           "description": "'private' means participants cannot see who has signed up for a particular time slot, 'protected' means that they can",
+#           "example": "private",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "private",
+#               "protected"
+#             ]
+#           }
+#         },
+#         "participant_type": {
+#           "description": "Indicates how participants sign up for the appointment group, either as individuals ('User') or in student groups ('Group'). Related to sub_context_codes (i.e. 'Group' signups always have a single group category)",
+#           "example": "User",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "User",
+#               "Group"
+#             ]
+#           }
+#         },
+#         "url": {
+#           "description": "URL for this appointment group (to update, delete, etc.)",
+#           "example": "https://example.com/api/v1/appointment_groups/543",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL for a user to view this appointment group",
+#           "example": "http://example.com/appointment_groups/1",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "When the appointment group was created",
+#           "example": "2012-07-13T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "When the appointment group was last updated",
+#           "example": "2012-07-13T10:55:20-06:00",
+#           "type": "datetime"
+#         }
+#       }
+#     }
+#
 class AppointmentGroupsController < ApplicationController
   include Api::V1::CalendarEvent
 
@@ -139,16 +219,16 @@ class AppointmentGroupsController < ApplicationController
   # Retrieve the list of appointment groups that can be reserved or managed by
   # the current user.
   #
-  # @argument scope [Optional, String, "reservable"|"manageable"]
+  # @argument scope [String, "reservable"|"manageable"]
   #   Defaults to "reservable"
   #
-  # @argument context_codes[] [Optional, String]
+  # @argument context_codes[] [String]
   #   Array of context codes used to limit returned results.
   #
-  # @argument include_past_appointments [Optional, Boolean]
+  # @argument include_past_appointments [Boolean]
   #   Defaults to false. If true, includes past appointment groups
   #
-  # @argument include[] [Optional, "appointments"|"child_events"|"participant_count"|"reserved_times"]
+  # @argument include[] ["appointments"|"child_events"|"participant_count"|"reserved_times"]
   #   Array of additional information to include.
   #
   #   "appointments":: calendar event time slots for this appointment group
@@ -201,50 +281,50 @@ class AppointmentGroupsController < ApplicationController
   # specified, the response will return a new_appointments array (same format
   # as appointments array, see "List appointment groups" action)
   #
-  # @argument appointment_group[context_codes][] [String]
+  # @argument appointment_group[context_codes][] [Required, String]
   #   Array of context codes (courses, e.g. course_1) this group should be
   #   linked to (1 or more). Users in the course(s) with appropriate permissions
   #   will be able to sign up for this appointment group.
   #
-  # @argument appointment_group[sub_context_codes][] [Optional, String]
+  # @argument appointment_group[sub_context_codes][] [String]
   #   Array of sub context codes (course sections or a single group category)
   #   this group should be linked to. Used to limit the appointment group to
   #   particular sections. If a group category is specified, students will sign
   #   up in groups and the participant_type will be "Group" instead of "User".
   #
-  # @argument appointment_group[title] [Optional, String]
+  # @argument appointment_group[title] [Required, String]
   #   Short title for the appointment group.
   #
-  # @argument appointment_group[description] [Optional, String]
+  # @argument appointment_group[description] [String]
   #   Longer text description of the appointment group.
   #
-  # @argument appointment_group[location_name] [Optional, String]
+  # @argument appointment_group[location_name] [String]
   #   Location name of the appointment group.
   #
-  # @argument appointment_group[location_address] [Optional, String]
+  # @argument appointment_group[location_address] [String]
   #   Location address.
   #
-  # @argument appointment_group[publish] [Optional, Boolean]
+  # @argument appointment_group[publish] [Boolean]
   #   Indicates whether this appointment group should be published (i.e. made
   #   available for signup). Once published, an appointment group cannot be
   #   unpublished. Defaults to false.
   #
-  # @argument appointment_group[participants_per_appointment] [Optional, Integer]
+  # @argument appointment_group[participants_per_appointment] [Integer]
   #   Maximum number of participants that may register for each time slot.
   #   Defaults to null (no limit).
   #
-  # @argument appointment_group[min_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[min_appointments_per_participant] [Integer]
   #   Minimum number of time slots a user must register for. If not set, users
   #   do not need to sign up for any time slots.
   #
-  # @argument appointment_group[max_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[max_appointments_per_participant] [Integer]
   #   Maximum number of time slots a user may register for.
   #
-  # @argument appointment_group[new_appointments][X][] [Optional]
+  # @argument appointment_group[new_appointments][X][]
   #   Nested array of start time/end time pairs indicating time slots for this
   #   appointment group. Refer to the example request.
   #
-  # @argument appointment_group[participant_visibility] [Optional, "private"|"protected"]
+  # @argument appointment_group[participant_visibility] ["private"|"protected"]
   #   "private":: participants cannot see who has signed up for a particular
   #               time slot
   #   "protected":: participants can see who has signed up.  Defaults to
@@ -287,7 +367,7 @@ class AppointmentGroupsController < ApplicationController
   #
   # Returns information for a single appointment group
   #
-  # @argument include[] [Optional, "child_events"|"appointments"]
+  # @argument include[] ["child_events"|"appointments"]
   #   Array of additional information to include. Ssee include[] argument of
   #   "List appointment groups" action.
   #
@@ -310,50 +390,50 @@ class AppointmentGroupsController < ApplicationController
   # the response will return a new_appointments array (same format as
   # appointments array, see "List appointment groups" action).
   #
-  # @argument appointment_group[context_codes][] [String]
+  # @argument appointment_group[context_codes][] [Required, String]
   #   Array of context codes (courses, e.g. course_1) this group should be
   #   linked to (1 or more). Users in the course(s) with appropriate permissions
   #   will be able to sign up for this appointment group.
   #
-  # @argument appointment_group[sub_context_codes][] [Optional, String]
+  # @argument appointment_group[sub_context_codes][] [String]
   #   Array of sub context codes (course sections or a single group category)
   #   this group should be linked to. Used to limit the appointment group to
   #   particular sections. If a group category is specified, students will sign
   #   up in groups and the participant_type will be "Group" instead of "User".
   #
-  # @argument appointment_group[title] [Optional, String]
+  # @argument appointment_group[title] [String]
   #   Short title for the appointment group.
   #
-  # @argument appointment_group[description] [Optional, String]
+  # @argument appointment_group[description] [String]
   #   Longer text description of the appointment group.
   #
-  # @argument appointment_group[location_name] [Optional, String]
+  # @argument appointment_group[location_name] [String]
   #   Location name of the appointment group.
   #
-  # @argument appointment_group[location_address] [Optional, String]
+  # @argument appointment_group[location_address] [String]
   #   Location address.
   #
-  # @argument appointment_group[publish] [Optional, Boolean]
+  # @argument appointment_group[publish] [Boolean]
   #   Indicates whether this appointment group should be published (i.e. made
   #   available for signup). Once published, an appointment group cannot be
   #   unpublished. Defaults to false.
   #
-  # @argument appointment_group[participants_per_appointment] [Optional, Integer]
+  # @argument appointment_group[participants_per_appointment] [Integer]
   #   Maximum number of participants that may register for each time slot.
   #   Defaults to null (no limit).
   #
-  # @argument appointment_group[min_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[min_appointments_per_participant] [Integer]
   #   Minimum number of time slots a user must register for. If not set, users
   #   do not need to sign up for any time slots.
   #
-  # @argument appointment_group[max_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[max_appointments_per_participant] [Integer]
   #   Maximum number of time slots a user may register for.
   #
-  # @argument appointment_group[new_appointments][X][] [Optional]
+  # @argument appointment_group[new_appointments][X][]
   #   Nested array of start time/end time pairs indicating time slots for this
   #   appointment group. Refer to the example request.
   #
-  # @argument appointment_group[participant_visibility] [Optional, "private"|"protected"]
+  # @argument appointment_group[participant_visibility] ["private"|"protected"]
   #   "private":: participants cannot see who has signed up for a particular
   #               time slot
   #   "protected":: participants can see who has signed up. Defaults to "private".
@@ -383,7 +463,7 @@ class AppointmentGroupsController < ApplicationController
   # Delete an appointment group (and associated time slots and reservations) 
   # and return the deleted group
   #
-  # @argument cancel_reason [Optional, String]
+  # @argument cancel_reason [String]
   #   Reason for deleting/canceling the appointment group.
   #
   # @example_request
@@ -409,7 +489,7 @@ class AppointmentGroupsController < ApplicationController
   # Refer to the Users API for the response fields. Returns no results for
   # appointment groups with the "Group" participant_type.
   #
-  # @argument registration_status [Optional, "all"|"registered"|"registered"]
+  # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def users
     participants('User'){ |u| user_json(u, @current_user, session) }
@@ -421,7 +501,7 @@ class AppointmentGroupsController < ApplicationController
   # group. Refer to the Groups API for the response fields. Returns no results
   # for appointment groups with the "User" participant_type.
   #
-  # @argument registration_status [Optional, "all"|"registered"|"registered"]
+  # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def groups
     participants('Group'){ |g| group_json(g, @current_user, session) }

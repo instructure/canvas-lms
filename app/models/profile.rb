@@ -16,10 +16,7 @@ class Profile < ActiveRecord::Base
   validates_inclusion_of :visibility, :in => %w{ public unlisted private }
 
   self.abstract_class = true
-
-  unless CANVAS_RAILS2
-    self.table_name = 'profiles'
-  end
+  self.table_name = 'profiles'
 
   def title=(title)
     write_attribute(:title, title)

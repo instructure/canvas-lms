@@ -18,7 +18,7 @@
 
 module EportfoliosHelper
   def show_me(link_class)
-    raw("<a href=\"#\" class=\"#{link_class}\"><b>#{t('#eportfolios.show_me', "show me")}</b></a>")
+    raw("<a href=\"#\" class=\"#{link_class}\"><b>#{h(t('#eportfolios.show_me', "show me"))}</b></a>")
   end
 
   def edit_icon

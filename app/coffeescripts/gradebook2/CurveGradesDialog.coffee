@@ -23,13 +23,21 @@ define [
         .formSubmit
           disableWhileLoading: true
           processData: (data) =>
+            if !@assignment.points_possible || @assignment.points_possible == "0"
+              errorBox = @$dialog.errorBox I18n.t("errors.no_points_possible", "Cannot curve without points possible")
+              setTimeout((-> errorBox.fadeOut(-> errorBox.remove())), 3500)
+              return false
             cnt = 0
             curves = @curve()
             for idx of curves
               pre = "submissions[submission_" + idx + "]"
               data[pre + "[assignment_id]"] = data.assignment_id
               data[pre + "[user_id]"] = idx
-              data[pre + "[grade]"] = curves[idx]
+              if @assignment.grading_type == "gpa_scale"
+                percent = (curves[idx]/@assignment.points_possible)*100
+                data[pre + "[grade]"] = "#{percent}%"
+              else
+                data[pre + "[grade]"] = curves[idx]
               cnt++
             if cnt == 0
               errorBox = @$dialog.errorBox I18n.t("errors.none_to_update", "None to Update")

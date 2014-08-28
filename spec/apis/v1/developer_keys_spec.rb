@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe DeveloperKeysController, :type => :integration do
+describe DeveloperKeysController, type: :request do
   describe "GET 'index'" do
     it 'should require authorization' do
       unauthorized_api_call(:get, "/api/v1/developer_keys.json",
@@ -73,7 +73,6 @@ describe DeveloperKeysController, :type => :integration do
 
   def admin_session
     account_admin_user(:account => Account.site_admin)
-    user_session(@admin)
   end
 
   def index_call

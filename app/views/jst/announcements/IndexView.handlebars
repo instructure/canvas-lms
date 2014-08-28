@@ -1,16 +1,20 @@
 {{#ifAll atLeastOnePageFetched length}}
+  <h1 class="screenreader-only">{{#t "announcements_title"}}Announcements{{/t}}</h1>
   <div class="headerBar clearfix">
     <div class="headerBar-right form-inline">
       {{#if options.atom_feed_url}}
         <a class="btn"
            href="{{options.atom_feed_url}}"
            data-tooltip
-           title="{{#t "rss_feed"}}RSS feed{{/t}}"><i class="icon-rss"></i></a>
+           title="{{#t "rss_feed"}}RSS feed{{/t}}">
+           <span class="screenreader-only">{{#t "rss_feed"}}RSS feed{{/t}}</span>
+           <i class="icon-rss"></i>
+        </a>
       {{/if}}
-      <span id="actionsForSelectedDiscussions" style="display:none;">
-        <input type="checkbox" id="lock" />
+      <span id="actionsForSelectedDiscussions" class="screenreader-only">
+        <input type="checkbox" id="lock" disabled="disabled"/>
         <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
-        <button id="delete" data-tooltip>{{#t "delete"}}Delete{{/t}}</button>
+        <button id="delete" data-tooltip disabled="disabled">{{#t "delete"}}Delete{{/t}}</button>
       </span>
 
       {{#if options.permissions.create}}
@@ -59,6 +63,6 @@
       {{/if}}
     </div>
   {{else}}
-    <h2>{{#t "loading"}}Loading...{{/t}}</h2>
+    <h1>{{#t "loading"}}Loading...{{/t}}</h1>
   {{/if}}
 {{/ifAll}}

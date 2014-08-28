@@ -15,14 +15,22 @@ define ['ember'], (Ember) ->
     canUpdate: ( ->
       return false unless @permissionsAvailable()
       @get('env').PERMISSIONS.update
-    ).property('env')
+    ).property('env.PERMISSIONS.update')
 
     canManage: ( ->
       return false unless @permissionsAvailable()
       @get('env').PERMISSIONS.manage
-    ).property('env')
+    ).property('env.PERMISSIONS.manage')
 
     permissionsAvailable: ->
       !!(@get('env') && @get('env').PERMISSIONS)
 
-  Environment.create()
+    moderateEnabled: ( ->
+      return false unless @flagsAvailable()
+      @get('env').FLAGS.quiz_moderate
+    ).property('env.FLAGS.quiz_moderate')
+
+    flagsAvailable: ->
+      !!(@get('env') && @get('env').FLAGS)
+
+  Environment.create(env: window.ENV)

@@ -13,11 +13,15 @@
       <li class="user_name"><%= link_to @current_user.short_name, user_profile_path(@current_user) %></li>
     <% end %>
     <% unless @current_user.fake_student? %>
-      <li class="first inbox"><a href="<%= conversations_path %>"><span><%= t 'links.inbox', "Inbox" %></span>
-      <% unread = @current_user.unread_conversations_count; if unread > 0 %>
-        <b class="unread-messages-count"><%= unread %></b>
-      <% end %>
-      </a></li>
+      <li class="first inbox">
+        <a href="<%= conversations_path %>">
+          <span><%= t 'links.inbox', "Inbox" %></span>
+          <% unless @current_user.disabled_inbox? %>
+            <% unread = @current_user.unread_conversations_count %>
+            <b class="unread-messages-count"<% if unread == 0 %> style="display: none;"<% end %>><%= unread %></b>
+          <% end %>
+        </a>
+      </li>
     <li><%= link_to t('links.settings', "Settings"), settings_profile_path %></li>
     <% end %>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>

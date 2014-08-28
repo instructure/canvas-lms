@@ -183,7 +183,12 @@ class SubmissionsApiController < ApplicationController
         student = enrollment.user
         next if seen_users.include?(student.id)
         seen_users << student.id
-        hash = { :user_id => student.id, :submissions => [] }
+        hash = { :user_id => student.id, :section_id => enrollment.course_section_id, :submissions => [] }
+
+        if pseudonym = student.sis_pseudonym_for(context)
+          hash[:integration_id] = pseudonym.integration_id
+        end
+
         student_submissions = submissions_for_user[student.id] || []
         student_submissions.each do |submission|
           # we've already got all the assignments loaded, so bypass AR loading
@@ -201,8 +206,9 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      submissions = @context.submissions.except(:includes, :order).where(:user_id => student_ids).includes(:user).order(:id)
+      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = submissions.preload(:user)
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       result = submissions.map do |s|
@@ -257,6 +263,21 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @model RubricAssessment
+  #  {
+  #     "id" : "RubricAssessment",
+  #     "required": ["criterion_id"],
+  #     "properties": {
+  #       "criterion_id": {
+  #         "description": "The ID of the quiz question.",
+  #         "example": 1,
+  #         "type": "integer",
+  #         "format": "int64"
+  #       },
+  #     }
+  #  }
+  #
+  #
   # @API Grade or comment on a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.
@@ -267,12 +288,12 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[text_comment] [String]
   #   Add a textual comment to the submission.
   #
-  # @argument comment[group_comment] [Optional, Boolean]
+  # @argument comment[group_comment] [Boolean]
   #   Whether or not this comment should be sent to the entire group (defaults
   #   to false). Ignored if this is not a group assignment or if no text_comment
   #   is provided.
   #
-  # @argument comment[media_comment_id] [Integer]
+  # @argument comment[media_comment_id] [String]
   #   Add an audio/video comment to the submission. Media comments can be added
   #   via this API, however, note that there is not yet an API to generate or
   #   list existing media comments, so this functionality is currently of
@@ -281,7 +302,7 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[media_comment_type] [String, "audio"|"video"]
   #   The type of media comment being added.
   #
-  # @argument comment[file_ids][] [Optional,Integer]
+  # @argument comment[file_ids][] [Integer]
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
@@ -314,13 +335,18 @@ class SubmissionsApiController < ApplicationController
   #   a posted_grade in the "points" or "percentage" format is sent, the grade
   #   will only be accepted if the grade equals one of those two values.
   #
+  #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
   #   format is, for each row in the rubric:
   #
-  #   rubric_assessment[criterion_id][points]:: The points awarded for this row.
-  #   rubric_assessment[criterion_id][comments]:: Comments to add for this row.
+  #   The points awarded for this row.
+  #     rubric_assessment[criterion_id][points]
+  #
+  #   Comments to add for this row.
+  #     rubric_assessment[criterion_id][comments]
+  #
   #
   #   For example, if the assignment rubric is (in JSON format):
   #     !!!javascript
@@ -371,7 +397,7 @@ class SubmissionsApiController < ApplicationController
         @submissions = @assignment.grade_student(@user, submission)
         @submission = @submissions.first
       else
-        @submission = @assignment.find_or_create_submission(@user)
+        @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
 
@@ -422,7 +448,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User, @domain_root_account)
+    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
 
   def get_user_considering_section(user_id)

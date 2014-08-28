@@ -6,37 +6,27 @@ define [
   module 'status_date',
     setup: ->
 
-  test 'dueFor defaults when base is present', ->
-    sDate = StatusDate.create
-      base: true
-    equal sDate.get('datesFor'), 'Everyone else'
-
-  test 'dueFor returns title when base is not present', ->
-    sDate = StatusDate.create
-      title: 'Test Group'
-    equal sDate.get('datesFor'), 'Test Group'
-
   test 'availableStatus closed', ->
     sDate = StatusDate.create
-      lock_at: dateString(-1),
-      unlock_at: dateString(-1)
+      lockAt: dateString(-1),
+      unlockAt: dateString(-1)
     equal sDate.get('availableStatus'), 'closed'
 
   test 'availableStatus pending', ->
     sDate = StatusDate.create
-      lock_at: dateString(2)
-      unlock_at: dateString(1)
+      lockAt: dateString(2)
+      unlockAt: dateString(1)
     equal sDate.get('availableStatus'), 'pending'
 
   test 'availableStatus none', ->
     sDate = StatusDate.create
-      unlock_at: dateString(-1)
+      unlockAt: dateString(-1)
     equal sDate.get('availableStatus'), 'none'
 
   test 'availableStatus availableUntil', ->
     sDate = StatusDate.create
-      unlock_at: dateString(-1)
-      lock_at: dateString(1)
+      unlockAt: dateString(-1)
+      lockAt: dateString(1)
     equal sDate.get('availableStatus'), 'availableUntil'
 
   test 'availableStatus none', ->

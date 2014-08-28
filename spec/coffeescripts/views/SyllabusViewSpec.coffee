@@ -19,6 +19,8 @@
 define [
   'jquery'
   'underscore'
+  'timezone'
+  'vendor/timezone/America/Denver'
   'compiled/behaviors/SyllabusBehaviors'
   'compiled/collections/SyllabusCollection'
   'compiled/collections/SyllabusCalendarEventsCollection'
@@ -27,7 +29,7 @@ define [
   'spec/javascripts/compiled/views/SyllabusViewPrerendered'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], ($, _, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered) ->
+], ($, _, tz, denver, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered, fakeENV) ->
 
   setupServerResponses = ->
     server = sinon.fakeServer.create()
@@ -74,11 +76,12 @@ define [
 
   module 'Syllabus',
     setup: ->
+      fakeENV.setup()
       # Setup stubs/mocks
       @server = setupServerResponses()
 
-      @getUserOffset = sinon.stub $, 'getUserOffset', ->
-        return -7 * 60
+      @tzSnapshot = tz.snapshot()
+      tz.changeZone(denver, 'America/Denver')
 
       @clock = sinon.useFakeTimers(new Date(2012, 0, 23, 15, 30).getTime())
 
@@ -129,11 +132,12 @@ define [
         collection: acollection
 
     teardown: ->
+      fakeENV.teardown()
       @syllabusContainer.remove()
       @miniMonth.remove()
       @jumpToToday.remove()
       @clock.restore()
-      @getUserOffset.restore()
+      tz.restore(@tzSnapshot)
       @server.restore()
 
     render: ->

@@ -2,7 +2,7 @@
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/conversations/<%= asset.conversation_id %>
 <% end %>
 <% define_content :user_name do %>
-  <%= asset.author.short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
+  <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
 <% end %>
 <%= t :body, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %><br/>
 <b><a href="<%= content :link %>"><%= t :link_text, "View Message" %></a></b>

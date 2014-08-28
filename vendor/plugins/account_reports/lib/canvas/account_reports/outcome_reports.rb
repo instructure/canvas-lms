@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 module Canvas::AccountReports
 
   class OutcomeReports
@@ -27,8 +29,8 @@ module Canvas::AccountReports
       extra_text_term(@account_report)
       if @account_report.has_parameter? "include_deleted"
         @include_deleted = @account_report.parameters["include_deleted"]
-        @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
+        add_extra_text(I18n.t('account_reports.grades.deleted',
+                              'Include Deleted Objects: true;'))
       end
     end
 
@@ -124,10 +126,30 @@ module Canvas::AccountReports
                  'course name', 'course id', 'course sis id', 'section name',
                  'section id', 'section sis id', 'assignment url']
 
-      # Generate the CSV report
+      t_headers = []
+      t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+      t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+      t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
+      t_headers << I18n.t('#account_reports.report_header_assignment_title', 'assignment title')
+      t_headers << I18n.t('#account_reports.report_header_assignment_id', 'assignment id')
+      t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
+      t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
+      t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
+      t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
+      t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
+      t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
+      t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+      t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+      t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+      t_headers << I18n.t('#account_reports.report_header_section_name', 'section name')
+      t_headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+      t_headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
+      t_headers << I18n.t('#account_reports.report_header_assignment_url', 'assignment url')
+
+        # Generate the CSV report
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
-        csv << headers
+        csv << t_headers
         Shackles.activate(:slave) do
           @total = students.count
           i = 0
@@ -164,8 +186,8 @@ module Canvas::AccountReports
                    'outcomes' => 'learning_outcomes.id, u.id, c.id'}
       if select.length == 1
         order = order_sql[select.first]
-        @account_report.parameters["extra_text"] << " " << I18n.t(
-          'account_reports.outcomes.order', "Order: %{order}", order: select.first)
+        add_extra_text(I18n.t('account_reports.outcomes.order',
+                              "Order: %{order}", order: select.first))
       else
         order = ('u.id, learning_outcomes.id, c.id')
       end
@@ -190,7 +212,7 @@ module Canvas::AccountReports
                  c.name                                      AS "course name",
                  c.id                                        AS "course id",
                  c.sis_source_id                             AS "course sis id",
-            CASE WHEN r.association_type = 'Quiz' THEN 'quiz'
+            CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
                  WHEN ct.content_type = 'Assignment' THEN 'assignment'
                  END                                         AS "assessment type"}).
         joins("INNER JOIN learning_outcomes ON content_tags.content_id = learning_outcomes.id
@@ -201,13 +223,13 @@ module Canvas::AccountReports
                INNER JOIN pseudonyms p on p.user_id = r.user_id
                INNER JOIN courses c ON r.context_id = c.id
                LEFT OUTER JOIN quizzes q ON q.id = r.association_id
-                 AND r.association_type = 'Quiz'
+                 AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
                LEFT OUTER JOIN assignments a ON a.id = ct.content_id
                  AND ct.content_type = 'Assignment'
                LEFT OUTER JOIN submissions subs ON subs.assignment_id = a.id
                  AND subs.user_id = u.id
                LEFT OUTER JOIN quiz_submissions qs ON r.artifact_id = qs.id
-                 AND r.artifact_type = 'QuizSubmission'
+                 AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
                LEFT OUTER JOIN assessment_questions aq ON aq.id = r.associated_asset_id
                  AND r.associated_asset_type = 'AssessmentQuestion'").
         where("ct.workflow_state <> 'deleted'
@@ -228,10 +250,29 @@ module Canvas::AccountReports
                  'assessment question', 'assessment question id',
                  'course name', 'course id', 'course sis id']
 
+      t_headers = []
+      t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+      t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+      t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
+      t_headers << I18n.t('#account_reports.report_header_assessment_title', 'assessment title')
+      t_headers << I18n.t('#account_reports.report_header_assessment_id', 'assessment id')
+      t_headers << I18n.t('#account_reports.report_header_assessment_type', 'assessment type')
+      t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
+      t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
+      t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
+      t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
+      t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
+      t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
+      t_headers << I18n.t('#account_reports.report_header_assessment_question', 'assessment question')
+      t_headers << I18n.t('#account_reports.report_header_assessment_question_id', 'assessment question id')
+      t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+      t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+      t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+
       # Generate the CSV report
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
-        csv << headers
+        csv << t_headers
         Shackles.activate(:slave) do
           @total = students.count
           i = 0

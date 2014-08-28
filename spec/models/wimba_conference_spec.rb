@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require_relative('web_conference_spec_helper')
 
 describe WimbaConference do
-  it_should_behave_like 'WebConference'
+  include_examples 'WebConference'
   
   # implements this WebConference option:
   it { should respond_to :admin_settings_url }
@@ -59,10 +59,12 @@ describe WimbaConference do
     end
   end
 
-  before do
-    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
-
+  before :once do
     user_model
+  end
+
+  before :each do
+    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
     email = "email@email.com"
     @user.stubs(:email).returns(email)
   end

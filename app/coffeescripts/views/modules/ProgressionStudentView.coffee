@@ -27,6 +27,7 @@ define [
     afterRender: ->
       super
       @showProgressions() if !@model.collection.currentStudentView
+      @syncHeight()
 
     createProgressions: ->
       studentId = @model.get('id')
@@ -47,6 +48,7 @@ define [
         template: collectionTemplate
         student: @model.attributes
         student_link: "<a href='#{studentUrl}'>#{@model.get('name')}</a>"
+        autoFetch: true
 
       @progressions.render()
       @progressions.$el.appendTo(@$modules)
@@ -70,5 +72,7 @@ define [
     syncHeight: =>
       setTimeout =>
         @$students.height(@$modules.height())
+        @$students.find('.collectionViewItems').
+          height((@$students.height() || 0) - (@$students.find('.header').height() || 16) - 16)
       , 0
 

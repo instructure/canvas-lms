@@ -1,8 +1,0 @@
-<% jammit_css :gradebooks %>
-<script>
-lastGradebookUpdate = "<%= Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ") %>";
-// only update entries that have changed since the last gradebook update!
-// compare to all updates, replace value with the highest update (keep it all server-time based)
-</script>
-
-<%= render :partial => 'gradebook' %>

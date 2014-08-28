@@ -124,6 +124,17 @@
         </div>
       {{/unless}}
 
+      <div class='message-header-row user_note_info' style="display: none">
+        <div class='message-header-label'></div>
+        <div class='message-header-input'>
+          <input type="hidden" name="user_note" value="0" />
+          <label class="checkbox">
+            <input type="checkbox" name="user_note" class="user_note" value="1" />
+            {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
+          </label>
+        </div>
+      </div>
+
       <div class="message-header-row">
         <div class='message-header-label'></div>
         <div class='message-header-input'>
@@ -145,21 +156,6 @@
               <i class="icon-media"></i> {{#t "links.media_comment"}}Record{{/t}}
             </a>
           {{/if}}
-        </div>
-      </div>
-
-      <div class='message-header-row user_note_info' style="display: none">
-        <div class='message-header-label'></div>
-        <div class='message-header-input'>
-          <label class="checkbox" for="compose-message-user_note">
-            {{checkbox "user_note"
-              id="compose-message-user_note"
-              data-track-category="Compose Message"
-              data-track-action="Edit"
-              data-track-label="Faculty Journal"
-              class="user_note"}}
-            {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
-          </label>
         </div>
       </div>
     </div>

@@ -15,21 +15,32 @@
 
     attributeBindings: [
       'tabindex',
-      'role'
+      'role',
+      'aria-disabled'
     ],
 
     role: 'menuitem',
 
+    enabled: true,
+
     tabindex: -1,
 
     focused: false,
+
+    'aria-disabled': function() {
+      return !this.get('enabled') + ''; // coerce to ensure true || false
+    }.property('enabled'),
 
     click: function(event) {
       var wasKeyboard = !event.clientX && !event.clientY;
       this.get('parentView').close();
       Ember.run.next(this, function() {
         if (wasKeyboard) { this.get('parentView').focusTrigger(); }
-        this.sendAction('on-select', this);
+        if (this.get('enabled')) {
+          this.sendAction('on-select', this);
+        } else {
+          this.sendAction('on-disabled-select', this);
+        }
       });
     },
 

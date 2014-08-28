@@ -19,6 +19,8 @@
 require 'oauth/client/action_pack'
 
 class LtiApiController < ApplicationController
+  skip_before_filter :require_user
+  skip_before_filter :load_user
   skip_before_filter :verify_authenticity_token
 
   # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
@@ -49,6 +51,25 @@ class LtiApiController < ApplicationController
 
   rescue BasicLTI::BasicOutcomes::Unauthorized => e
     render :text => e.to_s, :status => 401
+  end
+
+  def xapi
+    verify_oauth
+
+    if request.content_type != "application/json"
+      return render :text => '', :status => 415
+    end
+
+    source_id = params[:actor]['account']['name']
+    course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
+
+    duration = params[:result]['duration']
+    seconds = duration.match(/PT(\d+)S/)[1].to_i
+
+    # TODO: This should create an asset user access and page view as well.
+    course.enrollments.where(:user_id => user).update_all(['total_activity_time = total_activity_time + ?', seconds])
+
+    return render :text => '', :status => 200
   end
 
   protected

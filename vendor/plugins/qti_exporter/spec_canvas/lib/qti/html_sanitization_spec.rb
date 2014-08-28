@@ -9,11 +9,13 @@ describe "HTML Sanitization of" do
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
       hash[:question_text].should match_ignoring_whitespace("The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course – you just add a link to it. <br><br><b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above? alert('test')")
     end
-    it "should sanitize qti v2p1 html nodes" do
-      manifest_node=get_manifest_node('essay')
-      hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('nodes'))
-      hash[:question_text].should == "<p class=\"FORMATTED_TEXT_BLOCK\">Who likes to use Blackboard? alert('not me')</p>"
+
+    it "should try to escape unmatched brackets" do
+      manifest_node=get_manifest_node('unmatched_brackets')
+      hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
+      hash[:question_text].should match_ignoring_whitespace "<br> I\"m not good at xml so i\"m going to put in some unmatched &lt; brackets here <br> oh here have some more &gt; &gt; &lt;"
     end
+
     it "should sanitize other escaped html" do # e.g. angel proprietary
       qti_data = file_as_string(html_sanitization_question_dir('escaped'), 'angel_essay.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'essay_question', :custom_type=>'angel')
@@ -56,7 +58,7 @@ describe "HTML Sanitization of" do
       hash[:answers][1][:html].should match_ignoring_whitespace("Google Picasa<br><span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" width=\"150\" height=\"59\"></span>\302\240")
       hash[:answers][1][:text].should == "Google Picasa"
       hash[:answers][2][:html].should == nil # sanitized html == text, so we exclude it
-      hash[:answers][2][:text].should == "Facebook alert('0xFACE')" # no script tags
+      hash[:answers][2][:text].should == "Facebook alert(0xFACE)" # no script tags
       hash[:answers][3][:html].should == nil
       hash[:answers][3][:text].should == "Twitter" # we've stripped off extraneous whitespace
     end

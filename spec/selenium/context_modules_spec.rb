@@ -1,9 +1,8 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
+﻿require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
 describe "context_modules" do
   include_examples "in-process server selenium tests"
   context "as a teacher" do
-
     before (:each) do
       course_with_teacher_logged_in
 
@@ -504,7 +503,7 @@ describe "context_modules" do
       module_item.should include_text(item_edit_text)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f('h2.title').text.should == item_edit_text
+      f('h1.title').text.should == item_edit_text
 
       expect_new_page_load { f('.modules').click }
       f("#context_module_item_#{tag.id} .title").text.should == item_edit_text
@@ -555,40 +554,59 @@ describe "context_modules" do
       @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
     end
 
-    it "should not rename every text header when you rename one" do
+    it "should add the 'with-completion-requirements' class to rows that have requirements" do
+      set_course_draft_state
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})
+
+      mod.completion_requirements = {tag.id => {:type => 'must_view'}}
+      mod.save
+
       get "/courses/#{@course.id}/modules"
 
-      add_module('TestModule')
+      ig_rows = ff("#context_module_item_#{tag.id} .with-completion-requirements")
+      ig_rows.should_not be_empty
+    end
 
-      # add a text header
-      f('.admin-links.al-trigger').click
-      f('.add_module_item_link').click
-      select_module_item('#add_module_item_select', 'Text Header')
-      wait_for_ajaximations
-      title_input = fj('input[name="title"]:visible')
-      replace_content(title_input, 'First text header')
-      fj('.add_item_button:visible').click
-      wait_for_ajaximations
-      tag1 = ContentTag.last
+    it "should add a title attribute to the text header" do
+      set_course_draft_state
+      text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag1 = mod.add_item(title: text_header, type: 'sub_header')
 
-      # and another one
-      f('.admin-links.al-trigger').click
-      f('.add_module_item_link').click
-      select_module_item('#add_module_item_select', 'Text Header')
-      wait_for_ajaximations
-      title_input = fj('input[name="title"]:visible')
-      replace_content(title_input, 'Second text header')
-      fj('.add_item_button:visible').click
-      wait_for_ajaximations
-      tag2 = ContentTag.last
+      get "/courses/#{@course.id}/modules"
+      locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
 
-      # rename the second
+      locked_title[0].attribute(:title).should == text_header
+    end
+
+    it "should not rename every text header when you rename one" do
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag1 = mod.add_item(title: 'First text header', type: 'sub_header')
+      tag2 = mod.add_item(title: 'Second text header', type: 'sub_header')
+
+      get "/courses/#{@course.id}/modules"
       item2 = f("#context_module_item_#{tag2.id}")
       edit_module_item(item2) do |edit_form|
         replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
       end
 
-      # verify the first did not change
+      item1 = f("#context_module_item_#{tag1.id}")
+      item1.should_not include_text('Renamed!')
+    end
+
+    it "should not rename every external tool link when you rename one" do
+      tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag1 = mod.add_item(title: 'A', type: 'external_tool', id: tool.id, url: 'http://what.example.org/A')
+      tag2 = mod.add_item(title: 'B', type: 'external_tool', id: tool.id, url: 'http://what.example.org/B')
+
+      get "/courses/#{@course.id}/modules"
+      item2 = f("#context_module_item_#{tag2.id}")
+      edit_module_item(item2) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      end
+
       item1 = f("#context_module_item_#{tag1.id}")
       item1.should_not include_text('Renamed!')
     end
@@ -882,39 +900,22 @@ describe "context_modules" do
     end
 
     it "should preserve completion criteria after indent change" do
+      mod = @course.context_modules.create! name: 'Test Module'
+      tag = mod.add_item(type: 'assignment', id: @assignment2.id)
+      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
+      mod.save!
+
       get "/courses/#{@course.id}/modules"
 
-      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
-      tag = ContentTag.last
-
-      # add completion criterion
-      context_module = f('.context_module')
-      driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
-      f('.edit_module_link').click
-      edit_form = f('#add_context_module_form')
-      f('.add_completion_criterion_link', edit_form).click
-      wait_for_ajaximations
-      click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
-      click_option('#add_context_module_form .assignment_requirement_picker', 'must_contribute', :value)
-      submit_form(edit_form)
-      wait_for_ajax_requests
-
-      # verify it shows up (both visually and in the template data)
-      module_item = f("#context_module_item_#{tag.id}")
-      module_item.attribute('class').split.should include 'must_contribute_requirement'
-      f('.criterion', module_item).attribute('class').split.should include 'defined'
-      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
-
-      # now indent the item
+      # indent the item
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
 
       # make sure the completion criterion was preserved
       module_item = f("#context_module_item_#{tag.id}")
-      module_item.attribute('class').split.should include 'must_contribute_requirement'
+      module_item.attribute('class').split.should include 'must_submit_requirement'
       f('.criterion', module_item).attribute('class').split.should include 'defined'
-      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
+      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_submit"
     end
 
     it "should show a vdd tooltip summary for assignments with multiple due dates" do

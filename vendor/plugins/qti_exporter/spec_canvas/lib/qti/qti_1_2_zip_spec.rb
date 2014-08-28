@@ -17,11 +17,11 @@ if Qti.migration_executable
 
       @migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
     after(:all) do
-      ActiveRecord::Base.all_models.each { |m| truncate_table(m) }
+      truncate_all_tables
       @converter.delete_unzipped_archive
       if File.exists?(@dir)
         FileUtils::rm_rf(@dir)
@@ -58,10 +58,10 @@ if Qti.migration_executable
       @course.attachments.count.should == 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
-      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_path.should == "course files/#{dir}/#{@migration.id}/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_display_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
+      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path.should == "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do
@@ -101,7 +101,7 @@ if Qti.migration_executable
       course_data['all_files_export']['file_path'] = course_data['all_files_zip']
       migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
-      @course.import_from_migration(course_data, nil, migration)
+      Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
       
       # Check the first import
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
@@ -136,5 +136,5 @@ if Qti.migration_executable
                     :question_count=>10,
                     :quiz_type=>nil,
                     :quiz_name=>"Quiz",
-                    :title=>"Quiz"}]}
+                    :title=>"Quiz"}]}.with_indifferent_access
 end

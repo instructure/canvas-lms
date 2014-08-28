@@ -22,7 +22,7 @@
   <% end %>
 <% end %>
 
-<h2 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h2>
+<h1 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h1>
 <div id="create_entry" style="display: none; margin-bottom: 10px;">
   <%= form_for(@user_note, :url => user_user_notes_path, :html=>{:id=>'add_entry_form'}) do |f| %>
     <%= f.error_messages %>

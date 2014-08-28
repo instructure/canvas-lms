@@ -24,6 +24,30 @@ describe "groups" do
     @student.group_memberships.first.should be_accepted
   end
 
+  it "should allow student group leaders to edit the group name" do
+    course_with_student_logged_in(:active_all => true)
+    category1 = @course.group_categories.create!(:name => "category 1")
+    category1.configure_self_signup(true, false)
+    category1.save!
+    g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+
+    g1.add_user @student
+    g1.leader = @student
+    g1.save!
+
+    get "/groups/#{g1.id}"
+    wait_for_ajaximations
+
+    keep_trying_until do
+      f('#edit_group').click
+      set_value f('#group_name'), "new group name"
+      f('#ui-id-2').find_element(:css, 'button[type=submit]').click
+      wait_for_ajaximations
+    end
+
+    g1.reload.name.should == "new group name"
+  end
+
   it "should allow students to join student organized open groups" do
     course_with_student_logged_in(:active_all => true)
     g1 = @course.groups.create!(:name => "my group", :join_level => "parent_context_auto_join")
@@ -99,4 +123,31 @@ describe "groups" do
     new_group_el.find_elements(:css, ".student").length.should == 2
   end
 
+  describe "new groups page" do
+    it "should allow a student to create a group" do
+      pending
+      course_with_student_logged_in(:active_all => true)
+      @course.root_account.enable_feature!(:student_groups_next)
+      student_in_course
+      student_in_course
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      keep_trying_until do
+        f(".add_group_link").click
+        wait_for_animations
+      end
+
+      f("#group_name").send_keys("My Group")
+      ff("#group_join_level option").length.should == 2
+      f("#invitees_#{@student.id}").click
+      fj('button.confirm-dialog-confirm-btn').click
+      wait_for_ajaximations
+
+      new_group_el = fj(".student-group-header:first").text
+      new_group_el.should include "My Group"
+      new_group_el.should include "2 students"
+    end
+  end
 end

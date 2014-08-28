@@ -54,7 +54,7 @@ module Qti
   def self.convert_assessments(manifest_path, opts={})
     assessments = []
     doc = Nokogiri::XML(open(manifest_path))
-    doc.css('manifest resources resource[type=imsqti_assessment_xmlv2p1]').each do |item|
+    doc.css('manifest resources resource[type=imsqti_assessment_xmlv2p1], manifest resources resource[type=imsqti_test_xmlv2p1]').each do |item|
       a = AssessmentTestConverter.new(item, File.dirname(manifest_path), opts).create_instructure_quiz
       assessments << a if a
     end

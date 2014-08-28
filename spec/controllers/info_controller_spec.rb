@@ -77,4 +77,22 @@ describe InfoController do
       JSON.parse(response.body).should == { "status" => "canvas ok", "revision" => "Test Proc" }
     end
   end
+
+  describe "GET 'help_links'" do
+    it "should work" do
+      get 'help_links'
+      response.should be_success
+    end
+
+    it "should set the locale for translated help link text from the current user" do
+      user = User.create!(locale: 'es')
+      user_session(user)
+      # create and save account instance so that we don't invoke I18n's
+      # localizer lambda in a request filter prior to loading necessary
+      # users, accounts, context etc.
+      Account.default
+      get 'help_links'
+      (I18n.locale.to_s).should == 'es'
+    end
+  end
 end

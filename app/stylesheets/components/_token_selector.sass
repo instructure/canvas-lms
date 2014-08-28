@@ -1,0 +1,60 @@
+.autocomplete_menu
+  position: absolute
+  z-index: 2000
+  overflow: hidden
+  margin-left: -12px
+  padding: 0 12px 12px
+  > div
+    background: #ebebeb
+    border: 1px solid #999999
+    border-radius: 0 0 10px 10px
+    box-shadow: 0 0 12px 3px rgba(0,0,0,0.15)
+    overflow: hidden
+    width: 341px
+    // gets shifted left/right as menu slides
+    > div
+      position: relative
+      // each menu level (contains two uls)
+      > div
+        float: left
+        width: 341px
+  ul.heading
+    margin: 0
+    overflow: visible
+  ul
+    list-style: none
+    padding: 0
+    margin: 0 0 10px
+    overflow: auto
+    li, li.active.no-results
+      background: transparent
+      position: relative
+      overflow: hidden
+      border-top: 1px solid #fff
+      border-bottom: 1px solid #d4d5d7
+      padding: 5px
+    li.active.no-results
+      border-bottom: none
+    li.first
+      border-top: none
+    li.last
+      border-bottom: none
+    li.expanded
+      cursor: default
+      background: #fff
+      position: relative
+      z-index: 1
+      box-shadow: 0 0 4px 2px rgba(0,0,0,0.1)
+    li.message
+      line-height: 32px
+      text-align: center
+      border-bottom: none
+    li.active, li:focus
+      border-top-color: #d7eefb
+      border-bottom-color: #297fd1
+      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
+      outline: none
+    li.active.expanded
+      background: #f4fbff
+      border-top-color: #fff
+      border-bottom-color: #d4d5d7

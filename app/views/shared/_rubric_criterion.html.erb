@@ -22,7 +22,7 @@
       <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
       <div class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
         <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
-        <textarea class="long_description" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+        <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
       </div>
       <div class="threshold">
         <%= before_label :threshold, "threshold" %>
@@ -84,7 +84,7 @@
   <td class="nobr points_form">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap; font-size: 0.8em">
-        <% rating_points = %{<input type="text" aria-label="#{t :points_label, "Points" }" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
+        <% rating_points = %{<input type="text" aria-label="#{h(t(:points_label, "Points"))}" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
         <% if assessing && criterion && criterion.points %>
           <%= t :points_out_of2, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
         <% else %>

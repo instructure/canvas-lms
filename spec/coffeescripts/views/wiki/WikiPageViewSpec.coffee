@@ -94,6 +94,7 @@ define [
     CAN:
       VIEW_PAGES: true
       PUBLISH: true
+      VIEW_UNPUBLISHED: true
       UPDATE_CONTENT: true
       DELETE: true
       READ_REVISIONS: true
@@ -110,6 +111,7 @@ define [
     CAN:
       VIEW_PAGES: true
       PUBLISH: false
+      VIEW_UNPUBLISHED: true
       UPDATE_CONTENT: true
       DELETE: false
       READ_REVISIONS: true
@@ -124,6 +126,7 @@ define [
     CAN:
       VIEW_PAGES: true
       PUBLISH: false
+      VIEW_UNPUBLISHED: false
       UPDATE_CONTENT: false
       DELETE: false
       READ_REVISIONS: false
@@ -133,6 +136,7 @@ define [
     CAN:
       VIEW_PAGES: false
       PUBLISH: false
+      VIEW_UNPUBLISHED: false
       UPDATE_CONTENT: false
       DELETE: false
       READ_REVISIONS: false
@@ -151,6 +155,7 @@ define [
     CAN:
       VIEW_PAGES: true
       PUBLISH: true
+      VIEW_UNPUBLISHED: true
       UPDATE_CONTENT: true
       DELETE: false
       READ_REVISIONS: true

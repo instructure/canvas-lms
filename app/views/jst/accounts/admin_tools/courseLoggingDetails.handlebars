@@ -1,0 +1,112 @@
+<dl class="dl-horizontal">
+  <dt>{{#t "event_id"}}Event Id{{/t}}:</dt>
+  <dd>{{id}}</dd>
+  <dt>{{#t "date"}}Date{{/t}}:</dt>
+  <dd>{{tDateToString created_at "medium"}}</dd>
+  <dt>{{#t "time"}}Time{{/t}}:</dt>
+  <dd>{{tTimeToString created_at "tiny"}}</dd>
+  <dt>{{#t "user"}}User{{/t}}:</dt>
+  <dd>{{user.name}}</dd>
+  <dt>{{#t "event_source_label"}}Source{{/t}}:</dt>
+  <dd>{{event_source_present}}</dd>
+  {{#ifEqual event_source 'sis'}}
+    <dt>{{#t "event_sis_batch"}}SIS Batch{{/t}}:</dt>
+    {{#if links.sis_batch}}
+      <dd>{{links.sis_batch}}</dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+  <dt>{{#t "event_type_label"}}Type{{/t}}:</dt>
+  <dd>{{event_type_present}}</dd>
+  {{#ifEqual event_type 'copied_to'}}
+    <dt>{{#t "copied_to_label"}}Copied To{{/t}}:</dt>
+    {{#if copied_to}}
+      <dd>
+        {{#with copied_to}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+  {{#ifEqual event_type 'copied_from'}}
+    <dt>{{#t "copied_from_label"}}Copied From{{/t}}:</dt>
+    {{#if copied_from}}
+      <dd>
+        {{#with copied_from}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+  {{#ifEqual event_type 'reset_to'}}
+    <dt>{{#t "reset_to_label"}}Reset To{{/t}}:</dt>
+    {{#if reset_to}}
+      <dd>
+        {{#with reset_to}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+  {{#ifEqual event_type 'reset_from'}}
+    <dt>{{#t "reset_from_label"}}Reset From{{/t}}:</dt>
+    {{#if reset_from}}
+      <dd>
+        {{#with reset_from}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+</dl>
+
+{{#ifEqual event_type 'created'}}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>{{#t "Field"}}Field{{/t}}</th>
+        <th>{{#t "Value"}}Value{{/t}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#eachProp event_data}}
+        <tr>
+          <td>{{property}}</td>
+          <td>{{value}}</td>
+        </tr>
+      {{/eachProp}}
+    </tbody>
+  </table>
+{{/ifEqual}}
+
+{{#ifEqual event_type 'updated'}}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>{{#t "Field"}}Field{{/t}}</th>
+        <th>{{#t "From"}}From{{/t}}</th>
+        <th>{{#t "To"}}To{{/t}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#eachProp event_data}}
+        <tr>
+          <td>{{property}}</td>
+          {{#with value}}
+            <td>{{from}}</td>
+            <td>{{to}}</td>
+          {{/with}}
+        </tr>
+      {{/eachProp}}
+    </tbody>
+  </table>
+{{/ifEqual}}

@@ -20,48 +20,71 @@
 #
 # API for accessing learning outcome information.
 #
-# @object Outcome
-#
+# @model Outcome
 #     {
-#       // the ID of the outcome
-#       "id": 1,
-#
-#       // the URL for fetching/updating the outcome. should be treated as
-#       // opaque
-#       "url": "/api/v1/outcomes/1",
-#
-#       // the context owning the outcome. may be null for global outcomes
-#       "context_id": 1,
-#       "context_type": "Account",
-#
-#       // title of the outcome
-#       "title": "Outcome title",
-#
-#       // description of the outcome. omitted in the abbreviated form.
-#       "description": "Outcome description",
-#
-#       // A custom GUID for the learning standard.
-#       "vendor_guid": "customid9000",
-#
-#       // maximum points possible. included only if the outcome embeds a
-#       // rubric criterion. omitted in the abbreviated form.
-#       "points_possible": 5,
-#
-#       // points necessary to demonstrate mastery outcomes. included only if
-#       // the outcome embeds a rubric criterion. omitted in the abbreviated
-#       // form.
-#       "mastery_points": 3,
-#
-#       // possible ratings for this outcome. included only if the outcome
-#       // embeds a rubric criterion. omitted in the abbreviated form.
-#       "ratings": [
-#         { "description": "Exceeds Expectations", "points": 5 },
-#         { "description": "Meets Expectations", "points": 3 },
-#         { "description": "Does Not Meet Expectations", "points": 0 }
-#       ],
-#
-#       // whether the current user can update the outcome
-#       "can_edit": true
+#       "id": "Outcome",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the outcome",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "url": {
+#           "description": "the URL for fetching/updating the outcome. should be treated as opaque",
+#           "example": "/api/v1/outcomes/1",
+#           "type": "string"
+#         },
+#         "context_id": {
+#           "description": "the context owning the outcome. may be null for global outcomes",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "example": "Account",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "title of the outcome",
+#           "example": "Outcome title",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "description": "Optional friendly name for reporting",
+#           "example": "My Favorite Outocome",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "description of the outcome. omitted in the abbreviated form.",
+#           "example": "Outcome description",
+#           "type": "string"
+#         },
+#         "vendor_guid": {
+#           "description": "A custom GUID for the learning standard.",
+#           "example": "customid9000",
+#           "type": "string"
+#         },
+#         "points_possible": {
+#           "description": "maximum points possible. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "mastery_points": {
+#           "description": "points necessary to demonstrate mastery outcomes. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "ratings": {
+#           "description": "possible ratings for this outcome. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
+#           "type": "array",
+#           "items": { "$ref" : "RubricRating" }
+#         },
+#         "can_edit": {
+#           "description": "whether the current user can update the outcome",
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
 #     }
 #
 class OutcomesApiController < ApplicationController
@@ -97,22 +120,26 @@ class OutcomesApiController < ApplicationController
   # description". Any new ratings lacking a point value are given a default of
   # 0.
   #
-  # @argument title [Optional, String]
+  # @argument title [String]
   #   The new outcome title.
   #
-  # @argument description [Optional, String]
+  # @argument display_name [String]
+  #   A friendly name shown in reports for outcomes with cryptic titles,
+  #   such as common core standards names.
+  #
+  # @argument description [String]
   #   The new outcome description.
   #
-  # @argument vendor_guid [Optional, String]
+  # @argument vendor_guid [String]
   #   A custom GUID for the learning standard.
   #
-  # @argument mastery_points [Optional, Integer]
+  # @argument mastery_points [Integer]
   #   The new mastery threshold for the embedded rubric criterion.
   #
-  # @argument ratings[][description] [Optional, String]
+  # @argument ratings[][description] [String]
   #   The description of a new rating level for the embedded rubric criterion.
   #
-  # @argument ratings[][points] [Optional, Integer]
+  # @argument ratings[][points] [Integer]
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
@@ -123,6 +150,7 @@ class OutcomesApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        -F 'title=Outcome Title' \ 
+  #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \ 
@@ -140,6 +168,7 @@ class OutcomesApiController < ApplicationController
   #        -X PUT \ 
   #        --data-binary '{
   #              "title": "Outcome Title",
+  #              "display_name": "Title for reporting",
   #              "description": "Outcome description",
   #              "vendor_guid": "customid9001",
   #              "mastery_points": 3,
@@ -154,7 +183,7 @@ class OutcomesApiController < ApplicationController
   #
   def update
     if authorized_action(@outcome, @current_user, :update)
-      @outcome.update_attributes(params.slice(:title, :description, :vendor_guid))
+      @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
       if params[:mastery_points] || params[:ratings]
         criterion = @outcome.data && @outcome.data[:rubric_criterion]
         criterion ||= {}

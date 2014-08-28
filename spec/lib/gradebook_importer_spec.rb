@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'csv'
+
 describe GradebookImporter do
   context "construction" do
 
@@ -130,7 +132,33 @@ describe GradebookImporter do
       hash[:students][5][:id].should <  0
       hash[:students][5][:previous_id].should be_nil
     end
-    
+
+    it "should Lookup by root account" do
+      course_model
+
+      student_in_course(:name => "Some Name")
+      @u1 = @user
+
+      account2 = Account.create!
+      p = @u1.pseudonyms.create!(account: account2, unique_id: 'uniqueid')
+      p.sis_user_id = 'SISUSERID'
+      p.save!
+      Account.expects(:find_by_domain).with('account2').returns(account2)
+
+      uploaded_csv = CSV.generate do |csv|
+        csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Root Account", "Section", "Assignment 1"]
+        csv << ["    Points Possible", "", "","", "", ""]
+        csv << ["" , "",  @u1.pseudonym.sis_user_id, "", "account2", "", 99]
+      end
+
+      importer_with_rows(uploaded_csv)
+      hash = @gi.as_json
+
+      hash[:students][0][:id].should == @u1.id
+      hash[:students][0][:previous_id].should == @u1.id
+      hash[:students][0][:name].should eql(@u1.name)
+    end
+
     it "should allow ids that look like numbers" do
       course_model
 
@@ -215,17 +243,33 @@ describe GradebookImporter do
     @gi.assignments.first.points_possible.should == 20
   end
 
+  it "should not try to create assignments for the totals columns" do
+    course_model
+    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    importer_with_rows(
+        "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
+        "Points Possible,,,20,,,,,"
+    )
+    @gi.assignments.should == [@assignment1]
+    @gi.missing_assignments.should be_empty
+  end
+
   it "should parse new and existing users" do
     course_with_student
+    @student1 = @student
+    e = student_in_course
+    e.update_attribute :workflow_state, 'completed'
+    concluded_student = @student
     @student2 = user
     @course.enroll_student(@student2)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
-        ",#{@student.id},,10",
-        "New Student,,,12"
+        ",#{@student1.id},,10",
+        "New Student,,,12",
+        ",#{concluded_student.id},,10"
     )
-    @gi.students.length.should == 2
-    @gi.students.first.should == @student
+    @gi.students.length.should == 2  # doesn't include concluded_student
+    @gi.students.first.should == @student1
     @gi.students.last.should be_new_record
     @gi.students.last.id.should < 0
     @gi.missing_students.should == [@student2]

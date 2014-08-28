@@ -203,7 +203,7 @@ describe "outcomes" do
           course_bulk_outcome_groups_course(2, 2)
           get outcome_url
           wait_for_ajaximations
-          ff('.outcomes-content').first.text.should contain "Setting up Outcomes"
+          ff('.outcomes-content').first.text.should include "Setting up Outcomes"
         end
       end
     end
@@ -222,21 +222,21 @@ describe "outcomes" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
-        ff('.outcomes-content').first.text.should_not contain "Setting up Outcomes"
+        ff('.outcomes-content').first.text.should_not include "Setting up Outcomes"
       end
 
       it "should select the first outcome from the list if there are no outcome groups" do
         course_outcome 2
         get outcome_url
         wait_for_ajaximations
-        keep_trying_until { ff('.outcomes-content .title').first.text.should contain "outcome 0" }
+        keep_trying_until { ff('.outcomes-content .title').first.text.should include "outcome 0" }
       end
 
       it "should select the first outcome group from the list if there are outcome groups" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
-        keep_trying_until { ff('.outcomes-content .title').first.text.should contain "group 0" }
+        keep_trying_until { ff('.outcomes-content .title').first.text.should include "group 0" }
       end
     end
   end

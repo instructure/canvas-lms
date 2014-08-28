@@ -22,26 +22,27 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe QuizzesHelper do
   include ApplicationHelper
   include QuizzesHelper
+  include ERB::Util
 
   describe "#needs_unpublished_warning" do
-    before do
+    before :once do
       course_with_teacher
     end
 
     context "with draft state enabled" do
-      before do
+      before :once do
         @course.account.enable_feature!(:draft_state)
       end
 
       it "is false if quiz not manageable" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
 
         def can_publish(quiz); false; end
         needs_unpublished_warning?(quiz, User.new).should be_false
       end
 
       it "is false if quiz is available with no unpublished changes" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'available'
         quiz.last_edited_at = 10.minutes.ago
         quiz.published_at   = Time.now
@@ -51,7 +52,7 @@ describe QuizzesHelper do
       end
 
       it "is true if quiz is not available" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'created'
 
         def can_publish(quiz); true; end
@@ -59,7 +60,7 @@ describe QuizzesHelper do
       end
 
       it "is true if quiz has unpublished changes" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'available'
         quiz.last_edited_at = Time.now
         quiz.published_at   = 10.minutes.ago
@@ -72,14 +73,14 @@ describe QuizzesHelper do
     context "with draft state disabled" do
 
       it "is false if quiz is not readable" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
 
         def can_read(quiz); false; end
         needs_unpublished_warning?(quiz, User.new).should be_false
       end
 
       it "is false if quiz is available with no unpublished changes" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'available'
         quiz.last_edited_at = 10.minutes.ago
         quiz.published_at   = Time.now
@@ -89,7 +90,7 @@ describe QuizzesHelper do
       end
 
       it "is true if quiz is not available" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'created'
 
         def can_read(quiz); true; end
@@ -98,7 +99,7 @@ describe QuizzesHelper do
       end
 
       it "is true if quiz has unpublished changes" do
-        quiz = Quiz.new(:context => @course)
+        quiz = Quizzes::Quiz.new(:context => @course)
         quiz.workflow_state = 'available'
         quiz.last_edited_at = Time.now
         quiz.published_at   = 10.minutes.ago
@@ -216,14 +217,30 @@ describe QuizzesHelper do
 
   context 'fill_in_multiple_blanks_question' do
     before(:each) do
-      @question_text = %q|<input name="question_1" 'value={{question_1}}' />|
+      @question_text = %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />|
       @answer_list = []
       @answers = []
 
       def user_content(stuff); stuff; end # mock #user_content
     end
+
+    it 'should extract the answers by blank' do
+      @answer_list = [{ blank_id: 'color', answer: 'red' }]
+
+      html = fill_in_multiple_blanks_question(
+        :question => {:question_text => @question_text},
+        :answer_list => @answer_list,
+        :answers => @answers
+      )
+
+      html.should == %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+    end
+
     it 'should sanitize user input' do
-      malicious_answer_list =  [%q|'><script>alert('ha!')</script><img|]
+      malicious_answer_list = [{
+        blank_id: 'color',
+        answer: %q|'><script>alert('ha!')</script><img|
+      }]
 
       html = fill_in_multiple_blanks_question(
         :question => {:question_text => @question_text},
@@ -231,7 +248,8 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      html.should == %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      html.should be_html_safe
     end
 
     it 'should add an appropriate label' do
@@ -243,6 +261,34 @@ describe QuizzesHelper do
 
       html.should =~ /aria\-label/
       html.should =~ /Fill in the blank/
+    end
+    it 'should handle equation img tags in the question text' do
+      broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
+      @answer_list = [
+        { blank_id: 'kindof', answer: 'protein'},
+        {blank_id: 'role', answer: 'fixing'}
+      ]
+      html = fill_in_multiple_blanks_question(
+        question: {question_text: broken_question_text},
+        answer_list: @answer_list,
+        answers: @answers
+      )
+      html.should =~ /"readonly"/
+      html.should =~ /value='fixing'/
+      html.should =~ /value='protein'/
+    end
+  end
+
+  context "multiple_dropdowns_question" do
+    before do
+      def user_content(stuff); stuff; end # mock #user_content
+    end
+
+    it "should select the user's answer" do
+      html = multiple_dropdowns_question(question: { question_text: "some <select name='question_4'><option value='val'>val</option></select>"},
+                                         answer_list: ['val'])
+      html.should == "some <select name='question_4'><option value='val' selected>val</option></select>"
+      html.should be_html_safe
     end
   end
 

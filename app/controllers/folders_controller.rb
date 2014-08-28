@@ -19,31 +19,93 @@
 # @API Files
 # @subtopic Folders
 #
-# @object Folder
+# @model Folder
 #     {
-#       "context_type": "Course",
-#       "context_id": 1401,
-#       "files_count": 0,
-#       "position": 3,
-#       "updated_at": "2012-07-06T14:58:50Z",
-#       "folders_url": "https://www.example.com/api/v1/folders/2937/folders",
-#       "files_url": "https://www.example.com/api/v1/folders/2937/files",
-#       "full_name": "course files/11folder",
-#       "lock_at": null,
-#       "id": 2937,
-#       "folders_count": 0,
-#       "name": "11folder",
-#       "parent_folder_id": 2934,
-#       "created_at": "2012-07-06T14:58:50Z",
-#       "unlock_at": null,
-#       "hidden": null,
-#       "hidden_for_user": false,
-#       "locked": true,
-#       "locked_for_user": false
+#       "id": "Folder",
+#       "description": "",
+#       "properties": {
+#         "context_type": {
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "context_id": {
+#           "example": 1401,
+#           "type": "integer"
+#         },
+#         "files_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "position": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "updated_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "folders_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/folders",
+#           "type": "string"
+#         },
+#         "files_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/files",
+#           "type": "string"
+#         },
+#         "full_name": {
+#           "example": "course files/11folder",
+#           "type": "string"
+#         },
+#         "lock_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "id": {
+#           "example": 2937,
+#           "type": "integer"
+#         },
+#         "folders_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "example": "11folder",
+#           "type": "string"
+#         },
+#         "parent_folder_id": {
+#           "example": 2934,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "type": "datetime"
+#         },
+#         "hidden": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "hidden_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked": {
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
+#
 class FoldersController < ApplicationController
   include Api::V1::Folders
   include Api::V1::Attachment
+  include AttachmentHelper
 
   before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
 
@@ -78,11 +140,35 @@ class FoldersController < ApplicationController
       else
         scope = scope.by_name
       end
-      @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
+      @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
-  
+
+  # @API Resolve path
+  # @subtopic Folders
+  # Given the full path to a folder, returns a list of all Folders in the path hierarchy,
+  # starting at the root folder, and ending at the requested folder. The given path is
+  # relative to the context's root folder and does not include the root folder's name
+  # (e.g., "course files"). If an empty path is given, the context's root folder alone
+  # is returned. Otherwise, if no folder exists with the given full path, a Not Found
+  # error is returned.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders/by_path/foo/bar/baz' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def resolve_path
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      folders = Folder.resolve_path(@context, params[:full_path], can_manage_files)
+      raise ActiveRecord::RecordNotFound if folders.blank?
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
   # @API Get folder
   # @subtopic Folders
   # Returns the details for a folder
@@ -139,7 +225,11 @@ class FoldersController < ApplicationController
           res = {
             :actual_folder => @folder.as_json(folders_options),
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
-            :files => files.map { |f| f.as_json(files_options)}
+            :files => files.map { |f|
+              f.as_json(files_options).tap { |json|
+                json['attachment'].merge! doc_preview_json(f, @current_user)
+              }
+            }
           }
           format.json { render :json => res }
         end
@@ -275,7 +365,7 @@ class FoldersController < ApplicationController
   # @subtopic Folders
   # Creates a folder in the specified context
   #
-  # @argument name [String]
+  # @argument name [Required, String]
   #   The name of the folder
   #
   # @argument parent_folder_id [String]

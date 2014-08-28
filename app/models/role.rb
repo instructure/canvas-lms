@@ -20,6 +20,10 @@ class Role < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, :class_name => 'Account'
   attr_accessible :name
+
+  EXPORTABLE_ATTRIBUTES = [:id, :name, :base_role_type, :account_id, :workflow_state, :created_at, :updated_at, :deleted_at, :root_account_id]
+  EXPORTABLE_ASSOCIATIONS = [:account, :root_account]
+
   before_validation :infer_root_account_id
   validates_presence_of :name, :account_id, :workflow_state
   validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES, :message => 'is invalid'
@@ -71,12 +75,12 @@ class Role < ActiveRecord::Base
     save!
   end
 
-  scope :not_deleted, where("roles.workflow_state<>'deleted'")
-  scope :deleted, where(:workflow_state => 'deleted')
-  scope :active, where(:workflow_state => 'active')
-  scope :inactive, where(:workflow_state => 'inactive')
-  scope :for_courses, where("roles.base_role_type<>?", AccountUser::BASE_ROLE_NAME)
-  scope :for_accounts, where(:base_role_type => AccountUser::BASE_ROLE_NAME)
+  scope :not_deleted, -> { where("roles.workflow_state<>'deleted'") }
+  scope :deleted, -> { where(:workflow_state => 'deleted') }
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :inactive, -> { where(:workflow_state => 'inactive') }
+  scope :for_courses, -> { where("roles.base_role_type<>?", AccountUser::BASE_ROLE_NAME) }
+  scope :for_accounts, -> { where(:base_role_type => AccountUser::BASE_ROLE_NAME) }
 
   def self.is_base_role?(role_name)
     RoleOverride.base_role_types.include?(role_name)
@@ -112,15 +116,8 @@ class Role < ActiveRecord::Base
   # counts for the given course to each item
   def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
     users_scope = course.users_visible_to(user)
-    base_counts = users_scope.where(enrollments: {role_name: nil}).group('enrollments.type')
-    role_counts = users_scope.where('enrollments.role_name IS NOT NULL').group('enrollments.role_name')
-    if CANVAS_RAILS2
-      base_counts = base_counts.count(select: 'users.id', distinct: true)
-      role_counts = role_counts.count(select: 'users.id', distinct: true)
-    else
-      base_counts = base_counts.select('users.id').uniq.count
-      role_counts = role_counts.select('users.id').uniq.count
-    end
+    base_counts = users_scope.where(enrollments: {role_name: nil}).group('enrollments.type').select('users.id').uniq.count
+    role_counts = users_scope.where('enrollments.role_name IS NOT NULL').group('enrollments.role_name').select('users.id').uniq.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|

@@ -1,0 +1,23 @@
+{
+  "name": "ic-lazy-list",
+  "version": "0.2.4",
+  "main": "main.js",
+  "authors": [
+    "Ryan Florence <rpflorence@gmail.com>"
+  ],
+  "dependencies": {
+    "ember": "^1.2.0",
+    "ic-ajax": "^1.0.4"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "ember-template-compiler": "http://builds.emberjs.com/release/ember-template-compiler.js"
+  }
+}

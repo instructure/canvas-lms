@@ -243,10 +243,3 @@
   <a href="#" class="show_calendar_feed_link"><%= t 'links.feed', "click here to view the feed" %></a>
   </div>
 </div>
-<% js_block do %>
-  <script type="text/javascript">
-    var managementContexts = <%= raw @contexts.select{|c| can_do(c, @current_user, :manage_calendar) }.map(&:asset_string).to_json %>;
-    var canCreateEvent = managementContexts.length > 0;
-    lastCalendarUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
-  </script>
-<% end %>

@@ -1,4 +1,3 @@
-<style>
 ic-menu {
   display: inline-block;
 }
@@ -31,10 +30,24 @@ ic-menu-item {
   white-space: nowrap;
 }
 
+
 ic-menu-item:focus {
   background: #3879D9;
   color: #fff;
   outline: none;
 }
-</style>
+
+ic-menu-item[aria-disabled="true"] {
+  color: #999;
+}
+
+ic-menu-item[aria-disabled="true"]:focus {
+  background: #ccc;
+  color: #000;
+}
+
+ic-menu-item a {
+  color: inherit;
+  text-decoration: none;
+}
 

@@ -14,11 +14,24 @@ define [
   #    where <input> is the DOM node (not $-wrapped) of the file input
   class File extends Model
 
+    url: ->
+      if @isNew()
+        # if it is new, fall back to Backbone's default behavior of using
+        # the url of the collection this model belongs to.
+        # aka: POST /api/v1/folders/:folder_id/files (to create)
+        super
+      else
+        # for GET, PUT, and DELETE, our API expects "/api/v1/files/:file_id"
+        # not "/api/v1/folders/:folder_id/files/:file_id" which is what
+        # backbone would do by default.
+        "/api/v1/files/#{@id}"
+
     initialize: (attributes, options) ->
       @preflightUrl = options.preflightUrl
       super
 
     save: (attrs = {}, options = {}) ->
+      return super unless @get('file')
       @set attrs
       dfrd = $.Deferred()
       el = @get('file')
@@ -49,6 +62,7 @@ define [
           options.error?(error)
 
     toJSON: ->
+      return super unless @get('file')
       _.pick(@attributes, 'file', _.keys(@uploadParams ? {})...)
 
     present: ->

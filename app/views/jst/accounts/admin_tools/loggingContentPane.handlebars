@@ -1,6 +1,7 @@
 <label class="control-label" for="loggingType">
   <h4>{{#t "select_label"}}Select a log type to search.{{/t}}</h4>
 </label>
+
 <div class="controls">
   <select id="loggingType">
     <option value="default">{{#t "select_default"}}Select a Log type{{/t}}</option>
@@ -14,6 +15,11 @@
       {{#t "grade_change"}}Grade Change Activity{{/t}}
     </option>
     {{/if}}
+    {{#if course}}
+    <option value='#loggingCourse'>
+      {{#t "course"}}Course Activity{{/t}}
+    </option>
+    {{/if}}
   </select>
 </div>
 <hr/>
@@ -24,4 +30,8 @@
 
 {{#if grade_change}}
 <div id="loggingGradeChange" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if course}}
+<div id="loggingCourse" class="loggingTypeContent"></div>
 {{/if}}

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,11 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SectionsController, :type => :integration do
+describe SectionsController, type: :request do
   describe '#index' do
     USER_API_FIELDS = %w(id name sortable_name short_name)
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
       @me = @user
       @course1 = @course
@@ -45,7 +45,6 @@ describe SectionsController, :type => :integration do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       json.size.should == 2
-      json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
       json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
       json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
     end
@@ -89,8 +88,8 @@ describe SectionsController, :type => :integration do
   end
 
   describe "#show" do
-    before do
-      course_with_teacher_logged_in
+    before :once do
+      course_with_teacher
       @section = @course.default_section
     end
 
@@ -107,7 +106,6 @@ describe SectionsController, :type => :integration do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => nil,
           'start_at' => nil,
           'end_at' => nil
         }
@@ -121,7 +119,6 @@ describe SectionsController, :type => :integration do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => 'my_section',
           'start_at' => nil,
           'end_at' => nil
         }
@@ -148,7 +145,6 @@ describe SectionsController, :type => :integration do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => nil,
           'start_at' => nil,
           'end_at' => nil
         }
@@ -162,9 +158,21 @@ describe SectionsController, :type => :integration do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => 'my_section',
           'start_at' => nil,
           'end_at' => nil
+        }
+      end
+
+      it "should be accessible without a course context via integration id" do
+        @section.update_attribute(:integration_id, 'my_section')
+        json = api_call(:get, "#{@path_prefix}/sis_integration_id:my_section", @path_params.merge({ :id => "sis_integration_id:my_section" }))
+        json.should == {
+            'id' => @section.id,
+            'name' => @section.name,
+            'course_id' => @course.id,
+            'nonxlist_course_id' => nil,
+            'start_at' => nil,
+            'end_at' => nil
         }
       end
 
@@ -173,18 +181,43 @@ describe SectionsController, :type => :integration do
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
       end
     end
+
+    context "as an admin" do
+      before :once do
+        site_admin_user
+        @section = @course.default_section
+        @path_prefix = "/api/v1/courses/#{@course.id}/sections"
+        @path_params = { :controller => 'sections', :action => 'show', :course_id => @course.to_param, :format => 'json' }
+      end
+
+      it "should show sis information" do
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
+          'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'sis_import_id' => @section.sis_batch_id,
+          'integration_id' => nil,
+          'nonxlist_course_id' => nil,
+          'start_at' => nil,
+          'end_at' => nil
+        }
+      end
+    end
   end
 
   describe "#create" do
-    before do
+    before :once do
       course
       @path_prefix = "/api/v1/courses/#{@course.id}/sections"
       @path_params = { :controller => 'sections', :action => 'create', :course_id => @course.to_param, :format => 'json' }
     end
 
     context "as teacher" do
-      before do
-        course_with_teacher_logged_in :course => @course
+      before :once do
+        course_with_teacher :course => @course
       end
 
       it "should create a section with default parameters" do
@@ -240,7 +273,6 @@ describe SectionsController, :type => :integration do
     context "as admin" do
       before do
         site_admin_user
-        user_session(@admin)
       end
 
       it "should set the sis source id" do
@@ -250,12 +282,13 @@ describe SectionsController, :type => :integration do
         section = @course.active_course_sections.find(json['id'].to_i)
         section.name.should == 'Name'
         section.sis_source_id.should == 'fail'
+        section.sis_batch_id.should == nil
       end
     end
   end
 
   describe "#update" do
-    before do
+    before :once do
       course
       @section = @course.course_sections.create! :name => "Test Section"
       @section.update_attribute(:sis_source_id, "SISsy")
@@ -264,8 +297,8 @@ describe SectionsController, :type => :integration do
     end
 
     context "as teacher" do
-      before do
-        course_with_teacher_logged_in :course => @course
+      before :once do
+        course_with_teacher :course => @course
       end
 
       it "should modify section data by id" do
@@ -331,7 +364,6 @@ describe SectionsController, :type => :integration do
     context "as admin" do
       before do
         site_admin_user
-        user_session(@admin)
       end
 
       it "should set the sis id" do
@@ -346,7 +378,7 @@ describe SectionsController, :type => :integration do
   end
 
   describe "#delete" do
-    before do
+    before :once do
       course
       @section = @course.course_sections.create! :name => "Test Section"
       @section.update_attribute(:sis_source_id, "SISsy")
@@ -355,8 +387,8 @@ describe SectionsController, :type => :integration do
     end
 
     context "as teacher" do
-      before do
-        course_with_teacher_logged_in :course => @course
+      before :once do
+        course_with_teacher :course => @course
       end
 
       it "should delete a section by id" do
@@ -400,7 +432,7 @@ describe SectionsController, :type => :integration do
   end
 
   describe "#crosslist" do
-    before do
+    before :once do
       @dest_course = course
       course
       @section = @course.course_sections.create!
@@ -408,9 +440,8 @@ describe SectionsController, :type => :integration do
     end
 
     context "as admin" do
-      before do
+      before :once do
         site_admin_user
-        user_session(@admin)
       end
 
       it "should cross-list a section" do
@@ -430,6 +461,10 @@ describe SectionsController, :type => :integration do
       it "should work with sis IDs" do
         @dest_course.update_attribute(:sis_source_id, "dest_course")
         @section.update_attribute(:sis_source_id, "the_section")
+        @sis_batch = @section.root_account.sis_batches.create
+        SisBatch.where(id: @sis_batch).update_all(workflow_state: 'imported')
+        @section.sis_batch_id = @sis_batch.id
+        @section.save!
 
         @course.active_course_sections.should be_include(@section)
         @dest_course.active_course_sections.should_not be_include(@section)
@@ -439,6 +474,7 @@ describe SectionsController, :type => :integration do
         json['id'].should == @section.id
         json['course_id'].should == @dest_course.id
         json['nonxlist_course_id'].should == @course.id
+        json['sis_import_id'].should == @sis_batch.id
 
         @course.reload.active_course_sections.should_not be_include(@section)
         @dest_course.reload.active_course_sections.should be_include(@section)
@@ -463,6 +499,15 @@ describe SectionsController, :type => :integration do
         api_call(:post, "/api/v1/sections/#{@section.id}/crosslist/#{foreign_course.id}",
                  @params.merge(:id => @section.to_param, :new_course_id => foreign_course.to_param), {}, {}, :expected_status => 404)
       end
+
+      it "should confirm crosslist by sis id" do
+        user_session(@admin)
+        @dest_course.update_attribute(:sis_source_id, "blargh")
+        raw_api_call(:get, "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.sis_source_id}",
+                 @params.merge(:action => 'crosslist_check', :course_id => @course.to_param, :section_id => @section.to_param, :new_course_id => @dest_course.sis_source_id))
+        json = JSON.parse response.body.gsub(/\Awhile\(1\)\;/, '')
+        json['course']['id'].should eql @dest_course.id
+      end
     end
 
     context "as teacher" do
@@ -478,7 +523,7 @@ describe SectionsController, :type => :integration do
   end
 
   describe "#uncrosslist" do
-    before do
+    before :once do
       @dest_course = course
       course
       @section = @course.course_sections.create!
@@ -487,9 +532,8 @@ describe SectionsController, :type => :integration do
     end
 
     context "as admin" do
-      before do
+      before :once do
         site_admin_user
-        user_session(@admin)
       end
 
       it "should un-crosslist a section" do

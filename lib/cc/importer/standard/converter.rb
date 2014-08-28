@@ -21,9 +21,11 @@ module CC::Importer::Standard
     include WebcontentConverter
     include OrgConverter
     include DiscussionConverter
+    include AssignmentConverter
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
     
     attr_accessor :resources
 
@@ -34,50 +36,80 @@ module CC::Importer::Standard
       @is_canvas_cartridge = nil
       @resources = {}
       @file_path_migration_id = {}
-      
-      # namespace prefixes
-      @lom = nil
-      @lomimscc = nil
+      @resource_nodes_for_flat_manifest = {}
     end
 
     # exports the package into the intermediary json
-    def export(to_export = SCRAPE_ALL_HASH)
-      to_export = SCRAPE_ALL_HASH.merge to_export if to_export
-      unzip_archive
+    def convert(to_export = nil)
+      @archive.prepare_cartridge_file(MANIFEST_FILE)
       @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
-      check_metadata_namespaces
+      @manifest.remove_namespaces!
 
       get_all_resources(@manifest)
+      process_variants
       create_file_map
+
       @course[:discussion_topics] = convert_discussions
       lti_converter = CC::Importer::BLTIConverter.new
-      @course[:external_tools] = lti_converter.convert_blti_links(resources_by_type("imsbasiclti"), self)
+      @course[:external_tools] = convert_blti_links_with_flat(lti_converter)
       @course[:assignments] = lti_converter.create_assignments_from_lti_links(@course[:external_tools])
+      convert_cc_assignments(@course[:assignments])
       @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])
-      
-      # check for assignment intendeduse
-      
+
       #close up shop
       save_to_file
       delete_unzipped_archive
       @course
     end
-    
-    # Finds the resource object with the specified type(s)
-    # does a "start_with?" so that CC version can be ignored
-    def resources_by_type(*types)
-      @resources.values.find_all {|res| types.any?{|t| res[:type].start_with? t} }
+    alias_method :export, :convert
+
+    # A resource can have a "variant" that points to another resource.
+    # That means the other resource is preferred if it's supported.
+    # After this runs all migration_ids in @resources for the variant chain
+    # should point to just one object
+    def process_variants
+      @resources.values.select{|r|r[:preferred_resource_id]}.each do |res|
+        preferred = @resources[res[:preferred_resource_id]]
+        if preferred && preferred != res
+          if preferred[:type] =~ SUPPORTED_TYPES
+            # The preferred resource is supported, use it instead
+            @resources[res[:migration_id]] = preferred
+          else
+            # The preferred resource isn't supported, don't try to import it
+            @resources[preferred[:migration_id]] = res
+          end
+          res.delete :preferred_resource_id
+        end
+      end
     end
-    
+
     def find_file_migration_id(path)
-      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')]
+      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
+        @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
     end
     
     def get_canvas_att_replacement_url(path, resource_dir=nil)
-      mig_id = find_file_migration_id(resource_dir + '/' + path) if resource_dir
+      if path.start_with?('../')
+        if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
+          return url
+        end
+      end
+      path = path[1..-1] if path.start_with?('/')
+      mig_id = nil
+      if resource_dir
+        mig_id = find_file_migration_id(File.join(resource_dir, path))
+      end
       mig_id ||= find_file_migration_id(path)
+
+      unless mig_id
+        path = path.gsub(%r{\$[^$]*\$|\.\./}, '')
+        if key = @file_path_migration_id.keys.detect{|k| k.end_with?(path)}
+          mig_id = @file_path_migration_id[key]
+        end
+      end
+
       mig_id ? "$CANVAS_OBJECT_REFERENCE$/attachments/#{mig_id}" : nil
     end
 
@@ -86,6 +118,9 @@ module CC::Importer::Standard
     end
 
     def add_course_file(file, overwrite=false)
+      return unless file[:path_name]
+      file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
+      file[:path_name] = file[:path_name][1..-1] if file[:path_name].start_with?('/')
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]
@@ -95,40 +130,6 @@ module CC::Importer::Standard
       add_file(file)
     end
     
-    def get_all_resources(manifest)
-      manifest.css('resource').each do |r_node|
-        id = r_node['identifier']
-        resource = @resources[id]
-        resource ||= {:migration_id=>id}
-        resource[:type] = r_node['type']
-        resource[:href] = r_node['href']
-        resource[:href] = resource[:href].gsub('\\', '/') if resource[:href]
-        # Should be "Learner", "Instructor", or "Mentor"
-        resource[:intended_user_role] = get_node_val(r_node, "#{@lom}|intendedEndUserRole #{@lom}|value", nil) if @lom
-        # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
-        resource[:intended_use] = r_node['intendeduse']
-        resource[:files] = []
-        r_node.css('file').each do |file_node|
-          resource[:files] << {:href => file_node[:href].gsub('\\', '/')}
-        end
-        resource[:dependencies] = []
-        r_node.css('dependency').each do |d_node|
-          resource[:dependencies] << d_node[:identifierref]
-        end
-        @resources[id] = resource
-      end
-    end
-    
-    def check_metadata_namespaces
-      @manifest.namespaces.each_pair do |key, val|
-        if val =~ %r{lom/resource\z}i
-          @lom = key.gsub('xmlns:','')
-        elsif val =~ %r{lom/manifest\z}i
-          @lomimscc = key.gsub('xmlns:','')
-        end
-      end
-    end
-
     FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
     def replace_urls(html, resource_dir=nil)
       return "" if html.blank?
@@ -163,6 +164,20 @@ module CC::Importer::Standard
 
     def find_assignment(migration_id)
       @course[:assignments].find{|a|a[:migration_id] == migration_id}
+    end
+
+    def convert_blti_links_with_flat(lti_converter)
+      tools = []
+      resources_by_type("imsbasiclti").each do |res|
+        if doc = get_node_or_open_file(res)
+          tool = lti_converter.convert_blti_link(doc)
+          tool[:migration_id] = res[:migration_id]
+          res[:url] = tool[:url] # for the organization item to reference
+          tools << tool
+        end
+      end
+
+      tools
     end
     
   end

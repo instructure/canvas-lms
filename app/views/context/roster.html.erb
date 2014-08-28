@@ -14,6 +14,7 @@
 
 <% if @context.is_a?(Course) %>
   <% js_bundle :roster %>
+  <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
 <% else %>
   <% content_for :stylesheets do %>
     <style>
@@ -40,9 +41,7 @@
         <% @primary_users[@primary_users.keys.first].each do |student| %>
           <tr class="user" id="user_<%= student.id %>">
             <td style="vertical-align: top;">
-              <% if service_enabled?(:avatars) %>
-                <div class="avatar"><%= avatar(student, @context.asset_string, 30) %></div>
-              <% end %>
+              <%= avatar(student, context_code: @context.asset_string, size: 30) %>
             </td>
             <td>
               <div><a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a></div>
@@ -50,7 +49,7 @@
                 <div class="more_info">
                   <div class="short_name"><%= student.short_name %></div>
                   <div class="email"><%= student.email %></div>
-                  <% if @enrollments_hash %> 
+                  <% if @enrollments_hash %>
                     <% @enrollments_hash[student.id].each do |e| %>
                       <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
                     <% end %>
@@ -72,9 +71,7 @@
         <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
           <tr class="user" id="user_<%= teacher.id %>">
             <td style="vertical-align: top;">
-              <% if service_enabled?(:avatars) %>
-                <div class="avatar"><%= avatar(teacher, @context.asset_string, 30) %></div>
-              <% end %>
+              <%= avatar(teacher, context_code: @context.asset_string, size: 30) %>
             </td>
             <td>
               <div><a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a></div>
@@ -82,7 +79,7 @@
                 <div class="more_info">
                   <div class="short_name"><%= teacher.short_name %></div>
                   <div class="email"><%= teacher.email %></div>
-                  <% if @enrollments_hash %> 
+                  <% if @enrollments_hash %>
                     <% @enrollments_hash[teacher.id].each do |e| %>
                       <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
                     <% end %>

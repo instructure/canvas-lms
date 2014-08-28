@@ -1,4 +1,4 @@
-<div class="discussion-content">
+<div class="discussion-content" id="{{id}}_discussion_content">
   <div class="discussion-row{{#if ENV.permissions.publish}} {{#if published}}discussion-published{{else}}discussion-unpublished{{/if}}{{/if}}">
     {{#if permissions.moderate}}
       <div class="draggable-handle">
@@ -8,21 +8,40 @@
 
     <div class="discussion-type">
       {{#if assignment}}
+        {{#if assignment.peer_reviews}}
+          <i class="icon-peer-review" aria-hidden="true"></i>
+        {{/if}}
         <i class="icon-assignment" aria-hidden="true"></i>
-        <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion{{/t}}</span>
       {{/if}}
     </div>
 
     <div class="discussion-title">
-      <a href="{{html_url}}" class="title">{{title}}</a>
-      <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      <div role="heading" aria-level="3">
+        {{#if assignment}}
+          <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
+        {{/if}}
+        <a href="{{html_url}}" class="title">{{title}}</a>
+      </div>
+      <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+    </div>
+
+    <div class="discussion-date-available">
+      {{#with defaultDates}}
+        {{#unless closed}}
+          {{>[assignments/available_date_description]}}
+        {{/unless}}
+      {{/with}}
     </div>
 
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}
-        <span class="discussion-date-type">{{#t "due"}}Due{{/t}}</span>
-        {{datetimeFormatted assignment.due_at}}
+          <span class="discussion-date-type">
+            {{#t "due"}}Due{{/t}}
+          </span>
+          <span {{ contextSensitiveDatetimeTitle assignment.due_at }}>
+            {{datetimeFormatted assignment.due_at}}
+          </span>
         {{else}}
           {{#t "no_due_date"}}No Due Date{{/t}}
         {{/if}}
@@ -46,24 +65,30 @@
       <div class="new-and-total-badge pull-right">
         <span class="new-items"
               title="{{unread_count_tooltip}}"
-              aria-label="{{unread_count_tooltip}}"
+              aria-hidden="true"
               data-tooltip>
           {{unread_count}}
+        </span>
+        <span class="screenreader-only">
+          {{unread_count_tooltip}}
         </span>
 
         <div class="total-items"
              title="{{reply_count_tooltip}}"
-             aria-label="{{reply_count_tooltip}}"
+             aria-hidden="true"
              data-tooltip>
           {{discussion_subentry_count}}
+        </div>
+        <div class="screenreader-only">
+          {{reply_count_tooltip}}
         </div>
       </div>
     </div>
 
 
-    <div class="discussion-actions">
+    <div class="discussion-actions" role="application">
       {{#if permissions.delete}}
-        <a href="#" class="al-trigger">
+        <a href="#" class="al-trigger" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
         </a>
@@ -91,6 +116,13 @@
                 {{/if}}
               </a>
             </li>
+            {{#if pinned}}
+              <li>
+                <a href="#"
+                  class="move_item icon-updown"
+                >{{#t "move"}}Move To&hellip;{{/t}}</a>
+              </li>
+            {{/if}}
           {{/if}}
         </ul>
       {{/if}}

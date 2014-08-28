@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-class TestCourseApi
+class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
   def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
@@ -28,8 +28,8 @@ class TestCourseApi
 end
 
 describe Api::V1::DiscussionTopics do
-  before do
-    @test_api = TestCourseApi.new
+  before :once do
+    @test_api = DiscussionTopicsTestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     student_in_course(:active_all => true, :course => @course)
@@ -67,39 +67,40 @@ describe Api::V1::DiscussionTopics do
     @topic.assignment = assignment_model(:course => @course)
     @topic.save!
 
-    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, true)
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, include_assignment: true)
     data[:assignment].should_not be_nil
   end
 end
 
-describe DiscussionTopicsController, :type => :integration do
+describe DiscussionTopicsController, type: :request do
   include Api::V1::User
 
   context 'locked api item' do
+    include_examples 'a locked api item'
+
     let(:item_type) { 'discussion_topic' }
 
-    let(:locked_item) do
+    let_once(:locked_item) do
       @course.discussion_topics.create!(:user => @user, :message => 'Locked Discussion')
     end
 
     def api_get_json
+      @course.clear_permissions_cache(@user)
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",
         {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s},
       )
     end
-
-    it_should_behave_like 'a locked api item'
   end
 
-  before(:each) do
+  before(:once) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
   # needed for user_display_json
   def avatar_url_for_user(user, *a)
-    "http://www.example.com/images/messages/avatar-50.png"
+    User.avatar_fallback_url
   end
   def blank_fallback
     nil
@@ -162,7 +163,7 @@ describe DiscussionTopicsController, :type => :integration do
       lock_at = 2.months.from_now
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", 
+               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded",
                  :delayed_post_at => post_at.as_json, :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
       @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
@@ -240,10 +241,13 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "With item" do
-    before do
+    before :once do
       @attachment = create_attachment(@course)
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
       @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+    end
+
+    before :each do
       @response_json =
                  {"read_state"=>"read",
                   "unread_count"=>0,
@@ -290,7 +294,10 @@ describe DiscussionTopicsController, :type => :integration do
                   "locked"=>false,
                   "locked_for_user"=>false,
                   "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
-                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true }}
+                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true },
+                  "group_category_id" => nil,
+                  "can_group" => true,
+      }
     end
 
     describe "GET 'index'" do
@@ -357,9 +364,9 @@ describe DiscussionTopicsController, :type => :integration do
         end
         [@sub, @topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
-        
+
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                           :per_page => '10', :scope => 'unlocked'})
         json.size.should == 1
         links = response.headers['Link'].split(',')
@@ -368,7 +375,7 @@ describe DiscussionTopicsController, :type => :integration do
         end
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                           :per_page => '10', :scope => 'locked'})
         json.size.should == 3
         links = response.headers['Link'].split(',')
@@ -391,7 +398,7 @@ describe DiscussionTopicsController, :type => :integration do
                          :per_page => '10', :scope => 'locked,unpinned'})
         json.size.should == 2
       end
-      
+
       it "should include all parameters in pagination urls" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
@@ -399,7 +406,7 @@ describe DiscussionTopicsController, :type => :integration do
           topic.type = 'Announcement'
           topic.save!
         end
-        
+
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=2&only_announcements=true&order_by=recent_activity&scope=unlocked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                           :per_page => '2', :order_by => 'recent_activity', :only_announcements => 'true', :scope => 'unlocked'})
@@ -421,6 +428,45 @@ describe DiscussionTopicsController, :type => :integration do
         # get rid of random characters in podcast url
         json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
         json.should == @response_json.merge("subscribed" => @topic.subscribed?(@user))
+      end
+
+      it "should properly translate a video media comment in the discussion topic's message" do
+        @topic.update_attributes(
+          message: '<p><a id="media_comment_m-spHRwKY5ATHvPQAMKdZV_g" class="instructure_inline_media_comment video_comment" href="/media_objects/m-spHRwKY5ATHvPQAMKdZV_g">this is a media comment</a></p>'
+        )
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+        video_tag = Nokogiri::XML(json["message"]).css("p video").first
+        video_tag["poster"].should == "http://www.example.com/media_objects/m-spHRwKY5ATHvPQAMKdZV_g/thumbnail?height=448&type=3&width=550"
+        video_tag["data-media_comment_type"].should == "video"
+        video_tag["preload"].should == "none"
+        video_tag["class"].should == "instructure_inline_media_comment"
+        video_tag["data-media_comment_id"].should == "m-spHRwKY5ATHvPQAMKdZV_g"
+        video_tag["controls"].should == "controls"
+        video_tag["src"].should == "http://www.example.com/courses/#{@course.id}/media_download?entryId=m-spHRwKY5ATHvPQAMKdZV_g&media_type=video&redirect=1"
+        video_tag.inner_text.should == "this is a media comment"
+
+      end
+
+      it "should properly translate a audio media comment in the discussion topic's message" do
+        @topic.update_attributes(
+          message: '<p><a id="media_comment_m-QgvagKCQATEtJAAMKdZV_g" class="instructure_inline_media_comment audio_comment"></a>this is a media comment</p>'
+        )
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+        message = Nokogiri::XML(json["message"])
+        audio_tag = message.css("p audio").first
+        audio_tag["data-media_comment_type"].should == "audio"
+        audio_tag["preload"].should == "none"
+        audio_tag["class"].should == "instructure_inline_media_comment"
+        audio_tag["data-media_comment_id"].should == "m-QgvagKCQATEtJAAMKdZV_g"
+        audio_tag["controls"].should == "controls"
+        audio_tag["src"].should == "http://www.example.com/courses/#{@course.id}/media_download?entryId=m-QgvagKCQATEtJAAMKdZV_g&media_type=audio&redirect=1"
+        message.css("p").inner_text.should == "this is a media comment"
       end
     end
 
@@ -679,6 +725,66 @@ describe DiscussionTopicsController, :type => :integration do
         @assignment.should be_deleted
       end
 
+      it "should update due dates with cache enabled" do
+        old_due_date = 1.day.ago
+        @assignment = @topic.context.assignments.build
+        @assignment.due_at = old_due_date
+        @topic.assignment = @assignment
+        @topic.save!
+        @topic.assignment.should be_present
+
+        new_due_date = 2.days.ago
+        enable_cache do
+          Timecop.freeze do
+            api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                     { :assignment => { :due_at => new_due_date.iso8601} })
+            @topic.reload
+          end
+          @topic.assignment.overridden_for(@user).due_at.iso8601.should == new_due_date.iso8601
+        end
+      end
+
+      it "should update due dates with cache enabled and overrides already present" do
+        old_due_date = 1.day.ago
+        @assignment = @topic.context.assignments.build
+        @assignment.due_at = old_due_date
+        @topic.assignment = @assignment
+        @topic.save!
+        @topic.assignment.should be_present
+
+        lock_at_date = 1.day.from_now
+        assignment_override_model(:assignment => @assignment, :lock_at => lock_at_date)
+        @override.set = @course.default_section
+        @override.save!
+
+        new_due_date = 2.days.ago
+        enable_cache do
+          Timecop.freeze do
+            api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                     { :assignment => { :due_at => new_due_date.iso8601} })
+            @topic.reload
+          end
+          @topic.assignment.overridden_for(@user).due_at.iso8601.should == new_due_date.iso8601
+        end
+      end
+
+      it "should transfer assignment group category to the discussion" do
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        group.add_user(@user)
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :group_category_id => group_category.id } })
+        @topic.reload
+
+        @topic.title.should == "Topic 1"
+        @topic.group_category.should == group_category
+        @topic.assignment.should be_present
+        @topic.assignment.group_category.should be_nil
+      end
+
       it "should allow pinning a topic" do
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
@@ -853,7 +959,9 @@ describe DiscussionTopicsController, :type => :integration do
       "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
       "locked" => false,
       "locked_for_user" => false,
-      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!
+      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
+      "group_category_id" => nil,
+      "can_group" => true,
     }
     json.should == expected
   end
@@ -892,7 +1000,7 @@ describe DiscussionTopicsController, :type => :integration do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -911,7 +1019,7 @@ describe DiscussionTopicsController, :type => :integration do
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -926,7 +1034,7 @@ describe DiscussionTopicsController, :type => :integration do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
                  { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -934,7 +1042,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "creating an entry under a topic" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
       @message = "my message"
     end
@@ -987,8 +1095,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     it "should allow including attachments on top-level entries" do
-      data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../../fixtures/scribd_docs/txt.txt"), "text/plain", true)
-      require 'action_controller_test_process'
+      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
@@ -1001,8 +1108,7 @@ describe DiscussionTopicsController, :type => :integration do
 
     it "should include attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, :message => 'top-level message')
-      require 'action_controller_test_process'
-      data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../../fixtures/scribd_docs/txt.txt"), "text/plain", true)
+      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
@@ -1014,8 +1120,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     it "should include attachment info in the json response" do
-      data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../../fixtures/scribd_docs/txt.txt"), "text/plain", true)
-      require 'action_controller_test_process'
+      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
@@ -1066,7 +1171,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "listing top-level discussion entries" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @attachment = create_attachment(@course)
       @entry = create_entry(@topic, :message => "first top-level entry", :attachment => @attachment)
@@ -1182,7 +1287,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "listing replies" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
       @reply = create_reply(@entry, :message => "first reply")
@@ -1256,7 +1361,7 @@ describe DiscussionTopicsController, :type => :integration do
 
   # stolen and adjusted from spec/controllers/discussion_topics_controller_spec.rb
   context "require initial post" do
-    before(:each) do
+    before(:once) do
       course_with_student(:active_all => true)
 
       @observer = user(:name => "Observer", :active_all => true)
@@ -1289,7 +1394,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     describe "student" do
-      before(:each) do
+      before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum dolor')
         @user = @student
         @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -1320,7 +1425,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     describe "observer" do
-      before(:each) do
+      before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum')
         @user = @observer
         @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
@@ -1345,7 +1450,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "update entry" do
-    before do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "<p>top-level entry</p>")
     end
@@ -1393,7 +1498,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "delete entry" do
-    before do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
     end
@@ -1455,7 +1560,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "read/unread state" do
-    before(:each) do
+    before(:once) do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
       @reply = create_reply(@entry, :message => "first reply")
@@ -1517,13 +1622,13 @@ describe DiscussionTopicsController, :type => :integration do
     it "should set the read state for a topic" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_unread(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
       @topic.unread_count(@user).should == 2
@@ -1532,13 +1637,13 @@ describe DiscussionTopicsController, :type => :integration do
     it "should be idempotent for setting topic read state" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
@@ -1559,19 +1664,19 @@ describe DiscussionTopicsController, :type => :integration do
     it "should set the read state for a entry" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should_not be_forced_read_state
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_unread(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_false
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 2
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 1
@@ -1580,12 +1685,12 @@ describe DiscussionTopicsController, :type => :integration do
     it "should be idempotent for setting entry read state" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
     end
@@ -1607,7 +1712,7 @@ describe DiscussionTopicsController, :type => :integration do
       @entry.change_read_state('read', @user, :forced => true)
 
       call_mark_all_as_read_state('read')
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
 
@@ -1624,7 +1729,7 @@ describe DiscussionTopicsController, :type => :integration do
       [@topic, @entry].each { |e| e.change_read_state('read', @user) }
 
       call_mark_all_as_read_state('unread', :forced => true)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
 
@@ -1639,7 +1744,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   context "subscribing" do
-    before do
+    before :once do
       student_in_course(:active_all => true)
       @topic1 = create_topic(@course, :user => @student)
       @topic2 = create_topic(@course, :user => @teacher, :require_initial_post => true)
@@ -1649,14 +1754,12 @@ describe DiscussionTopicsController, :type => :integration do
       @user = user
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     def call_unsubscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     it "should allow subscription" do
@@ -1733,7 +1836,7 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   describe "threaded discussions" do
-    before do
+    before :once do
       student_in_course(:active_all => true)
       @topic = create_topic(@course, :threaded => true)
       @entry = create_entry(@topic)
@@ -1850,8 +1953,8 @@ describe DiscussionTopicsController, :type => :integration do
       json['unread_entries'].sort.should == (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       json['participants'].sort_by { |h| h['id'] }.should == [
-        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url, "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url, "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h['id'] }
 
       reply_reply1_attachment_json = {
@@ -1898,7 +2001,25 @@ describe DiscussionTopicsController, :type => :integration do
       v0_r1 = v0['replies'][1]
       v0_r1['id'].should         == @reply2.id
       v0_r1['user_id'].should    == @teacher.id
-      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\" data-api-endpoint=\"http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}\" data-api-returntype=\"File\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
+
+      message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
+
+      a_tag = message.css("p a").first
+      a_tag["href"].should == "http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
+      a_tag["data-api-endpoint"].should == "http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}"
+      a_tag["data-api-returntype"].should == "File"
+      a_tag.inner_text.should == "This is a file link"
+
+      video_tag = message.css("p video").first
+      video_tag["poster"].should == "http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
+      video_tag["data-media_comment_type"].should == "video"
+      video_tag["preload"].should == "none"
+      video_tag["class"].should == "instructure_inline_media_comment"
+      video_tag["data-media_comment_id"].should == "0_abcde"
+      video_tag["controls"].should == "controls"
+      video_tag["src"].should == "http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+      video_tag.inner_text.should == "link"
+
       v0_r1['parent_id'].should  == @root1.id
       v0_r1['created_at'].should == @reply2.created_at.as_json
       v0_r1['updated_at'].should == @reply2.updated_at.as_json
@@ -1984,87 +2105,32 @@ describe DiscussionTopicsController, :type => :integration do
     end
   end
 
-  context "collection items" do
-    before(:each) do
-      @collection = @user.collections.create!(:name => 'test1', :visibility => 'private')
-      @item = collection_item_model(:user_comment => "item 1", :user => @collection.context, :collection => @collection, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
-    end
+  it "returns due dates as they apply to the user" do
+    course_with_student(:active_all => true)
+    @user = @student
+    @student.enrollments.map(&:destroy!)
+    @section = @course.course_sections.create! :name => "afternoon delight"
+    @course.enroll_user(@student,'StudentEnrollment',
+                        :section => @section,
+                        :enrollment_state => :active)
 
-    it "should return a discussion topic for an item" do
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "show", :topic_id => "self"})
-      json["discussion_subentry_count"].should == 0
-      json["posted_at"].should be_nil
-    end
+    @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+    @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :due_at => 1.day.from_now)
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save
 
-    it "should return an empty discussion view for an item" do
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/view",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "view", :topic_id => "self"})
-      json.should == { "participants" => [], "unread_entries" => [], "forced_entries" => [], "view" => [], "new_entries" => [] }
-      @item.discussion_topic.should be_new_record
-    end
+    override = @assignment.assignment_overrides.build
+    override.set = @section
+    override.title = "extension"
+    override.due_at = 2.day.from_now
+    override.due_at_overridden = true
+    override.save!
 
-    it "should create a discussion topic when someone attempts to comment" do
-      message = "oh that is awesome"
-      json = nil
-      expect {
-        json = api_call(
-          :post, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries.json",
-          { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-            :collection_item_id => @item.id.to_s, :topic_id => "self" },
-          { :message => message })
-      }.to change(DiscussionTopic, :count).by(1)
-      json.should_not be_nil
-      json['id'].should_not be_nil
-      @entry = DiscussionEntry.find_by_id(json['id'])
-      @entry.should_not be_nil
-      @entry.message.should == message
-      @entry.user.should == @user
-      @entry.parent_entry.should be_nil
-    end
-
-    it "should return a discussion's details for a collection item after there are posts" do
-      @topic = @item.discussion_topic
-      @topic.save!
-      @entry1 = create_entry(@topic, :message => "loved it")
-      @entry2 = create_entry(@topic, :message => "ditto")
-      @topic.create_materialized_view
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/view",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "view", :topic_id => "self"})
-      json['participants'].length.should == 1
-      json['unread_entries'].length.should == 0
-      json['new_entries'].length.should == 0
-      json['view'].should == [{
-          "created_at" => @entry1.created_at.as_json,
-          "updated_at" => @entry1.updated_at.as_json,
-          "id" => @entry1.id,
-          "user_id" => @user.id,
-          "parent_id" => nil,
-          "message" => "loved it"
-        }, {
-          "created_at" => @entry2.created_at.as_json,
-          "updated_at" => @entry2.updated_at.as_json,
-          "id" => @entry2.id,
-          "user_id" => @user.id,
-          "parent_id" => nil,
-          "message" => "ditto"
-      }]
-    end
-
-    it "should mark entries as read on a collection item" do
-      Collection.where(:id => @collection).update_all(:visibility => 'public')
-      @collection.reload
-      topic = @item.discussion_topic
-      topic.save!
-      entry = create_entry(topic, :message => "loved it")
-
-      student_in_course(:course => @course, :user => user_with_pseudonym)
-      entry.read?(@user).should be_false
-      json = raw_api_call(:put, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries/#{entry.id}/read.json",
-                { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
-                  :collection_item_id => @item.id.to_s, :topic_id => "self", :entry_id => entry.id.to_s })
-      entry.reload.read?(@user).should be_true
-    end
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+              { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    json['assignment'].should_not be_nil
+    json['assignment']['due_at'].should == override.due_at.iso8601.to_s
   end
 end
 

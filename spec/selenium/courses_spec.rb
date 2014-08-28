@@ -19,6 +19,63 @@ describe "courses" do
       account.save!
     end
 
+    context 'draft state' do
+
+      before(:each) do
+        course_with_teacher_logged_in({draft_state: true})
+      end
+
+      def validate_action_button(postion, validation_text)
+        action_button = ff('#course_status_actions button').send(postion)
+        action_button.should have_class('disabled')
+        action_button.text.should == validation_text
+      end
+
+      it "should allow publishing of the course through the course status actions" do
+        @course.workflow_state = 'claimed'
+        @course.save!
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        f('.publish_course_in_wizard_link').should be_displayed
+        course_status_buttons.first.should have_class('disabled')
+        course_status_buttons.first.text.should == 'Unpublished'
+        course_status_buttons.last.should_not have_class('disabled')
+        course_status_buttons.last.text.should == 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
+        f('.publish_course_in_wizard_link').should be_nil
+        validate_action_button(:last, 'Published')
+      end
+
+      it "should allow unpublishing of a course through the course status actions" do
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        f('.publish_course_in_wizard_link').should be_nil
+        course_status_buttons.first.should_not have_class('disabled')
+        course_status_buttons.first.text.should == 'Unpublish'
+        course_status_buttons.last.should have_class('disabled')
+        course_status_buttons.last.text.should == 'Published'
+        expect_new_page_load { course_status_buttons.first.click }
+        f('.publish_course_in_wizard_link').should be_displayed
+        validate_action_button(:first, 'Unpublished')
+      end
+
+      it "should not show course status if graded submissions exist" do
+        course_with_student_submissions({submission_points: true, draft_state: true})
+        get "/courses/#{@course.id}"
+        f('#course_status').should be_nil
+      end
+
+      it "should allow unpublishing of the course if submissions have no score or grade" do
+        course_with_student_submissions({draft_state: true})
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        expect_new_page_load { course_status_buttons.first.click }
+        assert_flash_notice_message('successfully updated')
+        validate_action_button(:first, 'Unpublished')
+      end
+
+    end
+
     it "should properly hide the wizard and remember its hidden state" do
       course_with_teacher_logged_in
 
@@ -210,6 +267,75 @@ describe "courses" do
         roles_to_sections[role_name].should == sections.first.text
       end
     end
+
+    context "course_home_sub_navigation lti apps" do
+      def create_course_home_sub_navigation_tool(options = {})
+        @course.root_account.enable_feature!(:lor_for_account)
+        defaults = {
+          name: options[:name] || "external tool",
+          consumer_key: 'test',
+          shared_secret: 'asdf',
+          url: 'http://example.com/ims/lti',
+          course_home_sub_navigation: { icon_url: '/images/delete.png' },
+        }
+        @course.context_external_tools.create!(defaults.merge(options))
+      end
+
+      it "should display course_home_sub_navigation lti apps (draft state off)" do
+        course_with_teacher_logged_in(active_all: true)
+        num_tools = 3
+        num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == num_tools
+      end
+
+      it "should display course_home_sub_navigation lti apps (draft state on)" do
+        course_with_teacher_logged_in(active_all: true)
+        @course.account.enable_feature!(:draft_state)
+        num_tools = 2
+        num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == num_tools
+      end
+
+      it "should include launch type parameter (draft state off)" do
+        course_with_teacher_logged_in(active_all: true)
+        create_course_home_sub_navigation_tool
+        get "/courses/#{@course.id}"
+        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+      end
+
+      it "should include launch type parameter (draft state on)" do
+        course_with_teacher_logged_in(active_all: true)
+        @course.account.enable_feature!(:draft_state)
+        create_course_home_sub_navigation_tool
+        get "/courses/#{@course.id}"
+        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+      end
+
+      it "should only display active tools" do
+        course_with_teacher_logged_in(active_all: true)
+        tool = create_course_home_sub_navigation_tool
+        tool.workflow_state = 'deleted'
+        tool.save!
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 0
+      end
+
+      it "should not display admin tools to students" do
+        course_with_teacher_logged_in(active_all: true)
+        tool = create_course_home_sub_navigation_tool
+        tool.course_home_sub_navigation['visibility'] = 'admins'
+        tool.save!
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 1
+
+        course_with_student_logged_in(course: @course, active_all: true)
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 0
+      end
+    end
+
   end
 
   context "course as a student" do
@@ -245,11 +371,6 @@ describe "courses" do
       get "/courses/#{@course.id}"
       f(".global-message .btn[name=reject]").click
       assert_flash_notice_message /Invitation canceled./
-    end
-
-    it "should validate that a user cannot see a course they are not enrolled in" do
-      login_as(@student.name)
-      f('#menu').should_not include_text('Courses')
     end
 
     it "should display user groups on courses page" do

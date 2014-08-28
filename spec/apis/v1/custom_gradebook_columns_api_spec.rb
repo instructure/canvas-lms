@@ -18,18 +18,18 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CustomGradebookColumnsApiController, :type => :integration do
+describe CustomGradebookColumnsApiController, type: :request do
   include Api
   include Api::V1::CustomGradebookColumn
 
-  before do
+  before :once do
     course_with_teacher active_all: true
     student_in_course active_all: true
     @user = @teacher
   end
 
   describe 'index' do
-    before do
+    before :once do
       @cols = 2.times.map { |i|
         @course.custom_gradebook_columns.create! title: "Col #{i+1}",
                                                  position: i
@@ -49,7 +49,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
         course_id: @course.to_param, action: "index",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     it 'should return the custom columns' do
@@ -88,7 +88,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
         course_id: @course.to_param, action: "create",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'creates a column' do
@@ -103,7 +103,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
   end
 
   describe 'update' do
-    before { @col = @course.custom_gradebook_columns.create! title: "Foo" }
+    before(:once) { @col = @course.custom_gradebook_columns.create! title: "Foo" }
 
     it 'checks permissions' do
       @user = @student
@@ -112,7 +112,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         {course_id: @course.to_param, id: @col.to_param, action: "update",
          controller: "custom_gradebook_columns_api", format: "json"},
         "column[title]" => "Bar"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       @col.reload.title.should == "Foo"
     end
 
@@ -129,7 +129,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
   end
 
   describe 'delete' do
-    before do
+    before :once do
       @col = @course.custom_gradebook_columns.create! title: "Foo"
     end
 
@@ -139,7 +139,7 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
         course_id: @course.to_param, id: @col.to_param, action: "destroy",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'works' do

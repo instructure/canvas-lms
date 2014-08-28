@@ -1,8 +1,13 @@
 define [
+  'underscore'
   'compiled/gradebook2/OutcomeGradebookGrid'
-], (Grid) ->
+  'helpers/fakeENV'
+  'i18n!gradebook2'
+], (_, Grid,fakeENV) ->
 
-  module 'OutcomeGradebookGrid'
+  module 'OutcomeGradebookGrid',
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test 'Grid.Math.mean', ->
     subject = [1,1,2,4,5]
@@ -28,3 +33,15 @@ define [
     ok Grid.View.masteryClassName(7, outcome) == 'mastery', 'returns "mastery" if above mastery score"'
     ok Grid.View.masteryClassName(3, outcome) == 'near-mastery', 'returns "near-mastery" if half of mastery score or greater'
     ok Grid.View.masteryClassName(1, outcome) == 'remedial', 'returns "remedial" if less than half of mastery score'
+
+  test 'Grid.Events.sort', ->
+    rows = [
+      { student: { sortable_name: 'Draper, Don'    }, outcome_1: 3 }
+      { student: { sortable_name: 'Olson, Peggy'   }, outcome_1: 4 }
+      { student: { sortable_name: 'Campbell, Pete' }, outcome_1: 3 }
+    ]
+    outcomeSort = rows.sort((a, b) -> Grid.Events._sortResults(a, b, true, 'outcome_1'))
+    userSort    = rows.sort((a, b) -> Grid.Events._sortStudents(a, b, true))
+    ok _.isEqual([3, 3, 4], _.pluck(outcomeSort, 'outcome_1')), 'sorts by result value'
+    ok _.map(outcomeSort, (r) -> r.student.sortable_name)[0] == 'Campbell, Pete', 'result sort falls back to sortable name'
+    ok _.isEqual(_.map(userSort, (r) -> r.student.sortable_name), ['Campbell, Pete', 'Draper, Don', 'Olson, Peggy']), 'sorts by student name'

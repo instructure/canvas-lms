@@ -42,7 +42,7 @@ module CC::Importer
       tools = []
 
       blti_resources.each do |res|
-        path = res[:href] || res[:files].first[:href]
+        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
         if File.exists?(path)
@@ -60,6 +60,7 @@ module CC::Importer
     
     def convert_blti_link(doc)
       blti = get_blti_namespace(doc)
+      blti = nil unless doc.namespaces["xmlns:#{blti}"]
       link_css_path = "cartridge_basiclti_link"
       tool = {}
       tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")

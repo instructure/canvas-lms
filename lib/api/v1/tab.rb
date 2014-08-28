@@ -21,24 +21,43 @@ module Api::V1::Tab
   include Api::V1::ExternalTools::UrlHelpers
 
   def tabs_available_json(tabs, user, session)
-    tabs.map do |tab|
-      tab_json(tab, user, session)
-    end
+    json = tabs.map { |tab| tab_json(tab.with_indifferent_access, user, session) }
+    json.sort!{|x,y| x[:position] <=> y[:position]}
   end
 
   def tab_json(tab, user, session)
     hash = {}
-    if tab[:args]
-      hash[:html_url] = send(tab[:href], *tab[:args])
-    elsif tab[:no_args]
-      hash[:html_url] = send(tab[:href])
-    else
-      hash[:html_url] = send(tab[:href], @context)
-    end
-    hash[:label] = tab[:label]
     hash[:id] = tab[:css_class]
+    hash[:html_url] = html_url(tab)
+    hash[:position] = tab[:position]
+    hash[:hidden] = true if tab[:hidden]
+    hash[:unused] = true if tab[:hidden_unused]
+    hash[:visibility] = visibility(tab, hash)
+    hash[:label] = tab[:label]
     hash[:type] = (tab[:external] && 'external') || 'internal'
     hash[:url] = sessionless_launch_url(@context, :id => tab[:args][1], :launch_type => 'course_navigation') if tab[:external] && tab[:args] && tab[:args].length > 1
     api_json(hash, user, session)
   end
+
+  def html_url(tab)
+    if tab[:args]
+      send(tab[:href], *tab[:args])
+    elsif tab[:no_args]
+      send(tab[:href])
+    else
+      send(tab[:href], @context)
+    end
+
+  end
+
+  def visibility(tab, hash)
+    if hash[:type] == 'external' && hash[:hidden]
+      'none'
+    elsif hash[:id] =='settings' || hash[:unused] || hash[:hidden]
+      'admins'
+    else
+      tab[:visibility] || 'public'
+    end
+  end
+
 end

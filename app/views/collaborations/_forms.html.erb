@@ -19,7 +19,7 @@
         <% end %>
       </select>
     </td>
-  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs %>">
+  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs_authorized %>">
     <td colspan="2" style="padding: 5px 20px 10px">
       <%= image_tag "google_docs_icon.png", :style => "float: right; margin-left: 15px;" %>
       <%= mt 'descriptions.google_docs', "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations." %>
@@ -92,10 +92,4 @@ HEREDOC
     <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 <% end %>
-<% js_block do %>
-<script>
-require(['INST'], function(INST) {
-  INST.collaboration_types = <%= raw Collaboration.collaboration_types.to_json %>;
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/collaborations_forms' %>

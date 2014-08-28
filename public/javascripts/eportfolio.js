@@ -228,6 +228,8 @@ define([
     $("#edit_page_form .switch_views_link").click(function(event) {
       event.preventDefault();
       $("#edit_page_content").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".switch_views_link").andSelf().toggle();
     });
     $("#edit_page_sidebar .add_content_link").click(function(event) {
       event.preventDefault();

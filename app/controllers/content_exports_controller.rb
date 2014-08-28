@@ -17,66 +17,70 @@
 #
 
 class ContentExportsController < ApplicationController
-  before_filter :require_context, :except => :xml_schema
+  before_filter :require_permission, :except => :xml_schema
   before_filter { |c| c.active_tab = "settings" }
 
-  def index
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+  def require_permission
+    get_context
+    @context ||= @current_user # if we're going through the dashboard
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
+  end
 
-    @exports = @context.content_exports.active.not_for_copy
+  def index
+    @exports = @context.content_exports_visible_to(@current_user).active.not_for_copy.order('created_at DESC')
+
     @current_export_id = nil
-    if export = @context.content_exports.running.first
+    if export = @context.content_exports_visible_to(@current_user).running.first
       @current_export_id = export.id
     end
   end
 
   def show
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-
-    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
       render_export(export)
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
     end
   end
 
   def create
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-
-    if @context.content_exports.running.count == 0
-      export = ContentExport.new
-      export.course = @context
+    export = @context.content_exports_visible_to(@current_user).running.first
+    unless export
+      export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
-      if params[:export_type] == 'qti'
-        export.export_type = ContentExport::QTI
-        export.selected_content = params[:copy]
-      else
-        export.export_type = ContentExport::COMMON_CARTRIDGE
-        export.selected_content = { :everything => true }
+
+      if @context.is_a?(Course)
+        if params[:export_type] == 'qti'
+          export.export_type = ContentExport::QTI
+          export.selected_content = params[:copy]
+        else
+          export.export_type = ContentExport::COMMON_CARTRIDGE
+          export.selected_content = { :everything => true }
+        end
+      elsif @context.is_a?(User)
+        export.export_type = ContentExport::USER_DATA
       end
+
       export.progress = 0
       if export.save
-        export.export_course
+        export.export
         render_export(export)
       else
-        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}
+        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create content export.")}
       end
     else
       # an export is already running, just return it
-      export = @context.content_exports.running.first
       render_export(export)
     end
   end
 
   def destroy
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-
-    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
       export.destroy
       render :json => {:success=>'true'}
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
     end
   end
 
@@ -85,7 +89,7 @@ class ContentExportsController < ApplicationController
       cancel_cache_buster
       send_file(filename, :type => 'text/xml', :disposition => 'inline')
     else
-      render :template => 'shared/errors/404_message', :status => :bad_request
+      render :template => 'shared/errors/404_message', :status => :not_found
     end
   end
 

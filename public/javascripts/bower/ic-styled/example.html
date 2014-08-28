@@ -1,0 +1,38 @@
+<!doctype html public "enemy">
+<title>ic-styled demo</title>
+
+<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/handlebars/handlebars.js"></script>
+<script src="bower_components/ember/ember.js"></script>
+<script src="main.js"></script>
+
+<script type="text/x-handlebars">
+  {{#x-foo}}foo{{/x-foo}}<br>
+  {{#x-foo}}foo{{/x-foo}}<br>
+  {{#x-bar}}bar{{/x-bar}}<br>
+</script>
+
+<script type="text/x-handlebars" id="components/x-foo-css">
+x-foo {
+  color: red;
+}
+</script>
+
+<script type="text/x-handlebars" id="components/x-bar-css">
+.x-bar {
+  color: blue;
+}
+</script>
+
+
+<script>
+App = Ember.Application.create();
+
+App.XFooComponent = Ember.Component.extend({
+  tagName: 'x-foo'
+});
+
+App.XBarComponent = Ember.Component.extend({
+  classNames: 'x-bar'
+});
+</script>

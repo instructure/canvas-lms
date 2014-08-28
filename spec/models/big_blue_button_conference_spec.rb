@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require_relative('web_conference_spec_helper')
 
 describe BigBlueButtonConference do
-  it_should_behave_like 'WebConference'
+  include_examples 'WebConference'
 
   context "big_blue_button" do
     before do

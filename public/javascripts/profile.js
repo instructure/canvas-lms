@@ -22,7 +22,7 @@ define([
   'compiled/models/Pseudonym',
   'compiled/util/AvatarWidget',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
+  'jquery.instructure_date_and_time' /* datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
@@ -174,6 +174,11 @@ define([
     }, function(data) {
     });
   });
+  $("#disable_inbox").change(function() {
+    $.ajaxJSON("/profile/toggle_disable_inbox", 'POST', {'user[disable_inbox]': $(this).prop('checked')}, function(data) {
+    }, function(data) {
+    });
+  });
   $(".delete_pseudonym_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".pseudonym").confirmDelete({
@@ -219,8 +224,8 @@ define([
       $("#no_approved_integrations").hide()
       $("#access_tokens_holder").show();
       var $token = $(".access_token.blank:first").clone(true).removeClass('blank');
-      data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
+      data.created = $.datetimeString(data.created_at) || "--";
+      data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', "never");
       data.used = "--";
       $token.fillTemplateData({
         data: data,
@@ -244,9 +249,9 @@ define([
     var $button = $(this);
     $button.text(I18n.t('buttons.regenerating_token', "Regenerating token...")).attr('disabled', true);
     $.ajaxJSON(url, 'PUT', {'access_token[regenerate]': '1'}, function(data) {
-      data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
-      data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
+      data.created = $.datetimeString(data.created_at) || "--";
+      data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', "never");
+      data.used = $.datetimeString(data.last_used_at) || "--";
       data.visible_token = data.visible_token || "protected";
       $dialog.fillTemplateData({data: data})
         .find(".full_token_warning").showIf(data.visible_token.length > 10);
@@ -281,9 +286,9 @@ define([
       tokenLoaded(token);
     } else {
       $.ajaxJSON(url, 'GET', {}, function(data) {
-        data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-        data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
-        data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
+        data.created = $.datetimeString(data.created_at) || "--";
+        data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', "never");
+        data.used = $.datetimeString(data.last_used_at) || "--";
         data.visible_token = data.visible_token || "protected";
         $token.data('token', data);
         tokenLoaded(data);

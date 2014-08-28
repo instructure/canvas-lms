@@ -19,6 +19,7 @@ module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::ExternalTools::UrlHelpers
+  include Api::V1::Locked
 
   MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
@@ -94,7 +95,9 @@ module Api::V1::ContextModule
     api_url = nil
     case content_tag.content_type
       # course context
-      when 'Assignment', 'WikiPage', 'DiscussionTopic', 'Quiz'
+      when *Quizzes::Quiz.class_names
+        api_url = api_v1_course_quiz_url(context_module.context, content_tag.content)
+      when 'Assignment', 'WikiPage', 'DiscussionTopic'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       # no context
       when 'Attachment'
@@ -102,17 +105,20 @@ module Api::V1::ContextModule
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
           api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
-        else
+        elsif content_tag.content
           api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+        else
+          api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
         end
     end
     hash['url'] = api_url if api_url
 
-    # add external_url, if applicable
-    hash['external_url'] = content_tag.url if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
-
-    # add new_tab, if applicable
-    hash['new_tab'] = content_tag.new_tab if content_tag.content_type == 'ContextExternalTool'
+    if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
+      # add external_url, if applicable
+      hash['external_url'] = content_tag.url
+      # add new_tab, if applicable
+      hash['new_tab'] = content_tag.new_tab
+    end
 
     # add completion requirements
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
@@ -146,6 +152,23 @@ module Api::V1::ContextModule
         details[attr] = val
       end
     end
+
+    item_type = case content_tag.content_type
+      when 'Quiz', 'Quizzes::Quiz'
+        'quiz'
+      when 'Assignment'
+        'assignment'
+      when 'DiscussionTopic'
+        'topic'
+      when 'Attachment'
+        'file'
+      when 'WikiPage'
+        'page'
+      else
+        ''
+    end
+    locked_json(details, item, current_user, item_type)
+
     details
   end
 end

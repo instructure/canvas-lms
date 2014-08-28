@@ -32,12 +32,12 @@ describe 'DataFixup::FilterPageViewUrlParams' do
   end
 
   describe "db" do
-    it_should_behave_like 'DataFixup::FilterPageViewUrlParams'
+    include_examples 'DataFixup::FilterPageViewUrlParams'
   end
 
   describe "cassandra" do
-    it_should_behave_like "cassandra page views"
-    it_should_behave_like 'DataFixup::FilterPageViewUrlParams'
+    include_examples "cassandra page views"
+    include_examples 'DataFixup::FilterPageViewUrlParams'
   end
 end
 

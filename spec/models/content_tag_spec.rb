@@ -20,10 +20,85 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
+
+  describe "::asset_workflow_state" do
+    context "respond_to?(:published?)" do
+      mock_asset = Class.new do
+        def initialize(opts={})
+          opts = {published: true, deleted: false}.merge(opts)
+          @published = opts[:published]
+          @deleted = opts[:deleted]
+        end
+
+        def published?; !!@published; end
+        def unpublished?; !@published; end
+        def deleted?; @deleted; end
+      end
+
+      it "returns 'deleted' for deleted assets" do
+        a = mock_asset.new(deleted: true)
+        ContentTag.asset_workflow_state(a).should == 'deleted'
+      end
+
+      it "returns 'active' for published assets" do
+        a = mock_asset.new(published: true)
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'unpublished' for unpublished assets" do
+        a = mock_asset.new(published: false)
+        ContentTag.asset_workflow_state(a).should == 'unpublished'
+      end
+    end
+
+    context "respond_to?(:workflow_state)" do
+      mock_asset = Class.new do
+        attr_reader :workflow_state
+        def initialize(workflow_state)
+          @workflow_state = workflow_state
+        end
+      end
+
+      it "returns 'active' for 'active' workflow_state" do
+        a = mock_asset.new('active')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'active' for 'available' workflow_state" do
+        a = mock_asset.new('available')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'active' for 'published' workflow_state" do
+        a = mock_asset.new('published')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'unpublished' for 'unpublished' workflow_state" do
+        a = mock_asset.new('unpublished')
+        ContentTag.asset_workflow_state(a).should == 'unpublished'
+      end
+
+      it "returns 'deleted' for 'deleted' workflow_state" do
+        a = mock_asset.new('deleted')
+        ContentTag.asset_workflow_state(a).should == 'deleted'
+      end
+
+      it "returns nil for other workflow_state" do
+        a = mock_asset.new('terrified')
+        ContentTag.asset_workflow_state(a).should == nil
+      end
+    end
+  end
   
   describe "#sync_workflow_state_to_asset?" do
     it "true when content_type is Quiz" do
       content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
+    it "true when content_type is Quizzes::Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
       content_tag.sync_workflow_state_to_asset?.should be_true
     end
 
@@ -35,6 +110,47 @@ describe ContentTag do
     it "true when content_type is WikiPage" do
       content_tag = ContentTag.new(:content_type => "WikiPage")
       content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
+    it "true when content_type is DiscussionTopic" do
+      ContentTag.new(content_type: "DiscussionTopic").should be_sync_workflow_state_to_asset
+    end
+  end
+
+  describe "#content_type_quiz?" do
+    it "true when content_type is Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag.content_type_quiz?.should be_true
+    end
+
+    it "true when content_type is Quizzes::Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag.content_type_quiz?.should be_true
+    end
+
+    it "false when content_type is not valid" do
+      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag.content_type_quiz?.should be_false
+    end
+  end
+
+  describe "#scoreable?" do
+    it "true when quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+
+      content_tag.scoreable?.should be_true
+    end
+
+    it "true when gradeable" do
+      content_tag = ContentTag.new(:content_type => "Assignment")
+
+      content_tag.scoreable?.should be_true
+    end
+
+    it "false when neither quiz nor gradeable" do
+      content_tag = ContentTag.new(:content_type => "DiscussionTopic")
+
+      content_tag.scoreable?.should be_false
     end
   end
 
@@ -293,6 +409,29 @@ describe ContentTag do
     @tag2.reload
     @tag2.workflow_state.should == 'unpublished'
   end
+
+  it "should publish content via publish!" do
+    Account.default.enable_feature!(:draft_state)
+    assignment_model
+    @assignment.unpublish!
+    @module = @course.context_modules.create!
+    @tag = @module.add_item(type: 'Assignment', id: @assignment.id)
+    @tag.workflow_state = 'active'
+    @tag.content.expects(:publish!).once
+    @tag.save!
+    @tag.update_asset_workflow_state!
+  end
+
+  it "should unpublish content via unpublish!" do
+    Account.default.enable_feature!(:draft_state)
+    quiz_model
+    @module = @course.context_modules.create!
+    @tag = @module.add_item(type: 'Quiz', id: @quiz.id)
+    @tag.workflow_state = 'unpublished'
+    @tag.content.expects(:unpublish!).once
+    @tag.save!
+    @tag.update_asset_workflow_state!
+  end
   
   it "should not rename tag if linked attachment is renamed" do
     course
@@ -317,11 +456,10 @@ describe ContentTag do
     tag.update_asset_name!
     
     att.reload
-    att.filename.should == 'important title.txt'
     att.display_name.should == 'important title.txt'
   end
 
-  it_should_behave_like "url validation tests"
+  include_examples "url validation tests"
   it "should check url validity" do
     quiz = course.quizzes.create!
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
@@ -360,4 +498,43 @@ describe ContentTag do
     @module.reload.updated_at.to_i.should == yesterday.to_i
   end
 
+  describe '.content_type' do
+    it 'returns the correct representation of a quiz' do
+      content_tag = ContentTag.create! content: quiz_model, context: course_model
+      content_tag.content_type.should == 'Quizzes::Quiz'
+
+      content_tag.content_type = 'Quiz'
+      content_tag.send(:save_without_callbacks)
+
+      ContentTag.find(content_tag.id).content_type.should == 'Quizzes::Quiz'
+    end
+
+    it 'returns the content type attribute if not a quiz' do
+      content_tag = ContentTag.create! content: assignment_model, context: course_model
+
+      content_tag.content_type.should == 'Assignment'
+    end
+  end
+
+  describe "destroy" do
+    it "updates completion requirements on its associated ContextModule" do
+      course_with_teacher(:active_all => true)
+
+      @module = @course.context_modules.create!(:name => "some module")
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @assignment2 = @course.assignments.create!(:title => "some assignment2")
+
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @tag2 = @module.add_item({:id => @assignment2.id, :type => 'assignment'})
+
+      @module.completion_requirements = [{id: @tag.id, type: 'must_submit'},
+                                         {id: @tag2.id, type: 'must_submit'}]
+
+      @module.save
+
+      @tag.destroy
+
+      @module.reload.completion_requirements.should == [{id: @tag2.id, type: 'must_submit'}]
+    end
+  end
 end

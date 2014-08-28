@@ -26,12 +26,12 @@ describe FacebookController do
   describe "get_facebook_user" do
     before do
       # avoid making actual requests
-      Facebook.stubs(:send_request => '', :send_graph_request => '')
+      Facebook::Connection.stubs(:send_graph_request => '')
     end
 
     def signed_request(data={})
       str = [data.to_json].pack('m').chomp.tr('+/', '-_')
-      sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha256'), Facebook.config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
+      sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha256'), Facebook::Connection.config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
       signed_request = [sig, str].join('.')
     end
 
@@ -47,6 +47,19 @@ describe FacebookController do
       UserService.create!(:user => @user, :service => 'facebook', :service_user_id => 'garbage')
       get 'index', :signed_request => signed_request
       assigns[:user].should be_nil
+    end
+  end
+
+  describe "#notification_preferences" do
+    it "should reset unmentioned preferences to default frequency" do
+      notification_model(category: 'TestWeekly')
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'abc', path_type: 'facebook')
+      p = cc.notification_policies.create!(notification: @notification, frequency: 'daily')
+      session[:facebook_canvas_user_id] = user.id
+      post 'notification_preferences', types: { }
+      response.should be_redirect
+      p.reload.frequency.should == 'weekly'
     end
   end
 end

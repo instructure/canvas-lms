@@ -1,12 +1,13 @@
 define [
   'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/views/DialogFormView'
   'jst/assignments/DeleteGroup'
   'jst/EmptyDialogFormWrapper'
   'jquery.disableWhileLoading'
-], (I18n, _, AssignmentGroup, DialogFormView, template, wrapper) ->
+], (I18n, $, _, AssignmentGroup, DialogFormView, template, wrapper) ->
 
   class DeleteGroupView extends DialogFormView
     defaults:

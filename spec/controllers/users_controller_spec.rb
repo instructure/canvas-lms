@@ -24,7 +24,7 @@ describe UsersController do
     before :each do
       @a = Account.default
       @u = user(:active_all => true)
-      @a.add_user(@u)
+      @a.account_users.create!(user: @u)
       user_session(@user)
       @t1 = @a.default_enrollment_term
       @t2 = @a.enrollment_terms.create!(:name => 'Term 2')
@@ -61,6 +61,53 @@ describe UsersController do
     end
   end
 
+  describe "GET oauth" do
+    it "sets up oauth for facebook" do
+      Facebook::Connection.config = Proc.new do
+        {}
+      end
+      CanvasSlug.stubs(:generate).returns("some_uuid")
+
+      user_with_pseudonym
+      user_session(@user)
+
+      OauthRequest.expects(:create).with(
+          :service => "facebook",
+          :secret => "some_uuid",
+          :return_url => "http://example.com",
+          :user => @user,
+          :original_host_with_port => "test.host"
+      ).returns(stub(global_id: "123"))
+      Facebook::Connection.expects(:authorize_url).returns("http://example.com/redirect")
+
+      get :oauth, {service: "facebook", return_to: "http://example.com"}
+
+      response.should redirect_to "http://example.com/redirect"
+    end
+  end
+
+  describe "GET oauth_success" do
+    it "handles facebook post oauth redirects" do
+
+      user_with_pseudonym
+      user_session(@user)
+
+
+      Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
+      mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
+      OauthRequest.expects(:find_by_id).with("123").returns(mock_oauth_request)
+      Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
+      UserService.any_instance.expects(:save) do |user_service|
+        user_service.id.should == "456"
+        user_service.name.should == "joe"
+        user_service.link.should == "some_link"
+      end
+
+      get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
+
+    end
+  end
+
   it "should not include deleted courses in manageable courses" do
     course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
     course1 = @course
@@ -79,14 +126,16 @@ describe UsersController do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
-      lambda { get 'delete', :user_id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        get 'delete', :user_id => (User.all.map(&:id).max + 1)
+      end
     end
 
     it "should fail when the current user doesn't have user manage permissions" do
       course_with_teacher_logged_in
       student_in_course :course => @course
       get 'delete', :user_id => @student.id
-      response.status.should =~ /401 Unauthorized/
+      assert_status(401)
     end
 
     it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
@@ -100,7 +149,7 @@ describe UsersController do
       managed_pseudonym @student
       get 'delete', :user_id => @student.id
       flash[:error].should =~ /cannot delete a system-generated user/
-      response.redirected_to.should == user_profile_url(@student)
+      response.should redirect_to(user_profile_url(@student))
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
@@ -119,7 +168,9 @@ describe UsersController do
       account_admin_user
       user_session(@admin)
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      lambda { post 'destroy', :id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        post 'destroy', :id => (User.all.map(&:id).max + 1)
+      end
     end
 
     it "should fail when the current user doesn't have user manage permissions" do
@@ -127,7 +178,7 @@ describe UsersController do
       student_in_course :course => @course
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.status.should =~ /401 Unauthorized/
+      assert_status(401)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -135,7 +186,7 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
@@ -143,7 +194,8 @@ describe UsersController do
       course_with_student_logged_in
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      lambda { post 'destroy', :id => @student.id }.should raise_error
+      post 'destroy', :id => @student.id
+      assert_status(500)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -154,7 +206,7 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == users_url
+      response.should redirect_to(users_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
@@ -164,7 +216,7 @@ describe UsersController do
       managed_pseudonym @admin
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @admin.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @admin.reload.workflow_state.should == 'deleted'
     end
 
@@ -172,7 +224,7 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
   end
@@ -199,7 +251,7 @@ describe UsersController do
 
         it "should not allow teachers to self register" do
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :user => { :name => 'Jane Teacher', :terms_of_use => '1', :initial_enrollment_type => 'teacher' }, :format => 'json'
-          response.status.should match /403 Forbidden/
+          assert_status(403)
         end
 
         it "should not allow students to self register" do
@@ -207,14 +259,21 @@ describe UsersController do
           @course.update_attribute(:self_enrollment, true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut', :password_confirmation => 'lolwut' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
-          response.status.should match /403 Forbidden/
+          assert_status(403)
         end
 
         it "should allow observers to self register" do
           user_with_pseudonym(:active_all => true, :password => 'lolwut')
+          course_with_student(:user => @user, :active_all => true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
           response.should be_success
+          new_pseudo = Pseudonym.find_by_unique_id('jane@example.com')
+          new_user = new_pseudo.user
+          new_user.observed_users.should == [@user]
+          oe = new_user.observer_enrollments.first
+          oe.course.should == @course
+          oe.associated_user.should == @user
         end
 
         it "should redirect 'new' action to root_url" do
@@ -241,7 +300,7 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         p = u.pseudonyms.create!(:unique_id => 'jacob@instructure.com')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
         Pseudonym.find_all_by_unique_id('jacob@instructure.com').should == [p]
@@ -287,7 +346,7 @@ describe UsersController do
 
       it "should validate acceptance of the terms" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["user"]["terms_of_use"].should be_present
       end
@@ -300,21 +359,21 @@ describe UsersController do
 
       it "should require email pseudonyms by default" do
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
       end
 
       it "should require email pseudonyms if not self enrolling" do
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }, :pseudonym_type => 'username'
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
       end
 
       it "should validate the self enrollment code" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["user"]["self_enrollment_code"].should be_present
       end
@@ -327,45 +386,44 @@ describe UsersController do
         u.pseudonym.should be_password_auto_generated
       end
 
-      it "should ignore the password if self enrolling with an email pseudonym" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
+      context "self enrollment" do
+        before(:once) do
+          course(:active_all => true)
+          @course.root_account.allow_self_enrollment!
+          @course.update_attribute(:self_enrollment, true)
+        end
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
-        response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
-        u.should be_pre_registered
-        u.pseudonym.should be_password_auto_generated
-      end
+        it "should ignore the password if self enrolling with an email pseudonym" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
+          response.should be_success
+          u = User.find_by_name 'Jacob Fugal'
+          u.should be_pre_registered
+          u.pseudonym.should be_password_auto_generated
+        end
 
-      it "should require a password if self enrolling with a non-email pseudonym" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
+        it "should require a password if self enrolling with a non-email pseudonym" do
+          post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+          assert_status(400)
+          json = JSON.parse(response.body)
+          json["errors"]["pseudonym"]["password"].should be_present
+          json["errors"]["pseudonym"]["password_confirmation"].should be_present
+        end
 
-        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
-        response.status.should =~ /400 Bad Request/
-        json = JSON.parse(response.body)
-        json["errors"]["pseudonym"]["password"].should be_present
-        json["errors"]["pseudonym"]["password_confirmation"].should be_present
-      end
-
-      it "should auto-register the user if self enrolling" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
-
-        post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
-        response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
-        @course.students.should include(u)
-        u.should be_registered
-        u.pseudonym.should_not be_password_auto_generated
+        it "should auto-register the user if self enrolling" do
+          post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+          response.should be_success
+          u = User.find_by_name 'Jacob Fugal'
+          @course.students.should include(u)
+          u.should be_registered
+          u.pseudonym.should_not be_password_auto_generated
+        end
       end
 
       it "should validate the observee's credentials" do
         user_with_pseudonym(:active_all => true, :password => 'lolwut')
 
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'not it' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["observee"]["unique_id"].should be_present
       end
@@ -389,7 +447,7 @@ describe UsersController do
 
         before do
           user_with_pseudonym(:account => account)
-          account.add_user(@user)
+          account.account_users.create!(user: @user)
           user_session(@user, @pseudonym)
         end
 
@@ -442,21 +500,18 @@ describe UsersController do
       end
 
       it "should notify the user if a merge opportunity arises" do
-        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
-
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
+        CommunicationChannel.any_instance.expects(:send_merge_notification!)
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
-        Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first.should_not be_nil
       end
 
       it "should not notify the user if the merge opportunity can't log in'" do
@@ -464,7 +519,7 @@ describe UsersController do
 
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
@@ -670,7 +725,7 @@ describe UsersController do
     end
 
     describe 'as site admin' do
-      before { Account.site_admin.add_user(@admin) }
+      before { Account.site_admin.account_users.create!(user: @admin) }
 
       it 'warns about merging a user with itself' do
         user = User.create!
@@ -698,7 +753,23 @@ describe UsersController do
     context "sharding" do
       specs_require_sharding
 
-      it "should include enrollments from all shards" do
+      it "should include enrollments from all shards for the actual user" do
+        course_with_teacher(:active_all => 1)
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+        end
+        account_admin_user(:user => @teacher)
+        user_session(@teacher)
+
+        get 'show', :id => @teacher.id
+        response.should be_success
+        assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
+      end
+
+      it "should include enrollments from all shards for trusted account admins" do
+        pending "granting read permissions to trusted accounts"
         course_with_teacher(:active_all => 1)
         @shard1.activate do
           account = Account.create!
@@ -706,12 +777,27 @@ describe UsersController do
           @e2 = course.enroll_teacher(@teacher)
         end
         account_admin_user
-        user_session(@admin)
+        user_session(@user)
 
         get 'show', :id => @teacher.id
         response.should be_success
         assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
       end
+    end
+
+    it "should not let admins see enrollments from other accounts" do
+      @enrollment1 = course_with_teacher(:active_all => 1)
+      @enrollment2 = course_with_teacher(:active_all => 1, :user => @user)
+
+      other_root_account = Account.create!(:name => 'other')
+      @enrollment3 = course_with_teacher(:active_all => 1, :user => @user, :account => other_root_account)
+
+      account_admin_user
+      user_session(@admin)
+
+      get 'show', :id => @teacher.id
+      response.should be_success
+      assigns[:enrollments].sort_by(&:id).should == [@enrollment1, @enrollment2]
     end
 
     it "should respond to JSON request" do
@@ -724,6 +810,141 @@ describe UsersController do
       response.should be_success
       user = json_parse
       user['name'].should == @student.name
+    end
+  end
+
+  describe "POST 'masquerade'" do
+    specs_require_sharding
+
+    it "should associate the user with target user's shard" do
+      PageView.stubs(:page_view_method).returns(:db)
+      user_with_pseudonym
+      admin = @user
+      Account.site_admin.account_users.create!(user: admin)
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should be_redirect
+
+        admin.associated_shards(:shadow).should be_include(@shard1)
+      end
+    end
+
+    it "should not associate the user with target user's shard if masquerading failed" do
+      PageView.stubs(:page_view_method).returns(:db)
+      user_with_pseudonym
+      admin = @user
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should_not be_redirect
+
+        admin.associated_shards(:shadow).should_not be_include(@shard1)
+      end
+    end
+
+    it "should not associate the user with target user's shard for non-db page views" do
+      user_with_pseudonym
+      admin = @user
+      Account.site_admin.account_users.create!(user: admin)
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should be_redirect
+
+        admin.associated_shards(:shadow).should_not be_include(@shard1)
+      end
+    end
+  end
+
+  describe "oauth_success" do
+    it "should use the access token to get user info" do
+
+      user_with_pseudonym
+      admin = @user
+      user_session(admin)
+
+      mock_oauth_request = stub(token: 'token', secret: 'secret', original_host_with_port: 'test.host', user: @user, return_url: '/')
+      OauthRequest.expects(:find_by_token_and_service).with('token', 'google_docs').returns(mock_oauth_request)
+
+      mock_access_token = stub(token: '123', secret: 'abc')
+      GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
+      mock_google_docs = stub()
+      GoogleDocs::Connection.expects(:new).with('token', 'secret').returns(mock_google_docs)
+      mock_google_docs.expects(:get_service_user_info).with(mock_access_token)
+
+      get 'oauth_success', {oauth_token: 'token', service: 'google_docs', oauth_verifier: 'oauth_verifier'}, {host_with_port: 'test.host'}
+    end
+  end
+
+  describe 'GET media_download' do
+    let(:kaltura_client) do
+      kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)
+      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
+      kaltura_client
+    end
+
+    let(:media_source_fetcher) {
+      media_source_fetcher = mock('MediaSourceFetcher').responds_like_instance_of(MediaSourceFetcher)
+      MediaSourceFetcher.expects(:new).with(kaltura_client).returns(media_source_fetcher)
+      media_source_fetcher
+    }
+
+    before do
+      account = Account.create!
+      course_with_student(:active_all => true, :account => account)
+      user_session(@student)
+    end
+
+    it 'should pass type and media_type params down to the media fetcher' do
+      media_source_fetcher.expects(:fetch_preferred_source_url).
+        with(media_id: 'someMediaId', file_extension: 'mp4', media_type: 'video').
+        returns('http://example.com/media.mp4')
+
+      get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4', media_type: 'video'
+    end
+
+    context 'when redirect is set to 1' do
+      it 'should redirect to the url' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns('http://example.com/media.mp4')
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4', redirect: '1'
+
+        response.should redirect_to 'http://example.com/media.mp4'
+      end
+    end
+
+    context 'when redirect does not equal 1' do
+      it 'should render the url in json' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns('http://example.com/media.mp4')
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4'
+
+        json_parse['url'].should == 'http://example.com/media.mp4'
+      end
+    end
+
+    context 'when asset is not found' do
+      it 'should render a 404 and error message' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns(nil)
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4'
+
+        response.code.should == '404'
+        response.body.should == 'Could not find download URL'
+      end
     end
   end
 end

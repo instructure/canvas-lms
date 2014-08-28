@@ -5,7 +5,7 @@ define [
 ], ($, gradebook_uploads_form) ->
 
   class UploadDialog
-    constructor: ({@context_url}) ->
+    constructor: (@context_url) ->
       @init()
 
     init: (opts={context_url: @context_url}) =>

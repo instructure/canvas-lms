@@ -1,16 +1,17 @@
-<% 
+<%
   content_for :page_title, @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
 
 <% if @locked && !@locked[:due_at] %>
-
-  <h2><%= @assignment.title %></h2>
+  <% js_bundle :module_sequence_footer %>
+    
+  <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
 <% else %>
 
-<% 
+<%
   jammit_css :assignments
   js_bundle :assignment_show
 %>
@@ -19,9 +20,9 @@
   <% if can_do(@assignment, @current_user, :update) %>
     <div class='assignment-title'>
       <div class='title-content'>
-        <h2 class="title">
+        <h1 class="title">
           <%= @assignment.title %>
-        </h2>
+        </h1>
       </div>
       <div class='edit-content'>
         <% if @context.feature_enabled?(:draft_state) %>
@@ -38,20 +39,24 @@
     </div>
   <% else %>
     <!--Student View-->
-    <h2 class="title">
+    <h1 class="title">
       <%= @assignment.title %>
-    </h2>
+    </h1>
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>
         <span class='value'>
-          <% if @assignment.due_at %>
-            <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
-              <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
-              <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
-          <% else %>
-            <%= t :no_due_date, 'No Due Date' %>
-          <% end %>
+          <span class="date_text">
+            <% if @assignment.multiple_due_dates? %>
+              <%= multiple_due_date_tooltip(@assignment, @current_user) %>
+            <% elsif @assignment.due_at %>
+              <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
+                <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
+                <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
+            <% else %>
+              <%= t :no_due_date, 'No Due Date' %>
+            <% end %>
+          </span>
         </span>
       </li>
       <li>
@@ -132,7 +137,7 @@
         </tr>
       </thead>
 
-      <%= render 'shared/override_list', :assignment => @assignment, 
+      <%= render 'shared/override_list', :assignment => @assignment,
         :user => @current_user %>
 
     </table>

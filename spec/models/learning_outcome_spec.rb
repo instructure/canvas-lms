@@ -20,9 +20,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcome do
   context "outcomes" do
-    it "should allow learning outcome rows in the rubric" do
+    before :once do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+    end
+
+    it "should allow learning outcome rows in the rubric" do
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -52,10 +55,8 @@ describe LearningOutcome do
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
     end
-    
+
     it "should delete learning outcome alignments when they no longer exist" do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -107,10 +108,8 @@ describe LearningOutcome do
       @rubric.reload
       @rubric.learning_outcome_alignments.active.should be_empty
     end
-    
+
     it "should create learning outcome associations for multiple outcome rows" do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
@@ -161,10 +160,8 @@ describe LearningOutcome do
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
-    
+
     it "should create outcome results when outcome-aligned rubrics are assessed" do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -242,10 +239,8 @@ describe LearningOutcome do
       @result.original_score.should eql(2.0)
       @result.mastery.should eql(true)
     end
-    
+
     it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
       @alignment.should_not be_nil
       @alignment.content.should eql(@assignment)
@@ -276,7 +271,7 @@ describe LearningOutcome do
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
-      
+
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
@@ -318,8 +313,6 @@ describe LearningOutcome do
     end
 
     it "should not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -346,7 +339,7 @@ describe LearningOutcome do
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
-      
+
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
@@ -387,7 +380,7 @@ describe LearningOutcome do
 
   describe "permissions" do
     context "global outcome" do
-      before :each do
+      before :once do
         @outcome = LearningOutcome.create!(:title => 'global outcome')
       end
 
@@ -404,6 +397,7 @@ describe LearningOutcome do
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(true)
         @outcome.grants_right?(@admin, :update).should be_true
+        @outcome.clear_permissions_cache(@admin)
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(false)
         @outcome.grants_right?(@admin, :update).should be_false
@@ -411,7 +405,7 @@ describe LearningOutcome do
     end
 
     context "non-global outcome" do
-      before :each do
+      before :once do
         course(:active_course => 1)
         @outcome = @course.created_learning_outcomes.create!(:title => 'non-global outcome')
       end

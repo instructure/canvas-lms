@@ -49,6 +49,7 @@ describe "group weights" do
       is_checked('#group_weighting_scheme').should be_true
     end
     group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
+    set_value(group_weight_input, "")
     set_value(group_weight_input, weight_number)
     fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
@@ -92,7 +93,7 @@ describe "group weights" do
   end
 
   it "should validate setting group weights" do
-    weight_numbers = [26.0, 73.5]
+    weight_numbers = [26.1, 73.5]
 
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
@@ -104,7 +105,7 @@ describe "group weights" do
     set_group_weight(group_1, weight_numbers[0])
     validate_group_weight(group_1, weight_numbers[0])
 
-    #set and check the group weight of the first assignment group
+    #set and check the group weight of the second assignment group
     set_group_weight(group_2, weight_numbers[1])
     validate_group_weight(group_2, weight_numbers[1])
 

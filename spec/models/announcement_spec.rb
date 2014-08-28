@@ -63,30 +63,33 @@ describe Announcement do
   end
   
   context "broadcast policy" do
-    it "should sanitize message" do
-      announcement_model
-      @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
-      @a.save!
-      @a.message.should eql("<a href=\"#\">only this should stay</a>")
-    end
-    
-    it "should sanitize objects in a message" do
-      announcement_model
-      @a.message = "<object data=\"http://www.youtube.com/test\"></object>"
-      @a.save!
-      dom = Nokogiri(@a.message)
-      dom.css('object').length.should eql(1)
-      dom.css('object')[0]['data'].should eql("http://www.youtube.com/test")
-    end
-    
-    it "should sanitize objects in a message" do
-      announcement_model
-      @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
-      @a.save!
-      dom = Nokogiri(@a.message)
-      dom.css('object').length.should eql(1)
-      dom.css('object')[0]['data'].should eql("http://www.youtuube.com/test")
-      dom.css('object')[0]['othertag'].should eql(nil)
+    context "sanitization" do
+      before :once do
+        announcement_model
+      end
+
+      it "should sanitize message" do
+        @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
+        @a.save!
+        @a.message.should eql("<a href=\"#\">only this should stay</a>")
+      end
+
+      it "should sanitize objects in a message" do
+        @a.message = "<object data=\"http://www.youtube.com/test\"></object>"
+        @a.save!
+        dom = Nokogiri(@a.message)
+        dom.css('object').length.should eql(1)
+        dom.css('object')[0]['data'].should eql("http://www.youtube.com/test")
+      end
+
+      it "should sanitize objects in a message" do
+        @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
+        @a.save!
+        dom = Nokogiri(@a.message)
+        dom.css('object').length.should eql(1)
+        dom.css('object')[0]['data'].should eql("http://www.youtuube.com/test")
+        dom.css('object')[0]['othertag'].should eql(nil)
+      end
     end
 
     it "should broadcast to students and observers" do

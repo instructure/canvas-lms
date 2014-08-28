@@ -54,8 +54,12 @@ module Canvas::Security
   
   def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest::Digest.new('sha1'), (encryption_key || self.encryption_key), str
+      OpenSSL::Digest.new('sha1'), (encryption_key || self.encryption_key), str
     )
+  end
+
+  def self.verify_hmac_sha1(hmac, str)
+    hmac == hmac_sha1(str)
   end
 
   def self.validate_encryption_key(overwrite = false)

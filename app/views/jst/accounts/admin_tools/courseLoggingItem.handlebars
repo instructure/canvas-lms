@@ -1,0 +1,28 @@
+<td>
+  {{tDateToString created_at "medium"}}
+</td>
+<td>
+  {{tTimeToString created_at "tiny"}}
+</td>
+<td>
+  {{#if user}}
+    {{user.name}}
+  {{else}}
+    {{#t "blank_placeholder"}}-{{/t}}
+  {{/if}}
+</td>
+<td>
+  {{event_type_present}}
+</td>
+<td>
+  {{event_source_present}}
+</td>
+<td class="courseLoggingDetails">
+  {{#ifEqual event_type 'corrupted'}}
+    &nbsp;
+  {{else}}
+    <a href="#" data-id="{{id}}">
+    {{#t "view_event_details"}}View Details{{/t}}
+    </a>
+  {{/ifEqual}}
+</td>

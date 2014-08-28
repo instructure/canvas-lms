@@ -25,9 +25,12 @@ class StreamItem < ActiveRecord::Base
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'AssignmentOverride', 'Assignment']
   belongs_to :asset, :polymorphic => true, :types => [
       :collaboration, :conversation, :discussion_entry,
-      :discussion_topic, :message, :submission, :web_conference]
+      :discussion_topic, :message, :submission, :web_conference, :assessment_request]
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Collaboration', 'Conversation', 'DiscussionEntry',
+      'DiscussionTopic', 'Message', 'Submission', 'WebConference', 'AssessmentRequest']
   validates_presence_of :asset_type, :data
 
   attr_accessible :context, :asset
@@ -44,11 +47,7 @@ class StreamItem < ActiveRecord::Base
     when 'DiscussionTopic', 'Announcement'
       root_discussion_entries = data.delete(:root_discussion_entries)
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
-      if CANVAS_RAILS2
-        res.root_discussion_entries.target = root_discussion_entries
-      else
-        res.association(:root_discussion_entries).target = root_discussion_entries
-      end
+      res.association(:root_discussion_entries).target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
       data['body'] = nil
@@ -56,11 +55,7 @@ class StreamItem < ActiveRecord::Base
     if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
-      if CANVAS_RAILS2
-        res.users.target = users
-      else
-        res.association(:users).target = users
-      end
+      res.association(:users).target = users
     end
     if data.has_key?('participants')
       users = data.delete('participants')
@@ -173,7 +168,7 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
-    when CollectionItem
+    when AssessmentRequest
       res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
@@ -240,6 +235,8 @@ class StreamItem < ActiveRecord::Base
       l_context_id = res.context_id
       stream_item_id = res.id
 
+      # do the bulk insert in user id order to avoid locking problems on postges < 9.3 (foreign keys)
+      user_ids_subset.sort!
       #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
       greatest_existing_id = StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).maximum(:id) || 0
 
@@ -337,7 +334,7 @@ class StreamItem < ActiveRecord::Base
     scope = scope.includes(:stream_item_instances) if touch_users
 
     while true
-      batch = scope.all
+      batch = scope.reload.all
       batch.each do |item|
         count += 1
         if touch_users
@@ -351,11 +348,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      if CANVAS_RAILS2
-        User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
-      else
-        User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
-      end
+      User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
     end
 
     count
@@ -395,7 +388,7 @@ class StreamItem < ActiveRecord::Base
           original_res = res
           res = original_res.clone
           res.id = original_res.id
-          res.root_discussion_entries = []
+          res.association(:root_discussion_entries).target = []
           res.user_has_posted = false
           res.readonly!
         end
@@ -408,12 +401,7 @@ class StreamItem < ActiveRecord::Base
   public
   def destroy_stream_item_instances
     self.stream_item_instances.with_each_shard do |scope|
-      if CANVAS_RAILS2
-        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-        scope.scoped.delete_all
-      else
-        scope.delete_all
-      end
+      scope.delete_all
       nil
     end
   end

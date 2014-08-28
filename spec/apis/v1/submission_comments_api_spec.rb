@@ -20,17 +20,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe 'Submissions Comment API', :type => :integration do
+describe 'Submissions Comment API', type: :request do
 
   describe '#create_file' do
-    before do
+    before :once do
       teacher_in_course active_all: true
       student_in_course active_all: true
       @assignment = @course.assignments.create! name: "blah",
         submission_types: "online_upload"
     end
 
-    it_should_behave_like "file uploads api"
+    include_examples "file uploads api"
     def has_query_exemption?; false; end
     def preflight(preflight_params)
       api_call :post,

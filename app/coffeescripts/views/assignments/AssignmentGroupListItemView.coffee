@@ -1,5 +1,6 @@
 define [
   'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/class/cache'
   'compiled/views/DraggableCollectionView'
@@ -11,7 +12,7 @@ define [
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
+], (I18n, $, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin
@@ -36,6 +37,7 @@ define [
 
     events:
       'click .element_toggler': 'toggleArrow'
+      'keypress .element_toggler': 'toggleArrowWithKeyboard'
       'click .tooltip_link': preventDefault ->
       'keydown .assignment_group': 'handleKeys'
 
@@ -119,6 +121,7 @@ define [
           model: @model
         @moveGroupView = new MoveDialogView
           model: @model
+          closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> ENV.URLS.sort_url
 
     initCache: ->
@@ -266,6 +269,10 @@ define [
       @toggleCache() unless $(ev.currentTarget).data("noToggleCache")
       #reset noToggleCache because it is a one-time-use-only flag
       @resetNoToggleCache(ev.currentTarget)
+
+    toggleArrowWithKeyboard: (ev) =>
+      if ev.which == 13 || ev.which == 32
+        @toggleArrow(ev)
 
     resetNoToggleCache: (selector=null) ->
       if selector?

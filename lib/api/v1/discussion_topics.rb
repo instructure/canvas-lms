@@ -58,7 +58,12 @@ module Api::V1::DiscussionTopics
   # include_assignment - Optionally include the topic's assignment, if any (default: true).
   #
   # Returns a hash.
-  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
+  def discussion_topic_api_json(topic, context, user, session, opts = {})
+    opts.reverse_merge!(
+      include_assignment: true,
+      override_dates: true
+    )
+
     json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
     json.merge!(serialize_additional_topic_fields(topic, context, user))
 
@@ -67,8 +72,9 @@ module Api::V1::DiscussionTopics
     end
 
     locked_json(json, topic, user, session)
-    if include_assignment && topic.assignment
-      json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false, override_dates: false)
+    if opts[:include_assignment] && topic.assignment
+      json[:assignment] = assignment_json(topic.assignment, user, session,
+        include_discussion_topic: false, override_dates: opts[:override_dates])
     end
 
     json
@@ -83,12 +89,8 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user)
     attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
-    html_url    = if context.is_a?(CollectionItem)
-                    nil
-                  else
-                    named_context_url(context, :context_discussion_topic_url,
-                                      topic, include_host: true)
-                  end
+    html_url    = named_context_url(context, :context_discussion_topic_url,
+                                    topic, include_host: true)
     url         = if topic.podcast_enabled?
                     code = (@context_enrollment || @context || context).feed_code
                     feeds_topic_format_path(topic.id, code, :rss)
@@ -103,7 +105,8 @@ module Api::V1::DiscussionTopics
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
       attachments: attachments, published: topic.published?, can_unpublish: topic.can_unpublish?,
       locked: topic.locked?, author: user_display_json(topic.user, topic.context),
-      html_url: html_url, url: html_url, pinned: !!topic.pinned }
+      html_url: html_url, url: html_url, pinned: !!topic.pinned,
+      group_category_id: topic.legacy_group_category_id, can_group: topic.can_group? }
   end
 
   # Public: Serialize discussion entries for returning a JSON response. This method,

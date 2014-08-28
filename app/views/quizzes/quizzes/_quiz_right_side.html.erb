@@ -1,0 +1,85 @@
+<% allow_take ||= false %>
+<% if @quiz.available? || (params[:preview] && @submission) %>
+  <div>
+    <div style="border-bottom: 1px solid #888; font-size: 1.1em; font-weight: bold;">
+      <% if @quiz.allowed_attempts == 1 %>
+        <%= before_label(:submission_details, "Submission Details") %>
+      <% else %>
+        <%= before_label(:last_attempt_details, "Last Attempt Details") %>
+      <% end %>
+    </div>
+    <div>
+    <table class="summary" style="font-size: 1.1em;">
+      <% if @submission.pending_review? %>
+      <tfoot>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <td colspan="2" class="footnote">
+            *
+            <% if can_do(@quiz, @current_user, :grade) && !@quiz.survey? %>
+              <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
+            <% else %>
+              <%= t(:questions_not_graded, 'Some questions not yet graded') %>
+            <% end %>
+          </td>
+        </tr>
+      </tfoot>
+      <% end %>
+      <tbody>
+        <tr>
+          <th><%= before_label(:time, "Time") %></th>
+          <td><%= duration_in_minutes((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at) %></td>
+        </tr>
+        <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <th><%= before_label(:current_score, "Current Score") %></th>
+          <td><%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+                  <%= '*' if @submission.pending_review? %></td>
+        </tr>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <th><%= before_label(:kept_score, "Kept Score") %></th>
+          <td><%= score_out_of_points_possible(@submission.kept_score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
+        </tr>
+          <% if @submission.manually_scored %>
+            <tr>
+              <td colspan="2"><%= t('score_set_manually', 'This score was set by the teacher') %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+    </div>
+  </div>
+    <% if @submission && params[:preview] %>
+      <%= link_to context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1), :method => :post do %><%= @quiz.survey? ?
+          t('links.preview_survey_again', "Preview the Survey Again") :
+          t('links.preview_quiz_again', "Preview the Quiz Again") %><% end %><br/>
+    <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
+      <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
+        <% if (@submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update))) &&
+            (can_do(@quiz, @current_user, :grade) || !@quiz.muted?) %>
+          <%= t(:attempts_so_far, {:one => "1 Attempt so far", :other => "%{count} Attempts so far"}, :count => @submission.attempt) %><br/>
+          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="icon-clock"><%= t(:view_previous_attempts, "View Previous Attempts") %></a>
+          <br/>
+        <% end %>
+        <% if @quiz.unlimited_attempts? %>
+          <%= t(:unlimited_attempts, "Unlimited Attempts") %><br/>
+        <% elsif !can_do(@quiz, @current_user, :update) %>
+          <% if @submission.attempts_left <= 0 %>
+            <%= t(:no_more_attempts, "No More Attempts available") %><br/>
+          <% elsif can_do(@quiz, @current_user, :submit) %>
+            <%= t(:attempts_left, {:one => "1 More Attempt available", :other => "%{count} More Attempts available"}, :count => @submission.attempts_left) %><br/>
+          <% end %>
+        <% end %>
+      </div>
+      <% if allow_take && can_do(@quiz, @current_user, :submit) %>
+        <div style="margin-top: 10px; font-size: 1.2em;">
+        <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
+          <%= link_to_take_or_retake_poll %><br/>
+          <span style="font-size: 0.7em; padding-left: 20px;">
+            (<%= score_to_keep_message %>)
+          </span>
+        <% end %>
+        </div>
+      <% end %>
+    <% end %>
+<% end %>

@@ -19,14 +19,22 @@
 # @API Custom Gradebook Columns
 # @subtopic Custom Gradebook Column Data
 #
-# ColumnDatum objects contain the entry for a column for each user.
+# @model ColumnDatum
+#     {
+#       "id": "ColumnDatum",
+#       "description": "ColumnDatum objects contain the entry for a column for each user.",
+#       "properties": {
+#         "content": {
+#           "example": "Nut allergy",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "example": 2,
+#           "type": "integer"
+#         }
+#       }
+#     }
 #
-# @object ColumnDatum
-#    {
-#      "content": "Nut allergy",
-#
-#      "user_id": 2
-#    }
 class CustomGradebookColumnDataApiController < ApplicationController
   before_filter :require_context, :require_user
 
@@ -56,7 +64,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   #
   # Set the content of a custom column
   #
-  # @argument column_data[content] [String]
+  # @argument column_data[content] [Required, String]
   #   Column content.  Setting this to blank will delete the datum object.
   #
   # @returns ColumnDatum

@@ -14,7 +14,7 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  scope :active, lambda { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
+  scope :active, -> { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
 
   TOKEN_SIZE = 64
   OAUTH2_SCOPE_NAMESPACE = '/auth/'
@@ -71,7 +71,7 @@ class AccessToken < ActiveRecord::Base
 
   def generate_token(overwrite=false)
     if overwrite || !self.crypted_token
-      self.token = AutoHandle.generate(nil, TOKEN_SIZE)
+      self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
     end
   end
 
@@ -97,6 +97,10 @@ class AccessToken < ActiveRecord::Base
 
   #Scoped token convenience method
   def scoped_to?(req_scopes)
+    self.class.scopes_match?(scopes, req_scopes)
+  end
+
+  def self.scopes_match?(scopes, req_scopes)
     return req_scopes.size == 0 if scopes.nil?
 
     scopes.size == req_scopes.size &&

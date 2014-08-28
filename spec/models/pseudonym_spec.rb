@@ -40,20 +40,14 @@ describe Pseudonym do
     pseudonym.should be_valid
   end
 
-  it "should validate the presence of user and account ids" do
+  it "should validate the presence of user and infer default account" do
     u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
     p.save.should be_false
 
-    p.account_id = Account.default.id
-    p.save.should be_false
-
     p.user_id = u.id
-    p.account_id = nil
-    p.save.should be_false
-
-    p.account_id = Account.default.id
     p.save.should be_true
+    p.account_id.should == Account.default.id
 
     # make sure a password was generated
     p.password.should_not be_nil
@@ -172,7 +166,7 @@ describe Pseudonym do
   end
 
   context "LDAP errors" do
-    before do
+    before :once do
       require 'net/ldap'
       user_with_pseudonym(:active_all => true)
       @aac = @pseudonym.account.account_authorization_configs.create!(
@@ -218,7 +212,7 @@ describe Pseudonym do
   end
 
   context "Needs a pseudonym with an active user" do
-    before do
+    before :once do
       user_model
       pseudonym_model
     end
@@ -307,25 +301,6 @@ describe Pseudonym do
     end
   end
 
-  describe "mfa_settings" do
-    it "should inherit from the account" do
-      account = Account.create!
-      user = User.create!
-      p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
-      Account.default.add_user(user)
-
-      p.mfa_settings.should == :disabled
-      p.account.settings[:mfa_settings] = :optional
-      p.mfa_settings.should == :optional
-      p.account.settings[:mfa_settings] = :required
-      p.mfa_settings.should == :required
-      p.account.settings[:mfa_settings] = :required_for_admins
-      p.mfa_settings.should == :optional
-      account.add_user(user)
-      p.mfa_settings.should == :required
-    end
-  end
-
   describe 'valid_arbitrary_credentials?' do
     it "should ignore password if canvas authentication is disabled" do
       user_with_pseudonym(:password => 'qwerty')
@@ -347,9 +322,9 @@ describe Pseudonym do
   describe "authenticate" do
     context "sharding" do
       specs_require_sharding
+      let_once(:account2) { @shard1.activate { Account.create! } }
 
       it "should only query pertinent shards" do
-        account2 = @shard1.activate { Account.create! }
         Pseudonym.expects(:associated_shards).with('abc').returns([@shard1])
         Pseudonym.expects(:active).once.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)
@@ -357,7 +332,6 @@ describe Pseudonym do
       end
 
       it "should only query pertinent shards" do
-        account2 = @shard1.activate { Account.create! }
         Pseudonym.expects(:associated_shards).with('abc').returns([Shard.default, @shard1])
         Pseudonym.expects(:active).twice.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)
@@ -376,7 +350,7 @@ describe Pseudonym do
 
       let(:sis_user_id) { "1234554321" }
 
-      before do
+      before :once do
         user_with_pseudonym
         @pseudonym.sis_user_id = sis_user_id
         @pseudonym.save!

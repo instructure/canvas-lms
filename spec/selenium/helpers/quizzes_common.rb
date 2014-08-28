@@ -166,7 +166,7 @@ shared_examples_for "quizzes selenium tests" do
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations
-    Quiz.last
+    Quizzes::Quiz.last
   end
 
   def take_quiz
@@ -282,7 +282,7 @@ shared_examples_for "quizzes selenium tests" do
     find_accessible_link('New Question Group').click
     submit_form('#group_top_new form')
     wait_for_ajax_requests
-    @group = QuizGroup.last
+    @group = Quizzes::QuizGroup.last
   end
 
   ##

@@ -65,36 +65,8 @@ describe "gradebook2" do
       visible_students[0].text.should == 'student 1'
     end
 
-    it "should link to a students grades page" do
-      get "/courses/#{@course.id}/gradebook2"
-      els = ff('.student-name')
-      links = els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }
-      expected_links = @all_students.map { |s| "/courses/#{@course.id}/grades/#{s.id}" }
-      links.should == expected_links
-    end
-
     it "should not show not-graded assignments" do
       f('#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
-    end
-
-    it "should notify user that no updates are made if default grade assignment doesnt change anything" do
-      get "/courses/#{@course.id}/gradebook2"
-
-      ##
-      # borrowed this code from set_default_grade method. not calling it directly because
-      # we need to assert the content of the alert box.
-      open_assignment_options(0)
-      f('[data-action="setDefaultGrade"]').click
-      dialog = fj('.ui-dialog:visible')
-      f('.grading_value').send_keys(5)
-      submit_dialog(dialog, '.ui-button')
-      keep_trying_until do
-        driver.switch_to.alert.should_not be_nil
-        driver.switch_to.alert.text.should == 'None to Update'
-        driver.switch_to.alert.dismiss
-        true
-      end
-      driver.switch_to.default_content
     end
 
     it "should validate correct number of students showing up in gradebook" do
@@ -154,7 +126,7 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       ff('.student-name').length.should == @all_students.size
-      ff('.avatar img').length.should == @all_students.size
+      ff('.avatar').length.should == @all_students.size
     end
 
 
@@ -620,8 +592,8 @@ describe "gradebook2" do
       @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
       @student_3_submission.save!
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      ff('.late').count.should == 1
+
+      keep_trying_until { ffj('.late').count.should == 1 }
     end
 
     it "should not display a speedgrader link for large courses" do
@@ -657,29 +629,58 @@ describe "gradebook2" do
       end
     end
 
-    describe "Total dropdown" do
+    describe "Total points toggle" do
       def should_show_percentages
         ff(".total-column").each { |total| total.text.should =~ /%/ }
       end
 
-      def toggle_showing_points
+      def open_display_dialog
         f("#total_dropdown").click
         f(".toggle_percent").click
+      end
+
+      def close_display_dialog
+        f(".ui-icon-closethick").click
+      end
+
+      def toggle_grade_display
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        submit_dialog(dialog, '.ui-button')
+      end
+
+      it "should warn the teacher that studens will see a change" do
+        get "/courses/#{@course.id}/gradebook2"
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        dialog.text.should =~ /Warning/
       end
 
       it 'should allow toggling display by points or percent' do
         should_show_percentages
 
         get "/courses/#{@course.id}/gradebook2"
-        toggle_showing_points
+        toggle_grade_display
 
         expected_points = 15, 10, 10
         ff(".total-column").each { |total|
           total.text.should =~ /\A#{expected_points.shift}$/
         }
 
-        toggle_showing_points
+        toggle_grade_display
         should_show_percentages
+      end
+
+      it 'should not show the warning once dont show is checked' do
+        get "/courses/#{@course.id}/gradebook2"
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        fj("#hide_warning").click
+        submit_dialog(dialog, '.ui-button')
+
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        dialog.should equal nil
       end
     end
 
@@ -747,6 +748,34 @@ describe "gradebook2" do
         has_notes_column.call.should be_true
       end
     end
+
+    context "differentiated assignments" do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        @da_assignment = assignment_model({
+          :course => @course,
+          :name => 'DA assignment',
+          :points_possible => ASSIGNMENT_1_POINTS,
+          :submission_types => 'online_text_entry',
+          :assignment_group => @group,
+          :only_visible_to_overrides => true
+        })
+        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+      end
+
+      it "should gray out cells" do
+        get "/courses/#{@course.id}/gradebook"
+        #student 3, assignment 4
+        selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l5'
+        cell = f(selector)
+        cell.find_element(:css, '.gradebook-cell').should have_class('grayed-out')
+        cell.click
+        f(selector + ' .grade').should be_nil
+        #student 2, assignment 4 (not grayed out)
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l5')
+        cell.find_element(:css, '.gradebook-cell').should_not have_class('grayed-out')
+      end
+    end
   end
 
   context "as an observer" do
@@ -776,9 +805,31 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       ff('.gradebook-navigation').length.should == 1
 
-      f('a[data-id=outcome-gradebook]').click
+      f('a[data-id=outcome]').click
       wait_for_ajaximations
       f('.outcome-gradebook-container').should_not be_nil
+    end
+  end
+
+  describe "post_grades" do
+    before(:each) { data_setup }
+
+    it "should not be visible by default" do
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 0
+    end
+
+    it "should be visible when enabled" do
+      Account.default.set_feature_flag!('post_grades', 'on')
+      @course.integration_id = 'xyz'
+      @course.save
+      get "/courses/#{@course.id}/gradebook2"
+
+      wait_for_ajaximations
+      ff('.gradebook-navigation').length.should == 2
+      f('#post-grades-button').click
+      wait_for_ajaximations
+      f('#post-grades-container').should_not be_nil
     end
   end
 end

@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/profile/communication" do
   it "should render" do
     course_with_student
+    communication_channel(@user)
     view_context
 
     assigns[:email_channels] = []

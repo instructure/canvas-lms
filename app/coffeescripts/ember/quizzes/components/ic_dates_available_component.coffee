@@ -16,7 +16,13 @@ define [
     linkHref: '#'
     multipleDatesTitle: I18n.t('multiple_dates', 'Multiple Dates')
     multipleDates: Em.computed.gt('allDates.length', 1)
-    statusDates: Em.computed.map 'allDates', (item) -> StatusDate.create(item)
+    statusDates: Em.computed.map 'allDates', (item) ->
+      StatusDate.create
+        lockAt: item.get 'lockAt'
+        unlockAt: item.get 'unlockAt'
+        dueAt: item.get 'dueAt'
+        base: item.get 'base'
+        title: item.get 'title'
 
     multipleDatesLabel: ( ->
       if @get('showDueDates')

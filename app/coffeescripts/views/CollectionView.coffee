@@ -97,10 +97,18 @@ define [
     # @api private
 
     attachCollection: ->
-      @collection.on 'reset', @renderOnReset
-      @collection.on 'add', @renderOnAdd
-      @collection.on 'remove', @removeItem
+      @listenTo @collection, 'reset', @renderOnReset
+      @listenTo @collection, 'add', @renderOnAdd
+      @listenTo @collection, 'remove', @removeItem
       @empty = not @collection.length
+
+    detachCollection: ->
+      @stopListening @collection
+
+    switchCollection: (collection) ->
+      @detachCollection()
+      @collection = collection
+      @attachCollection()
 
     ##
     # Ensures item views are removed properly

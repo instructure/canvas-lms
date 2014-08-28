@@ -63,22 +63,6 @@ define [
 
 
   module 'WikiPage:Sync'
-  test 'sets the id during construction', ->
-    wikiPage = new WikiPage wikiPageObj()
-    equal wikiPage.get('url'), 'front-page-2'
-    equal wikiPage.get('id'), wikiPage.get('url'), 'Sets id to url'
-
-  test 'sets the id during parse', ->
-    wikiPage = new WikiPage
-    parseResponse = wikiPage.parse(wikiPageObj())
-    equal parseResponse.url, 'front-page-2'
-    equal parseResponse.id, parseResponse.url, 'Sets id to url'
-
-  test 'removes the id during toJSON', ->
-    wikiPage = new WikiPage wikiPageObj()
-    json = wikiPage.toJSON()
-    equal json.id, undefined, 'Removes id from serialized json'
-
   test 'parse removes wiki_page namespace added by api', ->
     wikiPage = new WikiPage
     namespacedObj = {}

@@ -1,0 +1,28 @@
+{{! this is only here for legacy styling to pull in
+  quiz submission versions from the server. Will be replace by
+  real ember versions once api is ready }}
+<div class="submission-attempt-history clearfix">
+  {{#if legacyQuizSubmissionVersionsReady}}
+    {{{quizSubmissionVersionsHtml.html}}}
+  {{else}}
+    <div class='ember-loading'>
+      <img src='/images/ajax-loader-medium-444.gif' />
+      {{#t 'loading'}}Loading{{/t}}
+    </div>
+  {{/if}}
+</div>
+
+{{! this is only here for legacy styling to pull in
+  quiz submissions from the server! Confusing id-show above vs
+  id_show should be removed soon! }}
+<div id="quiz_show">
+  {{#if legacyQuizSubmissionReady}}
+    {{{quizSubmissionHtml.html}}}
+  {{else}}
+    <div id='ember-loading'>
+      <img src='/images/ajax-loader-medium-444.gif' />
+      {{#t 'loading'}}Loading{{/t}}
+    </div>
+  {{/if}}
+</div>
+

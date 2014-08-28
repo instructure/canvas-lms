@@ -5,12 +5,14 @@ define [
   'compiled/models/Group'
   'compiled/views/groups/manage/AddUnassignedMenu'
   'jquery'
+  'helpers/fakeENV'
 ], (GroupUserCollection,
     GroupUser,
     GroupCategory,
     Group,
     AddUnassignedMenu,
-    $) ->
+    $,
+    fakeENV) ->
 
   clock = null
   server = null
@@ -25,6 +27,7 @@ define [
 
   module 'AddUnassignedMenu',
     setup: ->
+      fakeENV.setup()
       clock = sinon.useFakeTimers()
       server = sinon.fakeServer.create()
       waldo = new GroupUser id: 4, name: "Waldo", sortable_name: "Waldo"
@@ -35,7 +38,7 @@ define [
       users.loaded = true
       view = new AddUnassignedMenu
         collection: users
-      view.groupId = 777
+      view.group = new Group(id: 777)
       users.reset([
         new GroupUser(id: 1, name: "Frank Herbert", sortable_name: "Herbert, Frank"),
         new GroupUser(id: 2, name: "Neal Stephenson", sortable_name: "Stephenson, Neal"),
@@ -45,18 +48,19 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       clock.restore()
       server.restore()
       view.remove()
 
-  test "updates the user's groupId and removes from unassigned collection", ->
-    equal waldo.get('groupId'), null
+  test "updates the user's group and removes from unassigned collection", ->
+    equal waldo.get('group'), null
     $links = view.$('.assign-user-to-group')
     equal $links.length, 4
 
     $waldoLink = $links.last()
     $waldoLink.click()
     sendResponse 'POST',"/api/v1/groups/777/memberships", {}
-    equal waldo.get('groupId'), 777
+    equal waldo.get('group'), view.group
 
     ok not users.contains(waldo)

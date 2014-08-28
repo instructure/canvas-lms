@@ -17,6 +17,8 @@
 #
 
 module QuizzesHelper
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
+
   def needs_unpublished_warning?(quiz=@quiz, user=@current_user)
     if quiz.feature_enabled?(:draft_state)
       return false unless can_publish(quiz)
@@ -50,6 +52,30 @@ module QuizzesHelper
       'These changes will not appear for students until you publish or ' +
       'republish the quiz.',
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
+  end
+
+  def draft_state_unsaved_changes_warning
+    I18n.t("#quizzes.warnings.draft_state_unsaved_changes",
+      '*You have made changes to the questions in this quiz.* '+
+      'These changes will not appear for students until you ' +
+      'save the quiz.',
+      :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>')
+  end
+
+  def quiz_published_state_warning(quiz=@quiz)
+    if !quiz.available?
+      unpublished_quiz_warning
+    else
+      if quiz.feature_enabled? :draft_state
+        draft_state_unsaved_changes_warning
+      else
+        unpublished_changes_warning
+      end
+    end
+  end
+
+  def display_save_button?(quiz=@quiz)
+    quiz.available? && quiz.feature_enabled?(:draft_state) && can_publish(quiz)
   end
 
   def render_score(score, precision=2)
@@ -227,6 +253,16 @@ module QuizzesHelper
     end
   end
 
+  def render_result_protection(quiz, submission)
+    if quiz.one_time_results && submission.has_seen_results?
+      I18n.t(:quiz_results_protected_after_first_glimpse, "Quiz results are protected for this quiz and can be viewed a single time immediately after submission.")
+    elsif quiz.hide_results == 'until_after_last_attempt'
+      I18n.t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz and are not visible to students until they have submitted their last attempt.")
+    else
+      I18n.t(:quiz_results_protected, "Quiz results are protected for this quiz and are not visible to students.")
+    end
+  end
+
   QuestionType = Struct.new(:question_type,
                             :entry_type,
                             :display_answers,
@@ -377,38 +413,45 @@ module QuizzesHelper
     end
   end
 
+  # @param [Array<Hash>] options.answer_list
+  #   A set of question blanks and the student response for each. Example:
+  #   [{ blank_id: "color", "answer": "red" }]
   def fill_in_multiple_blanks_question(options)
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
-    answer_list = hash_get(options, :answer_list)
+    answer_list = hash_get(options, :answer_list, [])
     res      = user_content hash_get(question, :question_text)
     readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
     label_attr = "aria-label='#{I18n.t('#quizzes.labels.multiple_blanks_question', "Fill in the blank, read surrounding text")}'"
-    index  = 0
 
-    res.gsub! %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-      a = h(answer_list[index])
-      index += 1
+    answer_list.each do |entry|
+      entry[:blank_id] = AssessmentQuestion.variable_id(entry[:blank_id])
+    end
+    res.gsub! %r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>} do |match|
+      blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
+      blank.gsub!(/\\/,'')
+      answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
+      answer = h(answer[:answer] || '')
+
       # If given answer list, insert the values into the text inputs for displaying user's answers.
-      if answer_list && !answer_list.empty?
-
+      if answer_list.any?
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match = match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, answer.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
-          sub(/\/\>\Z/, readonly_markup)
+          sub(/\/*>\Z/, readonly_markup)
       end
-
       # add labelling to input element regardless
-      match.sub(/\/\>\Z/, "#{label_attr} />")
+      match.sub(/\/*>\Z/, "#{label_attr} />")
     end
 
-    unless answer_list && !answer_list.empty?
+    if answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
-    res
+    # all of our manipulation lost this flag - reset it
+    res.html_safe
   end
 
   def multiple_dropdowns_question(options)
@@ -417,7 +460,7 @@ module QuizzesHelper
     answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
     index  = 0
-    res.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
+    res.to_str.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
       if answer_list && !answer_list.empty?
         a = answer_list[index]
         index += 1
@@ -425,7 +468,7 @@ module QuizzesHelper
         a = hash_get(answers, $1)
       end
       match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
-    end
+    end.html_safe
   end
 
   def duration_in_minutes(duration_seconds)
@@ -446,7 +489,7 @@ module QuizzesHelper
     score_html = \
       if options[:id] or options[:class] or options[:style] then
         content_tag('span',
-          render_score(score, options[:precision]), 
+          render_score(score, options[:precision]),
           options.slice(:class, :id, :style))
       else
         render_score(score, options[:precision])
@@ -468,7 +511,7 @@ module QuizzesHelper
 
   def take_quiz_url
     user_id = @current_user && @current_user.id
-    polymorphic_path([@context, @quiz, :take], :user_id => user_id)
+    course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
   def link_to_take_or_retake_poll(opts={})
@@ -572,7 +615,7 @@ module QuizzesHelper
     elsif !show_correct_answers?(quiz, user, submission)
       true
     elsif quiz.hide_correct_answers_at.present?
-      !quiz.grants_right?(user, nil, :grade)
+      !quiz.grants_right?(user, :grade)
     end
   end
 

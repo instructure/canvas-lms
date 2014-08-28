@@ -28,7 +28,8 @@ describe "/shared/errors/400_message" do
     rescue => e
       assigns[:exception] = e
     end
-    render "shared/errors/400_message", :locals => {:exception => assigns[:exception], :status => ""}
+    ActionController::TestResponse.any_instance.stubs(:status).returns(400)
+    render "shared/errors/400_message"
     response.should_not be_nil
   end
 end

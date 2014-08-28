@@ -20,29 +20,64 @@
 #
 # API for accessing Assignment Group and Assignment information.
 #
-# @object AssignmentGroup
+# @model GradingRules
 #     {
-#       // the id of the Assignment Group
-#       "id": 1,
-#
-#       // the name of the Assignment Group
-#       "name": "group2",
-#
-#       // the position of the Assignment Group
-#       "position": 7,
-#
-#       // the weight of the Assignment Group
-#       "group_weight": 20,
-#
-#       // the assignments in this Assignment Group
-#       // (see the Assignment API for a detailed list of fields)
-#       "assignments": [],
-#
-#       // the grading rules that this Assignment Group has
-#       "rules": {
-#         "drop_lowest": 1,
-#         "drop_highest": 1,
-#         "never_drop": [33,17,24]
+#       "id": "GradingRules",
+#       "description": "",
+#       "properties": {
+#         "drop_lowest": {
+#           "description": "Number of lowest scores to be dropped for each user.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "drop_highest": {
+#           "description": "Number of highest scores to be dropped for each user.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "never_drop": {
+#           "description": "Assignment IDs that should never be dropped.",
+#           "example": "[33, 17, 24]",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         }
+#       }
+#     }
+# @model AssignmentGroup
+#     {
+#       "id": "AssignmentGroup",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the id of the Assignment Group",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "the name of the Assignment Group",
+#           "example": "group2",
+#           "type": "string"
+#         },
+#         "position": {
+#           "description": "the position of the Assignment Group",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "group_weight": {
+#           "description": "the weight of the Assignment Group",
+#           "example": 20,
+#           "type": "integer"
+#         },
+#         "assignments": {
+#           "description": "the assignments in this Assignment Group (see the Assignment API for a detailed list of fields)",
+#           "example": "[]",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
+#         "rules": {
+#           "description": "the grading rules that this Assignment Group has",
+#           "$ref": "GradingRules"
+#         }
 #       }
 #     }
 #
@@ -56,33 +91,38 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"]
-  #  Associations to include with the group. both "discussion_topic" and
-  #  "all_dates" is only valid are only valid if "assignments" is also included.
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"]
+  #  Associations to include with the group. "discussion_topic", "all_dates"
+  #  "assignment_visibility" are only valid are only valid if "assignments" is also included.
+  #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
-  # @argument override_assignment_dates [Optional, Boolean]
+  # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
   # @returns [AssignmentGroup]
   def index
-    if authorized_action(@context.assignment_groups.new, @current_user, :read)
+    if authorized_action(@context.assignment_groups.scoped.new, @current_user, :read)
       @groups = @context.assignment_groups.active
 
       params[:include] = Array(params[:include])
+      assignments_by_group = {}
       if params[:include].include? 'assignments'
         assignment_includes = [:rubric, :quiz, :external_tool_tag]
         assignment_includes.concat(params[:include] & [:discussion_topic])
         assignment_includes.concat(params[:include] & [:all_dates])
-        if params[:include].include? "module_ids"
-          assignment_includes.concat [{:discussion_topic => :context_module_tags},
-                                      {:quiz => :context_module_tags},
-                                      :context_module_tags]
-        end
-        @groups = @groups.includes(:active_assignments => assignment_includes)
 
-        assignment_descriptions = @groups
-          .flat_map(&:active_assignments)
-          .map(&:description)
+        all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
+
+        # because of a bug with including content_tags, we are preloading here rather than in
+        # visible_assignments with multiple associations referencing content_tags table and therefore
+        # aliased table names the conditons on has_many :context_module_tags will break
+        if params[:include].include? "module_ids"
+          module_includes = [:context_module_tags,{:discussion_topic => :context_module_tags},{:quiz => :context_module_tags}]
+          Assignment.send(:preload_associations, all_visible_assignments, module_includes)
+        end
+
+        assignment_descriptions = all_visible_assignments.map(&:description)
+        assignments_by_group = all_visible_assignments.group_by(&:assignment_group_id)
         user_content_attachments = api_bulk_load_user_content_attachments(
           assignment_descriptions, @context, @current_user
         )
@@ -94,8 +134,7 @@ class AssignmentGroupsController < ApplicationController
                                        .joins(:assignment_overrides)
                                        .select("assignments.id")
                                        .uniq
-          assignments_without_overrides = @groups.flat_map(&:active_assignments) -
-            assignments_with_overrides
+          assignments_without_overrides = all_visible_assignments - assignments_with_overrides
           assignments_without_overrides.each { |a| a.has_no_overrides = true }
         end
       end
@@ -107,7 +146,9 @@ class AssignmentGroupsController < ApplicationController
             assignment_group_json(g, @current_user, session, params[:include],
                                   stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
-                                  preloaded_user_content_attachments: user_content_attachments)
+                                  preloaded_user_content_attachments: user_content_attachments,
+                                  assignments: assignments_by_group[g.id]
+                                  )
           }
           render :json => json
         }
@@ -116,13 +157,11 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def reorder
-    if authorized_action(@context.assignment_groups.new, @current_user, :update)
+    if authorized_action(@context.assignment_groups.scoped.new, @current_user, :update)
       order = params[:order].split(',')
       @context.assignment_groups.first.update_order(order)
-      respond_to do |format|
-        new_order = @context.assignment_groups.pluck(:id)
-        format.json { render :json => {:reorder => true, :order => new_order}, :status => :ok }
-      end
+      new_order = @context.assignment_groups.pluck(:id)
+      render :json => {:reorder => true, :order => new_order}, :status => :ok
     end
   end
 
@@ -160,7 +199,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def create
-    @assignment_group = @context.assignment_groups.new(params[:assignment_group])
+    @assignment_group = @context.assignment_groups.scoped.new(params[:assignment_group])
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
         if @assignment_group.save

@@ -18,11 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "AccountAuthorizationConfigs API", :type => :integration do
-  before do
+describe "AccountAuthorizationConfigs API", type: :request do
+  before :once do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
-    @account.add_user(@user)
+    @account.account_users.create!(user: @user)
     @cas_hash = {"auth_type" => "cas", "auth_base" => "127.0.0.1"}
     @saml_hash = {'auth_type' => 'saml', 'idp_entity_id' => 'http://example.com/saml1', 'log_in_url' => 'http://example.com/saml1/sli', 'log_out_url' => 'http://example.com/saml1/slo', 'certificate_fingerprint' => '111222', 'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'}
     @ldap_hash = {'auth_type' => 'ldap', 'auth_host' => '127.0.0.1', 'auth_filter' => 'filter1', 'auth_username' => 'username1', 'auth_password' => 'password1'}
@@ -129,16 +129,20 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
       aac.auth_base.should == '127.0.0.1'
       aac.position.should == 1
     end
+
     it "should not allow multiple cas aacs (for now)" do
       call_create(@cas_hash)
-      json = call_create(@cas_hash, 400)
-      json['message'].should == "Can not create multiple CAS configurations"
+      json = call_create(@cas_hash, 422)
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
+      ]
     end
 
     it "should error when mixing auth_types (for now)" do
       call_create(@ldap_hash)
-      json = call_create(@saml_hash, 400)
-      json['message'].should == 'Can not mix authentication types'
+      json = call_create(@saml_hash, 422)
+      json['errors'].first['error_code'].should == 'mixing_authentication_types'
     end
 
     it "should update positions" do
@@ -156,12 +160,17 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
 
     it "should error if deprecated and new style are used" do
       json = call_create({:account_authorization_config => {"0" => @ldap_hash}}.merge(@ldap_hash), 400)
-      json['message'].should == "Can't use both deprecated and current version of create at the same time."
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        "error_code" => "deprecated_request_syntax",
+        "message" => "This request syntax has been deprecated",
+        "field" => nil,
+      ]
     end
 
     it "should error if empty post params sent" do
-      json = call_create({}, 400)
-      json['message'].should == "Must specify auth_type"
+      json = call_create({}, 422)
+      json['errors'].first.should == { 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' }
     end
 
     it "should return unauthorized error" do
@@ -194,6 +203,7 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
       @saml_hash['change_password_url'] = nil
       @saml_hash['requested_authn_context'] = nil
       @saml_hash['login_attribute'] = 'nameid'
+      @saml_hash['unknown_user_url'] = nil
       json.should == @saml_hash
     end
 
@@ -221,6 +231,7 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
       @cas_hash['log_in_url'] = nil
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
+      @cas_hash['unknown_user_url'] = nil
       json.should == @cas_hash
     end
 
@@ -357,7 +368,7 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
   end
 
   context "discovery url" do
-    append_before do
+    before do
       @account.auth_discovery_url = "http://example.com/auth"
       @account.save!
     end

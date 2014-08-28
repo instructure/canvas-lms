@@ -1,5 +1,6 @@
 require [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Message'
@@ -12,9 +13,11 @@ require [
   'compiled/util/deparam'
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
+  'compiled/collections/GroupCollection'
+  'compiled/behaviors/unread_conversations'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
- InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
+], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+ InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
 
   class ConversationsRouter extends Backbone.Router
 
@@ -24,6 +27,7 @@ require [
 
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
+      messageDeleted: I18n.t('message_deleted', 'Message Deleted!')
 
     sendingCount: 0
 
@@ -62,7 +66,10 @@ require [
       @list.selectedMessages = [] if event == 'unstar'       && @filters.type == 'starred'
       messages
 
+    lastFetch: null
+
     onSelected: (model) =>
+      @lastFetch.abort() if @lastFetch
       @header.onModelChange(null, @model)
       @model = model
       messages = @list.selectedMessages
@@ -82,7 +89,8 @@ require [
         if model.get('messages')
           @selectConversation(model)
         else
-          @detail.$el.disableWhileLoading(model.fetch(success: @selectConversation))
+          @lastFetch = model.fetch(data: {include_participant_contexts: false, include_private_conversation_enrollments: false}, success: @selectConversation)
+          @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
       @header.onModelChange(model, null)
@@ -119,6 +127,8 @@ require [
       messages = @batchUpdate('destroy')
       delete @detail.model
       @list.collection.remove(messages)
+      @header.updateUi(null)
+      $.flashMessage(@messages.messageDeleted)
       @detail.render()
 
     onCompose: (e) =>
@@ -141,7 +151,9 @@ require [
 
     onMarkUnread: =>
       @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
-      @header.onReadStateChange()
+
+    onMarkRead: =>
+      @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
 
     onForward: (message) =>
       model = if message
@@ -187,9 +199,10 @@ require [
         remoteLaunch: true
 
     _initCollections: () ->
-      @courses = 
+      @courses =
         favorites: new FavoriteCourseCollection()
         all: new CourseCollection()
+        groups: new GroupCollection()
       @courses.favorites.fetch()
 
     _initViews: ->
@@ -208,6 +221,7 @@ require [
       @header.on('filter',      @onFilter)
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
+      @header.on('mark-read', @onMarkRead)
       @header.on('forward',     @onForward)
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)
@@ -220,6 +234,7 @@ require [
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
       $(document).ready(@onPageLoad)
+      $(window).keydown(@onKeyDown)
 
     onPageLoad: (e) ->
       # we add the top style here instead of in the css because
@@ -229,9 +244,10 @@ require [
 
     onSubmit: (dfd) =>
       @_incrementSending(1)
+      dfd.always =>
+        @_incrementSending(-1)
 
     onAddMessage: (message, conversation) =>
-      @_incrementSending(-1)
       model = @list.collection.get(conversation.id)
       if model? && model.get('messages')
         message.context_name = model.messageCollection.last().get('context_name')
@@ -241,7 +257,6 @@ require [
           @detail.render()
 
     onNewConversations: (conversations) =>
-      @_incrementSending(-1)
 
     _incrementSending: (increment) ->
       @sendingCount += increment
@@ -283,6 +298,14 @@ require [
         folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
         account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
 
+    onKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      ctrl = e.ctrlKey || e.metaKey
+      if e.which == 65 && ctrl # ctrl-a
+        e.preventDefault()
+        @list.selectAll()
+        return
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()

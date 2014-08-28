@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/CollectionView'
   'compiled/views/wiki/WikiPageRevisionView'
   'jst/wiki/WikiPageRevisions'
   'compiled/jquery/floatingSticky'
-], (_, Backbone, CollectionView, WikiPageRevisionView, template) ->
+], ($, _, Backbone, CollectionView, WikiPageRevisionView, template) ->
 
   class WikiPageRevisionsView extends CollectionView
     className: 'show-revisions'
@@ -21,6 +22,8 @@ define [
         '#ticker': '$ticker'
         'aside': '$aside'
         '.revisions-list': '$revisionsList'
+
+    @optionProperty 'pages_path'
 
     initialize: (options) ->
       super
@@ -64,6 +67,7 @@ define [
         @setSelectedModelAndView(model, view)
       selectModel() unless @selectedModel
 
+      view.pages_path = @pages_path
       view.$el.on 'click', selectModel
 
     setSelectedModelAndView: (model, view) ->

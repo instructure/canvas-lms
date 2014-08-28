@@ -16,12 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 class MediaObject < ActiveRecord::Base
   include Workflow
   belongs_to :user
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'ConversationMessage',
+    'Account', 'Assignment', 'AssessmentQuestion', 'ContextMessage', 'ZipFileImport']
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :context_id, :context_type, :workflow_state, :user_type, :title, :user_entered_title, :media_id, :media_type, :duration, :max_size, :root_account_id,
+    :data, :created_at, :updated_at, :attachment_id, :total_size
+  ]
+  EXPORTABLE_ASSOCIATIONS = [:user, :context, :attachment, :root_account, :media_tracks]
+
   validates_presence_of :media_id, :workflow_state
   has_many :media_tracks, :dependent => :destroy, :order => 'locale'
   after_create :retrieve_details_later
@@ -51,7 +62,7 @@ class MediaObject < ActiveRecord::Base
 
 
   set_policy do
-    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, nil, :manage_content)) }
+    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, :manage_content)) }
     can :add_captions and can :delete_captions
   end
 
@@ -59,56 +70,12 @@ class MediaObject < ActiveRecord::Base
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
   def self.add_media_files(attachments, wait_for_completion)
-    return unless Kaltura::ClientV3.config
-    attachments = Array(attachments)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
-    files = []
-    root_account_id = attachments.map{|a| a.root_account_id }.compact.first
-    attachments.select{|a| !a.media_object }.each do |attachment|
-      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user
-      sis_source_id, sis_user_id = "", ""
-      if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
-        sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
-        sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
-      end
-      files << {
-                  :name       => attachment.display_name,
-                  :url        => attachment.cacheable_s3_download_url,
-                  :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload" #{sis_source_id} #{sis_user_id}}]
-               }
-    end
-    res = client.bulkUploadAdd(files)
-
-    if !res[:ready]
-      if wait_for_completion
-        bulk_upload_id = res[:id]
-        Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
-        started_at = Time.now
-        timeout = Setting.get('media_bulk_upload_timeout', 30.minutes.to_s).to_i
-        while !res[:ready]
-          if Time.now > started_at + timeout
-            MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
-            break
-          end
-          sleep(1.minute.to_i)
-          res = client.bulkUploadGet(bulk_upload_id)
-        end
-      else
-        MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
-      end
-    end
-
-    if res[:ready]
-      build_media_objects(res, root_account_id)
-    end
-    res
+    KalturaMediaFileHandler.new.add_media_files(attachments, wait_for_completion)
   end
 
   def self.bulk_migration(csv, root_account_id)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
     if !res[:ready]
       MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], [], root_account_id)
@@ -142,11 +109,17 @@ class MediaObject < ActiveRecord::Base
       if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
         attachment_id = entry[:originalId]
       elsif entry[:originalId].present? && entry[:originalId].length >= 2
-        partner_data = JSON.parse(entry[:originalId]).with_indifferent_access
+        partner_data = begin
+          JSON.parse(entry[:originalId]).with_indifferent_access
+        rescue JSON::ParserError
+          Rails.logger.error("Failed to parse kaltura partner info: #{entry[:originalId]}")
+          {}
+        end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
       attachment = Attachment.find_by_id(attachment_id) if attachment_id
-      mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
+      account = root_account || Account.default
+      mo = account.shard.activate { MediaObject.find_or_initialize_by_media_id(entry[:entryId]) }
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
       if attachment
@@ -165,8 +138,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt=0)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
     if !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
@@ -183,8 +156,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.media_id_exists?(media_id)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
     return !!info[:id]
   end
@@ -203,8 +176,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def update_title_on_kaltura
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
     if !res[:error]
       self.title = self.user_entered_title
@@ -218,9 +191,9 @@ class MediaObject < ActiveRecord::Base
   end
 
   def media_sources
-    Kaltura::ClientV3.new.media_sources(self.media_id)
+    CanvasKaltura::ClientV3.new.media_sources(self.media_id)
   end
-  
+
   def retrieve_details_ensure_codecs(attempt=0)
     retrieve_details
     if (!self.data || !self.data[:extensions] || !self.data[:extensions][:flv]) && self.created_at > 6.hours.ago
@@ -244,8 +217,8 @@ class MediaObject < ActiveRecord::Base
     # From Kaltura, retrieve the title (if it's not already set)
     # and the list of valid flavors along with their id's.
     # Might as well confirm the media type while you're at it.
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     self.data ||= {}
     entry = client.mediaGet(self.media_id)
     if entry
@@ -286,8 +259,8 @@ class MediaObject < ActiveRecord::Base
   def delete_from_remote
     return unless self.media_id
 
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     client.mediaDelete(self.media_id)
   end
 
@@ -318,7 +291,7 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
-  scope :active, where("media_objects.workflow_state<>'deleted'")
+  scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
   scope :by_media_id, lambda { |media_id| where("media_objects.media_id=? OR media_objects.old_media_id=?", media_id, media_id) }
 

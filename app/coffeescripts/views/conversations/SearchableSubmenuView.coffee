@@ -1,8 +1,9 @@
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
-], (I18n, _, {View}, CourseSelectionView, SearchView) ->
+], (I18n, $, _, {View}, CourseSelectionView, SearchView) ->
   class SearchableSubmenuView extends View
     initialize: ->
       super

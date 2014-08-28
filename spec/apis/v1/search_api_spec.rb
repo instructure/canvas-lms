@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SearchController, :type => :integration do
-  before do
+describe SearchController, type: :request do
+  before :once do
     @account = Account.default
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
@@ -26,7 +26,7 @@ describe SearchController, :type => :integration do
   end
 
   context "recipients" do
-    before do
+    before :once do
       @group = @course.groups.create(:name => "the group")
       @group.users = [@me, @bob, @joe]
     end
@@ -146,7 +146,7 @@ describe SearchController, :type => :integration do
         u
       end
 
-      before do
+      before :once do
         @bobs_mom = observer_in_course(:name => "bob's mom", :associated_user => @bob)
         @lonely = observer_in_course(:name => "lonely observer")
       end
@@ -158,11 +158,11 @@ describe SearchController, :type => :integration do
         json.should eql [
                             {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
                         ]
       end
@@ -181,8 +181,8 @@ describe SearchController, :type => :integration do
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         json.should eql [
-                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}}
                         ]
       end
 
@@ -193,9 +193,9 @@ describe SearchController, :type => :integration do
         json.should eql [
                             {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             # must not include lonely observer here
                             {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
                             {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
@@ -288,7 +288,7 @@ describe SearchController, :type => :integration do
 
     context "pagination" do
       it "should paginate even if no type is specified" do
-        4.times{ student_in_course(:name => "cletus") }
+        create_users_in_course(@course, 4.times.map{ {name: "cletus", sortable_name: "cletus"}})
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :per_page => '3'})
@@ -297,7 +297,7 @@ describe SearchController, :type => :integration do
       end
 
       it "should paginate users and return proper pagination headers" do
-        4.times{ student_in_course(:name => "cletus") }
+        create_users_in_course(@course, 4.times.map{ {name: "cletus", sortable_name: "cletus"}})
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '3'})
@@ -323,10 +323,7 @@ describe SearchController, :type => :integration do
       end
 
       it "should paginate contexts and return proper pagination headers" do
-        4.times{
-          course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
-          @course.update_attribute(:name, "ofcourse")
-        }
+        create_courses(4.times.map{ {name: "ofcourse"} }, enroll_user: @user)
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :per_page => '3'})
@@ -352,7 +349,7 @@ describe SearchController, :type => :integration do
       end
 
       it "should ignore invalid per_page" do
-        11.times{ student_in_course(:name => "cletus") }
+        create_users_in_course(@course, 11.times.map{ {name: "cletus", sortable_name: "cletus"}})
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '-1'})
@@ -379,14 +376,11 @@ describe SearchController, :type => :integration do
 
       it "should paginate combined context/user results" do
         # 6 courses, 6 users, 12 items total
-        course_ids = []
+        courses = create_courses(6.times.map{ {name: "term"} }, enroll_user: @user, return_type: :record)
+        course_ids = courses.map(&:asset_string)
         user_ids = []
-        6.times do
-          course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
-          @course.update_attribute(:name, "term")
-          student = student_in_course(:name => "term")
-          course_ids << @course.asset_string
-          user_ids << student.id
+        courses.each do |course|
+          user_ids.concat create_users_in_course(course, [{name: "term", sortable_name: "term"}])
         end
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=term&per_page=4",

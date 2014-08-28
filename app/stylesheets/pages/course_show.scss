@@ -1,0 +1,28 @@
+$highlight-color: #06a9ee;
+
+.course-options {
+  font-size: 14px;
+  margin: -13px -13px 25px -13px;
+  padding: 10px 15px;
+  .button-sidebar-wide {
+    color: black;
+    padding: 5px;
+    i {
+      margin-right: 5px;
+    }
+
+    &:link, &:visited, &:active {
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    &:hover, &:hover i[class^=icon-]:before {
+      color: $highlight-color !important;
+    }
+  }
+}
+
+#edit_course_home_content_form div.form_group {
+  padding-top: 2px;
+  padding-left: 10px;
+}

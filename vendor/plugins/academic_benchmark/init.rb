@@ -13,7 +13,8 @@ Rails.configuration.to_prepare do
             :common_core_guid => AcademicBenchmark::Converter::COMMON_CORE_GUID,
             :worker => 'CCWorker',
             :converter_class => AcademicBenchmark::Converter,
-            :provides => {:academic_benchmark => AcademicBenchmark::Converter}
+            :provides => {:academic_benchmark => AcademicBenchmark::Converter},
+            :valid_contexts => %w{Account}
           }
   }
 end

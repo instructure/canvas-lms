@@ -19,24 +19,30 @@
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :user, :alignments
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :title, :workflow_state, :deleted_at, :created_at, :updated_at]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :assessment_questions, :assessment_question_bank_users, :learning_outcome_alignments, :quiz_groups]
+
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
-  has_many :quiz_groups
+  has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
+  after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  
+
   workflow do
     state :active
     state :deleted
   end
-  
+
   set_policy do
-    given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
+    given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete and can :manage
-    
-    given{|user, session| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
+
+    given{|user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
   end
 
@@ -51,21 +57,21 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def self.unfiled_for_context(context)
     context.assessment_question_banks.find_by_title_and_workflow_state(default_unfiled_title, 'active') || context.assessment_question_banks.create(:title => default_unfiled_title) rescue nil
   end
-  
+
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
       self.context.short_name rescue ""
     end
   end
-  
+
   def assessment_question_count
     self.assessment_questions.active.count
   end
-  
+
   def context_code
     "#{self.context_type.underscore}_#{self.context_id}"
   end
-  
+
   def infer_defaults
     self.title = t(:default_title, "No Name - %{course}", :course => self.context.name) if self.title.blank?
   end
@@ -97,6 +103,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
     end
   end
 
+  def update_alignments
+    return unless workflow_state_changed? && deleted?
+    LearningOutcome.update_alignments(self, context, [])
+  end
+
   def bookmark_for(user, do_bookmark=true)
     if do_bookmark
       question_bank_user = self.assessment_question_bank_users.find_by_user_id(user.id)
@@ -105,17 +116,17 @@ class AssessmentQuestionBank < ActiveRecord::Base
       AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
     end
   end
-  
+
   def bookmarked_for?(user)
     user && self.assessment_question_bank_users.map(&:user_id).include?(user.id)
   end
-  
+
   def select_for_submission(count, exclude_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).shuffle[0...count]
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids).shuffle
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -128,6 +139,6 @@ class AssessmentQuestionBank < ActiveRecord::Base
     assessment_questions.destroy_all
     quiz_groups.destroy_all
   end
-  
-  scope :active, where("assessment_question_banks.workflow_state<>'deleted'")
+
+  scope :active, -> { where("assessment_question_banks.workflow_state<>'deleted'") }
 end

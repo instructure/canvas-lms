@@ -1,3 +1,5 @@
+define(['tinymce/jscripts/tiny_mce/tiny_mce_src'], function() {
+
 /**
  * editor_plugin_src.js
  *
@@ -883,3 +885,5 @@
 	// Register plugin
 	tinymce.PluginManager.add("paste", tinymce.plugins.PastePlugin);
 })();
+
+});

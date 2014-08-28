@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,7 +21,7 @@ module SIS
 
     def process(updates_every, messages)
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
+      importer = Work.new(@batch, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@sis_options) do
           Pseudonym.process_as_sis(@sis_options) do
@@ -35,7 +35,7 @@ module SIS
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
       importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch_id)
+        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch)
       end if @batch
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
@@ -47,8 +47,8 @@ module SIS
           :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
           :users_to_update_account_associations
 
-      def initialize(batch_id, root_account, logger, updates_every, messages)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger, updates_every, messages)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @updates_every = updates_every
@@ -62,14 +62,14 @@ module SIS
         @users_to_update_account_associations = []
       end
 
-      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil)
-        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id].inspect}")
+      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil, full_name=nil, sortable_name=nil)
+        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name].inspect}")
 
         raise ImportError, "No user_id given for a user" if user_id.blank?
         raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
         raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id]
+        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name]
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -86,7 +86,7 @@ module SIS
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
-            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id = user_row
+            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name = user_row
 
             pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id.to_s)
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
@@ -94,26 +94,38 @@ module SIS
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
             status_is_active = !(status =~ /\Adeleted/i)
-
             if pseudo
               if pseudo.sis_user_id && pseudo.sis_user_id != user_id
                 @messages << "user #{pseudo.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
-              if pseudo_by_login && (pseudo.unique_id != login_id || pseudo != pseudo_by_login && status_is_active)
+              if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
+                !(ActiveRecord::Base.connection.select_value("SELECT 1 FROM pseudonyms WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(login_id))} LIMIT 1")))
                 @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
 
               user = pseudo.user
-              user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
+              unless user.stuck_sis_fields.include?(:name)
+                user.name = "#{first_name} #{last_name}"
+                user.name = full_name if full_name.present?
+              end
               unless user.stuck_sis_fields.include?(:sortable_name)
                 user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+                user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
+                user.sortable_name = sortable_name if sortable_name.present?
+              end
+              unless user.stuck_sis_fields.include?(:short_name)
+                user.short_name = short_name if short_name.present?
               end
             else
               user = User.new
               user.name = "#{first_name} #{last_name}"
+              user.name = full_name if full_name.present?
               user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+              user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
+              user.sortable_name = sortable_name if sortable_name.present?
+              user.short_name = short_name if short_name.present?
             end
 
             # we just leave all users registered now
@@ -164,12 +176,12 @@ module SIS
                 if user.changed?
                   user_touched = true
                   raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
-                elsif @batch_id
+                elsif @batch
                   @users_to_set_sis_batch_ids << user.id
                 end
                 pseudo.user_id = user.id
                 if pseudo.changed?
-                  pseudo.sis_batch_id = @batch_id if @batch_id
+                  pseudo.sis_batch_id = @batch.id if @batch
                   raise ImportError, pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
                 end
               end
@@ -235,7 +247,7 @@ module SIS
             end
 
             if pseudo.changed?
-              pseudo.sis_batch_id = @batch_id if @batch_id
+              pseudo.sis_batch_id = @batch.id if @batch
               if pseudo.valid?
                 pseudo.save_without_broadcasting
                 @success_count += 1
@@ -245,7 +257,7 @@ module SIS
                 msg += pseudo.errors.full_messages.join(", ") + ")"
                 raise ImportError, msg
               end
-            elsif @batch_id && pseudo.sis_batch_id != @batch_id
+            elsif @batch && pseudo.sis_batch_id != @batch.id
               @pseudos_to_set_sis_batch_ids << pseudo.id
               @success_count += 1
             end

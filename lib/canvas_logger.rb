@@ -1,9 +1,11 @@
 require 'active_support'
 
 class CanvasLogger < ActiveSupport::BufferedLogger
+  attr_reader :log_path
 
-  def initialize(log, level = DEBUG, options = {})
-    super(log, level)
+  def initialize(log_path, level = DEBUG, options = {})
+    super(log_path, level)
+    @log_path = log_path
     @skip_thread_context = options[:skip_thread_context]
   end
 
@@ -18,5 +20,4 @@ class CanvasLogger < ActiveSupport::BufferedLogger
     end
     super(severity, message, progname)
   end
-
 end

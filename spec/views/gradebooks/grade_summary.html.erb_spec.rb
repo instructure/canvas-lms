@@ -70,4 +70,17 @@ describe "/gradebooks/grade_summary" do
     doc.at_css('.audio_comment ~ span.media_comment_id').text.should eql '0_abcdefgh'
     doc.at_css('.video_comment ~ span.media_comment_id').text.should eql '0_ijklmnop'
   end
+
+  it "should show a disabled message for grade stats for the test student" do
+    course_with_teacher(:active_all => true)
+    @student = @course.student_view_student
+    @user = @teacher
+    view_context
+    a = @course.assignments.create!(:title => "some assignment", :points_possible => 10)
+    a.grade_student(@student, grade: "10")
+    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    render "gradebooks/grade_summary"
+    response.should_not be_nil
+    response.body.should match(/Test Student scores are not included in grade statistics./)
+  end
 end

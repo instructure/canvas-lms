@@ -29,7 +29,12 @@
   </div>
   <div class="control-group">
       <div style="float: right;">
-        <a href="#" class="rte_switch_views_link">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
+        <a href="#" class="rte_switch_views_link">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="rte_switch_views_link" style="display:none;">
+          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+        </a>
       </div>
       <div style="clear:both;"></div>
       <textarea name="message"
@@ -66,14 +71,14 @@
     <label class="control-label">{{#t "options"}}Options{{/t}}</label>
     <div class="controls">
       {{#if isTopic}}
-        <label class="checkbox">
+        <label class="checkbox" for="threaded">
           {{checkbox "threaded"}}
           {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
         </label>
       {{/if}}
       {{#if contextIsCourse}}
         {{#if isAnnouncement}}
-          <label class="checkbox">
+          <label class="checkbox" for="delay_posting">
             {{checkbox "delay_posting"
               checked=delayed_post_at
               class="element_toggler"
@@ -88,32 +93,32 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </label>
         {{/if}}
-        <label class="checkbox">
+        <label class="checkbox" for="require_initial_post">
           {{checkbox "require_initial_post"}}
           {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
         </label>
       {{/if}}
       {{#if canModerate}}
-        <label class="checkbox">
+        <label class="checkbox" for="podcast_enabled">
           {{checkbox "podcast_enabled"
             checked=podcast_url
             class="element_toggler"
             aria-controls="podcast_has_student_posts_container"}}
           {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
         </label>
-  
+
         <label id="podcast_has_student_posts_container"
                style="{{hiddenUnless podcast_url}}"
-               class="checkbox">
+               class="checkbox" for="podcast_has_student_posts">
           {{checkbox "podcast_has_student_posts"}}
           {{#t "include_replies_in_podcast_feed"}}Include Replies in podcast feed{{/t}}
         </label>
       {{/if}}
       {{#if showAssignment}}
-        <label class="checkbox">
+        <label class="checkbox" for="use_for_grading">
           {{checkbox "assignment.set_assignment"
             id="use_for_grading"
             class="element_toggler"
@@ -129,6 +134,10 @@
 </fieldset>
 
 {{#if isTopic}}
+  {{#unless isLargeRoster}}
+    <div id="group_category_options" class="control-group"></div>
+  {{/unless}}
+
   {{#if contextIsCourse}}
     <div id="availability_options" style="{{hiddenIf set_assignment}}">
       <fieldset>
@@ -138,8 +147,9 @@
             <input type="text"
                    class="datetime_field input-medium"
                    name="delayed_post_at"
+                   id="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </div>
         </div>
       </fieldset>
@@ -152,8 +162,9 @@
               <input type="text"
                      class="datetime_field input-medium"
                      name="lock_at"
+                     id="lock_at"
                      {{! TODO: what would be the best way to get this formatted right? }}
-                     value="{{datetimeFormatted lock_at}}">
+                     value="{{datetimeFormatted lock_at false}}">
             </div>
           </div>
         </fieldset>
@@ -181,13 +192,21 @@
       <div id="assignment_group_options" class="control-group"></div>
 
       {{#unless isLargeRoster}}
-        <div id="group_category_options" class="control-group"></div>
-      {{/unless}}
-
-      {{#unless isLargeRoster}}
         <div id="peer_review_options" class="control-group"></div>
       {{/unless}}
     </fieldset>
+
+    <hr>
+
+    {{#if differentiatedAssignmnetsEnabled}}
+      <div class="text-center pad-box-mini" style="margin-bottom:10px">
+        <span>
+          <em>
+          {{#t "only_visible_to_overrides_note"}}Note: This discussion is <strong>only</strong> visible to the section(s) specified below:{{/t}}
+          </em>
+        </span>
+      </div>
+    {{/if}}
 
     <div class='js-assignment-overrides'></div>
   </div>
@@ -198,4 +217,3 @@
           data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
           class="btn btn-primary">{{#t "save"}}Save{{/t}}</button>
 </div>
-

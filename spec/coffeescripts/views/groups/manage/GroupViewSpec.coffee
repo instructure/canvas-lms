@@ -7,7 +7,7 @@ define [
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
-], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group) ->
+], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV) ->
 
   view = null
   group = null
@@ -15,6 +15,7 @@ define [
 
   module 'GroupView',
     setup: ->
+      fakeENV.setup()
       group = new Group
         id: 42
         name: 'Foo Group'
@@ -33,6 +34,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       view.remove()
 
   assertCollapsed = (view) ->

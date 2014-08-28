@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'compiled/fn/preventDefault'
   'compiled/registration/signupDialog'
   'jst/registration/login'
-], (preventDefault, signupDialog, loginForm) ->
+], ($, preventDefault, signupDialog, loginForm) ->
   $loginForm = null
 
   $('.signup_link').click preventDefault ->

@@ -3,7 +3,7 @@
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
-      <% if @assignment.discussion_topic.for_group_assignment? && (group = @assignment.group_students(@submission.user)[0]) %>
+      <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
         <%= t('group_discussion_submission_description',
                 "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
                 :user => context_user_name(@context, @submission.user),
@@ -17,7 +17,7 @@
 
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
-    <% if @assignment.has_group_category? %>
+    <% if @assignment.discussion_topic.for_group_discussion? %>
       <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
     <% @entries.each do |entry| %>
@@ -49,21 +49,7 @@
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
-  <% js_block do %>
-  <script>
-  require(['jquery'], function($) {
-    $(document).ready(function() {
-      $(".data_view").change(function() {
-        if($(this).val() == "paper") {
-          $("#submission_preview").removeClass('plain_text').addClass('paper');
-        } else {
-          $("#submission_preview").removeClass('paper').addClass('plain_text');
-        }
-      }).change();
-    });
-  });
-  </script>
-  <% end %>
+  <% js_bundle 'legacy/submissions_show_preview_text' %>
   <div style="text-align: right; margin-top: 15px;">
     <select class="data_view">
       <option value="paper"><%= t('paper_view', 'Paper View') %></option>
@@ -99,11 +85,19 @@
                   <span><%= number_to_human_size(attachment.size) %></span>
                 </div>
                 <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
-                <% preview_document = t('preview_document', 'Preview the document') %>
-                <% if attachment.crocodoc_available? || attachment.scribdable? %>
-                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
-                  <a href=<%= preview_url %> title="<%= preview_document %>" class="modal_preview_link" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></a>
-                </div>
+                <% if attachment.crocodoc_available? %>
+                  <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
+                     button_text = t('view_feedback_button', 'View Feedback')
+                  %>
+                <% elsif attachment.scribdable? || attachment.canvadocable? %>
+                  <% preview_document = t('preview_submission', 'Preview your submission')
+                     button_text = t('view_preview_button', 'Preview')
+                  %>
+                <% end %>
+                <% if attachment.crocodoc_available? || attachment.scribdable? || attachment.canvadocable? %>
+                  <div class="ui-listview-text ui-listview-right" style="padding: 4px 5px 0px 5px;">
+                    <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link btn" role="button" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
+                  </div>
                 <% end %>
                 <a href="<%= preview_url %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
@@ -115,41 +109,8 @@
       </div>
     </div>
   </div>
-  <% js_block do %>
-    <script>
-    require([
-      'jquery',
-      'vendor/swfobject/swfobject',
-      'jqueryui/dialog',
-      'jquery.doc_previews' // loadDocPreview
-    ], function($, swfobject, _docPreviews) {
-      $(document).ready(function(){
 
-        $("a.flash").click(function() {
-          swfobject.embedSWF($(this).attr('href'), "main", "100%", "100%", "9.0.0", false, null, { wmode: "opaque" }, null);
-          return false;
-        });
-
-        if ($.filePreviewsEnabled()) {
-          $('.modal_preview_link').live('click', function() {
-            $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
-              .dialog({
-                title: "Preview of " + $(this).data('dialog-title'),
-                width: $(document).width() * .95,
-                height: $(document).height() * .75
-              })
-              .loadDocPreview($.extend({
-                height: '100%'
-              }, $(this).data()));
-            return false;
-          });
-        }
-
-      });
-    });
-    </script>
-  <% end %>
-
+  <% js_bundle 'legacy/submissions_show_preview_upload' %>
 <% elsif @submission.submission_type == "online_quiz" %>
   <% content_for :stylesheets do %>
     <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
@@ -165,24 +126,7 @@
   </div>
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
-  <% js_block do %>
-    <script>
-    require([
-      'jquery',
-      'media_comments'
-    ], function($, _mediaComments) {
-      $(document).ready(function() {
-        $(".play_media_recording_link").click(function(event) {
-          event.preventDefault();
-          var id = $(".media_comment_id:first").text();
-          $("#media_recording_box .box_content").mediaComment('show_inline', id);
-          $(this).remove();
-        });
-        $(".play_media_recording_link").mediaCommentThumbnail();
-      });
-    });
-    </script>
-  <% end %>
+  <% js_bundle 'legacy/submissions_show_preview_media' %>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

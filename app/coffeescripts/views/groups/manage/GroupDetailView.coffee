@@ -1,10 +1,11 @@
 define [
   'i18n!GroupDetailView'
+  'jquery'
   'Backbone'
   'compiled/views/groups/manage/GroupEditView'
   'jst/groups/manage/groupDetail'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, {View}, GroupEditView, template) ->
+], (I18n, $, {View}, GroupEditView, template) ->
 
   class GroupDetailView extends View
 
@@ -26,10 +27,16 @@ define [
 
     summary: ->
       count = @model.usersCount()
-      if ENV.group_user_type is 'student'
-        I18n.t "student_count", "student", count: count
+      if @model.theLimit()
+        if ENV.group_user_type is 'student'
+          I18n.t "student_count_max", "%{count} / %{max} students", count: count, max: @model.theLimit()
+        else
+          I18n.t "user_count_max", "%{count} / %{max} users", count: count, max: @model.theLimit()
       else
-        I18n.t "user_count", "user", count: count
+        if ENV.group_user_type is 'student'
+          I18n.t "student_count", "student", count: count
+        else
+          I18n.t "user_count", "user", count: count
 
     editGroup: (e) =>
       e.preventDefault()
@@ -51,6 +58,7 @@ define [
 
     toJSON: ->
       json = @model.toJSON()
+      json.leader = @model.get('leader')
       json.canAssignUsers = ENV.IS_LARGE_ROSTER and not @model.isLocked()
       json.canEdit = not @model.isLocked()
       json.summary = @summary()

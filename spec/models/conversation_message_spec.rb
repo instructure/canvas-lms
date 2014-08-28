@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ConversationMessage do
   context "notifications" do
-    before(:each) do
+    before :once do
       Notification.create(:name => "Conversation Message", :category => "TestImmediately")
       Notification.create(:name => "Added To Conversation", :category => "TestImmediately")
 
@@ -37,15 +37,29 @@ describe ConversationMessage do
       end
 
       @conversation = @teacher.initiate_conversation(@initial_students)
+      user = User.find(@conversation.user_id)
+      @account = Account.find(user.account)
       add_message # need initial message for add_participants to not barf
     end
 
     def add_message(options = {})
-      @conversation.add_message("message", options)
+      @conversation.add_message("message", options.merge(:root_account_id => @account.id))
     end
 
     def add_last_student
       @conversation.add_participants([@last_student])
+    end
+
+    it "should format an author line with shared contexts" do
+      message = add_message
+      message.author_short_name_with_shared_contexts(@first_student).should == "#{message.author.short_name} (#{@course.name})"
+    end
+
+    it "should format an author line without shared contexts" do
+      user
+      @conversation = @teacher.initiate_conversation([@user])
+      message = add_message
+      message.author_short_name_with_shared_contexts(@user).should == "#{message.author.short_name}"
     end
 
     it "should create appropriate notifications on new message" do
@@ -120,45 +134,47 @@ describe ConversationMessage do
   context "generate_user_note" do
     it "should add a user note under nominal circumstances" do
       Account.default.update_attribute :enable_user_notes, true
-      course_with_teacher
-      student = student_in_course.user
+      course_with_teacher(active_all: true)
+      student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
-      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
       note = student.user_notes.first
       note.creator.should eql(@teacher)
-      note.title.should eql("Private message, Jan 1, 1970")
+      note.title.should eql("Private message")
       note.note.should eql("reprimanded!")
     end
 
     it "should fail if notes are disabled on the account" do
       Account.default.update_attribute :enable_user_notes, false
-      course_with_teacher
-      student = student_in_course.user
+      course_with_teacher(active_all: true)
+      student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(0)
     end
 
-    it "should fail if there's more than one recipient" do
+    it "should allow user notes on more than one recipient" do
       Account.default.update_attribute :enable_user_notes, true
-      course_with_teacher
-      student1 = student_in_course.user
-      student2 = student_in_course.user
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student1, student2])
       conversation.add_message("reprimanded!", :generate_user_note => true)
-      student1.user_notes.size.should be(0)
-      student2.user_notes.size.should be(0)
+      student1.user_notes.size.should be(1)
+      student2.user_notes.size.should be(1)
     end
   end
 
   context "stream_items" do
+    before :once do
+      course_with_teacher
+      student_in_course
+    end
+
     it "should create a stream item based on the conversation" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       message = conversation.add_message("initial message")
 
@@ -170,8 +186,6 @@ describe ConversationMessage do
     it "should not create a conversation stream item for a submission comment" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course.user
       assignment_model(:course => @course)
       @assignment.workflow_state = 'published'
       @assignment.save
@@ -184,8 +198,6 @@ describe ConversationMessage do
     it "should not create additional stream_items for additional messages in the same conversation" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("first message")
       stream_item = StreamItem.last
@@ -199,8 +211,6 @@ describe ConversationMessage do
     it "should not delete the stream_item if a message is deleted, just regenerate" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("initial message")
       message = conversation.add_message("second message")
@@ -215,7 +225,7 @@ describe ConversationMessage do
   end
 
   context "infer_defaults" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
     end
@@ -264,8 +274,11 @@ describe ConversationMessage do
   end
 
   describe "reply_from" do
-    it "should ignore replies on deleted accounts" do
+    before :once do
       course_with_teacher
+    end
+
+    it "should ignore replies on deleted accounts" do
       student_in_course
       conversation = @teacher.initiate_conversation([@user])
       cm = conversation.add_message("initial message", :root_account_id => Account.default.id)
@@ -279,16 +292,15 @@ describe ConversationMessage do
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      }) }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
+      }) }.should raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should reply only to the message author on conversations2 conversations" do
-      course_with_teacher
       users = 3.times.map{ course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
-      cm2.recipients.size.should == 2
+      cm2.conversation_message_participants.size.should == 3
       cm3 = cm2.reply_from({
         :purpose => 'general',
         :user => users[2],
@@ -296,8 +308,26 @@ describe ConversationMessage do
         :html => "body",
         :text => "body"
       })
-      cm3.conversation_message_participants.size.should == 1
-      cm3.conversation_message_participants[0].user.should == users[1]
+      cm3.conversation_message_participants.size.should == 2
+      cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
+    end
+
+    it "should mark conversations as read for the replying author" do
+      student_in_course
+      cp = @teacher.initiate_conversation([@user])
+      cm = cp.add_message("initial message", :root_account_id => Account.default.id)
+
+      cp2 = cp.conversation.conversation_participants.find_by_user_id(@user.id)
+      cp2.workflow_state.should == 'unread'
+      cm.reply_from({
+        :purpose => 'general',
+        :user => @user,
+        :subject => "an email reply",
+        :html => "body",
+        :text => "body"
+      })
+      cp2.reload
+      cp2.workflow_state.should == 'read'
     end
   end
 end

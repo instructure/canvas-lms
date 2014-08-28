@@ -1,9 +1,11 @@
 define [
   'i18n!roster'
+  'jquery'
   'Backbone'
   'jst/courses/roster/index'
   'compiled/views/ValidatedMixin'
-], (I18n, Backbone, template, ValidatedMixin) ->
+  'compiled/models/GroupCategory'
+], (I18n, $, Backbone, template, ValidatedMixin, GroupCategory) ->
 
   class RosterView extends Backbone.View
 
@@ -19,11 +21,14 @@ define [
 
     @child 'resendInvitationsView', '[data-view=resendInvitations]'
 
+    @child 'rosterTabsView', '[data-view=rosterTabs]'
+
     @optionProperty 'roles'
 
     @optionProperty 'permissions'
 
     @optionProperty 'course'
+
 
     template: template
 
@@ -46,6 +51,12 @@ define [
     fetch: =>
       @lastRequest?.abort()
       @lastRequest = @collection.fetch().fail @onFail
+
+    course_id: ->
+      ENV.context_asset_string.split('_')[1]
+
+    canAddCategories: ->
+      ENV.canManageCourse
 
     toJSON: -> this
 

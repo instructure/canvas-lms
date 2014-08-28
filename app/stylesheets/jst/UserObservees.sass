@@ -1,0 +1,42 @@
+@import base/environment
+
+.user-observees.loading
+  .loading-indicator
+    display: block
+
+.user-observees
+  h2
+    margin-top: 0
+
+  h3
+    margin-top: 55px
+
+  .add-observee-form
+    label input
+      width: inherit
+
+  .observees-list-container
+    min-height: 38px
+
+  .observees-list
+    display: block
+
+  .observees-list:empty
+    display: none
+
+  .loading-indicator
+    display: none
+    padding: 8px 0
+    border-top: 1px solid transparent
+    border-bottom: 1px solid transparent
+
+  .observees-list
+    margin: 0
+
+    li
+      list-style: none
+      padding: 8px 0
+      border-top: 1px solid #efefef
+
+    li:last-child
+      border-bottom: 1px solid #efefef

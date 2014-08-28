@@ -17,22 +17,23 @@
  */
 
 define([
- 'i18n!edit_rubric',
- 'jst/changePointsPossibleToMatchRubricDialog',
- 'jquery' /* $ */,
- 'underscore',
- 'find_outcome',
- 'jquery.ajaxJSON' /* ajaxJSON */,
- 'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
- 'jqueryui/dialog',
- 'jquery.instructure_misc_helpers' /* replaceTags */,
- 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
- 'jquery.loadingImg' /* loadingImage */,
- 'jquery.templateData' /* fillTemplateData, getTemplateData */,
- 'vendor/jquery.ba-tinypubsub',
- 'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
- 'compiled/jquery/fixDialogButtons'
-], function(I18n, changePointsPossibleToMatchRubricDialog, $, _) {
+  'i18n!edit_rubric',
+  'jst/changePointsPossibleToMatchRubricDialog',
+  'jquery' /* $ */,
+  'underscore' /* _ */,
+  'str/htmlEscape',
+  'find_outcome',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
+  'jqueryui/dialog',
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.ba-tinypubsub',
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'compiled/jquery/fixDialogButtons'
+], function(I18n, changePointsPossibleToMatchRubricDialog, $, _, htmlEscape) {
 
   var rubricEditing = {
     htmlBody: null,
@@ -381,8 +382,7 @@ define([
         showIf(rubric.permissions.update_association && !$("#rubrics").hasClass('raw_listing'));
 
       $rubric.find(".criterion:not(.blank) .ratings").empty();
-      for(var idx in rubric.criteria) {
-        var criterion = rubric.criteria[idx];
+      rubric.criteria.forEach(function(criterion) {
         criterion.display_criterion_points = criterion.points;
         criterion.criterion_id = criterion.id;
         var $criterion = $rubric.find(".criterion.blank:first").clone(true).show().removeAttr('id');
@@ -392,17 +392,18 @@ define([
         $criterion.find(".ratings").empty();
         $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id);
         $criterion.toggleClass('ignore_criterion_for_scoring', !!criterion.ignore_for_scoring);
-        for(var jdx in criterion.ratings) {
-          var rating = criterion.ratings[jdx];
+        var count = 0;
+        criterion.ratings.forEach(function(rating) {
+          count++;
           rating.rating_id = rating.id;
           var $rating = $rating_template.clone(true);
-          $rating.toggleClass('edge_rating', jdx === 0 || jdx === criterion.ratings.length - 1);
+          $rating.toggleClass('edge_rating', count === 0 || count === criterion.ratings.length - 1);
           $rating.fillTemplateData({data: rating});
           $criterion.find(".ratings").append($rating);
-        }
+        });
         $rubric.find(".summary").before($criterion);
         $criterion.find(".criterion_points").val(criterion.points).blur();
-      }
+      });
       $rubric.find(".criterion:not(.blank)")
         .find(".ratings").showIf(!rubric.free_form_criterion_comments).end()
         .find(".custom_ratings").showIf(rubric.free_form_criterion_comments);
@@ -419,7 +420,7 @@ define([
 
 
   rubricEditing.init = function() {
-    var limitToOneRubric = true;
+    var limitToOneRubric = !$("#rubrics").hasClass('raw_listing');
     var $rubric_dialog = $("#rubric_dialog"),
         $rubric_long_description_dialog = $("#rubric_long_description_dialog");
 
@@ -427,24 +428,44 @@ define([
 
     $("#rubrics")
     .delegate(".long_description_link", 'click', function(event) {
-      console.log('fart');
       event.preventDefault();
-      var editing    = $(this).parents(".rubric").hasClass('editing'),
-          $criterion = $(this).parents(".criterion"),
-          is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
-          data       = $criterion.getTemplateData({textValues: ['long_description', 'description']});
-      data.long_description = $criterion.find("textarea.long_description").val();
+      var editing           = $(this).parents(".rubric").hasClass('editing'),
+          $criterion        = $(this).parents(".criterion"),
+          isLearningOutcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
+          data              = $criterion.getTemplateData({textValues: ['long_description', 'description']});
+
+      if(editing && !isLearningOutcome) {
+        $rubric_long_description_dialog
+          .fillFormData(data)
+          .find('.editing').show()
+          .find(".displaying").hide();
+      } else {
+        if(!isLearningOutcome) {
+          // We want to prevent XSS in this dialog but users expect to have line
+          // breaks preserved when they view the long description. Previously we
+          // were letting fillTemplateData do the htmlEscape dance but that
+          // wouldn't let us preserve the line breaks because it munged the <br>
+          // tags we were inserting.
+          //
+          // Finally, we're not making any changes in the case of this being a
+          // learning outcome criterion because they come from elsewhere in the
+          // app and may have legitimate markup in the text (at least according
+          // to the tests that broke while putting this together).
+          data.long_description = htmlEscape(data.long_description).replace(/(\r?\n)/g, '<br>$1');
+        }
+
+        $rubric_long_description_dialog
+          .fillTemplateData({data: data, htmlValues: ['long_description'], avoid: 'textarea'})
+          .find(".displaying").show().end()
+          .find('.editing').hide().end();
+      }
+
       $rubric_long_description_dialog
         .data('current_criterion', $criterion)
-        .fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )})
-        .fillFormData(data)
-        .find(".editing").showIf(editing && !$criterion.hasClass('learning_outcome_criterion')).end()
-        .find(".displaying").showIf(!editing || $criterion.hasClass('learning_outcome_criterion')).end()
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
           width: 400
         }).fixDialogButtons().find("textarea:visible:first").focus().select();
-
     })
     .delegate(".find_rubric_link", 'click', function(event) {
       event.preventDefault();
@@ -458,8 +479,7 @@ define([
         $rubric_dialog.find(".loading_message").text(I18n.t('messages.loading_rubric_groups', "Loading rubric groups..."));
         var url = $rubric_dialog.find(".grading_rubrics_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
-          for(var idx in data) {
-            var context = data[idx];
+          data.forEach(function(context) {
             var $context = $rubric_dialog.find(".rubrics_dialog_context_select.blank:first").clone(true).removeClass('blank');
             $context.fillTemplateData({
               data: {
@@ -469,7 +489,7 @@ define([
               }
             });
             $rubric_dialog.find(".rubrics_dialog_contexts_select").append($context.show());
-          }
+          });
           var codes = {};
           if(data.length == 0) {
             $rubric_dialog.find(".loading_message").text("No rubrics found");
@@ -543,9 +563,7 @@ define([
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
       $rubric.find(":text:first").focus().select();
-      if(limitToOneRubric) {
         $(".add_rubric_link").hide();
-      }
     });
 
     $("#rubric_dialog")
@@ -569,8 +587,8 @@ define([
           $link.addClass('loaded');
           $rubric_dialog.find(".rubrics_loading_message").hide();
           $rubric_dialog.find(".rubrics_dialog_rubrics,.rubrics_dialog_rubrics_select").show();
-          for(var idx in data) {
-            var association = data[idx].rubric_association;
+          data.forEach(function(item) {
+            var association = item.rubric_association;
             var rubric = association.rubric;
             var $rubric_select = $rubric_dialog.find(".rubrics_dialog_rubric_select.blank:first").clone(true);
             $rubric_select.addClass(association.context_code);
@@ -585,8 +603,7 @@ define([
               data: rubric,
               id: 'rubric_dialog_' + rubric.id
             });
-            for(var idx in rubric.data) {
-              var criterion = rubric.data[idx];
+            rubric.data.forEach(function(criterion) {
               criterion.criterion_points = criterion.points;
               criterion.criterion_points_possible = criterion.points;
               criterion.criterion_description = criterion.description;
@@ -597,20 +614,19 @@ define([
                 data: criterion
               });
               $criterion.find(".rating_holder").addClass('blank');
-              for(var jdx in ratings) {
-                var rating = ratings[jdx];
+              ratings.forEach(function(rating) {
                 var $rating = $criterion.find(".rating_holder.blank:first").clone().removeClass('blank');
                 rating.rating = rating.description;
                 $rating.fillTemplateData({
                   data: rating
                 });
                 $criterion.find(".ratings").append($rating.show());
-              }
+              });
               $criterion.find(".rating_holder.blank").remove();
               $rubric.find(".rubric.rubric_summary tr.summary").before($criterion.show());
-            }
+            });
             $rubric_dialog.find(".rubrics_dialog_rubrics").append($rubric);
-          }
+          });
           $rubric_dialog.find(".rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select").hide();
           $rubric_dialog.find(".rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select." + context_code).show();
           $rubric_dialog.find(".rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select:visible:first").click();
@@ -678,7 +694,7 @@ define([
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
         if (data['rubric_association[use_for_grading]'] == '1') {
-          var assignmentPoints = parseFloat($("#assignment_show .points_possible").text());
+          var assignmentPoints = parseFloat($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
             var $confirmDialog = $(changePointsPossibleToMatchRubricDialog({
@@ -735,6 +751,13 @@ define([
         rubricEditing.updateRubric($rubric, rubric);
         if (data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
           $("#assignment_show .points_possible").text(rubric.points_possible);
+          discussion_points_text = I18n.t('discussion_points_possible',
+                                          {one: '%{count} point possible', other: '%{count} points possible' },
+                                          {count: rubric.points_possible || 0})
+          $(".discussion-title .discussion-points").text(discussion_points_text);
+        }
+        if(!limitToOneRubric) {
+          $(".add_rubric_link").show();
         }
         $rubric.find(".rubric_title .links:not(.locked)").show();
       }

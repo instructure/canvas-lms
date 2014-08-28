@@ -17,14 +17,25 @@
 #
 
 class Announcement < DiscussionTopic
-  
+
   belongs_to :context, :polymorphic => true
-  
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :title, :message, :type, :user_id,
+    :workflow_state, :last_reply_at, :created_at, :updated_at, :delayed_post_at, :posted_at,
+    :assignment_id, :attachment_id, :deleted_at, :root_topic_id, :could_be_locked, :cloned_item_id,
+    :context_code, :position, :subtopics_refreshed_at, :old_assignment_id, :last_assignment_id, :external_feed_id,
+    :editor_id, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :discussion_type, :lock_at, :pinned, :locked
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context]
+
   has_a_broadcast_policy
   include HasContentTags
-  
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
-  
+
+  sanitize_field :message, CanvasSanitize::SANITIZE
+
   before_save :infer_content
   before_save :respect_context_lock_rules
   validates_presence_of :context_id
@@ -55,6 +66,7 @@ class Announcement < DiscussionTopic
     to { active_participants(true) - [user] }
     whenever { |record|
       record.context.available? and
+        !record.context.concluded? and
       ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end
@@ -91,6 +103,10 @@ class Announcement < DiscussionTopic
   end
 
   def can_unpublish?
+    false
+  end
+
+  def draft_state_enabled?
     false
   end
 

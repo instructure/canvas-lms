@@ -31,14 +31,14 @@ describe "/gradebooks/speed_grader" do
   end
 
   it "should render" do
-    render "gradebooks/speed_grader"  
+    render "gradebooks/speed_grader"
     response.should_not be_nil
   end
 
   it "includes a link back to the gradebook (gradebook2 by default)" do
-    render "gradebooks/speed_grader"  
+    render "gradebooks/speed_grader"
     course_id = @course.id
-    response.body.should include "a href=\"http://test.host/courses/#{course_id}/gradebook2\""
+    response.body.should include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
   end
 end
 

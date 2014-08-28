@@ -1,0 +1,63 @@
+{{#form-dialog
+id="add_group_form"
+title="New Student Group"
+on-submit="createGroup"
+height=500
+width=700
+fix-dialog-buttons=false
+submit-disabled=nameError
+}}
+<p>
+{{#t 'group_explanation'}}
+  Groups are a good place to collaborate on projects or to figure out schedules for study sessions
+  and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
+  files.  Groups can collaborate on documents, or even schedule web conferences.
+  It's really like a mini-course where you can work with a smaller number of students on a
+  more focused project.
+{{/t}}
+</p>
+<table class="formtable">
+<tr>
+  <td><label for="group_name">{{#t 'name'}}Group Name{{/t}}</label></td>
+  <td>
+    {{view Ember.TextField id="group_name" value=name onEvent="keyPress" type="search" action="validate"}}
+    {{#if nameError}}
+      <span class="text-error">
+        {{#t 'name_error'}}Group name is required{{/t}}
+      </span>
+    {{/if}}
+  </td>
+</tr>
+<tr>
+  <td><label for="">{{#t 'joining'}}Joining{{/t}}</label></td>
+  <td>
+    {{view Ember.Select
+      id="group_join_level"
+      content=selectOptions
+      value=joinLevel
+      optionLabelPath="content.desc"
+      optionValuePath="content.value"
+      aria-label="Group Join Options"
+      }}
+  </td>
+</tr>
+<tr>
+  <td>
+    <label for="">Invite</label>
+  </td>
+  <td>
+    <ul class="unstyled_list">
+    {{#view controller=controllers.users}}
+      {{#ic-lazy-list data=content href=usersPath}}
+        {{#each }}
+          {{#unless isCurrentUser}}
+          <li><label class="checkbox">{{input type="checkbox" checked=invite id=idString}}{{name}}</label></li>
+          {{/unless}}
+        {{/each}}
+      {{/ic-lazy-list}}
+    {{/view}}
+    </ul>
+  </td>
+</tr>
+</table>
+{{/form-dialog}}

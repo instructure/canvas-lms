@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
-], (_, {View}, template, GroupUsersView, GroupDetailView) ->
+], ($, _, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View
 
@@ -41,6 +42,7 @@ define [
       @users = @model.users()
       @model.on 'destroy', @remove, this
       @model.on 'change:members_count', @updateFullState, this
+      @model.on 'change:max_membership', @updateFullState, this
 
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
@@ -71,7 +73,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      @addUnassignedMenu.groupId = @model.id
+      @addUnassignedMenu.group = @model
       @addUnassignedMenu.showBy $target, e.type is 'click'
 
     hideAddUser: (e) ->
@@ -91,4 +93,4 @@ define [
       user = ui.draggable.data('model')
       newGroupId = $(e.currentTarget).data('id')
       setTimeout =>
-        @model.collection.category.reassignUser(user, newGroupId)
+        @model.collection.category.reassignUser(user, @model.collection.get(newGroupId))

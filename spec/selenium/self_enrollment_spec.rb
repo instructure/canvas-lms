@@ -5,6 +5,7 @@ describe "self enrollment" do
 
   context "in a full course" do
     it "should not be allowed" do
+      Account.default.allow_self_enrollment!
       course(:active_all => true)
       @course.self_enrollment = true
       @course.self_enrollment_limit = 0
@@ -66,6 +67,7 @@ describe "self enrollment" do
 
   shared_examples_for "closed registration" do
     before do
+      Account.default.allow_self_enrollment!
       course(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)
@@ -113,10 +115,10 @@ describe "self enrollment" do
     }
     
     context "with open registration" do
-      it_should_behave_like "open registration"
+      include_examples "open registration"
     end
     context "without open registration" do
-      it_should_behave_like "closed registration"
+      include_examples "closed registration"
     end
   end
 
@@ -129,14 +131,14 @@ describe "self enrollment" do
     }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      f('#courses_menu_item').should include_text("Home")
+      f('#courses_menu_item').should include_text("Courses") # show for future course
       f('#dashboard').should include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do
-      it_should_behave_like "open registration"
+      include_examples "open registration"
     end
     context "without open registration" do
-      it_should_behave_like "closed registration"
+      include_examples "closed registration"
     end
   end
 
@@ -145,14 +147,14 @@ describe "self enrollment" do
     let(:set_up_course){ }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      f('#courses_menu_item').should include_text("Home")
+      f('#courses_menu_item').should include_text("Courses")
       f('#dashboard').should include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do
-      it_should_behave_like "open registration"
+      include_examples "open registration"
     end
     context "without open registration" do
-      it_should_behave_like "closed registration"
+      include_examples "closed registration"
     end
   end
 

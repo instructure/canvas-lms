@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/collections/GroupCollection'
   'compiled/models/Group'
   'compiled/models/GroupUser'
   'compiled/models/GroupCategory'
-], (AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
+], ($, AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
 
   view = null
   user = null
@@ -12,7 +13,7 @@ define [
   module 'AssignToGroupMenu',
     setup: ->
       groupCategory = new GroupCategory
-      user = new GroupUser(id: 1, name: "bob", groupId: null, category: groupCategory)
+      user = new GroupUser(id: 1, name: "bob", group: null, category: groupCategory)
       groups = new GroupCollection [
         new Group id: 1, name: "a group"
       ], {category: groupCategory}
@@ -25,11 +26,9 @@ define [
     teardown: ->
       view.remove()
 
-  test "updates the user's groupId", ->
-    equal user.get('groupId'), null
+  test "updates the user's group", ->
+    equal user.get('group'), null
     $link = view.$('.set-group')
     equal $link.length, 1
     $link.click()
-    equal user.get('groupId'), 1
-
-
+    equal user.get('group').id, 1

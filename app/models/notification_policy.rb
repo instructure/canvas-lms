@@ -20,11 +20,11 @@ class NotificationPolicy < ActiveRecord::Base
   
   belongs_to :notification
   belongs_to :communication_channel
-  
+  has_many :delayed_messages
+
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
   validates_presence_of :communication_channel_id, :frequency
-  validates_inclusion_of :broadcast, in: [true, false]
   validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
                                           Notification::FREQ_DAILY,
                                           Notification::FREQ_WEEKLY,
@@ -51,11 +51,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  def communication_preference
-    return nil unless broadcast
-    communication_channel || user.communication_channel
-  end
-  
   def self.spam_blocked_by(user)
     NotificationPolicy.where(:communication_channel_id => user.communication_channels.pluck(:id)).delete_all
     cc = user.communication_channel
@@ -101,21 +96,12 @@ class NotificationPolicy < ActiveRecord::Base
       frequency = params[:frequency]
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
-      # entry. If other than than, create or update the entry.
+      # entry. If other than that, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
-          if CANVAS_RAILS2
-            # can't use hash syntax for the where cause Rails 2 will try to
-            # call communication_channels= for the or_initialize portion
-            p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
-                find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
-          else
-            p = NotificationPolicy.joins(:communication_channel).where(
-              communication_channels: {user_id: user},
-              communication_channel_id: params[:channel_id],
-              notification_id: notification_id
-            ).find_or_initialize
-          end
+          scope = user.notification_policies.
+              where(communication_channel_id: params[:channel_id], notification_id: notification_id)
+          p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
           p.save!
@@ -182,7 +168,8 @@ class NotificationPolicy < ActiveRecord::Base
       policies = communication_channel.notification_policies.all
       Notification.all.each do |notification|
         next if policies.find { |p| p.notification_id == notification.id }
-        Notification.transaction(requires_new: true) do
+        NotificationPolicy.transaction(requires_new: true) do
+          np = nil
           begin
             np = communication_channel.notification_policies.build(notification: notification)
             np.frequency = if communication_channel == communication_channel.user.communication_channel
@@ -195,9 +182,9 @@ class NotificationPolicy < ActiveRecord::Base
             np = nil
             raise ActiveRecord::Rollback
           end
+          np ||= communication_channel.notification_policies.where(notification_id: notification).first
+          policies << np
         end
-        np ||= communication_channel.notification_policies.where(notification_id: notification).first
-        policies << np
       end
       policies
     end

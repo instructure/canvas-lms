@@ -1,6 +1,6 @@
 {
   "name": "ic-styled",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "authors": [
     "Ryan Florence <rpflorence@gmail.com>"
   ],
@@ -20,6 +20,6 @@
     "**/.*"
   ],
   "dependencies": {
-    "ember": "~1.2.0"
+    "ember": "^1.2.0"
   }
 }

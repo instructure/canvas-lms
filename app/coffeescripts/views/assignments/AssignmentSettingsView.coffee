@@ -1,9 +1,10 @@
 define [
+  'compiled/util/round'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], (_, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], (round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
@@ -73,6 +74,7 @@ define [
         @weights.push v
         #sum group weights
         total_weight += v.findWeight() || 0
+      total_weight = round(total_weight,2)
 
       @$el.find('#percent_total').html(total_weight + "%")
 
@@ -84,6 +86,7 @@ define [
       total_weight = 0
       for v in @weights
         total_weight += v.findWeight() || 0
+      total_weight = round(total_weight,2)
       @$el.find('#percent_total').html(total_weight + "%")
 
     toJSON: ->

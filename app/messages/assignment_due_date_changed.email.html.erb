@@ -5,6 +5,12 @@
 <% define_content :subject do %>
   <%= t('assignment_due_date_changed', 'Assignment Due Date Changed: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_text, 'View the assignment' %>
+  </a>
+<% end %>
       
 <p><%= t('assignment_due_date_changed_sentence', 'The due date for the assignment, %{assignment_name}, for the course, %{course_name}, has changed to:',
          :assignment_name => asset.title,
@@ -17,5 +23,3 @@
   <%= t('no_due_date', 'No Due Date') %>
 <% end %>
 </p>
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'View the assignment' %></a></p>

@@ -18,22 +18,32 @@
 # @API Admins
 # Manage account role assignments
 #
-# @object Admin
-#     {
-#       // The unique identifier for the account role/user assignment
-#       "id": 1023,
-#
-#       // The account role assigned. This can be 'AccountAdmin' or a
-#       // user-defined role created by the Roles API.
-#       "role": "AccountAdmin",
-#
-#       // The user the role is assigned to. See the Users API for details.
-#       "user": {
-#         "id": 8191,
-#         "name": "A. A. Dinwiddie",
-#         "login_id": "bursar@uu.example.edu"
+# @model Admin
+#    {
+#       "id": "Admin",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the account role/user assignment.",
+#           "example": 1023,
+#           "type": "integer"
+#         },
+#         "role": {
+#           "description": "The account role assigned. This can be 'AccountAdmin' or a user-defined role created by the Roles API.",
+#           "example": "AccountAdmin",
+#           "type": "string"
+#         },
+#         "user": {
+#           "description": "The user the role is assigned to. See the Users API for details.",
+#           "$ref": "User"
+#         },
+#         "status": {
+#           "description": "The status of the account role/user assignment.",
+#           "type": "string",
+#           "example": "deleted"
+#         }
 #       }
-#     }
+#    }
 class AdminsController < ApplicationController
   before_filter :require_user
   before_filter :get_context
@@ -44,21 +54,34 @@ class AdminsController < ApplicationController
   #
   # Flag an existing user as an admin within the account.
   #
-  # @argument user_id [String]
+  # @argument user_id [Required, Integer]
   #   The id of the user to promote.
   #
-  # @argument role [Optional, String]
+  # @argument role [String]
   #   The user's admin relationship with the account will be created with the
   #   given role. Defaults to 'AccountAdmin'.
   #
-  # @argument send_confirmation [Optional, Boolean] Send a notification email to
+  # @argument send_confirmation [Boolean] Send a notification email to
   #   the new admin if true. Default is true.
   #
   # @returns Admin
   def create
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      user = api_find(User, params[:user_id])
-      admin = user.flag_as_admin(@context, params[:role], !(params[:send_confirmation] == '0'))
+    user = api_find(User, params[:user_id])
+    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless user.find_pseudonym_for_account(@context.root_account, true)
+    role = params[:role] || 'AccountAdmin'
+    admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+
+    if authorized_action(admin, @current_user, :create)
+      if admin.new_record?
+        admin.save!
+        if !(params[:send_confirmation] == '0')
+          if user.registered?
+            admin.account_user_notification!
+          else
+            admin.account_user_registration!
+          end
+        end
+      end
       render :json => admin_json(admin, @current_user, session)
     end
   end
@@ -67,29 +90,33 @@ class AdminsController < ApplicationController
   #
   # Remove the rights associated with an account admin role from a user.
   #
-  # @argument role [Optional, String]
+  # @argument role [String]
   #   Account role to remove from the user. Defaults to 'AccountAdmin'. Any
   #   other account role must be specified explicitly.
   #
   # @returns Admin
   def destroy
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      user = api_find(User, params[:user_id])
-      role = params[:role] || 'AccountAdmin'
-      admin = @context.account_users.find_by_user_id_and_membership_type!(user.id, role)
+    user = api_find(User, params[:user_id])
+    role = params[:role] || 'AccountAdmin'
+    admin = @context.account_users.where(user_id: user, membership_type: role).first!
+    if authorized_action(admin, @current_user, :destroy)
       admin.destroy
       render :json => admin_json(admin, @current_user, session)
     end
   end
-  
+
   # @API List account admins
   #
   # List the admins in the account
-  # 
+  #
+  # @argument user_id[] [[Integer]]
+  #   Scope the results to those with user IDs equal to any of the IDs specified here.
+  #
   # @returns [Admin]
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
       scope = @context.account_users
+      scope = scope.where(user_id: params[:user_id]) if params[:user_id]
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }

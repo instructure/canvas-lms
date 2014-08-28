@@ -120,6 +120,38 @@ describe "account" do
       dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:*"
     end
 
+    context "cas" do
+      it "should be able to set unknown user url option" do
+        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        click_option('#add_auth_select', 'cas', :value)
+        f("#account_authorization_config_0_login_handle_name").should be_displayed
+
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#account_authorization_config_0_unknown_user_url").send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#auth_form') }
+
+        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+      end
+    end
+
+    context "saml" do
+      it "should be able to set unknown user url option" do
+        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        click_option('#add_auth_select', 'saml', :value)
+
+        saml_div = f('#saml_div')
+        saml_div.find_element(:css, 'button.element_toggler.btn').click
+
+        f("#account_authorization_config_idp_entity_id").should be_displayed
+
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#saml_config__form') }
+
+        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+      end
+    end
+
     it "should be able to create a new course" do
       get "/accounts/#{Account.default.id}"
       f('.add_course_link').click
@@ -133,7 +165,12 @@ describe "account" do
     end
 
     it "should be able to create a new course when no other courses exist" do
-      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.course_account_associations.scoped.delete_all; c.destroy! }
+      Account.default.courses.each do |c|
+        c.course_account_associations.scoped.delete_all
+        c.enrollments.scoped.delete_all
+        c.course_sections.scoped.delete_all
+        c.destroy!
+      end
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click
@@ -308,8 +345,9 @@ describe "account" do
         ui_auto_complete.should be_displayed
       end
 
-      element = ff('.ui-autocomplete li a').first
-      element.text.should == @course_name
+      elements = ff('.ui-autocomplete li:first-child a div')
+      elements[0].text.should == @course_name
+      elements[1].text.should == 'Default Term'
       keep_trying_until do
         driver.execute_script("$('.ui-autocomplete li a').hover().click()")
         driver.current_url.should include("/courses/#{@course.id}")
@@ -345,7 +383,7 @@ describe "account" do
 
     it "should be able to view user details from parent account" do
       user_non_root = user
-      create_sub_account.add_user(user_non_root)
+      create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
       #verify user details displayed properly
       f('.accounts .unstyled_list li').should include_text('sub_account')

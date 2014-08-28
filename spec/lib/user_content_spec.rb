@@ -62,4 +62,41 @@ describe UserContent do
       UserContent.css_size('100-x').should == '100'
     end
   end
+
+  describe 'HtmlRewriter' do
+    let(:rewriter) do
+      course_with_teacher
+      UserContent::HtmlRewriter.new(@course, @teacher)
+    end
+
+    it "handler should not convert id to integer for 'wiki' matches" do
+      called = false
+      rewriter.set_handler('wiki') do |match|
+        called = true
+        match.obj_id.class.should == String
+      end
+      rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/wiki/1234-numbered-page\">test</a>")
+      called.should be_true
+    end
+
+    it "handler should not convert id to integer for 'pages' matches" do
+      called = false
+      rewriter.set_handler('pages') do |match|
+        called = true
+        match.obj_id.class.should == String
+      end
+      rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/pages/1234-numbered-page\">test</a>")
+      called.should be_true
+    end
+
+    it "should not grant public access to locked files" do
+      course
+      att1 = attachment_model(context: @course)
+      att2 = attachment_model(context: @course)
+      att2.update_attribute(:locked, true)
+      rewriter = UserContent::HtmlRewriter.new(@course, nil)
+      rewriter.user_can_view_content?(att1).should be_true
+      rewriter.user_can_view_content?(att2).should be_false
+    end
+  end
 end

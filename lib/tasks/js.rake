@@ -1,10 +1,13 @@
 require 'timeout'
+require 'json'
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name>`'
+  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
+    #browsers = ARGV[2] || 'Firefox,Chrome,Safari'
+    browsers = ARGV[2] || 'Chrome'
     if app
       ENV['JS_SPEC_MATCHER'] = matcher_for_ember_app app
       unless File.exists?("app/coffeescripts/ember/#{app}")
@@ -13,7 +16,7 @@ namespace :js do
       end
     end
     Rake::Task['js:generate_runner'].invoke
-    exec('testem -f config/testem.yml')
+    exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
   def matcher_for_ember_app app_name
@@ -31,37 +34,63 @@ namespace :js do
     output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
+    build_requirejs_config
   end
 
-  desc 'test javascript specs with PhantomJS'
-  task :test do
+  def build_requirejs_config
+    require 'canvas/require_js'
+    require 'erubis'
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/requirejs_config.js.erb")).
+        result(Canvas::RequireJs.get_binding)
+    File.open("#{Rails.root}/spec/javascripts/requirejs_config.js", 'w') { |f| f.write(output) }
+
+    matcher = Canvas::RequireJs.matcher
+    tests = Dir[
+      "public/javascripts/#{matcher}",
+      "spec/javascripts/compiled/#{matcher}",
+      "spec/plugins/*/javascripts/compiled/#{matcher}"
+    ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
+    File.open("#{Rails.root}/spec/javascripts/tests.js", 'w') { |f|
+      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests)}")
+    }
+  end
+
+  desc 'test javascript specs with Karma'
+  task :test, :reporter do |task, args|
+    reporter = args[:reporter]
     require 'canvas/require_js'
 
     # run test for each ember app individually
     matcher = ENV['JS_SPEC_MATCHER']
 
+    if matcher
+      puts "--> Matcher: #{matcher}"
+    end
+
     if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-      ignored_embers = ['shared']
-      Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || ignored_embers.include?(d) }.each do |ember_app|
+      ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
+      Dir.entries('app/coffeescripts/ember').reject { |d|
+        d.match(/^\./) || ignored_embers.include?(d)
+      }.each do |ember_app|
         puts "--> Running tests for '#{ember_app}' ember app"
         Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-        test_suite
+        test_suite(reporter)
       end
     end
 
     # run test for non-ember apps
     Canvas::RequireJs.matcher = nil
-    test_suite
+    test_suite(reporter)
   end
 
-  def test_suite
-    if test_js_with_timeout(300) != 0 && !ENV['JS_SPEC_MATCHER']
-      puts "--> PhantomJS tests failed. retrying PhantomJS..."
-      raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
+  def test_suite(reporter=nil)
+    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER']
+      puts "--> Karma tests failed." # retrying karma...
+      raise "Karma tests failed on second attempt." if test_js_with_timeout(400,reporter) != 0
     end
   end
 
-  def test_js_with_timeout(timeout)
+  def test_js_with_timeout(timeout,reporter)
     require 'canvas/require_js'
     begin
       Timeout::timeout(timeout) do
@@ -70,32 +99,21 @@ namespace :js do
           puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
           Rake::Task['js:generate'].invoke
         end
-        puts "--> executing phantomjs tests"
+        puts "--> executing browser tests with Karma"
         build_runner
-        phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html 2>&1`
-        puts phantomjs_output
+        karma_output = `./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter} 2>&1`
+        puts karma_output
 
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif ENV['JS_SPEC_MATCHER'] || Canvas::RequireJs.matcher
-          # running a subset of tests in isolation, don't be paranoid about
-          # some unrun tests getting lost
-          result = 0
-        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 2000
-          # ran all tests but didn't see enough? do be paranoid about some
-          # unrun tests getting lost
-          puts 'all run specs passed, but not all specs were run'
-          result = 1
         else
-          # good exit status, and it seems enough specs ran to assuage our
-          # paranoia
           result = 0
         end
         return result
       end
     rescue Timeout::Error
-      puts "PhantomJS tests reached timeout!"
+      puts "Karma tests reached timeout!"
     end
   end
 
@@ -121,9 +139,56 @@ namespace :js do
     Canvas::RequireJs::PluginExtension.generate_all
   end
 
+  task :build_client_apps do
+    require 'config/initializers/client_app_symlinks'
+
+    Dir.glob('./client_apps/*/').each do |app_dir|
+      app_name = File.basename(app_dir)
+
+      Dir.chdir(app_dir) do
+        puts "Building client app '#{app_name}'"
+
+        begin
+          puts "\tRunning 'npm install --production'..."
+          output = `npm install --production`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            INSTALL FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Package installation failure for client app #{app_name}"
+          end
+        end
+
+        begin
+          puts "\tRunning 'npm run build --production'..."
+          output = `npm run build --production`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            BUILD FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Build script failed for client app #{app_name}"
+          end
+        end
+
+        puts "Client app '#{app_name}' was built successfully."
+      end
+    end
+
+    maintain_client_app_symlinks('public/javascripts')
+  end
+
   desc "generates compiled coffeescript, handlebars templates and plugin extensions"
   task :generate do
     require 'config/initializers/plugin_symlinks'
+    require 'config/initializers/client_app_symlinks'
     require 'fileutils'
     require 'canvas'
     require 'canvas/coffee_script'
@@ -137,6 +202,8 @@ namespace :js do
       Dir.glob('spec/plugins/*/javascripts/compiled')
     ]
     FileUtils.rm_rf(paths_to_remove)
+
+    Rake::Task['js:build_client_apps'].invoke
 
     threads = []
     threads << Thread.new do
@@ -173,7 +240,8 @@ namespace :js do
           Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
             destination = coffee_destination(dir)
             FileUtils.mkdir_p(destination)
-            system("coffee -m -c -o #{destination} #{dir}/*.coffee")
+            flags = "-m" if ENV["CANVAS_SOURCE_MAPS"] != "0"
+            system("coffee #{flags} -c -o #{destination} #{dir}/*.coffee")
             raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
           end
         else
@@ -200,12 +268,19 @@ namespace :js do
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/config/build.js", 'w') { |f| f.write(output) }
 
-    puts "--> Optimizing canvas-lms"
+    puts "--> Concatenating JavaScript bundles with r.js"
     optimize_time = Benchmark.realtime do
       output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
       raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
-    puts "--> Optimized canvas-lms in #{optimize_time}"
+    puts "--> Concatenated JavaScript bundles in #{optimize_time}"
+
+    puts "--> Compressing JavaScript with UglifyJS"
+    optimize_time = Benchmark.realtime do
+      output = `npm run compress 2>&1`
+      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+    end
+    puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
   desc "creates ember app bundles"

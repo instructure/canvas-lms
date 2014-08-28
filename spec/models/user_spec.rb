@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -131,7 +131,7 @@ describe User do
   it "should update account associations when a user is associated to an account just by account_users" do
     account = account_model
     @user = User.create
-    account.add_user(@user)
+    account.account_users.create!(user: @user)
 
     @user.reload
     @user.associated_accounts.length.should eql(1)
@@ -156,12 +156,21 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  it "should ignore stream item instances from concluded courses" do
+    course_with_teacher(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    @course.soft_conclude!
+    @course.save
+    @user.recent_stream_items.size.should == 0
+  end
+
   describe "#recent_stream_items" do
     it "should skip submission stream items" do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = bare_submission_model assignment, @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -171,7 +180,7 @@ describe User do
   end
 
   describe "#cached_recent_stream_items" do
-    before(:each) do
+    before(:once) do
       @contexts = []
       # create stream item 1
       course_with_teacher(:active_all => true)
@@ -220,8 +229,8 @@ describe User do
     p2.account = account2
     p1.save!
     p2.save!
-    account1.add_user(user)
-    account2.add_user(user)
+    account1.account_users.create!(user: user)
+    account2.account_users.create!(user: user)
     course1 = account1.courses.create
     course2 = account2.courses.create
     course1.offer!
@@ -343,7 +352,7 @@ describe User do
       enrollment = course.enroll_student(user)
       enrollment.should be_invited
       user.user_account_associations.should == []
-      Account.default.add_user(user)
+      Account.default.account_users.create!(user: user)
       user.user_account_associations(true).should == []
       user.pseudonyms.create!(:unique_id => 'test@example.com')
       user.user_account_associations(true).should == []
@@ -386,12 +395,12 @@ describe User do
 
       it "should create associations for a user in multiple shards" do
         user
-        Account.site_admin.add_user(@user)
+        Account.site_admin.account_users.create!(user: @user)
         @user.user_account_associations.map(&:account).should == [Account.site_admin]
 
         @shard1.activate do
           @account = Account.create!
-          au = @account.add_user(@user)
+          au = @account.account_users.create!(user: @user)
           @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
               [Account.site_admin, @account].sort_by(&:id)
           @account.user_account_associations.map(&:user).should == [@user]
@@ -401,7 +410,7 @@ describe User do
           @user.user_account_associations.with_each_shard.map(&:account).should == [Account.site_admin]
           @account.reload.user_account_associations.map(&:user).should == []
 
-          @account.add_user(@user)
+          @account.account_users.create!(user: @user)
 
           @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
               [Account.site_admin, @account].sort_by(&:id)
@@ -456,6 +465,17 @@ describe User do
     @assignment.grade_student @user, :grade => 9
     @assignment.unpublish
     @user.recent_feedback(:contexts => [@course]).should be_empty
+  end
+
+  it "should not include recent feedback for other students in admin feedback" do
+    create_course_with_student_and_assignment
+    other_teacher = @teacher
+    teacher = teacher_in_course(:active_all => true).user
+    student = student_in_course(:active_all => true).user
+    sub = @assignment.grade_student(student, :grade => 9).first
+    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
+    sub.save!
+    teacher.recent_feedback(:contexts => [@course]).should be_empty
   end
 
   describe '#courses_with_primary_enrollment' do
@@ -597,8 +617,8 @@ describe User do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
-      Account.site_admin.add_user(@site_admin)
-      Account.default.add_user(@admin)
+      Account.site_admin.account_users.create!(user: @site_admin)
+      Account.default.account_users.create!(user: @admin)
       user.can_masquerade?(@site_admin, Account.default).should be_true
       @admin.can_masquerade?(@site_admin, Account.default).should be_true
       user.can_masquerade?(@admin, Account.default).should be_true
@@ -614,7 +634,7 @@ describe User do
       @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
       account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
-      Account.default.add_user(@admin)
+      Account.default.account_users.create!(user: @admin)
       user.can_masquerade?(@restricted_admin, Account.default).should be_true
       @admin.can_masquerade?(@restricted_admin, Account.default).should be_false
       @restricted_admin.can_masquerade?(@admin, Account.default).should be_true
@@ -626,21 +646,21 @@ describe User do
       user.pseudonyms.create!(:unique_id => 'nobodyelse@example.com', :account => @account2)
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
-      Account.default.add_user(@admin)
-      Account.site_admin.add_user(@site_admin)
+      Account.default.account_users.create!(user: @admin)
+      Account.site_admin.account_users.create!(user: @site_admin)
       user.can_masquerade?(@admin, Account.default).should be_true
       user.can_masquerade?(@admin, @account2).should be_false
       user.can_masquerade?(@site_admin, Account.default).should be_true
       user.can_masquerade?(@site_admin, @account2).should be_true
-      @account2.add_user(@admin)
+      @account2.account_users.create!(user: @admin)
     end
 
     it "should allow site admin when they don't otherwise qualify for :create_courses" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
-      Account.default.add_user(@admin)
-      Account.site_admin.add_user(@site_admin)
+      Account.default.account_users.create!(user: @admin)
+      Account.site_admin.account_users.create!(user: @site_admin)
       course
       @course.enroll_teacher(@admin)
       Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
@@ -690,12 +710,41 @@ describe User do
     end
   end
 
+  context "check_courses_right?" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      @student = user_model
+    end
+
+    before :each do
+      @course.stubs(:grants_right?).returns(true)
+    end
+
+    it "should require parameters" do
+      @student.check_courses_right?(nil, :some_right).should be_false
+      @student.check_courses_right?(@teacher, nil).should be_false
+    end
+
+    it "should check current courses" do
+      @student.expects(:courses).once.returns([@course])
+      @student.expects(:concluded_courses).never
+      @student.check_courses_right?(@teacher, :some_right).should be_true
+    end
+
+    it "should check concluded courses" do
+      @student.expects(:courses).once.returns([])
+      @student.expects(:concluded_courses).once.returns([@course])
+      @student.check_courses_right?(@teacher, :some_right).should be_true
+    end
+  end
+
   context "search_messageable_users" do
-    before(:each) do
+    before(:once) do
       @admin = user_model
       @student = user_model
       tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
       tie_user_to_account(@student, :membership_type => 'Student')
+      set_up_course_with_users
     end
 
     def set_up_course_with_users
@@ -730,11 +779,11 @@ describe User do
     end
 
     it "should include yourself even when not enrolled in courses" do
+      @student = user_model
       search_messageable_users(@student).map(&:id).should include(@student.id)
     end
 
     it "should only return users from the specified context and type" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort.
@@ -756,7 +805,6 @@ describe User do
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
-      set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
@@ -773,7 +821,6 @@ describe User do
     end
 
     it "should let students message the entire class by default" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort.
@@ -781,7 +828,6 @@ describe User do
     end
 
     it "should not let users message the entire class if they cannot send_messages" do
-      set_up_course_with_users
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -792,7 +838,6 @@ describe User do
     end
 
     it "should not include deleted users" do
-      set_up_course_with_users
       search_messageable_users(@student).map(&:id).should_not include(@deleted_user.id)
       search_messageable_users(@student, :search => @deleted_user.name).map(&:id).should be_empty
       search_messageable_users(@student, :strict_checks => false).map(&:id).should_not include(@deleted_user.id)
@@ -800,13 +845,11 @@ describe User do
     end
 
     it "should include deleted iff strict_checks=false" do
-      set_up_course_with_users
       @student.load_messageable_user(@deleted_user.id, :strict_checks => false).should_not be_nil
       @student.load_messageable_user(@deleted_user.id).should be_nil
     end
 
     it "should only include users from the specified section" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
       messageable_users = search_messageable_users(@student, :context => "section_#{@course.default_section.id}").map(&:id)
       messageable_users.should include @this_section_user.id
@@ -818,7 +861,6 @@ describe User do
     end
 
     it "should include users from all sections if visibility is not limited to sections" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
       messageable_users = search_messageable_users(@student).map(&:id)
       messageable_users.should include @this_section_user.id
@@ -826,7 +868,6 @@ describe User do
     end
 
     it "should return users for a specified group if the receiver can access the group" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
@@ -835,7 +876,6 @@ describe User do
     end
 
     it "should respect section visibility when returning users for a specified group" do
-      set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
@@ -850,7 +890,6 @@ describe User do
     end
 
     it "should only show admins and the observed if the receiver is an observer" do
-      set_up_course_with_users
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
@@ -868,7 +907,6 @@ describe User do
     end
 
     it "should not show non-linked observers to students" do
-      set_up_course_with_users
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       student1, student2 = user_model, user_model
       @course.enroll_user(student1, 'StudentEnrollment', :enrollment_state => 'active')
@@ -886,7 +924,6 @@ describe User do
     end
 
     it "should include all shared contexts and enrollment information" do
-      set_up_course_with_users
       @first_course = @course
       @first_course.enroll_user(@this_section_user, 'TaEnrollment', :enrollment_state => 'active')
       @first_course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
@@ -933,23 +970,7 @@ describe User do
       search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
-    it "should return names with shared contexts" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      @group.users << @student
-
-      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
-      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
-
-      @student.shared_contexts(@other_section_user).should eql ['the course']
-      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
-
-      @student.shared_contexts(@unrelated_user).should eql []
-      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
-    end
-
     it "should not rank results by default" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by name (all the same), then id
@@ -959,7 +980,6 @@ describe User do
 
     context "concluded enrollments" do
       it "should return concluded enrollments" do # i.e. you can do a bare search for people who used to be in your class
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
@@ -968,7 +988,6 @@ describe User do
       end
 
       it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @course.complete!
 
@@ -982,7 +1001,6 @@ describe User do
       end
 
       it "should return concluded enrollments in the group if they are still members" do
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
@@ -993,7 +1011,6 @@ describe User do
       end
 
       it "should return concluded enrollments in the group and section if they are still members" do
-        set_up_course_with_users
         enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
         # we currently force limit_privileges_to_course_section to be false for students; override it in the db
         Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
@@ -1010,11 +1027,6 @@ describe User do
     end
 
     context "admin_context" do
-      before do
-        set_up_course_with_users
-        account_admin_user
-      end
-
       it "should find users in the course" do
         search_messageable_users(@admin, :context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
@@ -1048,11 +1060,12 @@ describe User do
   end
 
   context "tabs_available" do
+    before(:once) { Account.default }
     it "should not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == false
+      tool.has_placement?(:user_navigation).should == false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
@@ -1062,7 +1075,7 @@ describe User do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == true
+      tool.has_placement?(:user_navigation).should == true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
@@ -1074,8 +1087,11 @@ describe User do
   end
 
   context "avatars" do
-    it "should find only users with avatars set" do
+    before :once do
       user_model
+    end
+
+    it "should find only users with avatars set" do
       @user.avatar_state = 'submitted'
       @user.save!
       User.with_avatar_state('submitted').count.should == 0
@@ -1087,14 +1103,12 @@ describe User do
     end
 
     it "should clear avatar state when assigning by service that no longer exists" do
-      user_model
       @user.avatar_image_url = 'http://www.example.com'
       @user.avatar_image = { 'type' => 'twitter' }
       @user.avatar_image_url.should be_nil
     end
 
     it "should allow external url's to be assigned" do
-      user_model
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
       @user.reload.avatar_image_url.should == 'http://www.example.com/image.jpg'
@@ -1105,10 +1119,15 @@ describe User do
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
+      HostUrl.expects(:default_host).returns('somedomain:3000')
+      User.avatar_fallback_url("/path").should ==
+        "https://somedomain:3000/path"
       User.avatar_fallback_url("//somedomain/path").should ==
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
+      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+        "http://somedomain:3000/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
@@ -1122,8 +1141,7 @@ describe User do
     end
 
     describe "#clear_avatar_image_url_with_uuid" do
-      before :each do
-        user_model
+      before :once do
         @user.avatar_image_url = '1234567890ABCDEF'
         @user.save!
       end
@@ -1210,7 +1228,7 @@ describe User do
   end
 
   context "group_member_json" do
-    before :each do
+    before :once do
       @account = Account.default
       @enrollment = course_with_student(:active_all => true)
       @section = @enrollment.course_section
@@ -1262,14 +1280,14 @@ describe User do
   end
 
   describe "favorites" do
-    before :each do
+    before :once do
       @user = User.create!
 
       @courses = []
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
-        @user.favorites.build(context: course)
+        @user.favorites.create!(context: course)
       end
 
       @user.save!
@@ -1277,26 +1295,25 @@ describe User do
 
     it "should default favorites to enrolled courses when favorite courses do not exist" do
       @user.favorites.by("Course").destroy_all
-      @user.menu_courses.should == @courses
+      @user.menu_courses.to_set.should == @courses.to_set
     end
 
     it "should only include favorite courses when set" do
       course = @courses.shift
       @user.favorites.where(context_type: "Course", context_id: course).first.destroy
-      @user.menu_courses.should == @courses
+      @user.menu_courses.to_set.should == @courses.to_set
     end
 
     context "sharding" do
       specs_require_sharding
 
       before :each do
+        account2 = @shard1.activate { account_model }
         (4..6).each do |x|
-          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
           @courses << course
-          @user.favorites.build(context: course)
+          @user.favorites.create!(context: course)
         end
-
-        @user.save!
       end
 
       it "should include cross shard favorite courses" do
@@ -1340,9 +1357,13 @@ describe User do
   end
 
   describe "pseudonym_for_account" do
-    before do
+    before :once do
+      @account1 = Account.create!
       @account2 = Account.create!
       @account3 = Account.create!
+    end
+
+    before :each do
       Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
       Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
     end
@@ -1362,11 +1383,31 @@ describe User do
       @user.find_pseudonym_for_account(@account2).should == nil
     end
 
-    it "should create a copy of an existing pseudonym" do
-      @account1 = Account.create!
-      @account2 = Account.create!
-      @account3 = Account.create!
+    describe 'with cross-sharding' do
+      specs_require_sharding
+      it "should only search trusted shards" do
+        @user = user(:active_all => 1, :account => @account1)
+        @shard1.activate do
+          @account2 = Account.create!
+          @pseudonym1 = pseudonym(@user, :account => @account2)
+        end
 
+        @shard2.activate do
+          @account3 = Account.create!
+          @pseudonym2 = pseudonym(@user, :account => @account3)
+        end
+
+        @account1.stubs(:trusted_account_ids).returns([@account3.id])
+
+        @shard1.expects(:activate).never
+        @shard2.expects(:activate).once
+
+        pseudonym = @user.find_pseudonym_for_account(@account1)
+        pseudonym.should == @psuedonym2
+      end
+    end
+
+    it "should create a copy of an existing pseudonym" do
       # from unrelated account
       user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdef')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
@@ -1409,18 +1450,15 @@ describe User do
     end
 
     it "should not create a new one when there are no viable candidates" do
-      @account1 = Account.create!
       # no pseudonyms
       user
       @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
 
       # auto-generated password
-      @account2 = Account.create!
       @user.pseudonyms.create!(:account => @account2, :unique_id => 'bracken@instructure.com')
       @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
 
       # delegated auth
-      @account3 = Account.create!
       @account3.account_authorization_configs.create!(:auth_type => 'cas')
       @account3.should be_delegated_authentication
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
@@ -1436,21 +1474,20 @@ describe User do
     context "sharding" do
       specs_require_sharding
 
-      it "should find a pseudonym in another shard" do
+      before :once do
         @shard1.activate do
           account = Account.create!
-          user_with_pseudonym(:active_all => 1, :account => account)
+          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
         end
+      end
+
+      it "should find a pseudonym in another shard" do
         @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
         @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
         @user.find_pseudonym_for_account(Account.site_admin).should == @p2
       end
 
       it "should copy a pseudonym from another shard" do
-        @shard1.activate do
-          account = Account.create!
-          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
-        end
         p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
         p.should be_new_record
         p.save!
@@ -1459,80 +1496,107 @@ describe User do
     end
   end
 
+  describe "can_be_enrolled_in_course?" do
+    before :once do
+      course active_all: true
+    end
+
+    it "should allow a user with a pseudonym in the course's root account" do
+      user_with_pseudonym account: @course.root_account, active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should allow a temporary user with an existing enrollment but no pseudonym" do
+      @user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should not allow a registered user with an existing enrollment but no pseudonym" do
+      user active_all: true
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+
+    it "should not allow a user with neither an enrollment nor a pseudonym" do
+      user active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+  end
+
   describe "email_channel" do
     it "should not return retired channels" do
-      u = User.new
-      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u = User.create!
+      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
       u.email_channel.should be_nil
-      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
     end
   end
 
   describe "sis_pseudonym_for" do
+    let_once(:course1) { course :active_all => true, :account => Account.default }
+    let_once(:course2) { course :active_all => true, :account => account2 }
+    let_once(:account1) { account_model }
+    let_once(:account2) { account_model }
+    let_once(:u) { User.create! }
+
     it "should return active pseudonyms only" do
-      course :active_all => true, :account => Account.default
-      u = User.create!
       u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should be_nil
+      u.sis_pseudonym_for(course1).should be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      u.sis_pseudonym_for(@course).should == @p
+      u.sis_pseudonym_for(course1).should == @p
     end
 
     it "should return pseudonyms in the right account" do
-      course :active_all => true, :account => Account.default
       other_account = account_model
-      u = User.create!
       u.pseudonyms.create!(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      u.sis_pseudonym_for(@course).should be_nil
+      u.sis_pseudonym_for(course1).should be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should == @p
+      u.sis_pseudonym_for(course1).should == @p
     end
 
     it "should return pseudonyms with a sis id only" do
-      course :active_all => true, :account => Account.default
-      u = User.create!
       u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active' }
-      u.sis_pseudonym_for(@course).should be_nil
+      u.sis_pseudonym_for(course1).should be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should == @p
+      u.sis_pseudonym_for(course1).should == @p
     end
 
     it "should find the right root account for a course" do
-      @account = account_model
-      course :active_all => true, :account => @account
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@course).should == p
+      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(course2).should == p
     end
 
     it "should find the right root account for a group" do
-      @account = account_model
-      course :active_all => true, :account => @account
-      @group = group :group_context => @course
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      @group = group :group_context => course2
+      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
       u.sis_pseudonym_for(@group).should == p
     end
 
     it "should find the right root account for a non-root-account" do
-      @root_account = account_model
+      @root_account = account1
       @account = @root_account.sub_accounts.create!
-      u = User.create!
       p = @root_account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
       u.sis_pseudonym_for(@account).should == p
     end
 
     it "should find the right root account for a root account" do
-      @account = account_model
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@account).should == p
+      p = account1.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(account1).should == p
     end
 
     it "should bail if it can't find a root account" do
       context = Course.new # some context that doesn't have an account
-      (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+      (lambda {u.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+
+    it "should include a pseudonym from a trusted account" do
+      p = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+      account1.stubs(:trust_exists?).returns(true)
+      account1.stubs(:trusted_account_ids).returns([account2.id])
+      u.sis_pseudonym_for(account1).should be_nil
+      u.sis_pseudonym_for(account1, true).should == p
     end
 
     context "sharding" do
@@ -1553,52 +1617,6 @@ describe User do
     end
   end
 
-  describe "flag_as_admin" do
-    it "should add an AccountUser" do
-      @account = account_model
-      u = User.create!
-      u.account_users.should be_empty
-      u.flag_as_admin(@account)
-      u.reload
-      u.account_users.size.should == 1
-      admin = u.account_users.first
-      admin.account.should == @account
-    end
-
-    it "should default to the AccountAdmin role" do
-      @account = account_model
-      u = User.create!
-      u.flag_as_admin(@account)
-      u.reload
-      admin = u.account_users.first
-      admin.membership_type.should == 'AccountAdmin'
-    end
-
-    it "should respect a provided role" do
-      @account = account_model
-      u = User.create!
-      u.flag_as_admin(@account, "CustomAccountUser")
-      u.reload
-      admin = u.account_users.first
-      admin.membership_type.should == 'CustomAccountUser'
-    end
-
-    it "should send an account registration email for users that haven't registered yet" do
-      AccountUser.any_instance.expects(:account_user_registration!)
-      @account = account_model
-      u = User.create!
-      u.flag_as_admin(@account)
-    end
-
-    it "should send the pre-registered account registration email for users the have already registered" do
-      AccountUser.any_instance.expects(:account_user_notification!)
-      @account = account_model
-      u = User.create!
-      u.register
-      u.flag_as_admin(@account)
-    end
-  end
-
   describe "email=" do
     it "should work" do
       @user = User.create!
@@ -1610,8 +1628,8 @@ describe User do
 
   describe "event methods" do
     describe "calendar_events_for_calendar" do
+      before(:once) { course_with_student(:active_all => true) }
       it "should include own scheduled appointments" do
-        course_with_student(:active_all => true)
         ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
         ag.appointments.first.reserve_for(@user, @user)
         events = @user.calendar_events_for_calendar
@@ -1620,7 +1638,6 @@ describe User do
       end
 
       it "should include manageable appointments" do
-        course(:active_all => true)
         @user = @course.instructors.first
         ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.calendar_events_for_calendar
@@ -1629,7 +1646,6 @@ describe User do
       end
 
       it "should not include unpublished assignments when draft_state is enabled" do
-        course_with_student(:active_all => true)
         @course.enable_feature!(:draft_state)
         as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
         as.publish
@@ -1642,8 +1658,8 @@ describe User do
     end
 
     describe "upcoming_events" do
+      before(:once) { course_with_teacher(:active_all => true) }
       it "handles assignments where the applied due_at is nil" do
-        course_with_teacher_logged_in(:active_all => true)
         assignment = @course.assignments.create!(:title => "Should not throw",
                                                  :due_at => 1.days.from_now)
         assignment2 = @course.assignments.create!(:title => "Should not throw2",
@@ -1667,7 +1683,6 @@ describe User do
       end
 
       it "doesn't show unpublished assignments if draft_state is enabled" do
-        course_with_teacher_logged_in(:active_all => true)
         @course.enable_feature!(:draft_state)
         assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
         assignment.unpublish
@@ -1688,7 +1703,7 @@ describe User do
       user = User.new
       assignments.each do |assignment|
         assignment.stubs(:due_at => time)
-        assignment.expects(:grants_right?).with(user,nil,:delete).returns false
+        assignment.expects(:grants_right?).with(user, :delete).returns false
       end
       user.select_upcoming_assignments(assignments,{:end_at => time}).should == assignments
     end
@@ -1702,15 +1717,15 @@ describe User do
         due_date3 = {:due_at => 2.weeks.from_now }
         due_date4 = {:due_at => nil }
         assignments.each do |assignment|
-          assignment.expects(:grants_right?).with(user,nil,:delete).returns true
+          assignment.expects(:grants_right?).with(user, :delete).returns true
         end
-        assignments.first.expects(:all_dates_visible_to).with(user).
+        assignments.first.expects(:dates_hash_visible_to).with(user).
           returns [due_date1]
-        assignments.second.expects(:all_dates_visible_to).with(user).
+        assignments.second.expects(:dates_hash_visible_to).with(user).
           returns [due_date2]
-        assignments.third.expects(:all_dates_visible_to).with(user).
+        assignments.third.expects(:dates_hash_visible_to).with(user).
           returns [due_date3]
-        assignments[3].expects(:all_dates_visible_to).with(user).
+        assignments[3].expects(:dates_hash_visible_to).with(user).
           returns [due_date4]
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
@@ -1723,12 +1738,113 @@ describe User do
     end
   end
 
+  describe "assignments_visibile_in_course" do
+    before do
+      @teacher_enrollment = course_with_teacher(:active_course => true)
+      @course.enable_feature!(:draft_state)
+      @course_section = @course.course_sections.create
+      @student1 = User.create
+      @student2 = User.create
+      @student3 = User.create
+      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+      @unpublished_assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: false)
+      @unpublished_assignment.unpublish
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student1)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+      @course.reload
+    end
+
+    context "as student" do
+      context "differentiated_assignments on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return assignments only when a student has overrides" do
+          @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+          @student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment).should be_false
+        end
+
+        it "should not return students outside the class" do
+          @student3.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+        end
+      end
+
+      context "differentiated_assignments off" do
+        before {
+          @course.disable_feature!(:differentiated_assignments)
+        }
+        it "should return all assignments" do
+          @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        end
+      end
+    end
+
+    context "as teacher" do
+      it "should return all assignments" do
+        @teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        @teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@unpublished_assignment).should be_true
+      end
+    end
+
+    context "as observer" do
+      before do
+        @observer = User.create
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      end
+      context "differentiated_assignments on" do
+        before{@course.enable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be false" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+      end
+      context "differentiated_assignments off" do
+        before{@course.disable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+      end
+    end
+  end
+
   describe "assignments_needing_submitting" do
     # NOTE: More thorough testing of the Assignment#not_locked named scope is in assignment_spec.rb
     context "locked assignments" do
-      before :each do
-        course_with_student_logged_in(:active_all => true)
+      before :once do
+        course_with_student(:active_all => true)
         assignment_quiz([], :course => @course, :user => @user)
+      end
+
+      before :each do
+        user_session(@user)
         # Setup default values for tests (leave unsaved for easy changes)
         @quiz.unlock_at = nil
         @quiz.lock_at = nil
@@ -1799,6 +1915,82 @@ describe User do
 
       @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
     end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      course_with_student_logged_in(:active_all => true)
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignments = @student.assignments_needing_submitting(:contexts => [@course])
+      assignments[0].has_attribute?(:only_visible_to_overrides).should be_true
+    end
+
+    def create_course_with_assignment_needing_submitting(opts={})
+      student = opts[:student]
+      course_with_student_logged_in(:active_all => true, :user => student)
+      @course.enrollments.each(&:destroy!) #student removed from default section
+      section = @course.course_sections.create!
+      student_in_section(section, user: student)
+      assignment_quiz([], :course => @course, :user => student)
+      @assignment.only_visible_to_overrides = true
+      @assignment.publish
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      if opts[:differentiated_assignments]
+        @course.enable_feature!(:differentiated_assignments)
+      end
+      if opts[:override]
+        create_section_override_for_assignment(@assignment, {course_section: section})
+      end
+      @assignment
+    end
+
+    context "differentiated_assignments" do
+      context "feature flag on" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_false
+        end
+
+        it "should return the assignments with an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
+        end
+      end
+
+      context "feature flag off" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should return the assignment without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
+        end
+      end
+    end
+  end
+
+  describe "submissions_needing_peer_review" do
+    before(:each) do
+      course_with_student_logged_in(:active_all => true)
+      @assessor = @student
+      assignment_model(course: @course, peer_reviews: true)
+      @submission = submission_model(assignment: @assignment)
+      @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
+      @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @student, assessor_asset: @assessor_submission)
+      @assessment_request.workflow_state = 'assigned'
+      @assessment_request.save
+    end
+
+    it "should included assessment requests where the user is the assessor" do
+      @assessor.submissions_needing_peer_review.length.should == 1
+    end
+
+    it "should note include assessment requests that have been ignored" do
+      Ignore.create!(asset: @assessment_request, user: @assessor, purpose: 'reviewing')
+      @assessor.submissions_needing_peer_review.length.should == 0
+    end
   end
 
   describe "avatar_key" do
@@ -1833,22 +2025,22 @@ describe User do
   end
 
   describe "order_by_sortable_name" do
+    let_once :ids do
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+    end
+
     it "should sort lexicographically" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do
@@ -1870,12 +2062,12 @@ describe User do
   end
 
   describe "quota" do
+    before(:once) { user }
     it "should default to User.default_storage_quota" do
-      user().quota.should eql User.default_storage_quota
+      @user.quota.should eql User.default_storage_quota
     end
 
     it "should sum up associated root account quotas" do
-      user()
       @user.associated_root_accounts << Account.create! << (a = Account.create!)
       a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
       @user.quota.should eql(2 * User.default_storage_quota + 10.megabytes)
@@ -1892,14 +2084,13 @@ describe User do
   end
 
   describe "common_account_chain" do
-    before do
+    before :once do
       user_with_pseudonym
     end
+    let_once(:root_acct1) { Account.create! }
+    let_once(:root_acct2) { Account.create! }
 
     it "work for just root accounts" do
-      root_acct1 = Account.create!
-      root_acct2 = Account.create!
-
       @user.user_account_associations.create!(:account_id => root_acct2.id)
       @user.reload
       @user.common_account_chain(root_acct1).should == []
@@ -1907,7 +2098,7 @@ describe User do
     end
 
     it "should work for one level of sub accounts" do
-      root_acct = Account.create!
+      root_acct = root_acct1
       sub_acct1 = Account.create!(:parent_account => root_acct)
       sub_acct2 = Account.create!(:parent_account => root_acct)
 
@@ -1922,7 +2113,7 @@ describe User do
     end
 
     it "should work for two levels of sub accounts" do
-      root_acct = Account.create!
+      root_acct = root_acct1
       sub_acct1 = Account.create!(:parent_account => root_acct)
       sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
       sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
@@ -1946,13 +2137,14 @@ describe User do
   end
 
   describe "mfa_settings" do
+    let_once(:user) { User.create! }
+
     it "should be :disabled for unassociated users" do
       user = User.new
       user.mfa_settings.should == :disabled
     end
 
     it "should inherit from the account" do
-      user = User.create!
       user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
@@ -1961,18 +2153,17 @@ describe User do
 
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
-      user = User.find(user)
+      user = User.find(user())
       user.mfa_settings.should == :optional
     end
 
     it "should be the most-restrictive if associated with multiple accounts" do
-      user = User.create!
       disabled_account = Account.create!(:settings => { :mfa_settings => :disabled })
       optional_account = Account.create!(:settings => { :mfa_settings => :optional })
       required_account = Account.create!(:settings => { :mfa_settings => :required })
 
       p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
-      user = User.find(user)
+      user = User.find(user())
       user.mfa_settings.should == :disabled
 
       p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
@@ -1993,30 +2184,28 @@ describe User do
     end
 
     it "should be required if admin and required_for_admins" do
-      user = User.create!
       account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
       user.pseudonyms.create!(:account => account, :unique_id => 'user')
 
       user.mfa_settings.should == :optional
-      account.add_user(user)
+      account.account_users.create!(user: user)
       user.reload
       user.mfa_settings.should == :required
     end
 
     it "required_for_admins shouldn't get confused by admins in other accounts" do
-      user = User.create!
       account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
       user.pseudonyms.create!(:account => account, :unique_id => 'user')
       user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
 
-      Account.default.add_user(user)
+      Account.default.account_users.create!(user: user)
 
       user.mfa_settings.should == :optional
     end
   end
 
   context "crocodoc attributes" do
-    before do
+    before :once do
       Setting.set 'crocodoc_counter', 998
       @user = User.create! :short_name => "Bob"
     end
@@ -2041,7 +2230,7 @@ describe User do
   end
 
   context "assignments_needing_grading" do
-    before :each do
+    before :once do
       # create courses and sections
       @course1 = course_with_teacher(:active_all => true).course
       @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
@@ -2065,7 +2254,7 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          bare_submission_model assignment, student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          assignment.submit_homework student, body: "submission for #{student.name}"
         end
       end
     end
@@ -2111,17 +2300,19 @@ describe User do
     end
 
     it "should limit the number of returned assignments" do
-      20.times do |x|
-        assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        bare_submission_model assignment, @studentB
-      end
-      @teacher.assignments_needing_grading.size.should < 22
+      assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id} })
+      create_records(Submission, assignment_ids.map{ |id| {assignment_id: id, user_id: @studentB.id, body: "hello", workflow_state: "submitted", submission_type: 'online_text_entry'} })
+      @teacher.assignments_needing_grading.size.should == 15
+    end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      @teacher.assignments_needing_grading.each {|a| a.has_attribute?(:only_visible_to_overrides).should be_true }
     end
 
     context "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @shard1.activate do
           @account = Account.create!
           @course3 = @account.courses.create!
@@ -2130,13 +2321,17 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          bare_submission_model @assignment3, @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          @assignment3.submit_homework @studentA, body: "submission for A"
         end
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading.sort_by(&:id).should ==
-            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            @teacher.assignments_needing_grading.sort_by(&:id).should ==
+                [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+          end
+        end
       end
 
       it "should honor ignores for a separate shard" do
@@ -2180,13 +2375,25 @@ describe User do
 
     it "should include accounts from multiple shards" do
       user
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       @shard1.activate do
         @account2 = Account.create!
-        @account2.add_user(@user)
+        @account2.account_users.create!(user: @user)
       end
 
       @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+    end
+
+    it "should exclude deleted accounts" do
+      user
+      Account.site_admin.account_users.create!(user: @user)
+      @shard1.activate do
+        @account2 = Account.create!
+        @account2.account_users.create!(user: @user)
+        @account2.destroy
+      end
+
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin].map(&:id).sort
     end
   end
 
@@ -2206,7 +2413,7 @@ describe User do
   end
 
   describe "active_pseudonyms" do
-    before :each do
+    before :once do
       user_with_pseudonym(:active_all => 1)
     end
 
@@ -2220,27 +2427,24 @@ describe User do
     end
   end
 
-  describe "prefers_gradebook2?" do
+  describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2? }
+    let(:course) { mock('course') }
+    subject { user.preferred_gradebook_version }
 
-    context "by default" do
-      it { should be_true }
+    context "prefers gb2" do
+      before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+      it { should == '2' }
     end
 
-    context "with an explicit preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => true }) }
-      it { should be_true }
+    context "prefers srgb" do
+      before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+      it { should == 'srgb' }
     end
 
-    context "with an truthy preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
-      it { should be_true }
-    end
-
-    context "with an explicit preference for gradebook 1" do
-      before { user.stubs(:preferences => { :use_gradebook2 => false }) }
-      it { should be_false }
+    context "nil preference" do
+      before { user.stubs(:preferences => { :gradebook_version => nil }) }
+      it { should == '2' }
     end
   end
 
@@ -2274,30 +2478,30 @@ describe User do
   end
 
   describe '#grants_right?' do
-    let(:subaccount) do
+    let_once(:subaccount) do
       account = Account.create!
       account.root_account_id = Account.default.id
       account.save!
       account
     end
 
-    let(:site_admin) do
+    let_once(:site_admin) do
       user = User.create!
-      Account.site_admin.add_user(user)
-      Account.default.add_user(user)
+      Account.site_admin.account_users.create!(user: user)
+      Account.default.account_users.create!(user: user)
       user
     end
 
-    let(:local_admin) do
+    let_once(:local_admin) do
       user = User.create!
-      Account.default.add_user(user)
-      subaccount.add_user(user)
+      Account.default.account_users.create!(user: user)
+      subaccount.account_users.create!(user: user)
       user
     end
 
-    let(:user) do
+    let_once(:user) do
       user = User.create!
-      subaccount.add_user(user)
+      subaccount.account_users.create!(user: user)
       user
     end
 
@@ -2324,37 +2528,35 @@ describe User do
   end
 
   describe "#conversation_context_codes" do
-    before do
+    before :once do
       @user = user(:active_all => true)
+      course_with_student(:user => @user, :active_all => true)
+      group_with_user(:user => @user, :active_all => true)
     end
 
     it "should include courses" do
-      course_with_student(:user => @user, :active_all => true)
       @user.conversation_context_codes.should include(@course.asset_string)
     end
 
     it "should include concluded courses" do
-      course_with_student(:user => @user, :active_all => true)
       @enrollment.workflow_state = 'completed'
       @enrollment.save!
       @user.conversation_context_codes.should include(@course.asset_string)
     end
 
     it "should optionally not include concluded courses" do
-      course_with_student(:user => @user, :active_all => true)
       @enrollment.update_attribute(:workflow_state, 'completed')
       @user.conversation_context_codes(false).should_not include(@course.asset_string)
     end
 
     it "should include groups" do
-      group_with_user(:user => @user, :active_all => true)
       @user.conversation_context_codes.should include(@group.asset_string)
     end
 
-    context "sharding" do
+    describe "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @shard1_account = @shard1.activate{ Account.create! }
       end
 
@@ -2392,7 +2594,7 @@ describe User do
   end
 
   describe "#stamp_logout_time!" do
-    before do
+    before :once do
       user_model
     end
 
@@ -2426,5 +2628,28 @@ describe User do
       test_student.destroy
       test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
+  end
+
+  describe "otp remember me cookie" do
+    before do
+      @user = User.new
+      @user.otp_secret_key = ROTP::Base32.random_base32
+    end
+
+    it "should add an ip to an existing cookie" do
+      cookie1 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
+      cookie2 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, cookie1, 'ip2')
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip2').should be_false
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2').should be_true
+    end
+  end
+
+  it "should reset its conversation counter when told to" do
+    user = user_model
+    user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
+    user.reset_unread_conversations_counter
+    user.reload.unread_conversations_count.should == 5
   end
 end

@@ -1,20 +1,20 @@
 <fieldset>
   <div class="control-group">
-    <label class="control-label" for="external_tool_name">Name</label>
+    <label class="control-label" for="external_tool_name">{{#t "name"}}Name{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_name" value="{{name}}" name="name">
+      <input aria-required="true" type="text" id="external_tool_name" value="{{name}}" name="name">
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="external_tool_consumer_key">Consumer Key</label>
+    <label class="control-label" for="external_tool_consumer_key">{{#t "consumer_key"}}Consumer Key{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_consumer_key" value="{{consumer_key}}" name="consumer_key">
+      <input aria-required="true" type="text" id="external_tool_consumer_key" value="{{consumer_key}}" name="consumer_key">
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="external_tool_shared_secret">Shared Secret</label>
+    <label class="control-label" for="external_tool_shared_secret">{{#t "shared_secret"}}Shared Secret{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_shared_secret" value="{{shared_secret}}" name="shared_secret">
+      <input aria-required="true" type="text" id="external_tool_shared_secret" value="{{shared_secret}}" name="shared_secret">
       {{#if id}}
         <p class="help-block">{{#t "shared_secret_note"}}Enter a new value
         to change{{/t}}</p>
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="control-group {{#if id}}hide{{/if}}">
-    <label class="control-label" for="external_tool_config_type">Configuration Type</label>
+    <label class="control-label" for="external_tool_config_type">{{#t "configuration_type"}}Configuration Type{{/t}}</label>
     <div class="controls">
       <select id="external_tool_config_type" name="config_type">
         <option value="manual">{{#t "manual"}}Manual Entry{{/t}}</option>
@@ -95,10 +95,11 @@
     </label>
     <div class="controls">
       <textarea
+        aria-labelledby="custom_fields_explanation"
         id="external_tool_custom_fields_string"
         name="custom_fields_string"
       >{{custom_fields_string}}</textarea>
-      <div class="help-block"> {{#t "custom_feilds_explanation"}}One per
+      <div id="custom_fields_explanation" class="help-block"> {{#t "custom_feilds_explanation"}}One per
       line.  Format: name=value{{/t}}</div>
     </div>
   </div>

@@ -3,12 +3,14 @@ define [
   'compiled/models/Assignment'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/Course'
-], (AssignmentGroup, Assignment, AssignmentGroupCollection, Course) ->
+  'helpers/fakeENV'
+], (AssignmentGroup, Assignment, AssignmentGroupCollection, Course, fakeENV) ->
 
   COURSE_SUBMISSIONS_URL = "/courses/1/submissions"
 
   module "AssignmentGroupCollection",
     setup: ->
+      fakeENV.setup()
       @server       = sinon.fakeServer.create()
       @assignments  = (new Assignment({id: id}) for id in [1..4])
       @group        = new AssignmentGroup assignments: @assignments
@@ -16,6 +18,7 @@ define [
         courseSubmissionsURL: COURSE_SUBMISSIONS_URL
 
     teardown: ->
+      fakeENV.teardown()
       @server.restore()
 
   test "::model is AssignmentGroup", ->

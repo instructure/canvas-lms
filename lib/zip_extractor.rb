@@ -36,21 +36,18 @@ class ZipExtractor
     end
   end
   
-  attr_reader :filename, :zip, :unzipped_files
+  attr_reader :filename, :unzipped_files
   def initialize(filename)
     @filename = filename
-    @zip = Zip::File.open(@filename)
   end
   
   # Grabs all files and dumps them into a temporary directory.
   def unzip_files(&block)
     @unzipped_files = []
-    self.zip.entries.each do |zip_entry|
+    CanvasUnzip.extract_archive(@filename) do |zip_entry|
       next if zip_entry.directory?
       local_name = File.join(dirname, File.split(zip_entry.name).last)
-      fp = File.open(local_name, 'w')
-      fp.puts zip.read(zip_entry.name)
-      fp.close
+      zip_entry.extract(local_name)
       self.unzipped_files << local_name
     end
     block.call(self.unzipped_files) if block
@@ -70,9 +67,9 @@ class ZipExtractor
   alias :dirname :make_safe_haven
 
   def safe_haven_name
-    dirname = "/tmp/#{AutoHandle.generate}"
+    dirname = "/tmp/#{CanvasSlug.generate}"
     while File.exist?(dirname)
-      dirname = "/tmp/#{AutoHandle.generate}"
+      dirname = "/tmp/#{CanvasSlug.generate}"
     end
     dirname
   end

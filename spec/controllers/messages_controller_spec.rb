@@ -21,10 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe MessagesController do
   describe "create" do
     context "an admin user" do
-      before do
-        site_admin_user
-        user_session(@user)
-      end
+      before(:once){ site_admin_user }
+      before(:each){ user_session(@user) }
 
       it "should be able to access the page" do
         post 'create', :user_id => @user.to_param
@@ -33,7 +31,7 @@ describe MessagesController do
 
       it "should be able to send messages" do
         secure_id, message_id = ['secure_id', 42]
-        IncomingMail::IncomingMessageProcessor.expects(:process_single).with(anything, secure_id, message_id)
+        IncomingMailProcessor::IncomingMessageProcessor.any_instance.expects(:process_single).with(anything, "#{secure_id}-#{message_id}")
         post 'create', :secure_id  => secure_id,
                        :message_id => message_id,
                        :subject    => 'subject',
@@ -56,4 +54,3 @@ describe MessagesController do
     end
   end
 end
-

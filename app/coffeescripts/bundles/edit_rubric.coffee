@@ -18,11 +18,12 @@
 
 require [
   'i18n!outcomes'
+  'jquery'
   'compiled/models/OutcomeGroup'
   'compiled/views/outcomes/FindDialog'
   'compiled/views/outcomes/FindDirectoryView'
   'edit_rubric'
-], (I18n, OutcomeGroup, FindDialog, FindDirectoryView, rubricEditing) ->
+], (I18n, $, OutcomeGroup, FindDialog, FindDirectoryView, rubricEditing) ->
 
   class EditRubricPage
     $els: {}
@@ -56,6 +57,12 @@ require [
     onOutcomeImport: (model) ->
       rubricEditing.onFindOutcome(model)
 
-  $(document).ready ->
+  initEditRubricPage = ->
     new EditRubricPage
     rubricEditing.init()
+
+  if $.isReady
+    initEditRubricPage()
+  else
+    $(document).ready ->
+      initEditRubricPage()

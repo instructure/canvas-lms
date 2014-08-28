@@ -6,6 +6,6 @@ describe "sub account settings" do
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:account_settings_url) { "/accounts/#{account.id}/settings" }
     let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
-    it_should_behave_like "settings basic tests"
+    include_examples "settings basic tests"
   end
 end

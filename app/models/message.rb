@@ -18,15 +18,18 @@
 
 class Message < ActiveRecord::Base
   # Included modules
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
+                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
+
   include ERB::Util
   include SendToStream
   include TextHelper
-  include Twitter
+  include HtmlTextHelper
   include Workflow
 
   extend TextHelper
@@ -37,13 +40,15 @@ class Message < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :notification
   belongs_to :user
+  belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context
 
   attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type,
-    :from_name, :sent_at, :notification, :user, :communication_channel,
+    :from_name, :reply_to_name, :sent_at, :notification, :user, :communication_channel,
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
+  attr_accessor :output_buffer
 
   # Callbacks
   after_save  :stage_message
@@ -131,15 +136,15 @@ class Message < ActiveRecord::Base
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 
-  scope :to_dispatch, lambda {
+  scope :to_dispatch, -> {
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  scope :to_email, where(:path_type => ['email', 'sms'])
+  scope :to_email, -> { where(:path_type => ['email', 'sms']) }
 
-  scope :to_facebook, where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25)
+  scope :to_facebook, -> { where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25) }
 
-  scope :not_to_email, where("messages.path_type NOT IN ('email', 'sms')")
+  scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
   scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
 
@@ -149,15 +154,54 @@ class Message < ActiveRecord::Base
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, where(:workflow_state => ['created', 'staged', 'sending'])
+  scope :cancellable, -> { where(:workflow_state => ['created', 'staged', 'sending']) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
   # Where user can be a User or id, name needs to be the Notification name.
-  scope :staged, lambda { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
+  scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
   scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
+
+  #Public: Helper methods for grabbing a user via the "from" field and using it to
+  #populate the avatar, name, and email in the conversation email notification
+
+  def author
+    @_author ||= begin
+      if context.has_attribute?(:user_id)
+        User.find(context.user_id)
+      elsif context.has_attribute?(:author_id)
+        User.find(context.author_id)
+      else
+        nil
+      end
+    end
+  end
+
+  def avatar_enabled?
+    return false unless author_account.present?
+    author_account.service_enabled?(:avatars)
+  end
+
+  def author_account
+    # Root account is populated during save
+    return nil unless author.present?
+    root_account_id ? Account.find(root_account_id) : author.account
+  end
+
+  def author_avatar_url
+    url = author.try(:avatar_url)
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
+  end
+
+  def author_short_name
+    author.try(:short_name)
+  end
+
+  def author_email_address
+    author.try(:email)
+  end
 
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
@@ -204,7 +248,7 @@ class Message < ActiveRecord::Base
   end
 
   # Public: Custom getter that delegates and caches notification category to
-  # associated notification 
+  # associated notification
   #
   # Returns a notification category string.
   def notification_category
@@ -245,6 +289,11 @@ class Message < ActiveRecord::Base
     end
   end
 
+  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+    alias :append= :<<
+    alias :safe_concat :concat
+  end
+
   # Public: Store content in a message_content_... instance variable.
   #
   # name  - The symbol name of the content.
@@ -252,7 +301,11 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    if name == :subject || name == :user_name
+      old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
+    else
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    end
 
     yield
 
@@ -261,7 +314,7 @@ class Message < ActiveRecord::Base
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
-      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+      @output_buffer = old_output_buffer.class.new(@output_buffer)
     end
 
     ''
@@ -325,12 +378,14 @@ class Message < ActiveRecord::Base
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
-    inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
+    @output_buffer = nil
+    inner_html = ActionView::Template::Handlers::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
-    RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
+    @output_buffer = nil
+    ActionView::Template::Handlers::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
   end
@@ -353,7 +408,8 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
-      self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
+      @output_buffer = nil
+      self.body = ActionView::Template::Handlers::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
         :bufvar => '@output_buffer').result(_binding)
@@ -445,7 +501,7 @@ class Message < ActiveRecord::Base
 
     delivery_method = "deliver_via_#{path_type}".to_sym
 
-    if not delivery_method or not respond_to?(delivery_method)
+    if not delivery_method or not respond_to?(delivery_method, true)
       logger.warn("Could not set delivery_method from #{path_type}")
       return nil
     end
@@ -471,7 +527,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == 'Other' ? SortLast : m[0] }
+    message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
   # Public: Format and return the body for this message.
@@ -528,12 +584,8 @@ class Message < ActiveRecord::Base
     root_account = context_root_account
     self.root_account_id ||= root_account.try(:id)
 
-    self.from_name = root_account.settings[:outgoing_email_default_name] rescue nil
-    self.from_name = HostUrl.outgoing_email_default_name if from_name.blank?
-    self.from_name = asset_context.name if (asset_context &&
-      !asset_context.is_a?(Account) && asset_context.name &&
-      notification.dashboard? rescue false)
-    self.from_name = from_name if respond_to?(:from_name)
+    self.from_name = infer_from_name
+    self.reply_to_name = message_context.reply_to_name
 
     true
   end
@@ -611,7 +663,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.message(self).deliver
+      res = Mailer.create_message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
@@ -650,7 +702,10 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    TwitterMessenger.new(self).deliver
+    twitter_service = user.user_services.find_by_service('twitter')
+    host = HostUrl.short_host(self.asset_context)
+    msg_id = AssetSignature.generate(self)
+    Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
   end
 
@@ -660,7 +715,7 @@ class Message < ActiveRecord::Base
   def deliver_via_facebook
     facebook_user_id = self.to.to_i.to_s
     service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
-    Facebook.dashboard_increment_count(service) if service && service.token
+    Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
     complete_dispatch
   end
 
@@ -671,4 +726,27 @@ class Message < ActiveRecord::Base
   def deliver_via_sms
     deliver_via_email
   end
+
+  private
+  def infer_from_name
+    if asset_context
+      return message_context.from_name if message_context.from_name.present?
+      return asset_context.name if can_use_asset_name_for_from?
+    end
+
+    if root_account && root_account.settings[:outgoing_email_default_name]
+      return root_account.settings[:outgoing_email_default_name]
+    end
+
+    HostUrl.outgoing_email_default_name
+  end
+
+  def can_use_asset_name_for_from?
+    !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
+  end
+
+  def message_context
+    @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  end
+
 end

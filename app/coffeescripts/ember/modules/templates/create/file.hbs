@@ -1,0 +1,23 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+  {{c-icon type="document"}}
+
+  {{c-file-input
+    type="file"
+    files=files
+    value=fileValue
+    aria-label=text.file
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "upload"}}Upload{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

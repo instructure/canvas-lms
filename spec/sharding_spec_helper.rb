@@ -17,14 +17,30 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/support/onceler/sharding')
 
-if CANVAS_RAILS2
-  def specs_require_sharding
-    include Shard::RSpec
+SHARDING_ENABLED = defined?(ShardRSpecHelper)
+
+unless SHARDING_ENABLED
+  module ShardRSpecHelper
+    def self.included(klass)
+      klass.before do
+        pending "needs a sharding implementation"
+      end
+      require File.expand_path(File.dirname(__FILE__) + '/support/onceler/noop') unless defined?(Onceler::Noop)
+      klass.send(:include, Onceler::Noop)
+    end
   end
-else
-  def specs_require_sharding
-    require_dependency 'switchman/r_spec_helper'
-    include Switchman::RSpecHelper
+
+  RSpec.configure do |config|
+    config.before :all do
+      Shard.default.destroy if Shard.default.is_a?(Shard)
+      Shard.default(true)
+    end
   end
+end
+
+def specs_require_sharding
+  include ShardRSpecHelper
+  include Onceler::Sharding if SHARDING_ENABLED
 end

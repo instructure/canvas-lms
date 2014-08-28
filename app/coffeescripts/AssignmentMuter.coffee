@@ -9,7 +9,7 @@ define [
 ], (I18n, $, mute_dialog_template) ->
 
   class AssignmentMuter
-    constructor: (@$link, @assignment, @url) ->
+    constructor: (@$link, @assignment, @url, @setter) ->
       @$link = $(@$link)
       @updateLink()
       @$link.click (event) =>
@@ -27,12 +27,16 @@ define [
           click: =>
             @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : true }, @afterUpdate)
         }]
+        open: => setTimeout (=> @$dialog.find('#assignment_muter_content').focus()), 100
         close: => @$dialog.remove()
         resizable: false
         width: 400
 
     afterUpdate: (serverResponse) =>
-      @assignment.muted = serverResponse.assignment.muted
+      if @setter
+        @setter @assignment, 'muted', serverResponse.assignment.muted
+      else
+        @assignment.muted = serverResponse.assignment.muted
       @updateLink()
       @$dialog.dialog('close')
       $.publish('assignment_muting_toggled', [@assignment])
@@ -41,7 +45,7 @@ define [
       @$dialog = $('<div />')
         .text(I18n.t('unmute_dialog', "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"))
         .dialog
-          buttons: [{ 
+          buttons: [{
             text: I18n.t('unmute_button', 'Unmute Assignment')
             'data-text-while-loading': I18n.t('unmuting_assignment', 'Unmuting Assignment...')
             click: =>

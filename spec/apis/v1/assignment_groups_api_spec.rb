@@ -18,14 +18,33 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentGroupsController, :type => :integration do
+describe AssignmentGroupsController, type: :request do
   include Api
   include Api::V1::Assignment
+
+  def set_up_groups
+    @group1 = @course.assignment_groups.create!(:name => 'group1')
+    @group1.update_attribute(:position, 10)
+    @group1.update_attribute(:group_weight, 40)
+    @group2 = @course.assignment_groups.create!(:name => 'group2')
+    @group2.update_attribute(:position, 7)
+    @group2.update_attribute(:group_weight, 60)
+  end
+
+  def set_up_four_assignments(assignment_opts = {})
+    @a1 = @course.assignments.create!({:title => "test1", :assignment_group => @group1, :points_possible => 10}.merge(assignment_opts))
+    @a2 = @course.assignments.create!({:title => "test2", :assignment_group => @group1, :points_possible => 12}.merge(assignment_opts))
+    @a3 = @course.assignments.create!({:title => "test3", :assignment_group => @group2, :points_possible => 8}.merge(assignment_opts))
+    @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9}.merge(assignment_opts))
+  end
+
+  before :once do
+    course_with_teacher(:active_all => true)
+  end
 
   it "should sort the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
-    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
     group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -64,30 +83,17 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should include full assignment jsonification when specified" do
-    course_with_teacher(:active_all => true)
-    group1 = @course.assignment_groups.create!(:name => 'group1')
-    group1.update_attribute(:position, 10)
-    group1.update_attribute(:group_weight, 40)
-    group2 = @course.assignment_groups.create!(:name => 'group2')
-    group2.update_attribute(:position, 7)
-    group2.update_attribute(:group_weight, 60)
-
-    a1 = @course.assignments.create!(:title => "test1", :assignment_group => group1, :points_possible => 10)
-    a2 = @course.assignments.create!(:title => "test2", :assignment_group => group1, :points_possible => 12)
-    a3 = @course.assignments.create!(:title => "test3", :assignment_group => group2, :points_possible => 8)
-    a4 = @course.assignments.create!(:title => "test4", :assignment_group => group2, :points_possible => 9)
+    set_up_groups
+    set_up_four_assignments
 
     rubric_model(:user => @user, :context => @course, :points_possible => 12,
                                      :data => larger_rubric_data)
 
-    a3.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
+    @a3.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
 
-    a4.submission_types = 'discussion_topic'
-    a4.save!
-    a1.reload
-    a2.reload
-    a3.reload
-    a4.reload
+    @a4.submission_types = 'discussion_topic'
+    @a4.save!
+    [@a1, @a2, @a3, @a4].each(&:reload)
 
     @course.update_attribute(:group_weighting_scheme, 'percent')
 
@@ -100,24 +106,24 @@ describe AssignmentGroupsController, :type => :integration do
     expected = [
       {
         'group_weight' => 60,
-        'id' => group2.id,
+        'id' => @group2.id,
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
         'assignments' => [
-          controller.assignment_json(a3,@user,session),
-          controller.assignment_json(a4,@user,session, include_discussion_topic: true)
+          controller.assignment_json(@a3,@user,session),
+          controller.assignment_json(@a4,@user,session, include_discussion_topic: true)
         ],
       },
       {
         'group_weight' => 40,
-        'id' => group1.id,
+        'id' => @group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
         'assignments' => [
-          controller.assignment_json(a1,@user,session),
-          controller.assignment_json(a2,@user,session)
+          controller.assignment_json(@a1,@user,session),
+          controller.assignment_json(@a2,@user,session)
         ],
       }
     ]
@@ -125,8 +131,64 @@ describe AssignmentGroupsController, :type => :integration do
     compare_json(json, expected)
   end
 
+  context "differentiated assignments on" do
+    it "should only return visible assignments when differentiated assignments is on" do
+      set_up_groups
+      set_up_four_assignments(only_visible_to_overrides: true)
+      @user.enrollments.each(&:delete)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @user)
+      # make a1 and a3 visible
+      create_section_override_for_assignment(@a1, course_section: @section)
+      @a3.grade_student(@user, {grade: 10})
+
+      [@a1, @a2, @a3, @a4].each(&:reload)
+
+      @course.enable_feature!(:differentiated_assignments)
+
+      json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+          { :controller => 'assignment_groups', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :include => ['assignments'] })
+
+      json.each do |ag_json|
+        ag_json["assignments"].length.should == 1
+      end
+
+      @course.disable_feature!(:differentiated_assignments)
+
+      json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+          { :controller => 'assignment_groups', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :include => ['assignments'] })
+
+      json.each do |ag_json|
+        ag_json["assignments"].length.should == 2
+      end
+    end
+
+    it "should include assignment_visibility when requested" do
+      @course.assignments.create!
+      @course.enable_feature!(:differentiated_assignments)
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+        {
+          :controller => 'assignment_groups', :action => 'index',
+          :format => 'json', :course_id => @course.id.to_s
+        },
+        :include => ['assignments', 'assignment_visibility']
+      )
+      json.each do |ag|
+        ag["assignments"].each do |a|
+          a.has_key?("assignment_visibility").should == true
+        end
+      end
+    end
+  end
+
   it "should include module_ids when requested" do
-    course_with_teacher active_all: true
     mods = 2.times.map { |i| @course.context_modules.create! name: "Mod#{i}" }
     g = @course.assignment_groups.create! name: 'assignments'
     a = @course.assignments.create! assignment_group: g, title: "blah"
@@ -142,7 +204,6 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should not include all dates " do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.build(:name => 'group1')
     group.position = 10
     group.group_weight = 40
@@ -157,6 +218,10 @@ describe AssignmentGroupsController, :type => :integration do
       override.due_at = 1.day.ago
       override.due_at_overridden = true
     end
+
+    # catch updated timestamps
+    a1.reload
+    a2.reload
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
@@ -182,7 +247,6 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should include all dates" do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.build(:name => 'group1')
     group.position = 10
     group.group_weight = 40
@@ -197,6 +261,7 @@ describe AssignmentGroupsController, :type => :integration do
       override.due_at = 1.day.ago
       override.due_at_overridden = true
     end
+    a1.reload
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates",
@@ -222,7 +287,6 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should exclude deleted assignments" do
-    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
 
@@ -244,7 +308,6 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should return weights that aren't being applied" do
-    course_with_teacher(:active_all => true)
     @course.update_attribute(:group_weighting_scheme, 'equal')
 
     group1 = @course.assignment_groups.create!(:name => 'group1', :group_weight => 50)
@@ -258,7 +321,6 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should not explode on assignments with <objects> with percentile widths" do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.create!(:name => 'group')
     assignment = @course.assignments.create!(:title => "test", :assignment_group => group, :points_possible => 10)
     assignment.description = '<object width="100%" />'
@@ -273,7 +335,7 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should not return unpublished assignments to students" do
-    course_with_student(:active_all => true)
+    student_in_course(:active_all => true)
     @course.root_account.enable_feature!(:draft_state)
     @course.require_assignment_group
     assignment = @course.assignments.create! do |a|
@@ -295,13 +357,13 @@ describe AssignmentGroupsController, :type => :integration do
 end
 
 
-describe AssignmentGroupsApiController, :type => :integration do
+describe AssignmentGroupsApiController, type: :request do
   include Api
   include Api::V1::Assignment
 
   context '#show' do
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       @group = @course.assignment_groups.create!(:name => 'group', :rules => rules_in_db)
@@ -324,7 +386,7 @@ describe AssignmentGroupsApiController, :type => :integration do
         :format => 'json',
         :course_id => @course.id.to_s,
         :assignment_group_id => not_exist.to_s)
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     it 'should include assignments' do
@@ -338,6 +400,24 @@ describe AssignmentGroupsApiController, :type => :integration do
         :include => ['assignments'])
 
       json['assignments'].should_not be_empty
+    end
+
+    it "should include assignment_visibility when requested and with DA on" do
+      @course.enable_feature!(:differentiated_assignments)
+      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
+        {
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s
+        },
+        :include => ['assignments', 'assignment_visibility']
+      )
+      json['assignments'].each do |a|
+        a.has_key?("assignment_visibility").should == true
+      end
     end
 
     it 'should return never_drop rules as strings with Accept header' do
@@ -387,7 +467,7 @@ describe AssignmentGroupsApiController, :type => :integration do
   end
 
   context '#update' do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
     end
@@ -427,7 +507,7 @@ describe AssignmentGroupsApiController, :type => :integration do
   end
 
   context '#destroy' do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,36 +19,62 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe "Groups API", :type => :integration do
-  def group_json(group, user)
-    {
+describe "Groups API", type: :request do
+  def group_json(group, opts = {})
+    opts[:is_admin] ||= false
+    opts[:include_users] ||= false
+    json = {
       'id' => group.id,
       'name' => group.name,
       'description' => group.description,
       'is_public' => group.is_public,
       'join_level' => group.join_level,
       'members_count' => group.members_count,
+      'max_membership' => group.max_membership,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
-      'followed_by_user' => group.followers.include?(user),
       'context_type' => group.context_type,
       "#{group.context_type.downcase}_id" => group.context_id,
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
-      'storage_quota_mb' => group.storage_quota_mb
+      'storage_quota_mb' => group.storage_quota_mb,
+      'leader' => group.leader
+    }
+    if opts[:include_users]
+      json['users'] = users_json(group.users)
+    end
+    if group.context_type == 'Account' && opts[:is_admin]
+      json['sis_import_id'] = group.sis_batch_id
+      json['sis_group_id'] = group.sis_source_id
+    end
+    json
+  end
+
+  def users_json(users)
+    users.map { |user| user_json(user) }
+  end
+
+  def user_json(user)
+    {
+      'id' => user.id,
+      'name' => user.name,
+      'sortable_name' => user.sortable_name,
+      'short_name' => user.short_name
     }
   end
 
-  def membership_json(membership)
-    {
+  def membership_json(membership, is_admin = false)
+    json = {
       'id' => membership.id,
       'group_id' => membership.group_id,
       'user_id' => membership.user_id,
       'workflow_state' => membership.workflow_state,
       'moderator' => membership.moderator,
     }
+    json['sis_import_id'] = membership.sis_batch_id if membership.group.context_type == 'Account' && is_admin
+    json
   end
 
-  before do
+  before :once do
     @moderator = user_model
     @member = user_with_pseudonym
 
@@ -68,7 +94,7 @@ describe "Groups API", :type => :integration do
 
     @user = @member
     json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
-    json.should == [group_json(@community, @user), group_json(@group, @user)]
+    json.should == [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
     links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
   end
@@ -81,10 +107,10 @@ describe "Groups API", :type => :integration do
 
     @user = @member
     json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(:action => "index", :context_type => 'Course'))
-    json.should == [group_json(@group, @user)]
+    json.should == [group_json(@group)]
 
     json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(:action => "index", :context_type => 'Account'))
-    json.should == [group_json(@community, @user)]
+    json.should == [group_json(@community)]
   end
 
   it "should allow listing all of a course's groups" do
@@ -100,14 +126,22 @@ describe "Groups API", :type => :integration do
 
   it "should allow listing all of an account's groups for account admins" do
     @account = Account.default
+    sis_batch = @account.sis_batches.create
+    SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
+    @community.sis_source_id = 'sis'
+    @community.sis_batch_id = sis_batch.id
+    @community.save!
     account_admin_user(:account => @account)
 
     json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :account_id => @account.to_param))
     json.count.should == 1
+    json.first.should == group_json(@community, :is_admin =>true)
+
     json.first['id'].should == @community.id
-    json.first['sis_source_id'].should == nil
+    json.first['sis_group_id'].should == 'sis'
+    json.first['sis_import_id'].should == sis_batch.id
   end
 
   it "should not allow non-admins to view an account's groups" do
@@ -118,7 +152,7 @@ describe "Groups API", :type => :integration do
     response.code.should == '401'
   end
 
-  it "should limit students to their own groups" do
+  it "should show students all groups" do
     course_with_student(:active_all => true)
     @group_1 = @course.groups.create!(:name => 'Group 1')
     @group_2 = @course.groups.create!(:name => 'Group 2')
@@ -127,14 +161,20 @@ describe "Groups API", :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
-    json.count.should == 1
+    json.count.should == 2
     json.first['id'].should == @group_1.id
   end
 
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
-    json.should == group_json(@community, @user)
+    json.should == group_json(@community)
+  end
+
+  it "should include the group category" do
+    @user = @member
+    json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => [ "group_category" ]))
+    json.has_key?("group_category").should be_true
   end
 
   it 'should include permissions' do
@@ -157,7 +197,7 @@ describe "Groups API", :type => :integration do
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')
     json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
-    json.should == group_json(@community, @user)
+    json.should == group_json(@community)
   end
 
   it "should allow anyone to create a new community" do
@@ -170,7 +210,7 @@ describe "Groups API", :type => :integration do
     })
     @community2 = Group.order(:id).last
     @community2.group_category.should be_communities
-    json.should == group_json(@community2, @user)
+    json.should == group_json(@community2, :include_users => true)
   end
 
   it "should allow a teacher to create a group in a course" do
@@ -230,7 +270,7 @@ describe "Groups API", :type => :integration do
     @community.is_public.should == true
     @community.join_level.should == "parent_context_auto_join"
     @community.avatar_attachment.should == avatar
-    json.should == group_json(@community, @user)
+    json.should == group_json(@community)
   end
 
   it "should only allow updating a group from private to public" do
@@ -272,15 +312,14 @@ describe "Groups API", :type => :integration do
   end
 
   describe "quota" do
-    before do
+    before :once do
       @account = Account.default
       Setting.set('group_default_quota', 11.megabytes)
     end
 
     context "with manage_storage_quotas permission" do
-      before do
+      before :once do
         account_admin_user :account => @account
-        user_session(@admin)
       end
 
       it "should set the quota on create" do
@@ -299,9 +338,8 @@ describe "Groups API", :type => :integration do
     end
 
     context "without manage_storage_quotas permission" do
-      before do
+      before :once do
         account_admin_user_with_role_changes(:role_changes => {:manage_storage_quotas => false})
-        user_session(@admin)
       end
 
       it "should ignore the quota on create" do
@@ -319,47 +357,6 @@ describe "Groups API", :type => :integration do
         group.name.should == 'TheGruop'
         group.storage_quota_mb.should == 11
       end
-    end
-  end
-
-  describe "following" do
-    it "should allow following a public group" do
-      user_model
-      @community.update_attribute(:is_public, true)
-      json = api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"))
-      @user.user_follows.map(&:followed_item).should == [@community]
-      uf = @user.user_follows.first
-      json.should == { "following_user_id" => @user.id, "followed_group_id" => @community.id, "created_at" => uf.created_at.as_json }
-    end
-
-    it "should not allow following a private group" do
-      user_model
-      json = api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"), {}, {}, :expected_status => 401)
-    end
-
-    it "should allow members to follow a private group" do
-      @user = @member
-      api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"))
-      @user.user_follows.map(&:followed_item).should == [@community]
-    end
-  end
-
-  describe "unfollowing" do
-    it "should allow unfollowing a group" do
-      @user = @member
-      @user.reload.user_follows.map(&:followed_item).should == [@community]
-
-      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
-      @user.reload.user_follows.should == []
-    end
-
-    it "should do nothing if not following" do
-      @user = @member
-      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
-      @user.reload.user_follows.should == []
-
-      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
-      @user.reload.user_follows.should == []
     end
   end
 
@@ -641,7 +638,22 @@ describe "Groups API", :type => :integration do
 
       @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
       @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership).merge("just_created" => true)
+      json.should == membership_json(@membership, true).merge("just_created" => true)
+    end
+
+    it "should show sis_import_id for group" do
+      user_model
+      sis_batch = @community.root_account.sis_batches.create
+      SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
+      membership = @community.add_user(@user, 'invited')
+      membership.sis_batch_id = sis_batch.id
+      membership.save!
+      @user = account_admin_user(:account => @account, :active_all => true)
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
+        :filter_states => ["invited"]
+      })
+      json.first['sis_import_id'].should == sis_batch.id
+      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first, true)
     end
   end
 
@@ -691,11 +703,24 @@ describe "Groups API", :type => :integration do
         @community.users.map(&:id).should include(user['id'])
       end
     end
+
+    it "honors the include[avatar_url] query parameter flag" do
+      account = @community.context
+      account.set_service_availability(:avatars, true)
+      account.save!
+
+      user = @community.users.first
+      user.avatar_image_url = "http://expected_avatar_url"
+      user.save!
+
+      json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
+      json.first['avatar_url'].should == user.avatar_image_url
+    end
   end
 
   context "group files" do
-    it_should_behave_like "file uploads api with folders"
-    it_should_behave_like "file uploads api with quotas"
+    include_examples "file uploads api with folders"
+    include_examples "file uploads api with quotas"
 
     before do
       @user = @member
@@ -739,7 +764,7 @@ describe "Groups API", :type => :integration do
   end
 
   describe "/preview_html" do
-    before do
+    before :once do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => 'Group 1')
     end

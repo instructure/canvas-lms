@@ -20,7 +20,7 @@
     <% if true#unless @provider.scopes.blank? %>
       <div class="control-group">
         <label class="checkbox" for="remember_access">
-          <%= check_box_tag(:remember_access, :class => "checkbox") %>
+          <%= check_box_tag(:remember_access, "1", false, :class => "checkbox") %>
           <%= t 'remember_auth', 'Remember my authorization for this service' %>
         </label>
       </div>

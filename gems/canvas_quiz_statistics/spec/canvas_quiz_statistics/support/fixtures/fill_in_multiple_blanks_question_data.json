@@ -1,0 +1,46 @@
+{
+  "id": 46,
+  "regrade_option": false,
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "fill_in_multiple_blanks_question",
+  "question_name": "[FIMB] Question",
+  "name": "[FIMB] Question",
+  "question_text": "<p>[FIMB] Roses are [color1], violets are [color2]</p>",
+  "answers": [
+    {
+      "id": "9711",
+      "text": "Red",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "color1"
+    },
+    {
+      "id": "2700",
+      "text": "Blue",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "color1"
+    },
+    {
+      "id": 9702,
+      "text": "Purple",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "color2"
+    },
+    {
+      "id": 7150,
+      "text": "Green",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "color2"
+    }
+  ],
+  "text_after_answers": "",
+  "assessment_question_id": 43,
+  "position": 4,
+  "published_at": "2014-04-15T04:37:02Z"
+}

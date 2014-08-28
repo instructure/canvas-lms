@@ -49,8 +49,28 @@ define([
     }
 
     showAnswerArrows();
-    inputMethods.disableInputs('[type=radio], [type=checkbox]');
-    inputMethods.setWidths();
+    // quiz_show is being pulled into ember show for now. only hide inputs
+    // when we don't have a .allow-inputs
+    if (!$('.allow-inputs').length) {
+      inputMethods.disableInputs('[type=radio], [type=checkbox]');
+      inputMethods.setWidths();
+    }
+
+    $('form.edit_quizzes_quiz').on('submit', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      $(this).find('.loading').removeClass('hidden');
+      var data = $(this).serializeArray();
+      var url = $(this).attr('action');
+      $.ajax({
+        url: url,
+        data: data,
+        type: 'POST',
+        success: function() {
+          $('.edit_quizzes_quiz').parents('.alert').hide();
+        }
+      });
+    });
 
     $(".delete_quiz_link").click(function(event) {
       event.preventDefault();

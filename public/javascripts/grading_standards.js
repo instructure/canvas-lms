@@ -395,7 +395,7 @@ define([
         if(idx == $list.length - 1) {
           points = 0;
         }
-        else if(!points || points < prevVal + 0.1) {
+        else if((!points || points < prevVal + 0.1)&& points != 0) {
           points = parseInt(prevVal) + 1;
         }
         prevVal = points;

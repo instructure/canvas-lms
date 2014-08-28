@@ -39,7 +39,8 @@ describe "grading standards" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     form = f("#edit_assignment_form")
-    f('#assignment_toggle_advanced_options').click
+    f("#assignment_points_possible").clear()
+    f("#assignment_points_possible").send_keys("1")
     click_option('#assignment_grading_type', "Letter Grade")
     f('.edit_letter_grades_link').should be_displayed
     f('.edit_letter_grades_link').click
@@ -71,7 +72,7 @@ describe "grading standards" do
     @assignment.reload.grading_standard_id.should == @standard.id
   end
 
-  it "should allow setting a grading standard for a course" do
+  it "should allow setting a grading standard for a course", :non_parallel => true do
     course_with_teacher_logged_in
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
@@ -125,9 +126,9 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
     @assignment.grade_student(student, :grade => 899)
     get "/courses/#{@course.id}/grades/#{student.id}"
-    grading_scheme = driver.execute_script "return grading_scheme"
+    grading_scheme = driver.execute_script "return ENV.grading_scheme"
     grading_scheme[2][0].should == 'B+'
-    f("#right-side .final_grade .grade").text.should == '89.9'
+    f("#right-side .final_grade .grade").text.should == '89.9%'
     f("#final_letter_grade_text").text.should == 'B+'
   end
 

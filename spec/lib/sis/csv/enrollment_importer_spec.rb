@@ -608,4 +608,76 @@ describe SIS::CSV::EnrollmentImporter do
     end
   end
 
+  it "should allow cross-account imports" do
+    #create course, users, and sections
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    account2 = Account.create!
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active",
+        account: account2
+    )
+    user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
+    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).once.returns(user.pseudonyms.first)
+    SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(account2)
+    # the enrollments
+    process_csv_data_cleanly(
+        "course_id,root_account,user_id,role,status",
+        "test_1,account2,user_1,teacher,active",
+    )
+    course = @account.courses.where(sis_source_id: 'test_1').first
+    course.teachers.map(&:name).should == ['User Uno']
+  end
+
+  it "should check for a usable login for cross-account imports" do
+    #create course, users, and sections
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    account2 = Account.create!
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active",
+        account: account2
+    )
+    user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
+    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).once.returns(nil)
+    SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(account2)
+    # the enrollments
+    importer = process_csv_data(
+        "course_id,root_account,user_id,role,status",
+        "test_1,account2,user_1,teacher,active",
+    )
+    importer.warnings.map(&:last).should == ["User account2:user_1 does not have a usable login for this account"]
+    course = @account.courses.where(sis_source_id: 'test_1').first
+    course.teachers.to_a.should be_empty
+  end
+
+  it "should skip cross-account imports that can't be found" do
+    #create course, users, and sections
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    account2 = Account.create!
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active",
+        account: account2
+    )
+    user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
+    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).never
+    SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(nil)
+    # the enrollments
+    importer = process_csv_data_cleanly(
+        "course_id,root_account,user_id,role,status",
+        "test_1,account2,user_1,teacher,active",
+    )
+    course = @account.courses.where(sis_source_id: 'test_1').first
+    course.teachers.to_a.should be_empty
+  end
 end

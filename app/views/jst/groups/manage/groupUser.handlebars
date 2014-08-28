@@ -1,4 +1,10 @@
-<div class="group-user-name ellipsis" title="{{name}}"><i class="icon-drag-handle"></i>{{name}}</div>
+<div class="group-user-name ellipsis" title="{{name}}">
+  <i class="icon-drag-handle"></i>
+  {{name}}
+</div>
+{{#if isLeader}}<i class="icon-user group-leader"
+  aria-label="{{#t 'group_leader'}}Group Leader{{/t}}"
+  title="{{#t 'group_leader'}}Group Leader{{/t}}"></i>{{/if}}
 {{#if canAssignToGroup}}
   <a href="#"
      data-user-id="{{id}}"
@@ -9,33 +15,55 @@
   </a>
 {{/if}}
 {{#if canEditGroupAssignment}}
-  <a href="#"
-     id='group-{{groupId}}-user-{{id}}-actions'
-     data-user-id="{{id}}"
-     class="al-trigger group-user-actions"
-     data-kyle-menu-options='{"appendMenuTo": "body"}'>
-      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">
-        {{#t "edit_user_group_assignment"}}Remove or move {{name}} from group{{/t}}
-      </span>
-  </a>
-  <ul class="al-options">
+  <div role="application">
+    <a href="#"
+       id='group-{{groupId}}-user-{{id}}-actions'
+       data-user-id="{{id}}"
+       class="al-trigger group-user-actions"
+       data-kyle-menu-options='{"appendMenuTo": "body"}'
+       role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">
+          {{#t "edit_group_membership"}}Edit {{name}}'s membership{{/t}}
+        </span>
+    </a>
+    <ul class="al-options">
+        <li>
+          <a href="#"
+             data-user-id="{{id}}"
+             aria-label="{{#t "remove_from_group"}}Remove {{name}} from group{{/t}}"
+             class="icon-trash remove-from-group">
+              {{#t "remove"}}Remove{{/t}}
+          </a>
+        </li>
+      {{#if isLeader}}
     <li>
-      <a href="#"
-         data-user-id="{{id}}"
-         aria-label="{{#t "remove_from_group"}}Remove {{name}} from group{{/t}}"
-         class="icon-trash remove-from-group">
-          {{#t "remove"}}Remove{{/t}}
-      </a>
-    </li>
-    <li>
-      <a href="#"
-         data-focus-returns-to='group-{{groupId}}-user-{{id}}-actions'
-         data-user-id="{{id}}"
-         aria-label="{{#t "move_to_new_group"}}Move {{name}} to a new group{{/t}}"
-         class="icon-updown edit-group-assignment">
-          {{#t "move"}}Move To...{{/t}}
-      </a>
-    </li>
-  </ul>
+        <a href="#"
+           data-user-id="{{id}}"
+           aria-label="{{#t "remove_user_as_leader"}}Remove {{name}} as leader{{/t}}"
+           class="icon-user remove-as-leader">
+            {{#t "remove_as_leader"}}Remove as Leader{{/t}}
+        </a>
+      </li>
+      {{else}}
+      <li>
+        <a href="#"
+           data-user-id="{{id}}"
+           aria-label="{{#t "set_user_as_leader"}}Set {{name}} as leader{{/t}}"
+           class="icon-user set-as-leader">
+            {{#t "set_as_leader"}}Set as Leader{{/t}}
+        </a>
+      </li>
+      {{/if}}
+      <li>
+        <a href="#"
+           data-focus-returns-to='group-{{groupId}}-user-{{id}}-actions'
+           data-user-id="{{id}}"
+           aria-label="{{#t "move_to_new_group"}}Move {{name}} to a new group{{/t}}"
+           class="icon-updown edit-group-assignment">
+            {{#t "move"}}Move To...{{/t}}
+        </a>
+      </li>
+    </ul>
+  </div>
 {{/if}}

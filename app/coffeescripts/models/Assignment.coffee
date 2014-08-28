@@ -29,6 +29,9 @@ define [
           silent: true
       if (all_dates = @get('all_dates'))?
         @set 'all_dates', new DateGroupCollection(all_dates)
+      if (@postToSISEnabled())
+        unless @get('post_to_sis') == true || @get('post_to_sis') == false
+          @set 'post_to_sis', true
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
@@ -64,6 +67,9 @@ define [
     name: (newName) =>
       return @get 'name' unless arguments.length > 0
       @set 'name', newName
+
+    postToSIS:  =>
+      return @get 'post_to_sis' unless arguments.length > 0
 
     pointsPossible: (points) =>
       return @get('points_possible') || 0 unless arguments.length > 0
@@ -128,8 +134,8 @@ define [
 
     isOnlineSubmission: =>
       _.any @_submissionTypes(), (thing) ->
-          thing in ['online', 'online_text_entry',
-            'media_recording', 'online_url', 'online_upload']
+        thing in ['online', 'online_text_entry',
+          'media_recording', 'online_url', 'online_upload']
 
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
@@ -177,6 +183,8 @@ define [
       return @get( 'group_category_id' ) unless arguments.length > 0
       @set 'group_category_id', id
 
+    canGroup: -> !@get('has_submitted_submissions')
+
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id
@@ -205,6 +213,9 @@ define [
     isLetterGraded: =>
       @gradingType() == 'letter_grade'
 
+    isGpaScaled: =>
+      @gradingType() == 'gpa_scale'
+
     published: (newPublished) =>
       return @get 'published' unless arguments.length > 0
       @set 'published', newPublished
@@ -218,6 +229,11 @@ define [
       return 'discussion' if @isDiscussionTopic()
       return 'assignment'
 
+    objectType: =>
+      return 'Quiz' if @isQuiz()
+      return 'Discussion' if @isDiscussionTopic()
+      return 'Assignment'
+
     htmlUrl: =>
       @get 'html_url'
 
@@ -226,6 +242,9 @@ define [
 
     labelId: =>
       return @id
+
+    postToSISEnabled: =>
+      return ENV.POST_TO_SIS
 
     defaultDates: =>
       group = new DateGroup
@@ -263,10 +282,13 @@ define [
         'turnitinAvailable','turnitinEnabled',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-        'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
-        'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position',
+        'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
+        'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
       ]
+      if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
+        fields.push 'isOnlyVisibleToOverrides'
+
       hash = id: @get 'id'
       for field in fields
         hash[field] = @[field]()
@@ -348,3 +370,7 @@ define [
 
     disabledMessage: ->
       I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    isOnlyVisibleToOverrides: (override_flag) ->
+      return @get('only_visible_to_overrides') || false unless arguments.length > 0
+      @set 'only_visible_to_overrides', override_flag

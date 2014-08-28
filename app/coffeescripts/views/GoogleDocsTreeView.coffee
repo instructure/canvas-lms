@@ -1,4 +1,10 @@
-define ['i18n!titles', 'jquery', 'Backbone', 'jst/googleDocsTreeView'], (I18n, $, Backbone, template)->
+define [
+  'i18n!titles'
+  'jquery'
+  'Backbone'
+  'jst/googleDocsTreeView'
+  'jquery.inst_tree'
+], (I18n, $, Backbone, template)->
 
   class GoogleDocsTreeView extends Backbone.View
 

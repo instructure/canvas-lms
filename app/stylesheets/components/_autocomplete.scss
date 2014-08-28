@@ -1,0 +1,280 @@
+//
+// Autocomplete combo box
+// --------------------------------------------------
+
+/*
+@styleguide Autocomplete
+
+A generic, accessible autocomplete widget.
+
+```html
+<div class="ac">
+  <div class="ac-input-box">
+    <ul class="ac-token-list"></ul>
+    <input type="search"
+           class="ac-input"
+           aria-expanded="false"
+           aria-activedescendant=""
+           aria-owns="ac-result-list-1"
+           auto-autocomplete="list"
+           role="combobox" />
+
+    <span class="ac-placeholder">Search for results</span>
+  </div>
+
+  <button class="btn ac-search-btn"
+          type="button" aria-label="Search">
+    <i class="icon-address-book"></i>
+  </button>
+
+  <div class="ac-result-container" id="ac-result-list-1" aria-hidden="true">
+    <ul class="ac-result-list"></ul>
+  </div>
+</div>
+```
+*/
+
+$border-color: #999;
+$highlight-color: #0875be;
+
+ul[class*=ac-] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[class*=ac-][aria-hidden=true] {
+  display: none;
+}
+
+.ac {
+  position: relative;
+  display: table;
+  width: 100%;
+}
+
+.ac-row {
+  display: table-row;
+}
+
+.ac-input-cell {
+  display: table-cell;
+  width: 93%;
+}
+
+.ac-input-box {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px 0 0 3px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+  box-sizing: border-box;
+  cursor: text;
+  min-height: 30px;
+  overflow: hidden;
+  padding: 4px 6px;
+  position: relative;
+  transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+  width: 100%;
+
+  &.focused {
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+  }
+
+  &.disabled {
+    background-color: #ddd;
+  }
+}
+
+.ac .btn {
+  border-left: none;
+  border-radius: 0 3px 3px 0;
+  display: table-cell;
+  &.disabled {
+    color: #A6A6A6;
+  }
+}
+
+.ac-input-box .ac-input {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: inline;
+  margin: 0;
+  margin-left: 8px;
+  min-width: 15px;
+  padding: 0;
+  width: 15px;
+  vertical-align: middle;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.ac-placeholder {
+  color: #999;
+  left: 12px;
+  position: absolute;
+  top: 5px;
+  transition: opacity 0.2s linear;
+}
+
+.ac-clear {
+  display: none;
+  position: absolute;
+  right: 4px;
+  top: 5px;
+
+  i:before {
+    color: #999;
+    font-size: 20px;
+  }
+
+  &:hover, &:focus {
+    outline: none;
+
+    i:before {
+      color: inherit;
+    }
+  }
+}
+
+.ac-token-list {
+  display: inline;
+  position: relative;
+  z-index: 2;
+}
+
+.ac-token {
+  background: #dee7fa;
+  border: 1px solid #85ace0;
+  border-radius: 14px;
+  box-sizing: border-box;
+  cursor: default;
+  display: inline-block;
+  line-height: normal;
+  margin: 2px 4px 2px 0;
+  // Please don't remove overflow. It fixes a weird webkit bug.
+  overflow: hidden;
+  padding: 0 18px 0 8px;
+  position: relative;
+  vertical-align: middle;
+
+  &:hover {
+    background: #bccef4;
+    border-color: #6f94e6;
+  }
+
+  &:hover a, a:focus {
+    right: -1px;
+  }
+
+  a {
+    position: absolute;
+    right: -9999em;
+    top: 0;
+  }
+
+	a, a i:before {
+		color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, .4);
+	}
+}
+
+.ac-result-wrapper {
+  display: none;
+
+  &:before, &:after {
+    content: "";
+    height: 0;
+    position: absolute;
+    right: 15px;
+    width: 0;
+    z-index: 3;
+  }
+
+  &:before {
+    border-bottom: 10px solid $border-color;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    top: 26px;
+  }
+
+  &:after {
+    border-bottom: 10px solid #fff;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    top: 27px;
+  }
+}
+
+.ac-result-container {
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  box-sizing: border-box;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  font-size: 12px;
+  max-height: 250px;
+  min-height: 50px;
+  left: 0;
+  overflow: auto;
+  position: absolute;
+  top: 36px;
+  width: 100%;
+  z-index: 2;
+}
+
+.ac-result {
+	cursor: pointer;
+  line-height: 16px;
+  padding: 5px 8px 2px 8px;
+
+  &:first-child {
+    border-radius: 10px 10px 0 0 !important;
+  }
+
+  &:last-child {
+    border-radius: 0 0 10px 10px;
+  }
+
+  &.selected, &:hover {
+    background: $highlight-color;
+    color: #fff;
+		text-shadow: -1px -1px 0 rgba(0, 0, 0, .2);
+  }
+}
+
+.ac-result-list {
+  .context, .everyone {
+    border-bottom: 1px solid $border-color;
+    color: $highlight-color;
+
+    &.selected, &:hover {
+      color: #fff;
+    }
+  }
+
+  .back {
+    color: #333;
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+
+  .no-result {
+    display: block;
+  }
+
+  .result-name {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 80%;
+  }
+}

@@ -1,0 +1,285 @@
+#quiz-show {
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  background-color: #fff;
+
+  .edit-header {
+    padding-right: 20px;
+  }
+
+  //===== Action Buttons In the Top Right Corner ===
+
+  .edit-header {
+    margin-bottom: 1.5em;
+
+    h1 {
+      padding-left: 24px;
+    }
+  }
+  .teacher-action-buttons,
+  .student-action-buttons {
+    // Makes ICPublishButtonComponent render inline-block
+    div {
+      display: inline-block
+    }
+
+    text-align: right;
+    display: table-cell;
+    vertical-align: bottom;
+    min-height: 60px;
+    padding-top: 15px;
+
+    // Margin-right for the ic-actions dropdown to be absolutely positioned.
+    margin-right: 25px;
+  }
+
+  .lock-explanation,
+  .quiz-preview {
+    margin: 0 20px 25px;
+    border: 1px solid #D1D3D7;
+    border-radius: 7px;
+    background-color: #F8FAFB;
+    padding: 8px 20px;
+  }
+  .lock-explanation {
+  }
+  .quiz-preview {
+    margin: 0 0 25px 0;
+    padding: 0 20px;
+  }
+
+  //===== Tabs ===
+
+  #quiz-show-tabs {
+    position: relative;
+    top: 1px;
+
+    ol li {
+      border: 1px solid transparent;
+      border-bottom: 1px solid #CAD0D7;
+      background: white;
+      position: relative;
+      display: inline-block;
+      list-style-type: none;
+      min-width: 105px;
+      text-align: center;
+      font-size: 14px;
+
+      a {
+        font-weight: bold;
+        padding: 10px 5px 10px 5px;
+        display: block;
+        color: #5f666d;
+      }
+
+      &.active {
+        border: 1px solid #CAD0D7;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        border-bottom: 1px solid white;
+
+        a {
+          color: #2a333c;
+        }
+      }
+    }
+
+    ol {
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+
+  .tabs-content {
+    border-top: 1px solid #CAD0D7;
+    padding: 25px 35px 55px 35px;
+  }
+
+  table.quiz-table {
+    border: 1px solid #e6e6e7;
+
+    th {
+      background-color: #F4F5F6;
+      font-weight: bold;
+      text-align: left;
+    }
+    tbody {
+      font-weight: 300;
+    }
+  }
+
+  //===== Overview Tab ===
+  .submission-attempt-history {
+    margin: 30px 0 20px 0;
+
+    .desc {
+      width: 22%;
+      float: left;
+      margin-right: 2%;
+      text-align: right;
+      font-size: 110%;
+      color: #555;
+    }
+    table {
+      width: 65%;
+      float: left;
+      margin-bottom: 10px;
+    }
+    td {
+      padding: 4px 8px;
+    }
+    thead td.regraded {
+      color: white;
+      background-color: #f89508;
+      text-shadow: 0 -1px 0 #cf9b47;
+      border-top: none;
+    }
+    td.regraded {
+      border-top: 1px solid #C4AE90;
+      background-color: #fcf8e3;
+    }
+    .submission-pending-review {
+      width: 65%;
+      float: left;
+      margin-left: 24%;
+      margin-bottom: 0;
+      color: #777;
+      font-size: 90%;
+    }
+  }
+
+  .quiz-overview {
+    .quiz-description {
+      font-weight: 300;
+      font-size: 14px;
+      margin-bottom: 1.5em;
+    }
+
+    .quiz-attributes {
+      dl dt,
+      dl dd {
+        float: left;
+        margin: 0 0.5em 10px 0;
+      }
+      dl dd + dt,
+      dl dd + dd {
+        clear: left
+      }
+      dl dd + dd {
+        float: none
+      }
+      dl dt {
+        font-weight: bold;
+        clear:left;
+      }
+      dl dd {
+        font-weight: 200;
+      }
+    }
+
+    .quiz-attributes-student {
+      border-bottom: 1px solid #CAD0D7;
+      margin-bottom: 30px;
+      padding: 0 37px;
+
+      dl, dt, dd {
+        margin-bottom: 0;
+      }
+      .quiz-attribute-column {
+        float: left;
+        width: 20%;
+      }
+    }
+    .student-quiz-content {
+      padding: 0 35px 55px 35px;
+    }
+
+    .quiz-attributes-teacher {
+      overflow: hidden;
+      margin-bottom: 2.5em;
+
+      .quiz-attribute-column {
+        text-align: center;
+        border-right: 1px solid #F1F2F2;
+        margin-bottom: -99999px;
+        padding-bottom: 99999px;
+
+        &:last-of-type {
+          border-right: none;
+        }
+      }
+    }
+
+    #due-dates-table {
+      td {
+        width: 20%;
+      }
+      td:nth-of-type(2) {
+        width: 40%;
+      }
+      td:nth-of-type(3) span {
+        margin: 0 10px 0 12px;
+      }
+    }
+  }
+
+
+  // ic-actions overrides
+
+  ic-actions {
+    position: absolute;
+    top: 41px;
+    right: 6px;
+    padding-right: 5px;
+  }
+  ic-menu-item {
+    display: block;
+  }
+  ic-menu-item.disabled {
+    color: #aaa;
+  }
+  ic-menu-item.disabled:focus {
+    color: #999;
+    background-color: #f8f8f8;
+  }
+  ic-menu-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+  ic-menu-list {
+    top: 32px;
+    right: 5px;
+    text-align: left;
+  }
+
+}
+
+// Dialogs - Put outside the #quiz_show scope because jQueryUI puts
+// it in the body.
+
+.message-students-who-dialog {
+  .field {
+    margin-bottom: 11px;
+  }
+  .recipients {
+    margin-bottom: 11px;
+  }
+  select {
+    margin-bottom: 0;
+    width: 300px;
+  }
+  .label {
+    margin: 2px 0;
+  }
+  .more-label {
+    font-size: 88%;
+    color: #666;
+  }
+  textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    width: 100%;
+    height: 90px;
+  }
+}
+

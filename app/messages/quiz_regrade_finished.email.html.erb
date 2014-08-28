@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= polymorphic_path([asset.quiz.context,asset.quiz]) %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= course_quiz_path(asset.quiz.context,asset.quiz) %>
 <% end %>
 
 <p>
@@ -8,9 +8,10 @@
   <% end %>
 </p>
 
-<p><%= t :body, "A regrade has finished for the quiz %{quiz}", :quiz => asset.quiz %></p>
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "You can view the quiz here:" %>
+  </a>
+<% end %>
 
-<p>
-  <%= t :link_message, "You can view the quiz here:" %>
-  <a href="<%= content :link %>"><%= t :link_message, "You can view the quiz here:" %></a>
-</p>
+<p><%= t :body, "A regrade has finished for the quiz %{quiz}", :quiz => asset.quiz %></p>

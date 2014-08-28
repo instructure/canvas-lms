@@ -7,11 +7,11 @@ describe "Common Cartridge exporting" do
     message = "fail"
     course.stubs(:wiki).raises(message)
     content_export = ContentExport.new
-    content_export.course = course
+    content_export.context = course
     content_export.user = user
     content_export.save!
     
-    content_export.export_course_without_send_later
+    content_export.export_without_send_later
     
     content_export.error_messages.length.should == 1
     error = content_export.error_messages.first
@@ -25,9 +25,8 @@ describe "Common Cartridge exporting" do
 
     before do
       course_with_teacher
-      @ce = ContentExport.new
+      @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
-      @ce.course = @course
       @ce.user = @user
     end
 
@@ -37,8 +36,8 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    def run_export
-      @ce.export_course_without_send_later
+    def run_export(opts = {})
+      @ce.export_without_send_later(opts)
       @ce.error_messages.should == []
       @file_handle = @ce.attachment.open :need_local_file => true
       @zip_file = Zip::File.open(@file_handle.path)
@@ -185,6 +184,12 @@ describe "Common Cartridge exporting" do
 
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
+
+      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
     end
 
     it "should export quizzes with groups that point to external banks" do
@@ -209,6 +214,7 @@ describe "Common Cartridge exporting" do
       @ce.save!
 
       run_export
+
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(q1)}/#{mig_id(q1)}.xml"))
       selections = doc.css('selection')
       selections[0].at_css("sourcebank_ref").text.to_i.should == bank.id
@@ -403,6 +409,62 @@ describe "Common Cartridge exporting" do
       @course.name = "a" * Course.maximum_string_length
 
       run_export
+    end
+
+    it "should export media tracks" do
+      stub_kaltura
+      CanvasKaltura::ClientV3.any_instance.stubs(:startSession)
+      CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns(Tempfile.new('blah.flv'))
+      CC::CCHelper.stubs(:media_object_info).returns({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
+      obj = @course.media_objects.create! media_id: '0_deadbeef'
+      track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
+      page = @course.wiki.front_page
+      page.body = %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>}
+      page.save!
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export
+      file_node = @manifest_doc.at_css("resource[identifier='id4164d7d594985594573e63f8ca15975'] file[href$='/blah.flv.tlh.subtitles']")
+      file_node.should be_present
+      @zip_file.read(file_node['href']).should eql(track.content)
+      track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
+      track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]').should be_present
+    end
+
+    it "should export CC 1.3 assignments" do
+      @course.assignments.create! name: 'test assignment', description: '<em>what?</em>', points_possible: 11,
+                                  submission_types: 'online_text_entry,online_upload,online_url'
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export(version: '1.3')
+      @manifest_doc.at_css('metadata schemaversion').text.should eql('1.3.0')
+
+      # validate assignment manifest resource
+      assignment_resource = @manifest_doc.at_css("resource[type='assignment_xmlv1p0']")
+      assignment_id = assignment_resource.attribute('identifier').value
+      assignment_xml_file = assignment_resource.attribute('href').value
+      assignment_resource.at_css('file').attribute('href').value.should == assignment_xml_file
+
+      # validate cc1.3 assignment xml document
+      assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
+      assignment_xml_doc.at_css('text').text.should == '<em>what?</em>'
+      assignment_xml_doc.at_css('text').attribute('texttype').value.should == 'text/html'
+      assignment_xml_doc.at_css('gradable').text.should == 'true'
+      assignment_xml_doc.at_css('gradable').attribute('points_possible').value.should == '11'
+      assignment_xml_doc.css('submission_formats format').map{ |fmt| fmt.attribute('type').value }.should =~ %w(html file url)
+
+      # validate presence of canvas extension node
+      extension_node = assignment_xml_doc.at_css('extensions').elements.first
+      extension_node.name.should == 'assignment'
+      extension_node.namespace.href.should == 'http://canvas.instructure.com/xsd/cccv1p0'
+
+      # validate fallback html manifest resource
+      variant_tag = @manifest_doc.at_css(%Q{resource[identifier="#{assignment_id}_fallback"]}).elements.first
+      variant_tag.name.should == 'variant'
+      variant_tag.attribute('identifierref').value.should eql assignment_id
+      variant_tag.next_element.name.should == 'file'
+      html_file = variant_tag.next_element.attribute('href').value
+      @zip_file.read("#{assignment_id}/test-assignment.html").should be_include "<em>what?</em>"
     end
   end
 end

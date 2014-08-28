@@ -19,6 +19,7 @@
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
+  include Api::V1::User
 
   def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
@@ -44,7 +45,7 @@ module Api::V1::Attachment
                       elsif options.has_key?(:can_manage_files)
                         options[:can_manage_files]
                       else
-                        !attachment.grants_right?(user, nil, :update)
+                        !attachment.grants_right?(user, :update)
                       end
 
     downloadable = !attachment.locked_for?(user, check_policies: true)
@@ -81,6 +82,7 @@ module Api::V1::Attachment
       'thumbnail_url' => thumbnail_download_url,
     }
     locked_json(hash, attachment, user, 'file')
+    hash['user'] = user_display_json(attachment.user, attachment.context) if (options[:include] || []).include? 'user'
     hash
   end
 
@@ -100,7 +102,7 @@ module Api::V1::Attachment
     @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
-    @attachment.user = @current_user if opts[:set_user_id]
+    @attachment.user = @current_user
     @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe Submission do
-  before(:each) do
+  before(:once) do
     @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
     @course = @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
     @context.enroll_student(@user)
@@ -39,7 +39,7 @@ describe Submission do
     Submission.create!(@valid_attributes)
   end
 
-  it_should_behave_like "url validation tests"
+  include_examples "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
   end
@@ -102,23 +102,6 @@ describe Submission do
     end
   end
 
-  it "should not return duplicate conversation groups" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save!
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
-    @course.offer!
-    @course.enroll_student(@student = user)
-    @assignment.context.reload
-
-    @submission = @assignment.submit_homework(@student, :body => 'some message')
-    @submission.conversation_groups.should eql @submission.conversation_groups.uniq
-  end
-
   it "should ensure the media object exists" do
     assignment_model
     se = @course.enroll_student(user)
@@ -159,7 +142,7 @@ describe Submission do
 
   context "broadcast policy" do
     context "Submission Notifications" do
-      before do
+      before :once do
         Notification.create(:name => 'Assignment Submitted')
         Notification.create(:name => 'Assignment Resubmitted')
         Notification.create(:name => 'Assignment Submitted Late')
@@ -218,7 +201,7 @@ describe Submission do
     end
 
     context "Submission Graded" do
-      before do
+      before :once do
         Notification.create(:name => 'Submission Graded')
       end
 
@@ -246,7 +229,7 @@ describe Submission do
       it "should not create a message when this is a quiz submission" do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
@@ -292,11 +275,11 @@ describe Submission do
         user       = account_admin_user
         channel    = user.communication_channels.create!(:path => 'admin@example.com')
         submission = quiz.generate_submission(user, false)
-        submission.grade_submission
+        Quizzes::SubmissionGrader.new(submission).grade_submission
 
         channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
         submission2 = quiz.generate_submission(@teacher, false)
-        submission2.grade_submission
+        Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         submission.submission.messages_sent.should_not be_include('Submission Graded')
         submission2.submission.messages_sent.should_not be_include('Submission Graded')
@@ -349,7 +332,7 @@ describe Submission do
         @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -416,7 +399,7 @@ describe Submission do
         Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
       end
 
-      before(:each) do
+      before(:once) do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -519,7 +502,7 @@ describe Submission do
     end
 
     describe "group" do
-      before(:each) do
+      before(:once) do
         @teacher = User.create(:name => "some teacher")
         @student = User.create(:name => "a student")
         @student1 = User.create(:name => "student 1")
@@ -552,7 +535,7 @@ describe Submission do
     end
 
     context "report" do
-      before do
+      before :once do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -570,7 +553,9 @@ describe Submission do
           }
         }
         @submission.save!
+      end
 
+      before :each do
         api = Turnitin::Client.new('test_account', 'sekret')
         Turnitin::Client.expects(:new).at_least(1).returns(api)
         api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
@@ -822,7 +807,7 @@ describe Submission do
   end
 
   describe "past_due" do
-    before do
+    before :once do
       u1 = @user
       submission_spec_model
       @submission1 = @submission
@@ -880,7 +865,7 @@ describe Submission do
   end
 
   describe "late" do
-    before do
+    before :once do
       submission_spec_model
     end
 
@@ -904,7 +889,7 @@ describe Submission do
   end
 
   describe "missing" do
-    before do
+    before :once do
       submission_spec_model
     end
 
@@ -920,9 +905,33 @@ describe Submission do
       @submission.should_not be_missing
     end
 
-    it "should be true if not submitted and past due" do
+    it "should be true if not submitted, past due, and expects a submission" do
+      @submission.assignment.submission_types = "online_quiz"
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
+
+      # Regardless of score
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
+
+      @submission.should be_missing
+    end
+
+    it "should be true if not submitted, score of zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0
+      @submission.graded_at = Time.zone.now + 1.day
+      @submission.should be_missing
+    end
+
+    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
       @submission.should be_missing
     end
   end
@@ -945,7 +954,7 @@ describe Submission do
   end
 
   describe "update_attachment_associations" do
-    begin
+    before do
       course_with_student active_all: true
       @assignment = @course.assignments.create!
     end
@@ -977,6 +986,10 @@ describe Submission do
   end
 
   describe "#bulk_load_versioned_attachments" do
+    def ensure_attachments_arent_queried
+      Attachment.expects(:where).never
+    end
+
     it "loads attachments for many submissions at once" do
       attachments = []
 
@@ -991,9 +1004,23 @@ describe Submission do
       }
 
       Submission.bulk_load_versioned_attachments(submissions)
+      ensure_attachments_arent_queried
       submissions.each_with_index { |s, i|
         s.versioned_attachments.should == attachments[i]
       }
+    end
+
+    it "includes url submission attachments" do
+      student_in_course active_all: true
+      s = @assignment.submit_homework(@student,
+                                      submission_type: "online_url",
+                                      url: "http://example.com")
+      s.attachment = attachment_model(filename: "screenshot.jpg",
+                                      context: @student)
+
+      Submission.bulk_load_versioned_attachments([s])
+      ensure_attachments_arent_queried
+      s.versioned_attachments.should == [s.attachment]
     end
   end
 
@@ -1026,6 +1053,46 @@ describe Submission do
       submission1.assign_assessor(submission2)
     end
   end
+
+  describe "assignment_visible_to_student?" do
+    before(:once) do
+      student_in_course(active_all: true)
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
+      @submission = @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+    end
+
+    it "submission should be visible with normal course" do
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+
+    it "submission should not be visible with DA and no override or grade" do
+      @course.enable_feature!(:differentiated_assignments)
+      @submission.assignment_visible_to_student?(@student.id).should be_false
+    end
+
+    it "submission should be visible with DA and an override" do
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy!)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      create_section_override_for_assignment(@submission.assignment, course_section: @section)
+      @submission.reload
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+
+    it "submission should be visible with DA and a grade" do
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy!)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      @assignment.grade_student(@user, {grade: 10})
+      @submission.reload
+      @submission.assignment_visible_to_student?(@student.id).should be_true
+    end
+  end
+
+
 end
 
 def submission_spec_model(opts={})

@@ -6,7 +6,7 @@ describe "users" do
   context "logins" do
     it "should allow setting passwords for new pseudonyms" do
       admin = User.create!
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
 
       @user = User.create!
@@ -226,6 +226,7 @@ describe "users" do
 
     it "should register a student with a join code" do
       course(:active_all => true)
+      @course.root_account.allow_self_enrollment!
       @course.update_attribute(:self_enrollment, true)
 
       get '/register'
@@ -255,10 +256,11 @@ describe "users" do
 
       # if instructure_misc_plugin is installed, number of registration fields increase
       if (Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
-        f('#teacher_school_position').send_keys('Dean')
+        set_value f('#teacher_organization_type'), 'Higher Ed'
+        set_value f('#teacher_school_position'), 'Dean'
         f('#teacher_phone').send_keys('1231231234')
         f('#teacher_school_name').send_keys('example org')
-        f('#teacher_organization_type').send_keys('Higher Ed')
+        set_value f('#location'), 'United States and Canada'
       end
 
       f('input[name="user[terms_of_use]"]', form).click

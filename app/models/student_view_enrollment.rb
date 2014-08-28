@@ -17,7 +17,7 @@
 #
 
 class StudentViewEnrollment < StudentEnrollment
-   def fake_student?
+  def fake_student?
     true
   end
 end

@@ -119,13 +119,11 @@ define [
       result = _.map models, (group) -> group.toJSON()
 
     singleSectionDueDate: =>
-      if !@multipleDueDates() && !@dueAt()
-        allDates = @allDates()
-        for section in allDates
-          if section.dueAt
-            return section.dueAt.toISOString()
-      else
-        return @dueAt()
+      _.find(@allDates(), 'dueAt')?.dueAt.toISOString() || @dueAt()
+
+    isOnlyVisibleToOverrides: (overrideFlag) ->
+      return @get('only_visible_to_overrides') || false unless arguments.length > 0
+      @set('only_visible_to_overrides', overrideFlag)
 
     toView: =>
       fields = [

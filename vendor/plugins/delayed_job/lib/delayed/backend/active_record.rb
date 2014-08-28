@@ -21,7 +21,7 @@ module Delayed
         self.table_name = :delayed_jobs
 
         def self.reconnect!
-          connection.reconnect!
+          clear_all_connections!
         end
 
         class << self
@@ -193,9 +193,7 @@ module Delayed
             end
 
           scope = scope.group(:tag).offset(offset).limit(limit)
-          (CANVAS_RAILS2 ?
-              scope.count(:tag, :order => "COUNT(tag) DESC") :
-              scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
+          scope.order("COUNT(tag) DESC").count.map { |t,c| { :tag => t, :count => c } }
         end
 
         def self.get_and_lock_next_available(worker_name,
@@ -334,7 +332,7 @@ module Delayed
 
         def fail!
           attrs = self.attributes
-          attrs['original_id'] = attrs.delete('id')
+          attrs['original_job_id'] = attrs.delete('id')
           attrs['failed_at'] ||= self.class.db_time_now
           attrs.delete('next_in_strand')
           self.class.transaction do

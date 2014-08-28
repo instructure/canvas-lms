@@ -20,5 +20,8 @@ class WebConferenceParticipant < ActiveRecord::Base
   belongs_to :web_conference
   belongs_to :user
 
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :web_conference_id, :participation_type, :workflow_state, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:web_conference, :user]
+
   attr_accessible :web_conference, :user
 end

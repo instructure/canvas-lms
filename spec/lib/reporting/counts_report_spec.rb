@@ -38,10 +38,10 @@ describe Reporting::CountsReport do
 
   context "sharding" do
     specs_require_sharding
-    it_should_behave_like "counts_report"
+    include_examples "counts_report"
   end
 
-  it_should_behave_like "counts_report"
+  include_examples "counts_report"
 
   describe "detailed report" do
     describe "courses" do
@@ -108,7 +108,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'teachers' }
-      it_should_behave_like "user_counts"
+      include_examples "user_counts"
     end
 
     describe "students" do
@@ -119,7 +119,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'students' }
-      it_should_behave_like "user_counts"
+      include_examples "user_counts"
     end
 
     describe "users" do
@@ -130,7 +130,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'users' }
-      it_should_behave_like "user_counts"
+      include_examples "user_counts"
 
       it "should include tas" do
         Reporting::CountsReport.process

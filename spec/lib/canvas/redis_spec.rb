@@ -99,7 +99,7 @@ describe "Canvas::Redis" do
 
     it "should not fail cache.exist?" do
       enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
-        Rails.cache.exist?('blah').should == nil
+        Rails.cache.exist?('blah').should be_false
       end
     end
 

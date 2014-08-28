@@ -24,10 +24,12 @@
 module TimeZoneHelper
   module ClassMethods
     def time_zone_attribute(attr, options = {})
+      self.time_zone_attribute_defaults ||= {}
+      time_zone_attribute_defaults[attr] = options[:default]
       class_eval <<-CODE
         def #{attr}
           value = read_attribute(:#{attr})
-          #{options[:default] ? "value ||= #{options[:default].inspect}" : "return nil unless value"}
+          value ||= self.class.time_zone_attribute_defaults[#{attr.inspect}] or return
           TimeZoneHelper.rails_preferred_zone(ActiveSupport::TimeZone[value])
         end
 
@@ -63,5 +65,6 @@ module TimeZoneHelper
 
   def self.included(klass)
     klass.send(:extend, ClassMethods)
+    klass.send(:class_attribute, :time_zone_attribute_defaults)
   end
 end

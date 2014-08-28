@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 
-describe "Outcom Reports" do
+describe "Outcome Reports" do
   include ReportSpecHelper
 
   before(:each) do
@@ -286,7 +286,7 @@ describe "Outcom Reports" do
       question_2 = q2[:id]
       sub.submission_data["question_#{question_1}"] = answer_1
       sub.submission_data["question_#{question_2}"] = answer_2 + 1
-      sub.grade_submission
+      Quizzes::SubmissionGrader.new(sub).grade_submission
       outcome.reload
       outcome_group.add_outcome(outcome)
 
@@ -347,6 +347,26 @@ describe "Outcom Reports" do
       parsed[1][16].should == @course1.sis_source_id
 
       parsed.length.should == 3
+
+      # NOTE: remove after data migration of polymorphic relationships having: Quiz
+      result = LearningOutcomeResult.where(association_type: 'Quizzes::Quiz').first
+      result.association_type = 'Quiz'
+      result.send(:save_without_callbacks)
+
+      parsed = read_report(@type, {order: [0, 13]})
+      parsed[2][5].should == 'assignment'
+      parsed[0][5].should == 'quiz'
+      parsed[1][5].should == 'quiz'
+
+      # NOTE: remove after data migration of polymorphic relationships having: QuizSubmission
+      result = LearningOutcomeResult.where(artifact_type: 'Quizzes::QuizSubmission').first
+      LearningOutcomeResult.where(id: result).update_all(association_type: 'QuizSubmission')
+
+      parsed = read_report(@type, {order: [0, 13]})
+      parsed[0][6].should == sub.finished_at.iso8601
+      parsed[0][7].should == sub.score.to_s
+      parsed[1][6].should == sub.finished_at.iso8601
+      parsed[1][7].should == sub.score.to_s
     end
 
     it 'should include in extra text if option is set' do

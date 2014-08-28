@@ -17,7 +17,7 @@ describe DataFixup::ChangeGradedSurveySubmissionsToNotNeedGrading do
 
     submission = @quiz.generate_submission(@student)
     submission.submission = submission.assignment.find_or_create_submission(@student.id)
-    submission.grade_submission(grade: 15)
+    Quizzes::SubmissionGrader.new(submission).grade_submission(grade: 15)
     submission.workflow_state = 'pending_review'
     submission.score = 10
     submission.save!

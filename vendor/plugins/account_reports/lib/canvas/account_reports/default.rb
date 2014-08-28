@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,6 +41,10 @@ module Canvas::AccountReports
 
     def self.unpublished_courses_csv(account_report)
       CourseReports.new(account_report).unpublished_courses
+    end
+
+    def self.public_courses_csv(account_report)
+      CourseReports.new(account_report).public_courses
     end
 
     def self.unused_courses_csv(account_report)

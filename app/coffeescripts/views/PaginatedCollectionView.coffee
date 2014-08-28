@@ -56,19 +56,29 @@ define [
       @initScrollContainer()
 
     ##
+    # Set the scroll container after the view has been created.
+    # Useful if the view is created before the container is rendered.
+
+    resetScrollContainer: (container) =>
+      @detachScroll()
+      @scrollContainer = container
+      @initScrollContainer()
+      @attachScroll()
+
+    ##
     # Extends parent to detach scroll container event
     #
     # @api private
 
     attachCollection: ->
       super
-      @collection.on 'reset', @attachScroll
-      @collection.on 'fetched:last', @detachScroll
-      @collection.on 'beforeFetch', @showLoadingIndicator
+      @listenTo @collection, 'reset', @attachScroll
+      @listenTo @collection, 'fetched:last', @detachScroll
+      @listenTo @collection, 'beforeFetch', @showLoadingIndicator
       if @autoFetch
-        @collection.on 'fetch', => setTimeout @checkScroll # next tick so events don't stomp on each other
+        @listenTo @collection, 'fetch', => setTimeout @checkScroll # next tick so events don't stomp on each other
       else
-        @collection.on 'fetch', @hideLoadingIndicator
+        @listenTo @collection, 'fetch', @hideLoadingIndicator
 
     ##
     # Sets instance properties regarding the scrollContainer

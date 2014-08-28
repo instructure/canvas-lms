@@ -95,7 +95,7 @@ class UnzipAttachment
       @attachments = []
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      Zip::File.open(self.filename).each_with_index do |entry, index|
+      CanvasUnzip.extract_archive(self.filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -113,7 +113,9 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open(filename) do |f|
           begin
-            entry.extract(f.path) { true }
+            entry.extract(f.path, true) do |bytes|
+              zip_stats.charge_quota(bytes)
+            end
             # This is where the attachment actually happens.  See file_in_context.rb
             attachment = attach(f.path, entry, folder)
             id_positions[attachment.id] = path_positions[entry.name]
@@ -121,6 +123,9 @@ class UnzipAttachment
               attachment.update_attribute(:migration_id, migration_id)
             end
             @attachments << attachment if attachment
+          rescue Attachment::OverQuotaError
+            f.unlink
+            raise
           rescue => e
             @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
           end
@@ -134,7 +139,6 @@ class UnzipAttachment
     @context.touch
     update_progress(1.0)
   end
-
 
   def zip_stats
     @zip_stats ||= ZipFileStats.new(filename)
@@ -246,13 +250,14 @@ end
 #since it's such an integral part of the unzipping 
 #process
 class ZipFileStats
-  attr_reader :file_count, :total_size, :paths, :filename
+  attr_reader :file_count, :total_size, :paths, :filename, :quota_remaining
 
   def initialize(filename)
     @filename = filename
     @paths = []
     @file_count = 0
     @total_size = 0
+    @quota_remaining = nil
     process!
   end
 
@@ -262,10 +267,25 @@ class ZipFileStats
       raise ArgumentError, "Zip File cannot have more than #{max} entries"
     end
 
+    # check whether the nominal size of the zip's contents would exceed
+    # quota, and reject the zip immediately if so
     quota_hash = Attachment.get_quota(context)
-    if quota_hash[:quota] > 0 && (quota_hash[:quota_used] + total_size) > quota_hash[:quota]
-      raise Attachment::OverQuotaError, "Zip file would exceed quota limit"
+    if quota_hash[:quota] > 0
+      if (quota_hash[:quota_used] + total_size) > quota_hash[:quota]
+        raise Attachment::OverQuotaError, "Zip file would exceed quota limit"
+      end
+      @quota_remaining = quota_hash[:quota] - quota_hash[:quota_used]
     end
+  end
+
+  # since the central directory can lie, track quota during extraction as well
+  # to prevent zip bomb denial-of-service attacks
+  def charge_quota(size)
+    return if @quota_remaining.nil?
+    if size > @quota_remaining
+      raise Attachment::OverQuotaError, "Zip contents exceed course quota limit"
+    end
+    @quota_remaining -= size
   end
 
   def paths_with_positions(base)
@@ -280,7 +300,7 @@ class ZipFileStats
 
   private
   def process!
-    Zip::File.open(filename).each do |entry|
+    CanvasUnzip::extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name

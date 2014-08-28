@@ -1,0 +1,143 @@
+
+.alt
+  display: none
+
+
+ul.instTree
+  padding-left: 0
+  width: 100%
+  margin: 0
+  overflow: hidden
+  list-style: none
+
+  ul
+    padding-left: 0
+    margin-left: 0
+
+  li
+    list-style: none
+    min-height: 20px
+    padding-left: 35px
+    position: relative
+    border-radius: 3px
+    background: 13px top no-repeat
+
+    &.separator
+      min-height: 2px
+      line-height: 2px
+      font-size: 2px
+
+    &.node
+      background-image: url(/images/inst_tree/folder.png)
+
+      &.collaborations
+        background-image: url(/images/collaboration_folder.png)
+
+      &.groups
+        background-image: url(/images/groups_folder.png)
+
+      // &.open
+    &.leaf
+      background-image: url(/images/inst_tree/file_types/page_white.png)
+
+      &:hover
+        background-color: #eee
+
+      &.active-leaf
+        background-color: #ddd
+
+    &.node
+      ul
+        display: none
+        position: relative
+        left: -13px
+
+      &.open > ul
+        display: block
+
+    span
+      cursor: default
+      -moz-user-select: none
+
+      &.text
+        cursor: pointer
+
+      // &.active
+      &.sign
+        display: block
+        width: 30px
+        height: 15px
+        cursor: pointer
+        position: absolute
+        left: -4px
+        top: 0
+
+        &.plus
+          background: url(/images/inst_tree/plus.gif) 5px 50% no-repeat
+
+        &.minus
+          background: url(/images/inst_tree/minus.gif) 5px 50% no-repeat
+
+  input
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif
+    font-size: 1em
+    position: absolute
+    left: 30px
+    top: 0
+
+
+#instTree-drag
+  padding: 3px
+  padding-left: 30px
+  z-index: 1000
+  position: absolute
+
+  &.node
+    background: #C3E1FF url(/images/inst_tree/node-drag.gif) left 3px no-repeat
+
+  &.leaf
+    background: #C3E1FF url(/images/inst_tree/leaf-drag.gif) left 3px no-repeat
+
+
+ul.instTree
+  li.separator.dd-hover
+    background: transparent url(/images/inst_tree/separator-drag.gif) 3px 1px no-repeat
+
+  .dd-hover
+    background-color: yellow
+
+  .pdf
+    background-image: url('/images/inst_tree/file_types/page_white_acrobat.png') !important
+
+  .image
+    background-image: url('/images/inst_tree/file_types/page_white_picture.png') !important
+
+  .xls
+    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important
+
+  .word, .doc
+    background-image: url('/images/inst_tree/file_types/page_white_word.png') !important
+
+  .ppt
+    background-image: url('/images/inst_tree/file_types/page_white_powerpoint.png') !important
+
+  .zip
+    background-image: url('/images/inst_tree/file_types/page_white_zip.png') !important
+
+  .video
+    background-image: url('/images/inst_tree/file_types/page_white_camera.png') !important
+
+  .html
+    background-image: url('/images/inst_tree/file_types/page_white_world.png') !important
+
+  .spreadsheet
+    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important
+
+  .google_docs
+    background-image: url('/images/google_docs_icon.ico') !important
+
+  .etherpad
+    background-image: url('/images/etherpad_icon.ico') !important
+
+  .loading
+    background-image: url('/images/ajax-loader-small.gif') !important

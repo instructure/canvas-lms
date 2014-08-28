@@ -17,7 +17,7 @@
       </div>
     <% else %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
-        <%= before_label(:total, "Total") %> <%= raw(number_to_percentage(100, :precision => 0).sub(/100/, '<span class="grade"></span>')) %>
+        <%= before_label(:total, "Total") %> <span class="grade"></span>
         <% if @context.grading_standard_enabled? %>
           <span class="final_letter_grade">
             (<span class="grade" id="final_letter_grade_text">-</span>)
@@ -58,6 +58,7 @@
 <a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
   <%= t :print_grades, "Print grades" %>
 </a>
+
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
  <% unless @presenter.multiple_observed_students?  %>
@@ -71,15 +72,15 @@
   </select>
  <% end %>
 <% }) %>
-
 </h2>
+
 <% if @presenter.has_courses_with_grades? %>
-  <div style="margin-left: 10px;">
+  <div style="margin-left: 10px;" class="course_selector">
   <%= t(:for_course, "For the course,") %>
   <select id="course_url">
     <% @presenter.selectable_courses.each do |course| %>
       <%
-         url = if course.grants_rights?(@current_user, nil, :manage_grades, :view_all_grades).values.any?
+         url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
            context_url(course, :context_student_grades_url, @presenter.student_id)
          else
            context_url(course, :context_grades_url)
@@ -89,23 +90,36 @@
     <% end %>
   </select>
   </div>
-  <% js_block do %>
-    <script>
-    require([
-      'jquery' /* $ */
-    ], function($) {
-      $(document).ready(function() {
-        $("#course_url").change(function() {
-          if(location.href != $(this).val()) {
-            location.href = $(this).val();
-          }
-        });
-      });
-    });
-    </script>
-  <% end %>
+  <% js_bundle 'legacy/gradebooks_grade_summary' %>
 <% end %>
 </h2>
+
+<% if @context.feature_enabled?(:student_outcome_gradebook) %>
+  <ul id="navpills">
+    <li><a href="#assignments"><%= t :assignments, "Assignments" %></a></li>
+    <li><a href="#outcomes"><%= t :learning_outcomes, "Learning Mastery" %></a></li>
+  </ul>
+  <div class="outcome-toggles">
+    <a class="btn btn-small icon-collapse"
+       title="<%= t :collapse_title, "Collapse" %>"
+       disabled='disabled'
+       aria-disabled='true'
+       aria-controls='groups'
+       href="#">
+      <span class="screenreader-only"><%= t :collapse, "Collapse all learning mastery outcome groups." %></span>
+    </a>
+    <a class="btn btn-small icon-expand"
+       title="<%= t :expand_title, "Expand" %>"
+       aria-controls='groups'
+       aria-disabled='false'
+       href="#">
+      <span class="screenreader-only"><%= t :expand, "Expand all learning mastery outcome groups." %></span>
+    </a>
+  </div>
+  <div id="outcomes"></div>
+<% end %>
+
+<div id="assignments">
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
   <thead>
     <tr>
@@ -150,26 +164,28 @@
                   <% if assignment.muted? %>
                     <%= t(:student_mute_notification, "Instructor is working on grades") %>
                   <% elsif assignment.special_class %>
-                    <%= t(:percent, "Percent") %>
+                    <%= t(:total, "Total") %>
                   <% else %>
                     <%= t(:click_to_change, "Click to test a different score") %>
                   <% end %>
                 </span>
               <% end %>
             </span>
-            <span class="grade">
+            <span class="grade" tabindex="0">
               <% if assignment.muted? %>
                 <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
               <% else %>
-                <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
+                <span class="screenreader-only" role="link">
+                  <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
+                </span>
+                <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>
               <% end %>
             </span>
-            <% if assignment_presenter.is_letter_graded? %>
+            <% if assignment_presenter.is_letter_graded? || assignment_presenter.is_gpa_scaled?%>
               <span class="score_value" style="font-size: 0.8em; color: #aaa;">
                 <%= assignment_presenter.display_score %>
               </span>
             <% end %>
-            <%= "%" if assignment.special_class %>
           </span>
           <div style="display: none;">
             <span class="original_score">
@@ -236,28 +252,28 @@
       <% if assignment_presenter.should_display_details? %>
         <td colspan="5" style="padding-bottom: 20px;">
           <% if assignment_presenter.has_grade_distribution? && can_view_distribution %>
-            <% high, low, mean = assignment_presenter.grade_distribution  %>
-            <% title = "" %>
-            <% title += " " + before_label(:mean_score, "Mean") + " " + (mean.round(1) rescue 0).to_s %>
-            <% title += " " + before_label(:high_score, "High") + " " + high.to_s %>
-            <% title += " " + before_label(:low_score, "Low") + " " + low.to_s %>
-            <% if mean && high && low %>
-              <table id="score_details_<%= assignment.id %>" class="score_details_table">
-                <thead>
-                  <tr>
-                    <th colspan="3">
-                      Score Details
-                    </th>
-                    <th>
-                      <a href="#" data-aria="grade_info_<%= assignment.id %>" aria-label="<%= t(:close_score_screenreader, 'Close score details') %>" class="screenreader-toggle pull-right"><%= t(:close_score, "Close") %></a>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
+            <table id="score_details_<%= assignment.id %>" class="score_details_table">
+              <thead>
+                <tr>
+                  <th colspan="3">
+                    <%= t(:score_details, "Score Details") %>
+                  </th>
+                  <th>
+                    <a href="#" data-aria="grade_info_<%= assignment.id %>" aria-label="<%= t(:close_score_screenreader, 'Close score details') %>" class="screenreader-toggle pull-right"><%= t(:close_score, "Close") %></a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <% if assignment_presenter.viewing_fake_student? %>
+                    <td colspan="4">
+                      <%= t(:disabled_for_student_view, "Test Student scores are not included in grade statistics.") %>
+                    </td>
+                  <% else %>
+                    <% high, low, mean = assignment_presenter.grade_distribution %>
                     <td>
                       <%= before_label(:mean, "Mean") %>
-                      <%= mean.round(1) %>
+                      <%= mean %>
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
@@ -268,8 +284,8 @@
                       <%= low %>
                     </td>
                     <td>
-                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
-                        <% graph = assignment_presenter.graph %>
+                      <% graph = assignment_presenter.graph %>
+                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= graph.title %>">
                         <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
                         <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
                         <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
@@ -283,10 +299,10 @@
                         <% end %>
                       </div>
                     </td>
-                  </tr>
-                </tbody>
-              </table>
-            <% end %>
+                  <% end %>
+                </tr>
+              </tbody>
+            </table>
           <% end %>
         </tr>
     <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
@@ -295,7 +311,7 @@
             <table class="score_details_table">
               <thead>
                 <tr>
-                  <th>Comments</th>
+                  <th><%= t(:comments, "Comments") %></th>
                   <th>
                     <a href="#" data-aria="comments_thread_<%= assignment.id %>" aria-label="<%= t(:close_comments_label, 'Close comments') %>" class="screenreader-toggle pull-right"><%= t(:close_comments, "Close") %></a>
                   </th>
@@ -347,18 +363,12 @@
     </tr>
   <% end %>
 </table>
+</div>
 <% if @presenter.has_muted_assignments? %>
   <small><%= image_tag "sound_mute.png", :alt => "" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
-<input type="text" style="width: 40px; display: none;" id="grade_entry"/>
+<input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
 <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
-<% if @context.grading_standard_enabled? %>
-  <% js_block do %>
-  <script>
-    var grading_scheme = <%= raw((@context.grading_standard.try(:data) || GradingStandard.default_grading_standard).to_json) %>;
-  </script>
-  <% end %>
-<% end %>

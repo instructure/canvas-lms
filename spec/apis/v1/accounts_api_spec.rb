@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,17 +18,22 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Accounts API", :type => :integration do
-  before do
-    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+describe "Accounts API", type: :request do
+  before :once do
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45, :default_group_storage_quota_mb => 42)
-    @a1.add_user(@user)
-    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1', :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
-    @a2.add_user(@user)
+    @a1.account_users.create!(user: @user)
+    @sis_batch = @a1.sis_batches.create
+    SisBatch.where(id: @sis_batch).update_all(workflow_state: 'imported')
+    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1',  :sis_batch_id => @sis_batch.id, :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
+    @a2.account_users.create!(user: @user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
     @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
+  end
+
+  before :each do
+    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
   end
 
   describe 'index' do
@@ -45,24 +50,28 @@ describe "Accounts API", :type => :integration do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         },
         {
           'id' => @a2.id,
+          'integration_id' => nil,
           'name' => 'subby',
           'root_account_id' => @a1.id,
           'parent_account_id' => @a1.id,
           'sis_account_id' => 'sis1',
+          'sis_import_id' => @sis_batch.id,
           'default_time_zone' => 'America/Juneau',
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
           'default_group_storage_quota_mb' => 41,
+          'workflow_state' => 'active',
         },
       ]
     end
   end
 
   describe 'sub_accounts' do
-    before do
+    before :once do
       root = @a1
       a1 = root.sub_accounts.create! :name => "Account 1"
       a2 = root.sub_accounts.create! :name => "Account 2"
@@ -147,6 +156,7 @@ describe "Accounts API", :type => :integration do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         }
     end
   end
@@ -237,14 +247,14 @@ describe "Accounts API", :type => :integration do
     end
 
     context 'with :manage_storage_quotas' do
-      before(:each) do
+      before(:once) do
         # remove the user from being an Admin
-        @a1.add_user(@user).destroy
+        @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin with quota rights
         custom_account_role 'quotas', :account => @a1
         @a1.role_overrides.create! :enrollment_type => 'quotas', :permission => 'manage_storage_quotas', :enabled => true
-        @a1.add_user @user, 'quotas'
+        @a1.account_users.create!(user: @user, membership_type: 'quotas')
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -287,15 +297,15 @@ describe "Accounts API", :type => :integration do
     end
 
     context 'without :manage_storage_quotas' do
-      before(:each) do
+      before(:once) do
         # remove the user from being an Admin
-        @a1.add_user(@user).destroy
+        @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin without quota rights
         custom_account_role 'no-quotas', :account => @a1
         @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_account_settings', :enabled => true
         @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_storage_quotas', :enabled => false
-        @a1.add_user @user, 'no-quotas'
+        @a1.account_users.create!(user: @user, membership_type: 'no-quotas')
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -324,9 +334,9 @@ describe "Accounts API", :type => :integration do
   end
 
   it "should find accounts by sis in only this root account" do
-    Account.default.add_user(@user)
+    Account.default.account_users.create!(user: @user)
     other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :root_account => Account.default, :sis_source_id => 'sis1')
-    other_sub.add_user(@user)
+    other_sub.account_users.create!(user: @user)
 
     # this is scoped to Account.default
     json = api_call(:get, "/api/v1/accounts/sis_account_id:sis1",
@@ -337,7 +347,7 @@ describe "Accounts API", :type => :integration do
     other_sub.update_attribute(:sis_source_id, 'sis2')
     raw_api_call(:get, "/api/v1/accounts/sis_account_id:sis1",
                     { :controller => 'accounts', :action => 'show', :id => "sis_account_id:sis1", :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   context "courses_api" do
@@ -379,19 +389,39 @@ describe "Accounts API", :type => :integration do
       end
     end
 
-    it "should return courses filtered by state[]" do
-      @me = @user
-      [:c1, :c2].each do |course|
-        instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+    describe "courses filtered by state[]" do
+      before :once do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+        end
+        @c2.destroy
+        Course.where(id: @c1).update_all(workflow_state: 'claimed')
+        Course.where(id: @c3).update_all(workflow_state: 'available')
+        Course.where(id: @c4).update_all(workflow_state: 'completed')
+        @user = @me
       end
-      @c2.destroy
-      @user = @me
 
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+      it "should return courses filtered by state[]='deleted'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+        json.length.should eql 1
+        json.first['name'].should eql 'c2'
+      end
 
-      json.length.should eql 1
-      json.first['name'].should eql 'c2'
+      it "should return courses filtered by state[]=nil" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
+        json.length.should eql 3
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c3.id, @c4.id].sort
+      end
+
+      it "should return courses filtered by state[]='all'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=all",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[all] })
+        json.length.should eql 4
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c2.id, @c3.id, @c4.id].sort
+      end
     end
 
     it "should return courses filtered by enrollment_term" do
@@ -406,7 +436,7 @@ describe "Accounts API", :type => :integration do
     end
 
     describe "?with_enrollments" do
-      before do
+      before :once do
         @me = @user
         c1 = course_model(:account => @a1, :name => 'c1')    # has a teacher
         c2 = Course.create!(:account => @a1, :name => 'c2')  # has no enrollments
@@ -433,7 +463,7 @@ describe "Accounts API", :type => :integration do
     end
 
     describe "?published" do
-      before do
+      before :once do
         @me = @user
         [:c1, :c2].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
@@ -462,7 +492,7 @@ describe "Accounts API", :type => :integration do
     end
 
     describe "?completed" do
-      before do
+      before :once do
         @me = @user
         [:c1, :c2, :c3, :c4].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
@@ -499,7 +529,7 @@ describe "Accounts API", :type => :integration do
     end
 
     describe "?by_teachers" do
-      before do
+      before :once do
         @me = @user
         course_with_teacher(:account => @a1, :course_name => 'c1a', :user => user_with_pseudonym(:account => @a1))
         @pseudonym.sis_user_id = 'a_sis_id'
@@ -536,7 +566,7 @@ describe "Accounts API", :type => :integration do
     end
 
     describe "?by_subaccounts" do
-      before do
+      before :once do
         @me = @user
         @sub1 = account_model(:name => 'sub1', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sub1')
         @sub1a = account_model(:name => 'sub1a', :parent_account => @sub1, :root_account => @a1, :sis_source_id => 'sub1a')
@@ -588,16 +618,16 @@ describe "Accounts API", :type => :integration do
     end
 
     it "should limit the maximum per-page returned" do
-      @me = @user
-      15.times { |i| course_model(:name => "c#{i}", :account => @a1, :root_account => @a1) }
-      @user = @me
+      create_courses(15, account: @a1, account_associations: true)
       api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 12
       Setting.set('api_max_per_page', '5')
       api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 5
     end
 
     it "should return courses filtered search term" do
-      @user, @courses = @user, (5..12).map { |i| course_model(:name => "name#{i}", :course_code => "code#{i}", :account => @a1, :root_account => @a1) }
+      data = (5..12).map{ |i| {name: "name#{i}", course_code: "code#{i}" }}
+      @courses = create_courses(data, account: @a1, account_associations: true, return_type: :record)
+      @course = @courses.last
 
       search_term = "name"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",

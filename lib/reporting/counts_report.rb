@@ -43,7 +43,7 @@ class CountsReport
     start_time = Time.now
 
     Shackles.activate(:slave) do
-      Shard.with_each_shard do
+      Shard.with_each_shard(exception: -> { Shard.default.activate { ErrorReport.log_exception(:periodic_job, $!) } }) do
         Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
 
@@ -67,7 +67,8 @@ class CountsReport
           else
             timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
             enrollment_scope = Enrollment.active.not_fake.
-              joins(:user => :active_pseudonyms).
+              joins("INNER JOIN pseudonyms ON enrollments.user_id=pseudonyms.user_id").
+              where(pseudonyms: { workflow_state: 'active'}).
               where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.ago)
 
             data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').count(:user_id, :distinct => true)
@@ -249,7 +250,6 @@ class CountsReport
     }
     hash
   end
-
 end
 
 end

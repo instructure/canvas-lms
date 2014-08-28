@@ -18,11 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CustomGradebookColumnDataApiController, :type => :integration do
+describe CustomGradebookColumnDataApiController, type: :request do
   include Api
   include Api::V1::CustomGradebookColumn
 
-  before do
+  before :once do
     course_with_teacher active_all: true
     s1, s2 = 2.times.map { |i|
       @course.course_sections.create! name: "section #{i}"
@@ -42,7 +42,7 @@ describe CustomGradebookColumnDataApiController, :type => :integration do
   end
 
   describe 'index' do
-    before do
+    before :once do
       [@student1, @student2].each_with_index { |s,i|
         @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap { |d|
           d.user_id = s.id
@@ -57,7 +57,7 @@ describe CustomGradebookColumnDataApiController, :type => :integration do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
         course_id: @course.to_param, id: @col.to_param, action: "index",
         controller: "custom_gradebook_column_data_api", format: "json"
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     it 'only shows students you have permission for' do
@@ -112,7 +112,7 @@ describe CustomGradebookColumnDataApiController, :type => :integration do
          controller: "custom_gradebook_column_data_api", format: "json"},
         "column_data[content]" => "haha"
 
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'only lets you make notes for students you can see' do
@@ -127,7 +127,7 @@ describe CustomGradebookColumnDataApiController, :type => :integration do
          user_id: @student1.to_param, action: "update",
          controller: "custom_gradebook_column_data_api", format: "json"},
         "column_data[content]" => "jkl;"
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     it 'works' do

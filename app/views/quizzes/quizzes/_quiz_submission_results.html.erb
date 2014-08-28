@@ -1,0 +1,5 @@
+<% if @quiz.assignment && @quiz.assignment.muted? %>
+  <%= render(:partial => "muted") %>
+<% else %>
+  <%= render(:partial => "quiz_submission") %>
+<% end %>

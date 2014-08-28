@@ -19,7 +19,7 @@ describe 'Delayed::Backend::Redis::Job' do
     Delayed::Job.redis.flushdb
   end
 
-  it_should_behave_like 'a delayed_jobs implementation'
+  include_examples 'a delayed_jobs implementation'
 
   describe "tickle_strand" do
     it "should continue trying to tickle until the strand is empty" do
@@ -42,8 +42,9 @@ describe 'Delayed::Backend::Redis::Job' do
       Delayed::Job.redis.llen(Delayed::Job::Keys::STRAND['s1']).should == 4
       jobs[-1].destroy
       Delayed::Job.redis.lrange(Delayed::Job::Keys::STRAND['s1'], 0, -1).should == [job.id]
-      Delayed::Job.get_and_lock_next_available('test worker').should == nil
-      Delayed::Job.get_and_lock_next_available('test worker').should == job
+      found = [Delayed::Job.get_and_lock_next_available('test worker'),
+               Delayed::Job.get_and_lock_next_available('test worker')]
+      found.should =~ [job, nil]
     end
   end
 
@@ -56,13 +57,15 @@ describe 'Delayed::Backend::Redis::Job' do
     end
 
     it "should discard when trying to lock" do
-      Delayed::Job.get_and_lock_next_available("test worker").should be_nil
-      Delayed::Job.get_and_lock_next_available("test worker").should == @job2
+      found = [Delayed::Job.get_and_lock_next_available("test worker"),
+               Delayed::Job.get_and_lock_next_available("test worker")]
+      found.should =~ [@job2, nil]
     end
 
     it "should filter for find_available" do
-      Delayed::Job.find_available(1).should == []
-      Delayed::Job.find_available(1).should == [@job2]
+      found = [Delayed::Job.find_available(1),
+               Delayed::Job.find_available(1)]
+      found.should be_include([@job2])
     end
   end
 
@@ -73,7 +76,7 @@ describe 'Delayed::Backend::Redis::Job' do
       job = "string".send_later :reverse
       job.should be_nil
       Delayed::Job.jobs_count(:current).should == before_count
-      Delayed::Job.connection.run_transaction_commit_callbacks
+      ActiveRecord::Base.connection.run_transaction_commit_callbacks
       Delayed::Job.jobs_count(:current) == before_count + 1
     end
   end

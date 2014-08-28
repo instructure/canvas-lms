@@ -19,12 +19,13 @@
 require 'action_controller_test_process'
 
 module Canvas::Migration::Worker
+
   def self.get_converter(settings)
-    Canvas::Migration::PackageIdentifier.new(settings).get_converter
+    Canvas::Migration::Archive.new(settings).get_converter
   end
-  
+
   def self.upload_overview_file(file, content_migration)
-    uploaded_data = ActionController::TestUploadedFile.new(file.path, Attachment.mimetype(file.path))
+    uploaded_data = Rack::Test::UploadedFile.new(file.path, Attachment.mimetype(file.path))
     
     att = Attachment.new
     att.context = content_migration
@@ -54,7 +55,7 @@ module Canvas::Migration::Worker
         end
       end
 
-      upload_file = ActionController::TestUploadedFile.new(zip_file, "application/zip")
+      upload_file = Rack::Test::UploadedFile.new(zip_file, "application/zip")
       att = Attachment.new
       att.context = content_migration
       att.uploaded_data = upload_file
@@ -72,7 +73,7 @@ module Canvas::Migration::Worker
   
   def self.clear_exported_data(folder)
     begin
-      config = Setting.from_config('external_migration')
+      config = ConfigFile.load('external_migration')
       if !config || !config[:keep_after_complete]
         FileUtils::rm_rf(folder) if File.exists?(folder)
       end

@@ -39,7 +39,7 @@ def create_user_with_cc(opts = {})
 
   if @notification
     communication_channel_model
-    @communication_channel.notification_policies.create!(:notification => @notification)
+    @communication_channel.notification_policies.create!(notification: @notification, frequency: Notification::FREQ_DAILY)
   else
     communication_channel_model
   end
@@ -97,7 +97,7 @@ describe NotificationMessageCreator do
       a.should 
       
       @n = Notification.create(:name => "New Notification")
-      a.notification_policies.create!(:notification => @n)
+      a.notification_policies.create!(:notification => @n, :frequency => Notification::FREQ_IMMEDIATELY)
       messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
       messages.count.should eql(1)
       messages.first.communication_channel.should eql(@user.communication_channel)
@@ -187,16 +187,23 @@ describe NotificationMessageCreator do
     it "should make a delayed message for each user policy with a delayed frequency" do
       notification_set
       NotificationPolicy.delete_all
-      3.times do |i|
+      nps = (1..3).map do |i|
         communication_channel_model(:path => "user#{i}@example.com").confirm!
-        %w(immediately never daily weekly).each do |frequency|
-          notification_policy_model(:notification => @notification,
-                                    :communication_channel => @communication_channel,
-                                    :frequency => frequency)
-        end
+        notification_policy_model(:notification => @notification,
+                                  :communication_channel => @communication_channel,
+                                  :frequency => 'immediately')
       end
-      
-      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 6
+
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'never'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'daily'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
+
+      nps.each { |np| np.frequency = 'weekly'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
 
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
@@ -335,41 +342,45 @@ describe NotificationMessageCreator do
     end
 
     it "should respect browser locales" do
-      I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
-      @user.browser_locale = 'piglatin'
-      @user.save(false) # the validation was declared before :piglatin was added, so we skip it
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(piglatin: {messages: {test_name: {email: {subject: "Isthay isay ivefay!"}}}}) do
+        @user.browser_locale = 'piglatin'
+        @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
+        messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+        messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect user locales" do
-      I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
-      @user.locale = 'shouty'
-      @user.save(false)
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(shouty: {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
+        @user.locale = 'shouty'
+        @user.save(validate: false)
+        messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+        messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect course locales" do
       course
-      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-      @course.enroll_teacher(@user).accept!
-      @course.update_attribute(:locale, 'es')
-      messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-      messages.each { |m| m.subject.should eql('El Tigre Chino') }
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        @course.enroll_teacher(@user).accept!
+        @course.update_attribute(:locale, 'es')
+        messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect account locales" do
       course
-      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-      @course.account.update_attribute(:default_locale, 'es')
-      @course.enroll_teacher(@user).accept!
-      messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-      messages.each { |m| m.subject.should eql('El Tigre Chino') }
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        @course.account.update_attribute(:default_locale, 'es')
+        @course.enroll_teacher(@user).accept!
+        messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
     end
   end
 
@@ -386,6 +397,21 @@ describe NotificationMessageCreator do
         messages.length.should >= 1
         messages.each { |m| m.shard.should == @shard1 }
       end
+    end
+
+    it "should create policies and summary messages on the user's shard" do
+      @shard1.activate do
+        @user = User.create!
+        @cc = @user.communication_channels.create!(path: "user@example.com")
+        @cc.confirm!
+      end
+      notification_model(category: 'TestWeekly')
+      Message.any_instance.stubs(:get_template).returns('template')
+      @cc.notification_policies.should be_empty
+      @cc.delayed_messages.should be_empty
+      NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
+      @cc.notification_policies.reload.should_not be_empty
+      @cc.delayed_messages.reload.should_not be_empty
     end
   end
 end

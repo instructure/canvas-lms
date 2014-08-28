@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question creation" do
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -227,7 +227,7 @@ describe "quizzes question creation" do
     fj('button.save_formula_button').click
     # normally it's capped at 200 (to keep the yaml from getting crazy big)...
     # since selenium tests take forever, let's make the limit much lower
-    driver.execute_script("window.maxCombinations = 10")
+    driver.execute_script("ENV.quiz_max_combination_count = 10")
     fj('.combination_count:visible').send_keys('20') # over the limit
     button = fj('button.compute_combinations:visible')
     button.click
@@ -347,9 +347,34 @@ describe "quizzes question creation" do
     quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}.should be_nil
   end
 
+  it "respects character limits on short answer questions" do
+    quiz = @last_quiz
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Fill In the Blank')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answer = answers[0].find_element(:css, ".short_answer input")
+
+    short_answer_field = lambda {
+      replace_content(answer, 'a'*100)
+      driver.execute_script(%{$('.short_answer input:focus').blur();}) unless alert_present?
+    }
+
+    keep_trying_until do
+      short_answer_field.call
+      alert_present?
+    end
+    alert = driver.switch_to.alert
+    alert.text.should =~ /Answers for fill in the blank questions must be under 80 characters long/
+    alert.dismiss
+  end
+
   context "drag and drop reordering" do
 
     before(:each) do
+      resize_screen_to_normal
       quiz_with_new_questions
       create_question_group
     end
@@ -366,6 +391,7 @@ describe "quizzes question creation" do
     end
 
     it "should add and remove questions to/from a group" do
+      resize_screen_to_default
       # drag it into the group
       click_questions_tab
       drag_question_into_group @quest1.id, @group.id
@@ -381,6 +407,7 @@ describe "quizzes question creation" do
     end
 
     it "should reorder questions within a group" do
+      resize_screen_to_default
       drag_question_into_group @quest1.id, @group.id
       drag_question_into_group @quest2.id, @group.id
       data = get_question_data_for_group @group.id
@@ -524,10 +551,19 @@ describe "quizzes question creation" do
     def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
       wait_for_ajaximations
       click_settings_tab
-      f('#multiple_attempts_option').click
-      f('#limit_attempts_option').click
-      replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#quiz_time_limit').click
+      sleep 2 # wait for page to load
+      quiz_attempt_field = lambda {
+        set_value(f('#multiple_attempts_option'), false)
+        set_value(f('#multiple_attempts_option'), true)
+        set_value(f('#limit_attempts_option'), false)
+        set_value(f('#limit_attempts_option'), true)
+        replace_content(f('#quiz_allowed_attempts'), attempts)
+        driver.execute_script(%{$('#quiz_allowed_attempts').blur();}) unless alert_present?
+      }
+      keep_trying_until do
+        quiz_attempt_field.call
+        alert_present?
+      end
       alert = driver.switch_to.alert
       alert.text.should == alert_text
       alert.dismiss
@@ -555,11 +591,14 @@ describe "quizzes question creation" do
       f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
+
       expect_new_page_load {
         f('.save_quiz_button').click
-        wait_for_ajax_requests
+        wait_for_ajaximations
+        keep_trying_until { f('.admin-links').should be_displayed }
       }
-      Quiz.last.allowed_attempts.should == attempts.to_i
+
+      Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end
 

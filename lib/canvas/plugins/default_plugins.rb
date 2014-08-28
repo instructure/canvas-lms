@@ -118,7 +118,8 @@ Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
     :worker => 'CCWorker',
     :migration_partial => 'canvas_config',
     :requires_file_upload => true,
-    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
+    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter},
+    :valid_contexts => %w{Account Course}
   },
 }
 require_dependency 'canvas/migration/worker/course_copy_worker'
@@ -136,7 +137,8 @@ Canvas::Plugin.register 'course_copy_importer', :export_system, {
                 :requires_file_upload => false,
                 :skip_conversion_step => true,
                 :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
-                :required_settings => [:source_course_id]
+                :required_settings => [:source_course_id],
+                :valid_contexts => %w{Course}
         },
 }
 require_dependency 'canvas/migration/worker/zip_file_worker'
@@ -145,7 +147,7 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
         :display_name => lambda { I18n.t :zip_file_display, 'File Import' },
         :author => 'Instructure',
         :author_website => 'http://www.instructure.com',
-        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking plain .zip files into a course' },
+        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking .zip archives into course, group, or user files' },
         :version => '1.0.0',
         :select_text => lambda { I18n.t :zip_file_file_description, "Unzip .zip file into folder" },
         :sort_order => 2,
@@ -154,7 +156,8 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
                 :requires_file_upload => true,
                 :no_selective_import => true,
                 :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
-                :required_settings => [:source_folder_id]
+                :required_settings => [:source_folder_id],
+                :valid_contexts => %w(Course Group User)
         },
 }
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
@@ -164,7 +167,7 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :author_website => 'http://www.instructure.com',
   :description => lambda{ I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
+  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.x Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
@@ -172,7 +175,9 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
     :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
-                 :common_cartridge_1_2=>CC::Importer::Standard::Converter},
+                 :common_cartridge_1_2=>CC::Importer::Standard::Converter,
+                 :common_cartridge_1_3=>CC::Importer::Standard::Converter},
+    :valid_contexts => %w{Account Course}
   },
 }
 Canvas::Plugin.register('grade_export', :sis, {
@@ -224,19 +229,9 @@ Canvas::Plugin.register('assignment_freezer', nil, {
   :settings => nil
 })
 
-Canvas::Plugin.register('embedly', nil, {
-  :name => lambda{ t :name, 'Embedly Integration' },
-  :description => lambda{ t :description, 'Pull Embedly info for Collections' },
-  :website => 'http://embed.ly/',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/embedly_settings',
-  :settings => nil
-})
 Canvas::Plugin.register('crocodoc', :previews, {
   :name => lambda { t :name, 'Crocodoc' },
-  :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },
+  :description => lambda { t :description, 'Enable Crocodoc as a document preview option' },
   :website => 'https://crocodoc.com/',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -244,6 +239,17 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :settings_partial => 'plugins/crocodoc_settings',
   :settings => nil
 })
+
+Canvas::Plugin.register('canvadocs', :previews, {
+  :name => lambda { t :name, 'Canvadocs' },
+  :description => lambda { t :description, 'Enable Canvadocs (compatible with Box View) as a document preview option' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/canvadocs_settings',
+  :settings => nil
+})
+
 Canvas::Plugin.register('account_reports', nil, {
   :name => lambda{ t :name, 'Account Reports' },
   :description => lambda{ t :description, 'Select account reports' },

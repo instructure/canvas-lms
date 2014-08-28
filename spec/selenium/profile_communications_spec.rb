@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -49,8 +49,8 @@ describe "profile communication settings" do
     driver.execute_script("return document.title").should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
     f('#breadcrumbs').should include_text('Notification Preferences')
-    # Expect h2 with
-    f('#content > h2').text.should == 'Notification Preferences'
+    # Expect h1 with
+    f('#content > h1').text.should == 'Notification Preferences'
   end
 
   it "should display the users email address as channel" do
@@ -103,12 +103,10 @@ describe "profile communication settings" do
   it "should load the initial state of a user-pref checkbox" do
     # set the user's initial user preference and verify checked or unchecked
     @user.preferences[:send_scores_in_emails] = false
-    @user.preferences[:no_submission_comments_inbox] = true
     @user.save!
     get "/profile/communication"
     wait_for_ajaximations
     is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
-    is_checked('.user-pref-check[name=no_submission_comments_inbox]').should be_true
   end
 
   it "should save a user-pref checkbox change" do

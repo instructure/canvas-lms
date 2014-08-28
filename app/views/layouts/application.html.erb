@@ -27,22 +27,19 @@
     @body_classes << @active_tab
   end
 
+  jammit_css(:instructure_eportfolio) if @eportfolio_view === true
+  content_for :head, include_common_stylesheets
+
 -%>
-<% content_for :head do %>
-  <%= include_common_stylesheets %>
-  <% if @eportfolio_view === true %>
-    <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
-  <% end %>
-<% end %>
 <%= render :partial => "layouts/head" %>
 <%= render :partial => 'shared/flash_notices' %>
 
 <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
   <div id="header-inner">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
-    <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
+    <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
     <b id="header-logo-secondary"></b>
-    <div id="topbar">
+    <div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
       <% if (identity = (yield :identity).presence) %>
         <%= identity %>
       <% else %>
@@ -56,11 +53,7 @@
     <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li id="courses_menu_item" class="menu-item">
-        <%- if show_home_menu? -%>
-          <%= render(:partial => 'shared/home_menu') %>
-        <%- else  -%>
-          <a href="<%= dashboard_path %>" class="menu-item-no-drop"><%= t 'links.home', 'Home' %></a>
-        <%- end -%>
+        <%= render(:partial => 'shared/home_menu') %>
       </li>
       <%- end -%>
       <li id="assignments_menu_item" class="menu-item">
@@ -115,6 +108,7 @@
       <li id="calendar_menu_item" class="menu-item">
         <a href="<%= calendar_path %>" class="menu-item-no-drop"><%= t('menu.calendar', 'Calendar') %></a>
       </li>
+      <%= render(:partial => 'external_tools/global_nav_menu_items') %>
     </ul>
     <% end %>
   </div>
@@ -137,6 +131,17 @@
         <% if @context.try(:short_name) %>
           <div class='h1' id="section-tabs-header">
             <%= @context.short_name %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage)%>
+              <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only"><%= t("group_switch","Switch")%></span>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li><%= link_to group.short_name, group_path(group) %></li>
+                <% end %>
+              </ul>
+            <% end %>
             <% if @context && @context.respond_to?(:context)  %>
               <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
             <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
@@ -152,14 +157,15 @@
     </div>
     <% end %>
     <div id="main">
-      <div id="right-side-wrapper">
-        <aside id="right-side" role="complementary">
-          <%= right_side %>
-        </aside>
-      </div>
       <div id="not_right_side">
         <div id="content-wrapper">
           <%= render_crumbs %>
+	  <div id="right-side-wrapper">
+	    <aside id="right-side" role="complementary">
+	      <%= right_side %>
+	    </aside>
+	  </div>
+          <%= render :partial => 'shared/content_notices' if @context && @context.respond_to?(:content_notices) %>
           <div id="content" role="main" class="container-fluid">
             <%= yield %>
           </div>
@@ -215,7 +221,6 @@
 <% end %>
   <div style="display:none;"><!-- Everything inside of this should always stay hidden -->
     <div id="ajax_authenticity_token"><%= form_authenticity_token %></div>
-    <div id="time_zone_offset"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).utc_offset / -60 %></div>
     <% if @context && session && temp_type = session["role_#{@context.asset_string}"] %>
       <span id="switched_role_type" class="<%= @context.asset_string %>" data-role="<%= temp_type %>"><%= Enrollment.readable_type(temp_type) %></span>
     <% end %>
@@ -223,7 +228,6 @@
       <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>
       <div id="page_view_id"><%= @page_view.id || @page_view.temporary_id %></div>
     <% end %>
-    <div id="domain_root_account_id"><%= @domain_root_account.try(:id) %></div>
     <% if equella_enabled? %>
       <a id="equella_endpoint_url" href="<%= @equella_settings.endpoint %>">&nbsp;</a>
       <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>

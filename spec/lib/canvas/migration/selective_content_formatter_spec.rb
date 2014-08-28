@@ -55,7 +55,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
                                              {:type=>"context_external_tools", :property=>"copy[all_context_external_tools]", :title=>"External Tools", :count=>1, :sub_items_url=>"https://example.com?type=context_external_tools"},
-                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1, :sub_items_url=>"https://example.com?type=learning_outcomes"},
+                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1},
                                              {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1, :sub_items_url=>"https://example.com?type=attachments"}]
     end
 

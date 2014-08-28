@@ -2,7 +2,6 @@
    id = user_note.new_record? ? 'user_note_blank' : "user_note_#{user_note.id}"
    style = user_note.new_record? ? 'display: none;' : ''
    creator = user_note.creator.try_rescue(:name) || nil
-   created_at = datetime_string(user_note.try_rescue(:created_at)) || nil
 %>
 <div id="<%= id %>" class="user_note communication_message" style="<%= style %>">
   <div class="header clearfix">
@@ -22,17 +21,15 @@
       <div class="title subject">
         <%= user_note.try_rescue(:title) || t(:no_title, "No Title") %>
       </div>
-      <% if creator || created_at %>
+      <% if creator || user_note.created_at %>
         <div class="sub_title creator_name">
-          <span class="created_at time_ago_date">
-          <% if creator && created_at %>
-            <%= t 'subheader', "%{creator} on %{created_at}", :creator => creator, :created_at => created_at %>
+          <% if creator && user_note.created_at %>
+            <%= t 'subheader', "%{creator} on %{created_at}", :creator => creator, :created_at => datetime_string(user_note.created_at) %>
           <% elsif creator %>
             <%= creator %>
-          <% elsif created_at %>
-            <% created_at %>
+          <% elsif user_note.created_at %>
+            <span class="created_at time_ago_date" data-timestamp="<%= user_note.created_at.iso8601 %>"><%= datetime_string user_note.created_at %></span>
           <% end %>
-          </span>
         </div>
       <% end %>
     </div>

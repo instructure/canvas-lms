@@ -25,6 +25,14 @@ class GradeSummaryAssignmentPresenter
     assignment.grading_type == 'letter_grade'
   end
 
+  def is_gpa_scaled?
+    assignment.grading_type == 'gpa_scale'
+  end
+
+  def is_letter_graded_or_gpa_scaled?
+    is_letter_graded? || is_gpa_scaled?
+  end
+
   def is_assignment?
     assignment.class.to_s == "Assignment"
   end
@@ -74,7 +82,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def published_grade
-    is_letter_graded? ? "(#{submission.published_grade})" : ''
+    is_letter_graded_or_gpa_scaled? ? "(#{submission.published_grade})" : ''
   end
 
   def display_score
@@ -124,8 +132,8 @@ class GradeSummaryAssignmentPresenter
   def rubric_assessments
     @visible_rubric_assessments ||= begin
       if submission && !assignment.muted?
-        assessments = submission.rubric_assessments.select { |a| a.grants_rights?(@current_user, :read)[:read] }
-        assessments.sort_by { |a| [a.assessment_type == 'grading' ? SortFirst : SortLast, a.assessor_name] }
+        assessments = submission.rubric_assessments.select { |a| a.grants_right?(@current_user, :read) }
+        assessments.sort_by { |a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, a.assessor_name] }
       else
         []
       end
@@ -134,6 +142,10 @@ class GradeSummaryAssignmentPresenter
 
   def group
     @group ||= assignment && assignment.assignment_group
+  end
+
+  def viewing_fake_student?
+    @summary.student_enrollment.fake_student?
   end
 end
 
@@ -179,6 +191,12 @@ class GradeSummaryGraph
 
   def score_left
     pixels_for(@score) - 5
+  end
+
+  def title
+    I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
+      mean: @mean.to_s, high: @high.to_s, low: @low.to_s
+    })
   end
 
   private

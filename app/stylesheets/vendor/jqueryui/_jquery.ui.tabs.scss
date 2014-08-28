@@ -1,0 +1,99 @@
+/*!
+ * jQuery UI Tabs 1.8.21
+ *
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Tabs#theming
+ */
+
+/*
+@styleguide Tab Navigation
+
+We use jQuery UI tabs, there are two types of tabs:
+
+- **minimal tabs** are the normal Canvas style tabs
+- **regular tabs** are the standard jQuery UI tabs
+
+### Minimal Tabs
+
+```html
+<div class="ui-tabs-minimal">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Fap retro semiotics gluten-free, church-key +1 lomo you probably haven't heard of them shoreditch ugh banjo. Retro tousled tonx messenger bag, pork belly craft beer carles four loko mlkshk put a bird on it. Pinterest ugh blog selvage, swag fap mustache irony bicycle rights readymade banh mi deep v wes anderson. DIY mixtape literally you probably haven't heard of them pop-up forage. 8-bit vegan kogi tofu. Synth banksy intelligentsia bicycle rights bespoke. Kogi seitan freegan, literally sartorial godard art party brunch 90's blog.</div>
+  <div id="tabs-2">Whatever blog meggings +1 pop-up mcsweeney's. Hoodie freegan flexitarian small batch PBR, intelligentsia twee squid mlkshk truffaut bespoke. Deep v sartorial raw denim, photo booth fashion axe food truck brooklyn semiotics. Tonx disrupt freegan, tumblr vice vinyl master cleanse 3 wolf moon squid tofu single-origin coffee marfa banh mi farm-to-table. Raw denim semiotics bushwick fixie skateboard, whatever cliche aesthetic 90's jean shorts swag. Occupy shoreditch odd future Austin, put a bird on it helvetica retro letterpress narwhal small batch DIY. Food truck banksy cliche dreamcatcher high life.</div>
+  <div id="tabs-3">Meggings artisan wolf, scenester food truck kogi bicycle rights. PBR selvage 8-bit, bicycle rights umami meh pinterest fap polaroid ugh twee tonx tofu. Portland butcher scenester you probably haven't heard of them gastropub, selfies helvetica leggings aesthetic whatever. Chillwave tousled forage truffaut. Austin thundercats fap fingerstache skateboard. Helvetica pop-up craft beer pug bespoke master cleanse, bicycle rights forage fap authentic banksy wayfarers sustainable ugh VHS. 8-bit meh helvetica irony, selfies literally PBR blog DIY messenger bag forage four loko scenester mumblecore.</div>
+</div>
+```
+
+### Regular Tabs
+
+```html
+<div class="ui-tabs">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Fap retro semiotics gluten-free, church-key +1 lomo you probably haven't heard of them shoreditch ugh banjo. Retro tousled tonx messenger bag, pork belly craft beer carles four loko mlkshk put a bird on it. Pinterest ugh blog selvage, swag fap mustache irony bicycle rights readymade banh mi deep v wes anderson. DIY mixtape literally you probably haven't heard of them pop-up forage. 8-bit vegan kogi tofu. Synth banksy intelligentsia bicycle rights bespoke. Kogi seitan freegan, literally sartorial godard art party brunch 90's blog.</div>
+  <div id="tabs-2">Whatever blog meggings +1 pop-up mcsweeney's. Hoodie freegan flexitarian small batch PBR, intelligentsia twee squid mlkshk truffaut bespoke. Deep v sartorial raw denim, photo booth fashion axe food truck brooklyn semiotics. Tonx disrupt freegan, tumblr vice vinyl master cleanse 3 wolf moon squid tofu single-origin coffee marfa banh mi farm-to-table. Raw denim semiotics bushwick fixie skateboard, whatever cliche aesthetic 90's jean shorts swag. Occupy shoreditch odd future Austin, put a bird on it helvetica retro letterpress narwhal small batch DIY. Food truck banksy cliche dreamcatcher high life.</div>
+  <div id="tabs-3">Meggings artisan wolf, scenester food truck kogi bicycle rights. PBR selvage 8-bit, bicycle rights umami meh pinterest fap polaroid ugh twee tonx tofu. Portland butcher scenester you probably haven't heard of them gastropub, selfies helvetica leggings aesthetic whatever. Chillwave tousled forage truffaut. Austin thundercats fap fingerstache skateboard. Helvetica pop-up craft beer pug bespoke master cleanse, bicycle rights forage fap authentic banksy wayfarers sustainable ugh VHS. 8-bit meh helvetica irony, selfies literally PBR blog DIY messenger bag forage four loko scenester mumblecore.</div>
+</div>
+```
+
+*/
+
+.ui-tabs { position: relative; zoom: 1; /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+  border-radius: 0;
+  border: none !important;
+  background-color: transparent !important; //override white from .ui-widget-content
+  .ui-tabs-nav { margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border-width: 0 0 1px 0;
+    box-shadow: none; //override .ui-widget-header
+    li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap;
+      a { float: left; padding: .5em .9em; text-decoration: none;
+        font-weight: bold;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+      }
+      &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
+        background: $bgColorContent;
+        border-color: $borderColorContent;
+        box-shadow: none;
+        a { color: $fcDefault; }
+      }
+      &.ui-tabs-active, &.ui-state-disabled, &.ui-state-processing {
+        a { cursor: text; }
+      }
+    }
+  }
+  .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+  .ui-tabs-panel { display: block; padding: 1em 1.4em;
+    background-color: $bgColorContent;
+    border-width: 0 1px 1px 1px;
+    border-radius: 0;
+
+  }
+  .ui-tabs-hide { display: none !important; }
+}
+
+// this is a custom minimal tab style added by instructure, apply this class in addition to the .ui-tabs
+// that jqueryui puts on.
+.ui-tabs-minimal {
+  .ui-tabs-nav {
+    border-bottom-color: $borderColorContent;
+  }
+  .ui-tabs-panel {
+    border-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+}

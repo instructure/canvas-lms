@@ -41,6 +41,7 @@ define [
       @collection = new GradeChangeLoggingCollection
       super
       @dateRangeSearch = new DateRangeSearchView
+        name: "gradeChangeLogging"
       @graderSearch = new AutocompleteView
         collection: @options.users
         fieldName: 'grader_id'

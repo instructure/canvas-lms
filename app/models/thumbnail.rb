@@ -33,6 +33,11 @@ class Thumbnail < ActiveRecord::Base
       :keep_profile => true
   )
 
+  before_save :set_namespace
+  def set_namespace
+    self.namespace = attachment.namespace
+  end
+
   def local_storage_path
     "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
   end
@@ -47,7 +52,7 @@ class Thumbnail < ActiveRecord::Base
 
   before_save :assign_uuid
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 end

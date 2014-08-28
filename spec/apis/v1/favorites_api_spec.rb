@@ -17,11 +17,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Favorites API", :type => :integration do
-  before :each do
+describe "Favorites API", type: :request do
+  before :once do
     @courses = []
     @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
-    user_session(@user)
     5.times do |x|
       @courses << course_with_student(:course_name => "Course #{x + 1}", :user => @user, :active_all => true).course
     end
@@ -42,7 +41,7 @@ describe "Favorites API", :type => :integration do
   end
 
   context "explicit favorites" do
-    before :each do
+    before :once do
       @courses[0...3].each do |course|
         @user.favorites.build(:context => course)
       end
