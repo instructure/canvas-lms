@@ -34,6 +34,8 @@ namespace :canvas do
   desc "Log the deploy to graphite"
   task :log_deploy do
     ts = Time.now.to_i
+    stage = fetch :stage
+    stats_server = fetch :stats_server
     cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc #{stats_server} 2003"
     run_locally do
       execute cmd
