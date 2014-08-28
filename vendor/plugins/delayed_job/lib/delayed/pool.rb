@@ -82,12 +82,20 @@ class Pool
 
   protected
 
+  def procname
+    name = "delayed_jobs_pool"
+    if Canvas.revision
+      name = "#{name} (#{Canvas.revision})"
+    end
+    name
+  end
+
   def start
     load_rails
     tail_rails_log unless @daemon
 
     say "Started job master", :info
-    $0 = "delayed_jobs_pool"
+    $0 = procname
     apply_config
 
     # fork to handle unlocking (to prevent polluting the parent with worker objects)
