@@ -677,6 +677,7 @@ define([
 
     $("#add_context_module_form").formSubmit({
       object_name: 'context_module',
+      required: ['name'],
       processData: function(data) {
         var prereqs = [];
         $(this).find(".prerequisites_list .criteria_list .criterion").each(function() {
