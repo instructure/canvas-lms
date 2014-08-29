@@ -20,6 +20,9 @@ define [
   test 'initialStateProperties', ->
     ok @restrictedDialogForm.state.hasOwnProperty('calendarOption')
 
+  test '', ->
+    ok @restrictedDialogForm.state.hasOwnProperty('calendarOption')
+
   module 'RestrictedDialogForm#initialCalendarOption',
     setup: ->
     teardown: ->
@@ -33,7 +36,7 @@ define [
 
     React.unmountComponentAtNode(restrictedDialogForm.getDOMNode().parentNode)
 
-  test 'return true if hidden is false and locke_at/unlock_at have something', ->
+  test 'return true if hidden is false and lock_at/unlock_at have something', ->
     props =
       model: new Folder(id: 999, hidden: false, lock_at: 'abc', unlock_at: 'abc')
     
@@ -67,7 +70,7 @@ define [
     ok @restrictedDialogForm.props.model.save.calledWithMatch({}, {attrs: {hidden: true}}), 'Called save with single hidden true attribute'
     @restrictedDialogForm.props.model.save.restore()
 
-  test 'calls save on the model with calendar should update hidden, unlock_at and lock_at', 1, ->
+  test 'calls save on the model with calendar should update hidden, unlock_at, lock_at and locked', 1, ->
     refs = @restrictedDialogForm.refs
     Simulate.change(refs.showCalendarInput.getDOMNode())
 
@@ -77,5 +80,5 @@ define [
     sinon.spy(@restrictedDialogForm.props.model, 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
 
-    ok @restrictedDialogForm.props.model.save.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123'}}), 'Called save with single hidden true attribute'
+    ok @restrictedDialogForm.props.model.save.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123', locked: false}}), 'Called save with single hidden true attribute'
     @restrictedDialogForm.props.model.save.restore()

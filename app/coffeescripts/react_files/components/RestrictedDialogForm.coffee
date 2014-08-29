@@ -3,21 +3,17 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!restrict_student_access'
-  'compiled/models/Folder'
-  'compiled/models/File'
+  'compiled/models/FilesystemObject'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, withReactDOM, I18n, Folder, File) ->
+], ($, React, withReactDOM, I18n, FilesystemObject) ->
 
   RestrictedDialogForm = React.createClass
 
     # === React Functions === #
     propTypes:
       closeDialog: React.PropTypes.func.isRequired,
-      model: React.PropTypes.oneOfType([
-        React.PropTypes.instanceOf(File),
-        React.PropTypes.instanceOf(Folder)
-      ])
+      model: React.PropTypes.instanceOf(FilesystemObject)
 
     getInitialState: ->
       calendarOption: @initialCalendarOption()
@@ -44,6 +40,7 @@ define [
         'hidden': @refs.hiddenInput.getDOMNode().checked
         'unlock_at': @refs.availableFromInput.getDOMNode().value if @state.calendarOption
         'lock_at': @refs.availableUntilInput.getDOMNode().value if @state.calendarOption
+        'locked' : false # both restricted and hidden states require locked to be false to work
 
       # Calling .save like this (passing data as the 'attrs' property on
       # the 'options' argument instead of as the first argument) is so that we just send

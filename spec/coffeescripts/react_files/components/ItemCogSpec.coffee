@@ -41,5 +41,3 @@ define [
     ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
     $.fn.dialog.restore()
     React.renderComponent.restore()
-
-

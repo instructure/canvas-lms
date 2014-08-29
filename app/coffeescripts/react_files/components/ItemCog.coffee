@@ -48,7 +48,7 @@ define [
     # dialog window. This allows us to do react things inside of this all ready rendered
     # jQueryUI widget
     openRestrictedDialog: ->
-      @$dialog = $('<div>').dialog
+      $dialog = $('<div>').dialog
         title: I18n.t("title.limit_student_access", "Limit student access")
         width: 400
         close: cleanupDialog
@@ -56,7 +56,7 @@ define [
       React.renderComponent(RestrictedDialogForm({
         model: @props.model
         closeDialog: -> $dialog.dialog('close')
-      }), @$dialog[0])
+      }), $dialog[0])
 
 
     render: withReactDOM ->
