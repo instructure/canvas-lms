@@ -2841,6 +2841,17 @@ define([
         $question.find(".question_points").text(questionData.points_possible);
         quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
         if ($teaser.hasClass('to_edit')) {
+          // we need to explicity set our quiz variables in the dom
+          // or this appears to be adding a new question instead of editing
+          var ques = $question.find(".question");
+          var link = $question.find("a.update_question_url");
+          var qId  = $question.find(".assessment_question_id")
+          var href = link.attr('href');
+
+          ques.attr("id", "question_" + question_data.id);
+          link.attr("href", href.replace(/ions\/.*/, "ions/" + question_data.id));
+          qId.html(question_data.id);
+
           $question.find(".edit_question_link").click();
         }
       }
