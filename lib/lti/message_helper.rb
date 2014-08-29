@@ -32,9 +32,16 @@ module Lti
           '$Canvas.account.id' => account.id,
           '$Canvas.account.name' => account.name,
           '$Canvas.account.sisSourceId' => account.sis_source_id,
-          '$Canvas.root_account.id' => @domain_root_account.id,
-          '$Canvas.root_account.sisSourceId' => @domain_root_account.sis_source_id
+          '$Canvas.rootAccount.id' => @domain_root_account.id,
+          '$Canvas.rootAccount.sisSourceId' => @domain_root_account.sis_source_id
       }
+
+      #Depricated substitutions
+      substitutions.merge!(
+          '$Canvas.root_account.id' => @domain_root_account.id,
+          '$Canvas.root_account.sisSourceId' => @domain_root_account.sis_source_id,
+      )
+
 
       if @context.is_a? Course
         substitutions.merge!(
@@ -58,7 +65,7 @@ module Lti
                 '$Person.name.given' => @current_user.first_name,
                 '$Person.email.primary' => @current_user.email,
                 '$Person.address.timezone' => Time.zone.tzinfo.name,
-                '$User.image' => @current_user.avatar_url,
+                '$User.image' => -> { @current_user.avatar_url },
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
                 '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
