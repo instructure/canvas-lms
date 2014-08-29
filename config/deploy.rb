@@ -1,7 +1,7 @@
 lock '3.2.1'
 
 set :application,   'canvas'
-set :repo_url,      'git://github.com/sfu/canvas-lms.git'
+set :repo_url,      'https://github.com/sfu/canvas-lms.git'
 set :scm,           'git'
 set :branch,        ENV['branch'] || 'sfu-deploy'
 set :user,          'canvasuser'

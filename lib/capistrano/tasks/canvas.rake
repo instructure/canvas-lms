@@ -16,9 +16,10 @@ namespace :canvas do
       prefix = fetch :app_node_prefix
       nodes = capture "/usr/local/canvas/bin/getappnodes #{stage}"
       range = *(1..nodes.to_i)
-      roles[:app].clear
+      # roles[:app].clear
       range.each do |node|
-        parent.role :app, "#{prefix}#{node}.tier2.sfu.ca"
+        server "#{prefix}#{node}.tier2.sfu.ca", roles: [:app]
+        # parent.role :app, "#{prefix}#{node}.tier2.sfu.ca"
       end
     end
   end
@@ -56,4 +57,12 @@ namespace :canvas do
     end
   end
 
+end
+
+namespace :wtf do
+  task :hostname do
+    on roles(:all) do
+      execute :hostname
+    end
+  end
 end
