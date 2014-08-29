@@ -3629,6 +3629,13 @@ describe Course do
       @course.enrollments.count.should == enrollment_count
     end
 
+    it 'should allow deleted enrollments to be resurrected as active' do
+      course_with_student({ :active_enrollment => true })
+      @enrollment.destroy
+      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', { :enrollment_state => 'active' })
+      @enrollment.workflow_state.should eql 'active'
+    end
+
     context "unique enrollments" do
       before :once do
         course(active_all: true)

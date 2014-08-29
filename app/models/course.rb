@@ -1652,8 +1652,8 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         e.attributes = {
           :course_section => section,
-          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : 'invited',
-          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
+          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state,
+          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
       end
       # if we're creating a new enrollment, we want to return it as the correct
       # subclass, but without using associations, we need to manually activate
