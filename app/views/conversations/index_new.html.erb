@@ -1,7 +1,7 @@
 <% jammit_css :conversations_new %>
 <% js_bundle  :conversations_new %>
 <% @body_classes << 'full-width' %>
-
+<h1 class="screenreader-only"><%= t(:page_title_header, "Conversations") %></h1>
 <% content_for :page_title, t('titles.conversations', "Conversations") %>
 
 <div class="conversations">

@@ -177,9 +177,10 @@ input.move-module-label-spacer {
 
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>
+  <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
+<% else %>
+  <h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
 <% end %>
-
-<h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
 
 <div class="header-bar">
   <% if can_do(@context, @current_user, :manage_content) %>

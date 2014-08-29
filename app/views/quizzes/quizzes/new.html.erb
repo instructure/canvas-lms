@@ -25,6 +25,8 @@
   </ul>
 <% end %>
 
+<h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>
+
 <% if @context.feature_enabled?(:draft_state) %>
 <div class="header-bar" id="quiz_edit_header">
   <div class="header-bar-right">

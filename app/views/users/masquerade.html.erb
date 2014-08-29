@@ -1,7 +1,7 @@
 <% content_for :page_title do %><%= t('masquerade_as', 'Masquerade as %{user_name}', :user_name => @user.short_name) %> <% end %>
 
 <% jammit_css :roster_user %>
-
+<h1 class="screenreader-only"><%= t(:page_title_header, "Masquerade as User") %></h1>
 <div class="user-switch-alert">
   <% if @user == @real_current_user %>
     <span class="warning-text"><%= t('are_you_sure_stop', 'Are you sure you want to stop masquerading?') %></span>

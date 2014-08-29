@@ -442,6 +442,7 @@ TEXT
   <% if can_do @context, @current_user, :update %>
 
   <div id="tab-navigation">
+    <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>
     <div class="screenreader-only drag_and_drop_warning" tabindex="0">
       <%= t('nav_items_keyboard_drag_and_drop',
       'Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu.') %>

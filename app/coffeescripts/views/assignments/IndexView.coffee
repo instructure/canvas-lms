@@ -33,6 +33,9 @@ define [
       @collection.once 'reset', @enableSearch, @
       @collection.on 'cancelSearch', @clearSearch, @
 
+    toJSON: ->
+      course_home: ENV.COURSE_HOME
+
     afterRender: ->
       # need to hide child views and set trigger manually
 

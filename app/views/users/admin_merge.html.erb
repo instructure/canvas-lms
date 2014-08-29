@@ -30,7 +30,7 @@
 <% end %>
 <div style="width: 700px; margin-left: auto; margin-right: auto; margin-top: 10px;">
   <% if @other_user %>
-    <h2><%= t('titles.really_merge', 'Really Merge User Accounts?') %></h2>
+    <h1><%= t('titles.really_merge', 'Really Merge User Accounts?') %></h1>
     <p><strong>
       <%= t('no_merge_undo', "This process cannot be undone, so please make sure you're certain before you continue.") %>
     </strong></p>
@@ -49,7 +49,7 @@
       </div>
     <% end %>
   <% else %>
-    <h2><%= t('titles.merge_users', 'Merge User Accounts') %></h2>
+    <h1><%= t('titles.merge_users', 'Merge User Accounts') %></h1>
     <% if @pending_other_user %>
       <%= t('merge_result_explanation_again', "You've selected to merge the user, %{user_name} (%{user_email}) into
       the account, %{pending_other_user_name} (%{pending_other_user_email}).
@@ -69,7 +69,7 @@
       <table>
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
-            <h3><%= t('titles.find_user', 'Find a User') %></h3>
+            <h2><%= t('titles.find_user', 'Find a User') %></h2>
             <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq.select { |a| a.grants_any_right?(@current_user, session, :manage_user_logins, :read_roster) } %>
             <% if accounts.empty? %>
               <%= t('no_permission', "You don't have permission to search any accounts") %>
@@ -94,7 +94,7 @@
             <% end %>
           </td>
           <td style="vertical-align: top; padding: 10px 10px 10px 30px;">
-            <h3><%= t('titles.enter_user_id', 'Or Enter a User ID') %></h3>
+            <h2><%= t('titles.enter_user_id', 'Or Enter a User ID') %></h2>
             <%= form_tag user_admin_merge_url(@user.id), {:method => :get} do %>
               <label for="manual_user_id"><%= before_label('user_id', 'User ID') %></label>
               <input id="manual_user_id" name="pending_user_id" type="text" style="width: 50px;"/>

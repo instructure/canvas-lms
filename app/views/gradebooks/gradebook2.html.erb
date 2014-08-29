@@ -9,7 +9,7 @@
 %>
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
-
+<h1 class="screenreader-only"><%= t('page_header_title', 'Gradebook') %></h1>
   <div class="gradebook-header">
     <div class="accessibility_warning">
       <%= link_to t(:accessibility_warning, 'Warning: The Gradebook Grid View is not accessible. Click here to use the Individual View instead.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>

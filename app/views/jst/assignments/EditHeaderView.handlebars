@@ -1,3 +1,9 @@
+{{#if name}}
+  <h1 class="screenreader-only">{{name}}</h1>
+{{else}}
+  <h1 class="screenreader-only">{{#t "page_header_title"}}New Assignment{{/t}}</h1>
+{{/if}}
+
 <div class="header-bar-right">
   <div class="header-group-left" role="heading" tabindex="0">
     {{#if published}}

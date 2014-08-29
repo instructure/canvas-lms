@@ -4,7 +4,7 @@
   jammit_css :tinymce
   js_bundle :wiki_page_edit
 %>
-
+<h1 class="screenreader-only"><%= t 'page_header_title', 'Edit %{page_name}', :page_name => @page.title %></h1>
 <% if reason = @page.locked_for?(@current_user, :context => @context) %>
   <h2><%= @page.title %></h2>
   <%= lock_explanation(reason, 'page', @context) %>

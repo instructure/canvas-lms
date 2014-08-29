@@ -14,7 +14,7 @@
 <% jammit_css :quizzes, :tinymce %>
 
 <header class="quiz-header">
-  <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
+  <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>
   <% if @submission.preview? %>
     <% draft_preview_title = t('headers.draft_preview',
             "This is a preview of the draft version of the quiz") %>

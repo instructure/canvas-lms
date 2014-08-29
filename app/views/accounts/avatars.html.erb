@@ -35,7 +35,7 @@
 }
 </style>
 <% end %>
-<h2><%= t(:title, "Profile Pictures") %></h2>
+<h1><%= t(:title, "Profile Pictures") %></h1>
 <div class="views">
   <span style="padding-right: 10px; font-weight: bold;"><%= before_label :show, 'Show' %> </span>
   <a href="?avatar_state=submitted" id="submitted_profile"  class="<%= 'selected' if @avatar_state == 'submitted' %>"><%= t(:submitted_link, { :zero => "Submitted", :one => "Submitted %{count}", :other => "Submitted %{count}" }, :count => @avatar_counts[:submitted] || 0) %></a> |
@@ -45,7 +45,7 @@
 </div>
 
 <% if @users.empty? %>
-  <h3 style="padding-top: 20px;"><%= t(:no_avatars_message, "No Profile Pics to Show") %></h3>
+  <h2 style="padding-top: 20px;"><%= t(:no_avatars_message, "No Profile Pics to Show") %></h2>
 <% end %>
 <table id="avatars">
 <% @users.each do |user| %>

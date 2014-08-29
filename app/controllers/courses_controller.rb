@@ -2061,6 +2061,7 @@ class CoursesController < ApplicationController
   def set_urls_and_permissions_for_assignment_index
     permissions = {manage: false}
     js_env({
+      :COURSE_HOME => true,
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
         :course_url => api_v1_course_url(@context),
