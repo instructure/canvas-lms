@@ -130,7 +130,8 @@ define([
       studentLabel = I18n.t("student", "Student"),
       groupLabel = I18n.t("group", "Group"),
       gradeeLabel = studentLabel,
-      utils;
+      utils,
+      crocodocSessionTimer;
 
   utils = {
     getParam: function(name){
@@ -1115,6 +1116,7 @@ define([
     },
 
     handleSubmissionSelectionChange: function(){
+      clearInterval(crocodocSessionTimer);
       try {
         var $submission_to_view = $("#submission_to_view");
         var submissionToViewVal = $submission_to_view.val(),
@@ -1316,6 +1318,7 @@ define([
     },
 
     loadAttachmentInline: function(attachment){
+      clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
       $no_annotation_warning.hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
@@ -1341,6 +1344,24 @@ define([
           };
         }
         if (attachment && attachment.crocodoc_url) {
+          var crocodocStart = new Date()
+          ,   sessionLimit = 60 * 60 * 1000
+          ,   aggressiveWarnings = [50 * 60 * 1000,
+                                    55 * 60 * 1000,
+                                    58 * 60 * 1000,
+                                    59 * 60 * 1000];
+          crocodocSessionTimer = window.setInterval(function() {
+            var elapsed = new Date() - crocodocStart;
+            if (elapsed > sessionLimit) {
+              window.location.reload();
+            } else if (elapsed > aggressiveWarnings[0]) {
+              alert(I18n.t("crocodoc_expiring",
+                           "Your Crocodoc session is expiring soon.  Please reload " +
+                           "the window to avoid losing any work."));
+              aggressiveWarnings.shift();
+            }
+          }, 1000);
+
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
             crocodoc_session_url: attachment.crocodoc_url
           }));
