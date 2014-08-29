@@ -185,12 +185,18 @@
     });
     // END CANVAS-246
 
-    // CANVAS-252 Temporarily make full/sortable names read-only
+    // CANVAS-252 Manage user profile names
     utils.onPage(/^\/profile\/settings\/?$/, function () {
         $(document).ready(function () {
-            var $fields = $('.full_name.display_data, .sortable_name.display_data');
-            $fields.removeClass('display_data').addClass('edit_or_show_data');
-            $fields.siblings('input').remove();
+            var $fieldsToLock = $('.full_name.display_data, .sortable_name.display_data');
+            var $helpText = $('.short_name').siblings('span.edit_or_show_data');
+
+            // CANVAS-253 Temporarily make full/sortable names read-only
+            $fieldsToLock.removeClass('display_data').addClass('edit_or_show_data');
+            $fieldsToLock.siblings('input').remove();
+
+            // CANVAS-254 Add verbiage about Display Name
+            $helpText.append('<br />Changing this will only affect your display name within Canvas, and not in other systems such as SIMS and HAP.');
         });
     });
     // END CANVAS-252
