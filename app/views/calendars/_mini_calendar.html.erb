@@ -2,8 +2,8 @@
 <% cache(['mini_calendar_render', current.to_s, first_day.to_s].cache_key, :expires_in => (3600 - (Time.now.to_i % 3600)).seconds) do %>
 <div class="mini_month" aria-hidden="true">
   <div class="mini-cal-header">
-    <a href="#" class="prev_month_link"><i class="icon-arrow-left standalone-icon"></i></a>
-    <a href="#" class="next_month_link"><i class="icon-arrow-right standalone-icon"></i></a>
+    <span role="presentation" aria-hidden="true" class="prev_month_link"><i class="icon-arrow-left standalone-icon"></i></span>
+    <span role="presentation" aria-hidden="true" class="next_month_link"><i class="icon-arrow-right standalone-icon"></i></span>
     <span class="mini-cal-month-and-year">
       <span class="month_name"><%= I18n.t('date.month_names')[current.month] %></span>
       <span class="year_number"><%= current.year %></span>
