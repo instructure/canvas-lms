@@ -123,7 +123,11 @@ Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
   end
 end
 
-
+if BounceNotificationProcessor.enabled?
+  Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
+    BounceNotificationProcessor.process
+  end
+end
 
 Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
   require plugin_periodic_jobs

@@ -308,6 +308,19 @@ describe NotificationMessageCreator do
       NotificationPolicy.count.should == 2
     end
 
+    it "should not send to bouncing channels" do
+      notification_set
+      @communication_channel.bounce_count = 1
+      @communication_channel.save!
+      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      messages.select{|m| m.to == 'value for path'}.size.should == 1
+
+      @communication_channel.bounce_count = 100
+      @communication_channel.save!
+      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      messages.select{|m| m.to == 'value for path'}.size.should == 0
+    end
+
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
       cc = communication_channel_model(:workflow_state => 'unconfirmed', :path => "nope")
