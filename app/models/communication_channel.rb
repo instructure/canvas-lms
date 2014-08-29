@@ -38,7 +38,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user]
 
-  before_save :consider_retiring, :assert_path_type, :set_confirmation_code
+  before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
   validate :uniqueness_of_path
@@ -59,7 +59,7 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_FACEBOOK = 'facebook'
   TYPE_PUSH     = 'push'
 
-  RETIRE_THRESHOLD = 5
+  RETIRE_THRESHOLD = 3
 
   def self.sms_carriers
     @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
@@ -300,11 +300,6 @@ class CommunicationChannel < ActiveRecord::Base
     true
   end
   
-  def consider_retiring
-    self.retire if self.bounce_count >= RETIRE_THRESHOLD
-    true
-  end
-  
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'retired'
@@ -324,9 +319,7 @@ class CommunicationChannel < ActiveRecord::Base
     end
     
     state :retired do
-      event :re_activate, :transitions_to => :active do
-        self.bounce_count = 0
-      end
+      event :re_activate, :transitions_to => :active
     end
   end
 
@@ -388,4 +381,16 @@ class CommunicationChannel < ActiveRecord::Base
         end
       end
     end
+
+  def bouncing?
+    self.bounce_count >= RETIRE_THRESHOLD
+  end
+
+  def self.bounce_for_path(path)
+    Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
+      CommunicationChannel.unretired.email.by_path(path).each do |channel|
+        channel.update_attribute(:bounce_count, channel.bounce_count + 1)
+      end
+    end
+  end
 end

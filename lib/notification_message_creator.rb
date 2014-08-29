@@ -142,6 +142,7 @@ class NotificationMessageCreator
     messages = []
     message_options = message_options_for(user)
     channels.reject!{ |channel| ['email', 'sms'].include?(channel.path_type) } if too_many_messages_for?(user) && @notification.summarizable?
+    channels.reject!(&:bouncing?)
     channels.each do |channel|
       messages << user.messages.build(message_options.merge(:communication_channel => channel,
                                                             :to => channel.path))
