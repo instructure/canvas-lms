@@ -472,6 +472,9 @@ class CoursesController < ApplicationController
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
   #
+  # @argument course[grading_standard_id] [Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
   # @returns Course
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
@@ -1644,9 +1647,86 @@ class CoursesController < ApplicationController
   # @API Update a course
   # Update an existing course.
   #
-  # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
+  # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # Additional arguments available for Courses#update
+  # @argument account_id [Required, Integer]
+  #   The unique ID of the account to create to course under.
+  #
+  # @argument course[name] [String]
+  #   The name of the course. If omitted, the course will be named "Unnamed
+  #   Course."
+  #
+  # @argument course[course_code] [String]
+  #   The course code for the course.
+  #
+  # @argument course[start_at] [DateTime]
+  #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[end_at] [DateTime]
+  #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[license] [String]
+  #   The name of the licensing. Should be one of the following abbreviations
+  #   (a descriptive name is included in parenthesis for reference):
+  #   - 'private' (Private Copyrighted)
+  #   - 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives)
+  #   - 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike)
+  #   - 'cc_by_nc' (CC Attribution Non-Commercial)
+  #   - 'cc_by_nd' (CC Attribution No Derivatives)
+  #   - 'cc_by_sa' (CC Attribution Share Alike)
+  #   - 'cc_by' (CC Attribution)
+  #   - 'public_domain' (Public Domain).
+  #
+  # @argument course[is_public] [Boolean]
+  #   Set to true if course if public.
+  #
+  # @argument course[public_syllabus] [Boolean]
+  #   Set to true to make the course syllabus public.
+  #
+  # @argument course[public_description] [String]
+  #   A publicly visible description of the course.
+  #
+  # @argument course[allow_student_wiki_edits] [Boolean]
+  #   If true, students will be able to modify the course wiki.
+  #
+  # @argument course[allow_wiki_comments] [Boolean]
+  #   If true, course members will be able to comment on wiki pages.
+  #
+  # @argument course[allow_student_forum_attachments] [Boolean]
+  #   If true, students can attach files to forum posts.
+  #
+  # @argument course[open_enrollment] [Boolean]
+  #   Set to true if the course is open enrollment.
+  #
+  # @argument course[self_enrollment] [Boolean]
+  #   Set to true if the course is self enrollment.
+  #
+  # @argument course[restrict_enrollments_to_course_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the
+  #   course.
+  #
+  # @argument course[term_id] [Integer]
+  #   The unique ID of the term to create to course in.
+  #
+  # @argument course[sis_course_id] [String]
+  #   The unique SIS identifier.
+  #
+  # @argument course[integration_id] [String]
+  #   The unique Integration identifier.
+  #
+  # @argument course[hide_final_grades] [Boolean]
+  #   If this option is set to true, the totals in student grades summary will
+  #   be hidden.
+  #
+  # @argument course[apply_assignment_group_weights] [Boolean]
+  #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument offer [Boolean]
+  #   If this option is set to true, the course will be available to students
+  #   immediately.
+  #
+  # @argument course[syllabus_body] [String]
+  #   The syllabus body for the course
   #
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
