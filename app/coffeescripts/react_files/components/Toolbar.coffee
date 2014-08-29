@@ -11,7 +11,7 @@ define [
     propTypes:
       currentFolder: React.PropTypes.object # not required as we don't have it on the first render
 
-    onSubmit: (event) ->
+    onSubmitSearch: (event) ->
       event.preventDefault()
       query = {search_term: @refs.searchTerm.getDOMNode().value}
       Router.transitionTo 'search', @props.params, query
