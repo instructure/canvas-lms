@@ -32,8 +32,12 @@ define [
       @unregisterListeners()
 
 
+    buildFolderPath: (splat) ->
+      path = '/' + (splat || '')
+      encodeURI(path)
+
     getCurrentFolder: ->
-      path = '/' + (@props.params.splat || '')
+      path = @buildFolderPath(@props.params.splat)
       Folder.resolvePath(@props.params.contextType, @props.params.contextId, path).then (rootTillCurrentFolder) =>
         currentFolder = rootTillCurrentFolder[rootTillCurrentFolder.length - 1]
         @props.onResolvePath({currentFolder, rootTillCurrentFolder})
