@@ -122,12 +122,15 @@ describe "quizzes" do
           f('.description').should_not include_text('Resume Quiz')
         end
 
-        it "should grade any submission that needs grading" do
+        it "should grade any submission that needs grading (in the background)" do
+          Account.default.enable_feature!(:draft_state)
+
           @qsub.end_at = 5.minutes.ago
           @qsub.save!
           get "/courses/#{@course.id}/quizzes"
-          f('.description').should_not include_text('Resume Quiz')
-          f('.description').should include_text('0 out of')
+          Delayed::Job.find_by_tag(
+            'Quizzes::SubmissionGrader.grade_outstanding_submissions_in_course'
+          ).should be_present
         end
       end
 

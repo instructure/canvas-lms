@@ -1174,7 +1174,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def can_unpublish?
     !has_student_submissions? &&
-      (!assignment || !assignment.has_student_submissions?)
+      (assignment.blank? || assignment.can_unpublish?)
   end
 
   alias_method :unpublishable?, :can_unpublish?
