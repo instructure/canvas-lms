@@ -115,13 +115,13 @@ describe Quizzes::QuizzesController do
       Account.default.enable_feature! :draft_state
     end
 
-    it "should assign variables" do
+    it "should assign JS variables" do
       user_session(@teacher)
       get 'index', :course_id => @course.id
-      assigns[:assignment_json].should_not be_nil
-      assigns[:open_json].should_not be_nil
-      assigns[:surveys_json].should_not be_nil
-      assigns[:quiz_options].should_not be_nil
+      controller.js_env[:QUIZZES][:assignment].should_not be_nil
+      controller.js_env[:QUIZZES][:open].should_not be_nil
+      controller.js_env[:QUIZZES][:surveys].should_not be_nil
+      controller.js_env[:QUIZZES][:options].should_not be_nil
     end
 
     it "should filter out unpublished quizzes for student" do
@@ -131,9 +131,9 @@ describe Quizzes::QuizzesController do
 
       get 'index', :course_id => @course.id
 
-      assigns[:quizzes].length.should eql 1
-      assigns[:quizzes].map do |quiz|
-        quiz.published?.should be_true
+      controller.js_env[:QUIZZES][:assignment].length.should eql 1
+      controller.js_env[:QUIZZES][:assignment].map do |quiz|
+        quiz[:published].should be_true
       end
     end
   end

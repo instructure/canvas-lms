@@ -19,17 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
-describe "/quizzes/quizzes/index" do
+describe "/quizzes/quizzes/index_legacy" do
   it "should render" do
     course_with_student
     view_context
+    assigns[:body_classes] = []
     assigns[:quizzes] = [@course.quizzes.create!]
     assigns[:unpublished_quizzes] = []
     assigns[:assignment_quizzes] = assigns[:quizzes]
     assigns[:open_quizzes] = assigns[:quizzes]
     assigns[:surveys] = assigns[:quizzes]
     assigns[:submissions_hash] = {}
-    render "quizzes/quizzes/index"
+    render "quizzes/quizzes/index_legacy"
     response.should_not be_nil
   end
 
@@ -39,12 +40,6 @@ describe "/quizzes/quizzes/index" do
     course_with_student
     view_context
     assigns[:body_classes] = []
-
-    assigns[:quizzes] = [@course.quizzes.create!]
-    assigns[:assignment_json] = assigns[:quizzes]
-    assigns[:open_json]       = assigns[:quizzes]
-    assigns[:surveys_json]    = assigns[:quizzes]
-    assigns[:submissions_hash] = {}
 
     render "quizzes/quizzes/index"
     response.should_not be_nil

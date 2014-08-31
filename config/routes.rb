@@ -1325,6 +1325,10 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy
     end
 
+    scope(:controller => 'quizzes/quiz_assignment_overrides') do
+      get "courses/:course_id/quizzes/assignment_overrides", :action => :index, :path_name => 'course_quiz_assignment_overrides'
+    end
+
     scope(:controller => 'quizzes/quizzes_api') do
       get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
       post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'

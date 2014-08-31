@@ -17,12 +17,14 @@ module Quizzes
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
                 :message_students_url, :quiz_submission_html_url, :section_count,
-                :moderate_url, :take_quiz_url, :quiz_extensions_url, :takeable,
+                :moderate_url, :take_quiz_url, :quiz_extensions_url,
+                # :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
-                :assignment_id, :one_time_results, :only_visible_to_overrides
+                :assignment_id, :one_time_results, :only_visible_to_overrides,
+                :assignment_group_id
 
     def_delegators :@controller,
-      :api_v1_course_assignment_group_url,
+      # :api_v1_course_assignment_group_url,
       :speed_grader_course_gradebook_url,
       :api_v1_course_quiz_submission_url,
       :api_v1_course_quiz_submissions_url,
@@ -37,39 +39,39 @@ module Quizzes
       :course_quiz_quiz_submissions_url,
       :course_quiz_submission_versions_url
 
-   def_delegators :@object,
-     :context,
-     :submitted_students_visible_to,
-     :unsubmitted_students_visible_to
+    def_delegators :@object,
+      :context,
+      :submitted_students_visible_to,
+      :unsubmitted_students_visible_to
 
-    has_one :assignment_group, embed: :ids, root: :assignment_group
-    has_one :quiz_submission, embed: :ids, root: :quiz_submissions, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
-    has_many :student_quiz_submissions, embed: :ids, root: :student_quiz_submissions
-    has_many :submitted_students, embed: :ids, root: :submitted_students
-    has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
+    # has_one :assignment_group, embed: :ids, root: :assignment_group
+    # has_one :quiz_submission, embed: :ids, root: :quiz_submissions, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
+    # has_many :student_quiz_submissions, embed: :ids, root: :student_quiz_submissions
+    # has_many :submitted_students, embed: :ids, root: :submitted_students
+    # has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
 
-    def serialize_ids(association)
-      if (association.name == 'student_quiz_submissions')
-        send(:student_quiz_submissions_url)
-      else
-        super association
-      end
-    end
+    # def serialize_ids(association)
+    #   if (association.name == 'student_quiz_submissions')
+    #     send(:student_quiz_submissions_url)
+    #   else
+    #     super association
+    #   end
+    # end
 
-    def quiz_submission
-      @quiz_submission ||= if @self_quiz_submissions
-        @self_quiz_submissions[quiz.id]
-      else
-        quiz.quiz_submissions.where(user_id: current_user).first
-      end
-    end
+    # def quiz_submission
+    #   @quiz_submission ||= if @self_quiz_submissions
+    #     @self_quiz_submissions[quiz.id]
+    #   else
+    #     quiz.quiz_submissions.where(user_id: current_user).first
+    #   end
+    # end
 
-    def takeable
-      return true if !quiz_submission
-      return true if !quiz_submission.completed?
-      return true if quiz.unlimited_attempts?
-      (quiz_submission.completed? && quiz_submission.attempts_left > 0)
-    end
+    # def takeable
+    #   return true if !quiz_submission
+    #   return true if !quiz_submission.completed?
+    #   return true if quiz.unlimited_attempts?
+    #   (quiz_submission.completed? && quiz_submission.attempts_left > 0)
+    # end
 
     def deleted
       quiz.deleted?
@@ -79,26 +81,26 @@ module Quizzes
       course_quiz_take_url(context, quiz, user_id: current_user.id)
     end
 
-    def initialize(object, options={})
-      super
-      @self_quiz_submissions = options[:quiz_submissions]
-    end
+    # def initialize(object, options={})
+    #   super
+    #   @self_quiz_submissions = options[:quiz_submissions]
+    # end
 
-    def submitted_students
-      user_finder.submitted_students
-    end
+    # def submitted_students
+    #   user_finder.submitted_students
+    # end
 
     def preview_url
       course_quiz_take_url(context, quiz, preview: '1')
     end
 
-    def unsubmitted_students
-      user_finder.unsubmitted_students
-    end
+    # def unsubmitted_students
+    #   user_finder.unsubmitted_students
+    # end
 
-    def student_quiz_submissions
-      @student_quiz_submissions ||= quiz.quiz_submissions
-    end
+    # def student_quiz_submissions
+    #   @student_quiz_submissions ||= quiz.quiz_submissions
+    # end
 
     def message_students_url
       api_v1_course_quiz_submission_users_message_url(context, quiz)
@@ -153,11 +155,13 @@ module Quizzes
       context.active_course_sections.count
     end
 
-    def locked_for_json_type; 'quiz' end
+    def locked_for_json_type
+      'quiz'
+    end
 
     # Teacher or Observer?
     def include_all_dates?
-      due_dates == all_dates
+      !serializer_option(:skip_date_overrides) && due_dates == all_dates
     end
 
     def include_unpublishable?
@@ -167,36 +171,44 @@ module Quizzes
     def filter(keys)
       super(keys).select do |key|
         case key
-        when :all_dates then include_all_dates?
-        when :unpublishable then include_unpublishable?
-
+        when :all_dates
+          include_all_dates?
+        when :unpublishable, :can_unpublish
+          include_unpublishable?
         when :section_count,
              :access_code,
              :speed_grader_url,
              :message_students_url,
              :submitted_students,
-             :only_visible_to_overrides then user_may_grade?
-
-        when :unsubmitted_students then user_may_grade? || user_may_manage?
-
-        when :quiz_extensions_url,
-             :moderate_url,
-             :deleted then accepts_jsonapi? && user_may_manage?
-
-        when :quiz_submission,
-             :quiz_submission_html_url,
-             :take_quiz_url then accepts_jsonapi?
-
-        when :quiz_submissions_zip_url then accepts_jsonapi? && user_may_grade? && has_file_uploads?
-        when :preview_url then accepts_jsonapi? && user_may_grade? && user_may_manage?
+             :only_visible_to_overrides
+          user_may_grade?
+        when :unsubmitted_students
+          user_may_grade? || user_may_manage?
+        when :quiz_extensions_url, :moderate_url, :deleted
+          accepts_jsonapi? && user_may_manage?
+        when :quiz_submission_html_url, :take_quiz_url
+         accepts_jsonapi?
+        when :quiz_submissions_zip_url
+          accepts_jsonapi? && user_may_grade? && has_file_uploads?
+        when :preview_url
+          accepts_jsonapi? && user_may_grade? && user_may_manage?
+        when :locked_for_user, :lock_info, :lock_explanation
+          !serializer_option(:skip_lock_tests)
         else true
         end
       end
     end
 
     def can_unpublish
-      quiz.can_unpublish?
+      preloaded_permissions = serializer_option(:permissions)
+
+      if preloaded_permissions.present?
+        preloaded_permissions[quiz.id][:can_unpublish]
+      else
+        quiz.can_unpublish?
+      end
     end
+    alias_method :unpublishable, :can_unpublish
 
     def can_update
       quiz.grants_right?(current_user, session, :update)
@@ -227,12 +239,13 @@ module Quizzes
       # legacy v1 api
       unless accepts_jsonapi?
         links = hash.delete('links')
-        id = hash['assignment_group']
-        hash['assignment_group_id'] = quiz.assignment_group.try(:id)
+        # id = hash['assignment_group']
+        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       else
         # since we're not embedding QuizStatistics as an association because
         # the statistics objects are built on-demand when the endpoint is
         # requested, and we only need the link, we'll have to assign it manually
+        hash['links'] ||= {}
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
       end
@@ -240,9 +253,9 @@ module Quizzes
       hash
     end
 
-    def assignment_group_url
-      api_v1_course_assignment_group_url(context, quiz.assignment_group.id)
-    end
+    # def assignment_group_url
+    #   api_v1_course_assignment_group_url(context, quiz.assignment_group.id)
+    # end
 
     def quiz_reports_url
       api_v1_course_quiz_reports_url(quiz.context, quiz)
@@ -284,7 +297,10 @@ module Quizzes
     #
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
-      context.user_has_been_student?(current_user) ? due_dates[0][domain] : quiz.send(domain)
+      !serializer_option(:skip_date_overrides) &&
+      context.user_has_been_student?(current_user) ?
+        due_dates[0][domain] :
+        quiz.send(domain)
     end
 
     def due_at
@@ -311,15 +327,15 @@ module Quizzes
       @user_finder ||= Quizzes::QuizUserFinder.new(quiz, current_user)
     end
 
-    def submission_for_current_user
-      @submission_for_current_user ||= (
-        quiz.quiz_submissions.where(user_id: current_user).first
-      )
-    end
+    # def submission_for_current_user
+    #   @submission_for_current_user ||= (
+    #     quiz.quiz_submissions.where(user_id: current_user).first
+    #   )
+    # end
 
-    def submission_for_current_user?
-      !!submission_for_current_user
-    end
+    # def submission_for_current_user?
+    #   !!submission_for_current_user
+    # end
 
     def has_file_uploads?
       quiz.has_file_upload_question?

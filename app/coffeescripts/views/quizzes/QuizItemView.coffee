@@ -42,6 +42,9 @@ define [
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
+    afterRender: ->
+      this.$el.toggleClass('quiz-loading-overrides', !!@model.get('loadingOverrides'))
+
     # make clicks follow through to url for entire row
     clickRow: (e) =>
       target = $(e.target)
@@ -64,9 +67,10 @@ define [
       @$el.remove()
 
     observeModel: ->
-      @model.on('change:published', @upatePublishState)
+      @model.on('change:published', @updatePublishState)
+      @model.on('change:loadingOverrides', @render)
 
-    upatePublishState: =>
+    updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
 
     canManage: ->
