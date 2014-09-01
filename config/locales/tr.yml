@@ -2131,6 +2131,7 @@ tr:
         wizard_box: "Yapmak istediklerim:"
   assignments_api: 
     invalid_date_time: "%{attribute} için geçersiz tarih"
+    invalid_submission_types: "Geçersiz gönderim tipi"
   attachment: 
     default_filename: Dosya
     errors: 
@@ -3037,6 +3038,7 @@ tr:
         download_qti: "%{date}: tarihinde QTI Aktarımı *İndirmek için tıklayın*"
       message: 
         export_started: "Aktarma işlemi başladı. Büyük dersler için bu biraz zaman alabilir. *Sayfayı terkedebilirsiniz* aktarım tamamlandığında bilgilendirme epostası alacaksınız."
+      user_data_exports: "Kullanıcı Verisi Aktarma"
     labels: 
       new_export: "Yeni Dışa Aktarım:"
     links: 
@@ -3193,6 +3195,7 @@ tr:
         old_end_date_title: "Bitiş tarihi"
         old_start_date_label: "Başlama tarihi"
         old_start_date_title: "Başlama tarihi"
+        remove_dates: "Tarihleri sil"
         substitution: Altyazı
       day_substitution: 
         move_from: "Şuraya taşı"
@@ -3622,6 +3625,7 @@ tr:
         modules: 
           before_students_view: "Öğrenciler bu modülü görmeden önce"
         new_tab: "Yeni sekmede yükle"
+        publish_final_grade: "Modül tamamlandığında öğrenci final notlarını yayımla"
         sort_by: Sırala
         title: Başlık
         unlock_at: "Kilidi Kaldır"
@@ -4438,6 +4442,7 @@ tr:
       create_failed: "Ders oluşturma başarısız"
       role_not_active: "Aktif olmayan rol için kullanıcı eklenemez: '%{role}'"
       role_not_found: "'%{role}' rolü bulunamadı."
+      unpublish: "Öğrenci gönderimleri varolduğundan kurs yayımdan kaldırılamıyor."
     group_list: 
       headings: 
         groups: "Ders Grupları"
@@ -4500,6 +4505,8 @@ tr:
         close: Tamam
         duplicates_removed: "Bazı çakışmalar silindi."
         email: Eposta
+        email_field_label: "Eklemek istediğiniz kullanıcıların e-posta adreslerini araya virgül koyarak giriniz"
+        email_field_place_holder: "\"Deneme Öğrenci\" &lt;student@example.com&gt;, \"İsim, Soyisim\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Örnek : user@example.com, \"İsim Soyisim\" &lt;user@example.com&gt;, \"Soyisim, İsim\" &lt;user@example.com&gt;"
         form_instructions: "Aşağıya eposta adres listesi yazın ya da yapıştırın:"
         go_back: "Baştan Başla"
@@ -4827,9 +4834,13 @@ tr:
       rss_feed: "%{course} Akışı"
     unauthorized: 
       invalid_link: "Kullandığınız kayıt bağlantısı artık geçerli değil. Lütfen dersin öğretmeni ile iletişime geçip hala kayıtlı olduğunuzu doğrulayın."
+  create_item_base: 
+    there_was_an_error: "\"%{title}\" kaydedilmesinde hata, lütfen tekrar deneyiniz."
   create_module_item: 
     assignment_name: "Ödev Adı"
   create_module_item_quiz: 
+    discussion_name: "Tartışma İsmi"
+    file_to_upload: "Dosya yükle"
     graded_quiz: "Değerlendirilmiş Kısa Sınav"
     graded_survey: "Değerlendirilmiş Anket"
     header_name: "Başlık Adı"
@@ -4967,6 +4978,7 @@ tr:
     show_more_link: 
       show_less: "Daha Az Göster"
       show_more: "Daha Fazla Göster"
+  data_exports: "veri aktarma"
   date: 
     abbr_day_names: 
       - Paz
@@ -6307,6 +6319,7 @@ tr:
     no_deleting_folders_with_content: "İçerikle birlikte klasör silinemiyor"
     no_deleting_root: "Kök dizini silemezsiniz"
     only_one_folder: "Dizin yolu ve dizin numarası ayarlanamıyor"
+  for: için
   global_message_icons: 
     announcement: duyuru
     calendar: takvim
@@ -6602,6 +6615,7 @@ tr:
         other: "%{count} yorum"
       comment_count_screenreader: "Yorumları oku"
       comments: Yorumlar
+      disabled_for_student_view: "Test Öğrencisi notları, genel not istatistiklerine dahil edilmez."
       expand_title: Genişlet
       faculty_journal: "%{user} için Öğretim Üyesi Kaydı"
       for_course: "Bu ders için,"
@@ -9248,6 +9262,9 @@ tr:
     page_locked_until: "Bu sayfa %{date} tarihine kadar kilitlidir."
     page_unpublished_module: "Bu safa yayınlanmamış bir modülünün bir parçasıdır ve henüz mevcut değildir."
     peer_review_invitation: 
+      email: 
+        html: 
+          link_message: "İncelemenizi tamamlamak için tıklayınız"
       sms: 
         more_info: "Daha fazla bilgi için %{url}"
     pseudonym_registration: 
@@ -9871,6 +9888,7 @@ tr:
         
         Öğrenci ödev kaydı
     student_appointment_display: "Öğrenci Randevu Oturumları"
+    submission_comment_description: "Ödev gönderim yorumu"
     submission_comment_display: "Gönderi Yorumu"
   notification_preferences: 
     communication: 
@@ -10063,6 +10081,7 @@ tr:
     titles: 
       find_outcomes: "Öğrenme Çıktısı Ara"
     top_level: "%{context} Üst Seviye"
+    undefined: Başlamadı
     user_outcome_results: 
       artifacts: 
         one: "1 eser"
@@ -11164,6 +11183,7 @@ tr:
       regrade_options: "*(bu soruyu daha önce cevaplamış öğrenciler için)* Yeniden Notlandırma Seçenekleri:"
       some_scores_reduced: "Yalnızca doğru cevaba ödül puan ver (*bazı öğrencilerin notları azalabilir*)"
       update_question_without_regrading: "Tekrar değerlendirme olmadan soruyu güncelle"
+    regrade_score_affected: "Kısa sınav tekrardan notlandırıldı; notunuz değişmiş olabilir."
     resume_the_quiz: "Kısa Sınava Devam Et"
     resume_the_survey: "Ankete Devam Et"
     take_the_quiz: "Kısa Sınava Başla"
@@ -11171,11 +11191,14 @@ tr:
     take_the_survey: "Ankete Başla"
     take_the_survey_again: "Ankete Tekrar Başla"
     there_are_no_files_to_download: "İndirilecek dosya bulunamadı"
+    there_are_no_submissions_to_grade: "Gönderilmiş notunuz bulunamadı."
     time_limit_minutes: "%{limit} dakika"
     warning: Uyarı
+    you_cannot_message_unpublished: "Kısa sınavınız yayımlanana kadar öğrencilere mesaj gönderemezsiniz."
   quiz_extend_time: 
     ending_time: "bitiş zamanı"
     extend_time: "Süreyi Uzat"
+    extensions_student: "%{student} için zaman ekle"
     extensions_successfully_added: "Eklentiler Başarıyla Eklendi"
     now: şimdi
   quiz_extensions: 
