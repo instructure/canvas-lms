@@ -75,6 +75,7 @@ define [
       if before_or_after is 'after'
         selected_item.after current_item
       $('#move_nav_item_form').dialog('close')
+      current_item.focus()
 
     cancelMove: ->
       $('#move_nav_item_form').dialog('close')
