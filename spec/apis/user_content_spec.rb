@@ -399,14 +399,28 @@ describe UserContent, type: :request do
       tags[3]['id'].should == 'media_comment_test2'
     end
 
-    it "should leave verified user-context file links alone" do
-      user
-      attachment_model :context => @user
-      url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-      link = %Q{<a href="#{url}">what</a>}
-      html = tester.process_incoming_html_content(link)
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
-      doc.at_css('a')['href'].should == url
+    context "with verified user-context file links" do
+      before do
+        user
+        attachment_model :context => @user
+      end
+
+      def confirm_url_stability(url)
+        link = %Q{<a href="#{url}">what</a>}
+        html = tester.process_incoming_html_content(link)
+        doc = Nokogiri::HTML::DocumentFragment.parse(html)
+        doc.at_css('a')['href'].should == url
+      end
+
+      it "ignores them when scoped to the file" do
+        url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        confirm_url_stability(url)
+      end
+
+      it "ignores them when scoped to the user" do
+        url = "/users/#{@user.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        confirm_url_stability(url)
+      end
     end
 
     context "with verified user-context file links" do
