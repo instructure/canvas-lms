@@ -461,25 +461,31 @@ class ApplicationController < ActionController::Base
         @context = @current_user
         @context_membership = @context
       end
-      if @context.is_a?(Account) && !@context.root_account?
-        account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
-        account_chain.slice!(0) # the first element is the current context
-        count = account_chain.length
-        account_chain.reverse.each_with_index do |a, idx|
-          if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-            add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
-          elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-            next
-          else
-            add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+
+      assign_localizer if @context.present?
+
+      unless api_request?
+        if @context.is_a?(Account) && !@context.root_account?
+          account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
+          account_chain.slice!(0) # the first element is the current context
+          count = account_chain.length
+          account_chain.reverse.each_with_index do |a, idx|
+            if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+              add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
+            elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+              next
+            else
+              add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+            end
           end
         end
-      end
-      set_badge_counts_for(@context, @current_user, @current_enrollment)
-      assign_localizer if @context.present?
-      if @context && @context.respond_to?(:short_name)
-        crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
-        add_crumb(@context.short_name, crumb_url)
+
+        if @context && @context.respond_to?(:short_name)
+          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
+          add_crumb(@context.short_name, crumb_url)
+        end
+
+        set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
   end
