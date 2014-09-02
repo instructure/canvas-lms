@@ -11,7 +11,7 @@
       <% if @user_data[:can_edit] %>
         <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
       <% else %>
-        <%= avatar(@user_data[:id], size: 128) %>
+        <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>
     </div>
     <div class="image-block-content row-fluid">
