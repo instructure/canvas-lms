@@ -1465,17 +1465,6 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  # calls send_file if the io has a local file, or send_data otherwise
-  # make sure to rewind the io first, if necessary
-  def send_file_or_data(io, opts = {})
-    cancel_cache_buster
-    if io.respond_to?(:path) && io.path.present? && File.file?(io.path)
-      send_file(io.path, opts)
-    else
-      send_data(io, opts)
-    end
-  end
-
   def verified_file_download_url(attachment, *opts)
     file_download_url(attachment, { :verifier => attachment.uuid }, *opts)
   end
