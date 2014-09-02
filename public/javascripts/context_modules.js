@@ -293,16 +293,14 @@ define([
         $('#move_module_name').text($module.children('.header').children('.collapse_module_link').children('.name').text());
 
         // Get current module ordering
-        var currentOrdering = [];
         var selectOptions = [];
 
         $("#context_modules .context_module").each(function() {
+          if ($module.attr('id') === $(this).attr('id')) {
+            return;
+          }
           var id = $(this).attr('id').substring('context_module_'.length);
           var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          currentOrdering.push({
-            'id': id,
-            'name': name
-          });
           selectOptions.push('<option value="' + id + '">' + name + '</option>');
         });
 
@@ -942,9 +940,14 @@ define([
       // Remove all existing items
       $('#move_module_item_select').empty();
       var moduleId = $(event.currentTarget.selectedOptions).val();
+      // Get the current item id, so it can be skipped when adding options.
+      var selectedItemId = $(this).parents('#move_module_item_form').data('current_item').attr('id');
       // Get all the items for the selected module.
       var selectItemOptions = [];
       $('#context_module_' + moduleId).children().find('.context_module_item').each(function (index, item) {
+        if ($(item).attr('id') === selectedItemId) {
+          return;
+        }
         var id = $(item).attr('id').substring('context_module_item_'.length);
         var name = $(item).children().find('span.title').text();
         selectItemOptions.push('<option value="' + id + '">' + name + '</option>');
