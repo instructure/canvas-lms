@@ -462,7 +462,7 @@ define([
       .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);
         if ($this.hasClass('numerical_question_input')) {
-          var val = parseFloat($this.val());
+          var val = parseFloat($this.val().replace(/,/g, ''));
           $this.val(isNaN(val) ? "" : val.toFixed(4));
         }
         if (update !== false) {
@@ -472,7 +472,7 @@ define([
       .delegate(".numerical_question_input", {
         keyup: function(event) {
           var $this = $(this);
-          var val = $this.val();
+          var val = $this.val().replace(/,/g, '');
           var $errorBox = $this.data('associated_error_box');
 
           if (val.match(/^$|^-$/) || !isNaN(parseFloat(val))) {
@@ -685,4 +685,3 @@ define([
     showDeauthorizedDialog = _.bind(ldbLoginPopup.exec, ldbLoginPopup);
   }
 });
-

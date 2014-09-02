@@ -806,16 +806,18 @@ define([
 
     parseInput: function($input, type) {
       if ($input.val() == "") { return; }
+      var val = $input.val().replace(/,/g, '');
       if (type == "int") {
-        var val = parseInt($input.val(), 10);
+        val = parseInt(val, 10);
         if (isNaN(val)) { val = 0; }
         $input.val(val);
       } else if (type == "float") {
-        var val = Math.round(parseFloat($input.val()) * 100.0) / 100.0;
+        val = Math.round(parseFloat(val) * 100.0) / 100.0;
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
       } else if (type == "float_long") {
-        var val = Math.round(parseFloat($input.val()) * 10000.0) / 10000.0;
+        console.log(val);
+        val = Math.round(parseFloat(val) * 10000.0) / 10000.0;
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
       }
