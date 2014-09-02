@@ -28,13 +28,18 @@ define(function() {
       'answers',
       'answered_student_count',
 
+      // multiple-choice & true/false
       'top_student_count',
       'middle_student_count',
       'bottom_student_count',
       'correct_top_student_count',
       'correct_middle_student_count',
       'correct_bottom_student_count',
-      'point_biserials'
+      'point_biserials',
+
+      // multiple-answers
+      'correct',
+      'partially_correct',
     ],
 
     POINT_BISERIAL_ATTRS: [

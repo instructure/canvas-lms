@@ -7,11 +7,15 @@ define(function(require) {
   var ToggleDetailsButton = require('jsx!./questions/toggle_details_button');
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
+  var ShortAnswerRenderer = require('jsx!./questions/short_answer');
 
   var extend = _.extend;
   var Renderers = {
     'multiple_choice_question': MultipleChoiceRenderer,
     'true_false_question': MultipleChoiceRenderer,
+    'short_answer_question': ShortAnswerRenderer,
+    'multiple_answers_question': ShortAnswerRenderer,
+    'numerical_question': ShortAnswerRenderer,
   };
 
   var Statistics = React.createClass({

@@ -5,13 +5,15 @@ define(function(require) {
   var Question = React.createClass({
     getDefaultProps: function() {
       return {
-        expanded: false
+        expanded: false,
+        stretched: false
       };
     },
     render: function() {
       var className = classSet({
         'question-statistics': true,
         'with-details': !!this.props.expanded,
+        'stretched-answer-distribution': !!this.props.stretched
       });
 
       return(

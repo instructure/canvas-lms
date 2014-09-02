@@ -4,11 +4,6 @@ define(function(require) {
 
   var MULTIPLE_ANSWERS = 'multiple_answers_question';
 
-  // internal
-  var isMultipleAnswers = function(questionType) {
-    return questionType === MULTIPLE_ANSWERS;
-  };
-
   /**
    * @internal
    * @hide
@@ -36,8 +31,9 @@ define(function(require) {
     this.questionType = questionType;
 
     if (options) {
-      this.answerPool = options.answerPool;
-      this.participantCount = options.participantCount;
+      this.setAnswerPool(options.answerPool);
+      this.setParticipantCount(options.participantCount);
+      this.setCorrectResponseCount(options.correctResponseCount);
     }
 
     return this;
@@ -71,6 +67,10 @@ define(function(require) {
       this.answerPool = pool;
     },
 
+    setCorrectResponseCount: function(count) {
+      this.correctResponseCount = count;
+    },
+
     /**
      * Calculates the ratio of students who answered this question correctly
      * (partially correct answers do not count when applicable)
@@ -84,13 +84,18 @@ define(function(require) {
       if (participantCount <= 0) {
         return 0;
       }
-      else if (isMultipleAnswers(this.questionType)) {
-        return ratioForMultipleAnswers.call(this);
-      }
 
-      correctResponseCount = this.answerPool.reduce(function(sum, answer) {
-        return (answer.correct) ? sum + answer.responses : sum;
-      }, 0);
+      // Multiple-Answer question stats already come served with a "correct"
+      // field that denotes the count of students who provided a fully correct
+      // answer, so we don't have to calculate anything for it.
+      if (MULTIPLE_ANSWERS === this.questionType) {
+        correctResponseCount = this.correctResponseCount;
+      }
+      else {
+        correctResponseCount = this.answerPool.reduce(function(sum, answer) {
+          return (answer.correct) ? sum + answer.responses : sum;
+        }, 0);
+      }
 
       return parseFloat(correctResponseCount) / participantCount;
     }

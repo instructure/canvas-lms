@@ -6,6 +6,7 @@ define(function(require) {
   var ChartMixin = require('../../mixins/chart');
   var ChartInspectorMixin = require('../../mixins/components/chart_inspector');
   var I18n = require('i18n!quiz_statistics');
+  var round = require('../../util/round');
 
   var mapBy = _.map;
   var findWhere = _.findWhere;
@@ -221,7 +222,7 @@ define(function(require) {
           ref={'answer_' + answer.id}
           className="answer-distribution-tooltip-content">
           <p>
-            <span className="answer-response-ratio">{answer.ratio}%</span>
+            <span className="answer-response-ratio">{round(answer.ratio)}%</span>
             <span className="answer-response-count">
               {I18n.t('response_student_count', {
                 zero: 'Nobody',

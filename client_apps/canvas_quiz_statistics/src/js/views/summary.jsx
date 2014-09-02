@@ -6,6 +6,7 @@ define(function(require) {
   var Report = require('jsx!./summary/report');
   var secondsToTime = require('../util/seconds_to_time');
   var round = require('../util/round');
+  var formatNumber = require('../util/format_number');
 
   var Summary = React.createClass({
     getDefaultProps: function() {
@@ -78,7 +79,7 @@ define(function(require) {
                 </td>
                 <td>{this.ratioFor(this.props.scoreHigh)}%</td>
                 <td>{this.ratioFor(this.props.scoreLow)}%</td>
-                <td>{round(this.props.scoreStdev, 2, 2)}</td>
+                <td>{formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
                 <td>{secondsToTime(this.props.durationAverage)}</td>
               </tr>
             </tbody>

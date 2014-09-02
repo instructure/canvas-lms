@@ -1,4 +1,4 @@
-define([ '../config' ], function(config) {
+define([], function() {
   /**
    * @member Util
    * @method round
@@ -12,22 +12,14 @@ define([ '../config' ], function(config) {
    * @param  {Number} [digits=2]
    *         Number of digits to round to.
    *
-   * @param  {Number} [precision=config.precision]
-   *         Precision of the returned float (number of digits after the
-   *         decimal point.)
-   *
    * @return {Number}
    *         The rounded number, ready for human-consumption.
    */
-  return function round(n, digits, precision) {
+  return function round(n, digits) {
     var scale;
 
     if (digits === undefined) {
       digits = 0;
-    }
-
-    if (precision === undefined) {
-      precision = config.precision;
     }
 
     if (typeof n !== 'number' || !(n instanceof Number)) {
@@ -36,7 +28,6 @@ define([ '../config' ], function(config) {
 
     scale = Math.pow(10, parseInt(digits, 10));
     n = Math.round(n * scale) / scale;
-    n = n.toFixed(parseInt(precision, 10));
 
     return n;
   };

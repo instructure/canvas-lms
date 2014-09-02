@@ -8,6 +8,7 @@ define(function(require) {
   var ChartMixin = require('../../mixins/chart');
   var Dialog = require('jsx!../../components/dialog');
   var Help = require('jsx!./discrimination_index/help');
+  var formatNumber = require('../../util/format_number');
 
   var divide = function(x, y) {
     return (parseFloat(x) / y) || 0;
@@ -136,7 +137,7 @@ define(function(require) {
           <p>
             <em className={classSet(className)}>
               <span className="sign">{sign}</span>
-              {Math.abs((this.props.discriminationIndex || 0).toFixed(2))}
+              {formatNumber(Math.abs(this.props.discriminationIndex || 0))}
             </em>
 
             {' '}
