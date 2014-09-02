@@ -246,8 +246,6 @@ class User < ActiveRecord::Base
     scope.group("users.id")
   }
 
-  has_a_broadcast_policy
-
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
     :self_enrollment_course, :validation_root_account
@@ -534,14 +532,6 @@ class User < ActiveRecord::Base
   def new_registration(form_params = {}); end
   # DEPRECATED, override new_registration instead
   def new_teacher_registration(form_params = {}); new_registration(form_params); end
-
-  set_broadcast_policy do |p|
-    p.dispatch :new_teacher_registration
-    p.to { Account.site_admin.users }
-    p.whenever { |record|
-      record.just_created && record.school_name && record.school_position
-    }
-  end
 
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it

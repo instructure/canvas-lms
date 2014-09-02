@@ -31,7 +31,7 @@ describe SIS::UserImporter do
       # this is the fun bit where we get to stub User.new to insert a sleep into
       # the transaction loop.
 
-      User.any_instance.expects(:save_without_broadcasting).times(3).returns { Timecop.travel(5.seconds) }
+      User.any_instance.expects(:save).times(3).returns { Timecop.travel(5.seconds) }
       # two for each user
       User.expects(:transaction).times(6).yields
 
