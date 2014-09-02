@@ -85,6 +85,7 @@ module AuthenticationMethods
 
   def load_user
     @current_user = @current_pseudonym = nil
+    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies) # ensure that the cookie is set
 
     load_pseudonym_from_access_token
 
@@ -129,8 +130,8 @@ module AuthenticationMethods
         @developer_key ||
           request.get? ||
           !allow_forgery_protection ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token']) ||
           raise(AccessTokenError)
       end
     end

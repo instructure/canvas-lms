@@ -109,8 +109,10 @@ define([
         json_data = $.parseJSON(text);
       } catch(e) {}
       $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-        if(json_data && json_data.status == 'AUT') {
-          ajaxErrorFlash(I18n.t('errors.timeout', "There was a problem with your request, possibly due to a long period of inactivity.  Please reload the page and try again."), request);
+        if (json_data && json_data.status == 'unauthenticated') {
+          var message = I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity.")
+          message += "<br\/><a href='/login' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
+          $.flashError(message, 30000);
         } else {
           ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
         }

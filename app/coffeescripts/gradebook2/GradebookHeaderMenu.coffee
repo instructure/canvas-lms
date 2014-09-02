@@ -9,12 +9,13 @@ define [
   'jst/gradebook2/GradebookHeaderMenu'
   'jst/re_upload_submissions_form'
   'underscore'
+  'compiled/behaviors/authenticity_token'
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.kylemenu'
-], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _) ->
+], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token) ->
 
   class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
@@ -144,7 +145,7 @@ define [
     reuploadSubmissions: =>
       unless @$re_upload_submissions_form
         locals =
-          authenticityToken: $("#ajax_authenticity_token").text()
+          authenticityToken: authenticity_token()
 
         GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form(locals))
           .dialog

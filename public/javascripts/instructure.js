@@ -165,12 +165,6 @@ define([
 
     //////////////// END layout related stuff
 
-    $("#ajax_authenticity_token").ifExists(function(){
-      if(this.text()) {
-        $("input[name='authenticity_token']").val(this.text());
-      }
-    });
-
     KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')});
 
     $("#switched_role_type").ifExists(function(){
