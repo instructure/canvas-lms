@@ -26,7 +26,7 @@ if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   gateway_user =  ENV['gateway_user'] || ENV['USER']
 
   set :ssh_options, {
-    proxy: Net::SSH::Proxy::Command.new("ssh #{gateway_user}@welcome.its.sfu.ca -W %h:%p"),
+    proxy: Net::SSH::Proxy::Command.new("ssh #{gateway_user}@hatzic.sfu.ca -W %h:%p"),
     forward_agent: true,
     keys: [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")],
     user: 'canvasuser'
