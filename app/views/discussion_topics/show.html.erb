@@ -41,9 +41,9 @@
 
      <div class="alert alert-info">
        <% if @topic.is_a?(Announcement) %>
-         <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+         <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: datetime_string(@unlock_at)) %>
        <% else %>
-         <%= t(:topic_locked_until, "This topic is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+         <%= t(:topic_locked_until, "This topic is locked until %{time}", time: datetime_string(@unlock_at)) %>
        <% end %>
      </div>
     </div>
