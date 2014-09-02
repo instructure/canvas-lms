@@ -578,7 +578,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    it "should allow valid submission types" do
+    it "should allow valid submission types as an array" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
         { :controller => 'assignments_api',
           :action => 'create',
@@ -590,6 +590,19 @@ describe AssignmentsApiController, type: :request do
               'online_upload',
               'online_url'
             ]}
+      })
+      response.should be_success
+    end
+
+    it "should allow valid submission types as a string (quick add dialog)" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
+        { :controller => 'assignments_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s },
+        { :assignment => {
+            'name' => 'some assignment',
+            'submission_types' => 'not_graded'}
       })
       response.should be_success
     end

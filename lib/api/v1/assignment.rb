@@ -296,20 +296,12 @@ module Api::V1::Assignment
     return false
   end
 
-  API_ALLOWED_SUBMISSION_TYPES = %w(
-    online_quiz
-    none
-    on_paper
-    discussion_topic
-    external_tool
-    online_upload
-    online_text_entry
-    online_url
-    media_recording
-    not_graded
-  )
+  API_ALLOWED_SUBMISSION_TYPES = ["online_quiz", "none", "on_paper", "discussion_topic", "external_tool", "online_upload", "online_text_entry", "online_url", "media_recording", "not_graded", ""]
 
   def valid_submission_types?(assignment, assignment_params)
+    return true if assignment_params['submission_types'].nil?
+    assignment_params['submission_types'] = Array(assignment_params['submission_types'])
+
     if assignment_params['submission_types'].present? &&
       !assignment_params['submission_types'].all? { |s| API_ALLOWED_SUBMISSION_TYPES.include?(s) }
         assignment.errors.add('assignment[submission_types]',
