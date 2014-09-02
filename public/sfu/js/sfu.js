@@ -46,6 +46,7 @@
         '<option value="">Help</option>',
         '<option value="https://canvas.sfu.ca/courses/14504">Help for Students</option>',
         '<option value="https://canvas.sfu.ca/courses/14686">Help for Instructors</option>',
+        '<option value="http://www.sfu.ca/techforum">Q&A Forum</option>',
         '</li>'
     ].join('');
     $('#topbar .logout').before(helpHtml);
