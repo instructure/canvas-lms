@@ -98,13 +98,13 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
+    return {} if api_request?
     # set some defaults
     unless @js_env
       @js_env = {
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
         :current_user_roles => @current_user.try(:roles),
-        :AUTHENTICITY_TOKEN => form_authenticity_token,
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
         :SETTINGS => {
@@ -1100,14 +1100,14 @@ class ApplicationController < ActionController::Base
     if    protect_against_forgery? &&
           !request.get? &&
           !api_request?
-      if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
+      if cookies[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
@@ -1115,7 +1115,7 @@ class ApplicationController < ActionController::Base
   end
 
   def form_authenticity_token
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(session)
+    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -1527,13 +1527,6 @@ class ApplicationController < ActionController::Base
     true
   end
 
-  def reset_session
-    # when doing login/logout via ajax, we need to have the new csrf token
-    # for subsequent requests.
-    @resend_csrf_token_if_json = true
-    super
-  end
-
   def destroy_session
     @pseudonym_session.destroy rescue true
     reset_session
@@ -1571,10 +1564,6 @@ class ApplicationController < ActionController::Base
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?
         json = "while(1);#{json}"
-      end
-
-      if @resend_csrf_token_if_json
-        response.headers['X-CSRF-Token'] = form_authenticity_token
       end
 
       # fix for some browsers not properly handling json responses to multipart

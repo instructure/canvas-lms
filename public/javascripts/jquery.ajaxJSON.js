@@ -19,8 +19,9 @@
 
 define([
   'INST' /* INST */,
-  'jquery' /* $ */
-], function(INST, $) {
+  'jquery' /* $ */,
+  'compiled/behaviors/authenticity_token'
+], function(INST, $, authenticity_token) {
 
   var _getJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
@@ -40,9 +41,7 @@ define([
     if(submit_type != "GET") {
       data._method = submit_type;
       submit_type = "POST";
-      if(!data.authenticity_token) {
-        data.authenticity_token = $("#ajax_authenticity_token").text();
-      }
+      data.authenticity_token = authenticity_token();
     }
     if($("#page_view_id").length > 0 && !data.page_view_id && (!options || !options.skipPageViewLog)) {
       data.page_view_id = $("#page_view_id").text();
@@ -70,7 +69,6 @@ define([
       dataType: "json",
       type: submit_type,
       success: function(data, textStatus, xhr) {
-        updateCSRFToken(xhr);
         data = data || {};
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
@@ -90,7 +88,6 @@ define([
         }
       },
       error: function(xhr) {
-        updateCSRFToken(xhr);
         ajaxError.apply(this, arguments);
       },
       complete: function(xhr) {
@@ -129,17 +126,6 @@ define([
     return null;
   };
 
-  function updateCSRFToken(xhr) {
-    // in case the server has generated a new one, e.g. session reset on
-    // login actions
-    var token = xhr.getResponseHeader('X-CSRF-Token');
-    if (token) {
-      ENV.AUTHENTICITY_TOKEN = token;
-      // TODO: stop using me
-      $("#ajax_authenticity_token").text(token);
-    }
-  }
-
   // Defines a default error for all ajax requests.  Will always be called
   // in the development environment, and as a last-ditch error catching
   // otherwise.  See "ajax_errors.js"
@@ -149,7 +135,7 @@ define([
       var inProduction = (INST.environment == "production");
       var unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) != -1);
       var ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) != -1);
-      if((!inProduction || unhandled) && !ignore) {
+      if((!inProduction || unhandled || request.status == 401) && !ignore) {
         $.ajaxJSON.unhandledXHRs = $.grep($.ajaxJSON.unhandledXHRs, function(xhr, i) {
           return xhr != request;
         });

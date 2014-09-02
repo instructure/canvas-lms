@@ -1,8 +1,9 @@
 define [
   'jquery'
   'jst/gradebook_uploads_form'
+  'compiled/behaviors/authenticity_token'
   'jqueryui/dialog'
-], ($, gradebook_uploads_form) ->
+], ($, gradebook_uploads_form, authenticity_token) ->
 
   class UploadDialog
     constructor: (@context_url) ->
@@ -12,7 +13,7 @@ define [
       locals =
         download_gradebook_csv_url: "#{opts.context_url}/gradebook.csv"
         action: "#{opts.context_url}/gradebook_uploads"
-        authenticityToken: ENV.AUTHENTICITY_TOKEN
+        authenticityToken: authenticity_token()
 
       dialog = $(gradebook_uploads_form(locals))
       dialog.dialog

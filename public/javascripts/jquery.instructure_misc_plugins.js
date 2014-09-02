@@ -19,12 +19,13 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/behaviors/authenticity_token',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
   'jquery.scrollToVisible' /* scrollToVisible */,
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, authenticity_token) {
 
   $.fn.setOptions = function(prompt, options) {
     var result = prompt ? "<option value=''>" + htmlEscape(prompt) + "</option>" : "";
@@ -116,12 +117,7 @@ define([
           };
         }
         var data = options.prepareData ? options.prepareData.call($object, $dialog) : {};
-        if (options.token) {
-          data.authenticity_token = options.token;
-        }
-        if (!data.authenticity_token) {
-          data.authenticity_token = $("#ajax_authenticity_token").text();
-        }
+        data.authenticity_token = authenticity_token();
         $.ajaxJSON(options.url, "DELETE", data, function(data) {
           options.success.call($object, data);
         }, function(data, request, status, error) {

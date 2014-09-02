@@ -144,11 +144,21 @@ describe "API Authentication", type: :request do
           response.response_code.should == 401
       end
 
-      it "should allow post with authenticity token in application session" do
+      it "should allow post with old authenticity token in application session" do
+        session[:_csrf_token] = SecureRandom.base64(32)
+        CanvasBreachMitigation::MaskingSecrets.stubs(:valid_authenticity_token?).returns(true)
+        post "/api/v1/courses/#{@course.id}/assignments.json",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
+               :authenticity_token => 'mock csrf token' }
+        response.should be_success
+        @course.assignments.count.should == 1
+      end
+
+      it "should allow post with cookie authenticity token in application session" do
         get "/"
         post "/api/v1/courses/#{@course.id}/assignments.json",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
-               :authenticity_token => session[:_csrf_token] }
+               :authenticity_token => cookies['_csrf_token'] }
         response.should be_success
         @course.assignments.count.should == 1
       end
@@ -188,7 +198,8 @@ describe "API Authentication", type: :request do
           response['Location'].should match(%r{/login/oauth2/confirm$})
           get response['Location']
           response.should render_template("pseudonym_sessions/oauth2_confirm")
-          post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
+          post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
 
           response.should be_redirect
           response['Location'].should match(%r{/login/oauth2/auth\?})
@@ -299,7 +310,7 @@ describe "API Authentication", type: :request do
         response['Location'].should match(%r{/login/oauth2/confirm$})
         get response['Location']
         response.should render_template("pseudonym_sessions/oauth2_confirm")
-        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+        post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
         response.should be_redirect
         response['Location'].should match(%r{/login/oauth2/auth\?})
         code = response['Location'].match(/code=([^\?&]+)/)[1]
@@ -388,7 +399,7 @@ describe "API Authentication", type: :request do
             response['Location'].should match(%r{/login/oauth2/confirm$})
             get response['Location']
             response.should render_template("pseudonym_sessions/oauth2_confirm")
-            post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+            post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
 
             response.should be_redirect
             response['Location'].should match(%r{/login/oauth2/auth\?})
@@ -446,7 +457,7 @@ describe "API Authentication", type: :request do
             response.should be_redirect
             response['Location'].should match(%r{/login/oauth2/confirm$})
             get response['Location']
-            post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+            post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
 
             response.should be_redirect
             response['Location'].should match(%r{http://www.example.com/my_uri?})

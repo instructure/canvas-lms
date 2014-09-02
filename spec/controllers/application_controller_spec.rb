@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:form_authenticity_token).returns('asdf')
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
   end
 
@@ -126,11 +125,14 @@ describe ApplicationController do
   end
 
   describe "js_env" do
+    before do
+      controller.stubs(:api_request?).returns(false)
+    end
+
     it "should set items" do
       HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
       controller.js_env :FOO => 'bar'
       controller.js_env[:FOO].should == 'bar'
-      controller.js_env[:AUTHENTICITY_TOKEN].should == 'asdf'
       controller.js_env[:files_domain].should == 'files.example.com'
     end
 
