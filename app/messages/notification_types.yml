@@ -187,8 +187,6 @@
       delay_for: 0
     - name: New User
       delay_for: 0
-    - name: New Teacher Registration
-      delay_for: 0
     - name: New Student Organized Group
       delay_for: 0
 

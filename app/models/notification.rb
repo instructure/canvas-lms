@@ -297,7 +297,6 @@ class Notification < ActiveRecord::Base
     t 'names.new_file_added', 'New File Added'
     t 'names.new_files_added', 'New Files Added'
     t 'names.new_student_organized_group', 'New Student Organized Group'
-    t 'names.new_teacher_registration', 'New Teacher Registration'
     t 'names.new_user', 'New User'
     t 'names.pseudonym_registration', 'Pseudonym Registration'
     t 'names.report_generated', 'Report Generated'
@@ -476,7 +475,6 @@ EOS
 * Content export
 * Migration report
 * New account user
-* New teacher registration
 * New student group
 EOS
     when 'Calendar'
