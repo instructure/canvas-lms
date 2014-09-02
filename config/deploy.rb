@@ -9,7 +9,7 @@ set :deploy_to,     '/var/rails/canvas'
 set :stats_server,  'stats.tier2.sfu.ca'
 set :rails_env,     'production'
 set :linked_dirs,   %w{log tmp/pids public/system}
-# set :log_level,     :info
+set :log_level,     ENV['log_level'] || :info
 set :pty,           true
 
 set :bundle_path, "vendor/bundle"
