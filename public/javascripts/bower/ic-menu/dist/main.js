@@ -15,21 +15,32 @@
 
     attributeBindings: [
       'tabindex',
-      'role'
+      'role',
+      'aria-disabled'
     ],
 
     role: 'menuitem',
 
+    enabled: true,
+
     tabindex: -1,
 
     focused: false,
+
+    'aria-disabled': function() {
+      return !this.get('enabled') + ''; // coerce to ensure true || false
+    }.property('enabled'),
 
     click: function(event) {
       var wasKeyboard = !event.clientX && !event.clientY;
       this.get('parentView').close();
       Ember.run.next(this, function() {
         if (wasKeyboard) { this.get('parentView').focusTrigger(); }
-        this.sendAction('on-select', this);
+        if (this.get('enabled')) {
+          this.sendAction('on-select', this);
+        } else {
+          this.sendAction('on-disabled-select', this);
+        }
       });
     },
 
@@ -162,12 +173,45 @@
       item.focus();
     },
 
+    itemsAsHash: function() {
+      var items = this.get('items');
+      var itemsHash = {};
+      items.forEach(function(item){
+        var id = item.$().attr('id');
+        itemsHash[id] = item;
+      });
+      return itemsHash;
+    },
+
+    syncItemsWithChildViews: function() {
+      // this.get('childViews') doesn't seem to update as menu-items
+      // are added / removed. so resorting to pulling directly from DOM :/
+      if (!this.$()) {
+        return; // not in DOM
+      }
+      var cv = this.$().find('ic-menu-item').get();
+      var itemsHash = this.itemsAsHash();
+      if (!cv) {
+        return;
+      }
+      var items = [];
+      cv.forEach(function(child) {
+        var id = this.$(child).attr('id');
+        if (itemsHash[id]) {
+          items.push(itemsHash[id]);
+        }
+      });
+      this.set('items', items);
+    },
+
     registerItem: function(item) {
       this.get('items').addObject(item);
+      Ember.run.debounce(this, this.syncItemsWithChildViews, 1)
     },
 
     deregisterItem: function(item) {
       this.get('items').removeObject(item);
+      Ember.run.debounce(this, this.syncItemsWithChildViews, 1)
     },
 
     open: function() {
@@ -239,7 +283,8 @@
       'ariaOwns:aria-owns',
       'ariaHaspopup:aria-haspopup',
       'role',
-      'tabindex'
+      'tabindex',
+      'title'
     ],
 
     tabindex: 0,
@@ -357,19 +402,18 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   
 
 
-  data.buffer.push("<style>\nic-menu {\n  display: inline-block;\n}\n\nic-menu-list {\n  position: absolute;\n  display: none;\n}\n\nic-menu-list[aria-expanded=\"true\"] {\n  display: block;\n}\n\nic-menu-list {\n  outline: none;\n  background: #fff;\n  border: 1px solid #aaa;\n  border-radius: 3px;\n  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.25);\n  list-style-type: none;\n  padding: 2px 0px;\n  font-family: \"Lucida Grande\", \"Arial\", sans-serif;\n  font-size: 12px;\n}\n\nic-menu-item {\n  display: block;\n  padding: 4px 20px;\n  cursor: default;\n  white-space: nowrap;\n}\n\nic-menu-item:focus {\n  background: #3879D9;\n  color: #fff;\n  outline: none;\n}\n</style>\n\n");
+  data.buffer.push("ic-menu {\n  display: inline-block;\n}\n\nic-menu-list {\n  position: absolute;\n  display: none;\n}\n\nic-menu-list[aria-expanded=\"true\"] {\n  display: block;\n}\n\nic-menu-list {\n  outline: none;\n  background: #fff;\n  border: 1px solid #aaa;\n  border-radius: 3px;\n  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.25);\n  list-style-type: none;\n  padding: 2px 0px;\n  font-family: \"Lucida Grande\", \"Arial\", sans-serif;\n  font-size: 12px;\n}\n\nic-menu-item {\n  display: block;\n  padding: 4px 20px;\n  cursor: default;\n  white-space: nowrap;\n}\n\n\nic-menu-item:focus {\n  background: #3879D9;\n  color: #fff;\n  outline: none;\n}\n\nic-menu-item[aria-disabled=\"true\"] {\n  color: #999;\n}\n\nic-menu-item[aria-disabled=\"true\"]:focus {\n  background: #ccc;\n  color: #000;\n}\n\nic-menu-item a {\n  color: inherit;\n  text-decoration: none;\n}\n\n");
   
 });
 
 Ember.TEMPLATES["components/ic-menu-list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', hashTypes, hashContexts, escapeExpression=this.escapeExpression;
+  var buffer = '', stack1;
 
 
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "yield", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  stack1 = helpers._triageMustache.call(depth0, "yield", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n");
   return buffer;
   
@@ -378,15 +422,72 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["components/ic-menu"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', hashTypes, hashContexts, escapeExpression=this.escapeExpression;
+  var buffer = '', stack1;
 
 
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "yield", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  stack1 = helpers._triageMustache.call(depth0, "yield", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n");
   return buffer;
   
 });
 
 });
+// <look-the-other-way>
++function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([
+      'ember',
+      './lib/components/ic-menu-item',
+      './lib/components/ic-menu-list',
+      './lib/components/ic-menu-trigger',
+      './lib/components/ic-menu',
+      'ic-styled',
+      './lib/templates'
+    ], function(Ember, Item, List, Trigger, Menu) {
+      return factory(Ember, Item, List, Trigger, Menu);
+    });
+  } else if (typeof exports === 'object') {
+    module.exports = factory(
+      require('ember'),
+      require('./lib/components/ic-menu-item'),
+      require('./lib/components/ic-menu-list'),
+      require('./lib/components/ic-menu-trigger'),
+      require('./lib/components/ic-menu'),
+      require('ic-styled'),
+      require('./lib/templates')
+    );
+  } else {
+    factory(
+      Ember,
+      root.ic.MenuItemComponent,
+      root.ic.MenuListComponent,
+      root.ic.MenuTriggerComponent,
+      root.ic.MenuComponent
+    );
+  }
+}(this, function(Ember, Item, List, Trigger, Menu) {
+// </look-the-other-way>
+
+  Ember.Application.initializer({
+
+    name: 'ic-menu',
+
+    initialize: function(container, application) {
+      container.register('component:ic-menu-item', Item);
+      container.register('component:ic-menu-list', List);
+      container.register('component:ic-menu-trigger', Trigger);
+      container.register('component:ic-menu', Menu);
+    }
+
+  });
+
+  return {
+    MenuItemComponent: Item,
+    MenuListComponent: List,
+    MenuTriggerComponent: Trigger,
+    MenuComponent: Menu
+  }
+
+});
+

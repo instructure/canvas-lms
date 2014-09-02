@@ -8,7 +8,8 @@
     baseUrl: '<%= js_base_url %>',
     paths: <%= raw Canvas::RequireJs.paths(true) %>,
     packages : <%= raw Canvas::RequireJs.packages %>,
-    shim: <%= raw Canvas::RequireJs.shims %>
+    shim: <%= raw Canvas::RequireJs.shims %>,
+    waitSeconds: 60
   };
 </script>
 

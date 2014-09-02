@@ -83,6 +83,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     def api_get_json
+      @course.clear_permissions_cache(@user)
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",

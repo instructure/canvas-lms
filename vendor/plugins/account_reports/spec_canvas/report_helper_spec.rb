@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,11 +31,12 @@ end
 describe "report helper" do
   let(:account) { Account.default }
   let(:account_report) { AccountReport.new(:report_type => 'test_report', :account => account) }
-  let(:report){Canvas::AccountReports::TestReport.new(account_report)}
+  let(:report) { Canvas::AccountReports::TestReport.new(account_report) }
 
   describe "#send_report" do
     before do
-      Canvas::AccountReports.stubs(:for_account => {account_report.report_type => {:title => 'test_report'}})
+      Canvas::AccountReports.stubs(available_reports: {account_report.report_type => {title: 'test_report'}})
+      report.stubs(:report_title).returns('TitleReport')
     end
 
     it "Should not break for nil parameters" do
@@ -45,22 +46,22 @@ describe "report helper" do
   end
 
   describe "timezone_strftime" do
-      it "Should format DateTime" do
-         date_time = DateTime.new(2003,9,13)
-         formatted = report.timezone_strftime(date_time, '%d-%b')
-         formatted.should == "13-Sep"
-      end
+    it "Should format DateTime" do
+      date_time = DateTime.new(2003, 9, 13)
+      formatted = report.timezone_strftime(date_time, '%d-%b')
+      formatted.should == "13-Sep"
+    end
 
-      it "Should format Time" do
-        time_zone = Time.use_zone('UTC'){Time.zone.parse('2013-09-13T00:00:00Z')}
-        formatted = report.timezone_strftime(time_zone, '%d-%b')
-        formatted.should == "13-Sep"
-      end
+    it "Should format Time" do
+      time_zone = Time.use_zone('UTC') { Time.zone.parse('2013-09-13T00:00:00Z') }
+      formatted = report.timezone_strftime(time_zone, '%d-%b')
+      formatted.should == "13-Sep"
+    end
 
-      it "Should format String" do
-        time_zone = Time.use_zone('UTC'){Time.zone.parse('2013-09-13T00:00:00Z')}
-        formatted = report.timezone_strftime(time_zone.to_s, '%d-%b')
-        formatted.should == "13-Sep"
-      end
+    it "Should format String" do
+      time_zone = Time.use_zone('UTC') { Time.zone.parse('2013-09-13T00:00:00Z') }
+      formatted = report.timezone_strftime(time_zone.to_s, '%d-%b')
+      formatted.should == "13-Sep"
+    end
   end
 end

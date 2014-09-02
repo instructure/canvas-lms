@@ -108,21 +108,39 @@ describe "dashboard" do
     end
 
     it "should show account notifications on the dashboard" do
-      a1 = @course.account.announcements.create!(:message => "hey there")
-      a2 = @course.account.announcements.create!(:message => "another announcement")
+      a1 = @course.account.announcements.create!(:subject => 'test',
+                                                 :message => "hey there",
+                                                 :start_at => Date.today - 1.day,
+                                                 :end_at => Date.today + 1.day)
+      a2 = @course.account.announcements.create!(:subject => 'test 2',
+                                                 :message => "another annoucement",
+                                                 :start_at => Date.today - 1.day,
+                                                 :end_at => Date.today + 1.day)
 
       get "/"
       messages = ffj("#dashboard .global-message .message.user_content")
       messages.size.should == 2
-      messages[0].text.should == a2.message
-      messages[1].text.should == a1.message
+      messages[0].text.should == a1.message
+      messages[1].text.should == a2.message
     end
 
     it "should interpolate the user's domain in global notifications" do
-      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}")
+      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
+                                                           :subject => 'test',
+                                                           :start_at => Date.today,
+                                                           :end_at => Date.today + 1.day)
 
       get "/"
       fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
+    end
+
+    it "should interpolate the user's id in global notifications" do
+      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
+                                                           :subject => 'test',
+                                                           :start_at => Date.today,
+                                                           :end_at => Date.today + 1.day)
+      get "/"
+      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
     it "should show appointment stream items on the dashboard" do
@@ -246,15 +264,14 @@ describe "dashboard" do
       f('#courses_menu_item').should include_text('Current Groups')
     end
 
-    it "should go to /courses when the courses nav item is clicked" do
+    it "should present /courses as the href of the courses nav item" do
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
       Enrollment.update_all(:created_at => 1.minute.ago)
 
       get '/'
 
       keep_trying_until do
-        f('#courses_menu_item a').click
-        driver.current_url.should include('courses')
+        f('#courses_menu_item a').attribute('href').should include('courses')
       end
     end
 

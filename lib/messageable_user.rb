@@ -212,6 +212,9 @@ class MessageableUser < User
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name, id = pager.current_bookmark
+        if MessageableUser.connection.adapter_name == 'PostgreSQL'
+          name = MessageableUser.connection.escape_bytea(name)
+        end
         scope_shard = scope.shard_value
         id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 

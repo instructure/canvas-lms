@@ -801,10 +801,13 @@ describe "gradebook2" do
 
     it "should be visible when enabled" do
       Account.default.set_feature_flag!('post_grades', 'on')
+      @course.integration_id = 'xyz'
+      @course.save
       get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 2
 
-      f('#publish').click
+      wait_for_ajaximations
+      ff('.gradebook-navigation').length.should == 2
+      f('#post-grades-button').click
       wait_for_ajaximations
       f('#post-grades-container').should_not be_nil
     end

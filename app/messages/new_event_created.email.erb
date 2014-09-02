@@ -8,7 +8,7 @@
 
 <%= t('body', "There's a new event scheduled for %{course_name} that you should be aware of:", :course_name => asset.context.name) %>
 
-<%= asset.title %> 
+<%= asset.title %>
 
 <% if !asset.start_at && !asset.end_at %>
   <%= t('no_time_set', 'No Time Set') %>

@@ -26,12 +26,17 @@ describe EventStream::Failure do
     end
 
     before do
-      @request_id = CanvasUuid::Uuid.generate
+      @request_id = CanvasUUID.generate
       @event = EventRecord.new(
         'attribute1' => 'value1',
         'attribute2' => 'value2',
         'request_id' => @request_id
       )
+    end
+
+    it "responds to as_json with attributes" do
+      hash = @event.as_json
+      expect(hash.keys).to include(*%w[attribute1 attribute2 request_id])
     end
 
     it "sets default values" do
@@ -43,9 +48,9 @@ describe EventStream::Failure do
 
     it "allows overrided default values" do
       attributes = {
-        'id' => CanvasUuid::Uuid.generate,
+        'id' => CanvasUUID.generate,
         'event_type' => 'other_type',
-        'request_id' => CanvasUuid::Uuid.generate,
+        'request_id' => CanvasUUID.generate,
         'created_at' => Time.zone.now
       }
       event = EventRecord.new(attributes)
@@ -68,7 +73,7 @@ describe EventStream::Failure do
       request_id = 42
 
       attributes = {
-        'id' => CanvasUuid::Uuid.generate,
+        'id' => CanvasUUID.generate,
         'event_type' => 'other_type',
         'request_id' => request_id,
         'created_at' => Time.zone.now

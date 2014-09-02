@@ -109,7 +109,7 @@
             aria-controls="podcast_has_student_posts_container"}}
           {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
         </label>
-  
+
         <label id="podcast_has_student_posts_container"
                style="{{hiddenUnless podcast_url}}"
                class="checkbox" for="podcast_has_student_posts">
@@ -147,6 +147,7 @@
             <input type="text"
                    class="datetime_field input-medium"
                    name="delayed_post_at"
+                   id="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
                    value="{{datetimeFormatted delayed_post_at false}}">
           </div>
@@ -161,6 +162,7 @@
               <input type="text"
                      class="datetime_field input-medium"
                      name="lock_at"
+                     id="lock_at"
                      {{! TODO: what would be the best way to get this formatted right? }}
                      value="{{datetimeFormatted lock_at false}}">
             </div>
@@ -193,6 +195,18 @@
         <div id="peer_review_options" class="control-group"></div>
       {{/unless}}
     </fieldset>
+
+    <hr>
+
+    {{#if differentiatedAssignmnetsEnabled}}
+      <div class="text-center pad-box-mini" style="margin-bottom:10px">
+        <span>
+          <em>
+          {{#t "only_visible_to_overrides_note"}}Note: This discussion is <strong>only</strong> visible to the section(s) specified below:{{/t}}
+          </em>
+        </span>
+      </div>
+    {{/if}}
 
     <div class='js-assignment-overrides'></div>
   </div>

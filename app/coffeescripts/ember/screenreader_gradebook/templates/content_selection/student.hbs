@@ -1,0 +1,25 @@
+<div class="row pad-box bottom-only">
+  <div class="span4 text-right-responsive">
+    <label for="student_select">
+      {{#t 'select_student'}}Select a student{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select id="student_select"
+      class="student_select"
+      items=studentsInSelectedSection
+      valuePath="id"
+      labelPath=displayName
+      labelDefault=studentSelectDefaultLabel
+      selected=selectedStudent
+    }}
+
+    {{view App.SelectionButtonsView
+      type='student'
+      selected=selectedStudent
+      list=studentsInSelectedSection
+     }}
+
+  </div>
+</div>

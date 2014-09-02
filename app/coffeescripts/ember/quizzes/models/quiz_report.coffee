@@ -1,12 +1,11 @@
 define [
-  'ember'
-  'ember-data',
+  'ember-data'
   '../mixins/queriable_model'
-], (Em, DS, QueriableModel) ->
-  {Model, attr, belongsTo} = DS
+], (DS, QueriableModel) ->
+  {attr} = DS
 
-  Model.extend(QueriableModel, {
-    quiz: belongsTo 'quiz', async: false
+  DS.Model.extend(QueriableModel, {
+    quiz: DS.belongsTo 'quiz', async: false
 
     anonymous: attr()
     includesAllVersions: attr()

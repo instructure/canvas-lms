@@ -132,49 +132,53 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  describe "GET 'index' without fabulous quizzes enabled" do
+  describe "GET 'index' with quiz stats disabled" do
     before :each do
       a = Account.default
-      a.disable_fabulous_quizzes!
+      a.disable_feature! :quiz_stats
       a.save!
     end
 
     after :each do
       a = Account.default
-      a.enable_fabulous_quizzes!
+      a.enable_feature! :quiz_stats
       a.save!
     end
 
-    it "should not redirect" do
+    it "should render index page" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz(active = true)
       a = Account.default
-      a.enable_fabulous_quizzes?.should eql false
+      a.feature_enabled?(:quiz_stats).should eql false
       get 'index', :course_id => @course.id
       assert_response(:success)
+      response.should render_template('index')
     end
   end
 
-  describe "GET 'index' with fabulous quizzes enabled" do
+  describe "GET 'index' with quiz stats enabled" do
     before :each do
       a = Account.default
-      a.enable_fabulous_quizzes!
+      a.enable_feature! :draft_state
+      a.enable_feature! :quiz_stats
       a.save!
     end
 
     after :each do
       a = Account.default
-      a.disable_fabulous_quizzes!
+      a.disable_feature! :draft_state
+      a.disable_feature! :quiz_stats
       a.save!
     end
 
-    it "should render fabulous quizzes app" do
+    it "should render ember quiz index page" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz(active = true)
       a = Account.default
-      a.enable_fabulous_quizzes?.should eql true
+      a.feature_enabled?(:quiz_stats).should eql true
       get 'index', :course_id => @course.id
       assert_response(:success)
+      response.should render_template('fabulous_quizzes')
     end
   end
 
@@ -352,24 +356,57 @@ describe Quizzes::QuizzesController do
       assigns[:accessed_asset][:level].should == 'view'
       assigns[:access].view_score.should == 1
     end
+
+    it "locks results if there is a submission and one_time_results is on" do
+      Account.default.disable_feature! :quiz_stats
+      course_with_student_logged_in(active_all: true)
+
+      course_quiz(true)
+      @quiz.one_time_results = true
+      @quiz.save!
+      @quiz.publish!
+
+      submission = @quiz.generate_submission @student
+      submission.mark_completed
+      submission.save
+
+      get 'show', course_id: @course.id, id: @quiz.id
+
+      response.should be_success
+      submission.reload.has_seen_results.should == true
+    end
   end
 
-  describe "GET 'show' with fabulous quizzes enabled" do
+  describe "GET 'show' with quiz stats enabled" do
     before :each do
       a = Account.default
       a.enable_feature! :draft_state
-      a.enable_fabulous_quizzes!
+      a.enable_feature! :quiz_stats
       a.save!
 
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
     end
 
-    it "should redirect to fabulous quizzes app" do
+    it "should redirect to ember quiz stats app" do
       a = Account.default
-      a.enable_fabulous_quizzes?.should eql true
+      a.feature_enabled?(:quiz_stats).should eql true
       get 'show', :course_id => @course.id, :id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_url(@quiz.id)
+    end
+
+    it "should redirect to ember quiz stats app with headless if given" do
+      a = Account.default
+      a.feature_enabled?(:quiz_stats).should eql true
+      get 'show', :course_id => @course.id, :id => @quiz.id, :headless => 1
+      assert_redirected_to ember_urls.course_quiz_url(@quiz.id, headless: 1)
+    end
+
+    it "should redirect to preview ember quiz stats app" do
+      a = Account.default
+      a.feature_enabled?(:quiz_stats).should eql true
+      get 'show', :course_id => @course.id, :id => @quiz.id, :preview => 1
+      assert_redirected_to ember_urls.course_quiz_preview_url(@quiz.id)
     end
   end
 
@@ -447,6 +484,22 @@ describe Quizzes::QuizzesController do
       assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
       assigns[:submitted_students].should == [@user1]
     end
+
+    it "should not include teacher previews" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      quiz = quiz_model(course: @course)
+      quiz.publish!
+
+      quiz_submission = quiz.generate_submission(@teacher, true)
+      quiz_submission.complete!
+
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => quiz.id
+
+      assigns[:submissions_from_users].should be_empty
+      assigns[:submissions_from_logged_out].should be_empty
+      assigns[:submitted_students].should be_empty
+    end
   end
 
   describe "GET 'moderate'" do
@@ -493,24 +546,45 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  describe "GET 'moderate' with fabulous quizzes enabled" do
+  describe "GET 'moderate' with quiz stats enabled" do
     before :each do
       a = Account.default
       a.enable_feature! :draft_state
-      a.enable_fabulous_quizzes!
+      a.enable_feature! :quiz_stats
       a.save!
 
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
     end
 
-    it "should redirect to fabulous quizzes app" do
+    it "should not redirect to ember moderate app" do
       a = Account.default
-      a.enable_fabulous_quizzes?.should eql true
+      a.feature_enabled?(:quiz_stats).should eql true
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_response :success
+    end
+  end
+
+  describe "GET 'moderate' with new quiz moderate enabled" do
+    before :each do
+      a = Account.default
+      a.enable_feature! :draft_state
+      a.enable_feature! :quiz_stats
+      a.enable_feature! :quiz_moderate
+      a.save!
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+    end
+
+    it "should redirect to ember moderate app" do
+      a = Account.default
+      a.feature_enabled?(:quiz_moderate).should eql true
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_moderate_url(@quiz.id)
     end
   end
+
 
   describe "POST 'take'" do
     it "should require authorization" do
@@ -1175,20 +1249,20 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  describe "GET 'statistics' with fabulous quizzes enabled" do
+  describe "GET 'statistics' with new quiz stats enabled" do
     before :each do
       a = Account.default
       a.enable_feature! :draft_state
-      a.enable_fabulous_quizzes!
+      a.enable_feature! :quiz_stats
       a.save!
 
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
     end
 
-    it "should redirect to fabulous quizzes app" do
+    it "should redirect to ember quiz stats app" do
       a = Account.default
-      a.enable_fabulous_quizzes?.should eql true
+      a.feature_enabled?(:quiz_stats).should eql true
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_statistics_url(@quiz.id)
     end
@@ -1291,6 +1365,35 @@ describe Quizzes::QuizzesController do
         "quizzes/submission_html"
       end
       response.should render_template(template)
+    end
+  end
+
+  describe "GET 'submission_html' (as a student)" do
+    before do
+      course_with_student_logged_in(active_all: true)
+      course_quiz(true)
+    end
+
+    it "locks results if there is a submission and one_time_results is on" do
+      @quiz.one_time_results = true
+      @quiz.save!
+      @quiz.publish!
+
+      submission = @quiz.generate_submission(@student)
+      submission.mark_completed
+      submission.save!
+
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+
+      template = if CANVAS_RAILS2
+        "quizzes/quizzes/submission_html.html.erb"
+      else
+        "quizzes/submission_html"
+      end
+
+      response.should render_template(template)
+      submission.reload.has_seen_results.should == true
     end
   end
 

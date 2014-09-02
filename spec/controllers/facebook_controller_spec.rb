@@ -31,7 +31,7 @@ describe FacebookController do
 
     def signed_request(data={})
       str = [data.to_json].pack('m').chomp.tr('+/', '-_')
-      sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha256'), Facebook::Connection.config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
+      sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha256'), Facebook::Connection.config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
       signed_request = [sig, str].join('.')
     end
 

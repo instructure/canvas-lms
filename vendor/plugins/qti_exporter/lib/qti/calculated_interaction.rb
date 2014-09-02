@@ -12,7 +12,9 @@ class CalculatedInteraction < AssessmentItemConverter
     imported_formula = @doc.at_css('calculated formula')
     @question[:imported_formula] = CGI.unescape(imported_formula.text) if imported_formula
     get_calculated_property('answer_tolerance')
-    @question[:answer_tolerance] = @question[:answer_tolerance].to_f if @question[:answer_tolerance]
+    if @question[:answer_tolerance] && !@question[:answer_tolerance].to_s.match(/[^\d\.]/)
+      @question[:answer_tolerance] = @question[:answer_tolerance].to_f
+    end
     get_calculated_property('unit_points_percent')
     @question[:unit_points_percent] = @question[:unit_points_percent].to_f if @question[:unit_points_percent]
     get_calculated_property('unit_value')

@@ -26,7 +26,7 @@ describe ApplicationHelper do
   alias_method :content_tag_without_nil_return, :content_tag
 
   context "folders_as_options" do
-    before(:each) do
+    before(:once) do
       course_model
       @f = Folder.create!(:name => 'f', :context => @course)
       @f_1 = Folder.create!(:name => 'f_1', :parent_folder => @f, :context => @course)
@@ -166,7 +166,7 @@ describe ApplicationHelper do
   end
 
   context "include_account_css" do
-    before do
+    before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
     end
@@ -234,7 +234,7 @@ describe ApplicationHelper do
     end
 
     context "sub-accounts" do
-      before do
+      before :once do
         @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
         @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/admin/css' })
         @site_admin.save!
@@ -337,7 +337,7 @@ describe ApplicationHelper do
   end
 
   describe "include_account_js" do
-    before do
+    before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
     end
@@ -473,7 +473,7 @@ describe ApplicationHelper do
   end
 
   context "dashboard_url" do
-    before :each do
+    before :once do
       @domain_root_account = Account.default
     end
 

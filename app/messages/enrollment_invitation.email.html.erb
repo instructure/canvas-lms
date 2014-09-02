@@ -1,9 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>?invitation=<%= asset.uuid %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "Course Invitation" %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t(:link, "Click here to view the course page") %>
+  </a>
+<% end %>
+
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 
 <p>
@@ -41,7 +49,5 @@
       </tr>
     <% end %>
 </table>
-
-<p><a href="<%= content(:link) %>"><%= t(:link, "Click here to view the course page") %></a></p>
 
 

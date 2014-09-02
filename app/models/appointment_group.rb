@@ -227,19 +227,19 @@ class AppointmentGroup < ActiveRecord::Base
         )
         COND
   }
-  scope :current, lambda { where("end_at>=?", Time.zone.now.midnight) }
-  scope :current_or_undated, lambda { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
+  scope :current, -> { where("end_at>=?", Time.zone.now.midnight) }
+  scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
   scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
-    given { |user, session|
+    given { |user|
       active? && participant_for(user)
     }
     can :reserve and can :read
 
-    given { |user, session|
+    given { |user|
       next false if deleted?
-      next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
+      next false unless active_contexts.all? { |c| c.grants_right? user, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_sections = sub_context_ids & contexts.map { |c|
@@ -252,8 +252,8 @@ class AppointmentGroup < ActiveRecord::Base
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete
 
-    given { |user, session|
-      participant_visibility == 'protected' && grants_right?(user, session, :reserve)
+    given { |user|
+      participant_visibility == 'protected' && grants_right?(user, :reserve)
     }
     can :read_appointment_participants
   end

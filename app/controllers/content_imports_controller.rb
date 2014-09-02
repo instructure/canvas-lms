@@ -125,7 +125,7 @@ class ContentImportsController < ApplicationController
       end
 
       # make sure the user can copy from the source course
-      return render_unauthorized_action unless @source_course.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+      return render_unauthorized_action unless @source_course.grants_all_rights?(@current_user, :read, :read_as_admin)
       cm = ContentMigration.create!(:context => @context,
                                     :user => @current_user,
                                     :source_course => @source_course,

@@ -24,7 +24,7 @@ define [
         {id: '2', name: "bar" }
         {id: '3', name: "baz" }
       ]
-      @dueDateList = new DueDateList @overrides, @sections
+      @dueDateList = new DueDateList @overrides, @sections, @assignment
       @dueDateListView = new DueDateListView model: @dueDateList
       @stubReRenderSections = ( stubAvailableSections = true )->
         @dueDateListView.dueDateViews.forEach ( dueDateView ) ->
@@ -33,7 +33,7 @@ define [
     teardown: -> @clock.restore()
 
   test "creates child DueDateViews for each override", ->
-    strictEqual @dueDateListView.dueDateViews.length, 2
+    strictEqual @dueDateListView.dueDateViews.length, 3 # 2 overrides + 1 default
 
   test """
     when a child duedate view emits model change event for course_section_id,
@@ -67,7 +67,7 @@ define [
     @stubReRenderSections()
     override = @overrides.get 2
     @overrides.on 'add', ( override ) =>
-      strictEqual @dueDateListView.dueDateViews.length, 3
+      strictEqual @dueDateListView.dueDateViews.length, 4 # 3 overrides + 1 default
       @dueDateListView.dueDateViews.pop()
       @dueDateListView.dueDateViews.forEach ( dueDateView ) ->
         strictEqual dueDateView.reRenderSections.called, true

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,18 +23,24 @@ module Canvas::AccountReports
 
   REPORTS = {}
 
-  # account id is ignored; use PluginSetting to enable a subset of reports
-  def self.add_account_reports(account_id, module_name, reports)
-    reports.each do |report_type, details|
-      details = {:title => details} if details.is_a? String
-      details[:module] ||= module_name
-      details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
-      REPORTS[report_type] = details
+  class Report < Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc)
+    def title
+      title = super
+      title = title.call if title.respond_to?(:call)
+      title
     end
   end
 
-  # again, id is ignored; use PluginSetting to enable a subset of reports
-  def self.for_account(id)
+  def self.configure_account_report(module_name, reports)
+    reports.each do |report_type, details|
+      details[:module] ||= module_name
+      details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
+      report = Report.new(details[:title], details[:description_partial], details[:parameters_partial], details[:parameters], details[:module], details[:proc])
+      REPORTS[report_type] = report
+    end
+  end
+
+  def self.available_reports
     settings = Canvas::Plugin.find(:account_reports).settings
     return REPORTS.dup unless settings
     enabled_reports = settings.select { |report, enabled| enabled }.map(&:first)
@@ -53,22 +59,22 @@ module Canvas::AccountReports
     end
   end
 
-  def self.generate_file_name(account_report, ext)
-    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.#{ext}"
+  def self.generate_file_name(account_report)
+    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}"
   end
 
   def self.generate_file(account_report, ext = 'csv')
-    temp = Tempfile.open(generate_file_name(account_report, ext))
+    temp = Tempfile.open([generate_file_name(account_report), ".#{ext}"])
     filepath = temp.path
     temp.close!
     filepath
   end
 
-  def self.report_attachment(account_report, csv=mil)
+  def self.report_attachment(account_report, csv=nil)
     attachment = nil
     if csv.is_a? Hash
-      filename = generate_file_name(account_report, "zip")
-      temp = Tempfile.open(filename)
+      filename = generate_file_name(account_report)
+      temp = Tempfile.open([filename, ".zip"])
       filepath = temp.path
       temp.close!
 
@@ -94,8 +100,8 @@ module Canvas::AccountReports
           filepath = csv
           filetype = 'text/rtf'
         else
-          filename = generate_file_name(account_report, "csv")
-          f = Tempfile.open(filename)
+          filename = generate_file_name(account_report)
+          f = Tempfile.open([filename, ".csv"])
           f << csv
           f.close
           filepath = f.path

@@ -45,7 +45,7 @@ describe "LTI integration tests" do
     end
   }
 
-  let(:canvas_user) { user(name: 'Shorty McLongishname') }
+  let_once(:canvas_user) { user(name: 'Shorty McLongishname') }
 
   let(:canvas_course) {
     course(active_course: true, course_name: 'my course').tap do |course|

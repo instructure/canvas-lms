@@ -21,8 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentExport do
 
   context "export_object?" do
-    before do
-      @ce = ContentExport.new(course: Account.default.courses.create!)
+    before :once do
+      course = Account.default.courses.create!
+      @ce = course.content_exports.create!
     end
 
     it "should return true for everything if there are no copy options" do
@@ -61,8 +62,9 @@ describe ContentExport do
   end
 
   context "add_item_to_export" do
-    before do
-      @ce = ContentExport.new(course: Account.default.courses.create!)
+    before :once do
+      course = Account.default.courses.create!
+      @ce = course.content_exports.create!
     end
 
     it "should not add nil" do
@@ -96,9 +98,9 @@ describe ContentExport do
   end
 
   context "notifications" do
-    before(:each) do
+    before :once do
       course_with_teacher(:active_all => true)
-      @ce = ContentExport.create! { |ce| ce.user = @user; ce.course = @course }
+      @ce = @course.content_exports.create! { |ce| ce.user = @user }
 
       Notification.create!(:name => 'Content Export Finished', :category => 'Migration')
       Notification.create!(:name => 'Content Export Failed', :category => 'Migration')

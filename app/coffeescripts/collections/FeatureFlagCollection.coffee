@@ -7,3 +7,7 @@ define [
   class FeatureFlagCollection extends Backbone.Collection
 
     model: FeatureFlag
+
+    fetch: (options = {}) ->
+      options.data = _.extend per_page: 20, options.data || {}
+      super options

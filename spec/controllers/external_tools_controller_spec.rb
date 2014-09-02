@@ -54,7 +54,7 @@ describe ExternalToolsController do
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings].should_not be_nil
+      assigns[:lti_launch].params.should_not be_nil
     end
 
     it "should find tools matching by domain" do
@@ -63,7 +63,7 @@ describe ExternalToolsController do
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings].should_not be_nil
+      assigns[:lti_launch].params.should_not be_nil
     end
 
     it "should redirect if no matching tools are found" do

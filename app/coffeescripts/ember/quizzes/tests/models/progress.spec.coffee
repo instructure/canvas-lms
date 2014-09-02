@@ -3,6 +3,7 @@ define [
   'ember'
   'underscore'
   '../start_app'
+  '../environment_setup'
 ], (ajax, Ember, _, startApp) ->
 
   {run} = Ember
@@ -36,7 +37,7 @@ define [
         # not in the spec...
         adapter = container.lookup 'adapter:progress'
         adapter.ajax = (url, method) ->
-          ajax({ url: url, type: method })
+          ajax.request({ url: url, type: method })
     teardown: ->
       clearTimeout timeout
       run App, 'destroy'
@@ -56,7 +57,6 @@ define [
     ajax.defineFixture '/api/v1/progress/1',
       response: progressFixture(workflow_state: 'completed'),
       jqXHR: {}
-      testStatus: 200
       textStatus: 'success'
 
     run ->
@@ -70,7 +70,6 @@ define [
     ajax.defineFixture '/api/v1/progress/1',
       response: progressFixture(workflow_state: 'failed'),
       jqXHR: {}
-      testStatus: 200
       textStatus: 'success'
 
     run ->

@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountNotification do
 
-  before do
-    account_notification 
+  before :once do
+    account_notification
     user
   end
 

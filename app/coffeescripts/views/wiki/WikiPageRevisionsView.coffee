@@ -23,6 +23,8 @@ define [
         'aside': '$aside'
         '.revisions-list': '$revisionsList'
 
+    @optionProperty 'pages_path'
+
     initialize: (options) ->
       super
       @selectedRevision = null
@@ -65,6 +67,7 @@ define [
         @setSelectedModelAndView(model, view)
       selectModel() unless @selectedModel
 
+      view.pages_path = @pages_path
       view.$el.on 'click', selectModel
 
     setSelectedModelAndView: (model, view) ->

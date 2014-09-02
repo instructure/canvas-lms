@@ -103,12 +103,10 @@ describe "profile communication settings" do
   it "should load the initial state of a user-pref checkbox" do
     # set the user's initial user preference and verify checked or unchecked
     @user.preferences[:send_scores_in_emails] = false
-    @user.preferences[:no_submission_comments_inbox] = true
     @user.save!
     get "/profile/communication"
     wait_for_ajaximations
     is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
-    is_checked('.user-pref-check[name=no_submission_comments_inbox]').should be_true
   end
 
   it "should save a user-pref checkbox change" do

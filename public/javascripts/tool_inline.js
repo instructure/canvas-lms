@@ -77,7 +77,8 @@ switch($toolForm.data('tool-launch-type')){
 //Google analytics tracking code
 var toolName = $toolForm.data('tool-id') || "unknown";
 var toolPath = $toolForm.data('tool-path');
-$.trackEvent('tool_launch', toolName, toolPath);
+var messageType = $toolForm.data('message-type') || 'tool_launch';
+$.trackEvent(messageType, toolName, toolPath);
 
 //Iframe resize handler
 $(document).ready(function() {

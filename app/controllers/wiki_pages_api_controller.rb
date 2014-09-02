@@ -569,7 +569,10 @@ class WikiPagesApiController < ApplicationController
 
     hide_from_students_provided = page_params.has_key?(:hide_from_students)
     if page_params.has_key?(:published)
-      workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
+      published_value = page_params.delete(:published)
+      if published_value != ''
+        workflow_state = value_to_boolean(published_value) ? 'active' : 'unpublished'
+      end
     elsif hide_from_students_provided
       workflow_state = value_to_boolean(page_params.delete(:hide_from_students)) ? 'unpublished' : 'active'
     end

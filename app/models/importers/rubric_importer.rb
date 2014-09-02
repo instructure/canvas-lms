@@ -60,7 +60,7 @@ module Importers
           end
         end
 
-        migration.add_imported_item(item) if migration && item.new_record?
+        migration.add_imported_item(item) if migration
         item.save!
       end
 

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ErrorsController do
   before do
     user = User.create!
-    Account.site_admin.add_user(user)
+    Account.site_admin.account_users.create!(user: user)
     user_session(user)
   end
 

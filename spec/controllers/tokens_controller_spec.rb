@@ -40,7 +40,7 @@ describe TokensController do
     it "should not allow creating an access token while masquerading" do
       user(:active_user => true)
       user_session(@user)
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
 
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011"}
@@ -81,7 +81,7 @@ describe TokensController do
       user_session(@user)
       token = @user.access_tokens.create!
       token.user_id.should == @user.id
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
 
       delete 'destroy', :id => token.id
@@ -179,7 +179,7 @@ describe TokensController do
       token.save!
       token.user_id.should == @user.id
       token.protected_token?.should == false
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
       assert_status(401)

@@ -32,25 +32,42 @@ describe Polling::PollSessionsController, type: :request do
       end
     end
 
-    def get_index(raw = false, data = {})
+    def get_index(raw = false, data = {}, header = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
                   { controller: 'polling/poll_sessions', action: 'index', format: 'json',
                     poll_id: @poll.id.to_s
-                  }, data)
+                  }, data, header)
     end
 
     it "returns all existing poll sessions" do
       json = get_index
       poll_sessions_json = json['poll_sessions']
-      session_ids = @poll.poll_sessions.map(&:id)
+      session_ids = @poll.poll_sessions.pluck(:id)
       poll_sessions_json.size.should == 3
 
       poll_sessions_json.each_with_index do |session, i|
         session_ids.should include(session['id'].to_i)
         session['is_published'].should be_false
       end
+    end
+
+    it "paginates to the jsonapi standard if requested" do
+      json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
+      poll_sessions_json = json['poll_sessions']
+      session_ids = @poll.poll_sessions.pluck(:id)
+
+      poll_sessions_json.size.should == 3
+
+      poll_sessions_json.each_with_index do |session, i|
+        session_ids.should include(session['id'].to_i)
+        session['is_published'].should be_false
+      end
+
+      json.should have_key('meta')
+      json['meta'].should have_key('pagination')
+      json['meta']['primaryCollection'].should == 'poll_sessions'
     end
   end
 
@@ -168,12 +185,27 @@ describe Polling::PollSessionsController, type: :request do
         2.times { create_submission(choice1) }
         1.times { create_submission(choice2) }
 
-        student = student_in_course(active_user:true).user
-        @user = student
+        @user = student_in_course(active_user:true).user
 
         json = get_show['poll_sessions'].first
 
-        json.should_not have_key('poll_submissions')
+        json.should have_key('poll_submissions')
+        json['poll_submissions'].size.should be_zero
+      end
+
+      it "does embed the student's own submission" do
+        choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        @user = student_in_course(active_user:true).user
+
+        @poll_session.poll_submissions.create!(
+          poll: @poll,
+          user: @user,
+          poll_choice: choice
+        )
+
+        json = get_show['poll_sessions'].first
+        json.should have_key('poll_submissions')
+        json['poll_submissions'].size.should be(1)
       end
 
       context "when has_public_results is false" do
@@ -437,11 +469,11 @@ describe Polling::PollSessionsController, type: :request do
       @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
     end
 
-    def get_opened
+    def get_opened(headers = {})
       api_call(:get,
                "/api/v1/poll_sessions/opened",
                { controller: 'polling/poll_sessions', action: 'opened', format: 'json' },
-               {}, {}, {})
+               {}, headers)
     end
 
     it "returns all poll sessions available to the current user that are published" do
@@ -475,6 +507,27 @@ describe Polling::PollSessionsController, type: :request do
       session_ids.should include(@published.id)
       session_ids.should_not include(@wrong_course_section.id)
     end
+
+    it "paginates to the jsonapi standard if requested" do
+      @published = @poll1.poll_sessions.create!(course: @course1)
+      @published.publish!
+      @unenrolled = @poll2.poll_sessions.create!(course: @course2)
+      @unenrolled.publish!
+      @not_published = @poll1.poll_sessions.create!(course: @course1)
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_opened('Accept' => 'application/vnd.api+json')
+      sessions = json['poll_sessions']
+      session_ids = sessions.map { |session| session["id"].to_i }
+
+      session_ids.should include(@published.id)
+      session_ids.should_not include(@unenrolled.id)
+      session_ids.should_not include(@not_published.id)
+
+      json.should have_key('meta')
+      json['meta'].should have_key('pagination')
+      json['meta']['primaryCollection'].should == 'poll_sessions'
+    end
   end
 
   describe 'GET closed' do
@@ -487,11 +540,11 @@ describe Polling::PollSessionsController, type: :request do
       @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
     end
 
-    def get_closed
+    def get_closed(headers = {})
       api_call(:get,
                "/api/v1/poll_sessions/closed",
                { controller: 'polling/poll_sessions', action: 'closed', format: 'json' },
-               {}, {}, {})
+               {}, headers)
     end
 
     it "returns all poll sessions available to the current user that are closed" do
@@ -526,6 +579,28 @@ describe Polling::PollSessionsController, type: :request do
       session_ids.should include(@not_published.id)
       session_ids.should_not include(@wrong_course_section.id)
     end
-  end
 
+    it "paginates to the jsonapi standard if requested" do
+      @published = @poll1.poll_sessions.create!(course: @course1)
+      @published.publish!
+      @unenrolled = @poll2.poll_sessions.create!(course: @course2)
+      @unenrolled.close!
+      @not_published = @poll1.poll_sessions.create!(course: @course1)
+      @not_published.close!
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_closed('Accept' => 'application/vnd.api+json')
+
+      sessions = json['poll_sessions']
+      session_ids = sessions.map { |session| session["id"].to_i }
+
+      session_ids.should include(@not_published.id)
+      session_ids.should_not include(@unenrolled.id)
+      session_ids.should_not include(@published.id)
+
+      json.should have_key('meta')
+      json['meta'].should have_key('pagination')
+      json['meta']['primaryCollection'].should == 'poll_sessions'
+    end
+  end
 end

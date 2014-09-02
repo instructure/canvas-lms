@@ -2,7 +2,7 @@
 result=0
 
 echo "################ multipart ################"
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 result+=$?
 

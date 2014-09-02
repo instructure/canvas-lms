@@ -26,7 +26,7 @@ module Importers
       item ||= ContextModule.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
       item ||= ContextModule.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
       item.name = hash[:title] || hash[:description]
       item.migration_id = hash[:migration_id]
       if hash[:workflow_state] == 'unpublished'
@@ -93,13 +93,13 @@ module Importers
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.find_by_id(hash[:id]) if hash[:id].present?
       existing_item ||= context_module.content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
-      existing_item ||= context_module.content_tags.new(:context => context)
+      existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
       if hash[:workflow_state] == 'unpublished'
         existing_item.workflow_state = 'unpublished'
       else
         existing_item.workflow_state = 'active'
       end
-      migration.add_imported_item(existing_item) if migration && existing_item.new_record?
+      migration.add_imported_item(existing_item) if migration
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
@@ -144,12 +144,14 @@ module Importers
         }, existing_item, :position => context_module.migration_position)
       elsif hash[:linked_resource_type] =~ /url/i
         # external url
-        if hash['url']
+        if url = hash[:url]
+          url = migration.process_domain_substitutions(url) if migration
+
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
             :type => 'external_url',
             :indent => hash[:indent].to_i,
-            :url => hash['url']
+            :url => url
           }, existing_item, :position => context_module.migration_position)
         end
       elsif hash[:linked_resource_type] =~ /contextexternaltool/i
@@ -170,6 +172,7 @@ module Importers
         end
 
         if external_tool_url
+          external_tool_url = migration.process_domain_substitutions(external_tool_url) if migration
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
             :type => 'context_external_tool',
@@ -223,7 +226,7 @@ module Importers
     def self.add_custom_fields_to_url(original_url, custom_fields)
       return nil unless uri = URI.parse(original_url)
 
-      custom_fields_query = custom_fields.map{|k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
+      custom_fields_query = custom_fields.map{|k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
       uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
       new_url = uri.to_s
 

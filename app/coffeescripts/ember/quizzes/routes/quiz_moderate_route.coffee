@@ -2,7 +2,9 @@ define [
   'ember'
   '../mixins/redirect'
   '../shared/environment'
-], (Em, Redirect, env) ->
+  'i18n!quiz_moderate_route',
+  '../shared/title_builder'
+], (Em, Redirect, env, I18n, titleBuilder) ->
 
   ModerateRoute = Em.Route.extend Redirect,
 
@@ -11,6 +13,11 @@ define [
 
     model: ->
       @combinedUsersSubmissionsPromise()
+
+    afterModel: ->
+      title = @modelFor('quiz').get('title')
+      desc =  I18n.t('moderate', "Moderate")
+      titleBuilder([title, desc])
 
     combinedUsersSubmissionsPromise: ->
       quiz = @modelFor('quiz')

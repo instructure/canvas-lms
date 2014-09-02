@@ -25,7 +25,7 @@ class GradebookUploadsController < ApplicationController
       @gradebook_upload = @context.build_gradebook_upload
     end
   end
-  
+
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:gradebook_upload] &&
@@ -43,7 +43,7 @@ class GradebookUploadsController < ApplicationController
         respond_to do |format|
           if errored_csv
             flash[:error] = t('errors.invalid_file', "Invalid csv file, grades could not be updated")
-            format.html { redirect_to gradebook_url_for(@current_user, @context) }
+            format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
           else
             format.html { render :action => "show" }
           end
@@ -51,7 +51,7 @@ class GradebookUploadsController < ApplicationController
       else
         respond_to do |format|
           flash[:error] = t('errors.upload_failed', 'File could not be uploaded.')
-          format.html { redirect_to gradebook_url_for(@current_user, @context) }
+          format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
         end
       end
     end
@@ -59,7 +59,7 @@ class GradebookUploadsController < ApplicationController
 
   def update
     @data_to_load = ActiveSupport::JSON.decode(params["json_data_to_submit"])
-    if authorized_action(@context, @current_user, :manage_grades) 
+    if authorized_action(@context, @current_user, :manage_grades)
       if @data_to_load
         @students = @data_to_load["students"]
         @assignments = @data_to_load["assignments"]
@@ -94,7 +94,7 @@ class GradebookUploadsController < ApplicationController
             .each do |s|
           all_submissions[[s.assignment_id, s.user_id]] = s
         end
-      
+
         submissions_updated_count = 0
         @submissions.each do |sub|
           next unless @assignments
@@ -119,9 +119,9 @@ class GradebookUploadsController < ApplicationController
         flash[:notice] = t('notices.updated', {:one => "Successfully updated 1 submission.", :other => "Successfully updated %{count} submissions."}, :count => submissions_updated_count)
       end
       respond_to do |format|
-        format.html { redirect_to gradebook_url_for(@current_user, @context) }
+        format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
       end
     end
   end
-  
+
 end

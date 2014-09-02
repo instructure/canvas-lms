@@ -43,11 +43,11 @@ class Eportfolio < ActiveRecord::Base
     self.save
   end
   
-  scope :active, where("eportfolios.workflow_state<>'deleted'")
+  scope :active, -> { where("eportfolios.workflow_state<>'deleted'") }
 
   before_create :assign_uuid
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 

@@ -25,8 +25,8 @@ describe SisImportsApiController, type: :request do
     @account = Account.default
     @account.allow_sis_import = true
     @account.save
-    @account.add_user(@user, 'AccountAdmin')
-    Account.site_admin.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
+    Account.site_admin.account_users.create!(user: @user)
 
     @user_count = User.count
     @batch_count = SisBatch.count
@@ -418,6 +418,18 @@ describe SisImportsApiController, type: :request do
     end
   end
 
+  it "should allow raw post without content-type" do
+    # In the current API docs, we specify that you need to send a content-type to make raw
+    # post work. However, long ago we added code to make it work even without the header,
+    # so we are going to maintain that behavior.
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", "\xffab=\xffcd", { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+
+    batch = SisBatch.last
+    batch.attachment.filename.should == "sis_import.zip"
+    batch.attachment.content_type.should == "application/x-www-form-urlencoded"
+    batch.attachment.size.should == 7
+  end
+
   it "should allow raw post without charset" do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
@@ -462,7 +474,7 @@ describe SisImportsApiController, type: :request do
     @account = Account.create(name: 'sis account')
     @account.allow_sis_import = true
     @account.save!
-    @account.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
     batch = post_csv(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"

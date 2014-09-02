@@ -3,7 +3,7 @@ group :i18n_tools do
 
 end
 
-group :i18n_tools, :rake_tasks do
+group :i18n_tools, :development do
   gem 'i18n_tasks', :path => 'gems/i18n_tasks'
   gem 'handlebars_tasks', :path => 'gems/handlebars_tasks'
 end

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssignmentOverrideStudent do
   describe "validations" do
-    before :each do
+    before :once do
       student_in_course
       @override = assignment_override_model(:course => @course)
       @override_student = @override.assignment_override_students.build

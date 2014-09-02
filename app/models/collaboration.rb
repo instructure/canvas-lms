@@ -24,6 +24,7 @@ class Collaboration < ActiveRecord::Base
   attr_readonly   :collaboration_type
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   belongs_to :user
   has_many :collaborators, :dependent => :destroy
   has_many :users, :through => :collaborators
@@ -63,7 +64,7 @@ class Collaboration < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session|
+    given { |user|
       !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||
@@ -75,19 +76,19 @@ class Collaboration < ActiveRecord::Base
     }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :create_collaborations) }
+    given { |user, session| self.context.grants_right?(user, session, :create_collaborations) }
     can :create
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
     can :read and can :update and can :delete
 
     given { |user, session|
       user && self.user_id == user.id &&
-        self.cached_context_grants_right?(user, session, :create_collaborations) }
+        self.context.grants_right?(user, session, :create_collaborations) }
     can :read and can :update and can :delete
   end
 
-  scope :active, where("collaborations.workflow_state<>'deleted'")
+  scope :active, -> { where("collaborations.workflow_state<>'deleted'") }
 
   scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
 
@@ -277,7 +278,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a UUID string.
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 

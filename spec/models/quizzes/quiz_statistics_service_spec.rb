@@ -20,8 +20,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizStatisticsService do
-  let(:course) { Course.new.tap { |course| course.id = 1 } }
-  let :quiz do
+  let_once (:course) { Course.new.tap { |course| course.id = 1 } }
+  let_once :quiz do
     Quizzes::Quiz.new.tap do |quiz|
       quiz.workflow_state = 'available'
       quiz.context = course
@@ -53,16 +53,20 @@ describe Quizzes::QuizStatisticsService do
       end
     end
 
+    after do
+      Quizzes::QuizStatistics.unstub(:large_quiz?)
+    end
+
     it 'should not generate for all versions of a large course' do
-      course.stubs(:large_roster?).returns true
+      Quizzes::QuizStatistics.stubs(:large_quiz?).returns true
 
       expect {
         subject.generate_aggregate_statistics(true)
-      }.to raise_error(RequestError, 'operation not available for large courses')
+      }.to raise_error(RequestError, 'operation not available for large quizzes')
     end
 
     it 'should generate for all quiz versions' do
-      course.stubs(:large_roster?).returns false
+      Quizzes::QuizStatistics.stubs(:large_quiz?).returns false
 
       quiz.expects(:current_statistics_for).with('student_analysis', {
         includes_all_versions: true
@@ -74,7 +78,7 @@ describe Quizzes::QuizStatisticsService do
     end
 
     it 'should generate for the latest quiz version' do
-      course.stubs(:large_roster?).returns false
+      Quizzes::QuizStatistics.stubs(:large_quiz?).returns false
 
       quiz.expects(:current_statistics_for).with('student_analysis', {
         includes_all_versions: false

@@ -19,21 +19,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'CrocodocDocument' do
-  before do
+  before :once do
     Setting.set 'crocodoc_counter', 0
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }
+  end
+
+  before :each do
     Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
   end
 
   context 'permissions_for_user' do
-    before do
+    before :once do
       teacher_in_course(:active_all => true)
       student_in_course
       @submitter = @student
       student_in_course
       @other_student = @student
       submission_model :course => @course, :user => @submitter
+    end
+
+    before :each do
       attachment = attachment_model(:context => @submitter)
       attachment.associate_with(@submission)
       attachment.save!

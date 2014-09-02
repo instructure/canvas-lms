@@ -61,16 +61,19 @@ module Canvas
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
-          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd'
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
+          'react' => 'bower/react/react',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
 
       def packages
         @packages ||= [
-          {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
+          {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax/dist/amd'},
           {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
           {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
           {'name' => 'ic-tabs', 'location' => 'bower/ic-tabs/dist/amd'},
+          {'name' => 'ic-lazy-list', 'location' => 'bower/ic-lazy-list/dist/amd'},
+          {'name' => 'ic-modal', 'location' => 'bower/ic-modal/dist/amd'},
           {'name' => 'ember-qunit', 'location' => 'bower/ember-qunit/dist/amd'},
         ].to_json
       end
@@ -122,6 +125,9 @@ module Canvas
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'
+            },
+            'bower/react/react': {
+              exports: 'React'
             }
           }
         JS

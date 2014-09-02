@@ -17,6 +17,8 @@ define [
     title: attr()
     quizType: attr()
     links: attr()
+    #at some point we may need this as a relationship
+    assignmentId: attr()
     htmlURL: attr()
     # editURL is temporary until we have a real ember route for it
     editURL: (->
@@ -40,6 +42,7 @@ define [
     published: attr()
     deleted: attr()
     speedGraderUrl: attr()
+    moderateUrl: attr()
     allowedAttempts: attr('number')
     unpublishable: attr()
     canNotUnpublish: equal 'unpublishable', false
@@ -71,42 +74,17 @@ define [
     ).property('scoringPolicy')
     tQuizType: (->
       switch @get('quizType')
-        when 'assignment' then I18n.t 'assignment', 'Assignment'
+        when 'assignment' then I18n.t 'graded_quiz', 'Graded Quiz'
         when 'survey' then I18n.t 'survey', 'Survey'
         when 'graded_survey' then I18n.t 'graded_survey', 'Graded Survey'
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
     ).property('quizType')
+    onlyVisibleToOverrides: attr()
+    daEnabled: ENV.FLAGS.differentiated_assignments
+    differentiatedAssignmentsApplies: Em.computed.and('daEnabled', 'onlyVisibleToOverrides')
 
-    # temporary until we ship the show page with quiz submission info in ember
-    quizSubmissionHtmlURL: attr()
-    quizSubmissionHTML: (->
-      promise = ajax(
-        url: @get 'quizSubmissionHtmlURL'
-        dataType: 'html'
-        contentType: 'text/html'
-        headers:
-          Accept: 'text/html'
-      ).then (html) =>
-        @set 'didLoadQuizSubmissionHTML', true
-        { html: html }
-      PromiseObject.create promise: promise
-    ).property('quizSubmissionHtmlURL')
-
-    # temporary until we ship the quiz submission versions in ember
+    quizSubmissionHtmlUrl: attr()
     quizSubmissionVersionsHtmlUrl: attr()
-    quizSubmissionVersionsHtml: (->
-      return unless @get 'quizSubmissionVersionsHtmlUrl'
-      promise = ajax(
-        url: @get 'quizSubmissionVersionsHtmlUrl'
-        dataType: 'html'
-        contentType: 'text/html'
-        headers:
-          Accept: 'text/html'
-      ).then (html) =>
-        @set 'didLoadQuizSubmissionVersionsHtml', true
-        { html: html }
-      PromiseObject.create promise: promise
-    ).property('quizSubmissionVersionsHtmlUrl')
 
     quizStatistics: hasMany 'quiz_statistics', async: true
     quizReports: hasMany 'quiz_report', async: true
@@ -122,7 +100,7 @@ define [
     allDates: (->
       dates = []
       overrides = @get('assignmentOverrides').toArray()
-      if overrides.length == 0 || overrides.length != @get 'sectionCount'
+      if (overrides.length == 0 || overrides.length != @get 'sectionCount') && !@get 'differentiatedAssignmentsApplies'
         title = if overrides.length > 0
           I18n.t('everyone_else', 'Everyone Else')
         else
@@ -136,8 +114,8 @@ define [
 
       Ember.A(dates.concat(overrides))
     ).property('lockAt', 'unlockAt', 'dueAt', 'sectionCount', 'assignmentOverrides.[]')
-    submittedStudents: hasMany 'user', polymporphic: true, async: true
-    unsubmittedStudents: hasMany 'user', polymorphic: true, async: true
+    submittedStudents: hasMany 'submitted_student', polymporphic: true, async: true
+    unsubmittedStudents: hasMany 'unsubmitted_student', polymorphic: true, async: true
     messageStudentsUrl: attr()
     quizExtensionsUrl: attr()
     quizSubmission: belongsTo 'quiz_submission'

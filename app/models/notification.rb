@@ -52,10 +52,7 @@ class Notification < ActiveRecord::Base
 
   attr_accessible  :name, :subject, :main_link, :delay_for, :category
 
-  EXPORTABLE_ATTRIBUTES = [:id, :workflow_state, :name, :subject, :category, :delay_for, :created_at, :updated_at, :main_link]
-  EXPORTABLE_ASSOCIATIONS = [:messages, :notification_policies]
-
-  scope :to_show_in_feed, where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED)
+  scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
 
   validates_uniqueness_of :name
 
@@ -183,9 +180,6 @@ class Notification < ActiveRecord::Base
   # Return a hash with information for a related user option if one exists.
   def related_user_setting(user)
     case self.category
-      when 'Submission Comment'
-        setting = {:name => :no_submission_comments_inbox, :value => user.preferences[:no_submission_comments_inbox],
-                   :label => t(:submission_new_as_read, 'Mark new submission comments as read.')}
       when 'Grading'
         setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
                    :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
@@ -441,7 +435,7 @@ Includes:
 * Un-muted assignment grade
 * Grade weight changed
 
-&nbsp;
+\u{200B}
 
 Check 'Include scores when alerting about grade changes' if you want to see your grades in the notifications.
 If your email is not an institution email this means sensitive content will be sent outside of the institution.
@@ -462,9 +456,6 @@ EOS
       mt(:submission_comment_description, <<-EOS)
 Assignment submission comment
 
-&nbsp;
-
-Check 'Mark new submission comments as read' if you don't want them to show up as 'new' in your Canvas Inbox
 EOS
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
@@ -542,6 +533,8 @@ EOS
     case category
     when 'All Submissions', 'Late Grading'
       user.teacher_enrollments.count > 0 || user.ta_enrollments.count > 0
+    when 'Added To Conversation', 'Conversation Message'
+      !user.disabled_inbox?
     else
       true
     end

@@ -1,9 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t('subject', 'Group Membership Accepted: %{group_name}', :group_name => asset.group.name) %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click to check out the group" %>
+  </a>
+<% end %>
+
 <p><%= t('group_request_accepted', 'Group Request Accepted: %{group_name}', :group_name => asset.group.name) %></p>
 
 <p>
@@ -13,5 +21,3 @@
 <%= t('course_group', "Your request to join the group %{group_name} for the course %{course_name} has been accepted.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
 <% end %>
 </p>
-
-<p><a href="<%= content :link %>"><%= t :link, "Click to check out the group" %></a></p>

@@ -37,7 +37,7 @@ module AssignmentOverrideApplicator
     # students get the last overridden date that applies to them, but teachers
     # should see the assignment's due_date if that is more lenient
     context = result_assignment_or_quiz.context
-    if context && result_assignment_or_quiz.grants_right?(user, nil, :delete)
+    if context && result_assignment_or_quiz.grants_right?(user, :delete)
 
       overridden_section_ids = result_assignment_or_quiz
         .applied_overrides.select { |o| o.set_type == "CourseSection" }
@@ -83,9 +83,11 @@ module AssignmentOverrideApplicator
       context = assignment_or_quiz.context
       overrides = []
 
-      if context.account_membership_allows(user, nil, :manage_courses) || context.user_has_been_admin?(user)
-        overrides = assignment_or_quiz.assignment_overrides.active.to_a
-        unless assignment_or_quiz.current_version?
+      if context.account_membership_allows(user, :manage_courses) || context.user_has_been_admin?(user)
+        overrides = assignment_or_quiz.assignment_overrides
+        if assignment_or_quiz.current_version?
+          overrides = overrides.active.to_a
+        else
           overrides = current_override_version(assignment_or_quiz, overrides)
         end
         return overrides

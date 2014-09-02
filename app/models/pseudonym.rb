@@ -167,7 +167,7 @@ class Pseudonym < ActiveRecord::Base
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
       # using the SIS, for example.
-      self.persistence_token = CanvasUuid::Uuid.generate('pseudo', 15)
+      self.persistence_token = CanvasSlug.generate('pseudo', 15)
       self.save
     end
     
@@ -381,7 +381,7 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, where(workflow_state: 'active')
+  scope :active, -> { where(workflow_state: 'active') }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 

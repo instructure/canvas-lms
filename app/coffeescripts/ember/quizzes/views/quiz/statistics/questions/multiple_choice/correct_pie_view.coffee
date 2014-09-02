@@ -1,6 +1,6 @@
-define [ 'ember', 'vendor/d3.v3' ], ({View}, d3) ->
+define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
   # This view plots a donut chart that shows the ratio of correct answers.
-  View.extend
+  Ember.View.extend
     # @config [Integer] [radius=80]
     #   Radius of the donut chart in pixels.
     radius: 80

@@ -36,7 +36,7 @@ class CommunicationChannel < ActiveRecord::Base
     :created_at, :updated_at, :build_pseudonym_on_confirm
   ]
 
-  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user, :notification_policies, :delayed_mesasge, :messages]
+  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user]
 
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
@@ -128,12 +128,11 @@ class CommunicationChannel < ActiveRecord::Base
     return if path.nil?
     return if retired?
     return unless user_id
-    conditions = ["LOWER(path)=LOWER(?) AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path, user_id, path_type]
+    scope = self.class.by_path(path).where(user_id: user_id, path_type: path_type, workflow_state: ['unconfirmed', 'active'])
     unless new_record?
-      conditions.first << " AND id<>?"
-      conditions << id
+      scope = scope.where("id<>?", id)
     end
-    if self.class.where(conditions).exists?
+    if scope.exists?
       self.errors.add(:path, :taken, :value => path)
     end
   end
@@ -207,9 +206,9 @@ class CommunicationChannel < ActiveRecord::Base
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= CanvasUuid::Uuid.generate(nil, 25)
+      self.confirmation_code ||= CanvasSlug.generate(nil, 25)
     else
-      self.confirmation_code ||= CanvasUuid::Uuid.generate
+      self.confirmation_code ||= CanvasSlug.generate
     end
     true
   end
@@ -225,19 +224,22 @@ class CommunicationChannel < ActiveRecord::Base
     end
   }
 
-  scope :by_path, lambda { |path|
+  def self.by_path_condition(path)
     if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      where(:path => path)
+      path
     else
-      where("LOWER(communication_channels.path)=LOWER(?)", path)
+      "LOWER(#{path})"
     end
+  end
+  scope :by_path, lambda { |path|
+    where("#{by_path_condition("communication_channels.path")}=#{by_path_condition("?")}", path)
   }
 
-  scope :email, where(:path_type => TYPE_EMAIL)
-  scope :sms, where(:path_type => TYPE_SMS)
+  scope :email, -> { where(:path_type => TYPE_EMAIL) }
+  scope :sms, -> { where(:path_type => TYPE_SMS) }
 
-  scope :active, where(:workflow_state => 'active')
-  scope :unretired, where("communication_channels.workflow_state<>'retired'")
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :unretired, -> { where("communication_channels.workflow_state<>'retired'") }
 
   scope :for_notification_frequency, lambda { |notification, frequency|
     includes(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
@@ -260,10 +262,10 @@ class CommunicationChannel < ActiveRecord::Base
       all
   end
 
-  scope :include_policies, includes(:notification_policies)
+  scope :include_policies, -> { includes(:notification_policies) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
-  scope :of_type, lambda {|type| where(:path_type => type) }
+  scope :of_type, lambda { |type| where(:path_type => type) }
   
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true

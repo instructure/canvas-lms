@@ -59,7 +59,8 @@
 #         "sis_import_id": {
 #           "description": "The id of the SIS import.  This field is only included if the user came from a SIS import and has permissions to manage SIS information.",
 #           "example": "18",
-#           "type": "int64"
+#           "type": "integer",
+#           "format": "int64"
 #         },
 #         "sis_login_id": {
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
@@ -147,7 +148,7 @@ class UsersController < ApplicationController
         :service => 'google_docs',
         :token => request_token.token,
         :secret => request_token.secret,
-        :user_secret => CanvasUuid::Uuid.generate(nil, 16),
+        :user_secret => CanvasSlug.generate(nil, 16),
         :return_url => return_to_url,
         :user => @real_current_user || @current_user,
         :original_host_with_port => request.host_with_port
@@ -185,7 +186,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
-        :secret => CanvasUuid::Uuid.generate("fb", 10),
+        :secret => CanvasSlug.generate("fb", 10),
         :return_url => return_to_url,
         :user => @current_user,
         :original_host_with_port => request.host_with_port
@@ -1049,15 +1050,15 @@ class UsersController < ApplicationController
       @user.validation_root_account = @domain_root_account
     end
 
-    @observee = nil
+    @invalid_observee_creds = nil
     if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
-      if observee = Pseudonym.authenticate(params[:observee] || {},
+      if observee_pseudonym = Pseudonym.authenticate(params[:observee] || {},
           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-        @user.observed_users << observee.user unless @user.observed_users.include?(observee.user)
+        @observee = observee_pseudonym.user
       else
-        @observee = Pseudonym.new
-        @observee.errors.add('unique_id', 'bad_credentials')
+        @invalid_observee_creds = Pseudonym.new
+        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
       end
     end
 
@@ -1085,7 +1086,7 @@ class UsersController < ApplicationController
     @cc.user = @user
     @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
-    if @user.valid? && @pseudonym.valid? && @observee.nil?
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still
@@ -1097,6 +1098,10 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
+      if @observee && !@user.user_observees.where(user_id: @observee).exists?
+        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
+      end
+
       message_sent = false
       if notify == :self_registration
         unless @user.pending_approval? || @user.registered?
@@ -1111,7 +1116,7 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if @cc.has_merge_candidates?
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
         render(:json => user_json(@user, @current_user, session, %w{locale}))
       else
@@ -1122,7 +1127,7 @@ class UsersController < ApplicationController
         :errors => {
           :user => @user.errors.as_json[:errors],
           :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          :observee => @observee ? @observee.errors.as_json[:errors] : {}
+          :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
         }
       }
       render :json => errors, :status => :bad_request
@@ -1225,13 +1230,13 @@ class UsersController < ApplicationController
     end
 
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
-    if @user.grants_right?(@current_user, nil, :manage_user_details)
+    if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
 
-    if @user.grants_right?(@current_user, nil, :update_avatar)
+    if @user.grants_right?(@current_user, :update_avatar)
       avatar = params[:user].delete(:avatar)
 
       # delete any avatar_image passed, because we only allow updating avatars
@@ -1254,8 +1259,8 @@ class UsersController < ApplicationController
     if user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
-        @user.grants_right?(@current_user, nil, :update_avatar) &&
-        @user.grants_right?(@current_user, nil, :manage_user_details)
+        @user.grants_right?(@current_user, :update_avatar) &&
+        @user.grants_right?(@current_user, :manage_user_details)
 
       if admin_avatar_update
         old_avatar_state = @user.avatar_state

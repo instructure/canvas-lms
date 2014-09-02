@@ -22,6 +22,7 @@ class InboxItem < ActiveRecord::Base
 
   # Associations
   belongs_to :asset,  :polymorphic => true
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['DiscussionEntry', 'SubmissionComment', 'ContextMessage']
   belongs_to :author, :class_name => 'User', :foreign_key => :sender_id
   belongs_to :user
 
@@ -43,8 +44,8 @@ class InboxItem < ActiveRecord::Base
   attr_accessible :user_id, :asset, :subject, :body_teaser, :sender_id
 
   # Named scopes
-  scope :active, where("workflow_state NOT IN ('deleted', 'retired', 'retired_unread')")
-  scope :unread, where(:workflow_state => 'unread')
+  scope :active, -> { where("workflow_state NOT IN ('deleted', 'retired', 'retired_unread')") }
+  scope :unread, -> { where(:workflow_state => 'unread') }
 
   # State machine
   workflow do

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe BookmarkService do
-  before do
+  before :once do
     bookmark_service_model
   end
   

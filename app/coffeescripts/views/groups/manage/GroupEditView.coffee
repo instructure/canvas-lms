@@ -9,16 +9,29 @@ define [
   class GroupEditView extends DialogFormView
 
     @optionProperty 'groupCategory'
+    @optionProperty 'student'
 
     defaults:
       width: 550
       title: I18n.t "edit_group", "Edit Group"
+
+    els:
+      '[name=max_membership]': '$maxMembership'
 
     template: template
 
     wrapperTemplate: wrapper
 
     className: 'dialogFormView group-edit-dialog form-horizontal form-dialog'
+
+    attach: ->
+      if @model
+        @model.on('change', @refreshIfNameOnlyMode, this)
+
+    refreshIfNameOnlyMode: ->
+      if @options.nameOnly
+        window.location.reload()
+
 
     events: _.extend {},
       DialogFormView::events
@@ -28,7 +41,7 @@ define [
       too_long: I18n.t "name_too_long", "Name is too long"
 
     validateFormData: (data, errors) ->
-      if !$("[name=max_membership]")[0].validity.valid
+      if @$maxMembership.length > 0 and !@$maxMembership[0].validity.valid
         {"max_membership": [{message: I18n.t('max_membership_number', 'Max membership must be a number') }]}
 
     openAgain: ->
@@ -39,5 +52,8 @@ define [
       @$('input:first').focus()
 
     toJSON: ->
-      _.extend super,
+      json = _.extend super,
         role: @groupCategory.get('role')
+        nameOnly: @options.nameOnly
+      json
+

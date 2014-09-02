@@ -1,6 +1,7 @@
-define [ 'ember', 'underscore' ], (Ember, _) ->
-  Ember.Controller.extend
-    discriminationIndex: Ember.computed.alias('model.discriminationIndex')
+define [
+  'ember'
+], (Ember) ->
+  Ember.ObjectController.extend
     discriminationIndexClass: (->
       if @get('discriminationIndex') > 0.25 then 'positive' else 'negative'
     ).property('discriminationIndex')
@@ -33,23 +34,23 @@ define [ 'ember', 'underscore' ], (Ember, _) ->
     chartData: (->
       stats = {
         top:
-          correct: @get('model.correctTopStudentCount')
-          total: @get('model.topStudentCount')
+          correct: @get('correctTopStudentCount')
+          total: @get('topStudentCount')
         mid:
-          correct: @get('model.correctMiddleStudentCount')
-          total: @get('model.middleStudentCount')
+          correct: @get('correctMiddleStudentCount')
+          total: @get('middleStudentCount')
         bot:
-          correct: @get('model.correctBottomStudentCount')
-          total: @get('model.bottomStudentCount')
+          correct: @get('correctBottomStudentCount')
+          total: @get('bottomStudentCount')
       }
 
       {
         correct: [ stats.top.correct, stats.mid.correct, stats.bot.correct ],
         total: [ stats.top.total, stats.mid.total, stats.bot.total ],
         ratio: [
-          (1.0 * stats.top.correct / stats.top.total) || 0,
-          (1.0 * stats.mid.correct / stats.mid.total) || 0,
-          (1.0 * stats.bot.correct / stats.bot.total) || 0
+          (parseFloat(stats.top.correct) / stats.top.total) || 0,
+          (parseFloat(stats.mid.correct) / stats.mid.total) || 0,
+          (parseFloat(stats.bot.correct) / stats.bot.total) || 0
         ]
       }
-    ).property('model.{top,middle,bottom}StudentCount')
+    ).property('{top,middle,bottom}StudentCount')

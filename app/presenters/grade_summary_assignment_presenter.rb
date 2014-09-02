@@ -132,7 +132,7 @@ class GradeSummaryAssignmentPresenter
   def rubric_assessments
     @visible_rubric_assessments ||= begin
       if submission && !assignment.muted?
-        assessments = submission.rubric_assessments.select { |a| a.grants_rights?(@current_user, :read)[:read] }
+        assessments = submission.rubric_assessments.select { |a| a.grants_right?(@current_user, :read) }
         assessments.sort_by { |a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, a.assessor_name] }
       else
         []
@@ -142,6 +142,10 @@ class GradeSummaryAssignmentPresenter
 
   def group
     @group ||= assignment && assignment.assignment_group
+  end
+
+  def viewing_fake_student?
+    @summary.student_enrollment.fake_student?
   end
 end
 
@@ -187,6 +191,12 @@ class GradeSummaryGraph
 
   def score_left
     pixels_for(@score) - 5
+  end
+
+  def title
+    I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
+      mean: @mean.to_s, high: @high.to_s, low: @low.to_s
+    })
   end
 
   private

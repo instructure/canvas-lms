@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ConversationMessageParticipant do
-  before do
+  before :once do
     teacher_in_course
     student_in_course
     @student1 = @student
@@ -28,7 +28,7 @@ describe ConversationMessageParticipant do
   end
 
   describe "scopes" do
-    before do
+    before :once do
       @conv = conversation(@teacher, @student1, @student2)
       @msg = @conv.messages.first
     end

@@ -9,6 +9,12 @@
         :override => asset.title) %>
 <% end %>
       
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to view the assignment" %>
+  </a>
+<% end %>
+
 <p><%= t('assignment_due_date_changed_sentence', 'The due date for the assignment, %{assignment_name}, for the course, %{course_name} (%{override}), has changed to:',
          :assignment_name => asset.assignment.title,
          :course_name => asset.assignment.context.name,
@@ -20,5 +26,3 @@
   <%= t('no_due_date', 'No Due Date') %>
 <% end %>
 </p>
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'View the assignment' %></a></p>

@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'html_text_helper'
+
 module CanvasQuizStatistics
   module Util
     def self.digest(str)
@@ -38,6 +41,10 @@ module CanvasQuizStatistics
         result[new_key] = new_value
         result
       end
+    end
+
+    def self.strip_tags(html)
+      ::HtmlTextHelper.strip_tags(html)
     end
   end
 end

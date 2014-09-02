@@ -75,7 +75,6 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
             answer_id_for_color1: "9711"
           }
         ])
-        puts stats.to_json
 
         stats[:answer_sets].detect { |as| as[:text] == 'color1' }.tap do |answer_set|
           unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }

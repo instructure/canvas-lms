@@ -16,15 +16,39 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+Attachment.class_eval do
+  # previously we would stub this, but that doesn't play nicely with
+  # Marshal.load. since there's only a single spec in the entire suite
+  # that wants a non-downloadable attachment, this is going to be a more
+  # performant approach
+  def downloadable?; true; end
+
+  unless CANVAS_RAILS2
+    # fix so we can once-ler attachment instances. in order to
+    # Marshal.dump, you can't have any singleton methods (which our
+    # Rails 3 attachment_fu hacks do while saving)
+    def marshal_dump
+      attributes = clone_attributes(:read_attribute_before_type_cast)
+      self.class.initialize_attributes(attributes, :serialized => false)
+      [attributes, instance_variable_get(:@new_record)]
+    end
+
+    def marshal_load(data)
+      initialize
+      instance_variable_set :@attributes, data[0]
+      instance_variable_set :@new_record, data[1]
+    end
+  end
+end
+
 def attachment_model(opts={})
   attrs = valid_attachment_attributes(opts).merge(opts)
   attrs.delete(:filename) if attrs.key?(:uploaded_data)
   @attachment = factory_with_protected_attributes(Attachment, attrs, false)
-  @attachment.stubs(:downloadable?).returns(true)
   @attachment.save!
   @attachment
 end
-  
+
 def valid_attachment_attributes(opts={})
   @context = opts[:context] || @context || @course || course_model(:reusable => true)
   if opts[:folder]

@@ -104,7 +104,7 @@
 #       "properties": {
 #         "url": {
 #           "description": "the URL for fetching/updating the outcome link. should be treated as opaque",
-#           "example": "/api/v1/account/1/outcome_groups/1/outcomes/1",
+#           "example": "/api/v1/accounts/1/outcome_groups/1/outcomes/1",
 #           "type": "string"
 #         },
 #         "context_id": {
@@ -122,7 +122,7 @@
 #         },
 #         "outcome": {
 #           "description": "an abbreviated Outcome object representing the outcome linked into the containing outcome group.",
-#           "$ref": "OutcomeGroup"
+#           "$ref": "Outcome"
 #         }
 #       }
 #     }
@@ -162,13 +162,23 @@ class OutcomeGroupsApiController < ApplicationController
   # @API Get all outcome links for context
   # @beta
   #
+  # @argument outcome_style [Optional, String]
+  #   The detail level of the outcomes. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
+  # @argument outcome_group_style [Optional, String]
+  #   The detail level of the outcome groups. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
   # @returns [OutcomeLink]
   def link_index
     return unless can_read_outcomes
 
     url = polymorphic_url [:api_v1, @context || :global, :outcome_group_links]
     links = Api.paginate(context_outcome_links, self, url)
-    render json: links.map { |link| outcome_link_json(link, @current_user, session) }
+    render json: links.map { |link|
+      outcome_link_json(link, @current_user, session, params.slice(:outcome_style, :outcome_group_style))
+    }
   end
 
   # @API Show an outcome group
@@ -374,6 +384,10 @@ class OutcomeGroupsApiController < ApplicationController
   # @argument title [Optional, String]
   #   The title of the new outcome. Required if outcome_id is absent.
   #
+  # @argument display_name [Optional, String]
+  #   A friendly name shown in reports for outcomes with cryptic titles,
+  #   such as common core standards names.
+  #
   # @argument description [Optional, String]
   #   The description of the new outcome.
   #
@@ -402,6 +416,7 @@ class OutcomeGroupsApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
   #        -X POST \ 
   #        -F 'title=Outcome Title' \ 
+  #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9000' \
   #        -F 'mastery_points=3' \ 
@@ -419,6 +434,7 @@ class OutcomeGroupsApiController < ApplicationController
   #        -X POST \ 
   #        --data-binary '{
   #              "title": "Outcome Title",
+  #              "display_name": "Title for reporting",
   #              "description": "Outcome description",
   #              "vendor_guid": "customid9000",
   #              "mastery_points": 3,
@@ -441,7 +457,7 @@ class OutcomeGroupsApiController < ApplicationController
           return
         end
       else
-        @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid))
+        @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
         unless @outcome.valid?
           render :json => @outcome.errors, :status => :bad_request
           return
@@ -656,7 +672,7 @@ class OutcomeGroupsApiController < ApplicationController
 
   def context_create_outcome(data)
     scope = @context ? @context.created_learning_outcomes : LearningOutcome.global
-    outcome = scope.build(data.slice(:title, :description, :vendor_guid))
+    outcome = scope.build(data.slice(:title, :display_name, :description, :vendor_guid))
     if data[:ratings]
       outcome.rubric_criterion = data.slice(:ratings, :mastery_points)
     end

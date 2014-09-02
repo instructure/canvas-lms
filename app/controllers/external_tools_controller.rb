@@ -27,6 +27,12 @@ class ExternalToolsController < ApplicationController
 
   REDIS_PREFIX = 'external_tool:sessionless_launch:'
 
+  TOOL_DISPLAY_TEMPLATES = {
+    'full_width' => 'external_tools/full_width',
+    'in_context' => 'external_tools/tool_show',
+    'default' => 'external_tools/tool_show',
+  }
+
   # @API List external tools
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
@@ -103,17 +109,23 @@ class ExternalToolsController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
         return
       end
-      @resource_title = @tool.name
-      @resource_url = params[:url]
       add_crumb(@context.name, named_context_url(@context, :context_url))
-      @return_url = url_for(@context)
+
+      @lti_launch = Lti::Launch.new
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, launch_url: @resource_url)
-      @tool_settings = adapter.generate_post_payload
+      adapter.prepare_tool_launch(url_for(@context), resource_type: @resource_type, launch_url: params[:url])
+      @lti_launch.params = adapter.generate_post_payload
 
-      @tool_launch_type = 'self' if params['borderless']
-      render :template => 'external_tools/tool_show'
+      @lti_launch.resource_url = params[:url]
+      @lti_launch.link_text =  @tool.name
+
+      if params['borderless']
+        @lti_launch.launch_type = 'self'
+        render :template => 'lti/framed_launch', layout: 'bare'
+      else
+        render :template => 'lti/framed_launch'
+      end
     end
   end
 
@@ -187,8 +199,7 @@ class ExternalToolsController < ApplicationController
       if launch_url
         @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
       else
-        find_tool(tool_id, params[:launch_type])
-        return unless @tool
+        return unless find_tool(tool_id, params[:launch_type])
       end
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -292,13 +303,17 @@ class ExternalToolsController < ApplicationController
         raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")
       end
     else
-      # this is coming from a content tag redirect that set @tool
-      selection_type = "#{@context.class.base_ar_class.to_s.downcase}_navigation"
-
-      find_tool(params[:id], selection_type)
-      @active_tab = @tool.asset_string if @tool
-      @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
-      render_tool(selection_type)
+      selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
+      if find_tool(params[:id], selection_type)
+        if selection_type == 'course_home_sub_navigation' && @context.is_a?(Course)
+          @return_url = external_content_success_url('external_tool_redirect', :include_host => true)
+          @redirect_return = true
+          js_env(:course_id => @context.id)
+        end
+        @active_tab = @tool.asset_string
+        @show_embedded_chat = false if @tool.tool_id == 'chat'
+      end
+      render tool_launch(@tool, selection_type) if @tool
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
   end
@@ -311,30 +326,33 @@ class ExternalToolsController < ApplicationController
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url = external_content_success_url('external_tool')
+    @return_url = external_content_success_url('external_tool_dialog')
     @headers = false
     @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
-    render_tool(selection_type)
+    render tool_launch(@tool, selection_type) if @tool
   end
 
   def find_tool(id, selection_type)
-    @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
+    if selection_type.nil? || ContextExternalTool::EXTENSION_TYPES.include?(selection_type.to_sym)
+      @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
+    end
+
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
-  end
 
+    @tool
+  end
   protected :find_tool
 
-  def render_tool(selection_type)
-    return unless @tool
-    @resource_title = @tool.label_for(selection_type.to_sym)
+  def tool_launch(tool, selection_type)
+    @resource_title = tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
 
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context)
     adapter.prepare_tool_launch(@return_url, resource_type: selection_type, selected_html: params[:selection])
     if selection_type == 'homework_submission'
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -346,13 +364,19 @@ class ExternalToolsController < ApplicationController
     @resource_url = adapter.launch_url
 
     resource_uri = URI.parse @resource_url
-    @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
+    @tool_id = tool.tool_id || resource_uri.host || 'unknown'
     @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
 
-    render :template => 'external_tools/tool_show'
+    return :template => find_display_type_template(tool, selection_type)
   end
+  protected :tool_launch
 
-  protected :render_tool
+  def find_display_type_template(tool, selection_type)
+    TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] ||
+    TOOL_DISPLAY_TEMPLATES['default']
+  end
+  protected :find_display_type_template
+
 
   # @API Create an external tool
   # Create an external tool in the specified course/account.

@@ -22,19 +22,23 @@ module CC
     def add_course_files
       return if for_course_copy
 
+      @html_exporter.referenced_files.keys.each do |att_id|
+        add_item_to_export("attachment_#{att_id}", "attachments")
+      end
+
       course_folder = Folder.root_folders(@course).first
       files_with_metadata = { :folders => [], :files => [] }
       @added_attachment_ids = Set.new
 
       zipper = ContentZipper.new(:check_user => false)
-      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |file, folder_names|
+      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], :exporter => @manifest.exporter) do |file, folder_names|
         begin
           if file.is_a? Folder
             dir = File.join(folder_names[1..-1])
             files_with_metadata[:folders] << [file, dir] if file.hidden? || file.locked
             next
           end
-          
+
           @added_attachment_ids << file.id
           path = File.join(folder_names, file.display_name)
           migration_id = CCHelper.create_key(file)

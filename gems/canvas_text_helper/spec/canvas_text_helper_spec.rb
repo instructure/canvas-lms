@@ -60,4 +60,18 @@ describe CanvasTextHelper do
       CanvasTextHelper::indent("test string\nnext line\nanother line", 3).should == "test string\n   next line\n   another line"
     end
   end
+
+  describe "cgi_escape_truncate" do
+    it "should not truncate strings that fit" do
+      CanvasTextHelper::cgi_escape_truncate('!!!', 9).should eql("%21%21%21")
+    end
+
+    it "should not split escape sequences" do
+      CanvasTextHelper::cgi_escape_truncate('!!!', 8).should eql("%21%21")
+    end
+
+    it "should not split UTF-8 characters" do
+      CanvasTextHelper::cgi_escape_truncate("\u2600\u2603", 15).should eql("%E2%98%80")
+    end
+  end
 end

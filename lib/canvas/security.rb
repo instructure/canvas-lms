@@ -54,7 +54,7 @@ module Canvas::Security
   
   def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest::Digest.new('sha1'), (encryption_key || self.encryption_key), str
+      OpenSSL::Digest.new('sha1'), (encryption_key || self.encryption_key), str
     )
   end
 

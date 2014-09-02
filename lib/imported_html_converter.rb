@@ -22,19 +22,15 @@ class ImportedHtmlConverter
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 
+  # yields warnings
   def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
 
     for_course_copy = false
-    domain_substitution_map = {}
     if migration
       for_course_copy = true if migration.for_course_copy?
-
-      if ds_map = migration.migration_settings[:domain_substitution_map]
-        ds_map.each{|k, v| domain_substitution_map[k.to_s] = v.to_s } # ensure strings
-      end
     end
 
     doc.search("*").each do |node|
@@ -46,7 +42,8 @@ class ImportedHtmlConverter
 
           new_url = nil
           missing_relative_url = nil
-          val = URI.unescape(node[attr])
+
+          val = URI.unescape(node[attr]) rescue node[attr]
 
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
@@ -90,7 +87,8 @@ class ImportedHtmlConverter
           elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
             rel_path = $1
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
-              unless new_url = replace_media_comment_data(node, rel_path, context, opts)
+              new_url = replace_media_comment_data(node, rel_path, context, opts) {|warning, data| yield warning, data if block_given?}
+              unless new_url
                 unless new_url = replace_relative_file_url(rel_path, context)
                   missing_relative_url = rel_path
                 end
@@ -138,14 +136,16 @@ class ImportedHtmlConverter
             node[attr] = replace_missing_relative_url(missing_relative_url, context, course_path)
           end
 
-          if new_converted_url = check_domain_substitutions(new_url || val, domain_substitution_map)
-            new_url = new_converted_url
+          if migration && converted_url = migration.process_domain_substitutions(new_url || val)
+            if converted_url != (new_url || val)
+              new_url = converted_url
+            end
           end
 
           if new_url
             node[attr] = new_url
-          elsif opts[:missing_links]
-            opts[:missing_links] << node[attr]
+          else
+            yield :missing_link, node[attr] if block_given?
           end
         end
       end
@@ -162,17 +162,6 @@ class ImportedHtmlConverter
     node.inner_html
   rescue
     ""
-  end
-
-  def self.check_domain_substitutions(url, sub_map)
-    return nil if sub_map.empty?
-    new_url = nil
-    sub_map.each do |from_domain, to_domain|
-      if url.start_with?(from_domain)
-        new_url = url.sub(from_domain, to_domain)
-      end
-    end
-    return new_url
   end
 
   def self.find_file_in_context(rel_path, context)
@@ -240,13 +229,13 @@ class ImportedHtmlConverter
 
     if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
       link = "/media_objects/#{$1}"
-      opts[:missing_links] << link if opts[:missing_links]
+      yield :missing_link, link
       return link
     else
       node.delete('class')
       node.delete('id')
       node.delete('style')
-      opts[:missing_links] << rel_path if opts[:missing_links]
+      yield :missing_link, rel_path
       return nil
     end
   end

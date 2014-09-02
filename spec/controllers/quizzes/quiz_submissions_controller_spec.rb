@@ -181,4 +181,30 @@ describe Quizzes::QuizSubmissionsController do
       end
     end
   end
+
+  describe "POST / (#extension)" do
+    context "as a teacher in course" do
+      it "should be able to extend own extra attempts" do
+        course_with_teacher_logged_in
+        quiz = course_quiz !!:active
+        request.accept = "application/json"
+        post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1
+        response.should be_success
+        json = JSON.parse(response.body)
+        json.should have_key('extra_attempts')
+        json['extra_attempts'].should == 1
+      end
+
+      it "should be able to reset the result lockdown flag" do
+        course_with_teacher_logged_in
+        quiz = course_quiz !!:active
+        request.accept = "application/json"
+        post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1
+        response.should be_success
+        json = JSON.parse(response.body)
+        json.should have_key('has_seen_results')
+        json['has_seen_results'].should == false
+      end
+    end
+  end
 end

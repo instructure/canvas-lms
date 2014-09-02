@@ -2,16 +2,18 @@ define [
   'ember'
   'underscore'
   '../shared/query_parameters'
-], ({Mixin}, _, QueryParameters) ->
+], (Ember, _, QueryParameters) ->
+  {extend} = _
+
   # This mixin adds support for providing query parameters to a DS.Model's
   # fetching methods, necessary if you need to side-load different things based
   # on runtime state.
-  Mixin.create
+  Ember.Mixin.create
     reload: (queryParams) ->
       originalUrl = @get('url')
       originalParams = QueryParameters.extractParameters(originalUrl)
       baseUrl = QueryParameters.extractUrl(originalUrl)
-      params = _.extend({}, originalParams, queryParams)
+      params = extend({}, originalParams, queryParams)
 
       @set 'url', QueryParameters.composeUrl(baseUrl, params)
 

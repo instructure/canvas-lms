@@ -59,10 +59,12 @@ describe WimbaConference do
     end
   end
 
-  before do
-    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
-
+  before :once do
     user_model
+  end
+
+  before :each do
+    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
     email = "email@email.com"
     @user.stubs(:email).returns(email)
   end

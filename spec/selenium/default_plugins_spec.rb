@@ -5,7 +5,7 @@ describe "default plugins" do
 
   before(:each) do
     user_logged_in
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
   end
 
   it "should allow configuring twitter plugin" do

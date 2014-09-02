@@ -21,7 +21,7 @@ module Api::V1::Conferences
   API_CONFERENCE_JSON_OPTS = {
     :only => %w(id title conference_type description
       duration ended_at started_at user_ids long_running
-      recordings join_url had_advanced_settings)
+      recordings join_url has_advanced_settings)
   }
 
   def api_conferences_json(conferences, user, session)

@@ -54,11 +54,18 @@ define([
     for(var idx in params) {
       txt = txt + 'error[' + idx + "]=" + encodeURIComponent(params[idx]) + "&";
     }
+    txt = txt.substring(0, 2000);
+    // make sure we don't leave hanging broken %-encodings on the end
+    if (txt.length >= 1 && txt[txt.length - 1] === '%') {
+      txt = txt.substring(0, txt.length - 1);
+    } else if (txt.length >= 2 && txt[txt.length - 2] === '%') {
+      txt = txt.substring(0, txt.length - 2);
+    }
     INST.errorCount += 1;
     
     // doing this old-school in case something happend where jquery is not loaded.
     var img = document.createElement('img');
-    img.src = INST.errorURL + txt.substring(0, 2000);
+    img.src = INST.errorURL + txt;
     img.style.position = 'absolute';
     img.style.left = '-10000px';
     img.style.top= 0;

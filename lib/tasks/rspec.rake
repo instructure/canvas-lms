@@ -1,5 +1,5 @@
 # Don't load rspec if running "rake gems:*"
-unless ARGV.any? { |a| a =~ /\Agems/ }
+unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
     if CANVAS_RAILS2

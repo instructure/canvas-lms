@@ -34,6 +34,53 @@ describe AssignmentGroup do
     AssignmentGroup.should be_respond_to(:acts_as_list)
   end
 
+  context "visible assignments" do
+    before(:each) do
+      @u = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+      @c = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
+      @ag = @c.assignment_groups.create!(@valid_attributes)
+      @s = @c.course_sections.create!(name: "test section")
+      student_in_section(@s, user: @u)
+      assignments = (0...4).map { @c.assignments.create!({:title => "test_foo",
+                                  :assignment_group => @ag,
+                                  :points_possible => 10,
+                                  :only_visible_to_overrides => true})}
+      assignments.first.destroy
+      assignments.second.grade_student(@u, {grade: 10})
+      assignment_to_override = assignments.last
+      create_section_override_for_assignment(assignment_to_override, course_section: @s)
+      @c.reload
+      @ag.reload
+    end
+    context "with differentiated assignments and draft state on" do
+      it "should return only active assignments with overrides or grades for the user" do
+        @c.enable_feature! :differentiated_assignments
+        @c.enable_feature! :draft_state
+        @ag.active_assignments.count.should == 3
+        # one with override, one with grade
+        @ag.visible_assignments(@u).count.should == 2
+      end
+    end
+
+    context "with differentiated assignments off and draft state on" do
+      it "should return all published assignments" do
+        @c.disable_feature! :differentiated_assignments
+        @c.enable_feature! :draft_state
+        @ag.active_assignments.count.should == 3
+        @ag.visible_assignments(@u).count.should == 3
+      end
+    end
+
+    context "with both differentiated assignments and draft state off" do
+      it "should return all active assignments" do
+        @c.disable_feature! :differentiated_assignments
+        @c.disable_feature! :draft_state
+        @ag.active_assignments.count.should == 3
+        @ag.visible_assignments(@u).count.should == 3
+      end
+    end
+  end
+
   context "broadcast policy" do
     context "grade weight changed" do
       # it "should have a 'Grade Weight Changed' policy" do

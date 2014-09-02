@@ -3,7 +3,7 @@ module Api::V1::EnrollmentTerm
 
   def enrollment_term_json(enrollment_term, user, session, includes=[])
     api_json(enrollment_term, user, session, :only => %w(id name start_at end_at workflow_state)).tap do |hash|
-      hash['sis_term_id'] = enrollment_term.sis_source_id if enrollment_term.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
+      hash['sis_term_id'] = enrollment_term.sis_source_id if enrollment_term.root_account.grants_any_right?(user, :read_sis, :manage_sis)
     end
   end
 

@@ -23,7 +23,7 @@ end
 def valid_page_view_attributes
   {
     :url => "http://www.example.com/courses/1",
-    :request_id => UUIDSingleton.instance.generate,
+    :request_id => CanvasUUID.generate,
     :user => @user || user
   }
 end

@@ -763,7 +763,7 @@ class MessageableUser
     def uncached_visible_account_ids
       # ditto
       @user.associated_accounts.with_each_shard(Shard.current).
-        select{ |account| account.grants_right?(@user, nil, :read_roster) }.
+        select{ |account| account.grants_right?(@user, :read_roster) }.
         map(&:id)
     end
 
@@ -849,7 +849,7 @@ class MessageableUser
     # get additional objects to include in the per-shard cache keys
     def shard_cached(key, *methods)
       @shard_caches ||= {}
-      @shard_caches[key] ||= 
+      @shard_caches[key] ||=
         begin
           by_shard = {}
           Shard.with_each_shard(@user.associated_shards) do
@@ -953,7 +953,7 @@ class MessageableUser
 
     def course_visibility(course)
       @course_visibilities ||= {}
-      @course_visibilities[course.global_id] ||= 
+      @course_visibilities[course.global_id] ||=
         course.enrollment_visibility_level_for(@user, course.section_visibilities_for(@user), true)
     end
 

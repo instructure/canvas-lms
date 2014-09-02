@@ -119,10 +119,11 @@ module CC
       doc.discussion_type topic.discussion_type
       doc.pinned 'true' if topic.pinned
       doc.require_initial_post 'true' if topic.require_initial_post
+      doc.workflow_state topic.workflow_state
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|
-          AssignmentResources.create_assignment(a, topic.assignment)
+          AssignmentResources.create_canvas_assignment(a, topic.assignment)
         end
       end
     end

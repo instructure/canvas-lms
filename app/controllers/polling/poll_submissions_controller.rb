@@ -108,15 +108,14 @@ module Polling
     def serialize_jsonapi(poll_submissions)
       poll_submissions = Array.wrap(poll_submissions)
 
-      serialized_set = Canvas::APIArraySerializer.new(poll_submissions, {
+      Canvas::APIArraySerializer.new(poll_submissions, {
         each_serializer: Polling::PollSubmissionSerializer,
         controller: self,
-        root: false,
+        root: :poll_submissions,
+        meta: {},
         scope: @current_user,
         include_root: false
       }).as_json
-
-      { poll_submissions: serialized_set }
     end
 
   end

@@ -23,6 +23,7 @@
 /db/*sql
 /exports/
 Gemfile.lock
+Gemfile.lock2
 Gemfile.lock3
 /log/
 /public/app/

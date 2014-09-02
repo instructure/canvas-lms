@@ -77,8 +77,8 @@ module CC
 
       def add_question(node, question, for_cc=false)
         aq_mig_id = create_key("assessment_question_#{question['assessment_question_id']}")
-        qq_mig_id = create_key("assessment_question_#{question['id']}")
-        question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id  
+        qq_mig_id = create_key("quiz_question_#{question['id']}")
+        question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id
 
         if question['question_type'] == 'missing_word_question'
           change_missing_word(question)
@@ -97,7 +97,7 @@ module CC
               else
                 meta_field(qm_node, 'question_type', question['question_type'])
                 meta_field(qm_node, 'points_possible', question['points_possible'])
-                if question[:is_quiz_question] 
+                if question[:is_quiz_question]
                   meta_field(qm_node, 'assessment_question_identifierref', aq_mig_id)
                 end
               end

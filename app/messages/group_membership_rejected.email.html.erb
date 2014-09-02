@@ -1,9 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
 <% end %>
+
 <% define_content :subject do %>
   <%= t('subject', 'Group Membership Rejected: %{group_name}', :group_name => asset.group.name) %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click to view other groups" %>
+  </a>
+<% end %>
+
 <p><%= t('group_request_rejected', 'Group Request Rejected: %{group_name}', :group_name => asset.group.name) %></p>
 
 <p>
@@ -13,5 +21,3 @@
 <%= t('course_group', "Your request to join the group %{group_name} for the course %{course_name} has been rejected.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
 <% end %>
 </p>
-
-<p><a href="<%= content :link %>"><%= t :link, "Click to view other groups" %></a></p>

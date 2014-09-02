@@ -45,14 +45,18 @@
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>
-        <span class='value' <%= context_sensitive_datetime_title(@assignment.due_at, @context) %>>
-          <% if @assignment.due_at %>
-            <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
-              <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
-              <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
-          <% else %>
-            <%= t :no_due_date, 'No Due Date' %>
-          <% end %>
+        <span class='value'>
+          <span class="date_text">
+            <% if @assignment.multiple_due_dates? %>
+              <%= multiple_due_date_tooltip(@assignment, @current_user) %>
+            <% elsif @assignment.due_at %>
+              <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
+                <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
+                <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
+            <% else %>
+              <%= t :no_due_date, 'No Due Date' %>
+            <% end %>
+          </span>
         </span>
       </li>
       <li>

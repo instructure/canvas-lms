@@ -4,7 +4,7 @@ describe "error reporting" do
   include_examples "in-process server selenium tests"
 
   it "should log the same error at most 1 time per 5 seconds" do
-    get('/logout')
+    get('/login')
     4.times do
       driver.execute_script("window.onerror('Throwing a test error', ''+document.location, 12)")
     end

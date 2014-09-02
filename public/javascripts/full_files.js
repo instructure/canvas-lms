@@ -1585,7 +1585,7 @@ define([
                       mimeType: data.content_type,
                       attachment_id: data.id,
                       height: '100%',
-                      crocodoc_session_url: data.crocodocSession,
+                      crocodoc_session_url: data.crocodoc_session_url,
                       canvadoc_session_url: data.canvadoc_session_url,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
                       scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
@@ -1594,30 +1594,11 @@ define([
                       attachment_preview_processing: data.workflow_state == 'pending_upload' || data.workflow_state == 'processing'
                     });
                   };
-                  if (data.canvadoc_session_url) {
+                  if (data.canvadoc_session_url || data.crocodoc_session_url) {
                     showPreview();
                   }
                   else if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
-                    if (data['crocodoc_available?'] && !data.crocodocSession) {
-                      $preview.disableWhileLoading(
-                        $.ajaxJSON(
-                          '/attachments/' + data.id + '/crocodoc_sessions/',
-                          'POST',
-                          {annotations: false},
-                          function(response) {
-                            data.crocodocSession = response.session_url;
-                            showPreview();
-                          },
-                          function() {
-                            data['crocodoc_available?'] = false;
-                            showPreview();
-                          }
-                        )
-                      );
-                    }
-                    else {
-                      showPreview();
-                    }
+                    showPreview();
                   }
                 }
                 $(window).triggerHandler('resize');

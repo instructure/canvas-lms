@@ -1,0 +1,61 @@
+ic-modal-screen,
+ic-modal,
+ic-modal-main,
+ic-modal-title {
+  display: block;
+}
+
+ic-modal,
+.ic-modal-form {
+  display: none;
+  -webkit-overflow-scrolling: touch;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  overflow: auto;
+  background-color: hsla(0, 0%, 100%, .90);
+  padding: 10px;
+}
+
+ic-modal[is-open],
+.ic-modal-form[is-open] {
+  display: block;
+}
+
+ic-modal-main {
+  position: relative;
+  margin: 40px auto;
+  max-width: 800px;
+  padding: 20px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid hsl(0, 0%, 70%);
+}
+
+ic-modal-title {
+  margin: 0 -20px 20px -20px;
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+
+.ic-modal-trigger.ic-modal-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  padding: 6px;
+}
+
+.ic-modal-trigger.ic-modal-close:focus {
+  outline: none;
+  text-shadow: 0 0 6px hsl(208, 47%, 60%),
+    0 0 2px hsl(208, 47%, 60%),
+    0 0 2px hsl(208, 47%, 60%),
+    0 0 1px hsl(208, 47%, 60%);
+}
+

@@ -1,5 +1,7 @@
 define [ 'ember' ], (Ember) ->
   Ember.ObjectController.extend
+    inspectorData: Ember.computed.alias('answers')
+
     chartData: (->
       @get('answers').map (answer) ->
         {
@@ -8,5 +10,3 @@ define [ 'ember' ], (Ember) ->
           correct: answer.correct # correct answer bars get highlighted
         }
     ).property('answers')
-
-    inspectorData: Ember.computed.alias('answers')

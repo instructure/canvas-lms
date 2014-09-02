@@ -4,20 +4,31 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
     gem 'redcarpet', '3.0.0'
-  gem 'mocha', '1.0.0.alpha', :require => false
-    gem 'metaclass', '0.0.2'
+  if RUBY_VERSION >= '2.1'
+    gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
+      gem 'metaclass', '0.0.2'
+  else
+    gem 'mocha', '1.1.0', :require => false
+      gem 'metaclass', '0.0.2'
+  end
   gem 'thin', '1.5.1'
-    gem 'eventmachine', '1.0.3'
+    if RUBY_VERSION >= '2.2'
+      gem 'eventmachine', :github => 'eventmachine/eventmachine'
+    else
+      gem 'eventmachine', '1.0.3'
+    end
+
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
     gem 'test-unit', '1.2.3'
   else
-    gem 'rspec', '2.14.1'
-    gem 'rspec-rails', '2.14.1'
+    gem 'rspec', '2.99.0'
+    gem 'rspec-rails', '2.99.0'
+    gem 'once-ler', '0.0.13'
   end
   gem 'sequel', '4.5.0', :require => false
-  gem 'selenium-webdriver', '2.40.0'
+  gem 'selenium-webdriver', '2.42.0'
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
   gem 'webmock', '1.16.1', :require => false

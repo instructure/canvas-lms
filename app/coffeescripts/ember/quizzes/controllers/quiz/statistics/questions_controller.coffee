@@ -1,9 +1,11 @@
-define [ 'ember', 'i18n!quiz_statistics' ], (Em, I18n) ->
-  Em.ObjectController.extend
+define [ 'ember', 'i18n!quiz_statistics' ], (Ember, I18n) ->
+  {alias} = Ember.computed
+
+  Ember.ObjectController.extend
     needs: [ 'quizStatistics' ]
 
-    participantCount: Em.computed.alias('ratioCalculator.participantCount').readOnly()
-    correctResponseRatio: Em.computed.alias('ratioCalculator.ratio').readOnly()
+    participantCount: alias('ratioCalculator.participantCount').readOnly()
+    correctResponseRatio: alias('ratioCalculator.ratio').readOnly()
 
     attemptsLabel: (->
       I18n.t('attempts', 'Attempts: %{count} out of %{total}', {
@@ -16,7 +18,7 @@ define [ 'ember', 'i18n!quiz_statistics' ], (Em, I18n) ->
       I18n.t('correct_response_ratio',
         '%{ratio}% of your students correctly answered this question.',
         {
-          ratio: Em.Util.round(@get('correctResponseRatio') * 100, 0)
+          ratio: Ember.Util.round(@get('correctResponseRatio') * 100, 0)
         })
     ).property('correctResponseRatio')
 
@@ -29,4 +31,5 @@ define [ 'ember', 'i18n!quiz_statistics' ], (Em, I18n) ->
 
     actions:
       showDetails: ->
-        @set('detailsVisible', !@get('detailsVisible'))
+        @toggleProperty('detailsVisible')
+        null

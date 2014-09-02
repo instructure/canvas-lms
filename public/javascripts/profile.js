@@ -174,6 +174,11 @@ define([
     }, function(data) {
     });
   });
+  $("#disable_inbox").change(function() {
+    $.ajaxJSON("/profile/toggle_disable_inbox", 'POST', {'user[disable_inbox]': $(this).prop('checked')}, function(data) {
+    }, function(data) {
+    });
+  });
   $(".delete_pseudonym_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".pseudonym").confirmDelete({

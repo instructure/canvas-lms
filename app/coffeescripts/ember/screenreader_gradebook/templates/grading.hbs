@@ -1,0 +1,59 @@
+<div id="grading">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'grading'}}Grading{{/t}}</h2>
+    </div>
+    <div class= "span8 pad-box top-only">
+      {{#if selectedSubmission}}
+        <div class="pad-box bottom-only">
+          <label for="student_and_assignment_grade">
+            {{#with selectedAssignment}}
+              <strong>{{#t 'grade_for'}}Grade for: {{name}}{{/t}}</strong>
+            {{/with}}
+          </label>
+        </div>
+        {{
+          grading-cell
+          assignment=selectedAssignment
+          input-id="student_and_assignment_grade"
+          submission=selectedSubmission
+          on-submit-grade="gradeUpdated"
+          class="pad-box bottom-only"
+        }}
+        {{#if selectedSubmission.drop}}
+          <p class="dropped muted">
+            <em>
+              {{#t 'is_dropped'}}This grade is currently dropped for this student.{{/t}}
+            </em>
+          </p>
+        {{/if}}
+        {{#if selectedSubmission.late}}
+          <p class="late muted">
+            <em>
+              {{#t 'is_late'}}This submission was late.{{/t}}
+            </em>
+          </p>
+        {{/if}}
+        {{#unless selectedSubmission.grade_matches_current_submission}}
+          <p class="resubmitted muted">
+            <em>
+              {{#t 'was_resubmitted'}}This assignment has been resubmitted since it was graded last.{{/t}}
+            </em>
+          </p>
+        {{/unless}}
+        </div>
+        <button
+          id="submission_details"
+          class="btn"
+          {{action 'openDialog' 'submission' target=view}}
+        >
+          {{#t 'submission_details'}}Submission Details{{/t}}
+        </button>
+      {{else}}
+        <p class="submission_selection">
+          {{#t "empty_submission_selection"}}Select a student and an assignment to view and edit grades.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

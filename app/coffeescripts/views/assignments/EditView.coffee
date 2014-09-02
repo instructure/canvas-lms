@@ -113,7 +113,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
             setting_from_cache = userSettings.contextGet('new_assignment_settings')[setting]
             if setting_from_cache == "1" || setting_from_cache == "0"
               setting_from_cache = parseInt setting_from_cache
-            if setting_from_cache then @assignment.set(setting, setting_from_cache)
+            if setting_from_cache && (!@assignment.get(setting) || @assignment.get(setting)?.length == 0)
+              @assignment.set(setting, setting_from_cache)
           )
         else
           @assignment.set('submission_type','online')
@@ -173,6 +174,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
+        differentiatedAssignmnetsEnabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
@@ -205,6 +207,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       data.lock_at = defaultDates?.get('lock_at') or null
       data.unlock_at = defaultDates?.get('unlock_at') or null
       data.due_at = defaultDates?.get('due_at') or null
+      if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
+        data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       return data
 
@@ -221,7 +225,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
           success: =>
-            @model.setNullDates()
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
           missingDateDialog.$dialog.dialog('close').remove()

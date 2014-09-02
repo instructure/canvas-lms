@@ -1,0 +1,82 @@
+@import 'base/environment';
+@import 'vendor/bootstrap/button-groups';
+
+$border-dark:  #c1c7cf;
+$border-light: #e1e3e4;
+$font-color:   #555;
+$left-offset:  16px;
+
+#tab-features .alert {
+  margin-bottom: 20px;
+  padding: 8px 35px 8px 14px;
+}
+
+.feature-flags {
+  border: 1px solid $border-dark;
+  border-radius: 3px;
+  color: $font-color;
+  list-style: none;
+  margin: 0 0 24px 0;
+  padding: 0;
+}
+
+.feature-flag {
+  border-bottom: 1px solid $border-light;
+  line-height: 30px;
+  padding: 6px 6px 6px $left-offset;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.feature-flag .element_toggler, .feature-flag .element_toggler:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.feature-flag .btn {
+  min-width: 80px;
+}
+
+.feature-flag-group-title {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 24px;
+  padding-left: $left-offset;
+}
+
+.feature-title {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.feature-release, .feature-release-notes-link {
+  font-size: 12px;
+}
+
+.feature-release-date {
+  font-weight: bold;
+}
+
+.feature-lock-message {
+  text-transform: uppercase;
+}
+
+.feature-details {
+  display: none;
+  font-size: 12px;
+  line-height: 20px;
+  margin-top: 16px;
+  position: relative;
+}
+
+.feature-details p {
+  padding-left: 24px;
+}
+
+.feature-detail-links {
+  bottom: 0;
+  position: absolute;
+  right: 0;
+}

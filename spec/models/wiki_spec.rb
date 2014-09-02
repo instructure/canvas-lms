@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Wiki do
-  before :each do
+  before :once do
     course
     @wiki = @course.wiki
   end
@@ -77,10 +77,9 @@ describe Wiki do
   end
 
   context 'set policy' do
-    before :each do
+    before :once do
       @course.offer!
       user :active_all => true
-      user_session(@user)
     end
 
     it 'should give read rights to public courses' do
@@ -100,7 +99,7 @@ describe Wiki do
     end
 
     context 'allow student wiki edits' do
-      before :each do
+      before :once do
         course_with_student :course => @course, :user => @user, :active_all => true
         @course.default_wiki_editing_roles = 'teachers,students'
         @course.save!

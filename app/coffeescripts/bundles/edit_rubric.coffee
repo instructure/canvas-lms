@@ -57,6 +57,12 @@ require [
     onOutcomeImport: (model) ->
       rubricEditing.onFindOutcome(model)
 
-  $(document).ready ->
+  initEditRubricPage = ->
     new EditRubricPage
     rubricEditing.init()
+
+  if $.isReady
+    initEditRubricPage()
+  else
+    $(document).ready ->
+      initEditRubricPage()

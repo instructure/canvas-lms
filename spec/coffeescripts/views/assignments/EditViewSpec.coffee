@@ -127,7 +127,7 @@ define [
   module 'EditView: setDefaultsIfNew',
     setup: ->
       fakeENV.setup()
-      sinon.stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1"}
+      sinon.stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
     teardown: ->
       userSettings.contextGet.restore()
       fakeENV.teardown()
@@ -143,6 +143,20 @@ define [
     view.setDefaultsIfNew()
 
     equal view.assignment.get('peer_reviews'), 1
+
+  test 'doesnt overwrite existing assignment settings', ->
+    view = editView()
+    view.assignment.set('assignment_group_id', 22)
+    view.setDefaultsIfNew()
+
+    equal view.assignment.get('assignment_group_id'), 22
+
+  test 'will overwrite empty arrays', ->
+    view = editView()
+    view.assignment.set('submission_types', [])
+    view.setDefaultsIfNew()
+
+    equal view.assignment.get('submission_types'), "foo"
 
   module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->

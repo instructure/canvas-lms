@@ -24,9 +24,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
-  EXPORTABLE_ATTRIBUTES = [:id, :notification_id, :communication_channel_id, :broadcast, :frequency, :created_at, :updated_at]
-  EXPORTABLE_ASSOCIATIONS = [:notification, :communication_channel, :delayed_messages]
-
   validates_presence_of :communication_channel_id, :frequency
   validates_inclusion_of :broadcast, in: [true, false]
   validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
@@ -183,7 +180,7 @@ class NotificationPolicy < ActiveRecord::Base
       policies = communication_channel.notification_policies.all
       Notification.all.each do |notification|
         next if policies.find { |p| p.notification_id == notification.id }
-        Notification.transaction(requires_new: true) do
+        NotificationPolicy.transaction(requires_new: true) do
           np = nil
           begin
             np = communication_channel.notification_policies.build(notification: notification)

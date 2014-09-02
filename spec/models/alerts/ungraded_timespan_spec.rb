@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
 module Alerts
   describe Alerts::UngradedTimespan do
     describe "#should_not_receive_message?" do
-      before(:each) do
+      before :once do
         course_with_teacher(:active_all => 1)
         @teacher = @user
         @user = nil

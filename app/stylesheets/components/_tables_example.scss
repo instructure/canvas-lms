@@ -1,0 +1,164 @@
+// Look in app/stylesheets/vendor/bootstrap/_tables.scss for the source.
+// This file is for DOCUMENTATION ONLY!
+
+/*
+@styleguide Tables
+
+```html
+<table class="table">
+  <thead>
+    <tr>
+      <td>Column Heading 1</td>
+      <td>Column Heading 2</td>
+      <td>Column Heading 3</td>
+      <td>Column Heading 4</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+  </tbody>
+</table>
+```
+*/
+
+/*
+@styleguide Tables: Condensed/Half-Padding
+
+```html
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <td>Column Heading 1</td>
+      <td>Column Heading 2</td>
+      <td>Column Heading 3</td>
+      <td>Column Heading 4</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+  </tbody>
+</table>
+```
+*/
+
+/*
+@styleguide Tables: Bordered
+
+```html
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <td>Column Heading 1</td>
+      <td>Column Heading 2</td>
+      <td>Column Heading 3</td>
+      <td>Column Heading 4</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+  </tbody>
+</table>
+```
+*/
+
+/*
+@styleguide Tables: Zebra-Striping
+
+```html
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>Column Heading 1</td>
+      <td>Column Heading 2</td>
+      <td>Column Heading 3</td>
+      <td>Column Heading 4</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+      <td>Cell 4</td>
+    </tr>
+  </tbody>
+</table>
+```
+*/
+
+/*
+@styleguide Tables: Backgrounds
+
+```html
+<table class="table">
+  <thead>
+    <tr>
+      <td>Column Heading 1</td>
+      <td>Column Heading 2</td>
+      <td>Column Heading 3</td>
+      <td>Column Heading 4</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="success">
+      <td>Success</td>
+      <td>Success</td>
+      <td>Success</td>
+      <td>Success</td>
+    </tr>
+    <tr class="error">
+      <td>Error</td>
+      <td>Error</td>
+      <td>Error</td>
+      <td>Error</td>
+    </tr>
+    <tr class="warning">
+      <td>Warning</td>
+      <td>Warning</td>
+      <td>Warning</td>
+      <td>Warning</td>
+    </tr>
+    <tr class="info">
+      <td>Info</td>
+      <td>Info</td>
+      <td>Info</td>
+      <td>Info</td>
+    </tr>
+  </tbody>
+</table>
+```
+*/
+

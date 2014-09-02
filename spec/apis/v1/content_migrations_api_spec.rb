@@ -103,7 +103,7 @@ describe ContentMigrationsController, type: :request do
     context "Account" do
       before do
         @account = Account.create!(:name => 'name')
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @migration = @account.content_migrations.create
         @migration.migration_type = 'qti_converter'
         @migration.user = @user
@@ -237,7 +237,7 @@ describe ContentMigrationsController, type: :request do
     context "Account" do
       before do
         @account = Account.create!(:name => 'name')
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @migration = @account.content_migrations.create
         @migration.migration_type = 'qti_converter'
         @migration.user = @user
@@ -456,7 +456,7 @@ describe ContentMigrationsController, type: :request do
     context "Account" do
       before do
         @account = Account.create!(:name => 'migration account')
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @migration_url = "/api/v1/accounts/#{@account.id}/content_migrations"
         @params = @params.reject{|k| k == :course_id}.merge(:account_id => @account.to_param)
       end

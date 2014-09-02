@@ -16,8 +16,8 @@
   quiz submissions from the server! Confusing id-show above vs
   id_show should be removed soon! }}
 <div id="quiz_show">
-  {{#if didLoadQuizSubmissionHTML}}
-    {{{quizSubmissionHTML.html}}}
+  {{#if legacyQuizSubmissionReady}}
+    {{{quizSubmissionHtml.html}}}
   {{else}}
     <div id='ember-loading'>
       <img src='/images/ajax-loader-medium-444.gif' />

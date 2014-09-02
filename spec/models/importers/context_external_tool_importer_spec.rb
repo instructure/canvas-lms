@@ -16,7 +16,7 @@ describe Importers::ContextExternalToolImporter do
   end
 
   context "combining imported external tools" do
-    before :each do
+    before :once do
       course_model
       @migration = ContentMigration.new(:migration_type => "common_cartridge_importer")
     end

@@ -32,10 +32,6 @@ class Setting < ActiveRecord::Base
     end
   end
 
-  class << self
-    alias_method :get_cached, :get
-  end
-
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
     @@cache.delete(name)
@@ -68,14 +64,5 @@ class Setting < ActiveRecord::Base
     @@cache.delete(name)
     s = Setting.find_by_name(name)
     s.destroy if s
-  end
-
-  # backcompat
-  def self.set_config(config_name, value)
-    ConfigFile.stub(config_name, value)
-  end
-
-  def self.from_config(config_name, with_rails_env=:current)
-    ConfigFile.load(config_name, with_rails_env)
   end
 end

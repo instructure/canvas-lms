@@ -17,29 +17,30 @@ else
   puts "Code coverage not enabled"
 end
 
-if ENV['BULLET']
-  puts "Bullet enabled"
-  require 'bullet'
-
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-  end
-
-elsif ENV['BULLET_GEM']
-  puts "Bullet enabled"
-  require 'bullet_instructure'
-
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-  end
-
-else
-  puts "Bullet not enabled"
-end
-
 environment_configuration(defined?(config) && config) do |config|
+
+  if ENV['BULLET'] == "1"
+    puts "Bullet enabled"
+    require 'bullet'
+
+    config.after_initialize do
+      Bullet.enable = true
+      Bullet.bullet_logger = true
+    end
+
+  elsif ENV['BULLET_GEM'] == "1"
+    puts "Bullet enabled"
+    require 'bullet_instructure'
+
+    config.after_initialize do
+      Bullet.enable = true
+      Bullet.bullet_logger = true
+    end
+
+  else
+    puts "Bullet not enabled"
+  end
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # The test environment is used exclusively to run your application's

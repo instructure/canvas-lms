@@ -8,7 +8,7 @@
     <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
     <div class="long_description_holder editing <%= 'empty' if !criterion || !criterion.long_description || criterion.long_description.empty? %>">
       <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
-      <textarea class="long_description" style="display: none;"><%= h((criterion.long_description rescue '')) %></textarea>
+      <textarea aria-label="<%= t 'labels.long_description', "Long Description" %>" class="long_description" style="display: none;"><%= h((criterion.long_description rescue '')) %></textarea>
     </div>
   </td>
   <td class="points_form">

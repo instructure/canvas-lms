@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem "canvas_uuid", path: "../canvas_uuid"
+gem "canvas_slug", path: "../canvas_slug"

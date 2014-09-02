@@ -31,8 +31,8 @@ class ConversationMessageParticipant < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [:id, :conversation_message_id, :conversation_participant_id, :tags, :user_id, :workflow_state]
   EXPORTABLE_ASSOCIATIONS = [:conversation_message, :user, :conversation_participant]
 
-  scope :active, where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)")
-  scope :deleted, where("conversation_message_participants.workflow_state = 'deleted'")
+  scope :active, -> { where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)") }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
 
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
     joins("INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id").

@@ -59,6 +59,7 @@ define [
       @moveItemView = new MoveDialogView
         model: @model
         nested: true
+        closeTarget: @$el.find('a[id=manage_link]')
         saveURL: -> @model.collection.reorderURL()
       super
 
@@ -88,7 +89,11 @@ define [
     # Returns nothing.
     onDelete: (e) =>
       e.preventDefault()
-      @delete() if confirm(@messages.confirm)
+      if confirm(@messages.confirm)
+        @goToPrevItem()
+        @delete()
+      else
+        @$el.find('a[id=manage_link]').focus()
 
     # Public: Delete the model and update the server.
     #
@@ -96,6 +101,20 @@ define [
     delete: ->
       @model.destroy()
       @$el.remove()
+
+    goToPrevItem: =>
+      if @previousDiscussionInGroup()?
+        $('#' + @previousDiscussionInGroup().id + '_discussion_content').attr("tabindex",-1).focus()
+      else if @model.get('pinned')
+        $('.pinned&.discussion-list').attr("tabindex",-1).focus()
+      else if @model.get('locked')
+        $('.locked&.discussion-list').attr("tabindex",-1).focus()
+      else
+        $('.open&.discussion-list').attr("tabindex",-1).focus()
+
+    previousDiscussionInGroup: =>
+      current_index = @model.collection.models.indexOf(@model)
+      @model.collection.models[current_index - 1]
 
     # Public: Pin or unpin the model and update it on the server.
     #

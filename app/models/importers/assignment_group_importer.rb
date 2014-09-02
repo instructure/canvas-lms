@@ -39,7 +39,7 @@ module Importers
       item ||= AssignmentGroup.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
       item ||= AssignmentGroup.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
       item ||= context.assignment_groups.new
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?
       item.name = hash[:title]

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ConversationMessage do
   context "notifications" do
-    before(:each) do
+    before :once do
       Notification.create(:name => "Conversation Message", :category => "TestImmediately")
       Notification.create(:name => "Added To Conversation", :category => "TestImmediately")
 
@@ -37,11 +37,13 @@ describe ConversationMessage do
       end
 
       @conversation = @teacher.initiate_conversation(@initial_students)
+      user = User.find(@conversation.user_id)
+      @account = Account.find(user.account)
       add_message # need initial message for add_participants to not barf
     end
 
     def add_message(options = {})
-      @conversation.add_message("message", options)
+      @conversation.add_message("message", options.merge(:root_account_id => @account.id))
     end
 
     def add_last_student
@@ -132,8 +134,8 @@ describe ConversationMessage do
   context "generate_user_note" do
     it "should add a user note under nominal circumstances" do
       Account.default.update_attribute :enable_user_notes, true
-      course_with_teacher
-      student = student_in_course.user
+      course_with_teacher(active_all: true)
+      student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
@@ -145,8 +147,8 @@ describe ConversationMessage do
 
     it "should fail if notes are disabled on the account" do
       Account.default.update_attribute :enable_user_notes, false
-      course_with_teacher
-      student = student_in_course.user
+      course_with_teacher(active_all: true)
+      student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(0)
@@ -154,9 +156,9 @@ describe ConversationMessage do
 
     it "should allow user notes on more than one recipient" do
       Account.default.update_attribute :enable_user_notes, true
-      course_with_teacher
-      student1 = student_in_course.user
-      student2 = student_in_course.user
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student1, student2])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student1.user_notes.size.should be(1)
@@ -226,7 +228,7 @@ describe ConversationMessage do
   end
 
   context "infer_defaults" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
     end
@@ -309,6 +311,25 @@ describe ConversationMessage do
       })
       cm3.conversation_message_participants.size.should == 2
       cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
+    end
+
+    it "should mark conversations as read for the replying author" do
+      course_with_teacher
+      student_in_course
+      cp = @teacher.initiate_conversation([@user])
+      cm = cp.add_message("initial message", :root_account_id => Account.default.id)
+
+      cp2 = cp.conversation.conversation_participants.find_by_user_id(@user.id)
+      cp2.workflow_state.should == 'unread'
+      cm.reply_from({
+        :purpose => 'general',
+        :user => @user,
+        :subject => "an email reply",
+        :html => "body",
+        :text => "body"
+      })
+      cp2.reload
+      cp2.workflow_state.should == 'read'
     end
   end
 end

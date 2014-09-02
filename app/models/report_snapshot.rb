@@ -74,10 +74,10 @@ class ReportSnapshot < ActiveRecord::Base
     write_attribute(:data, data.to_json)
   end
 
-  scope :detailed, where(:report_type => 'counts_detailed')
-  scope :progressive, where(:report_type => 'counts_progressive_detailed')
-  scope :overview, where(:report_type => 'counts_overview')
-  scope :progressive_overview, where(:report_type => 'counts_progressive_overview')
+  scope :detailed, -> { where(:report_type => 'counts_detailed') }
+  scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
+  scope :overview, -> { where(:report_type => 'counts_overview') }
+  scope :progressive_overview, -> { where(:report_type => 'counts_progressive_overview') }
 
   def push_to_instructure_if_collection_enabled
     begin
@@ -87,7 +87,7 @@ class ReportSnapshot < ActiveRecord::Base
       
       installation_uuid = Setting.get("installation_uuid", "")
       if installation_uuid == ""
-        installation_uuid = CanvasUuid::Uuid.generate_securish_uuid
+        installation_uuid = CanvasSlug.generate_securish_uuid
         Setting.set("installation_uuid", installation_uuid)
       end
   

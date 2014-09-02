@@ -17,6 +17,15 @@ define [
     equal t("k", "ohai %{name}", name: undefined),
       "ohai [missing %{name} value]"
 
+  test "default locale fallback on lookup", ->
+    originalLocale = I18n.locale
+    try
+      $.extend(true, I18n, {locale: 'bad-locale', translations: {en: {foo: {fallback_message: 'this is in the en locale'}}}})
+      equal scope.lookup('fallback_message'),
+        'this is in the en locale'
+    finally
+      I18n.locale = originalLocale
+
   test "html safety: should not html-escape translations or interpolations by default", ->
     equal t('bar', 'these are some tags: <input> and %{another}', {another: '<img>'}),
       'these are some tags: <input> and <img>'
@@ -51,4 +60,3 @@ define [
     # manually concatenate it into your wrapper
     equal t('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'}),
       'you need to <a href="http://foo.bar">log in</a>'
-

@@ -47,6 +47,10 @@ nl:
     nl: Nederlands (crowd-sourced)
   qualified_locale: nl-NL
   crowdsourced: true
+nb:
+  locales:
+    nb: Norwegian (Bokmål)
+  qualified_locale: nb-NO
 ko:
   locales:
     ko: 한국말 (crowd-sourced)
@@ -64,4 +68,9 @@ tr:
   locales:
     tr: Türkçe (crowd-sourced)
   qualified_locale: tr-TR
+  crowdsourced: true
+fa-IR:
+  locales:
+    fa-IR: فارسی (crowd-sourced)
+  qualified_locale: fa-IR
   crowdsourced: true

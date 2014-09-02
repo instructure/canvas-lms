@@ -626,7 +626,11 @@ var SwaggerOperation = function(nickname, path, method, parameters, summary, not
     // for 1.1 compatibility
     var type = param.type || param.dataType;
     if(type === 'array') {
-      type = 'array[' + (param.items.$ref ? param.items.$ref : param.items.type) + ']';
+      if(param.items) {
+        type = 'array[' + (param.items.$ref ? param.items.$ref : param.items.type) + ']';
+      } else {
+        console.log("Warning: " + param.name + " is array type but has no 'items'", this);
+      }
     }
 
     if(type.toLowerCase() === 'boolean') {
@@ -965,22 +969,35 @@ var SwaggerRequest = function(type, url, params, opts, successCallback, errorCal
   if (requestContentType && requestContentType.indexOf("application/x-www-form-urlencoded") === 0) {
     var fields = {};
     var possibleParams = {};
-    var values = {};
+    var values = [];
+    var splitStrip = function(str) {
+          return _.map(str.split(","), function(v) { return v.trim(); });
+        };
 
       for(var i = 0; i < formParams.length; i++){
           var param = formParams[i];
-          var value = this.params[param.name];
+          var name = param.name;
+          var value = this.params[name];
           if (value !== undefined) {
-              values[param.name] = value;
+              if (param.tags && param.tags.type == "array") {
+                var sepValues = splitStrip(value);
+                for (var j = 0; j < sepValues.length; j++) {
+                  var sepValue = sepValues[j];
+                  values.push([name + "[]", sepValue]);
+                }
+              } else {
+                values.push([name, value]);
+              }
           }
       }
 
       var encoded = "";
-      for(key in values) {
-          value = values[key];
+      for(var i = 0; i < values.length; i++) {
+          var key = values[i][0];
+          var value = values[i][1];
           if(encoded !== "")
               encoded += "&";
-          encoded += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+          encoded += key + '=' + encodeURIComponent(value);
       }
     body = encoded
   }

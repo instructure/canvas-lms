@@ -199,7 +199,7 @@ class AccountReportsController < ApplicationController
 #
   def available_reports
     if authorized_action(@account, @current_user, :read_reports)
-      available_reports = AccountReport.available_reports(@account)
+      available_reports = AccountReport.available_reports
 
       results = []
 
@@ -207,7 +207,7 @@ class AccountReportsController < ApplicationController
         last_run = @account.account_reports.where(:report_type => key).order('created_at DESC').first
         last_run = account_report_json(last_run, @current_user, session) if last_run
         report = {
-          :title => value[:title],
+          :title => value.title,
           :parameters => nil,
           :report => key,
           :last_run => last_run
@@ -238,7 +238,7 @@ class AccountReportsController < ApplicationController
 #
   def create
     if authorized_action(@context, @current_user, :read_reports)
-      available_reports = AccountReport.available_reports(@account).keys
+      available_reports = AccountReport.available_reports.keys
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
       report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>params[:parameters])
       report.workflow_state = :running

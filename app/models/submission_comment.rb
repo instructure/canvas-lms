@@ -25,6 +25,7 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :recipient, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
@@ -33,7 +34,7 @@ class SubmissionComment < ActiveRecord::Base
     :id, :comment, :submission_id, :recipient_id, :author_id, :author_name, :group_comment_id, :created_at, :updated_at, :attachment_ids, :assessment_request_id, :media_comment_id,
     :media_comment_type, :context_id, :context_type, :cached_attachments, :anonymous, :teacher_only_comment, :hidden
   ]
-  EXPORTABLE_ASSOCIATIONS = [:submission, :author, :recipient, :assessment_request, :context, :associated_attachments, :submission_comment_participants, :messages]
+  EXPORTABLE_ASSOCIATIONS = [:submission, :author, :recipient, :assessment_request, :context, :associated_attachments, :submission_comment_participants]
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
@@ -222,7 +223,7 @@ class SubmissionComment < ActiveRecord::Base
     context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
   end
 
-  scope :visible, where(:hidden => false)
+  scope :visible, -> { where(:hidden => false) }
 
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }

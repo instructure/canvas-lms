@@ -843,24 +843,6 @@ describe SIS::CSV::UserImporter do
     p.communication_channel_id.should == user1.communication_channels.unretired.first.id
   end
 
-  it "should use an existing active communication channel, even if a retired one exists" do
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,,active"
-    )
-    p = Pseudonym.find_by_unique_id('user1')
-    u = p.user
-    u.communication_channels.create!(:path => 'user1@example.com') { |ccc| ccc.workflow_state = 'retired' }
-    cc = u.communication_channels.create!(:path => 'user1@example.com') { |ccc| ccc.workflow_state = 'active' }
-    u.communication_channels.create!(:path => 'user1@example.com') { |ccc| ccc.workflow_state = 'retired' }
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,User1@example.com,active"
-    )
-    cc.reload
-    cc.path.should == 'User1@example.com'
-  end
-
   it "should work when a communication channel already exists, but there's no sis_communication_channel" do
     importer = process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

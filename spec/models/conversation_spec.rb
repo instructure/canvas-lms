@@ -194,7 +194,7 @@ describe Conversation do
 
   context "message counts" do
     shared_examples_for "message counts" do
-      before do
+      before :once do
         (@shard1 || Shard.default).activate do
           @sender = user
           @recipient = user
@@ -241,7 +241,7 @@ describe Conversation do
 
   context "unread counts" do
     shared_examples_for "unread counts" do
-      before do
+      before :once do
         (@shard1 || Shard.default).activate do
           @sender = user
           @unread_guy = @recipient = user
@@ -824,7 +824,7 @@ describe Conversation do
     end
 
     context "migration" do
-      before do
+      before :once do
         @u1 = student_in_course(:active_all => true).user
         @u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
@@ -867,7 +867,7 @@ describe Conversation do
     end
 
     context 'tag updates' do
-      before(:each) do
+      before :once do
         @teacher    = teacher_in_course(:active_all => true).user
         @student    = student_in_course(:active_all => true, :course => @course).user
         @old_course = @course
@@ -1043,7 +1043,7 @@ describe Conversation do
     context "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @sender = User.create!(:name => 'a')
         @conversation1 = Conversation.initiate([@sender], false)
         @conversation2 = Conversation.initiate([@sender], false)

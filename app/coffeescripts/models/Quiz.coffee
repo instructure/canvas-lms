@@ -121,6 +121,10 @@ define [
     singleSectionDueDate: =>
       _.find(@allDates(), 'dueAt')?.dueAt.toISOString() || @dueAt()
 
+    isOnlyVisibleToOverrides: (overrideFlag) ->
+      return @get('only_visible_to_overrides') || false unless arguments.length > 0
+      @set('only_visible_to_overrides', overrideFlag)
+
     toView: =>
       fields = [
         'htmlUrl', 'multipleDueDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'

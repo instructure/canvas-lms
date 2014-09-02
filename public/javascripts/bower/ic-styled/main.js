@@ -26,12 +26,9 @@
       var Style = lookupStyleComponent(this);
       if (!Style || Style._injected) { return; }
       Style._injected = true;
-      var style = Style.create();
-      style.reopen({tagName: 'style', classNames: 'ic-styled'});
-      style.appendTo(document.body);
-      Ember.run.scheduleOnce('afterRender', this, function() {
-        style.$().prependTo('head');
-      });
+      var name = getStyleComponentName(this);
+      var css = Style.create().renderToBuffer().buffer;
+      inject(name, css);
     }.on('willInsertElement')
   });
 
@@ -49,6 +46,21 @@
     var noIdea = component.container.lookup('component-lookup:main');
     var name = getStyleComponentName(component);
     return noIdea.lookupFactory(name, component.container);
+  }
+
+  function getStyleTag() {
+    var style = document.createElement('style');
+    style.setAttribute('id', 'ic-styled-styles');
+    var head = document.getElementsByTagName('head')[0];
+    head.insertBefore(style, head.firstChild);
+    getStyleTag = function() { return style; };
+    return style;
+  }
+
+  function inject(name, css) {
+    var styleTag = getStyleTag();
+    var comment = '\n\n/* ic-styled: '+name+' */\n\n';
+    styleTag.appendChild(document.createTextNode(comment+css));
   }
 
 }));

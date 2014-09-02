@@ -107,6 +107,11 @@
 #           "example": "2013-01-23T23:59:00-07:00",
 #           "type": "datetime"
 #         },
+#         "one_time_results": {
+#           "description": "prevent the students from seeing their results more than once (right after they submit the quiz)",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "scoring_policy": {
 #           "description": "which quiz score to keep (only if allowed_attempts != 1) possible values: 'keep_highest', 'keep_latest'",
 #           "example": "keep_highest",
@@ -275,17 +280,26 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns [Quiz]
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
-      api_route = api_v1_course_quizzes_url(@context)
-      scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
-      json = if accepts_jsonapi?
-        unless is_authorized_action?(@context, @current_user, :manage_assignments)
-          scope = scope.available
+      updated = @context.quizzes.active.reorder('updated_at DESC').limit(1).pluck(:updated_at).first
+      cache_key = ['quizzes', @context.id, @context.quizzes.active.size,
+                   @current_user, updated, accepts_jsonapi?,
+                   params[:search_term], params[:page], params[:per_page]
+                  ].cache_key
+
+      json = Rails.cache.fetch(cache_key) do
+        api_route = api_v1_course_quizzes_url(@context)
+        scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+        json = if accepts_jsonapi?
+          unless is_authorized_action?(@context, @current_user, :manage_assignments)
+            scope = scope.available
+          end
+          jsonapi_quizzes_json(scope: scope, api_route: api_route)
+        else
+          @quizzes = Api.paginate(scope, self, api_route)
+          quizzes_json(@quizzes, @context, @current_user, session)
         end
-        jsonapi_quizzes_json(scope: scope, api_route: api_route)
-      else
-        @quizzes = Api.paginate(scope, self, api_route)
-        quizzes_json(@quizzes, @context, @current_user, session)
       end
+
       render json: json
     end
   end
@@ -403,6 +417,12 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   NOTE: If students have started taking the quiz, or there are any
   #   submissions for the quiz, you may not unpublish a quiz and will recieve
   #   an error.
+  #
+  # @argument quiz[one_time_results] [Optional, Boolean]
+  #   Whether students should be prevented from viewing their quiz results past
+  #   the first time (right after they turn the quiz in.)
+  #   Only valid if "hide_results" is not set to "always".
+  #   Defaults to false.
   #
   # @returns Quiz
   def create

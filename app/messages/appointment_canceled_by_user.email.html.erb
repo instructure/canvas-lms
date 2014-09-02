@@ -2,6 +2,12 @@
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t 'click_to_see_appointment', 'Click here to view the appointment' %>
+  </a>
+<% end %>
+
 <% courses = asset.appointment_group.participant_type == 'Group' ?
     asset.appointment_group.contexts.first.name  :
     asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %>
@@ -45,14 +51,3 @@
 <p style="font-weight: bold;"><%= t :cancel_reason, 'Reason for canceling' %></p>
 <p><%= data.cancel_reason || t(:no_reason_given, "none given") %></p>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><%= t :view_appointment, 'View the appointment at the following link' %>:</p>
-
-<p><a href="<%= content :link %>"><%= t 'click_to_see_assignment', 'Click here to view the assignment' %></a></p>

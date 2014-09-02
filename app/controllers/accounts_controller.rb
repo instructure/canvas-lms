@@ -130,7 +130,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
-        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
+        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
@@ -466,7 +466,7 @@ class AccountsController < ApplicationController
 
   def settings
     if authorized_action(@account, @current_user, :read)
-      @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
+      @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
         @last_complete_reports = {}
         @last_reports = {}
@@ -508,9 +508,9 @@ class AccountsController < ApplicationController
       return render_unauthorized_action
     end
 
-    authentication_logging = @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?
-    grade_change_logging = @account.grants_rights?(@current_user, :view_grade_changes).values.any?
-    course_logging = @account.grants_rights?(@current_user, :view_course_changes).values.any?
+    authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
+    grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    course_logging = @account.grants_right?(@current_user, :view_course_changes)
     if authentication_logging || grade_change_logging || course_logging
       logging = {
         authentication: authentication_logging,
@@ -600,14 +600,14 @@ class AccountsController < ApplicationController
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
-      if @account.grants_right?(@current_user, nil, :read_course_list)
+      if @account.grants_right?(@current_user, :read_course_list)
         @recently_started_courses = @account.all_courses.recently_started
         @recently_ended_courses = @account.all_courses.recently_ended
         if @account == Account.default
           @recently_created_courses = @account.all_courses.recently_created
         end
       end
-      if @account.grants_right?(@current_user, nil, :read_roster)
+      if @account.grants_right?(@current_user, :read_roster)
         @recently_logged_users = @account.all_users.recently_logged_in
       end
       @counts_report = @account.report_snapshots.detailed.last.try(:data)
@@ -734,34 +734,49 @@ class AccountsController < ApplicationController
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list],
-                          :root_account => @context.root_account,
-                          :search_method => @context.user_list_search_mode_for(@current_user))
-      users = list.users
-      account_users = users.map do |user|
-        admin = user.flag_as_admin(@context, params[:membership_type])
-        { :enrollment => {
+    role = params[:membership_type] || 'AccountAdmin'
+
+    list = UserList.new(params[:user_list],
+                        :root_account => @context.root_account,
+                        :search_method => @context.user_list_search_mode_for(@current_user))
+    users = list.users
+    admins = users.map do |user|
+      admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+      admin.user = user
+      return unless authorized_action(admin, @current_user, :create)
+      admin
+    end
+
+    account_users = admins.map do |admin|
+      admin.save! if admin.new_record?
+      if admin.new_record?
+        if admin.user.registed?
+          admin.account_user_notification!
+        else
+          admin.account_user_registration!
+        end
+      end
+
+      { :enrollment => {
           :id => admin.id,
-          :name => user.name,
+          :name => admin.user.name,
           :membership_type => admin.membership_type,
           :workflow_state => 'active',
-          :user_id => user.id,
+          :user_id => admin.user.id,
           :type => 'admin',
-          :email => user.email
-        }}
-      end
-      render :json => account_users
+          :email => admin.user.email
+      }}
     end
+    render :json => account_users
   end
 
   def remove_account_user
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      @account_user = @context.account_users.find(params[:id])
-      @account_user.destroy
+    admin = @context.account_users.find(params[:id])
+    if authorized_action(admin, @current_user, :destroy)
+      admin.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
-        format.json { render :json => @account_user }
+        format.json { render :json => admin }
       end
     end
   end

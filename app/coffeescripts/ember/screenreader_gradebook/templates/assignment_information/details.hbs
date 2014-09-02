@@ -1,0 +1,47 @@
+<div class="pad-box no-sides">
+  <p><strong>
+    {{#t 'submission_types'}}Submission types: {{/t}} {{assignmentSubmissionTypes}}
+  </strong></p>
+  <p><strong>
+    {{#t 'graded_sub_count'}}Graded submissions: {{/t}} {{assignmentDetails.cnt}}
+  </strong></p>
+</div>
+
+<div class="pad-box bottom-only">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{{#t 'points_possible'}}Points possible{{/t}}</th>
+        {{#if assignmentDetails}}
+          {{#with assignmentDetails }}
+            {{#if cnt}}
+              <th>{{#t 'avg_score'}}Average Score{{/t}}</th>
+              <th>{{#t 'high_score'}}High Score{{/t}}</th>
+              <th>{{#t 'low_score'}}Low Score{{/t}}</th>
+            {{/if}}
+          {{/with}}
+        {{/if}}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          {{#if selectedAssignment.points_possible}}
+            {{selectedAssignment.points_possible}}
+          {{else}}
+            {{#t 'no_points'}}No points possible{{/t}}
+          {{/if}}
+        </td>
+        {{#if assignmentDetails}}
+          {{#with assignmentDetails }}
+            {{#if cnt}}
+              <td>{{average}}</td>
+              <td>{{max}}</td>
+              <td>{{min}}</td>
+            {{/if}}
+          {{/with}}
+        {{/if}}
+      </tr>
+    </tbody>
+  </table>
+</div>

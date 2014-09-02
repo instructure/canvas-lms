@@ -172,7 +172,7 @@ class GradeChangeAuditApiController < AuditorApiController
   #
   def for_student
     @student = User.active.find(params[:student_id])
-    unless @student.associated_accounts.to_a.include?(@domain_root_account)
+    unless @domain_root_account.associated_user?(@student)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:student_id]}'"
     end
     if authorize
@@ -197,7 +197,7 @@ class GradeChangeAuditApiController < AuditorApiController
   #
   def for_grader
     @grader = User.active.find(params[:grader_id])
-    unless @grader.associated_accounts.to_a.include?(@domain_root_account)
+    unless @domain_root_account.associated_user?(@grader)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:grader_id]}'"
     end
     if authorize

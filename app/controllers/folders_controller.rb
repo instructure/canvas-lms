@@ -105,6 +105,7 @@
 class FoldersController < ApplicationController
   include Api::V1::Folders
   include Api::V1::Attachment
+  include AttachmentHelper
 
   before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
 
@@ -144,6 +145,21 @@ class FoldersController < ApplicationController
     end
   end
 
+  # @API Resolve path
+  # @subtopic Folders
+  # Given the full path to a folder, returns a list of all Folders in the path hierarchy,
+  # starting at the root folder, and ending at the requested folder. The given path is
+  # relative to the context's root folder and does not include the root folder's name
+  # (e.g., "course files"). If an empty path is given, the context's root folder alone
+  # is returned. Otherwise, if no folder exists with the given full path, a Not Found
+  # error is returned.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders/by_path/foo/bar/baz' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
   def resolve_path
     if authorized_action(@context, @current_user, :read)
       can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
@@ -211,7 +227,7 @@ class FoldersController < ApplicationController
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
             :files => files.map { |f|
               f.as_json(files_options).tap { |json|
-                json['attachment']['canvadoc_session_url'] = f.canvadoc_url(@current_user)
+                json['attachment'].merge! doc_preview_json(f, @current_user)
               }
             }
           }

@@ -24,7 +24,7 @@ describe UsersController do
     before :each do
       @a = Account.default
       @u = user(:active_all => true)
-      @a.add_user(@u)
+      @a.account_users.create!(user: @u)
       user_session(@user)
       @t1 = @a.default_enrollment_term
       @t2 = @a.enrollment_terms.create!(:name => 'Term 2')
@@ -66,7 +66,7 @@ describe UsersController do
       Facebook::Connection.config = Proc.new do
         {}
       end
-      CanvasUuid::Uuid.stubs(:generate).returns("some_uuid")
+      CanvasSlug.stubs(:generate).returns("some_uuid")
 
       user_with_pseudonym
       user_session(@user)
@@ -265,9 +265,16 @@ describe UsersController do
 
         it "should allow observers to self register" do
           user_with_pseudonym(:active_all => true, :password => 'lolwut')
+          course_with_student(:user => @user, :active_all => true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
           response.should be_success
+          new_pseudo = Pseudonym.find_by_unique_id('jane@example.com')
+          new_user = new_pseudo.user
+          new_user.observed_users.should == [@user]
+          oe = new_user.observer_enrollments.first
+          oe.course.should == @course
+          oe.associated_user.should == @user
         end
 
         it "should redirect 'new' action to root_url" do
@@ -442,7 +449,7 @@ describe UsersController do
 
         before do
           user_with_pseudonym(:account => account)
-          account.add_user(@user)
+          account.account_users.create!(user: @user)
           user_session(@user, @pseudonym)
         end
 
@@ -497,7 +504,7 @@ describe UsersController do
       it "should notify the user if a merge opportunity arises" do
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
@@ -514,7 +521,7 @@ describe UsersController do
 
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
@@ -720,7 +727,7 @@ describe UsersController do
     end
 
     describe 'as site admin' do
-      before { Account.site_admin.add_user(@admin) }
+      before { Account.site_admin.account_users.create!(user: @admin) }
 
       it 'warns about merging a user with itself' do
         user = User.create!
@@ -815,7 +822,7 @@ describe UsersController do
       PageView.stubs(:page_view_method).returns(:db)
       user_with_pseudonym
       admin = @user
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
       @shard1.activate do
         account = Account.create!
@@ -847,7 +854,7 @@ describe UsersController do
     it "should not associate the user with target user's shard for non-db page views" do
       user_with_pseudonym
       admin = @user
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
       @shard1.activate do
         account = Account.create!

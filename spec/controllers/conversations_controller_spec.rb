@@ -51,9 +51,6 @@ describe ConversationsController do
       get 'index'
       response.should be_success
       assigns[:js_env].should_not be_nil
-      assigns[:contexts][:courses].to_a.map{|p|p[1]}.
-        reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
-      assigns[:contexts][:courses][@course.id][:term].should == "Fall"
     end
 
     it "should assign variables for json" do
@@ -166,7 +163,7 @@ describe ConversationsController do
         @student.initiate_conversation([user]).add_message('test2') # no root account, so teacher can't see it
 
         course_with_teacher_logged_in(:active_all => true, :account => a)
-        a.add_user(@user)
+        a.account_users.create!(user: @user)
         session[:become_user_id] = @student.id
       end
 

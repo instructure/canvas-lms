@@ -45,7 +45,7 @@ module Api::V1::Attachment
                       elsif options.has_key?(:can_manage_files)
                         options[:can_manage_files]
                       else
-                        !attachment.grants_right?(user, nil, :update)
+                        !attachment.grants_right?(user, :update)
                       end
 
     downloadable = !attachment.locked_for?(user, check_policies: true)

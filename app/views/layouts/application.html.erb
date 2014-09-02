@@ -39,7 +39,7 @@
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
     <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
     <b id="header-logo-secondary"></b>
-    <div id="topbar">
+    <div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
       <% if (identity = (yield :identity).presence) %>
         <%= identity %>
       <% else %>
@@ -53,11 +53,7 @@
     <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li id="courses_menu_item" class="menu-item">
-        <%- if show_home_menu? -%>
-          <%= render(:partial => 'shared/home_menu') %>
-        <%- else  -%>
-          <a href="<%= dashboard_path %>" class="menu-item-no-drop"><%= t 'links.home', 'Home' %></a>
-        <%- end -%>
+        <%= render(:partial => 'shared/home_menu') %>
       </li>
       <%- end -%>
       <li id="assignments_menu_item" class="menu-item">
@@ -134,6 +130,17 @@
         <% if @context.try(:short_name) %>
           <div class='h1' id="section-tabs-header">
             <%= @context.short_name %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage)%>
+              <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only"><%= t("group_switch","Switch")%></span>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li><%= link_to group.short_name, group_path(group) %></li>
+                <% end %>
+              </ul>
+            <% end %>
             <% if @context && @context.respond_to?(:context)  %>
               <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
             <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
