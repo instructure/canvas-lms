@@ -166,7 +166,7 @@ define [
     curve_button_text = find('#curve_grades').text()
     notEqual(curve_button_text.indexOf("Curve Grades"), -1)
 
-  test 'curve grades button does not display with 0 points poisslbe', ->
+  test 'curve grades button does not display with 0 points possible', ->
     Ember.run =>
       @controller.set('selectedAssignment.points_possible', 0)
     equal(find('#curve_grades').text(), "")

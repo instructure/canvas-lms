@@ -87,6 +87,10 @@ describe "people" do
       wait_for_ajaximations
     end
 
+    it "should have tabs" do
+      fj('.collectionViewItems>li:first').text.should match "Everyone"
+    end
+
     it "should validate the main page" do
       users = ff('.roster_user_name')
       users[1].text.should match @student_1.name

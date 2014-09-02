@@ -21,17 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'csv'
 
 describe GradebookUploadsController do
-  before do
-    Course.any_instance.stubs(:feature_enabled?).returns(false)
-  end
-
   describe "POST 'create'" do
     it "should require authorization" do
       course_model
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect on failed csvs" do
       course_with_teacher_logged_in(:active_all => true)
       file = Tempfile.new("csv.csv")
@@ -41,12 +37,12 @@ describe GradebookUploadsController do
       post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
       response.should be_redirect
     end
-    
+
     it "should accept a valid csv upload" do
       course_with_graded_student
       check_create_response
     end
-    
+
     it "should accept a valid csv upload with a final grade column" do
       course_with_graded_student
       @course.grading_standard_id = 0
@@ -61,16 +57,16 @@ describe GradebookUploadsController do
       check_create_response(true)
     end
   end
-  
+
   describe "POST 'update'" do
-    
+
     it "should update grades and save new versions" do
       course_with_graded_student
       @assignment.reload
       @assignment2.reload
       @assignment.submissions.first.grade.should == '10'
       @assignment2.submissions.first.grade.should == '8'
-      
+
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2"]
         csv << ["    Points Possible", "", "","", ""]
@@ -80,7 +76,7 @@ describe GradebookUploadsController do
       @gi = GradebookImporter.new(@course, uploaded_csv)
       @gi.parse!
       post 'update', :course_id => @course.id, :json_data_to_submit => @gi.to_json
-      
+
       a_sub = @assignment.reload.submissions.first
       a2_sub = @assignment2.reload.submissions.first
       a_sub.grade.should == '5'
@@ -92,12 +88,12 @@ describe GradebookUploadsController do
       a2_sub.grader_id.should_not be_nil
       a2_sub.version_number.should == 2
 
-      response.should redirect_to(course_gradebook2_url(@course))
+      response.should redirect_to(course_gradebook_url(@course))
     end
-    
+
     it "should create new assignments" do
       course_with_graded_student
-      
+
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2", "Third Assignment"]
         csv << ["    Points Possible", "", "","", "", "", "", "15"]
@@ -107,17 +103,17 @@ describe GradebookUploadsController do
       @gi = GradebookImporter.new(@course, uploaded_csv)
       @gi.parse!
       post 'update', :course_id => @course.id, :json_data_to_submit => @gi.to_json
-      
+
       a = @course.assignments.find_by_title("Third Assignment")
       a.should_not be_nil
       a.title.should == "Third Assignment"
       a.points_possible.should == 15
       a.submissions.first.grade.should == '10'
     end
-    
-    
+
+
   end
-  
+
   def course_with_graded_student
     course_with_student(:active_all => true)
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
@@ -133,7 +129,7 @@ describe GradebookUploadsController do
     @course.enroll_teacher(@user).accept
     user_session(@user)
   end
-  
+
   def check_create_response(include_sis_id=false)
     file = Tempfile.new("csv.csv")
     file.puts(@course.gradebook_to_csv(:include_sis_id => include_sis_id))

@@ -5,6 +5,7 @@
            placeholder="{{#t "group_name"}}Group Name{{/t}}">
   </div>
 </div>
+{{#unless nameOnly}}
 {{#ifEqual role "student_organized"}}
 <div class="control-group">
   <label class="control-label" for="group_join_level">{{#t "group_join_level"}}Joining{{/t}}</label>
@@ -25,6 +26,7 @@
   </div>
 </div>
 {{/ifEqual}}
+{{/unless}}
 
 <div class="form-controls">
   <button class="btn dialog_closer" type="button"

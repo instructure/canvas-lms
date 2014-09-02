@@ -20,6 +20,7 @@ define [
     assignmentsLabel: I18n.t('assignments_label', 'Assignment Quizzes toggle quiz visibility')
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
+    finishedPaginationLoading: false
 
     environment: environment
 

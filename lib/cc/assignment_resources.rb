@@ -37,6 +37,8 @@ module CC
       end
     end
 
+    VERSION_1_3 = Gem::Version.new('1.3')
+
     def add_assignment(assignment)
       migration_id = CCHelper.create_key(assignment)
 
@@ -44,16 +46,58 @@ module CC
       FileUtils::mkdir_p lo_folder
 
       file_name = "#{assignment.title.to_url}.html"
-      relative_path = File.join(migration_id, file_name)
       path = File.join(lo_folder, file_name)
+      html_path = File.join(migration_id, file_name)
 
       # Write the assignment description as an .html file
-      # That way at least the content of the assignment will
-      # appear when someone non-canvas imports the package
+      # That way at least the content of the assignment will appear
+      # for agents that support neither CC 1.3 nor Canvas assignments
       File.open(path, 'w') do |file|
         file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title)
       end
 
+      if Gem::Version.new(@manifest.cc_version) >= VERSION_1_3
+        add_cc_assignment(assignment, migration_id, lo_folder, html_path)
+      else
+        add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
+      end
+    end
+    
+    def add_cc_assignment(assignment, migration_id, lo_folder, html_path)
+      File.open(File.join(lo_folder, CCHelper::ASSIGNMENT_XML), 'w') do |assignment_file|
+        document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
+        document.instruct!
+
+        document.assignment("identifier" => migration_id,
+                            "xmlns" => CCHelper::ASSIGNMENT_NAMESPACE,
+                            "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                            "xsi:schemaLocation"=> "#{CCHelper::ASSIGNMENT_NAMESPACE} #{CCHelper::ASSIGNMENT_XSD_URI}"
+        ) do |a|
+          AssignmentResources.create_cc_assignment(a, assignment, migration_id)
+        end
+      end
+
+      xml_path = File.join(migration_id, CCHelper::ASSIGNMENT_XML)
+      @resources.resource(:identifier => migration_id,
+                          :type => CCHelper::ASSIGNMENT_TYPE,
+                          :href => xml_path
+      ) do |res|
+        res.file(:href => xml_path)
+      end
+
+      @resources.resource(:identifier => migration_id + "_fallback",
+                          :type => CCHelper::WEBCONTENT
+      ) do |res|
+        res.tag!('cpx:variant', :identifier => migration_id + "_variant",
+                                :identifierref => migration_id
+        ) do |var|
+          var.tag!('cpx:metadata')
+        end
+        res.file(:href => html_path)
+      end
+    end
+    
+    def add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
       assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
       document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)
       document.instruct!
@@ -64,21 +108,53 @@ module CC
                           "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                           "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |a|
-        AssignmentResources.create_assignment(a, assignment)
+        AssignmentResources.create_canvas_assignment(a, assignment)
       end
       assignment_file.close
 
       @resources.resource(
-              :identifier => migration_id,
-              "type" => CCHelper::LOR,
-              :href => relative_path
+        :identifier => migration_id,
+        "type" => CCHelper::LOR,
+        :href => html_path
       ) do |res|
-        res.file(:href=>relative_path)
+        res.file(:href=>html_path)
         res.file(:href=>File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
       end
     end
-    
-    def self.create_assignment(node, assignment)
+
+    SUBMISSION_TYPE_MAP = {
+        "online_text_entry" => "html",
+        "online_url" => "url",
+        "online_upload" => "file"
+    }.freeze
+
+    def self.create_cc_assignment(node, assignment, migration_id)
+      node.title(assignment.title)
+      node.text(assignment.description, texttype: 'text/html')
+      if assignment.points_possible
+        node.gradable(assignment.graded?, points_possible: assignment.points_possible)
+      else
+        node.gradable(assignment.graded?)
+      end
+      node.submission_formats do |fmt|
+        assignment.submission_types.split(',').each do |st|
+          if cc_type = SUBMISSION_TYPE_MAP[st]
+            fmt.format(:type => cc_type)
+          end
+        end
+      end
+      node.extensions do |ext|
+        ext.assignment("identifier" => migration_id + "_canvas",
+                       "xmlns" => CCHelper::CANVAS_NAMESPACE,
+                       "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                       "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        ) do |a|
+          AssignmentResources.create_canvas_assignment(a, assignment)
+        end
+      end
+    end
+
+    def self.create_canvas_assignment(node, assignment)
       node.title assignment.title
       node.due_at CCHelper::ims_datetime(assignment.due_at) if assignment.due_at
       node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at

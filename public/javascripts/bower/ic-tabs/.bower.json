@@ -36,7 +36,6 @@
     "commit": "575a4589062badbf1624a61aa61a7065b0386050"
   },
   "_source": "git://github.com/instructure/ic-tabs.git",
-  "_target": "~0.1.3",
-  "_originalSource": "ic-tabs",
-  "_direct": true
+  "_target": "0.1.3",
+  "_originalSource": "ic-tabs"
 }

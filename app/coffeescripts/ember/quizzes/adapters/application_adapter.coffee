@@ -7,7 +7,7 @@ define [
   DS.ActiveModelAdapter.extend
     ajax: (url, type, options) ->
       options = @ajaxOptions url, type, options
-      ajax(options)
+      ajax.request(options)
 
     headers:
       'Accept': 'application/vnd.api+json'

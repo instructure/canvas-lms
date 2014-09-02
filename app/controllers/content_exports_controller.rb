@@ -21,7 +21,7 @@ class ContentExportsController < ApplicationController
   before_filter { |c| c.active_tab = "settings" }
 
   def index
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     @exports = @context.content_exports.active.not_for_copy
     @current_export_id = nil
@@ -31,7 +31,7 @@ class ContentExportsController < ApplicationController
   end
 
   def show
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       render_export(export)
@@ -41,11 +41,10 @@ class ContentExportsController < ApplicationController
   end
 
   def create
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if @context.content_exports.running.count == 0
-      export = ContentExport.new
-      export.course = @context
+      export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
       if params[:export_type] == 'qti'
@@ -60,7 +59,7 @@ class ContentExportsController < ApplicationController
         export.export_course
         render_export(export)
       else
-        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}
+        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create content export.")}
       end
     else
       # an export is already running, just return it
@@ -70,7 +69,7 @@ class ContentExportsController < ApplicationController
   end
 
   def destroy
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       export.destroy

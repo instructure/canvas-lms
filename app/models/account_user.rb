@@ -21,7 +21,7 @@ class AccountUser < ActiveRecord::Base
   belongs_to :user
   has_many :role_overrides, :as => :context
   has_a_broadcast_policy
-  before_save :infer_defaults
+  before_validation :infer_defaults
   after_save :touch_user
   after_destroy :touch_user
   after_save :update_account_associations_if_changed
@@ -73,7 +73,12 @@ class AccountUser < ActiveRecord::Base
     p.to {|record| record.user }
     p.whenever {|record| @account_user_notification }
   end
-  
+
+  set_policy do
+    given { |user| self.account.grants_right?(user, :manage_account_memberships) && is_subset_of?(user) }
+    can :create and can :destroy
+  end
+
   def readable_type
     AccountUser.readable_type(self.membership_type)
   end

@@ -28,6 +28,7 @@ define [
       'click .view_tools_link': 'showExternalToolsView'
       'click .view_app_center_link': 'showAppCenterView'
       'click .app': 'showAppFullView'
+      'keyup .app': 'showAppFullView'
       'click .add_tool_link': 'addTool'
       'click [data-edit-external-tool]': 'editTool'
       'click [data-delete-external-tool]': 'deleteTool'
@@ -76,16 +77,17 @@ define [
       $(document).scrollTop(@currentAppCenterPosition)
 
     showAppFullView: (event) ->
-      @hideExternalToolsView()
-      @hideAppCenterView()
-      view = @$(event.currentTarget).data('view')
-      @appFullView = new AppFullView
-        model: view.model
-      @appFullView.on 'cancel', @showAppCenterView, this
-      @appFullView.on 'addApp', @addApp, this
-      @appFullView.render()
-      @$appFull.append @appFullView.$el
-      
+      if event.type != 'keyup' || event.keyCode == 32
+        @hideExternalToolsView()
+        @hideAppCenterView()
+        view = @$(event.currentTarget).data('view')
+        @appFullView = new AppFullView
+          model: view.model
+        @appFullView.on 'cancel', @showAppCenterView, this
+        @appFullView.on 'addApp', @addApp, this
+        @appFullView.render()
+        @$appFull.append @appFullView.$el
+
     addApp: ->
       newTool = new ExternalTool
       newTool.on 'sync', @onToolSync
@@ -139,6 +141,8 @@ define [
     toggleInstalledState: (event) =>
       elm = @$(event.currentTarget)
       @appCenterView.targetInstalledState = elm.data('toggle-installed-state')
+      @$('[data-installed-state] > a').attr('aria-selected', 'false')
       @$('[data-installed-state]').removeClass('active')
       @$('[data-installed-state="' + @appCenterView.targetInstalledState + '"]').addClass('active')
+      @$('[data-installed-state="' + @appCenterView.targetInstalledState + '"] > a').attr('aria-selected', 'true')
       @appCenterView.render()

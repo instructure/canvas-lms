@@ -1,0 +1,13 @@
+// These are the variables and mixins that we
+// want to run throughout canvas
+
+//functions
+@import "sass-functions/_ensure-contrast.scss";
+
+//variables
+@import "themes/variables";
+
+//mixins
+@import "vendor/bootstrap/mixins";
+@import "compass";
+@import "base/mixins/compile_mixins";

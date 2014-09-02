@@ -45,6 +45,7 @@
           {{bind-attr aria-label=assignmentsLabel}}
           aria-controls='assignment-quizzes'
           aria-expanded='true'
+          tabindex="0"
           role='button'>
           <i class='icon-mini-arrow-down auto_rotate'}}></i>
           {{#t 'assignments'}}Assignment Quizzes{{/t}}
@@ -127,4 +128,12 @@
       </ul>
     </div>
   {{/if}}
+
+  {{#unless finishedPaginationLoading}}
+    <div class='paginated-loading'>
+      <img src='/images/ajax-loader-medium-444.gif' />
+      {{#t 'loading'}}Loading{{/t}}
+    </div>
+  {{/unless}}
+
 </div>

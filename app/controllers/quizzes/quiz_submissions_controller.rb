@@ -132,12 +132,13 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @student = @context.students.find(params[:user_id])
+    @student = @context.students.find_by_id(params[:user_id])
     @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student || @current_user, nil, 'settings_only')
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0
       @submission.extra_attempts = params[:extra_attempts].to_i if params[:extra_attempts]
       @submission.extra_time = params[:extra_time].to_i if params[:extra_time]
+      @submission.has_seen_results = false if params[:reset_has_seen_results] == '1'
       @submission.manually_unlocked = params[:manually_unlocked] == '1' if params[:manually_unlocked]
       if @submission.extendable? && (params[:extend_from_now] || params[:extend_from_end_at]).to_i > 0
         if params[:extend_from_now].to_i > 0
@@ -210,7 +211,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           end
         end
 
-        format.json { render :json => attachment.as_json(:methods => :readable_size) }
+        format.any(:json, :jsonapi) { render :json => attachment.as_json(:methods => :readable_size) }
       else
         flash[:notice] = t('still_zipping', "File zipping still in process...")
 
@@ -222,7 +223,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           redirect_to named_context_url(context, :context_quiz_url, quiz.id)
         end
 
-        format.json { render :json => attachment }
+        format.any(:json, :jsonapi) { render :json => attachment }
       end
     end
   end

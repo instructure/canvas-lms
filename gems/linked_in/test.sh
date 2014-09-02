@@ -2,7 +2,7 @@
 result=0
 
 echo "################ linked_in ################"
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
 

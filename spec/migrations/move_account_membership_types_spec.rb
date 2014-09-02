@@ -113,10 +113,10 @@ describe 'MoveAccountMembershipTypes' do
   end
 
   it "should add inactive roles for non-existent account user membership types" do
-    @account1.add_user(user, 'role1')
-    @account1.add_user(user, 'NonexistentType')
-    @account2.add_user(user, 'AnotherNonexistentType')
-    @account2.add_user(user, 'YetAnotherNonexistentType')
+    @account1.account_users.create!(user: user, membership_type: 'role1')
+    @account1.account_users.create!(user: user, membership_type: 'NonexistentType')
+    @account2.account_users.create!(user: user, membership_type: 'AnotherNonexistentType')
+    @account2.account_users.create!(user: user, membership_type: 'YetAnotherNonexistentType')
 
     MoveAccountMembershipTypes.up
 
@@ -134,7 +134,7 @@ describe 'MoveAccountMembershipTypes' do
   end
 
   it "should not add inactive roles for non-existent account user membership types if the role already exists" do
-    @account1.add_user(user, 'NonexistentType')
+    @account1.account_users.create!(user: user, membership_type: 'NonexistentType')
 
     role1 = @account1.roles.build(:name => 'NonexistentType')
     role1.base_role_type = 'TeacherEnrollment'
@@ -149,7 +149,7 @@ describe 'MoveAccountMembershipTypes' do
   end
 
   it "should not fail when encountering a user with a reserved membership type" do
-    @account1.add_user(user, 'AccountAdmin')
+    @account1.account_users.create!(user: user)
 
     MoveAccountMembershipTypes.up
   end

@@ -31,7 +31,7 @@ class UserProfile < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
-    TAB_HOME, TAB_PROFILE_SETTINGS = *0..10
+    TAB_HOME, TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
 
   def tabs_available(user=nil, opts={})
     unless @tabs
@@ -59,6 +59,10 @@ class UserProfile < ActiveRecord::Base
       end
       if user && user.fake_student?
         @tabs = @tabs.slice(0,2)
+      end
+
+      if user && user.user_observees.exists?
+        @tabs << { :id => TAB_OBSERVEES, :label => I18n.t('#tabs.observees', 'Observing'), :css_class => 'observees', :href => :observees_profile_path, :no_args => true }
       end
     end
     @tabs

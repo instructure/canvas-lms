@@ -23,7 +23,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
   before do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
-    @account.add_user(@user)
+    @account.account_users.create!(user: @user)
   end
 
   it "should set the authorization config" do

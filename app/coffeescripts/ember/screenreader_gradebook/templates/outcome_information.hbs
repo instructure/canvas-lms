@@ -1,0 +1,55 @@
+<div id="outcome_information">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'outcome_info'}}Outcome Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedOutcome}}
+        <h3 class="outcome_selection">
+          {{selectedOutcome.title}}
+        </h3>
+
+        <div class="pad-box no-sides">
+          <p><strong>
+            {{#t 'result_sub_count'}}Total results: {{/t}} {{outcomeDetails.cnt}}
+          </strong></p>
+        </div>
+
+        <div class="pad-box bottom-only">
+          <table class="table">
+            <thead>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <th scope="col">{{#t 'avg_score'}}Average Score{{/t}}</th>
+                      <th scope="col">{{#t 'high_score'}}High Score{{/t}}</th>
+                      <th scope="col">{{#t 'low_score'}}Low Score{{/t}}</th>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <td>{{average}}</td>
+                      <td>{{max}}</td>
+                      <td>{{min}}</td>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="outcome_selection pad-box top-only">
+          {{#t 'empty_outcome_selection'}}Select an outcome to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

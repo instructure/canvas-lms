@@ -54,4 +54,8 @@ environment_configuration(defined?(config) && config) do |config|
     # Send deprecation notices to registered listeners
     config.active_support.deprecation = :notify
   end
+
+  # we use lots of db specific stuff - don't bother trying to dump to ruby
+  # (it also takes forever)
+  config.active_record.schema_format = :sql
 end

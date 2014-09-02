@@ -123,7 +123,7 @@ describe "enrollment_date_restrictions" do
     html = Nokogiri::HTML(response.body)
     html.css('.course').length.should == 2
 
-    Account.default.add_user(@user)
+    Account.default.account_users.create!(user: @user)
     get "/users/#{@user.id}"
     response.body.should match /Inactive/
     response.body.should match /Completed/

@@ -6,10 +6,13 @@
   <%= t :subject, "New Assessment: %{title}, %{context}", :title => asset.title, :context => asset.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "Click here to review the assessment and submit your entry" %>
+  </a>
+<% end %>
+
 <p><%= t :body, "A new assessment has been created for %{context}:", :context => asset.context.name %></p>
 
 <p><strong><%= asset.title %></strong></p>
 <p><%= asset.description %></p>
-
-<p><a href="<%= content :link %>"><%= t :link_message, "Click here to review the assessment and submit your entry" %></a></p>
-

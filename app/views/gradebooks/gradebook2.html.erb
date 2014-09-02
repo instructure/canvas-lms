@@ -3,11 +3,7 @@
   @body_classes << "gradebook2 full-width"
   @show_left_side = false
   @show_embedded_chat = false
-  if @context.feature_enabled?(:screenreader_gradebook)
-    add_crumb t(:individual_view, "Switch to Individual View"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
-  elsif @context.old_gradebook_visible?
-    add_crumb t(:old_gradebook, "old gradebook", :version => 1), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
-  end
+  add_crumb t(:individual_view, "Switch to Individual View"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
   jammit_css :slickgrid, :gradebook2
   js_bundle :gradebook2
 %>
@@ -27,17 +23,17 @@
               <a href="#"
                  data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
             </li>
-             <% end %>
+            <% end %>
           </ul>
         </nav>
         <div class="section-button-placeholder"></div>
         <% if @context.feature_enabled?(:post_grades) %>
         <div class="pull-right">
-          <nav class="gradebook-navigation">
+          <nav class="gradebook-navigation hidden">
             <ul class="nav nav-pills gradebook-navigation-pills pull-right">
               <li>
                 <a class="btn-outline" href="#"
-                   id="publish"><%= t(:post_grades, "Post Grades") %></a>
+                   id="post-grades-button"><%= t(:post_grades, "Post Grades") %></a>
               </li>
             </ul>
           </nav>

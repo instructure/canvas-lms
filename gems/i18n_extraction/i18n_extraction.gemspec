@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sexp_processor", "4.2.1"
-  spec.add_dependency "ruby_parser", "3.1.3"
+  spec.add_dependency "ruby_parser", "3.6.1"
   if CANVAS_RAILS3
     spec.add_dependency "activesupport", "~> 3.2"
   else
@@ -28,5 +28,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", "2.14.1"
 end

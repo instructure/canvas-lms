@@ -1,10 +1,47 @@
 Based on the question type it represents, the `question_statistics` document
 may include extra metrics. You can find these metrics below.
 
-#### Multiple Choice & True/False
+<a class="bookmark" id="multiple-choice-question-stats"></a>
+
+#### Multiple Choice
 
 ```javascript
 {
+  // Number of students who have picked any choice.
+  "responses": 4,
+
+  "answers": [
+    {
+      // Unique ID of this answer.
+      "id": "3866",
+
+       // The readable answer text.
+      "text": "Red",
+
+       // Number of students who picked this answer.
+      "responses": 3,
+
+       // Whether this answer is a correct one.
+      "correct": true
+    },
+
+    // An incorrect choice:
+    {
+      "id": "2040",
+      "text": "Green",
+      "correct": false,
+      "responses": 1
+    },
+
+    // The "No Answer" - students who didn't make any choice:
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 2,
+      "correct": false
+    }
+  ],
+
   // Number of students who have answered this question.
   "answered_student_count": 0,
 
@@ -154,6 +191,64 @@ may include extra metrics. You can find these metrics below.
           "correct": false
         }
       ]
+    }
+  ]
+}
+```
+
+#### Multiple Answers
+
+```javascript
+{
+  // Number of students who have picked any choice.
+  "responses": 3,
+
+  // Number of students who have picked all the right choices.
+  "correct": 1,
+
+  // Number of students who have picked at least one of the right choices,
+  // but may have also picked a wrong one.
+  "partially_correct": 2,
+
+  "answers": [
+    {
+      // Unique ID of this answer choice.
+      "id": "5514",
+
+      // Displayable choice text.
+      "text": "A",
+
+      // Number of students who picked this choice.
+      "responses": 3,
+
+      // Whether this choice is part of the answer.
+      "correct": true
+    },
+    // Here's the second part of the correct answer:
+    {
+      "id": "4261",
+      "text": "B",
+      "responses": 1,
+      "correct": true
+    },
+
+    // And here's a distractor:
+    {
+      "id": "3322",
+      "text": "C",
+      "responses": 2,
+      "correct": false
+    },
+
+    // "Missing" answers:
+    //
+    // This is an auto-generated answer to account for all students who
+    // left this question unanswered.
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 0,
+      "correct": false
     }
   ]
 }
@@ -327,3 +422,65 @@ Formula question statistics look just like the statistics for [Essays](#essay-qu
   ]
 }
 ```
+
+### Short Answer (aka Fill in The Blank)
+
+```javascript
+{
+  // Number of students who have written anything.
+  "responses": 2,
+
+  // Number of students who have written a correct answer.
+  "correct": 2,
+
+  "answers": [
+    {
+      // Unique ID of this answer.
+      "id": "4684",
+
+       // The readable answer text.
+      "text": "Something",
+
+       // Number of students who picked this answer.
+      "responses": 3,
+
+       // Whether this answer is a correct one.
+      "correct": true
+    },
+
+    // Another correct answer:
+    {
+      "id": "1797",
+      "text": "Very cool.",
+      "responses": 0,
+      "correct": true
+    },
+
+    // "Other" answers:
+    //
+    // This is an auto-generated answer that will be present if any student
+    // does write an answer, but is incorrect.
+    {
+      "id": "other",
+      "text": "Other",
+      "responses": 0,
+      "correct": false
+    },
+
+    // "Missing" answers:
+    //
+    // This is an auto-generated answer to account for all students who
+    // left this question unanswered.
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 0,
+      "correct": false
+    }
+  ]
+}
+```
+
+#### True/False
+
+True/False question statistics look just like the statistics for [Multiple-Choice](#multiple-choice-question-stats).

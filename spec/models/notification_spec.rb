@@ -33,20 +33,6 @@ def notification_set(opts = {})
   @notification.reload
 end
 
-# The opts pertain to user only
-def create_user_with_cc(opts = {})
-  user_model(opts)
-
-  if @notification
-    communication_channel_model
-    @communication_channel.notification_policies.create!(:notification => @notification)
-  else
-    communication_channel_model
-  end
-
-  @user.reload
-end
-
 describe Notification do
   it "should create a new instance given valid attributes" do
     Notification.create!(notification_valid_attributes)
@@ -71,7 +57,7 @@ describe Notification do
   end
 
   context "by_name" do
-    before do
+    before :once do
       @foo = Notification.create(:name => "foo")
       @bar = Notification.create(:name => "bar")
     end

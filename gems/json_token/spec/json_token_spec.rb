@@ -26,4 +26,9 @@ describe JSONToken do
   it 'should decode' do
     expect(JSONToken.decode("eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19")).to eq({"a" => 123, "b" => [1, 2, "13"]})
   end
+
+  it 'should handle binary strings' do
+    messy = "\xD1\x9B\x86".force_encoding("ASCII-8BIT")
+    expect(JSONToken.decode(JSONToken.encode(messy))).to eq messy
+  end
 end

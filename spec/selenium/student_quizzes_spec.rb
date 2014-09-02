@@ -190,7 +190,7 @@ describe "quizzes" do
         f('#last_saved_indicator').text.should match(/^Quiz saved at \d+:\d+(pm|am)$/)
 
         # now kill our session (like logging out)
-        destroy_session(@pseudonym, false)
+        destroy_session(false)
 
         index = 1
         keep_trying_until {

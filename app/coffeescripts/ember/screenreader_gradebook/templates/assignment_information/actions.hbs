@@ -1,0 +1,38 @@
+<div class="checkbox">
+  <label class="checkbox">
+    {{#t 'assignment_is_muted'}}Muted?{{/t}}
+    {{
+      assignment-muter
+      assignment=selectedAssignment
+      id='assignment_muted_check'
+      name='assignment_muted_check'
+    }}
+  </label>
+</div>
+<div class="pad-box no-sides">
+  <button
+    id="message_students"
+    class="btn"
+    {{ action 'openDialog' 'message_students' target=view }}
+  >
+    {{#t 'message_students'}}Message students who...{{/t}}
+  </button>
+</div>
+<div class="pad-box bottom-only">
+  <button
+    id="set_default_grade"
+    class="btn"
+    {{ action 'openDialog' 'set_default_grade' target=view }}
+  >
+    {{#t 'set_default_grade'}}Set default grade{{/t}}
+  </button>
+  {{#if selectedAssignment.points_possible}}
+    <button
+      id="curve_grades"
+      class="btn"
+      {{ action 'openDialog' 'curve_grades' target=view }}
+    >
+      {{#t 'curve_grades'}}Curve Grades{{/t}}
+    </button>
+  {{/if}}
+</div>

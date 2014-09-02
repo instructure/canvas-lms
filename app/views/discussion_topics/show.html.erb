@@ -61,7 +61,7 @@
             </button>
           <% end %>
 
-          <% if @topic.grants_right?(@current_user, nil, :update) %>
+          <% if @topic.grants_right?(@current_user, :update) %>
             <a href="<%= context_url(@topic.context,
                                      :edit_context_discussion_topic_url,
                                      @topic) %>"

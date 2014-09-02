@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GroupLeadership do
 
   describe "member_changed_event" do
-    before(:each) do
+    before(:once) do
       course
       @category = @course.group_categories.build(:name => "category 1")
       @category.save!
@@ -11,7 +11,7 @@ describe GroupLeadership do
     end
 
     describe "with auto assignment enabled" do
-      before(:each) do
+      before(:once) do
         @category.auto_leader = "first"
         @category.save!
       end
@@ -34,7 +34,7 @@ describe GroupLeadership do
     end
 
     describe "revocation without auto leader assignment" do
-      before(:each) do
+      before(:once) do
         @leader = user_model
         @leader_membership = @group.group_memberships.create!(:user => @leader, :workflow_state => 'accepted')
         @group.leader = @leader

@@ -43,7 +43,7 @@ module Polling
       end
       can :create and can :update and can :read and can :delete and can :submit
 
-      given do |user, session|
+      given do |user|
         self.poll_sessions.with_each_shard do |scope|
           scope.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                        Enrollment.where(user_id: user).active.select(:course_id),

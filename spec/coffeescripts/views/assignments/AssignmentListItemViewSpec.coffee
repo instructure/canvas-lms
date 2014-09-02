@@ -169,6 +169,7 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
+    group_stub = sinon.stub(view, 'visibleAssignments', -> [])
     confirm_stub = sinon.stub(window, "confirm", -> true )
     delete_spy = sinon.spy view, "delete"
 
@@ -179,6 +180,7 @@ define [
 
     confirm_stub.restore()
     delete_spy.restore()
+    group_stub.restore()
 
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string
@@ -277,6 +279,7 @@ define [
     @server.respond()
 
     equal @model.get('published'), true
+    @server.restore()
 
   test "correctly displays module's name", ->
     mods = genModules(1)

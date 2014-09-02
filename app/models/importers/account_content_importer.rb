@@ -5,8 +5,6 @@ module Importers
     Importers.register_content_importer(self)
 
     def self.import_content(account, data, params, migration)
-
-      migration.migration_settings[:import_quiz_questions_without_quiz] = true
       Importers::AssessmentQuestionImporter.process_migration(data, migration)
       Importers::LearningOutcomeImporter.process_migration(data, migration)
 

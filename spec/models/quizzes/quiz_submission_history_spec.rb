@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Quizzes::QuizSubmissionHistory do
 
   context "submissions with history" do
-    before do
+    before :once do
       course
       @quiz       = @course.quizzes.create!
       @submission = @quiz.quiz_submissions.new
@@ -81,6 +81,18 @@ describe Quizzes::QuizSubmissionHistory do
         models = attempts.version_models
         models.length.should == 2
         models.first.should be_a(Quizzes::QuizSubmission)
+      end
+    end
+
+    describe "#kept" do
+      it "should return the version of the submission that was kept" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        attempts.length.should == 2
+
+        models = attempts.version_models
+        models.length.should == 2
+
+        attempts.kept.should == models.first
       end
     end
   end

@@ -26,13 +26,21 @@ module CC::Importer::Standard
       conversion_dir = File.join(@unzipped_file_path, "temp_qti_conversions")
 
       resources_by_type("imsqti").each do |res|
-        path = res[:href] || res[:files].first[:href]
-        path = get_full_path(path)
+        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+        full_path = path ? get_full_path(path) : nil
         id = res[:migration_id]
 
-        if File.exists?(path)
+        if path.nil? # inline qti
+          next unless res_node = @resource_nodes_for_flat_manifest[id]
+          qti_node = res_node.elements.first
+          path = "#{id}_qti.xml"
+          full_path = get_full_path(path)
+          File.open(full_path, 'w') {|f| f << qti_node.to_xml} # write to file so we can convert with qti exporter
+        end
+
+        if File.exists?(full_path)
           qti_converted_dir = File.join(conversion_dir, id)
-          if run_qti_converter(path, qti_converted_dir, id)
+          if run_qti_converter(full_path, qti_converted_dir, id)
             # get quizzes/questions
             if q_list = convert_questions(qti_converted_dir, id)
               questions += q_list
@@ -95,7 +103,7 @@ module CC::Importer::Standard
           quiz[:migration_id] = resource_id
         end
       rescue
-         add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), $!)
+        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), $!)
       end
       quiz
     end

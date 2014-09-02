@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Folder do
-  before(:each) do
+  before(:once) do
     course
   end
   
@@ -59,6 +59,14 @@ describe Folder do
     f1.parent_folder = f3
     f1.save.should == false
     f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }.should be_present
+  end
+
+  it "should not allow root folders to have their names changed" do
+    f1 = Folder.root_folders(@course).first
+    f1.reload
+    f1.update_attributes(:name => "something")
+    f1.save.should == false
+    f1.errors.detect { |e| e.first.to_s == 'name' }.should be_present
   end
 
   it "files without an explicit folder_id should be inferred" do
@@ -139,27 +147,40 @@ describe Folder do
   end
 
   describe "resolve_path" do
-    before do
+    before :once do
       @root_folder = Folder.root_folders(@course).first
     end
 
-    it "should return all a sequence of Folders" do
+    it "should return a sequence of Folders" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, "foo/bar").should eql [@root_folder, foo, bar]
     end
 
-    it "should deal with root folder alone" do
-      Folder.resolve_path(@course, @root_folder.name).should eql [@root_folder]
+    it "should ignore trailing slashes" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      Folder.resolve_path(@course, "foo/").should eql [@root_folder, foo]
     end
 
-    it "should deal with incorrect root name" do
-      Folder.resolve_path(@course, 'curse files').should be_nil
+    it "should find the root folder given an empty path" do
+      Folder.resolve_path(@course, '').should eql [@root_folder]
+    end
+
+    it "should find the root folder given '/'" do
+      Folder.resolve_path(@course, '/').should eql [@root_folder]
+    end
+
+    it "should find the root folder given a nil path" do
+      Folder.resolve_path(@course, nil).should eql [@root_folder]
+    end
+
+    it "should find the root folder given an empty array" do
+      Folder.resolve_path(@course, []).should eql [@root_folder]
     end
 
     it "should return nil on incomplete match" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should be_nil
+      Folder.resolve_path(@course, "foo/bar").should be_nil
     end
 
     it "should search duplicate paths" do
@@ -167,29 +188,31 @@ describe Folder do
       foo2 = @course.folders.create! name: 'foo', parent_folder: @root_folder
       bar = @course.folders.create! name: 'bar', parent_folder: foo1
       baz = @course.folders.create! name: 'baz', parent_folder: foo2
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should eql [@root_folder, foo1, bar]
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/baz").should eql [@root_folder, foo2, baz]
+      Folder.resolve_path(@course, "foo/bar").should eql [@root_folder, foo1, bar]
+      Folder.resolve_path(@course, "foo/baz").should eql [@root_folder, foo2, baz]
     end
 
     it "should exclude hidden if specified" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       foo.update_attribute(:workflow_state, 'hidden')
       bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", true).should eql [@root_folder, foo, bar]
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", false).should be_nil
+      Folder.resolve_path(@course, "foo/bar", true).should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, "foo/bar", false).should be_nil
     end
 
     it "should exclude locked if specified" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
       bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", true).should eql [@root_folder, foo, bar]
-      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", false).should be_nil
+      Folder.resolve_path(@course, "foo/bar", true).should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, "foo/bar", false).should be_nil
     end
 
     it "should accept an array" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, [@root_folder.name, 'foo', 'bar']).should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, ['foo', 'bar']).should eql [@root_folder, foo, bar]
     end
   end
 end
+
+

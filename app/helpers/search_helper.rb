@@ -43,7 +43,7 @@ module SearchHelper
             :term => term_for_course.call(course),
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
-            :permissions => course.grants_rights?(@current_user),
+            :permissions => course.rights_status(@current_user).select { |key, value| value },
             :default_section_id => course.default_section(no_create: true).try(:id)
           }
         end
@@ -78,7 +78,7 @@ module SearchHelper
             :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
             :context_name => group.context.name,
             :category => group.category,
-            :permissions => group.grants_rights?(@current_user)
+            :permissions => group.rights_status(@current_user).select { |key, value| value }
           }
         end
       end

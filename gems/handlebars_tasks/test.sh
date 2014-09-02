@@ -2,7 +2,7 @@
 result=0
 
 echo "################ handlebars_tasks ################"
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 result+=$?
 

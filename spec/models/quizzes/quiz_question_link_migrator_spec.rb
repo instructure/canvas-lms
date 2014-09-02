@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestionLinkMigrator do
+  before :each do
+    Quizzes::QuizQuestionLinkMigrator.reset_cache!
+  end
+
   context "for_each_interesting_field" do
     it "should yield for each interesting root-level field" do
       data = {
@@ -83,7 +87,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
   end
 
   context "related_attachment_ids" do
-    before :each do
+    before :once do
       @course = course_model
       @file = @course.attachments.new(:filename => 'foo.txt')
       @file.content_type = 'text/plain'
@@ -163,7 +167,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
   end
 
   context "migrate_file_link" do
-    before :each do
+    before :once do
       @course = course_model
       @quiz = @course.quizzes.create!
     end
@@ -176,354 +180,285 @@ describe Quizzes::QuizQuestionLinkMigrator do
       new_link.should == link
     end
 
-    it "should find links in the assessment question for related attachments" do
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
-      @question.assessment_question.should_not be_nil
+    context "with assessment questions" do
+      before :once do
+        @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+        @question.assessment_question.should_not be_nil
+      end
 
-      file = @course.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+      let_once(:file) do
+        file = @course.attachments.new(:filename => 'foo.txt')
+        file.content_type = 'text/plain'
+        file.save!
+        file
+      end
 
-      new_file = @course.attachments.new(:filename => 'bar.txt')
-      new_file.content_type = 'text/plain'
-      new_file.root_attachment_id = file.id
-      new_file.save!
+      it "should find links in the assessment question for related attachments" do
+        new_file = @course.attachments.new(:filename => 'bar.txt')
+        new_file.content_type = 'text/plain'
+        new_file.root_attachment_id = file.id
+        new_file.save!
 
-      source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
-      @question.assessment_question.question_data[:question_text] = "Some text #{target_link} more text."
-      @question.assessment_question.save!
+        source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
+        target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
+        @question.assessment_question.question_data[:question_text] = "Some text #{target_link} more text."
+        @question.assessment_question.save!
 
-      new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-      new_link.should == target_link
-    end
+        new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
+        new_link.should == target_link
+      end
 
-    it "should look for links in more than the question text" do
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+      it "should look for links in more than the question text" do
+        new_file = @course.attachments.new(:filename => 'bar.txt')
+        new_file.content_type = 'text/plain'
+        new_file.root_attachment_id = file.id
+        new_file.save!
 
-      file = @course.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+        source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
+        target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
+        @question.assessment_question.question_data[:correct_comments] = "Some text #{target_link} more text."
+        @question.assessment_question.save!
 
-      new_file = @course.attachments.new(:filename => 'bar.txt')
-      new_file.content_type = 'text/plain'
-      new_file.root_attachment_id = file.id
-      new_file.save!
+        new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
+        new_link.should == target_link
+      end
 
-      source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
-      @question.assessment_question.question_data[:correct_comments] = "Some text #{target_link} more text."
-      @question.assessment_question.save!
+      it "should just pass the link through if the assessment question doesn't have a matching link" do
+        # note I'm not linking file and new_file
+        new_file = @course.attachments.new(:filename => 'bar.txt')
+        new_file.content_type = 'text/plain'
+        new_file.save!
 
-      new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-      new_link.should == target_link
-    end
+        source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
+        unrelated_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
+        @question.assessment_question.question_data[:question_text] = "Some text #{unrelated_link} more text."
+        @question.assessment_question.save!
 
-    it "should just pass the link through if the assessment question doesn't have a matching link" do
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+        new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
+        new_link.should == source_link
+      end
 
-      file = @course.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+      it "reuse cached translations" do
+        new_file = @course.attachments.new(:filename => 'bar.txt')
+        new_file.content_type = 'text/plain'
+        new_file.root_attachment_id = file.id
+        new_file.save!
 
-      # note I'm not linking file and new_file
-      new_file = @course.attachments.new(:filename => 'bar.txt')
-      new_file.content_type = 'text/plain'
-      new_file.save!
+        source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
+        target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
+        @question.assessment_question.question_data[:question_text] = "Some text #{target_link} more text."
+        @question.assessment_question.save!
 
-      source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
-      unrelated_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
-      @question.assessment_question.question_data[:question_text] = "Some text #{unrelated_link} more text."
-      @question.assessment_question.save!
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
+        @question.assessment_question.question_data[:question_text] = ""
+        @question.assessment_question.save!
 
-      new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-      new_link.should == source_link
-    end
-
-    it "reuse cached translations" do
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
-
-      file = @course.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
-
-      new_file = @course.attachments.new(:filename => 'bar.txt')
-      new_file.content_type = 'text/plain'
-      new_file.root_attachment_id = file.id
-      new_file.save!
-
-      source_link = "/courses/#{@course.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{new_file.id}/download"
-      @question.assessment_question.question_data[:question_text] = "Some text #{target_link} more text."
-      @question.assessment_question.save!
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-      @question.assessment_question.question_data[:question_text] = ""
-      @question.assessment_question.save!
-
-      new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-      new_link.should == target_link
+        new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
+        new_link.should == target_link
+      end
     end
   end
 
-  context"migrate_file_links_in_blob" do
-    before :each do
+  context "migrating" do
+    before :once do
       @course1 = course_model
       @course2 = course_model
       @quiz = @course1.quizzes.create!
       @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
     end
 
-    it "should migrate links for the wrong course" do
+    let_once :file do
       # we'll just use this one file everywhere
       file = @course2.attachments.new(:filename => 'foo.txt')
       file.content_type = 'text/plain'
       file.save!
-
-      # using the wrong course in source link
-      source_link = "/courses/#{@course2.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{target_link} more text"
-      target_blob = "Some question text #{target_link} more text"
-
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
-      source_blob.should == target_blob
+      file
     end
 
-    it "should not migrate links for the correct course" do
-      # we'll just use this one file everywhere
-      file = @course1.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+    # using the wrong course in source link
+    let_once(:source_link) { "/courses/#{@course2.id}/files/#{file.id}/preview" }
+    let_once(:target_link) { "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download" }
+    let_once(:source_blob) { "Some question text #{source_link} more text" }
+    let_once(:assessment_text) { "Some assessment text #{target_link} more text" }
+    let_once(:target_blob) { "Some question text #{target_link} more text" }
 
-      # using the right course in source link
-      source_link = "/courses/#{@course1.id}/files/#{file.id}/preview"
-      irrelevant_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{irrelevant_link} more text"
+    context "migrate_file_links_in_blob" do
+      it "should migrate links for the wrong course" do
 
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
 
-      # done this way because the modification is in place
-      original_blob = source_blob.dup
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
-      source_blob.should == original_blob
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
+        source_blob.should == target_blob
+      end
+
+      it "should not migrate links for the correct course" do
+        file = @course1.attachments.new(:filename => 'foo.txt')
+        file.content_type = 'text/plain'
+        file.save!
+
+        # using the right course in source link
+        source_link = "/courses/#{@course1.id}/files/#{file.id}/preview"
+        irrelevant_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
+        source_blob = "Some question text #{source_link} more text"
+        assessment_text = "Some assessment text #{irrelevant_link} more text"
+
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
+
+        # done this way because the modification is in place
+        original_blob = source_blob.dup
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
+        source_blob.should == original_blob
+      end
+
+      it "should return true iff a link was migrated" do
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
+
+        # first time true, second time false because it's already migrated
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_true
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_false
+      end
     end
 
-    it "should return true iff a link was migrated" do
-      # we'll just use this one file everywhere
-      file = @course2.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+    context "migrate_file_links_in_question_data" do
+      before :once do
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
+      end
 
-      # using the wrong course in source link
-      source_link = "/courses/#{@course2.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{target_link} more text"
-      target_blob = "Some question text #{target_link} more text"
+      it "should migrate links in each interesting field" do
+        question_data = {
+          :question_text => source_blob.dup,
+          :correct_comments => source_blob.dup,
+          :incorrect_comments => source_blob.dup,
+          :neutral_comments => source_blob.dup,
+          :answers => [{:comments => source_blob.dup}]
+        }
 
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question)
+        question_data[:question_text].should == target_blob
+        question_data[:correct_comments].should == target_blob
+        question_data[:incorrect_comments].should == target_blob
+        question_data[:neutral_comments].should == target_blob
+        question_data[:answers].first[:comments].should == target_blob
+      end
 
-      # first time true, second time false because it's already migrated
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_true
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_false
-    end
-  end
+      it "should infer the contextual question from the question_data" do
+        question_data = { :question_text => source_blob.dup, :id => @question.id }
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data)
+        question_data[:question_text].should == target_blob
+      end
 
-  context "migrate_file_links_in_question_data" do
-    before :each do
-      @course1 = course_model
-      @course2 = course_model
-      @quiz = @course1.quizzes.create!
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+      it "should return true iff a link was migrated" do
+        question_data = {
+          :question_text => source_blob.dup,
+          :correct_comments => source_blob.dup,
+          :incorrect_comments => source_blob.dup,
+          :neutral_comments => source_blob.dup,
+          :answers => [{:comments => source_blob.dup}]
+        }
 
-      # we'll just use this one file everywhere
-      file = @course2.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
-
-      # using the wrong course in source link
-      source_link = "/courses/#{@course2.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      @source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{target_link} more text"
-      @target_blob = "Some question text #{target_link} more text"
-
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
-    end
-
-    it "should migrate links in each interesting field" do
-      question_data = {
-        :question_text => @source_blob.dup,
-        :correct_comments => @source_blob.dup,
-        :incorrect_comments => @source_blob.dup,
-        :neutral_comments => @source_blob.dup,
-        :answers => [{:comments => @source_blob.dup}]
-      }
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question)
-      question_data[:question_text].should == @target_blob
-      question_data[:correct_comments].should == @target_blob
-      question_data[:incorrect_comments].should == @target_blob
-      question_data[:neutral_comments].should == @target_blob
-      question_data[:answers].first[:comments].should == @target_blob
+        # first time true, second time false because it's already migrated
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_true
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_false
+      end
     end
 
-    it "should infer the contextual question from the question_data" do
-      question_data = { :question_text => @source_blob.dup, :id => @question.id }
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data)
-      question_data[:question_text].should == @target_blob
+    context "migrate_file_links_in_question" do
+      before :once do
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
+      end
+
+      it "should migrate links in the question's data" do
+        qd = @question.question_data
+        qd[:question_text] = source_blob.dup
+        @question.question_data = qd
+
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)
+        @question.question_data[:question_text].should == target_blob
+      end
+
+      it "should return true iff a question was migrated" do
+        qd = @question.question_data
+        qd[:question_text] = source_blob.dup
+        @question.question_data = qd
+
+        # first time true, second time false because it's already migrated
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_true
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_false
+      end
     end
 
-    it "should return true iff a link was migrated" do
-      question_data = {
-        :question_text => @source_blob.dup,
-        :correct_comments => @source_blob.dup,
-        :incorrect_comments => @source_blob.dup,
-        :neutral_comments => @source_blob.dup,
-        :answers => [{:comments => @source_blob.dup}]
-      }
+    context "migrate_file_links_in_quiz" do
+      before :once do
+        @question.assessment_question.question_data[:question_text] = assessment_text
+        @question.assessment_question.save!
+      end
 
-      # first time true, second time false because it's already migrated
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_true
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_false
-    end
-  end
+      it "should migrate links each question in the quiz's data" do
+        @quiz.quiz_data = [
+          {:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id},
+          {:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id},
+          {:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id}
+        ]
 
-  context "migrate_file_links_in_question" do
-    before :each do
-      @course1 = course_model
-      @course2 = course_model
-      @quiz = @course1.quizzes.create!
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
+        @quiz.quiz_data.each{ |q| q[:question_text].should == target_blob }
+      end
 
-      # we'll just use this one file everywhere
-      file = @course2.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+      it "should migrate links from each question in each question group in the quiz's data" do
+        @quiz.quiz_data = [{ :entry_type => 'quiz_group', :questions => [
+          {:question_text => source_blob.dup, :id => @question.id},
+          {:question_text => source_blob.dup, :id => @question.id},
+          {:question_text => source_blob.dup, :id => @question.id}
+        ]}]
 
-      # using the wrong course in source link
-      source_link = "/courses/#{@course2.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      @source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{target_link} more text"
-      @target_blob = "Some question text #{target_link} more text"
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
+        @quiz.quiz_data.first[:questions].each{ |q| q[:question_text].should == target_blob }
+      end
 
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
-    end
+      it "should migrate links where the course matches the question's quiz's course but not the quiz's course" do
+        # a quiz in the course the link uses, and a question in that quiz (sharing the assessment question)
+        @quiz2 = @course2.quizzes.create!
+        @question2 = @quiz2.quiz_questions.new(:question_data => {:question_type => :multiple_choice})
+        @question2.assessment_question = @question.assessment_question
+        @question2.save!
 
-    it "should migrate links in the question's data" do
-      qd = @question.question_data
-      qd[:question_text] = @source_blob.dup
-      @question.question_data = qd
+        # use the quiz from the first course, but embed the question from the
+        # second course. this happens in practice when @quiz2 existed first and
+        # @quiz was cloned from it. @quiz gets a copy of @question2 as @question,
+        # but the quiz_data, up until the next time it's rebuilt, has the
+        # question_data from @question2 still, including id.
+        @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question2.id}]
 
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)
-      @question.question_data[:question_text].should == @target_blob
-    end
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
+        @quiz.quiz_data.first[:question_text].should == target_blob
+      end
 
-    it "should return true iff a question was migrated" do
-      qd = @question.question_data
-      qd[:question_text] = @source_blob.dup
-      @question.question_data = qd
+      it "should not migrate links where the course matches the quiz's course but not the question's quiz's course" do
+        # a quiz in the course the link uses
+        @quiz2 = @course2.quizzes.create!
 
-      # first time true, second time false because it's already migrated
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_true
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_false
-    end
-  end
+        # use the quiz from the second course, but embed the question from the
+        # first course. I'm not sure if it can happen in practice, but it's the
+        # converse of the above, and if it does happen in practice, we don't want
+        # it migrating
+        @quiz2.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id}]
 
-  context "migrate_file_links_in_quiz" do
-    before :each do
-      @course1 = course_model
-      @course2 = course_model
-      @quiz = @course1.quizzes.create!
-      @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz2)
+        @quiz2.quiz_data.first[:question_text].should == source_blob
+      end
 
-      # we'll just use this one file everywhere
-      file = @course2.attachments.new(:filename => 'foo.txt')
-      file.content_type = 'text/plain'
-      file.save!
+      it "should return true iff a link was migrated" do
+        @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id}]
 
-      # using the wrong course in source link
-      source_link = "/courses/#{@course2.id}/files/#{file.id}/preview"
-      target_link = "/assessment_questions/#{@question.assessment_question_id}/files/#{file.id}/download"
-      @source_blob = "Some question text #{source_link} more text"
-      assessment_text = "Some assessment text #{target_link} more text"
-      @target_blob = "Some question text #{target_link} more text"
-
-      @question.assessment_question.question_data[:question_text] = assessment_text
-      @question.assessment_question.save!
-    end
-
-    it "should migrate links each question in the quiz's data" do
-      @quiz.quiz_data = [
-        {:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question.id},
-        {:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question.id},
-        {:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question.id}
-      ]
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-      @quiz.quiz_data.each{ |q| q[:question_text].should == @target_blob }
-    end
-
-    it "should migrate links from each question in each question group in the quiz's data" do
-      @quiz.quiz_data = [{ :entry_type => 'quiz_group', :questions => [
-        {:question_text => @source_blob.dup, :id => @question.id},
-        {:question_text => @source_blob.dup, :id => @question.id},
-        {:question_text => @source_blob.dup, :id => @question.id}
-      ]}]
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-      @quiz.quiz_data.first[:questions].each{ |q| q[:question_text].should == @target_blob }
-    end
-
-    it "should migrate links where the course matches the question's quiz's course but not the quiz's course" do
-      # a quiz in the course the link uses, and a question in that quiz (sharing the assessment question)
-      @quiz2 = @course2.quizzes.create!
-      @question2 = @quiz2.quiz_questions.new(:question_data => {:question_type => :multiple_choice})
-      @question2.assessment_question = @question.assessment_question
-      @question2.save!
-
-      # use the quiz from the first course, but embed the question from the
-      # second course. this happens in practice when @quiz2 existed first and
-      # @quiz was cloned from it. @quiz gets a copy of @question2 as @question,
-      # but the quiz_data, up until the next time it's rebuilt, has the
-      # question_data from @question2 still, including id.
-      @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question2.id}]
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-      @quiz.quiz_data.first[:question_text].should == @target_blob
-    end
-
-    it "should not migrate links where the course matches the quiz's course but not the question's quiz's course" do
-      # a quiz in the course the link uses
-      @quiz2 = @course2.quizzes.create!
-
-      # use the quiz from the second course, but embed the question from the
-      # first course. I'm not sure if it can happen in practice, but it's the
-      # converse of the above, and if it does happen in practice, we don't want
-      # it migrating
-      @quiz2.quiz_data = [{:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question.id}]
-
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz2)
-      @quiz2.quiz_data.first[:question_text].should == @source_blob
-    end
-
-    it "should return true iff a link was migrated" do
-      @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => @source_blob.dup, :id => @question.id}]
-
-      # first time true, second time false because it's already migrated
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_true
-      Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_false
+        # first time true, second time false because it's already migrated
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_true
+        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_false
+      end
     end
   end
 end

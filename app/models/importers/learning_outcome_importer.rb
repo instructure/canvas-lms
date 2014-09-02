@@ -77,7 +77,7 @@ module Importers
 
         item.save!
 
-        migration.add_imported_item(item) if migration && item.new_record?
+        migration.add_imported_item(item) if migration
       else
         item = outcome
       end

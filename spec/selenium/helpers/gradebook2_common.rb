@@ -89,22 +89,6 @@ def switch_to_section(section=nil)
   wait_for_ajaximations
 end
 
-# `students` should be a hash of student_id, expected total pairs, like:
-# {
-#   1 => '12%',
-#   3 => '86.7%',
-# }
-def check_gradebook_1_totals(students)
-  get "/courses/#{@course.id}/gradebook"
-  # this keep_trying_untill is there because gradebook1 loads it's cells in a bunch of setTimeouts
-  keep_trying_until do
-    students.each do |student_id, expected_score|
-      row_total = f(".final_grade .student_#{student_id} .grade").text + '%'
-      row_total.should == expected_score
-    end
-  end
-end
-
 def conclude_and_unconclude_course
   #conclude course
   @course.complete!
@@ -124,7 +108,8 @@ def data_setup
 end
 
 def data_setup_as_observer
-  course_with_observer_logged_in
+  user_with_pseudonym
+  course_with_observer_logged_in user: @user
   @course.observers=[@observer]
   assignment_setup
   @all_students.each {|s| s.observers=[@observer]}

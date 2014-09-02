@@ -16,6 +16,7 @@
 # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
 
 require 'i18n'
+require 'cgi'
 
 I18n.load_path += Dir.glob(File.join(File.dirname(__FILE__),  '../config/locales/*.yml'))
 
@@ -46,5 +47,17 @@ module CanvasTextHelper
     indentation = " " * spaces
     text.gsub(/\n/, "\n#{indentation}")
   end
+
+  # CGI escape a string, truncating it without breaking apart UTF-8 characters or other escape sequences
+  def self.cgi_escape_truncate(string, max_len)
+    retval = ''
+    string.chars do |char|
+      escape_seq = CGI::escape(char)
+      break if retval.length + escape_seq.length > max_len
+      retval << escape_seq
+    end
+    retval
+  end
+
 end
 

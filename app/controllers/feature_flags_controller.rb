@@ -232,6 +232,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "invalid feature" }, status: :bad_request unless feature_def
 
       # check whether the feature is locked
+      Rails.cache.delete(@context.feature_flag_cache_key(params[:feature]))
       current_flag = @context.lookup_feature_flag(params[:feature])
       if current_flag
         return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context, @current_user)
@@ -245,7 +246,7 @@ class FeatureFlagsController < ApplicationController
       end
 
       # create or update flag
-      new_flag = current_flag if current_flag && !current_flag.default? && current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
+      new_flag = @context.feature_flags.find(current_flag) if current_flag && !current_flag.default? && !current_flag.new_record? && current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build
 
       new_flag.feature = params[:feature]

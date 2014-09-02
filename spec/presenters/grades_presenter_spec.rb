@@ -106,13 +106,18 @@ describe GradesPresenter do
 
     let(:course1) { stub }
     let(:course2) { stub }
-    let(:instructor) { stub(:instructor? => true, :course => course1, :state_based_on_date => :active) }
+    let(:instructor2) { stub(:instructor? => true, :course => course1, :course_section_id => 3, :state_based_on_date => :active) }
+    let(:instructor) { stub(:instructor? => true, :course => course1, :course_section_id => 1, :state_based_on_date => :active) }
     let(:noninstructor) { stub(:instructor? => false, :course => course2, :state_based_on_date => :active) }
-    let(:enrollments) { [instructor, noninstructor] }
+    let(:enrollments) { [instructor, instructor2, noninstructor] }
     let(:teacher_enrollments) { presenter.teacher_enrollments }
 
     it 'includes instructors' do
-      teacher_enrollments.should include(instructor)
+      teacher_enrollments[0].course.should == course1
+    end
+
+    it 'includes should not include duplicate courses' do
+      teacher_enrollments.length.should == 1
     end
 
     it 'excludes non-instructors' do

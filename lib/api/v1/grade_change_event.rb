@@ -30,7 +30,7 @@ module Api::V1::GradeChangeEvent
       :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       :student => Shard.relative_id_for(event.student_id, Shard.current, Shard.current),
       :grader => Shard.relative_id_for(event.grader_id, Shard.current, Shard.current),
-      :page_view => PageView.find_by_id(event.request_id).try(:id)
+      :page_view => event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
 
     {
@@ -72,20 +72,20 @@ module Api::V1::GradeChangeEvent
   end
 
   def linked_json(events, user, session)
-    course_ids = events.map{ |event| event.course_id }
+    course_ids = events.map{ |event| event.course_id }.compact
     courses = Course.find_all_by_id(course_ids) if course_ids.length > 0
     courses ||= []
 
-    assignment_ids = events.map{ |event| event.assignment_id }
+    assignment_ids = events.map{ |event| event.assignment_id }.compact
     assignments = Assignment.find_all_by_id(assignment_ids) if assignment_ids.length > 0
     assignments ||= []
 
-    user_ids = events.map{ |event| event.grader_id }
-    user_ids.concat(events.map{ |event| event.student_id })
+    user_ids = events.map{ |event| event.grader_id }.compact
+    user_ids.concat(events.map{ |event| event.student_id }.compact)
     users = User.find_all_by_id(user_ids) if user_ids.length > 0
     users ||= []
 
-    page_view_ids = events.map{ |event| event.request_id }
+    page_view_ids = events.map{ |event| event.request_id }.compact
     page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
     page_views ||= []
 

@@ -79,13 +79,13 @@ class UserService < ActiveRecord::Base
   
   scope :of_type, lambda { |type| where(:type => type.to_s) }
 
-  scope :to_be_polled, lambda { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
+  scope :to_be_polled, -> { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :for_service, lambda { |service|
     service = service.service if service.is_a?(UserService)
     where(:service => service.to_s)
   }
-  scope :visible, where("visible")
+  scope :visible, -> { where("visible") }
   
   def service_name
     self.service.titleize rescue ""

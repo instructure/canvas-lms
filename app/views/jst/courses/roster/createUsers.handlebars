@@ -6,7 +6,14 @@
     {{/t}}<br>
   </p>
   <div class="row-fluid content-box">
-    <textarea id="user_list_textarea" name="user_list" class="span12" rows=7 placeholder='"Example Student" &lt;student@example.com&gt;, "Lastname, Firstname" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com'>{{user_list}}</textarea>
+    <textarea
+              id="user_list_textarea"
+              name="user_list"
+              class="span12"
+              rows=7
+              placeholder='{{#t "email_field_place_holder"}}"Example Student" &lt;student@example.com&gt;, "Lastname, Firstname" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com{{/t}}'
+              aria-label="{{#t "email_field_label"}}Enter the email addresses of the users you would like to add, seperated by commas{{/t}}"
+    >{{user_list}}</textarea>
   </div>
   <div class="form-horizontal">
     <div class="control-group">
@@ -54,7 +61,7 @@
 {{#ifEqual step 2}}
 <div class="form-dialog-content" id="create-users-step-2">
   {{#if errored_users.length}}
-    <div class="alert alert-error content-box">
+    <div role="alert" tabindex="0" id="user_email_errors" class="alert alert-error content-box">
       <p>
         {{#t "will_not_be_added"}}These users had errors and will not be added. Please ensure they are formatted correctly.{{/t}}<br>
         <small>{{#t "example_formats"}}Examples: user@example.com, "First Last" &lt;user@example.com&gt;, "Last, First" &lt;user@example.com&gt;{{/t}}</small>

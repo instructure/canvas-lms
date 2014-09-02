@@ -6,6 +6,10 @@
   <%= t :subject, "Assignment Unmuted: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
 <% end %>
 
-<p><%= t :body, "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.", :title => asset.title %></p>
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "You can view it here" %>
+  </a>
+<% end %>
 
-<p><a href="<%= content :link %>"><%= t :link, "You can view it here" %></a></p>
+<p><%= t :body, "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.", :title => asset.title %></p>

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
 
-  def create_learning_outcome_result
+  let_once :learning_outcome_result do
     assignment_model
     outcome = @course.created_learning_outcomes.create!(title: 'outcome')
 
@@ -35,7 +35,6 @@ describe LearningOutcomeResult do
 
   describe '.association_type' do
     it 'returns the correct representation of a quiz' do
-      learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.association_type.should == 'Quizzes::Quiz'
 
       learning_outcome_result.association_type = 'Quiz'
@@ -45,7 +44,6 @@ describe LearningOutcomeResult do
     end
 
     it 'returns the association type attribute if not a quiz' do
-      learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.association_object = assignment_model
       learning_outcome_result.send(:save_without_callbacks)
       learning_outcome_result.association_type.should == 'Assignment'
@@ -54,7 +52,6 @@ describe LearningOutcomeResult do
 
   describe '.artifact_type' do
     it 'returns the correct representation of a quiz submission' do
-      learning_outcome_result = create_learning_outcome_result
       sub = learning_outcome_result.association_object.quiz_submissions.create!
 
       learning_outcome_result.artifact = sub
@@ -69,7 +66,6 @@ describe LearningOutcomeResult do
 
   describe '.associated_asset_type' do
     it 'returns the correct representation of a quiz' do
-      learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.associated_asset_type.should == 'Quizzes::Quiz'
 
       learning_outcome_result.associated_asset_type = 'Quiz'
@@ -79,7 +75,6 @@ describe LearningOutcomeResult do
     end
 
     it 'returns the associated asset type attribute if not a quiz' do
-      learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.associated_asset = assignment_model
       learning_outcome_result.send(:save_without_callbacks)
 

@@ -60,6 +60,15 @@ module Polling
   #         "example": "2014-01-07T15:16:18Z",
   #         "type": "string",
   #         "format": "date-time"
+  #       },
+  #       "results": {
+  #         "description": "The results of the submissions of the poll. Each key is the poll choice id, and the value is the count of submissions.",
+  #         "example": { "144": 10, "145": 3, "146": 27, "147": 8 },
+  #         "type": "object"
+  #       },
+  #       "poll_submissions": {
+  #         "description": "If the poll session has public results, this will return an array of all submissions, viewable by both students and teachers. If the results are not public, for students it will return their submission only.",
+  #         "$ref": "PollSubmission"
   #       }
   #     }
   #   }
@@ -83,9 +92,9 @@ module Polling
     def index
       if authorized_action(@poll, @current_user, :update)
         @poll_sessions = @poll.poll_sessions
-        @poll_sessions = Api.paginate(@poll_sessions, self, api_v1_poll_sessions_url(@poll))
+        json, meta = paginate_for(@poll_sessions, api_v1_poll_sessions_url(@poll))
 
-        render json: serialize_jsonapi(@poll_sessions)
+        render json: serialize_jsonapi(json, meta)
       end
     end
 
@@ -243,7 +252,8 @@ module Polling
     #
     def opened
       @poll_sessions = Polling::PollSession.available_for(@current_user).where(is_published: true)
-      render json: serialize_jsonapi(@poll_sessions)
+      json, meta = paginate_for(@poll_sessions, api_v1_poll_sessions_opened_url)
+      render json: serialize_jsonapi(json, meta)
     end
 
     # @API List closed poll sessions
@@ -258,22 +268,36 @@ module Polling
     #
     def closed
       @poll_sessions = Polling::PollSession.available_for(@current_user).where(is_published: false)
-      render json: serialize_jsonapi(@poll_sessions)
+      json, meta = paginate_for(@poll_sessions, api_v1_poll_sessions_closed_url)
+      render json: serialize_jsonapi(json, meta)
     end
 
     protected
-    def serialize_jsonapi(poll_sessions)
+    def paginate_for(poll_sessions, api_url="")
+      meta = {}
+      json = if accepts_jsonapi?
+              poll_sessions, meta = Api.jsonapi_paginate(poll_sessions, self, api_url)
+              meta[:primaryCollection] = 'poll_sessions'
+              poll_sessions
+             else
+               Api.paginate(poll_sessions, self, api_url)
+             end
+
+      return json, meta
+    end
+
+
+    def serialize_jsonapi(poll_sessions, meta = {})
       poll_sessions = Array.wrap(poll_sessions)
 
-      serialized_set = Canvas::APIArraySerializer.new(poll_sessions, {
+      Canvas::APIArraySerializer.new(poll_sessions, {
         each_serializer: Polling::PollSessionSerializer,
         controller: self,
-        root: false,
+        root: :poll_sessions,
+        meta: meta,
         scope: @current_user,
         include_root: false
       }).as_json
-
-      { poll_sessions: serialized_set }
     end
 
   end

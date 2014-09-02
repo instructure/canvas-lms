@@ -95,7 +95,7 @@ class UnzipAttachment
       @attachments = []
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      Zip::File.open(self.filename).each_with_index do |entry, index|
+      CanvasUnzip.extract_archive(self.filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -113,7 +113,9 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open(filename) do |f|
           begin
-            extract_entry(entry, f.path)
+            entry.extract(f.path, true) do |bytes|
+              zip_stats.charge_quota(bytes)
+            end
             # This is where the attachment actually happens.  See file_in_context.rb
             attachment = attach(f.path, entry, folder)
             id_positions[attachment.id] = path_positions[entry.name]
@@ -136,19 +138,6 @@ class UnzipAttachment
     queue_scribd_submissions(@attachments)
     @context.touch
     update_progress(1.0)
-  end
-
-  def extract_entry(entry, dest_path)
-    ::File.open(dest_path, "wb") do |os|
-      entry.get_input_stream do |is|
-        entry.set_extra_attributes_on_path(dest_path)
-        buf = ''
-        while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
-          os << buf
-          zip_stats.charge_quota(buf.size)
-        end
-      end
-    end
   end
 
   def zip_stats
@@ -311,7 +300,7 @@ class ZipFileStats
 
   private
   def process!
-    Zip::File.open(filename).each do |entry|
+    CanvasUnzip::extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name

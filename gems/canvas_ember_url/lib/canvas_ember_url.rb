@@ -9,8 +9,13 @@ module CanvasEmberUrl
       @mappings[:course_quizzes]
     end
 
-    def course_quiz_url(id)
-      "#{course_quizzes_url}#/#{id}"
+    def course_quiz_url(id, options={})
+      headless = '?headless=1' if options[:headless]
+      "#{course_quizzes_url}#{headless}#/#{id}"
+    end
+
+    def course_quiz_preview_url(id)
+      "#{course_quiz_url(id)}/preview"
     end
 
     def course_quiz_moderate_url(id)

@@ -35,7 +35,10 @@ I18n.isValidNode = function(obj, node) {
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
-  var messages = translations[I18n.currentLocale()];
+  var locales = [I18n.currentLocale()];
+  if (I18n.currentLocale() != I18n.defaultLocale) {
+      locales.push(I18n.defaultLocale);
+  }
   options = this.prepareOptions(options);
 
   if (typeof(scope) == "object") {
@@ -46,11 +49,14 @@ I18n.lookup = function(scope, options) {
     scope = options.scope.toString() + this.defaultSeparator + scope;
   }
 
-  scope = scope.split(this.defaultSeparator);
-
-  while (messages && scope.length > 0) {
-    var currentScope = scope.shift();
-    messages = messages[currentScope];
+  var messages, scopes;
+  while (!messages && locales.length > 0) {
+    messages = translations[locales.shift()];
+    scopes = scope.split(this.defaultSeparator);
+    while (messages && scopes.length > 0) {
+      var currentScope = scopes.shift();
+      messages = messages[currentScope];
+    }
   }
 
   if (!messages && this.isValidNode(options, "defaultValue")) {
@@ -117,10 +123,10 @@ I18n.interpolate = function(message, options) {
       value = "[missing " + placeholder + " value]";
     }
     if (needsEscaping) {
-      if (!value.htmlSafe && !htmlSafe) {
+      if (!value._icHTMLSafe && !htmlSafe) {
         value = htmlEscape(value);
       }
-    } else if (value.htmlSafe || htmlSafe) {
+    } else if (value._icHTMLSafe || htmlSafe) {
       needsEscaping = true;
       message = htmlEscape(message);
     }

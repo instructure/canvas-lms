@@ -360,6 +360,35 @@ describe ContextExternalTool do
       ContextExternalTool.all_tools_for(@course).should eql(@tools.sort_by(&:name))
     end
   end
+
+  describe "find_integration_for" do
+    it "should return nil if there are no matching integrations" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.should be_nil
+    end
+
+    it "should find the integration in the specified context" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.id.should == cit.id
+    end
+
+    it "should find the integration in the nearest context" do
+      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      rt  = @root_account.context_external_tools.create!(name: 'rt', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      rit = @root_account.context_external_tools.create!(name: 'rit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
+      integration = ContextExternalTool.find_integration_for(@course, 'testing')
+      integration.id.should == ait.id
+    end
+  end
   
   describe "infer_defaults" do
     def new_external_tool
@@ -509,6 +538,28 @@ describe ContextExternalTool do
       tool.user_navigation.should_not == nil
       tool.resource_selection.should_not == nil
       tool.editor_button.should_not == nil
+    end
+
+    describe "display_type" do
+      it "should be 'in_context' by default" do
+        tool.display_type(:course_navigation).should == 'in_context'
+        tool.course_navigation = {enabled: true}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'in_context'
+      end
+
+      it "should be configurable by a property" do
+        tool.course_navigation = { enabled: true }
+        tool.settings[:display_type] = "custom_display_type"
+        tool.save!
+        tool.display_type(:course_navigation).should == 'custom_display_type'
+      end
+
+      it "should be configurable in extension" do
+        tool.course_navigation = {display_type: 'other_display_type'}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'other_display_type'
+      end
     end
   end
 

@@ -34,7 +34,7 @@ class GradesPresenter
   end
 
   def teacher_enrollments
-    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }
+    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }.index_by { |e| e.course }.values
   end
 
   def prior_enrollments

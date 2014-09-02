@@ -69,6 +69,26 @@ describe LtiOutbound::ToolLaunch do
       assignment.return_types = ['url', 'text']
       assignment.allowed_extensions = ['jpg', 'pdf']
     end
+
+    @variable_substitutor = LtiOutbound::VariableSubstitutor.new()#user:@user)
+    #Account
+    @variable_substitutor.add_substitution('$Canvas.account.id', @account.id)
+    @variable_substitutor.add_substitution('$Canvas.account.name', @account.name)
+    @variable_substitutor.add_substitution('$Canvas.account.sisSourceId', @account.sis_source_id)
+    #Consumer Instance
+    @variable_substitutor.add_substitution('$Canvas.root_account.id', @consumer_instance.id)
+    @variable_substitutor.add_substitution('$Canvas.root_account.sisSourceId', @consumer_instance.sis_source_id)
+    @variable_substitutor.add_substitution('$Canvas.api.domain', @consumer_instance.domain)
+    #Course
+    @variable_substitutor.add_substitution('$Canvas.course.id', @course.id)
+    @variable_substitutor.add_substitution('$Canvas.course.sisSourceId', @course.sis_source_id)
+    #User
+    @variable_substitutor.add_substitution('$Canvas.user.id', @user.id)
+    @variable_substitutor.add_substitution('$Canvas.user.sisSourceId', @user.sis_source_id)
+    @variable_substitutor.add_substitution('$Canvas.user.loginId', @user.login_id)
+    @variable_substitutor.add_substitution('$Canvas.enrollment.enrollmentState', @user.enrollment_state)
+    @variable_substitutor.add_substitution('$Canvas.membership.concludedRoles', @user.concluded_role_types)
+
     @tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                :tool => @tool,
                                                :user => @user,
@@ -76,7 +96,8 @@ describe LtiOutbound::ToolLaunch do
                                                :context => @course,
                                                :link_code => '123456',
                                                :return_url => 'http://www.google.com',
-                                               :outgoing_email_address => 'outgoing_email_address')
+                                               :outgoing_email_address => 'outgoing_email_address',
+                                               :variable_substitutor => @variable_substitutor)
   end
 
   describe '#generate' do
@@ -166,20 +187,25 @@ describe LtiOutbound::ToolLaunch do
                                          :account => @account,
                                          :context => @account,
                                          :link_code => '123456',
-                                         :return_url => 'http://www.google.com').generate
+                                         :return_url => 'http://www.google.com',
+                                         :variable_substitutor => @variable_substitutor).generate
       expect(hash['custom_canvas_account_id']).to eq 'account_id'
       expect(hash['custom_canvas_account_sis_id']).to eq 'account_sis_source_id'
       expect(hash['custom_canvas_user_login_id']).to eq 'user_login_id'
     end
 
     it 'adds account and user info in launch data for user profile launch' do
+      @variable_substitutor.add_substitution('$Canvas.account.id', @consumer_instance.id)
+      @variable_substitutor.add_substitution('$Canvas.account.sisSourceId', @consumer_instance.sis_source_id)
+
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => @tool,
                                          :user => @user,
                                          :account => @consumer_instance,
                                          :context => @user,
                                          :link_code => '123456',
-                                         :return_url => 'http://www.google.com').generate
+                                         :return_url => 'http://www.google.com',
+                                         :variable_substitutor => @variable_substitutor).generate
       expect(hash['custom_canvas_account_id']).to eq 'root_account_id'
       expect(hash['custom_canvas_account_sis_id']).to eq 'root_account_sis_source_id'
       expect(hash['lis_person_sourcedid']).to eq 'sis_user_id'
@@ -280,36 +306,11 @@ describe LtiOutbound::ToolLaunch do
     end
 
     describe 'variable substitutions' do
-      before do
-        @substitutor = double('Substitutor', substitute!: 'something')
-        LtiOutbound::VariableSubstitutor.stub(:new).and_return(@substitutor)
-      end
-
-      it 'substitutes for a course context' do
+      it 'substitutes params' do
+        @variable_substitutor.stub(substitute!: 'something')
         @tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute!)
-      end
-
-      it 'substitutes with an assignment' do
-        @tool_launch.for_homework_submission!(@assignment)
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!)
-      end
-
-      it 'substitutes account if context is account' do
-        tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                                  :tool => @tool,
-                                                  :user => @user,
-                                                  :account => @account,
-                                                  :context => @account,
-                                                  :link_code => '123456',
-                                                  :return_url => 'http://www.google.com',
-                                                  :outgoing_email_address => 'outgoing_email_address')
-        tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!)
+        expect(@variable_substitutor).to have_received(:substitute!)
       end
     end
   end

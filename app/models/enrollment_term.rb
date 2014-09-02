@@ -32,7 +32,7 @@ class EnrollmentTerm < ActiveRecord::Base
     :id, :root_account_id, :name, :term_code, :sis_source_id, :sis_batch_id, :start_at, :end_at, :accepting_enrollments, :can_manually_enroll, :created_at,
     :updated_at, :workflow_state, :ignore_term_date_restrictions
   ]
-  EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :enrollments, :course_sections]
+  EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
 
   validates_presence_of :root_account_id, :workflow_state
   before_validation :verify_unique_sis_source_id
@@ -140,5 +140,5 @@ class EnrollmentTerm < ActiveRecord::Base
     save!
   end
   
-  scope :active, where("enrollment_terms.workflow_state<>'deleted'")
+  scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
 end

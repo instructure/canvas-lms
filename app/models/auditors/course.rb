@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::Course
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :course_id,
                :user_id,
                :event_source,
@@ -28,8 +26,7 @@ class Auditors::Course
     def self.generate(course, user, event_type, event_data = {}, opts = {})
       event_source = opts[:source] || :manual
       sis_batch_id = opts[:sis_batch_id]
-
-      new(
+      event = new(
         'course' => course,
         'user' => user,
         'event_type' => event_type,
@@ -37,12 +34,12 @@ class Auditors::Course
         'event_source' => event_source.to_s,
         'sis_batch_id' => sis_batch_id
       )
+      event.sis_batch = opts[:sis_batch] if opts[:sis_batch]
+      event
     end
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['course']
         self.course = attributes.delete('course')
@@ -96,7 +93,7 @@ class Auditors::Course
     end
 
     def event_data
-      @event_data ||= JSON.parse(attributes['data'])
+      @event_data ||= JSON.parse(attributes['data']) if attributes['data']
     end
 
     def event_data=(value)
@@ -106,7 +103,7 @@ class Auditors::Course
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
@@ -154,6 +151,11 @@ class Auditors::Course
   def self.record_published(course, user, opts = {})
     return unless course
     self.record(course, user, 'published', {}, opts)
+  end
+
+  def self.record_claimed(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'claimed', {}, opts)
   end
 
   def self.record_copied(course, copy, user, opts = {})

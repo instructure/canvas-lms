@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentRequest do
   describe "workflow" do
-    let(:request) do
+    let_once(:request) do
       user
       course
       assignment = @course.assignments.create!
@@ -40,6 +40,7 @@ describe AssessmentRequest do
   end
 
   describe "notifications" do
+
     let(:notification_name) { 'Rubric Assessment Submission Reminder' }
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
@@ -52,6 +53,7 @@ describe AssessmentRequest do
       assignment = @course.assignments.create!
       submission = assignment.find_or_create_submission(@student)
       request = AssessmentRequest.new(:user => @user, :asset => submission, :assessor_asset => @student, :assessor => @user)
+      request.stubs(:rubric_association).returns(true)
       request.send_reminder!
 
       request.messages_sent.keys.should include(notification_name)

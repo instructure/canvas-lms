@@ -31,7 +31,7 @@ describe CalendarEvent do
   end
 
   describe "default_values" do
-    before(:each) do
+    before(:once) do
       course_model
       @original_start_at =  Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
@@ -229,7 +229,7 @@ describe CalendarEvent do
   end
 
   context "for_user_and_context_codes" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
       @student = @user
       @e1 = @course.calendar_events.create!
@@ -292,7 +292,7 @@ describe CalendarEvent do
   end
 
   context "notifications" do
-    before do
+    before :once do
       Notification.create(:name => 'New Event Created', :category => "TestImmediately")
       Notification.create(:name => 'Event Date Changed', :category => "TestImmediately")
       course_with_student(:active_all => true)
@@ -358,7 +358,7 @@ describe CalendarEvent do
   end
 
   context "appointments" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
       @student1 = @user
       @other_section = @course.course_sections.create!
@@ -676,7 +676,7 @@ describe CalendarEvent do
     end
 
     context "bulk updating" do
-      before do
+      before :once do
         course_with_teacher
       end
 

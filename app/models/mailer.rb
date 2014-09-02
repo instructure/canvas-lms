@@ -101,12 +101,13 @@ class Mailer < ActionMailer::Base
     headers('Auto-Submitted' => m.context ? 'auto-generated' : 'auto-replied')
 
     params = {
-      from: "#{m.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">",
-      reply_to: IncomingMail::ReplyToAddress.new(m).address,
+      from: from_mailbox(m),
       to: m.to,
       subject: m.subject
     }
 
+    reply_to = reply_to_mailbox(m)
+    params[:reply_to] = reply_to if reply_to
     params[:cc] = m.cc if m.cc
     params[:bcc] = m.bcc if m.bcc
 
@@ -114,5 +115,24 @@ class Mailer < ActionMailer::Base
       format.text{ render text: m.body }
       format.html{ render text: m.html_body } if m.html_body
     end
+  end
+
+  private
+  def quoted_address(display_name, address)
+    addr = Mail::Address.new(address)
+    addr.display_name = display_name
+    addr.format
+  end
+
+  def from_mailbox(message)
+    quoted_address(message.from_name || HostUrl.outgoing_email_default_name, HostUrl.outgoing_email_address)
+  end
+
+  def reply_to_mailbox(message)
+    address = IncomingMail::ReplyToAddress.new(message).address
+    return address unless message.reply_to_name.present?
+    return nil unless address.present?
+
+    quoted_address(message.reply_to_name, address)
   end
 end

@@ -81,6 +81,10 @@
 #           "description": "Optional: This field is only returned in certain API calls, and will return the IANA time zone name of the user's preferred timezone.",
 #           "example": "America/Denver",
 #           "type": "string"
+#         },
+#         "locale": {
+#           "description": "The users locale.",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -136,7 +140,7 @@
 #
 class ProfileController < ApplicationController
   before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_filter :require_user, :only => [:settings, :communication, :communication_update]
+  before_filter :require_user, :only => [:settings, :communication, :communication_update, :observees, :toggle_inbox_disable]
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
   before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
@@ -250,7 +254,7 @@ class ProfileController < ApplicationController
   # @API List avatar options
   # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
   # type:: ["gravatar"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
-  # url:: The url of the avatar 
+  # url:: The url of the avatar
   # token:: A unique representation of the avatar record which can be used to set the avatar with the user update endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
   # display_name:: A textual description of the avatar record
   # id:: ['attachment' type only] the internal id of the attachment
@@ -296,7 +300,25 @@ class ProfileController < ApplicationController
       render :json => avatars_json_for_user(@user)
     end
   end
-  
+
+  def toggle_disable_inbox
+    disable_inbox = value_to_boolean(params[:user][:disable_inbox])
+    @current_user.preferences[:disable_inbox] = disable_inbox
+    @current_user.save!
+
+    email_channel_id = @current_user.email_channel.try(:id)
+    if disable_inbox && !email_channel_id.nil?
+      params = {:channel_id=>email_channel_id,:frequency=>"immediately"}
+
+      ["added_to_conversation", "conversation_message"].each do |category|
+        params[:category] = category
+        NotificationPolicy.setup_for(@current_user, params)
+      end
+    end
+
+    render :json => {}
+  end
+
   def update
     @user = @current_user
 
@@ -416,4 +438,13 @@ class ProfileController < ApplicationController
     require_user
   end
   private :require_user_for_private_profile
+
+  def observees
+    @user ||= @current_user
+    @active_tab = 'observees'
+    @context = @user.profile if @user == @current_user
+
+    add_crumb(@user.short_name, profile_path)
+    add_crumb(t('crumbs.observees', "Observing"))
+  end
 end

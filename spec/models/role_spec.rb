@@ -28,7 +28,7 @@ describe Role do
   end
 
   context "with account" do
-    before do
+    before :once do
       account_model
     end
 
@@ -121,7 +121,7 @@ describe Role do
   end
 
   context "with multiple accounts" do
-    before do
+    before :once do
       @root_account_1 = account_model
       @sub_account_1a = @root_account_1.sub_accounts.create!
       @sub_account_1b = @root_account_1.sub_accounts.create!
@@ -155,7 +155,7 @@ describe Role do
   end
 
   context "with active role" do
-    before do
+    before :once do
       account_model
       @role = custom_student_role("1337 Student")
       @role.reload
@@ -203,7 +203,7 @@ describe Role do
   end
 
   context "custom role helpers" do
-    before do
+    before :once do
       account_model
       @sub_account = @account.sub_accounts.create!
       @base_types = RoleOverride::ENROLLMENT_TYPES.map{|et|et[:base_role_name]}

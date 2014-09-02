@@ -30,12 +30,14 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
   belongs_to :asset, :polymorphic => true, :types => :submission
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Submission']
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
@@ -49,9 +51,9 @@ class ConversationMessage < ActiveRecord::Base
 
   after_create :generate_user_note!
 
-  scope :human, where("NOT generated")
-  scope :with_attachments, where("attachment_ids<>'' OR has_attachments") # TODO: simplify post-migration
-  scope :with_media_comments, where("media_comment_id IS NOT NULL OR has_media_objects") # TODO: simplify post-migration
+  scope :human, -> { where("NOT generated") }
+  scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
+  scope :with_media_comments, -> { where("media_comment_id IS NOT NULL OR has_media_objects") } # TODO: simplify post-migration
   scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
 
   def self.preload_latest(conversation_participants, author=nil)
@@ -273,8 +275,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.try(:root_account).try(:deleted?)
-    # If this is from conversations 2, only reply to the author.
-    recipients = conversation.context ? [author] : nil
+    # It would be nice to have group conversations via e-mail, but if so, we need to make it much more obvious
+    # that replies to the e-mail will be sent to multiple recipients.
+    recipients = [author]
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
   end
 

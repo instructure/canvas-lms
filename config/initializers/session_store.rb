@@ -17,6 +17,7 @@ config = {
 # RedisSessionStore, and EncryptedCookieStore)
 config[:expire_after] ||= 1.day
 config[:expires] = nil
+config[:logger] = Rails.logger
 session_store = config.delete(:session_store).to_sym
 
 case session_store
@@ -44,9 +45,11 @@ else
   CanvasRails::Application.config.secret_token = config[:secret]
 end
 
-ActionController::Flash::FlashHash.class_eval do
-  def store(session, key = "flash")
-    return session.delete(key) if self.empty?
-    session[key] = self
+if CANVAS_RAILS2
+  ActionController::Flash::FlashHash.class_eval do
+    def store(session, key = "flash")
+      return session.delete(key) if self.empty?
+      session[key] = self
+    end
   end
 end

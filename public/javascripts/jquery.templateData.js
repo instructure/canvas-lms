@@ -87,11 +87,14 @@ define([
           var $obj = $(this), 
               oldHref, oldRel, oldName;
           for(var i in options.hrefValues) {
+            if(!options.hrefValues.hasOwnProperty(i)) {
+              continue;
+            }
             var name = options.hrefValues[i];
             if(oldHref = $obj.attr('href')) {
               var newHref = $.replaceTags(oldHref, name, encodeURIComponent(options.data[name]));
-              var orig = $obj.text() == $obj.html() ? $obj.text() : null;
-              if(oldHref != newHref) {
+              var orig = $obj.text() === $obj.html() ? $obj.text() : null;
+              if(oldHref !== newHref) {
                 $obj.attr('href', newHref);
                 if(orig) {
                   $obj.text(orig);
@@ -125,15 +128,16 @@ define([
     }
     var result = {}, item, val;
     if(options.textValues) {
-      for(item in options.textValues) {
-        var $item = this.find("." + options.textValues[item].replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ":first");
+      var _this = this;
+      options.textValues.forEach(function(item) {
+        var $item = _this.find("." + item.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ":first");
         val = $.trim($item.text());
-        if($item.html() == "&nbsp;") { val = ""; }
-        if(val.length == 1 && val.charCodeAt(0) == 160) {
+        if($item.html() === "&nbsp;") { val = ""; }
+        if(val.length === 1 && val.charCodeAt(0) === 160) {
           val = "";
         }
-        result[options.textValues[item]] = val;
-      }
+        result[item] = val;
+      });
     }
     if(options.dataValues) {
       for(item in options.dataValues) {

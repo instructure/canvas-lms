@@ -56,7 +56,7 @@ describe "HTML Sanitization of" do
       hash[:answers][1][:html].should match_ignoring_whitespace("Google Picasa<br><span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" width=\"150\" height=\"59\"></span>\302\240")
       hash[:answers][1][:text].should == "Google Picasa"
       hash[:answers][2][:html].should == nil # sanitized html == text, so we exclude it
-      hash[:answers][2][:text].should == "Facebook alert('0xFACE')" # no script tags
+      hash[:answers][2][:text].should == "Facebook alert(0xFACE)" # no script tags
       hash[:answers][3][:html].should == nil
       hash[:answers][3][:text].should == "Twitter" # we've stripped off extraneous whitespace
     end

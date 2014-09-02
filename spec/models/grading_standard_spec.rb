@@ -19,7 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingStandard do
-  before do
+  before :once do
+    course_with_teacher
     @default_standard_v1 = {
       "A" => 1.0,
       "A-" => 0.93,
@@ -77,7 +78,6 @@ describe GradingStandard do
 
   context "standards_for" do
     it "should return standards that match the context" do
-      course_with_teacher
       grading_standard_for @course
 
       standards = GradingStandard.standards_for(@course)
@@ -86,7 +86,6 @@ describe GradingStandard do
     end
 
     it "should include standards made in the parent account" do
-      course_with_teacher
       grading_standard_for @course.root_account
 
       standards = GradingStandard.standards_for(@course)
@@ -97,7 +96,6 @@ describe GradingStandard do
 
   context "sorted" do
     it "should return used grading standards before unused ones" do
-      course_with_teacher
       gs = grading_standard_for(@course.root_account, :title => "zzz")
       gs2 = grading_standard_for(@course.root_account, :title => "aaa")
 
@@ -112,7 +110,6 @@ describe GradingStandard do
     end
 
     it "it should return standards with a title first" do
-      course_with_teacher
       gs = grading_standard_for(@course.root_account, :title => "zzz")
       gs2 = grading_standard_for(@course.root_account, :title => "aaa")
       gs2.title = nil
@@ -215,7 +212,6 @@ describe GradingStandard do
 
   context "associations" do
     it "should not count deleted standards in associations" do
-      course_with_teacher
       grading_standard_for(@course)
       grading_standard_for(@course).destroy
       @course.grading_standards.count.should == 1

@@ -30,6 +30,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 
@@ -71,10 +72,10 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades, :manage_grades).any?(&:last) }
+    given { |user, session| self.context.grants_any_right?(user, session, :read, :view_all_grades, :manage_grades) }
     can :read
 
-    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments).any?(&:last) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete
   end
 
@@ -145,8 +146,8 @@ class AssignmentGroup < ActiveRecord::Base
     self.assignments.map{|a| a.points_possible || 0}.sum
   end
 
-  scope :include_active_assignments, includes(:active_assignments)
-  scope :active, where("assignment_groups.workflow_state<>'deleted'")
+  scope :include_active_assignments, -> { includes(:active_assignments) }
+  scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
   scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
@@ -200,6 +201,16 @@ class AssignmentGroup < ActiveRecord::Base
     false
   end
 
+  def visible_assignments(user)
+    return self.active_assignments if context.grants_right?(user, :manage_grades)
+    potential_assignments = self.send(AssignmentGroup.assignment_scope_for_draft_state(context))
+    if context.feature_enabled?(:differentiated_assignments)
+      potential_assignments.visible_to_student_in_course_with_da(user.id, context.id)
+    else
+      potential_assignments
+    end
+  end
+
   def move_assignments_to(move_to_id)
     new_group = context.assignment_groups.active.find(move_to_id)
     order = new_group.assignments.active.pluck(:id)
@@ -211,7 +222,7 @@ class AssignmentGroup < ActiveRecord::Base
     self.reload
   end
 
-  def self.assignment_scope_for_grading(context)
+  def self.assignment_scope_for_draft_state(context)
     if context.feature_enabled?(:draft_state)
       :published_assignments
     else

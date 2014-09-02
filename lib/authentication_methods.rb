@@ -34,7 +34,7 @@ module AuthenticationMethods
   def load_pseudonym_from_policy
     if (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
-        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
+        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
         (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
         policy['conditions'] &&
         (credential = policy['conditions'].detect{ |cond| cond.is_a?(Hash) && cond.has_key?("pseudonym_id") })
@@ -46,6 +46,9 @@ module AuthenticationMethods
   end
 
   class AccessTokenError < Exception
+  end
+
+  class LoggedOutError < Exception
   end
 
   def self.access_token(request, params_method = :params)
@@ -104,6 +107,9 @@ module AuthenticationMethods
 
           destroy_session
           @current_pseudonym = nil
+          if api_request? || request.format.json?
+            raise LoggedOutError
+          end
         end
       end
       if params[:login_success] == '1' && !@current_pseudonym
@@ -311,11 +317,17 @@ module AuthenticationMethods
     false
   end
 
-  def initiate_cas_login(cas_client = nil)
+  def cas_client(account = @domain_root_account)
+    @cas_client ||= CASClient::Client.new(
+      cas_base_url: account.account_authorization_config.auth_base,
+      encode_extra_attributes_as: :raw
+    )
+  end
+
+  def initiate_cas_login(client = nil)
     reset_session_for_login
-    config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
-    cas_client ||= CASClient::Client.new(config)
-    delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
+    client ||= cas_client
+    delegated_auth_redirect(client.add_service_to_login_url(cas_login_url))
   end
 
   def initiate_saml_login(current_host=nil, aac=nil)

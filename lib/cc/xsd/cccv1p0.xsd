@@ -134,6 +134,7 @@
         <xs:element name="require_initial_post" type="xs:boolean" minOccurs="0"/>
         <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
+        <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
         <xs:element name="discussion_type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">

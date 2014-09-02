@@ -175,7 +175,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "should allow specifying an unenrolled but accessible context" do
       unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
 
       json = api_call(:get, "/api/v1/calendar_events",
@@ -188,10 +188,21 @@ describe CalendarEventsApiController, type: :request do
     def public_course_query(options = {})
       yield @course if block_given?
       @course.save!
+      @user = nil
 
-      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}", {
-        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+      # both calls are made on a public syllabus access
+      # events
+      @course.calendar_events.create! :title => 'some event', :start_at => 1.month.from_now
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=event&all_events=1", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'event', :all_events => '1',
         :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-31'},
+               options[:body_params] || {}, options[:headers] || {}, options[:opts] || {})
+
+      # assignments
+      @course.assignments.create! :title => 'teh assignment', :due_at => 1.month.from_now
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=assignment&all_events=1", {
+          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment', :all_events => '1',
+          :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-31'},
                options[:body_params] || {}, options[:headers] || {}, options[:opts] || {})
     end
 

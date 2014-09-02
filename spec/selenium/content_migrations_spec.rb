@@ -28,7 +28,6 @@ end
 def submit
   @course.reload
   count = @course.content_migrations.count
-
   driver.execute_script("$('#migrationConverterContainer').submit()")
   keep_trying_until do
     @course.content_migrations.count.should == count + 1
@@ -39,6 +38,8 @@ end
 def run_migration(cm=nil)
   cm ||= @course.content_migrations.last
   cm.reload
+  cm.skip_job_progress = false
+  cm.reset_job_progress
   worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(cm.migration_type).settings['worker'])
   worker_class.new(cm.id).perform
 end

@@ -2,9 +2,6 @@
 # going to use. Currently, all Cassandra usage is optional and disabled by
 # default.
 #
-# If you are going to use Cassandra, Canvas requires version 1.1.11. Canvas
-# doesn't yet support Cassandra 1.2.x.
-#
 # Similar to database configuration, Keyspaces are not created by Canvas.
 # You'll need to create the keyspace you are going to use *before* enabling
 # Cassandra and trying to run the migrations.  This gives you the flexibility
@@ -14,13 +11,15 @@
 # Reading the documentation at http://www.datastax.com/docs/1.1/index is a good
 # start.
 #
-# To create the page views keyspace locally for development and testing, run a `cqlsh -3` prompt and:
+# To create the page views keyspace locally for development and testing:
 #
-#   CREATE KEYSPACE page_views WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
-#   CREATE KEYSPACE auditors WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#   For Cassandra 1.1 run `cqlsh -3` and:
+#     CREATE KEYSPACE page_views WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#     CREATE KEYSPACE auditors WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
 #
-#   CREATE KEYSPACE page_views WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
-#   CREATE KEYSPACE auditors WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+#   For Cassandra 1.2 and 2.0 run `cqlsh` and:
+#     CREATE KEYSPACE page_views WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+#     CREATE KEYSPACE auditors WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 #
 # To create the keyspace in production you'll need to determine the appropriate
 # placement strategy and options.

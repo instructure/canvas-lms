@@ -18,6 +18,10 @@ migrations.each do |migration|
   @migration = migration
   data = File.read(@migration)
 
+  if data =~ /\bdef up\b/ || data =~ /\bdef down\b/
+    add_error("for rails2 compatibility, use self.up and self.down not instance methods")
+  end
+
   if data =~ /concurrently/i && data !~ /disable_ddl_transaction/
     add_error("Adding an index concurrently in a transactional migration?!")
   end

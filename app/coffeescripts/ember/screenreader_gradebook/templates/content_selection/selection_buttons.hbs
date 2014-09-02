@@ -1,0 +1,20 @@
+<div {{bind-attr class=":row :pad-box :bottom-only view.classPath"}}>
+  <div class="span3">
+    <button
+      class="btn btn-block previous_object"
+      {{action 'selectItem' 'previous' target="view"}}
+      {{bind-attr disabled=view.disablePreviousButton }}
+    >
+      {{view.previousLabel}}
+    </button>
+  </div>
+  <div class="span3">
+    <button
+      class="btn btn-block next_object"
+      {{action 'selectItem' 'next' target="view"}}
+      {{bind-attr disabled=view.disableNextButton}}
+    >
+      {{view.nextLabel}}
+    </button>
+  </div>
+</div>

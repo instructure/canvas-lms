@@ -244,7 +244,7 @@ class DiscussionTopicsController < ApplicationController
   #   The partial title of the discussion topics to match and return.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #          -H 'Authorization: Bearer <token>'
   def index
     return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
@@ -363,6 +363,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
+
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
       js_hash = {DISCUSSION_TOPIC: hash,
@@ -372,7 +373,8 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DRAFT_STATE: @topic.draft_state_enabled?}
+                 DRAFT_STATE: @topic.draft_state_enabled?,
+                 DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
@@ -437,7 +439,7 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : !(@topic.for_group_discussion? || @topic.locked_for?(@current_user)),     # Can reply
+                :CAN_REPLY      => @locked ? false : @topic.grants_right?(@current_user, session, :reply),     # Can reply
                 :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
@@ -540,17 +542,17 @@ class DiscussionTopicsController < ApplicationController
   #   to the group.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
-  #         -F title='my topic' \ 
-  #         -F message='initial message' \ 
-  #         -F podcast_enabled=1 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
+  #         -F title='my topic' \
+  #         -F message='initial message' \
+  #         -F podcast_enabled=1 \
   #         -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
-  #         -F title='my assignment topic' \ 
-  #         -F message='initial message' \ 
-  #         -F assignment[points_possible]=15 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
+  #         -F title='my assignment topic' \
+  #         -F message='initial message' \
+  #         -F assignment[points_possible]=15 \
   #         -H 'Authorization: Bearer <token>'
   #
   def create
@@ -562,9 +564,9 @@ class DiscussionTopicsController < ApplicationController
   # Accepts the same parameters as create
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
-  #         -F title='This will be positioned after Topic #1234' \ 
-  #         -F position_after=1234 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
+  #         -F title='This will be positioned after Topic #1234' \
+  #         -F position_after=1234 \
   #         -H 'Authorization: Bearer <token>'
   #
   def update
@@ -577,7 +579,7 @@ class DiscussionTopicsController < ApplicationController
   # an assignment discussion.
   #
   # @example_request
-  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
+  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #          -H 'Authorization: Bearer <token>'
   def destroy
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
@@ -785,7 +787,7 @@ class DiscussionTopicsController < ApplicationController
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless params[:group_category_id].to_s != @topic.group_category_id.to_s
+    return unless discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
     if @topic.is_announcement
       @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
       return
@@ -857,7 +859,7 @@ class DiscussionTopicsController < ApplicationController
       elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
              @assignment.grants_right?(@current_user, session, :update)
         params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
-        update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
+        update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')), @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
         @topic.assignment = @assignment

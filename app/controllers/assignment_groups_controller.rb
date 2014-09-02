@@ -116,7 +116,7 @@ class AssignmentGroupsController < ApplicationController
         @groups = @groups.includes(:active_assignments => assignment_includes)
 
         assignment_descriptions = @groups
-          .flat_map(&:active_assignments)
+          .flat_map{|ag| ag.visible_assignments(@current_user) }
           .map(&:description)
         user_content_attachments = api_bulk_load_user_content_attachments(
           assignment_descriptions, @context, @current_user
@@ -129,7 +129,7 @@ class AssignmentGroupsController < ApplicationController
                                        .joins(:assignment_overrides)
                                        .select("assignments.id")
                                        .uniq
-          assignments_without_overrides = @groups.flat_map(&:active_assignments) -
+          assignments_without_overrides = @groups.flat_map{|ag| ag.visible_assignments(@current_user)} -
             assignments_with_overrides
           assignments_without_overrides.each { |a| a.has_no_overrides = true }
         end

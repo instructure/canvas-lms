@@ -91,4 +91,6 @@ define [
     afterRender: ->
       @$('[placeholder]').placeholder()
       @maybeShowPrivileges()
+      $('#user_email_errors').focus()
+
 

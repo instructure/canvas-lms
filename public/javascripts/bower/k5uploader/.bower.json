@@ -1,6 +1,6 @@
 {
   "name": "k5uploader",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "authors": [
     "Jason Madsen <knomedia@gmail.com>"
   ],
@@ -23,13 +23,13 @@
     "testem.json"
   ],
   "homepage": "https://github.com/knomedia/k5uploader",
-  "_release": "0.0.2",
+  "_release": "0.0.3",
   "_resolution": {
     "type": "version",
-    "tag": "0.0.2",
-    "commit": "f1a78db02e4589500e23648d089f07c4a01982c9"
+    "tag": "0.0.3",
+    "commit": "453eddaad575079946144192626b4f0bbe78042a"
   },
   "_source": "git://github.com/knomedia/k5uploader.git",
-  "_target": "0.0.2",
+  "_target": "0.0.3",
   "_originalSource": "k5uploader"
 }

@@ -6,6 +6,12 @@
   <%= t :subject, "Assignment Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t(:link_message, "You can review the assignment here") %>
+  </a>
+<% end %>
+
 <p><%= t :body, "Your assignment, %{assignment}, has been graded.", :assignment => asset.assignment.title %></p>
 
 <p><%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %></p>
@@ -15,5 +21,3 @@
 <% end %>
 
 <p><%= t(:score_pending_review, "score pending review by the teacher") if asset.pending_review? %></p>
-
-<p><a href="<%= content :link %>"><%= t(:link_message, "You can review the assignment here") %></a></p>

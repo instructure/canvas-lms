@@ -10,6 +10,12 @@ define [
     return if $trigger.data('kyleMenu')
     opts = $.extend {noButton: true}, $trigger.data('kyleMenuOptions')
     opts.appendMenuTo = 'body' if $trigger.data('append-to-body')
+    opts = $.extend opts,
+      popupOpts:
+        position:
+          my: $trigger.data('popup-my')
+          at: $trigger.data('popup-at')
+          within: $trigger.data('popup-within')
     new KyleMenu($trigger, opts)
 
     $trigger.trigger(event)

@@ -37,7 +37,7 @@
     <p>
       <%= t('merge_result_explanation', "Are you sure you want to merge the account, %{source_user_name}
       (%{source_user_email}) into this account, %{target_user_name} (%{target_user_email})? This
-      process will have the following end result:", 
+      process will have the following end result:",
             :source_user_name => @user.name, :source_user_email => @user.email,
             :target_user_name => @other_user.name, :target_user_email => @other_user.email) %>
     <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @other_user} %>
@@ -53,7 +53,7 @@
     <% if @pending_other_user %>
       <%= t('merge_result_explanation_again', "You've selected to merge the user, %{user_name} (%{user_email}) into
       the account, %{pending_other_user_name} (%{pending_other_user_email}).
-      This process will have the following end result:", 
+      This process will have the following end result:",
             :user_name => @user.name, :user_email => @user.email,
             :pending_other_user_name => @pending_other_user.name, :pending_other_user_email => @pending_other_user.email) %>
       <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @pending_other_user} %>
@@ -70,7 +70,7 @@
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
             <h3><%= t('titles.find_user', 'Find a User') %></h3>
-            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq.select { |a| a.grants_rights?(@current_user, session, :manage_user_logins, :read_roster).values.all? } %>
+            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq.select { |a| a.grants_any_right?(@current_user, session, :manage_user_logins, :read_roster) } %>
             <% if accounts.empty? %>
               <%= t('no_permission', "You don't have permission to search any accounts") %>
             <% else %>

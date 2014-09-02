@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "GradeChangeAudit API", type: :request do
   context "not configured" do
@@ -37,7 +38,7 @@ describe "GradeChangeAudit API", type: :request do
     include_examples "cassandra audit logs"
 
     before do
-      @request_id = UUIDSingleton.instance.generate
+      @request_id = CanvasUUID.generate
       RequestContextGenerator.stubs( :request_id => @request_id )
 
       @domain_root_account = Account.default
@@ -54,7 +55,7 @@ describe "GradeChangeAudit API", type: :request do
 
     def fetch_for_context(context, options={})
       type = context.class.to_s.downcase unless type = options.delete(:type)
-      id = context.id.to_s
+      id = Shard.global_id_for(context).to_s
 
       arguments = { controller: 'grade_change_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
       query_string = []
@@ -197,6 +198,32 @@ describe "GradeChangeAudit API", type: :request do
         fetch_for_context(@assignment, expected_status: 404)
         fetch_for_context(@student, expected_status: 404, type: "student")
         fetch_for_context(@teacher, expected_status: 404, type: "grader")
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        before do
+          @new_root_account = @shard2.activate{ Account.create!(name: 'New Account') }
+          LoadAccount.stubs(:default_domain_root_account).returns(@new_root_account)
+          @new_root_account.stubs(:grants_right?).returns(true)
+          @viewing_user = user_with_pseudonym(account: @new_root_account)
+        end
+
+        it "should foo" do
+          fetch_for_context(@student, expected_status: 404, type: "student")
+          fetch_for_context(@teacher, expected_status: 404, type: "grader")
+        end
+
+        it "should foo" do
+          course_with_teacher(account: @new_root_account, user: @teacher)
+          fetch_for_context(@teacher, expected_status: 200, type: "grader")
+        end
+
+        it "should foo" do
+          course_with_student(account: @new_root_account, user: @student)
+          fetch_for_context(@student, expected_status: 200, type: "student")
+        end
       end
     end
 

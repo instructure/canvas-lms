@@ -44,22 +44,16 @@ class Message < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :notification
   belongs_to :user
+  belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context
 
   attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type,
-    :from_name, :sent_at, :notification, :user, :communication_channel,
+    :from_name, :reply_to_name, :sent_at, :notification, :user, :communication_channel,
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
   attr_accessor :output_buffer
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :to, :from, :cc, :bcc, :subject, :body, :delay_for, :dispatch_at, :sent_at, :workflow_state, :transmission_errors, :is_bounced, :notification_id,
-    :communication_channel_id, :context_id, :context_type, :asset_context_id, :asset_context_type, :user_id, :created_at, :updated_at, :notification_name, :url, :path_type,
-    :from_name, :asset_context_code, :notification_category, :to_email, :html_body, :root_account_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:asset_context, :communication_channel, :context, :notification, :user, :attachments]
   # Callbacks
   after_save  :stage_message
   before_save :infer_defaults
@@ -146,15 +140,15 @@ class Message < ActiveRecord::Base
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 
-  scope :to_dispatch, lambda {
+  scope :to_dispatch, -> {
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  scope :to_email, where(:path_type => ['email', 'sms'])
+  scope :to_email, -> { where(:path_type => ['email', 'sms']) }
 
-  scope :to_facebook, where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25)
+  scope :to_facebook, -> { where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25) }
 
-  scope :not_to_email, where("messages.path_type NOT IN ('email', 'sms')")
+  scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
   scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
 
@@ -164,15 +158,54 @@ class Message < ActiveRecord::Base
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, where(:workflow_state => ['created', 'staged', 'sending'])
+  scope :cancellable, -> { where(:workflow_state => ['created', 'staged', 'sending']) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
   # Where user can be a User or id, name needs to be the Notification name.
-  scope :staged, lambda { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
+  scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
   scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
+
+  #Public: Helper methods for grabbing a user via the "from" field and using it to
+  #populate the avatar, name, and email in the conversation email notification
+
+  def author
+    @_author ||= begin
+      if context.has_attribute?(:user_id)
+        User.find(context.user_id)
+      elsif context.has_attribute?(:author_id)
+        User.find(context.author_id)
+      else
+        nil
+      end
+    end
+  end
+
+  def avatar_enabled?
+    return false unless author_account.present?
+    author_account.service_enabled?(:avatars)
+  end
+
+  def author_account
+    # Root account is populated during save
+    return nil unless author.present?
+    root_account_id ? Account.find(root_account_id) : author.account
+  end
+
+  def author_avatar_url
+    url = author.try(:avatar_url)
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
+  end
+
+  def author_short_name
+    author.try(:short_name)
+  end
+
+  def author_email_address
+    author.try(:email)
+  end
 
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
@@ -472,7 +505,7 @@ class Message < ActiveRecord::Base
 
     delivery_method = "deliver_via_#{path_type}".to_sym
 
-    if not delivery_method or not respond_to?(delivery_method)
+    if not delivery_method or not respond_to?(delivery_method, true)
       logger.warn("Could not set delivery_method from #{path_type}")
       return nil
     end
@@ -555,12 +588,8 @@ class Message < ActiveRecord::Base
     root_account = context_root_account
     self.root_account_id ||= root_account.try(:id)
 
-    self.from_name = root_account.settings[:outgoing_email_default_name] rescue nil
-    self.from_name = HostUrl.outgoing_email_default_name if from_name.blank?
-    self.from_name = asset_context.name if (asset_context &&
-      !asset_context.is_a?(Account) && asset_context.name &&
-      notification.dashboard? rescue false)
-    self.from_name = from_name if respond_to?(:from_name)
+    self.from_name = infer_from_name
+    self.reply_to_name = message_context.reply_to_name
 
     true
   end
@@ -701,4 +730,27 @@ class Message < ActiveRecord::Base
   def deliver_via_sms
     deliver_via_email
   end
+
+  private
+  def infer_from_name
+    if asset_context
+      return message_context.from_name if message_context.from_name.present?
+      return asset_context.name if can_use_asset_name_for_from?
+    end
+
+    if root_account && root_account.settings[:outgoing_email_default_name]
+      return root_account.settings[:outgoing_email_default_name]
+    end
+
+    HostUrl.outgoing_email_default_name
+  end
+
+  def can_use_asset_name_for_from?
+    !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
+  end
+
+  def message_context
+    @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  end
+
 end

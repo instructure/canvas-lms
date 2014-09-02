@@ -50,10 +50,6 @@ module MigratorHelper
     end
   end
 
-  def self.unzip_command(zip_file, dest_dir)
-    "unzip -qo #{Shellwords.escape(zip_file)} -d #{Shellwords.escape(dest_dir)} 2>&1"
-  end
-
   def add_error(type, message, object=nil, e=nil)
     logger.error message
     @error_count += 1
@@ -139,6 +135,10 @@ module MigratorHelper
   def save_to_file(file_name = nil)
     make_export_dir
     add_assessment_id_prepend
+
+    @course = @course.with_indifferent_access
+    Importers::AssessmentQuestionImporter.preprocess_migration_data(@course)
+
     file_name ||= File.join(@base_export_dir, FULL_COURSE_JSON_FILENAME)
     file_name = File.expand_path(file_name)
     @course[:full_export_file_path] = file_name
@@ -148,24 +148,7 @@ module MigratorHelper
     File.open(file_name, 'w') { |file| file << @course.to_json}
     file_name
   end
-  
-  def self.download_archive(settings)
-    config = ConfigFile.load('external_migration') || {}
-    if settings[:export_archive_path]
-      settings[:archive_file] = File.open(settings[:export_archive_path], 'rb')
-    elsif settings[:course_archive_download_url].present?
-      # open-uri downloads the http response to a tempfile
-      settings[:archive_file] = open(settings[:course_archive_download_url])
-    elsif settings[:attachment_id]
-      att = Attachment.find(settings[:attachment_id])
-      settings[:archive_file] = att.open(:temp_folder => config[:data_folder], :need_local_file => true)
-    else
-      raise "No migration file found"
-    end
 
-    settings[:archive_file]
-  end
-  
   def id_prepender
     @settings[:id_prepender]
   end
@@ -284,6 +267,7 @@ module MigratorHelper
     @overview[:all_questions_qti_export] = @course[:all_questions_qti_export] if @course[:all_questions_qti_export]
     @overview[:course_outline] = @course[:course_outline] if @course[:course_outline]
     @overview[:error_count] = @error_count
+
     if @course[:assessments]
       @overview[:assessments] = []
       if @course[:assessments][:assessments]
@@ -306,6 +290,14 @@ module MigratorHelper
         end
       end
     end
+
+    if @course[:assessment_question_banks]
+      @overview[:assessment_question_banks] ||= []
+      @course[:assessment_question_banks].each do |aqb|
+        @overview[:assessment_question_banks] << aqb.dup
+      end
+    end
+
     if @course[:calendar_events]
       @overview[:calendar_events] = []
       @course[:calendar_events].each do |e|

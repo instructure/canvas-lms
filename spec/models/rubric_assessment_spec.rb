@@ -20,12 +20,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssessment do
-  it "should htmlify the rating comments" do
+  before :once do
     assignment_model
-    rubric_model
+    @teacher = user(:active_all => true)
+    @course.enroll_teacher(@teacher).accept
     @student = user(:active_all => true)
     @course.enroll_student(@student).accept
+    rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+  end
+
+  it "should htmlify the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
     @assessment = @association.assess({
       :user => @student,
@@ -47,13 +52,6 @@ describe RubricAssessment do
 
   context "grading" do
     it "should update scores if used for grading" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
-      rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
@@ -77,11 +75,6 @@ describe RubricAssessment do
     end
     
     it "should not update scores if not used for grading" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
       @assessment = @association.assess({
@@ -106,15 +99,8 @@ describe RubricAssessment do
     end
     
     it "should not update scores if not a valid grader" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
       @student2 = user(:active_all => true)
       @course.enroll_student(@student2).accept
-      rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assessment = @association.assess({
         :user => @student,
         :assessor => @student2,

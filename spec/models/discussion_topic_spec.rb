@@ -84,35 +84,40 @@ describe DiscussionTopic do
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
     @topic.lock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
     @topic.unlock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
 
     @entry = @topic.discussion_entries.create!(:user => @teacher)
     @entry.discussion_topic = @topic
+    @topic.clear_permissions_cache(@user)
     (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
     @topic.lock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
     @topic.unlock!
+    @topic.clear_permissions_cache(@user)
     (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
   describe "visibility" do
-    before(:each) do
-      course_with_teacher(:active_all => 1, :draft_state => draft_state)
+    before(:once) do
+      course_with_teacher(:active_all => 1, :draft_state => false) # this does not disable draft state if it is switched on at the account level
       student_in_course(:active_all => 1)
       @topic = @course.discussion_topics.create!(:user => @teacher)
     end
 
-    let(:draft_state) {false} # this does not disable draft state is it is switched on at the account level
-
     context "with draft state enabled" do
-      let(:draft_state) {true}
+      before(:once) do
+        @course.enable_feature!(:draft_state)
+      end
 
       it "should be visible to author when unpublished" do
         @topic.unpublish!
@@ -185,7 +190,7 @@ describe DiscussionTopic do
 
   describe "allow_student_discussion_topics setting" do
 
-    before(:each) do
+    before(:once) do
       course_with_teacher(:active_all => 1)
       student_in_course(:active_all => 1)
       @topic = @course.discussion_topics.create!(:user => @teacher)
@@ -206,32 +211,39 @@ describe DiscussionTopic do
 
   end
 
-  it "should grant observers read permission by default" do
-    course_with_teacher(:active_all => true)
-    course_with_observer(:course => @course, :active_all => true)
-    relevant_permissions = [:read, :reply, :update, :delete]
+  context "observers" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      course_with_observer(:course => @course, :active_all => true)
+    end
 
-    @topic = @course.discussion_topics.create!(:user => @teacher)
-    (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
-    @entry = @topic.discussion_entries.create!(:user => @teacher)
-    (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
-  end
+    it "should grant observers read permission by default" do
+      relevant_permissions = [:read, :reply, :update, :delete]
 
-  it "should not grant observers read permission when read_forum override is false" do
-    course_with_teacher(:active_all => true)
-    course_with_observer(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+      (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
+      @entry = @topic.discussion_entries.create!(:user => @teacher)
+      (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
+    end
 
-    RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                         :enrollment_type => "ObserverEnrollment", :enabled => false)
+    it "should not grant observers read permission when read_forum override is false" do
+      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                           :enrollment_type => "ObserverEnrollment", :enabled => false)
 
-    relevant_permissions = [:read, :reply, :update, :delete]
-    @topic = @course.discussion_topics.create!(:user => @teacher)
-    (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
-    @entry = @topic.discussion_entries.create!(:user => @teacher)
-    (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
+      relevant_permissions = [:read, :reply, :update, :delete]
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+      (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
+      @entry = @topic.discussion_entries.create!(:user => @teacher)
+      (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
+    end
   end
 
   context "delayed posting" do
+    before :once do
+      course_with_student(:active_all => true)
+      @user.register
+    end
+
     def discussion_topic(opts = {})
       workflow_state = opts.delete(:workflow_state)
       @topic = @course.discussion_topics.build(opts)
@@ -245,8 +257,6 @@ describe DiscussionTopic do
     end
 
     it "shouldn't send to streams on creation or update if it's delayed" do
-      course_with_student(:active_all => true)
-      @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
       topic.stream_item.should_not be_nil
 
@@ -259,8 +269,6 @@ describe DiscussionTopic do
     end
 
     it "should send to streams on update from delayed to active" do
-      course_with_student(:active_all => true)
-      @user.register
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       topic.workflow_state.should == 'post_delayed'
       topic.stream_item.should be_nil
@@ -273,11 +281,6 @@ describe DiscussionTopic do
     end
 
     describe "#update_based_on_date" do
-      before do
-        course_with_student(:active_all => true)
-        @user.register
-      end
-
       it "should be active when delayed_post_at is in the past" do
         topic = delayed_discussion_topic(:title => "title",
                                          :message => "content here",
@@ -372,8 +375,11 @@ describe DiscussionTopic do
   end
 
   context "sub-topics" do
-    it "should default subtopics_refreshed_at on save if a group discussion" do
+    before :once do
       course_with_student(:active_all => true)
+    end
+
+    it "should default subtopics_refreshed_at on save if a group discussion" do
       group_category = @course.group_categories.create(:name => "category")
       @group = @course.groups.create(:name => "group", :group_category => group_category)
       @topic = @course.discussion_topics.create(:title => "topic")
@@ -385,7 +391,6 @@ describe DiscussionTopic do
     end
 
     it "should not allow students to edit sub-topics" do
-      course_with_student(:active_all => true)
       @first_user = @user
       @second_user = user_model
       @course.enroll_student(@second_user).accept
@@ -397,8 +402,8 @@ describe DiscussionTopic do
       @sub_topic = @group.discussion_topics.build(:title => "sub topic", :message => "not ok to be edited", :user => @first_user)
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
-      @group_topic.grants_right?(@second_user, nil, :update).should eql(false)
-      @sub_topic.grants_right?(@second_user, nil, :update).should eql(false)
+      @group_topic.grants_right?(@second_user, :update).should eql(false)
+      @sub_topic.grants_right?(@second_user, :update).should eql(false)
     end
   end
 
@@ -416,39 +421,45 @@ describe DiscussionTopic do
       @topic.reload.child_topics.should be_empty
     end
 
-    it "should create a topic per active group in the category otherwise" do
-      group_discussion_assignment
-      @topic.refresh_subtopics
-      subtopics = @topic.reload.child_topics
-      subtopics.should_not be_nil
-      subtopics.size.should == 2
-      subtopics.each { |t| t.root_topic.should == @topic }
-      @group1.reload.discussion_topics.should_not be_empty
-      @group2.reload.discussion_topics.should_not be_empty
-    end
+    context "in a group discussion" do
+      before :once do
+        group_discussion_assignment
+      end
 
-    it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
-      group_discussion_assignment
-      @topic.refresh_subtopics
-      subtopics = @topic.reload.child_topics
-      subtopics.each {|st| st.discussion_type.should == 'side_comment' }
-      @topic.discussion_type = 'threaded'
-      @topic.save!
-      subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
-    end
+      it "should create a topic per active group in the category otherwise" do
+        @topic.refresh_subtopics
+        subtopics = @topic.reload.child_topics
+        subtopics.should_not be_nil
+        subtopics.size.should == 2
+        subtopics.each { |t| t.root_topic.should == @topic }
+        @group1.reload.discussion_topics.should_not be_empty
+        @group2.reload.discussion_topics.should_not be_empty
+      end
 
-    it "should not rename the assignment to match a subtopic" do
-      group_discussion_assignment
-      original_name = @assignment.title
-      @assignment.reload
-      @assignment.title.should == original_name
+      it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
+        @topic.refresh_subtopics
+        subtopics = @topic.reload.child_topics
+        subtopics.each {|st| st.discussion_type.should == 'side_comment' }
+        @topic.discussion_type = 'threaded'
+        @topic.save!
+        subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
+      end
+
+      it "should not rename the assignment to match a subtopic" do
+        original_name = @assignment.title
+        @assignment.reload
+        @assignment.title.should == original_name
+      end
     end
   end
 
   context "root_topic?" do
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
     it "should be false if the topic has a root topic" do
       # subtopic has the assignment and group_category, but has a root topic
-      course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @parent_topic = @course.discussion_topics.create(:title => "parent topic")
       @parent_topic.group_category = group_category
@@ -465,14 +476,12 @@ describe DiscussionTopic do
 
     it "should be false unless the topic has an assignment" do
       # topic has no root topic, but also has no assignment
-      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "subtopic")
       @topic.should_not be_root_topic
     end
 
     it "should be false unless the topic has a group_category" do
       # topic has no root topic and has an assignment, but the assignment has no group_category
-      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
       @assignment.infer_times
@@ -485,7 +494,6 @@ describe DiscussionTopic do
 
     it "should be true otherwise" do
       # topic meets all criteria
-      course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @topic = @course.discussion_topics.create(:title => "topic")
       @topic.group_category = group_category
@@ -545,36 +553,39 @@ describe DiscussionTopic do
   end
 
   context "should_send_to_stream" do
-    it "should be true for non-assignment discussions" do
-      course_with_student(:active_all => true)
-      @topic = @course.discussion_topics.create(:title => "topic")
-      @topic.should_send_to_stream.should be_true
-    end
+    context "in a published course" do
+      before :once do
+        course_with_student(:active_all => true)
+      end
 
-    it "should be true for non-group discussion assignments" do
-      course_with_student(:active_all => true)
-      @topic = @course.discussion_topics.build(:title => "topic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :due_at => 1.day.from_now)
-      @assignment.saved_by = :discussion_topic
-      @topic.assignment = @assignment
-      @topic.save
-      @topic.should_send_to_stream.should be_true
-    end
+      it "should be true for non-assignment discussions" do
+        @topic = @course.discussion_topics.create(:title => "topic")
+        @topic.should_send_to_stream.should be_true
+      end
 
-    it "should be true for the parent topic only in group discussions, not the subtopics" do
-      course_with_student(:active_all => true)
-      group_category = @course.group_categories.create(:name => "category")
-      @parent_topic = @course.discussion_topics.create(:title => "parent topic")
-      @parent_topic.group_category = group_category
-      @parent_topic.save
-      @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
-      @subtopic.group_category = group_category
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :due_at => 1.day.from_now)
-      @assignment.saved_by = :discussion_topic
-      @subtopic.assignment = @assignment
-      @subtopic.save
-      @parent_topic.should_send_to_stream.should be_true
-      @subtopic.should_send_to_stream.should be_false
+      it "should be true for non-group discussion assignments" do
+        @topic = @course.discussion_topics.build(:title => "topic")
+        @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :due_at => 1.day.from_now)
+        @assignment.saved_by = :discussion_topic
+        @topic.assignment = @assignment
+        @topic.save
+        @topic.should_send_to_stream.should be_true
+      end
+
+      it "should be true for the parent topic only in group discussions, not the subtopics" do
+        group_category = @course.group_categories.create(:name => "category")
+        @parent_topic = @course.discussion_topics.create(:title => "parent topic")
+        @parent_topic.group_category = group_category
+        @parent_topic.save
+        @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
+        @subtopic.group_category = group_category
+        @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :due_at => 1.day.from_now)
+        @assignment.saved_by = :discussion_topic
+        @subtopic.assignment = @assignment
+        @subtopic.save
+        @parent_topic.should_send_to_stream.should be_true
+        @subtopic.should_send_to_stream.should be_false
+      end
     end
 
     it "should not send stream items to students if course isn't published'" do
@@ -596,7 +607,7 @@ describe DiscussionTopic do
   end
 
   context "posting first to view" do
-    before(:each) do
+    before(:once) do
       course_with_student(:active_all => true)
       @observer = user(:active_all => true)
       course_with_teacher(:course => @course, :active_all => true)
@@ -619,7 +630,7 @@ describe DiscussionTopic do
       # enroll as a student.
       course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
       @topic.reload
-      DiscussionTopic.clear_cached_contexts
+      @topic.clear_permissions_cache(@ta)
       @topic.user_can_see_posts?(@ta).should == false
     end
 
@@ -646,7 +657,7 @@ describe DiscussionTopic do
   end
 
   context "subscribers" do
-    before :each do
+    before :once do
       course_with_student(:active_all => true)
       @context = @course
       discussion_topic_model(:user => @teacher)
@@ -707,7 +718,7 @@ describe DiscussionTopic do
   end
 
   context "posters" do
-    before :each do
+    before :once do
       @teacher = course_with_teacher(:active_all => true).user
       @context = @course
       discussion_topic_model(:user => @teacher)
@@ -751,7 +762,7 @@ describe DiscussionTopic do
   end
 
   context "submissions when graded" do
-    before :each do
+    before :once do
       @teacher = course_with_teacher(:active_all => true).user
       @context = @course
       discussion_topic_model(:user => @teacher)
@@ -910,7 +921,7 @@ describe DiscussionTopic do
   end
 
   context "read/unread state" do
-    before(:each) do
+    before(:once) do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
@@ -1003,7 +1014,7 @@ describe DiscussionTopic do
   end
 
   context "subscribing" do
-    before :each do
+    before :once do
       course_with_student(:active_all => true)
       @context = @course
       discussion_topic_model(:user => @teacher)
@@ -1049,7 +1060,7 @@ describe DiscussionTopic do
   end
 
   context "subscription holds" do
-    before :each do
+    before :once do
       course_with_student(:active_all => true)
       @context = @course
     end
@@ -1092,7 +1103,7 @@ describe DiscussionTopic do
 
   context "a group topic subscription" do
 
-    before(:each) do
+    before(:once) do
       group_discussion_assignment
       course_with_student(active_all: true)
     end
@@ -1135,8 +1146,11 @@ describe DiscussionTopic do
   end
 
   context "materialized view" do
-    before do
+    before :once do
       topic_with_nested_replies
+    end
+
+    before :each do
       # materialized view jobs are now delayed
       Timecop.travel(Time.now + 20.seconds)
     end
@@ -1178,8 +1192,9 @@ describe DiscussionTopic do
   end
 
   context "destroy" do
+    before(:once) { group_discussion_assignment }
+
     it "should destroy the assignment and associated child topics" do
-      group_discussion_assignment
       @topic.destroy
       @topic.reload.should be_deleted
       @topic.child_topics.each{ |ct| ct.reload.should be_deleted }
@@ -1187,7 +1202,6 @@ describe DiscussionTopic do
     end
 
     it "should not revive the assignment if updated when deleted" do
-      group_discussion_assignment
       @topic.destroy
       @assignment.reload.should be_deleted
       @topic.touch
@@ -1196,8 +1210,9 @@ describe DiscussionTopic do
   end
 
   context "restore" do
+    before(:once) { group_discussion_assignment }
+
     it "should restore the assignment and associated child topics" do
-      group_discussion_assignment
       @topic.destroy
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
@@ -1207,7 +1222,6 @@ describe DiscussionTopic do
     end
 
     it "should restore to unpublished state if draft mode is enabled" do
-      group_discussion_assignment
       @course.root_account.enable_feature!(:draft_state)
       @topic.destroy
 
@@ -1246,7 +1260,7 @@ describe DiscussionTopic do
   end
 
   describe "locked flag" do
-    before :each do
+    before :once do
       discussion_topic_model
     end
 

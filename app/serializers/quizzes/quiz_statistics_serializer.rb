@@ -1,6 +1,6 @@
 module Quizzes
   class QuizStatisticsSerializer < Canvas::APISerializer
-    root :quiz_statistics
+    SubmissionStatisticsExtractor = /^submission_(.+)/
 
     # Utilizes both Student and Item analysis to generate a compound document of
     # quiz statistics.
@@ -9,6 +9,8 @@ module Quizzes
     class Input < Struct.new(:quiz, :student_analysis, :item_analysis)
       include ActiveModel::SerializerSupport
     end
+
+    root :quiz_statistics
 
     attributes *[
       # the id is really only included in JSON-API and only because the spec
@@ -81,32 +83,26 @@ module Quizzes
       # we're going to merge the item analysis for applicable questions into the
       # generic question statistics from the student analysis
       question_statistics.each do |question|
-        question_id = question[:id]
+        question_id = question[:id] = "#{question[:id]}"
         question_item = item_analysis_report.detect do |question_item|
-          question_item[:question_id] == question_id
+          "#{question_item[:question_id]}" == question_id
         end
 
         if question_item.present?
-          question_item.delete :question_id
-          question.merge! question_item
+          question.merge! question_item.except(:question_id)
         end
-
-        remove_unwanted_fields question
       end
 
       question_statistics
     end
 
     def submission_statistics
-      report = student_analysis_report
-      extractor = /^submission_(.+)/
-
       {}.tap do |out|
-        report.each_pair do |key, statistic|
-          out[$1] = statistic if key =~ extractor
+        student_analysis_report.each_pair do |key, statistic|
+          out[$1] = statistic if key =~ SubmissionStatisticsExtractor
         end
 
-        out[:unique_count] = report[:unique_submission_count]
+        out[:unique_count] = student_analysis_report[:unique_submission_count]
       end
     end
 
@@ -130,18 +126,6 @@ module Quizzes
 
     def item_analysis_report
       @item_analysis_report ||= object[:item_analysis].report.generate(false)
-    end
-
-    def remove_unwanted_fields(question)
-      # this is always empty
-      question.delete(:unexpected_response_values)
-
-      (question[:answers] || []).each do |answer|
-        # this is 99% of the time empty, see CNVS-12170
-        answer.delete(:html)
-        # this is unnecessary
-        answer.delete(:comments)
-      end
     end
   end
 end

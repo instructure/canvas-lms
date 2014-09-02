@@ -54,7 +54,7 @@ class AdminsController < ApplicationController
   #
   # Flag an existing user as an admin within the account.
   #
-  # @argument user_id [String]
+  # @argument user_id [Integer]
   #   The id of the user to promote.
   #
   # @argument role [Optional, String]
@@ -66,10 +66,22 @@ class AdminsController < ApplicationController
   #
   # @returns Admin
   def create
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      user = api_find(User, params[:user_id])
-      raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless user.find_pseudonym_for_account(@context.root_account, true)
-      admin = user.flag_as_admin(@context, params[:role], !(params[:send_confirmation] == '0'))
+    user = api_find(User, params[:user_id])
+    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless user.find_pseudonym_for_account(@context.root_account, true)
+    role = params[:role] || 'AccountAdmin'
+    admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+
+    if authorized_action(admin, @current_user, :create)
+      if admin.new_record?
+        admin.save!
+        if !(params[:send_confirmation] == '0')
+          if user.registered?
+            admin.account_user_notification!
+          else
+            admin.account_user_registration!
+          end
+        end
+      end
       render :json => admin_json(admin, @current_user, session)
     end
   end
@@ -84,23 +96,27 @@ class AdminsController < ApplicationController
   #
   # @returns Admin
   def destroy
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      user = api_find(User, params[:user_id])
-      role = params[:role] || 'AccountAdmin'
-      admin = @context.account_users.find_by_user_id_and_membership_type!(user.id, role)
+    user = api_find(User, params[:user_id])
+    role = params[:role] || 'AccountAdmin'
+    admin = @context.account_users.where(user_id: user, membership_type: role).first!
+    if authorized_action(admin, @current_user, :destroy)
       admin.destroy
       render :json => admin_json(admin, @current_user, session)
     end
   end
-  
+
   # @API List account admins
   #
   # List the admins in the account
-  # 
+  #
+  # @argument user_id[] [Optional, [Integer]]
+  #   Scope the results to those with user IDs equal to any of the IDs specified here.
+  #
   # @returns [Admin]
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
       scope = @context.account_users
+      scope = scope.where(user_id: params[:user_id]) if params[:user_id]
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }

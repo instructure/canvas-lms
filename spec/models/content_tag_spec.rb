@@ -409,6 +409,29 @@ describe ContentTag do
     @tag2.reload
     @tag2.workflow_state.should == 'unpublished'
   end
+
+  it "should publish content via publish!" do
+    Account.default.enable_feature!(:draft_state)
+    assignment_model
+    @assignment.unpublish!
+    @module = @course.context_modules.create!
+    @tag = @module.add_item(type: 'Assignment', id: @assignment.id)
+    @tag.workflow_state = 'active'
+    @tag.content.expects(:publish!).once
+    @tag.save!
+    @tag.update_asset_workflow_state!
+  end
+
+  it "should unpublish content via unpublish!" do
+    Account.default.enable_feature!(:draft_state)
+    quiz_model
+    @module = @course.context_modules.create!
+    @tag = @module.add_item(type: 'Quiz', id: @quiz.id)
+    @tag.workflow_state = 'unpublished'
+    @tag.content.expects(:unpublish!).once
+    @tag.save!
+    @tag.update_asset_workflow_state!
+  end
   
   it "should not rename tag if linked attachment is renamed" do
     course
@@ -433,7 +456,6 @@ describe ContentTag do
     tag.update_asset_name!
     
     att.reload
-    att.filename.should == 'important title.txt'
     att.display_name.should == 'important title.txt'
   end
 

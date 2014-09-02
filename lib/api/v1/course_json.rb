@@ -2,10 +2,10 @@ module Api::V1
   class CourseJson
 
     BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view)
-    
-    INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body', 
+
+    INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body',
                          :url => 'html_url', :description => 'public_description', :permissions => "permissions" }
-    
+
     OPTIONAL_FIELDS = %w(needs_grading_count public_description enrollments)
 
     attr_reader :course, :user, :includes, :enrollments, :hash
@@ -15,17 +15,17 @@ module Api::V1
       @user = user
       @includes = includes.map{ |include_key| include_key.to_sym }
       @enrollments = enrollments
-      if block_given? 
+      if block_given?
         @hash = yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
       else
         @hash = {}
       end
     end
-    
-    def allowed_attributes 
-      @allowed_attributes ||= @includes.is_a?(Array) ? BASE_ATTRIBUTES + @includes : BASE_ATTRIBUTES 
+
+    def allowed_attributes
+      @allowed_attributes ||= @includes.is_a?(Array) ? BASE_ATTRIBUTES + @includes : BASE_ATTRIBUTES
     end
-    
+
     def methods_to_send
       methods = ['end_at', 'public_syllabus', 'storage_quota_mb']
       methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
@@ -36,7 +36,7 @@ module Api::V1
       set_sis_course_id(@hash, @course, @user)
       set_integration_id(@hash, @course, @user)
       @hash['enrollments'] = extract_enrollments( @enrollments )
-      @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course) 
+      @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course)
       @hash['public_description'] = description(@course)
       @hash['hide_final_grades'] = @course.hide_final_grades?
       @hash['workflow_state'] = @course.api_state
@@ -56,13 +56,13 @@ module Api::V1
     end
 
     def set_sis_course_id(hash, course, user)
-      if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
+      if course.root_account.grants_any_right?(user, :read_sis, :manage_sis)
         hash['sis_course_id'] = course.sis_source_id
       end
     end
 
     def set_integration_id(hash, course, user)
-      if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
+      if course.root_account.grants_any_right?(user, :read_sis, :manage_sis)
         hash['integration_id'] = course.integration_id
       end
     end
@@ -102,8 +102,8 @@ module Api::V1
         @includes.include?( val.to_sym )
       end
     end
-    
-    def include_total_scores 
+
+    def include_total_scores
       @includes.include?(:total_scores) && !@course.hide_final_grades?
     end
   end

@@ -1,0 +1,15 @@
+font_name: canvas-icons
+preprocessor_path: false
+autowidth: false
+no_hash: true
+force: false
+debug: false
+quiet: false
+input:
+  vectors: public/font/icons            
+  templates: public/font/icons
+output:
+  fonts: public/font/canvas
+  css: app/stylesheets/components
+templates: 
+  - _canvas-icons.scss

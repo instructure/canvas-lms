@@ -46,8 +46,8 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 30],
       ]
       ra.rollup_user_results(results).should == [
-        RollupScore.new(MockOutcome[80], 20),
-        RollupScore.new(MockOutcome[81], 30),
+        RollupScore.new(MockOutcome[80], 20, 1),
+        RollupScore.new(MockOutcome[81], 30, 1),
       ]
     end
 
@@ -59,8 +59,8 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 50],
       ]
       ra.rollup_user_results(results).should == [
-        RollupScore.new(MockOutcome[80], 30),
-        RollupScore.new(MockOutcome[81], 50),
+        RollupScore.new(MockOutcome[80], 30, 2),
+        RollupScore.new(MockOutcome[81], 50, 2),
       ]
     end
   end
@@ -73,8 +73,8 @@ describe Outcomes::ResultAnalytics do
       ]
       users = [MockUser[10, 'a'], MockUser[30, 'c']]
       ra.outcome_results_rollups(results, users).should == [
-        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 40) ]),
-        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 50) ]),
+        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 40, 1) ]),
+        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 50, 1) ]),
         Rollup.new(MockUser[30, 'c'], []),
       ]
     end
@@ -97,8 +97,8 @@ describe Outcomes::ResultAnalytics do
       aggregate_result.should == Rollup.new(
         fake_context,
         [
-          RollupScore.new(MockOutcome[80], 2.5),
-          RollupScore.new(MockOutcome[81], 6.0),
+          RollupScore.new(MockOutcome[80], 2.5, 4),
+          RollupScore.new(MockOutcome[81], 6.0, 3),
         ]
       )
     end

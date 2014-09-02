@@ -1,9 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>/details
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "%{user} accepted the Course Invitation", :user => asset.user.name %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details, "See the list of current enrollments" %>
+  </a>
+<% end %>
+
 <p><%=
     case asset.type
     when 'TeacherEnrollment'
@@ -18,5 +26,3 @@
       t :body_student, "%{user} just accepted their invitation to participate in the course, %{course}, as a student.", :user => asset.user.name, :course => asset.course.name
     end
 %></p>
-
-<p><a href="<%= content :link %>"><%= t :details, "See the list of current enrollments" %></a></p>

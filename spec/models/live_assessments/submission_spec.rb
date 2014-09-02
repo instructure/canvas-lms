@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe LiveAssessments::Submission do
-  let(:assessment_context) { course(active_all: true) }
+  let_once(:assessment_context) { course(active_all: true) }
   let(:outcome) do
     outcome = assessment_context.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_context.root_outcome_group.add_outcome(outcome)
@@ -28,9 +28,9 @@ describe LiveAssessments::Submission do
     outcome
   end
   let(:alignment) { outcome.align(assessment, assessment_context, mastery_type: 'none') }
-  let(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
-  let(:assessment) { LiveAssessments::Assessment.create(context: assessment_context, key: 'test key', title: 'test title') }
-  let(:submission) { LiveAssessments::Submission.create(user: assessment_user, assessment: assessment, possible: 10, score: 5, assessed_at: Time.now) }
+  let_once(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
+  let_once(:assessment) { LiveAssessments::Assessment.create(context: assessment_context, key: 'test key', title: 'test title') }
+  let_once(:submission) { LiveAssessments::Submission.create(user: assessment_user, assessment: assessment, possible: 10, score: 5, assessed_at: Time.now) }
 
   describe '#create_outcome_result' do
     it 'does not create a result when no points are possible' do

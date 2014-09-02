@@ -20,14 +20,8 @@ class ExternalFeed < ActiveRecord::Base
   attr_accessible :url, :verbosity, :header_match
   belongs_to :user
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   has_many :external_feed_entries, :dependent => :destroy
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :context_id, :context_type, :consecutive_failures, :failures, :refresh_at, :title, :feed_type, :feed_purpose, :url, :header_match,
-    :body_match, :created_at, :updated_at, :verbosity
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :context, :external_feed_entries]
 
   before_validation :infer_defaults
 
@@ -58,7 +52,7 @@ class ExternalFeed < ActiveRecord::Base
     write_attribute(:header_match, str.to_s.strip.presence)
   end
   
-  scope :to_be_polled, lambda {
+  scope :to_be_polled, -> {
     where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", Time.now.utc).order(:refresh_at)
   }
   

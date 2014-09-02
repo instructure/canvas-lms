@@ -116,7 +116,7 @@ describe UsersController do
       @johnstclair = @user.update_attributes(:name => 'John St. Clair', :sortable_name => 'St. Clair, John')
       user_with_pseudonym(:active_all => 1, :username => 'jtolds@instructure.com', :name => 'JT Olds')
       @jtolds = @user
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       get account_users_url(Account.default)
       response.should be_success
@@ -158,7 +158,7 @@ describe UsersController do
       student_in_course(:account => @account)
       RoleOverride.create!(:context => @account, :permission => 'view_statistics',
                            :enrollment_type => 'AccountMembership', :enabled => true)
-      @account.add_user(user, 'AccountMembership')
+      @account.account_users.create!(user: user, membership_type: 'AccountMembership')
       user_session(@user)
 
       get "/users/#{@student.id}"
@@ -170,7 +170,7 @@ describe UsersController do
       student_in_course(:account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :enrollment_type => 'AccountMembership', :enabled => true)
-      @account.add_user(user, 'AccountMembership')
+      @account.account_users.create!(user: user, membership_type: 'AccountMembership')
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"
@@ -275,7 +275,7 @@ describe UsersController do
   describe "admin_merge" do
     it "should work for the whole flow" do
       user_with_pseudonym(:active_all => 1)
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       @admin = @user
       user_with_pseudonym(:active_all => 1, :username => 'user2@instructure.com')
       user_session(@admin)

@@ -166,7 +166,7 @@ describe Pseudonym do
   end
 
   context "LDAP errors" do
-    before do
+    before :once do
       require 'net/ldap'
       user_with_pseudonym(:active_all => true)
       @aac = @pseudonym.account.account_authorization_configs.create!(
@@ -212,7 +212,7 @@ describe Pseudonym do
   end
 
   context "Needs a pseudonym with an active user" do
-    before do
+    before :once do
       user_model
       pseudonym_model
     end
@@ -322,9 +322,9 @@ describe Pseudonym do
   describe "authenticate" do
     context "sharding" do
       specs_require_sharding
+      let_once(:account2) { @shard1.activate { Account.create! } }
 
       it "should only query pertinent shards" do
-        account2 = @shard1.activate { Account.create! }
         Pseudonym.expects(:associated_shards).with('abc').returns([@shard1])
         Pseudonym.expects(:active).once.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)
@@ -332,7 +332,6 @@ describe Pseudonym do
       end
 
       it "should only query pertinent shards" do
-        account2 = @shard1.activate { Account.create! }
         Pseudonym.expects(:associated_shards).with('abc').returns([Shard.default, @shard1])
         Pseudonym.expects(:active).twice.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)
@@ -351,7 +350,7 @@ describe Pseudonym do
 
       let(:sis_user_id) { "1234554321" }
 
-      before do
+      before :once do
         user_with_pseudonym
         @pseudonym.sis_user_id = sis_user_id
         @pseudonym.save!

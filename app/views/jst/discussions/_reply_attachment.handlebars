@@ -1,4 +1,5 @@
 <li>
-  <input name="attachment" type="file">
+  <label class="screenreader-only" for="attachment_{{uniqid}}">{{#t "attachment_label"}}Attachment{{/t}}</label>
+  <input name="attachment" type="file" id="attachment_{{uniqid}}">
   <a href="#" class='discussion-reply-action' data-event="removeReplyAttachment">{{#t "remove_attachment"}}remove{{/t}}</a>
 </li>

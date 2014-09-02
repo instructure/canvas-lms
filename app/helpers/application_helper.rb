@@ -138,44 +138,10 @@ module ApplicationHelper
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
-  # policies from within a view.  Caches the response, but basically
-  # user calls object.grants_right?(user, nil, action)
+  # policies from within a view.
   def can_do(object, user, *actions)
     return false unless object
-    if object.is_a?(OpenObject) && object.type
-      obj = object.temporary_instance
-      if !obj
-        obj = object.type.classify.constantize.new
-        obj.instance_variable_set("@attributes", object.instance_variable_get("@table").with_indifferent_access)
-        obj.instance_variable_set("@new_record", false)
-        object.temporary_instance = obj
-      end
-      return can_do(obj, user, actions)
-    end
-    actions = Array(actions).flatten
-    if (object == @context || object.is_a?(Course)) && user == @current_user
-      @context_all_permissions ||= {}
-      @context_all_permissions[object.asset_string] ||= object.grants_rights?(user, session, nil)
-      return !(@context_all_permissions[object.asset_string].keys & actions).empty?
-    end
-    @permissions_lookup ||= {}
-    return true if actions.any? do |action|
-      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
-      @permissions_lookup[lookup] if @permissions_lookup[lookup] != nil
-    end
-    begin
-      rights = object.grants_rights?(user, session, *actions)
-    rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-      return false
-    end
-    res = false
-    rights.each do |action, value|
-      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
-      @permissions_lookup[lookup] = value
-      res ||= value
-    end
-    res
+    object.grants_any_right?(user, session, *actions)
   end
 
   # Loads up the lists of files needed for the wiki_sidebar.  Called from
@@ -294,9 +260,15 @@ module ApplicationHelper
   end
 
   def variant_name_for(bundle_name)
-    use_new_styles = @domain_root_account.feature_enabled?(:new_styles)
+    if k12?
+      variant = '_k12'
+    elsif @domain_root_account.feature_enabled?(:new_styles)
+      variant = '_new_styles'
+    else
+      variant = '_legacy'
+    end
+
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    variant = use_new_styles ? '_new_styles' : '_legacy'
     variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
     "#{bundle_name}#{variant}"
   end
@@ -433,7 +405,7 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user)
-    @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
+    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.
@@ -669,16 +641,6 @@ module ApplicationHelper
       :title => t('#menu.managed_accounts', "Managed Accounts"),
       :link_text => t('#layouts.menu.view_all_accounts', 'View all accounts')
     }
-  end
-
-  def show_home_menu?
-    @current_user.set_menu_data(session[:enrollment_uuid])
-    [
-      @current_user.menu_courses(session[:enrollment_uuid]),
-      @current_user.all_accounts,
-      @current_user.cached_current_group_memberships,
-      @current_user.enrollments.ended
-    ].any?{ |e| e.respond_to?(:count) && e.count > 0 }
   end
 
   def cache_if(cond, *args)

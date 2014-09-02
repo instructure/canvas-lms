@@ -1,9 +1,17 @@
 <% course = asset.is_a?(Course) ? asset : asset.context %>
+
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
 <% end %>
+
 <% define_content :subject do %>
   <%= before_label('subject', 'Grade Weight Changed') %> <%= asset.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t 'see_details', 'You can see details here' %>
+  </a>
 <% end %>
 
 <p><%= t('grade_changed', "The grading policy for the course, %{course_name} has changed.", :course_name => course.name) %></p>
@@ -18,5 +26,3 @@
 <% else %>
   <p><%= t('grading_based_on_points', 'Grading is based on total points for all assignments.') %></p>
 <% end %>
-
-<p><a href="<%= content :link %>"><%= before_label('now_see_here', 'You can see details here') %></a></p>

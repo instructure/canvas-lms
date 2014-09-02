@@ -8,9 +8,13 @@
         :assignment_name => asset.assignment.title) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to view the submission" %>
+  </a>
+<% end %>
+
 <p><%= t('user_submitted_sentence', '%{user_name} has just turned in a submission for %{assignment_name} in the course %{course_name}',
          :user_name => asset.user.name,
          :assignment_name => asset.assignment.title,
          :course_name => asset.assignment.context.name) %></p>
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'View the submission' %></a></p>

@@ -2,10 +2,10 @@ define [
   'ember'
   'vendor/d3.v3'
   '../../../../../mixins/views/chart_inspector'
-], ({View}, d3, ChartInspectorMixin) ->
+], (Ember, d3, ChartInspectorMixin) ->
   # This view draws an area chart with a trend line plotting the graded scores
   # for essay responses.
-  View.extend ChartInspectorMixin,
+  Ember.View.extend ChartInspectorMixin,
     tooltipOptions:
       position:
         my: 'center+8 bottom'

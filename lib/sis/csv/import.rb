@@ -58,7 +58,6 @@ module SIS
 
         @total_rows = 1
         @current_row = 0
-        @rows_since_progress_update = 0
     
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
@@ -96,7 +95,7 @@ module SIS
             if File.extname(file).downcase == '.zip'
               tmp_dir = Dir.mktmpdir
               @tmp_dirs << tmp_dir
-              unzip_file(file, tmp_dir)
+              CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
                 process_file(tmp_dir, fn[tmp_dir.size+1 .. -1])
               end
@@ -211,17 +210,18 @@ module SIS
         @current_row += count
         return unless @batch
 
-        @rows_since_progress_update += count
-        if @rows_since_progress_update >= @updates_every
+        if update_progress?
+          @last_progress_update = Time.now
           if @parallelism > 1
             SisBatch.transaction do
-              @batch.reload(:select => 'data, progress', :lock => true)
+              lock_type = true
+              lock_type = 'FOR NO KEY UPDATE' if SisBatch.connection.adapter_name == 'PostgreSQL' && SisBatch.connection.send(:postgresql_version) >= 90300
+              @batch.reload(:select => 'data, progress', :lock => lock_type)
               @current_row += @batch.data[:current_row]
               @batch.data[:current_row] = @current_row
               @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
               @batch.save
               @current_row = 0
-              @rows_since_progress_update = 0
             end
           else
             @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
@@ -232,6 +232,12 @@ module SIS
           sleep(@pause_duration)
           update_pause_vars
         end
+      end
+
+      def update_progress?
+        @last_progress_update ||= Time.now
+        update_interval = Setting.get('sis_batch_progress_interval', 2.seconds).to_i
+        @last_progress_update < update_interval.ago
       end
 
       def run_single_importer(importer, csv)
@@ -316,16 +322,6 @@ module SIS
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
     
-      def unzip_file(file, dest)
-        Zip::File.open(file) do |zip_file|
-          zip_file.each do |f|
-            f_path = File.join(dest, f.name)
-            FileUtils.mkdir_p(File.dirname(f_path))
-            zip_file.extract(f, f_path) unless File.exist?(f_path)
-          end
-        end
-      end
-
       def rebalance_csvs(importer)
         rows_per_batch = (@rows[importer].to_f / @parallelism).ceil.to_i
         new_csvs = []

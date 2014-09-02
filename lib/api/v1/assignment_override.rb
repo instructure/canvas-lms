@@ -281,6 +281,8 @@ module Api::V1::AssignmentOverride
 
     # save the new/kept overrides
     overrides.each{ |override| override.save! }
+
+    Rails.cache.delete([@current_user, assignment, 'overrides'].cache_key) # turns out touching isn't enough
   end
 
   def deserialize_overrides( overrides )

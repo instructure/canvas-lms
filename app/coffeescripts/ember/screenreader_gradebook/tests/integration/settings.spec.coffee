@@ -36,10 +36,10 @@ define [
         isLoading: false
       @controller.set('selectedStudent', student)
 
-    equal Ember.$.trim(find("#secondary_id").text()), ''
+    equal Ember.$.trim(find(".secondary_id").text()), ''
     click("#hide_names_checkbox")
     andThen =>
-      equal $.trim(find("#secondary_id").text()), 'hidden'
+      equal $.trim(find(".secondary_id:first").text()), 'hidden'
 
   test 'view concluded enrollments', ->
     enrollments = @controller.get('enrollments')

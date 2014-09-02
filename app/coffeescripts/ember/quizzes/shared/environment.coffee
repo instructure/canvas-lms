@@ -25,4 +25,12 @@ define ['ember'], (Ember) ->
     permissionsAvailable: ->
       !!(@get('env') && @get('env').PERMISSIONS)
 
+    moderateEnabled: ( ->
+      return false unless @flagsAvailable()
+      @get('env').FLAGS.quiz_moderate
+    ).property('env.FLAGS.quiz_moderate')
+
+    flagsAvailable: ->
+      !!(@get('env') && @get('env').FLAGS)
+
   Environment.create(env: window.ENV)

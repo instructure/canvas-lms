@@ -21,7 +21,7 @@ class RubricAssociationsController < ApplicationController
   def create
     update
   end
-  
+
   def update
     params[:rubric_association] ||= {}
     @association = @context.rubric_associations.find(params[:id]) rescue nil
@@ -33,7 +33,7 @@ class RubricAssociationsController < ApplicationController
     if !@association && !authorized_action(@context, @current_user, :manage_rubrics)
       return
     elsif !@association || authorized_action(@association, @current_user, :update)
-      if params[:rubric] && @rubric.grants_rights?(@current_user, session, :update)[:update]
+      if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
         @rubric.update_criteria(params[:rubric])
       end
       params[:rubric_association][:association_object] = @association.association_object if @association
@@ -47,14 +47,14 @@ class RubricAssociationsController < ApplicationController
       render :json => json_res
     end
   end
-  
+
   def destroy
     @association = @context.rubric_associations.find(params[:id])
     @rubric = @association.rubric
     if authorized_action(@association, @current_user, :delete)
       @association.destroy
       # If the rubric wasn't created as a general course rubric,
-      # and this was the last place it was being used in the course, 
+      # and this was the last place it was being used in the course,
       # go ahead and delete the rubric from the course.
       association_count = RubricAssociation.where(:context_id => @context, :context_type => @context.class.to_s, :rubric_id => @rubric).for_grading.count
       if !RubricAssociation.for_purpose('bookmark').find_by_rubric_id(@rubric.id) && association_count == 0

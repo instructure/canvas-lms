@@ -5,7 +5,8 @@ module Moodle
     end
 
     def export(to_export = Canvas::Migration::Migrator::SCRAPE_ALL_HASH)
-      migrator = Moodle2CC::Migrator.new @archive_file.path, @unzipped_file_path, 'format' => 'canvas', 'logger' => self
+      unzip_archive
+      migrator = Moodle2CC::Migrator.new @unzipped_file_path, Dir.mktmpdir, 'format' => 'canvas', 'logger' => self
       migrator.migrate
 
       if migrator.last_error
@@ -13,6 +14,8 @@ module Moodle
       end
 
       @settings[:archive_file] = File.open(migrator.imscc_path)
+      @settings.delete(:archive)
+
       cc_converter = CC::Importer::Canvas::Converter.new(@settings)
       cc_converter.export
       @course = cc_converter.course
@@ -21,7 +24,7 @@ module Moodle
       File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json}
       @course
     ensure
-      FileUtils.rm migrator.imscc_path if migrator && File.exists?(migrator.imscc_path)
+      FileUtils.rm migrator.imscc_path if migrator && migrator.imscc_path && File.exists?(migrator.imscc_path)
     end
 
     def add_question_warnings

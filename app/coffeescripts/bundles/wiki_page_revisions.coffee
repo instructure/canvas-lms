@@ -14,6 +14,7 @@ require [
 
   revisionsView = new WikiPageRevisionsView
     collection: revisions
+    pages_path: ENV.WIKI_PAGES_PATH
   revisionsView.on 'selectionChanged', (newSelection) ->
     contentView.setModel(newSelection.model)
     if !newSelection.model.get('title') || newSelection.model.get('title') == ''

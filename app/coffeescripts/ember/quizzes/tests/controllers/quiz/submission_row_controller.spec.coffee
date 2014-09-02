@@ -61,9 +61,16 @@ define [
     equal @get('attempt', '--')
 
   emq.test 'friendlyScore converted correctly', ->
+    expect(3)
     equal @get('friendlyScore'), '5 / 8'
+    @subCtr.set('keptScore', 0)
+    equal @get('friendlyScore'), '0 / 8'
     @subCtr.set('model', @blankSub)
     equal @get('friendlyScore'), undefined
+
+  emq.test 'friendlyScore rounds potentially repeating decimal score values', ->
+    @subCtr.set('keptScore', 2.333333333333)
+    equal @get('friendlyScore'), '2.33 / 8'
 
   emq.test 'friendlyTime converts correctly', ->
     equal @get('friendlyTime'), '01:00'
@@ -76,5 +83,3 @@ define [
   emq.test 'remainingAttempts uses quiz value when no user submission', ->
     @subCtr.set('model', @blankSub)
     equal @get('remainingAttempts'), '10'
-
-

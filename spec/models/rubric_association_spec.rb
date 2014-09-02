@@ -33,7 +33,7 @@ describe RubricAssociation do
   end
 
   context "assignment rubrics" do
-    before :each do
+    before :once do
       # Create a course, 2 students and enroll them
       course_with_teacher(:active_course => true, :active_user => true)
       @student_1 = student_in_course(:active_user => true).user

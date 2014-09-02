@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentParticipation do
-  before do
+  before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     assignment_model(:course => @course)

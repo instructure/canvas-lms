@@ -51,7 +51,7 @@ describe Collaboration do
   end
 
   context "parsed data" do
-    before do
+    before :once do
       google_docs_collaboration_model
     end
 
@@ -72,7 +72,7 @@ describe Collaboration do
   end
 
   context "a collaboration with collaborators" do
-    before(:each) do
+    before :each do
       PluginSetting.create!(:name => "etherpad", :settings => {})
       @users  = (1..4).map { user_with_pseudonym(:active_all => true) }
       @groups = [group_model]

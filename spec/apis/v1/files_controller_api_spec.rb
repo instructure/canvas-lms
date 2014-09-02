@@ -126,6 +126,20 @@ describe "Files API", type: :request do
       @attachment.reload.file_state.should == 'available'
     end
 
+    it "should render the response as text/html when in app" do
+      s3_storage!
+      FilesController.any_instance.stubs(:in_app?).returns(true)
+
+      AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                          :content_type => 'text/plain',
+                                          :content_length => 1234,
+                                      })
+
+      raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+               {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+      response.headers["content-type"].should == "text/html; charset=utf-8"
+    end
+
     it "should fail for an incorrect uuid" do
       upload_data
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",
@@ -420,6 +434,23 @@ describe "Files API", type: :request do
 
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
       json.map{|h| h['id']}.sort.should == atts.map(&:id).sort
+    end
+  end
+
+  describe "#index other contexts" do
+    it "should operate on groups" do
+      group_model
+      attachment_model display_name: 'foo', content_type: 'text/plain', context: @group, folder: Folder.root_folders(@group).first
+      account_admin_user
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/files", { controller: "files", action: "api_index", format: "json", group_id: @group.to_param })
+      json.map{|r| r['id']}.should eql [@attachment.id]
+    end
+
+    it "should operate on users" do
+      user_model
+      attachment_model display_name: 'foo', content_type: 'text/plain', context: @user, folder: Folder.root_folders(@user).first
+      json = api_call(:get, "/api/v1/users/#{@user.id}/files", { controller: "files", action: "api_index", format: "json", user_id: @user.to_param })
+      json.map{|r| r['id']}.should eql [@attachment.id]
     end
   end
 

@@ -20,6 +20,7 @@ class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, :class_name => 'Attachment'
@@ -34,13 +35,6 @@ class ContentMigration < ActiveRecord::Base
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
   attr_accessor :imported_migration_items, :outcome_to_id_map
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :user_id, :workflow_state, :migration_settings, :started_at, :finished_at, :created_at, :updated_at, :context_type,
-    :error_count, :error_data, :attachment_id, :overview_attachment_id, :exported_attachment_id, :source_course_id, :migration_type
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :user, :attachment, :overview_attachment, :exported_attachment, :content_export]
 
   workflow do
     state :created
@@ -364,6 +358,23 @@ class ContentMigration < ActiveRecord::Base
     check_quiz_id_prepender
   end
 
+  def process_domain_substitutions(url)
+    unless @domain_substitution_map
+      @domain_substitution_map = {}
+      (self.migration_settings[:domain_substitution_map] || {}).each do |k, v|
+        @domain_substitution_map[k.to_s] = v.to_s # ensure strings
+      end
+    end
+
+    @domain_substitution_map.each do |from_domain, to_domain|
+      if url.start_with?(from_domain)
+        return url.sub(from_domain, to_domain)
+      end
+    end
+
+    url
+  end
+
   def check_quiz_id_prepender
     return unless self.context.respond_to?(:assessment_questions)
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
@@ -471,10 +482,10 @@ class ContentMigration < ActiveRecord::Base
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
-  scope :successful, where(:workflow_state => 'imported')
-  scope :running, where(:workflow_state => ['exporting', 'importing'])
-  scope :waiting, where(:workflow_state => 'exported')
-  scope :failed, where(:workflow_state => ['failed', 'pre_process_error'])
+  scope :successful, -> { where(:workflow_state => 'imported') }
+  scope :running, -> { where(:workflow_state => ['exporting', 'importing']) }
+  scope :waiting, -> { where(:workflow_state => 'exported') }
+  scope :failed, -> { where(:workflow_state => ['failed', 'pre_process_error']) }
 
   def complete?
     %w[imported failed pre_process_error].include?(workflow_state)
@@ -577,12 +588,6 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  # returns a list of content for selective content migrations
-  # If no section is specified the top-level areas with content are returned
-  def get_content_list(type=nil, base_url=nil)
-    Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
-  end
-
   UPLOAD_TIMEOUT = 1.hour
   def check_for_pre_processing_timeout
     if self.pre_processing? && (self.updated_at.utc + UPLOAD_TIMEOUT) < Time.now.utc
@@ -594,20 +599,47 @@ class ContentMigration < ActiveRecord::Base
   end
 
   # strips out the "id_" prepending the migration ids in the form
-  def self.process_copy_params(hash)
-    return {} if hash.blank? || !hash.is_a?(Hash)
-    hash.values.each do |sub_hash|
-      next unless sub_hash.is_a?(Hash) # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+  # also converts arrays of migration ids (or real ids for course exports) into the old hash format
+  def self.process_copy_params(hash, for_content_export=false)
+    return {} if hash.blank?
+    new_hash = {}
 
-      clean_hash = {}
-      sub_hash.keys.each do |k|
-        if k.is_a?(String) && k.start_with?("id_")
-          clean_hash[k.sub("id_", "")] = sub_hash.delete(k)
+    hash.each do |key, value|
+      case value
+      when Hash # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+        new_sub_hash = {}
+
+        value.each do |sub_key, sub_value|
+          if for_content_export
+            new_sub_hash[CC::CCHelper.create_key(sub_key)] = sub_value
+          elsif sub_key.is_a?(String) && sub_key.start_with?("id_")
+            new_sub_hash[sub_key.sub("id_", "")] = sub_value
+          else
+            new_sub_hash[sub_key] = sub_value
+          end
         end
+
+        new_hash[key] = new_sub_hash
+      when Array
+        # e.g. :select => {:context_modules => [100, 101]} for content exports
+        # or :select => {:context_modules => [blahblahblah, blahblahblah2]} for normal migration ids
+        sub_hash = {}
+        if for_content_export
+          asset_type = key.to_s.singularize
+          value.each do |id|
+            sub_hash[CC::CCHelper.create_key("#{asset_type}_#{id}")] = '1'
+          end
+        else
+          value.each do |id|
+            sub_hash[id] = '1'
+          end
+        end
+        new_hash[key] = sub_hash
+      else
+        new_hash[key] = value
       end
-      sub_hash.merge!(clean_hash)
     end
-    hash
+    new_hash
   end
 
   def imported_migration_items

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AccessToken do
   context "hashed tokens" do
-    before do
+    before :once do
       @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
       @token_string = @at.full_token
     end
@@ -42,7 +42,7 @@ describe AccessToken do
   end
 
   describe "token scopes" do
-    let(:token) do
+    let_once(:token) do
       token = AccessToken.new
       token.scopes = %w{https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts}
       token

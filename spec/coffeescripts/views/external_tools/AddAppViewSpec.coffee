@@ -12,6 +12,8 @@ define [
 
   module "ExternalTools",
     setup: ->
+      $('.ui-dialog').remove()
+
       server = sinon.fakeServer.create()
       server.respondWith("POST", /external_tools/,
         [200, { "Content-Type": "application/json" }, JSON.stringify([
@@ -118,6 +120,7 @@ define [
 
     teardown: ->
       view.remove()
+      server.restore()
 
   test 'AddAppView: render', ->
     equal $.trim($('.ui-dialog-title:visible').text()), "Add App",

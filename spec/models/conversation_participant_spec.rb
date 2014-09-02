@@ -115,7 +115,7 @@ describe ConversationParticipant do
       c.reload
     end
 
-    before do
+    before :once do
       @me = user
       @c1 = conversation_for("course_1")
       @c2 = conversation_for("course_1", "course_2")
@@ -177,13 +177,13 @@ describe ConversationParticipant do
   end
 
   context "for_masquerading_user scope" do
-    before do
+    before :once do
       @a1 = Account.create
       @a2 = Account.create
       @a3 = Account.create
       @admin_user = user
-      @a1.add_user(@admin_user)
-      @a2.add_user(@admin_user)
+      @a1.account_users.create!(user: @admin_user)
+      @a2.account_users.create!(user: @admin_user)
       @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
 
       @target_user = user
@@ -202,7 +202,7 @@ describe ConversationParticipant do
     end
 
     it "should let site admins see everything" do
-      Account.site_admin.add_user(@admin_user)
+      Account.site_admin.account_users.create!(user: @admin_user)
       Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       convos.size.should eql 4
@@ -217,7 +217,7 @@ describe ConversationParticipant do
   end
 
   context "participants" do
-    before do
+    before :once do
       @me = course_with_student(:active_all => true).user
       @u1 = student_in_course(:active_all => true).user
       @u2 = student_in_course(:active_all => true).user
@@ -264,7 +264,7 @@ describe ConversationParticipant do
   end
 
   context "move_to_user" do
-    before do
+    before :once do
       @user1 = user_model
       @user2 = user_model
     end

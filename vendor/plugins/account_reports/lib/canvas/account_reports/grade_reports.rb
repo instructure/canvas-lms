@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,6 +32,11 @@ module Canvas::AccountReports
         @include_deleted = @account_report.parameters["include_deleted"]
         add_extra_text(I18n.t('account_reports.grades.deleted',
                               'Include Deleted Objects: true;'))
+      end
+
+      if @account_report.has_parameter? "limiting_period"
+        add_extra_text(I18n.t('account_reports.grades.limited',
+                              'deleted objects limited by days specified;'))
       end
     end
 
@@ -77,11 +82,19 @@ module Canvas::AccountReports
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")
+        if @account_report.parameters.has_key? 'limiting_period'
+          limiting_period = @account_report.parameters['limiting_period'].to_i
+          students = students.where("e.workflow_state = 'active'
+                                    OR c.conclude_at >= ?
+                                    OR (e.workflow_state = 'deleted'
+                                    AND e.updated_at >= ?)",
+                                    limiting_period.days.ago, limiting_period.days.ago)
+        end
       else
         students = students.where(
           "pseudonyms.workflow_state<>'deleted'
-	     AND c.workflow_state='available'
-	     AND e.workflow_state IN ('active', 'completed')")
+           AND c.workflow_state='available'
+           AND e.workflow_state IN ('active', 'completed')")
       end
 
       students = add_course_sub_account_scope(students, 'c')
@@ -89,10 +102,26 @@ module Canvas::AccountReports
 
       file = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
-        csv << ['student name', 'student id', 'student sis', 'course',
-                'course id', 'course sis', 'section', 'section id',
-                'section sis', 'term', 'term id', 'term sis', 'current score',
-                'final score', 'enrollment state']
+        headers = []
+
+        headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+        headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+        headers << I18n.t('#account_reports.report_header_student_sis', 'student sis')
+        headers << I18n.t('#account_reports.report_header_course', 'course')
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis', 'course sis')
+        headers << I18n.t('#account_reports.report_header_section', 'section')
+        headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+        headers << I18n.t('#account_reports.report_header_section_sis', 'section sis')
+        headers << I18n.t('#account_reports.report_header_term', 'term')
+        headers << I18n.t('#account_reports.report_header_term_id', 'term id')
+        headers << I18n.t('#account_reports.report_header_term_sis', 'term sis')
+        headers << I18n.t('#account_reports.report_header_current_score', 'current score')
+        headers << I18n.t('#account_reports.report_header_final_score', 'final score')
+        headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
+
+        csv << headers
+
         Shackles.activate(:slave) do
           students.find_each do |student|
             arr = []

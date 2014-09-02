@@ -50,24 +50,21 @@ describe "Migration package importers" do
     unsupported.each_pair do |key, val|
       it "should correctly identify package type for #{key}" do 
         settings = get_settings(val.first)
-        Canvas::Migration::PackageIdentifier.new(settings).identify_package.should == val.last
+        archive = Canvas::Migration::Archive.new(settings)
+        Canvas::Migration::PackageIdentifier.new(archive).identify_package.should == val.last
       end
     end
   end
   
   context "migrator" do
-    it "should do something" do
+    it "should deal with backslashes path separators in migrations" do
       file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
       cm = ContentMigration.create!(:context => course)
 
       mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
       mig.unzip_archive
-
-      cm.old_warnings_format.length.should == 1
-      cm.old_warnings_format.first.tap do |w|
-        w.first.should == "The content package unzipped successfully, but with a warning"
-        w.last.should =~ /backslashes as path separators/
-      end
+      File.should be_exist(File.join(mig.unzipped_file_path, 'messaging/why oh why.txt'))
+      File.should be_exist(File.join(mig.unzipped_file_path, 'res00175/SR_Epilogue_Frequently_Asked_Questions.html'))
     end
   end
   

@@ -53,6 +53,11 @@ module CCHelper
   # imsqti_xmlv1p2/imscc_xmlv1p2/question-bank
   # imsbasiclti_xmlv1p0
 
+  # Common Cartridge 1.3
+  ASSIGNMENT_TYPE = "assignment_xmlv1p0"
+  ASSIGNMENT_NAMESPACE = "http://www.imsglobal.org/xsd/imscc_extensions/assignment"
+  ASSIGNMENT_XSD_URI = "http://www.imsglobal.org/profile/cc/cc_extensions/cc_extresource_assignmentv1p0_v1p0.xsd"
+
   # QTI-only export
   QTI_ASSESSMENT_TYPE = 'imsqti_xmlv1p2'
   
@@ -85,7 +90,8 @@ module CCHelper
   MEDIA_OBJECTS_FOLDER = 'media_objects'
   CANVAS_EXPORT_FLAG = 'canvas_export.txt'
   MEDIA_TRACKS = 'media_tracks.xml'
-  
+  ASSIGNMENT_XML = 'assignment.xml'
+
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)
   end
@@ -170,16 +176,20 @@ module CCHelper
           "#{COURSE_TOKEN}/files"
         else
           if @course && match.obj_class == Attachment
-            obj = @course.attachments.find(match.obj_id)
+            obj = @course.attachments.find_by_id(match.obj_id)
           else
             obj = match.obj_class.find_by_id(match.obj_id)
           end
           next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
           folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+          folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
+
           @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
           # for files, turn it into a relative link by path, rather than by file id
           # we retain the file query string parameters
-          "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"
+          path = "#{folder}/#{URI.escape(obj.display_name)}"
+          path = HtmlTextHelper.escape_html(path)
+          "#{path}#{CCHelper.file_query_string(match.rest)}"
         end
       end
       wiki_handler = Proc.new do |match|

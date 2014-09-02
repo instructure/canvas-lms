@@ -170,19 +170,23 @@ define [
 
     initPostGrades: () ->
 
-      $("#publish").click (event) =>
+      $("#post-grades-button").click (event) =>
         event.preventDefault()
 
-        postGradesModel = new PostGradesModel(
-          {
-            gradebook: ENV.GRADEBOOK_OPTIONS,
-            assignments: @assignments,
-            section_id: if @sectionToShow then @sections[@sectionToShow].integration_id else null,
-            course_id: ENV.GRADEBOOK_OPTIONS.context_integration_id
-          }
-        )
+        pg = {
+          assignments: @assignments
+          course_id: ENV.GRADEBOOK_OPTIONS.context_id
+        }
+        if @sectionToShow
+          pg.integration_section_id = @sections[@sectionToShow].integration_id
+        else
+          pg.integration_course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
 
-        postGradesDialog = new PostGradesDialog(postGradesModel)
+        postGradesModel = new PostGradesModel(pg)
+
+        postGradesDialog = new PostGradesDialog(postGradesModel,
+          ENV.GRADEBOOK_OPTIONS.sis_app_url,
+          ENV.GRADEBOOK_OPTIONS.sis_app_token)
         postGradesModel.reset_ignored_assignments()
         postGradesDialog.render().show()
         open = $('#post-grades-container').dialog('isOpen')
@@ -216,6 +220,7 @@ define [
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
+      @displayPostGradesButton(@sectionToShow)
       @sections_enabled = sections.length > 1
       @hasSections.resolve()
 
@@ -757,12 +762,29 @@ define [
         sections: @sectionList(),
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @initPostGrades()
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
+      @displayPostGradesButton(section)
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
+
+    displayPostGradesButton: (section) =>
+      if section?
+        is_integration_section = @sections[section] && @sections[section].integration_id
+      else
+        is_integration_course = ENV.GRADEBOOK_OPTIONS.context_integration_id
+
+      if is_integration_section or is_integration_course
+        @showPostGradesButton()
+      else
+        @hidePostGradesButton()
+
+    hidePostGradesButton: ->
+      $('#post-grades-button').closest('.gradebook-navigation').addClass('hidden')
+
+    showPostGradesButton: ->
+      $('#post-grades-button').closest('.gradebook-navigation').removeClass('hidden')
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
@@ -800,6 +822,8 @@ define [
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
+
+      @initPostGrades()
 
       @renderTotalHeader()
 
@@ -1035,13 +1059,11 @@ define [
             data.sortCol.field
 
           @sortRowsBy (a, b) =>
-            [b, a] = [a, b] if not data.sortAsc
+            [b, a] = [a, b] unless data.sortAsc
             @localeSort(a[sortProp], b[sortProp])
         else
-          @sortRowsBy (a, b) ->
-            aScore = a[data.sortCol.field]?.score
-            bScore = b[data.sortCol.field]?.score
-            numberCompare(aScore, bScore, descending: !data.sortAsc)
+          @sortRowsBy (a, b) =>
+            @gradeSort(a, b, data.sortCol.field, data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
@@ -1085,6 +1107,28 @@ define [
       (a || "").localeCompare b || "",
         window.I18n.locale,
         sensitivity: 'accent', numeric: true
+
+    gradeSort: (a, b, field, asc) =>
+      scoreForSorting = (obj) =>
+        percent = (obj) ->
+          if obj[field].possible > 0
+            obj[field].score / obj[field].possible
+          else
+            null
+
+        switch
+          when field == "total_grade"
+            if @options.show_total_grade_as_points
+              obj[field].score
+            else
+              percent(obj)
+          when field.match /^assignment_group/
+            percent(obj)
+          else
+            # TODO: support assignment grading types
+            obj[field].score
+
+      numberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>

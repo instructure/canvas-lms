@@ -200,7 +200,9 @@ require [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
-            questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS)
+            questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS, model: ConverterViewControl.getModel())
+
+
 
 
   registerExternalTool = (et) ->

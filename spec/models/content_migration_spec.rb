@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -21,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentMigration do
 
   context "course copy" do
-    before do
+    before :once do
       course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
@@ -40,10 +41,9 @@ describe ContentMigration do
     end
 
     it "should show correct progress" do
-      ce = ContentExport.new
+      ce = @course.content_exports.build
       ce.export_type = ContentExport::COMMON_CARTRIDGE
       ce.content_migration = @cm
-      ce.course = @course
       @cm.content_export = ce
       ce.save!
 
@@ -319,6 +319,32 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should be able to copy links to files in folders with html entities and unicode in path" do
+      root_folder = Folder.root_folders(@copy_from).first
+      folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute;")
+      att1 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder1, :context => @copy_from)
+      folder2 = root_folder.sub_folders.create!(:context => @copy_from, :name => "olé")
+      att2 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder2, :context => @copy_from)
+
+      body = "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att1.id}/download'>link</a>"
+      body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
+      dt = @copy_from.discussion_topics.create!(:message => body, :title => "discussion title")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body)
+
+      run_course_copy
+
+      att_to1 = @copy_to.attachments.find_by_migration_id(mig_id(att1))
+      att_to2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+
+      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
+      page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
+
+      dt_to = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt))
+      dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
+      dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
+    end
+
     it "should not escape links to wiki urls" do
       page1 = @copy_from.wiki.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
 
@@ -373,6 +399,22 @@ describe ContentMigration do
           tag_copy.unpublished?.should == true
           tag_copy.content.unpublished?.should == true
         end
+      end
+
+      it "should copy unpublished discussion topics" do
+        dt1 = @copy_from.discussion_topics.create!(:message => "hideeho", :title => "Blah")
+        dt1.workflow_state = :unpublished
+        dt1.save!
+        dt2 = @copy_from.discussion_topics.create!(:message => "asdf", :title => "qwert")
+        dt2.workflow_state = :active
+        dt2.save!
+
+        run_course_copy
+
+        dt1_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1))
+        dt1_copy.workflow_state.should == 'unpublished'
+        dt2_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt2))
+        dt2_copy.workflow_state.should == 'active'
       end
 
       it "should copy unpublished wiki pages" do
@@ -1119,6 +1161,21 @@ describe ContentMigration do
       q.question_count.should == 1
     end
 
+    it "should not mix up quiz questions and assessment questions with the same ids" do
+      pending unless Qti.qti_enabled?
+      quiz1 = @copy_from.quizzes.create!(:title => "quiz 1")
+      quiz2 = @copy_from.quizzes.create!(:title => "quiz 1")
+
+      qq1 = quiz1.quiz_questions.create!(:question_data => {'question_name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      qq2 = quiz2.quiz_questions.create!(:question_data => {'question_name' => 'test question 2', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      Quizzes::QuizQuestion.where(:id => qq1).update_all(:assessment_question_id => qq2.id)
+
+      run_course_copy
+
+      newquiz2 = @copy_to.quizzes.find_by_migration_id(mig_id(quiz2))
+      newquiz2.quiz_questions.first.question_data['question_name'].should == 'test question 2'
+    end
+
     it "should generate numeric ids for answers" do
       pending unless Qti.qti_enabled?
 
@@ -1518,9 +1575,21 @@ describe ContentMigration do
       account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
       account.save!
 
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://derp.derp/somethingelse", :consumer_key => '12345', :shared_secret => 'secret')
+      tag2 = mod.add_item :type => 'context_external_tool', :id => tool.id, :url => "#{tool.url}?queryyyyy=something"
+
       @copy_from.syllabus_body = "<p><a href=\"http://derp.derp/stuff\">this is a link to an insecure domain that could cause problems</a></p>"
 
       run_course_copy
+
+      tool_to = @copy_to.context_external_tools.find_by_migration_id(mig_id(tool))
+      tool_to.url.should == tool.url.sub("http://derp.derp", "https://derp.derp")
+      tag1_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag1))
+      tag1_to.url.should == tag1.url.sub("http://derp.derp", "https://derp.derp")
+      tag2_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag2))
+      tag2_to.url.should == tag2.url.sub("http://derp.derp", "https://derp.derp")
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
     end
@@ -1734,6 +1803,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.announcements.create!(:title => "hear ye",
+                                       :message => "<p>grades will henceforth be in Cyrillic letters</p>",
+                                       :delayed_post_at => old_start + 10.days)
       @copy_from.calendar_events.create!(:title => "an event",
                                          :start_at => old_start + 4.days,
                                          :end_at => old_start + 4.days + 1.hour)
@@ -1762,6 +1834,9 @@ describe ContentMigration do
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_ann = @copy_to.announcements.first
+      new_ann.delayed_post_at.to_i.should == (new_start + 10.day).to_i
 
       new_event = @copy_to.calendar_events.first
       new_event.start_at.to_i.should == (new_start + 4.day).to_i
@@ -2176,7 +2251,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "copying frozen assignments" do
-      append_before (:each) do
+      before :once do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
 
         @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
@@ -2252,7 +2327,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "external tools" do
-      append_before do
+      before :once do
         @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
         @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
         @tool_from.save!
@@ -2405,7 +2480,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
   end
 
   context "import_object?" do
-    before do
+    before :once do
       course
       @cm = ContentMigration.new(context: @course)
     end
@@ -2516,7 +2591,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true
@@ -2551,7 +2626,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true
@@ -2578,5 +2653,32 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       bank.assessment_questions.count.should == 1
     end
+  end
+
+  it "should identify and import compressed tarball archives" do
+    pending unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.tar.gz")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    cm.migration_issues.should be_empty
+
+    @course.assessment_question_banks.count.should == 1
   end
 end

@@ -5,8 +5,9 @@ module Importers
     Importers.register_content_importer(self)
 
     def self.process_migration_files(course, data, migration)
-      return unless data['all_files_export'] && data['all_files_export']['file_path']
-      return unless File.exist?(data['all_files_export']['file_path'])
+      data['all_files_export'] ||= {}
+      data['all_files_export']['file_path'] ||= data['all_files_zip']
+      return unless data['all_files_export']['file_path'] && File.exist?(data['all_files_export']['file_path'])
 
       course.attachment_path_id_lookup ||= {}
       course.attachment_path_id_lookup_lower ||= {}
@@ -17,7 +18,11 @@ module Importers
         course.attachment_path_id_lookup[path] = file['migration_id']
         course.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
         if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
-          valid_paths << path
+          if file['errored']
+            migration.add_warning(t(:file_import_warning, "File %{file} could not be found", :file => File.basename(file['path_name'])))
+          else
+            valid_paths << path
+          end
         end
       end
       valid_paths = [0] if valid_paths.empty? && params[:copy] && params[:copy][:files]
@@ -65,7 +70,7 @@ module Importers
       course.full_migration_hash = data
       course.external_url_hash = {}
       course.migration_results = []
-      course.content_migration = migration
+
       (data['web_link_categories'] || []).map{|c| c['links'] }.flatten.each do |link|
         course.external_url_hash[link['link_id']] = link
       end
@@ -157,6 +162,11 @@ module Importers
             event.save_without_broadcasting!
           end
 
+          migration.imported_migration_items_by_class(Announcement).each do |event|
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.save_without_broadcasting!
@@ -187,7 +197,7 @@ module Importers
           course.set_course_dates_if_blank(shift_options)
         end
       rescue
-        course.add_migration_warning("Couldn't adjust the due dates.", $!)
+        migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
       end
       migration.progress=100
       migration.migration_settings ||= {}
@@ -205,12 +215,14 @@ module Importers
       migration.imported_migration_items
     end
 
-    def self.import_syllabus_from_migration(course, syllabus_body, migration=nil)
+    def self.import_syllabus_from_migration(course, syllabus_body, migration)
       missing_links = []
-      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration, {:missing_links => missing_links})
-      course.content_migration.add_missing_content_links(:class => course.class.to_s,
-                                                       :id => course.id, :field => "syllabus", :missing_links => missing_links,
-                                                       :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")
+      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
+      migration.add_missing_content_links(:class => course.class.to_s,
+        :id => course.id, :field => "syllabus", :missing_links => missing_links,
+        :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")
     end
 
     def self.import_settings_from_migration(course, data, migration)
@@ -235,7 +247,7 @@ module Importers
         end
         course.tab_configuration = tab_config
       end
-      if settings[:storage_quota] && ( migration.for_course_copy? || course.account.grants_right?(migration.user, nil, :manage_courses))
+      if settings[:storage_quota] && ( migration.for_course_copy? || course.account.grants_right?(migration.user, :manage_courses))
         course.storage_quota = settings[:storage_quota]
       end
       atts = Course.clonable_attributes
@@ -249,13 +261,13 @@ module Importers
           if gs = course.grading_standards.find_by_migration_id(settings[:grading_standard_identifier_ref])
             course.grading_standard = gs
           else
-            migration.add_warning("Couldn't find copied grading standard for the course.")
+            migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
           end
         elsif settings[:grading_standard_id].present?
           if gs = GradingStandard.standards_for(course).find_by_id(settings[:grading_standard_id])
             course.grading_standard = gs
           else
-            migration.add_warning("Couldn't find account grading standard for the course.")
+            migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))
           end
         end
       end
@@ -301,7 +313,7 @@ module Importers
         old_event_diff = old_date - old_start_date
         old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
         new_full_diff = new_end_date - new_start_date
-        new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
+        new_event_diff = (new_full_diff.to_f * old_event_percent).round
         new_date = new_start_date + new_event_diff
         options[:day_substitutions] ||= {}
         options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s

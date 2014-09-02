@@ -1,5 +1,10 @@
 <% content_for :page_title do %><%= join_title t(:page_title, 'Course Groups'), @context.name %><% end %>
 
+<% if !@context.is_a?(Account) && @context.root_account.feature_enabled?(:student_groups_next)  %>
+  <% js_env :course_id => @context.id %>
+  <% js_bundle :student_groups %>
+<% else %>
+
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups %>
@@ -9,82 +14,90 @@
     <% else %>
       <%= t :groups_disabled, 'Student-organized groups have been disabled for this course, so you\'ll have to be content with the groups the teacher makes for you.' %>
     <% end %>
-    <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide icon-user"><%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
   </div>
 <% end %>
 
 <% js_bundle :groups %>
-<h2><%= @context.is_a?(Account) ? t('account_groups', 'Account Groups') : t('course_groups', 'Course Groups') %></h2>
-<p>
-<%= t 'group_explanation', <<-TEXT
-Groups are a good place to collaborate on projects or to figure out schedules for study sessions
-and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
-files.  Groups can collaborate on documents, or even schedule web conferences.  
-It's really like a mini-course where you can work with a smaller number of students on a
-more focused project.
-TEXT
-%>
-</p>
-
-<ul class="group_list">
-  <%= render :partial => 'group', :collection => @user_groups, :locals => {:in_group => true} %>
-  <%= render :partial => 'group', :object => nil, :locals => {:in_group => true} %>
-</ul>
-
-<% if @available_groups && !@available_groups.empty? %>
-  <h2><%= t 'headings.available_groups', "Available Groups" %></h2>
-  <ul class="group_list">
-    <%= render :partial => 'group', :collection => @available_groups, :locals => {:in_categories => @user_groups.map{ |g| g.group_category }.compact.uniq, :in_group => false} %>
+<div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all">
+  <ul class='collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all'>
+  <li class="ui-state-default ui-corner-top"><a href="<%= context_url(@context, :context_users_url) %>"><%=t('student_groups_tabs_everyone',"Everyone") %></a></li>
+    <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active"><a href="#"><%= t('student_groups_tabs_groups',"Groups") %></a></li>
   </ul>
+  <div class="roster-tab tab-panel">
+    <h2><%= @context.is_a?(Account) ? t('account_groups', 'Account Groups') : t('course_groups', 'Course Groups') %></h2>
+    <p>
+    <%= t 'group_explanation', <<-TEXT
+    Groups are a good place to collaborate on projects or to figure out schedules for study sessions
+    and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
+    files.  Groups can collaborate on documents, or even schedule web conferences.
+    It's really like a mini-course where you can work with a smaller number of students on a
+    more focused project.
+    TEXT
+    %>
+    </p>
+    <ul class="group_list">
+      <%= render :partial => 'group', :collection => @user_groups, :locals => {:in_group => true} %>
+      <%= render :partial => 'group', :object => nil, :locals => {:in_group => true} %>
+    </ul>
+
+    <% if @available_groups && !@available_groups.empty? %>
+      <h2><%= t 'headings.available_groups', "Available Groups" %></h2>
+      <ul class="group_list">
+        <%= render :partial => 'group', :collection => @available_groups, :locals => {:in_categories => @user_groups.map{ |g| g.group_category }.compact.uniq, :in_group => false} %>
+      </ul>
+    <% end %>
+
+    <%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
+    <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
+    <%= image_tag "warning.png" %>
+    <%= t :student_group_warning, <<-TEXT
+    If your teacher has talked about putting you into
+    groups as part of an assignment, this is not the way to make that happen.
+    Groups you organize yourself can't be used for grading... you can still form
+    your own groups, but you won't be able to turn in an electric copy of any
+    assignments unless your teacher builds the groups for you.
+    TEXT
+    %>
+    <table class="formtable">
+      <tr>
+        <td><%= f.blabel :name, :en => "Group Name" %></td>
+        <td><%= f.text_field :name %></td>
+      <% if @context %>
+      <tr>
+        <td><%= before_label :restrictions_for_joining_groups, 'Joining' %></td>
+        <td>
+          <select id="group_join_level" name="group[join_level]">
+            <option value="parent_context_auto_join"><%= t 'options.open_to_course_members', 'Course members are free to join' %></option>
+            <%# Right now the 'parent_context_request' option isn't any different
+            than 'parent_context_auto_join' because we're auto-accepting requested
+            memberships. So, we're removing it until we implement an accept request
+            feature. %>
+            <option value="invitation_only"><%= t 'options.invite_only', 'Membership by invitation only' %></option>
+          </select>
+        </td>
+      <% end %>
+      </tr><tr>
+        <td style="vertical-align: top;">
+          <%= before_label :users_to_invite, 'Invite' %>
+        </td>
+        <td>
+          <ul class="unstyled_list">
+          <% (@context.users - [@current_user]).each do |user| %>
+            <li>
+              <%= check_box :invitees, "#{user.id}".to_sym, :value => user.id %>
+              <%= label :invitees, "#{user.id}".to_sym, context_user_name(@context, user) %>
+            </li>
+          <% end %>
+          </ul>
+        </td>
+      </tr><tr>
+        <td colspan="2">
+          <button type="submit" class="btn submit_button"><%= t 'buttons.create', 'Create Group' %></button>
+          <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></button>
+        </td>
+    </table>
+  </div>
+</div>
+<% end %>
 <% end %>
 
-<%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
-<h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
-<%= image_tag "warning.png" %>
-<%= t :student_group_warning, <<-TEXT
-If your teacher has talked about putting you into
-groups as part of an assignment, this is not the way to make that happen.
-Groups you organize yourself can't be used for grading... you can still form
-your own groups, but you won't be able to turn in an electric copy of any
-assignments unless your teacher builds the groups for you.
-TEXT
-%>
-<table class="formtable">
-  <tr>
-    <td><%= f.blabel :name, :en => "Group Name" %></td>
-    <td><%= f.text_field :name %></td>
-  <% if @context %>
-  <tr>
-    <td><%= before_label :restrictions_for_joining_groups, 'Joining' %></td>
-    <td>
-      <select id="group_join_level" name="group[join_level]">
-        <option value="parent_context_auto_join"><%= t 'options.open_to_course_members', 'Course members are free to join' %></option>
-        <%# Right now the 'parent_context_request' option isn't any different
-        than 'parent_context_auto_join' because we're auto-accepting requested
-        memberships. So, we're removing it until we implement an accept request
-        feature. %>
-        <option value="invitation_only"><%= t 'options.invite_only', 'Membership by invitation only' %></option>
-      </select>
-    </td>
-  <% end %>
-  </tr><tr>
-    <td style="vertical-align: top;">
-      <%= before_label :users_to_invite, 'Invite' %>
-    </td>
-    <td>
-      <ul class="unstyled_list">
-      <% (@context.users - [@current_user]).each do |user| %>
-        <li>
-          <%= check_box :invitees, "#{user.id}".to_sym, :value => user.id %>
-          <%= label :invitees, "#{user.id}".to_sym, context_user_name(@context, user) %>
-        </li>
-      <% end %>
-      </ul>
-    </td>
-  </tr><tr>
-    <td colspan="2">
-      <button type="submit" class="btn submit_button"><%= t 'buttons.create', 'Create Group' %></button>
-      <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></button>
-    </td>
-</table>
-<% end %>

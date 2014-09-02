@@ -4,19 +4,22 @@ OAuth
 OAuth2 is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
 password. Canvas uses OAuth2 for authentication and
-authorization of the Canvas API. HTTP Basic Auth is deprecated and will be removed.
+authorization of the Canvas API.
 
 Authenticating a Request
 ------------------------
 
 Once you have an OAuth access token, you can use it to make API
 requests. If possible, using the HTTP Authorization header is
-recommended. Sending the access token in the query string or POST
-parameters is also supported.
+recommended.
 
 OAuth2 Token sent in header:
 
     curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+
+Sending the access token in the query string or POST
+parameters is also supported, but discouraged as it increases the
+chances of the token being logged or leaked in transit.
 
 OAuth2 Token sent in query string:
 
@@ -26,7 +29,7 @@ Storing Tokens
 --------------
 
 When appropriate, applications should store the token locally, rather
-the requesting a new token for the same user each time the user uses the
+than requesting a new token for the same user each time the user uses the
 application. If the token is deleted or expires, the application will
 get a 401 Unauthorized error from the API, in which case the application should
 perform the OAuth flow again to receive a new token. You can differentiate this
@@ -51,8 +54,14 @@ including but not limited to:
 Manual Token Generation
 -----------------------
 
-If your application only needs to access the API as a single user, the
-simplest option is to generate an access token on the user's profile page.
+For testing your application before you've implemented OAuth, the
+simplest option is to generate an access token on your user's profile
+page. Note that asking any other user to manually generate a token and
+enter it into your application is a violation of Canvas' terms of
+service. Applications in use by multiple users *must* use OAuth to obtain
+tokens.
+
+To manually generate a token for testing:
 
   1. Click the "profile" link in the top right menu bar, or navigate to
      `/profile`
@@ -129,7 +138,7 @@ This is the OAuth flow for third-party web applications.
 
 <div class="method_details">
 
-<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&redirect_uri=https://example.com/oauth_complete&state=YYY</h3>
 
 <h4>Parameters</h4>
 
@@ -154,6 +163,18 @@ currently supported value is <code>code</code>.
 authorization. The domain of this URL must match the domain of the
 redirect_uri stored on the developer key, or it must be a subdomain of
 that domain.
+    </div>
+  </li>
+  <li>
+    <span class="name">state</span>
+    <div class="inline">
+      optional. Your application can pass Canvas an arbitrary piece of
+state in this parameter, which will be passed back to your application
+in Step 2. It's strongly encouraged that your application pass a unique
+identifier in the state parameter, and then verify in Step 2 that the
+state you receive back from Canvas is the same expected value. Failing
+to do this opens your application to the possibility of logging the
+wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-common-oauth2.html">described here</a>.
     </div>
   </li>
   <li>
@@ -194,11 +215,15 @@ request\_uri with a specific query string, containing the OAuth2
 response:
 
 <div class="method_details">
-<h3>http://www.example.com/oauth2response?code=&lt;code&gt;</h3>
+<h3>http://www.example.com/oauth2response?code=XXX&state=YYY</h3>
 </div>
 
 The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
+
+If your application passed a state parameter in step 1, it will be
+returned here in step 2 so that your app can tie the request and
+response together.
 
 If the user doesn't accept the request for access, or if another error
 occurs, Canvas redirects back to your request\_uri with an `error`

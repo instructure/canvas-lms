@@ -193,7 +193,7 @@ describe PageView do
 
   if Canvas.redis_enabled?
     describe "active user counts" do
-      before do
+      before :once do
         Setting.set('enable_page_views', 'db')
       end
 
@@ -240,7 +240,9 @@ describe PageView do
   end
 
   describe "for_users" do
-    before :each do
+    before :once do
+      course_model
+      @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
       @page_view.save!
     end
 
@@ -260,7 +262,7 @@ describe PageView do
   end
 
   describe '.generate' do
-    let(:params) { {'action' => 'path', 'controller' => 'some'} }
+    let(:params) { {:action => 'path', :controller => 'some'} }
     let(:session) { {:id => '42'} }
     let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
     let(:user) { User.new }
@@ -273,8 +275,8 @@ describe PageView do
 
     its(:url) { should == request.url }
     its(:user) { should == user }
-    its(:controller) { should == params['controller'] }
-    its(:action) { should == params['action'] }
+    its(:controller) { should == params[:controller] }
+    its(:action) { should == params[:action] }
     its(:session_id) { should == session[:id] }
     its(:real_user) { should == user }
     its(:user_agent) { should == request.user_agent }
@@ -307,7 +309,7 @@ describe PageView do
 
   describe ".find_all_by_id" do
     context "db-backed" do
-      before do
+      before :once do
         Setting.set('enable_page_views', 'db')
       end
 
@@ -379,7 +381,7 @@ describe PageView do
 
   describe ".find_by_id" do
     context "db-backed" do
-      before do
+      before :once do
         Setting.set('enable_page_views', 'db')
       end
 
@@ -409,7 +411,7 @@ describe PageView do
 
    describe ".find_one" do
     context "db-backed" do
-      before do
+      before :once do
         Setting.set('enable_page_views', 'db')
       end
 
@@ -439,7 +441,7 @@ describe PageView do
 
   describe ".find_for_update" do
     context "db-backed" do
-      before do
+      before :once do
         Setting.set('enable_page_views', 'db')
       end
 

@@ -1,24 +1,22 @@
-define [ 'ember', 'vendor/d3.v3' ], (Em, {max, sum}) ->
-  Em.ObjectController.extend
+define [
+  'ember'
+  'vendor/d3.v3'
+  '../../../shared/seconds_to_time'
+], (Ember, d3, secondsToTime) ->
+  {max, sum} = d3
+
+  Ember.ObjectController.extend
     ratioFor: (score) ->
       quizPoints = parseFloat(@get('quiz.pointsPossible'))
 
       if quizPoints > 0
-        Em.Util.round(@get(score) / quizPoints * 100.0, 0)
+        Ember.Util.round(@get(score) / quizPoints * 100.0, 0)
       else
         0
 
-    avgScoreRatio: (->
-      @ratioFor('avgScore')
-    ).property('avgScore')
-
-    highScoreRatio: (->
-      @ratioFor('highScore')
-    ).property('highScore')
-
-    lowScoreRatio: (->
-      @ratioFor('lowScore')
-    ).property('lowScore')
+    avgScoreRatio: (-> @ratioFor('avgScore') ).property('avgScore')
+    highScoreRatio: (-> @ratioFor('highScore') ).property('highScore')
+    lowScoreRatio: (-> @ratioFor('lowScore') ).property('lowScore')
 
     # Format a duration given in seconds into a stopwatch-style timer, e.g:
     #
@@ -29,18 +27,7 @@ define [ 'ember', 'vendor/d3.v3' ], (Em, {max, sum}) ->
     #   7530 seconds  => 02:05:30
     #
     formattedAvgDuration: (->
-      floor = Math.floor
-      seconds = @get('avgDuration')
-      pad = (duration) ->
-        ('00' + duration).slice(-2)
-
-      if seconds > 3600
-        hh = floor (seconds / 3600)
-        mm = floor ((seconds - hh*3600) / 60)
-        ss = seconds % 60
-        "#{pad hh}:#{pad mm}:#{pad ss}"
-      else
-        "#{pad floor seconds / 60}:#{pad floor seconds % 60}"
+      secondsToTime @get('avgDuration')
     ).property('avgDuration')
 
     # Convert the percentile-score map into an array of 101 elements to
@@ -83,9 +70,9 @@ define [ 'ember', 'vendor/d3.v3' ], (Em, {max, sum}) ->
     #     0 // 100
     #   ]
     scoreChartData: (->
-      set = Em.A()
+      set = Ember.A()
       scores = @get('submissionStatistics.scores') || {}
-      highest = max(Em.keys(scores).map (d) -> parseInt(d, 10))
+      highest = max(Ember.keys(scores).map (d) -> parseInt(d, 10))
 
       for percentile in [0..max([100, highest])]
         set[percentile] = scores["#{percentile}"] || 0

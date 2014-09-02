@@ -1,0 +1,15 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context.id %>/assignments/<%= asset.asset.assignment_id %>/<%= asset.asset.class.to_s.downcase.pluralize %>/<%= asset.asset.user_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('#messages.peer_review_invitation.email.subject', "Assigned peer review for %{reviewee}", :reviewee => asset.asset.user.name)%>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "Click here to complete your review" %>
+  </a>
+<% end %>
+
+<%= t('#messages.peer_review_invitation.email.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => asset.asset.user.name)%>

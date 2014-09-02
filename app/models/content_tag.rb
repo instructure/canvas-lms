@@ -22,13 +22,19 @@ class ContentTag < ActiveRecord::Base
       super( 'Link is the last link to an aligned outcome.' +
            'Remove the alignment and then try again')
       @alignment = alignment
-    end
+    end 
   end
   include Workflow
   include SearchTermHelper
   belongs_to :content, :polymorphic => true
+  validates_inclusion_of :content_type, :allow_nil => true, :in => ['Attachment', 'Assignment', 'WikiPage',
+    'ContextModuleSubHeader', 'Quizzes::Quiz', 'ExternalUrl', 'LearningOutcome', 'DiscussionTopic',
+    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment']
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'LearningOutcomeGroup',
+    'Assignment', 'Account', 'Quizzes::Quiz']
   belongs_to :associated_asset, :polymorphic => true
+  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['LearningOutcomeGroup']
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
@@ -65,7 +71,7 @@ class ContentTag < ActiveRecord::Base
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
     can :delete
   end
-
+  
   workflow do
     state :active do
       event :unpublish, :transitions_to => :unpublished
@@ -78,8 +84,8 @@ class ContentTag < ActiveRecord::Base
 
   alias_method :published?, :active?
 
-  scope :active, where(:workflow_state => 'active')
-  scope :not_deleted, where("content_tags.workflow_state<>'deleted'")
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
   def touch_context_module
@@ -93,7 +99,7 @@ class ContentTag < ActiveRecord::Base
     }
   end
   private :touch_context_module_after_transaction
-
+  
   def self.touch_context_modules(ids=[])
     if ids.length == 1
       ContextModule.where(id: ids).update_all(updated_at: Time.now.utc)
@@ -107,13 +113,13 @@ class ContentTag < ActiveRecord::Base
     end
     true
   end
-
+  
   def touch_context_if_learning_outcome
     if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
       self.context_type.constantize.where(:id => self.context_id).update_all(:updated_at => Time.now.utc)
     end
   end
-
+  
   def default_values
     self.title ||= self.content.title rescue nil
     self.title ||= self.content.name rescue nil
@@ -124,11 +130,11 @@ class ContentTag < ActiveRecord::Base
     self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}"
   end
   protected :default_values
-
+  
   def context_code
     read_attribute(:context_code) || "#{self.context_type.to_s.underscore}_#{self.context_id}" rescue nil
   end
-
+  
   def context_name
     self.context.name rescue ""
   end
@@ -140,7 +146,7 @@ class ContentTag < ActiveRecord::Base
 
   def self.update_could_be_locked(tags=[])
     content_ids = {}
-    tags.each do |t|
+    tags.each do |t| 
       (content_ids[t.content_type] ||= []) << t.content_id if t.content_type && t.content_id
     end
     content_ids.each do |type, ids|
@@ -154,11 +160,11 @@ class ContentTag < ActiveRecord::Base
   def confirm_valid_module_requirements
     self.context_module && self.context_module.confirm_valid_requirements
   end
-
+  
   def scoreable?
     self.content_type_quiz? || self.graded?
   end
-
+  
   def graded?
     return true if self.content_type == 'Assignment'
     return false unless self.content_type.constantize.column_names.include?('assignment_id') #.new.respond_to?(:assignment_id)
@@ -191,14 +197,14 @@ class ContentTag < ActiveRecord::Base
     return self.content if self.content_type == 'Assignment'
     return self.content.assignment if self.content.respond_to?(:assignment)
   end
-
+  
   alias_method :old_content, :content
   def content
     #self.content_type = 'Quizzes::Quiz' if self.content_type == 'Quiz'
     klass = self.content_type.classify.constantize rescue nil
     klass.respond_to?("tableless?") && klass.tableless? ? nil : old_content
   end
-
+  
   def content_or_self
     content || self
   end
@@ -260,21 +266,13 @@ class ContentTag < ActiveRecord::Base
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
     return unless self.asset_context_matches?
+    return unless self.content && self.content.respond_to?(:publish!)
 
-    new_asset_workflow_state = nil
-    if self.unpublished? && self.content.respond_to?(:unpublished?)
-      new_asset_workflow_state = 'unpublished'
-    elsif self.active?
-      if self.content.respond_to?(:available?)
-        new_asset_workflow_state = 'available'
-      elsif self.content.respond_to?(:active?)
-        new_asset_workflow_state = 'active'
-      elsif self.content.respond_to?(:published?)
-        new_asset_workflow_state = 'published'
-      end
-    end
-    if new_asset_workflow_state
-      self.content.update_attribute(:workflow_state, new_asset_workflow_state)
+    if self.unpublished? && self.content.published? && self.content.can_unpublish?
+      self.content.unpublish!
+      self.class.update_for(self.content)
+    elsif self.active? && !self.content.published?
+      self.content.publish!
       self.class.update_for(self.content)
     end
   end
@@ -327,11 +325,11 @@ class ContentTag < ActiveRecord::Base
   def locked_for?(user, opts={})
     self.context_module.locked_for?(user, opts.merge({:tag => self}))
   end
-
+  
   def available_for?(user, opts={})
     self.context_module.available_for?(user, opts.merge({:tag => self}))
   end
-
+  
   def self.update_for(asset)
     tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted.select([:id, :tag_type, :content_type, :context_module_id]).all
     module_ids = tags.map(&:context_module_id).compact
@@ -355,7 +353,7 @@ class ContentTag < ActiveRecord::Base
     # update the module timestamp
     ContentTag.touch_context_modules(module_ids)
   end
-
+  
   def sync_title_to_asset_title?
     self.tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(self.content_type)
   end
@@ -375,15 +373,15 @@ class ContentTag < ActiveRecord::Base
   def context_module_action(user, action, points=nil)
     self.context_module.update_for(user, action, self, points) if self.context_module
   end
-
+  
   def content_asset_string
     @content_asset_string ||= "#{self.content_type.underscore}_#{self.content_id}"
   end
-
+  
   def associated_asset_string
     @associated_asset_string ||= "#{self.associated_asset_type.underscore}_#{self.associated_asset_id}"
   end
-
+  
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
@@ -397,7 +395,7 @@ class ContentTag < ActiveRecord::Base
   def has_rubric_association?
     content.respond_to?(:rubric_association) && content.rubric_association
   end
-
+  
   scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
   scope :for_context, lambda { |context|
     case context
@@ -416,8 +414,8 @@ class ContentTag < ActiveRecord::Base
       where(:context_type => context.class.to_s, :context_id => context)
     end
   }
-  scope :learning_outcome_alignments, where(:tag_type => 'learning_outcome')
-  scope :learning_outcome_links, where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome')
+  scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
+  scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause

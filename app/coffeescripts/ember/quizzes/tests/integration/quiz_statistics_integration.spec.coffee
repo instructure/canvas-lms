@@ -4,7 +4,8 @@ define [
   '../environment_setup'
   '../shared_ajax_fixtures'
   '../test_redirection'
-], (Ember, startApp, env, fixtures, testRedirection) ->
+  '../test_title'
+], (Ember, startApp, env, fixtures, testRedirection, testTitle) ->
   App = null
 
   {$} = Ember
@@ -38,3 +39,8 @@ define [
     path: '/1/statistics'
     defaultRoute: 'quiz.statistics'
     redirectRoute: 'quiz.show'
+
+  test 'it shows up empty if there are no submissions', ->
+    env.setUserPermissions(true, true)
+    visit('/3/statistics').then ->
+      equal find('.erratic-statistics').length, 1

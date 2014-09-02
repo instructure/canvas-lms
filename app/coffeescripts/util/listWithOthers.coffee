@@ -9,7 +9,7 @@ define [
     if strings.length > cutoff
       strings = strings[0...cutoff].concat([strings[cutoff...strings.length]])
     $.toSentence(for strOrArray in strings
-      if typeof strOrArray is 'string' or strOrArray.htmlSafe
+      if typeof strOrArray is 'string' or strOrArray._icHTMLSafe
         "<span>#{h(strOrArray)}</span>"
       else
         """

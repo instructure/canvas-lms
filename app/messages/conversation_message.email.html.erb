@@ -1,46 +1,72 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/conversations/<%= asset.conversation_id %>
 <% end %>
+
 <% define_content :user_name do %>
   <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
 <% end %>
-<p><%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %></p>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+<% define_content :footer_link do %>
+  <a href="<%= content :link %>">
+    <%= t :view_message, "View this message in Conversations" %>
+  </a>
+<% end %>
 
 <% if asset.conversation.subject.present? %>
-<h4><%= format_message(asset.conversation.subject).first %></h4>
+<h4>
+  <%= format_message(asset.conversation.subject).first %>
+</h4>
 <% end %>
 
-<%= format_message(asset.body).first %>
+<p>
+  <%= format_message(asset.body).first %>
+</p>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<% if asset.has_media_objects? %>
-<p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
+<% if avatar_enabled? %>
+  <table border="0" style="border-collapse: collapse">
+    <tr height="30px">
+      <td></td>
+    </tr>
+    <tr >
+      <td align="left" width="50px" ><img style="border-radius: 50px;" height= 50px width = 50px src= <%=author_avatar_url%> alt=<%=author_short_name%>> </td>
+      <td width="10"></td>
+      <td>
+        <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
+          <tr>
+            <td valign="bottom" align="left">
+              <b><%= author_short_name%></b>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top" align="left">
+              <a href="<%= content :link %>">
+                <%= author_email_address%>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 <% else %>
-<p><%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %></p>
+  <p height="30px"></p>
+  <p>
+    <b><%= author_short_name%></b>
+    <br/>
+    <a href="<%= content :link %>">
+      <%= author_email_address%>
+    </a>
+  </p>
 <% end %>
 
-<p><a href="<%= content :link %>"><%= content :link %></a></p>
+
 
 <% unless asset.attachments.empty? %>
-<div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
+<div style="margin-top: 20px; padding: 10px; background-color: #f3f3f3;">
   <p style="margin: 0px;"><%= t :attached_files, "Attached Files:" %></p>
   <ul style="padding-left: 20px;">
     <% asset.attachments.each do |attachment| %>

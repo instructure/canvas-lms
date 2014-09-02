@@ -1,0 +1,84 @@
+//add variable modifications to the global _variables.sass
+//they will override bootstrap styles
+
+// CSS Reset
+@import "vendor/bootstrap/reset";
+
+// Grid system and page structure
+@import "vendor/bootstrap/scaffolding";
+@import "vendor/bootstrap/grid";
+@import "vendor/bootstrap/layouts";
+
+// Base CSS
+@import "vendor/bootstrap/type";
+@import "vendor/bootstrap/code";
+@import "vendor/bootstrap/forms";
+@import "vendor/bootstrap/tables";
+
+
+// Components: common
+//@import "vendor/bootstrap/sprites"; //we do our own icons
+@import "vendor/bootstrap/dropdowns";
+@import "vendor/bootstrap/wells";
+@import "vendor/bootstrap/component-animations";
+@import "vendor/bootstrap/close";
+
+
+// Components: Buttons & Alerts
+@import "vendor/bootstrap/buttons";
+//@import "vendor/bootstrap/button-groups"; //use jquerUI buttonsets
+@import "vendor/bootstrap/alerts";
+
+// Components: Nav
+@import "vendor/bootstrap/navs";
+//these are just commented out because we dont use them yet, if you want them just uncomment.
+//@import "vendor/bootstrap/navbar";
+//@import "vendor/bootstrap/breadcrumbs";
+@import "vendor/bootstrap/pagination";
+@import "vendor/bootstrap/pager";
+
+// Components: Popovers
+//@import "vendor/bootstrap/modals"; // use jqueryUI instead
+//@import "vendor/bootstrap/tooltip"; // we do our own
+@import "vendor/bootstrap/popovers";
+
+// Components: Misc
+@import "vendor/bootstrap/thumbnails";
+
+
+// Components: Misc
+@import "vendor/bootstrap/thumbnails";
+@import "vendor/bootstrap/labels-badges";
+@import "vendor/bootstrap/progress-bars";
+//@import "vendor/bootstrap/accordion"; // use jqueryUI instead
+//these are just commented out because we dont use them yet, if you want them just uncomment.
+//@import "vendor/bootstrap/carousel";
+//@import "vendor/bootstrap/hero-unit";
+
+// Utility classes
+@import "vendor/bootstrap/utilities"; // Has to be last to override when necessary
+
+
+// RESPONSIVE CLASSES
+// ------------------
+@import "vendor/bootstrap/responsive-utilities";
+
+
+// MEDIA QUERIES
+// ------------------
+
+// Large desktops
+@import "vendor/bootstrap/responsive-1200px-min";
+
+// Tablets to regular desktops
+@import "vendor/bootstrap/responsive-768px-979px";
+
+// RESPONSIVE NAVBAR
+// ------------------
+
+
+// From 979px and below, show a button to toggle navbar contents
+//@import "vendor/bootstrap/responsive-navbar"; //Uncomment if you want to use a responsive navbar
+
+
+@import "bootstrap_overrides";

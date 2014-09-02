@@ -18,27 +18,25 @@
 
 class ContentExport < ActiveRecord::Base
   include Workflow
-  belongs_to :course
+  belongs_to :context, :polymorphic => true
+
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :course
-  validates_presence_of :course_id, :workflow_state
+  attr_accessible :context
+  validates_presence_of :context_id, :workflow_state
+  validates_inclusion_of :context_type, :in => ['Course']
+
   has_one :job_progress, :class_name => 'Progress', :as => :context
-
-  alias_method :context, :course
-
-  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :course_id, :attachment_id, :export_type, :settings, :workflow_state, :created_at, :updated_at, :content_migration_id]
-  EXPORTABLE_ASSOCIATIONS = [:course, :user, :attachment, :content_migration, :attachments]
 
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
   QTI = 'qti'
-  
+
   workflow do
     state :created
     state :exporting
@@ -52,19 +50,23 @@ class ContentExport < ActiveRecord::Base
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:exported) && self.content_migration.blank?
+      record.context_type == 'Course' && record.changed_state(:exported) && self.content_migration.blank?
     }
     
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:failed) && self.content_migration.blank?
+      record.context_type == 'Course' && record.changed_state(:failed) && self.content_migration.blank?
     }
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage_files) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
     can :manage_files and can :read
+  end
+
+  def course
+    raise "Use context instead"
   end
 
   def export_course(opts={})
@@ -95,7 +97,7 @@ class ContentExport < ActiveRecord::Base
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
-  def queue_api_job
+  def queue_api_job(opts)
     if self.job_progress
       p = self.job_progress
     else
@@ -107,7 +109,7 @@ class ContentExport < ActiveRecord::Base
     p.user = self.user
     p.save!
 
-    export_course
+    export_course(opts)
   end
 
   def referenced_files
@@ -167,12 +169,12 @@ class ContentExport < ActiveRecord::Base
     is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
-  def add_item_to_export(obj)
-    return unless obj && obj.class.respond_to?(:table_name)
+  def add_item_to_export(obj, type=nil)
+    return unless obj && (type || obj.class.respond_to?(:table_name))
     return if selected_content.empty?
     return if is_set?(selected_content[:everything])
 
-    asset_type = obj.class.table_name
+    asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
     selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
@@ -188,7 +190,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   def root_account
-    self.course.root_account
+    self.context.try_rescue(:root_account)
   end
   
   def running?
@@ -213,12 +215,12 @@ class ContentExport < ActiveRecord::Base
     self.job_progress.try(:update_completion!, val)
   end
   
-  scope :active, where("workflow_state<>'deleted'")
-  scope :not_for_copy, where("export_type<>?", COURSE_COPY)
-  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
-  scope :qti, where(:export_type => QTI)
-  scope :course_copy, where(:export_type => COURSE_COPY)
-  scope :running, where(:workflow_state => ['created', 'exporting'])
+  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :not_for_copy, -> { where("export_type<>?", COURSE_COPY) }
+  scope :common_cartridge, -> { where(:export_type => COMMON_CARTRIDGE) }
+  scope :qti, -> { where(:export_type => QTI) }
+  scope :course_copy, -> { where(:export_type => COURSE_COPY) }
+  scope :running, -> { where(:workflow_state => ['created', 'exporting']) }
 
   private
 

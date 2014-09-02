@@ -11,6 +11,7 @@ define [
     jQuery ->
       $menu = jQuery '#menu_enrollments'
       $menuDrop = $menu.closest('.menu-item-drop')
+      $menuTitle = $menuDrop.prev('.menu-item-title')
 
       return if $menu.length is 0 # :(
 
@@ -29,3 +30,8 @@ define [
             wrapper: wrapper
             content: content
             onToggle: (state) -> $menuDrop.toggleClass 'menuCustomListEditing', state
+
+      $menuTitle.click (e) ->
+        return if e.metaKey or e.ctrlKey
+        e.preventDefault()
+        $menuTitle.focus()

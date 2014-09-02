@@ -18,7 +18,7 @@
 
 # @API Groups
 #
-# Group memberships are the objects that tie users and groups together. 
+# Group memberships are the objects that tie users and groups together.
 #
 # @model GroupMembership
 #     {
@@ -88,8 +88,8 @@ class GroupMembershipsController < ApplicationController
   #   return all memberships.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
-  #          -F 'filter_states[]=invited&filter_states[]=requested' \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
+  #          -F 'filter_states[]=invited&filter_states[]=requested' \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [GroupMembership]
@@ -119,7 +119,7 @@ class GroupMembershipsController < ApplicationController
   # @argument user_id [String]
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
   #          -F 'user_id=self'
   #          -H 'Authorization: Bearer <token>'
   #
@@ -150,7 +150,7 @@ class GroupMembershipsController < ApplicationController
   # @argument moderator
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
   # @example_request
@@ -180,8 +180,8 @@ class GroupMembershipsController < ApplicationController
   # in place of a membership_id.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \ 
-  #          -X DELETE \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \
+  #          -X DELETE \
   #          -H 'Authorization: Bearer <token>'
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/users/<user_id> \

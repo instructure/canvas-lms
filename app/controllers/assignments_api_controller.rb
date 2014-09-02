@@ -213,6 +213,16 @@
 #           "example": "<p>Do the following:</p>...",
 #           "type": "string"
 #         },
+#         "created_at": {
+#           "description": "The time at which this assignment was originally created",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The time at which this assignment was last modified in any way",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
 #         "due_at": {
 #           "description": "the due date for the assignment. returns null if not present. NOTE: If this assignment has assignment overrides, this field will be the due date as it applies to the user requesting information from the API.",
 #           "example": "2012-07-01T23:59:00-06:00",
@@ -293,7 +303,7 @@
 #           "type": "datetime"
 #         },
 #         "group_category_id": {
-#           "description": "the ID of the assignment’s group set (if this is a group assignment)",
+#           "description": "The ID of the assignment’s group set, if this is a group assignment. For group discussions, set group_category_id on the discussion topic, not the linked assignment.",
 #           "example": 1,
 #           "type": "integer"
 #         },
@@ -312,9 +322,19 @@
 #           "type" : "boolean",
 #           "description" : "(optional, present if Post Grades to SIS feature is enabled)"
 #         },
+#         "integration_id": {
+#           "example": "12341234",
+#           "type" : "string",
+#           "description" : "(optional, Third Party unique identifier for Assignment)"
+#         },
+#         "integration_data": {
+#           "example": "12341234",
+#           "type" : "string",
+#           "description" : "(optional, Third Party integration data for assignment)"
+#         },
 #         "muted": {
 #           "description": "whether the assignment is muted",
-#           "type": "integer"
+#           "type": "boolean"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
@@ -455,11 +475,11 @@ class AssignmentsApiController < ApplicationController
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
-      @assignments = @context.active_assignments.
+      scope = @context.active_assignments.
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
-      @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
+      scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
       fake = @context.assignments.scoped.new
@@ -467,13 +487,17 @@ class AssignmentsApiController < ApplicationController
 
       if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
-        @assignments = @assignments.published
+        scope = scope.published
       end
+
+      # TODO temporary! remote this default_per_page parameter once dependent
+      # applications have had a change to start honoring the pagination
+      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context), default_per_page: Api.max_per_page)
 
       if Array(params[:include]).include?('submission')
         submissions = Hash[
           @context.submissions.
-            where(:assignment_id => @assignments.except(:order)).
+            where(:assignment_id => assignments).
             for_user(@current_user).
             map { |s| [s.assignment_id,s] }
         ]
@@ -484,14 +508,12 @@ class AssignmentsApiController < ApplicationController
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
       if override_dates
-        assignments_with_overrides = @assignments.joins(:assignment_overrides)
-          .select("assignments.id")
-        @assignments = @assignments.all
-        assignments_without_overrides = @assignments - assignments_with_overrides
-        assignments_without_overrides.each { |a| a.has_no_overrides = true }
+        Assignment.send(:preload_associations, assignments, :assignment_overrides)
+        assignments.select{ |a| a.assignment_overrides.size == 0 }.
+          each { |a| a.has_no_overrides = true }
       end
 
-      hashes = @assignments.map do |assignment|
+      hashes = assignments.map do |assignment|
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
                         submission: submission, override_dates: override_dates)
@@ -509,16 +531,9 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides to the assignment, defaults to true.
   # @returns Assignment
   def show
-    if authorized_action(@context, @current_user, :read)
-      @assignment = @context.active_assignments.find(params[:id],
-          :include => [:assignment_group, :rubric_association, :rubric])
-
-      if @context.feature_enabled?(:draft_state) && !@assignment.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        render_unauthorized_action
-        return
-      end
-
+    @assignment = @context.active_assignments.find(params[:id],
+        :include => [:assignment_group, :rubric_association, :rubric])
+    if authorized_action(@assignment, @current_user, :read)
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       end
@@ -544,6 +559,150 @@ class AssignmentsApiController < ApplicationController
   #   assignment lists.
   #
   # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  #   List of supported submission types for the assignment.
+  #   Unless the assignment is allowing online submissions, the array should
+  #   only have one element.
+  #
+  #   If not allowing online submissions, your options are:
+  #     "online_quiz"
+  #     "none"
+  #     "on_paper"
+  #     "online_quiz"
+  #     "discussion_topic"
+  #     "external_tool"
+  #
+  #   If you are allowing online submissions, you can have one or many
+  #   allowed submission types:
+  #
+  #     "online_upload"
+  #     "online_text_entry"
+  #     "online_url"
+  #     "media_recording" (Only valid when the Kaltura plugin is enabled)
+  #
+  # @argument assignment[allowed_extensions][] [Optional, String]
+  #   Allowed extensions if submission_types includes "online_upload"
+  #
+  #   Example:
+  #     allowed_extensions: ["docx","ppt"]
+  #
+  # @argument assignment[turnitin_enabled] [Optional, Boolean]
+  #   Only applies when the Turnitin plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles Turnitin submissions for the assignment.
+  #   Will be ignored if Turnitin is not available for the course.
+  #
+  # @argument assignment[integration_data] [Optional]
+  #   Data related to third party integrations, JSON string required.
+  #
+  # @argument assignment[integration_id] [Optional]
+  #   Unique ID from third party integrations
+  #
+  # @argument assignment[turnitin_settings] [Optional]
+  #   Settings to send along to turnitin. See Assignment object definition for
+  #   format.
+  #
+  # @argument assignment[peer_reviews] [Optional, Boolean]
+  #   If submission_types does not include external_tool,discussion_topic,
+  #   online_quiz, or on_paper, determines whether or not peer reviews
+  #   will be turned on for the assignment.
+  #
+  # @argument assignment[automatic_peer_reviews] [Optional, Boolean]
+  #   Whether peer reviews will be assigned automatically by Canvas or if
+  #   teachers must manually assign peer reviews. Does not apply if peer reviews
+  #   are not enabled.
+  #
+  # @argument assignment[notify_of_update] [Optional, Boolean]
+  #   If true, Canvas will send a notification to students in the class
+  #   notifying them that the content has changed.
+  #
+  # @argument assignment[group_category_id] [Optional, Integer]
+  #   If present, the assignment will become a group assignment assigned
+  #   to the group.
+  #
+  # @argument assignment[grade_group_students_individually] [Optional, Integer]
+  #   If this is a group assignment, teachers have the options to grade
+  #   students individually. If false, Canvas will apply the assignment's
+  #   score to each member of the group. If true, the teacher can manually
+  #   assign scores to each member of the group.
+  #
+  # @argument assignment[external_tool_tag_attributes] [Optional]
+  #   Hash of attributes if submission_types is ["external_tool"]
+  #   Example:
+  #     external_tool_tag_attributes: {
+  #       // url to the external tool
+  #       url: "http://instructure.com",
+  #       // create a new tab for the module, defaults to false.
+  #       new_tab: false
+  #     }
+  #
+  # @argument assignment[points_possible] [Optional, Float]
+  #   The maximum points possible on the assignment.
+  #
+  # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
+  #  The strategy used for grading the assignment.
+  #  The assignment is ungraded if this field is omitted.
+  #
+  # @argument assignment[due_at] [Optional, Timestamp]
+  #   The day/time the assignment is due.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[lock_at] [Optional, Timestamp]
+  #   The day/time the assignment is locked after.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[unlock_at] [Optional, Timestamp]
+  #   The day/time the assignment is unlocked.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[description] [Optional, String]
+  #   The assignment's description, supports HTML.
+  #
+  # @argument assignment[assignment_group_id] [Optional, Integer]
+  #   The assignment group id to put the assignment in.
+  #   Defaults to the top assignment group in the course.
+  #
+  # @argument assignment[muted] [Optional, Boolean]
+  #   Whether this assignment is muted.
+  #   A muted assignment does not send change notifications
+  #   and hides grades from students.
+  #   Defaults to false.
+  #
+  # @argument assignment[assignment_overrides][] [Optional, AssignmentOverride]
+  #   List of overrides for the assignment.
+  #   NOTE: The assignment overrides feature is in beta.
+  #
+  # @argument assignment[only_visible_to_overrides] [Optional, Boolean]
+  #   Whether this assignment is only visible to overrides
+  #   (Only useful if 'differentiated assignments' account setting is on)
+  #
+  # @argument assignment[published] [Optional, Boolean]
+  #   Whether this assignment is published.
+  #   (Only useful if 'draft state' account setting is on)
+  #   Unpublished assignments are not visible to students.
+  #
+  # @argument assignment[grading_standard_id] [Optional, Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
+  #
+  # @returns Assignment
+  def create
+    @assignment = @context.assignments.build
+    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    if authorized_action(@assignment, @current_user, :create)
+      save_and_render_response
+    end
+  end
+
+  # @API Edit an assignment
+  # Modify an existing assignment.
+  #
+  # @argument assignment[name] [Optional, String] The assignment name.
+  #
+  # @argument assignment[position] [Optional, Integer]
+  #   The position of this assignment in the group when displaying
+  #   assignment lists.
+  #
+  # @argument assignment[submission_types][] [Optional, String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -659,19 +818,6 @@ class AssignmentsApiController < ApplicationController
   #   (Only useful if 'draft state' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
-  # @returns Assignment
-  def create
-    @assignment = @context.assignments.build
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
-    if authorized_action(@assignment, @current_user, :create)
-      save_and_render_response
-    end
-  end
-
-  # @API Edit an assignment
-  # Modify an existing assignment. See the documentation for assignment
-  # creation.
-  #
   # @argument assignment[grading_standard_id] [Optional, Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
@@ -685,7 +831,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Assignment
   def update
-    @assignment = @context.assignments.find(params[:id])
+    @assignment = @context.active_assignments.find(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
@@ -693,7 +839,7 @@ class AssignmentsApiController < ApplicationController
 
   def save_and_render_response
     @assignment.content_being_saved_by(@current_user)
-    if update_api_assignment(@assignment, params[:assignment])
+    if update_api_assignment(@assignment, params[:assignment], @current_user)
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       errors = @assignment.errors.as_json[:errors]

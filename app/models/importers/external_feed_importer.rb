@@ -31,7 +31,7 @@ module Importers
       item.header_match = hash[:header_match] unless hash[:header_match].blank?
 
       item.save!
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
       item
     end
   end

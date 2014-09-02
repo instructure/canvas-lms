@@ -28,7 +28,7 @@ describe Quizzes::QuizSerializer do
     @quiz.context = @context
     @user = User.new
     @quiz.stubs(:locked_for?).returns false
-    @quiz.stubs(:grants_right?).returns true
+    @quiz.stubs(:check_right?).returns true
     @session = stub(:[] => nil)
     controller.stubs(:session).returns session
     controller.stubs(:context).returns context
@@ -331,6 +331,7 @@ describe Quizzes::QuizSerializer do
 
       it "sends nil if user can't grade" do
         course_with_student_logged_in(active_all: true)
+        @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
         serializer = quiz_serializer(scope: @student)
         serializer.as_json[:quiz]['links'].should_not have_key 'unsubmitted_students'
@@ -352,6 +353,7 @@ describe Quizzes::QuizSerializer do
     describe "unsubmitted_students" do
 
       it "sends nil if user can't grade" do
+        @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
         course_with_student_logged_in(active_all: true)
         serializer = quiz_serializer(scope: @student)
@@ -487,6 +489,47 @@ describe Quizzes::QuizSerializer do
     output[:all_dates].detect { |e| e[:base] }.should == teacher_overrides[0]
     output[:all_dates].detect { |e| !e[:base] }.should == teacher_overrides[1]
     output[:due_at].should == quiz.due_at
+  end
+
+  describe "only_visible_to_overrides" do
+    context "as a teacher" do
+      before :once do
+        course_with_teacher_logged_in(active_all: true)
+        course_quiz(true)
+      end
+
+      it "returns the value when the feature flag is on" do
+        @quiz.context.stubs(:feature_enabled?).with(:differentiated_assignments).returns true
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz][:only_visible_to_overrides].should be_true
+
+        @quiz.only_visible_to_overrides = false
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz].should have_key :only_visible_to_overrides
+        json[:quiz][:only_visible_to_overrides].should be_false
+      end
+
+      it "is not in the hash when the feature flag is off" do
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @teacher).as_json
+        json[:quiz].should_not have_key :only_visible_to_overrides
+      end
+    end
+
+    context "as a student" do
+      before :once do
+        course_with_student_logged_in(active_all: true)
+        course_quiz(true)
+      end
+
+      it "is not in the hash" do
+        @quiz.only_visible_to_overrides = true
+        json = quiz_serializer(scope: @student).as_json
+        json[:quiz].should_not have_key :only_visible_to_overrides
+      end
+    end
+
   end
 
 end

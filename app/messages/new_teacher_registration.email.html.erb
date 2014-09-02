@@ -1,5 +1,16 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
-<% define_content :subject do %><%= t :subject, "New Teacher Registration" %><% end %>
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Teacher Registration" %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details, "Click here to view teacher" %>
+  </a>
+<% end %>
 
 <p><%= t :body, "%{user} just registered as a teacher at %{website}.", :user => asset.name, :website => (HostUrl.context_host(asset.latest_pseudonym.account) rescue nil) || HostUrl.default_host %></p>
 
@@ -23,5 +34,3 @@
         <td style="font-weight: bold;"><%= asset.email %></td>
     </tr>
 </table>
-
-<p><a href="<%= content :link %>"><%= t :link, "Click here to view teacher" %></a></p>

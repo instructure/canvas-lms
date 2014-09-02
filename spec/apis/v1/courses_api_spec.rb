@@ -408,7 +408,7 @@ describe CoursesController, type: :request do
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :enrollment_type => 'lamer'
           user
-          @account.add_user @user, 'lamer'
+          @account.account_users.create!(user: @user, membership_type: 'lamer')
           user_session @user
         end
 
@@ -1217,6 +1217,47 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "root account filter" do
+    before do
+      @course1 = course_with_student(account: Account.default, active_all: true).course
+      @course2 = course_with_student(account: account_model(name: 'other root account'), user: @student, active_all: true).course
+    end
+
+    it "should not filter by default" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' })
+      json.map { |c| c['id'] }.should =~ [@course1.id, @course2.id]
+    end
+
+    it "should accept current_domain_only=true" do
+      json = api_call(:get, "/api/v1/courses.json?current_domain_only=true",
+                      { :controller => 'courses', :action => 'index', :format => 'json',
+                        :current_domain_only => 'true' })
+      json.map { |c| c['id'] }.should eql [@course1.id]
+    end
+
+    it "should accept root_account_id=self" do
+      json = api_call(:get, "/api/v1/courses.json?root_account_id=self",
+                      { :controller => 'courses', :action => 'index', :format => 'json',
+                        :root_account_id => 'self' })
+      json.map { |c| c['id'] }.should eql [@course1.id]
+    end
+
+    it "should accept root_account_id=id" do
+      json = api_call(:get, "/api/v1/courses.json?root_account_id=#{@course2.root_account.id}",
+                      { :controller => 'courses', :action => 'index', :format => 'json',
+                        :root_account_id => @course2.root_account.to_param })
+      json.map { |c| c['id'] }.should eql [@course2.id]
+    end
+
+    it "should return an empty result if the given root account does not exist" do
+      json = api_call(:get, "/api/v1/courses.json?root_account_id=0",
+                      { :controller => 'courses', :action => 'index', :format => 'json',
+                        :root_account_id => '0' })
+      json.should eql([])
+    end
+  end
+
   describe "/students" do
     it "should return the list of students for the course" do
       first_user = @user
@@ -1245,7 +1286,7 @@ describe CoursesController, type: :request do
     end
 
     it "should include user sis id and login id if account admin" do
-      @course2.account.add_user(@me)
+      @course2.account.account_users.create!(user: @me)
       first_user = @user
       new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
       @course2.enroll_student(new_user).accept!
@@ -1277,7 +1318,7 @@ describe CoursesController, type: :request do
     end
 
     it "should include user sis id and login id if site admin" do
-      Account.site_admin.add_user(@me)
+      Account.site_admin.account_users.create!(user: @me)
       first_user = @user
       new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
       @course2.enroll_student(new_user).accept!
@@ -1601,7 +1642,7 @@ describe CoursesController, type: :request do
       end
 
       it "should include user sis id and login id if account admin" do
-        @course2.account.add_user(@me)
+        @course2.account.account_users.create!(user: @me)
         first_user = @user
         new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
         @course2.enroll_student(new_user).accept!
@@ -1635,7 +1676,7 @@ describe CoursesController, type: :request do
       end
 
       it "should include user sis id and login id if site admin" do
-        Account.site_admin.add_user(@me)
+        Account.site_admin.account_users.create!(user: @me)
         first_user = @user
         new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
         @course2.enroll_student(new_user).accept!
@@ -1789,6 +1830,19 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "user" do
+    it "should allow searching for user by sis id" do
+      student = student_in_course(course: @course1, name: "student").user
+      pseudonym = pseudonym(student)
+      pseudonym.sis_user_id = "sis_1"
+      pseudonym.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/sis_user_id:#{pseudonym.sis_user_id}.json",
+        { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: "sis_user_id:#{pseudonym.sis_user_id}", :format => 'json' })
+      response.code.should == '200'
+    end
+  end
+
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
@@ -1870,7 +1924,7 @@ describe CoursesController, type: :request do
 
     it "should not find courses in other root accounts" do
       acct = account_model(:name => 'root')
-      acct.add_user(@user)
+      acct.account_users.create!(user: @user)
       course(:account => acct)
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
@@ -2117,6 +2171,16 @@ describe CoursesController, type: :request do
     json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream/summary.json",
                     { controller: "courses", course_id: @course.id.to_s, action: "activity_stream_summary", format: 'json' })
     json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
+  end
+
+  it "should update activity time" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @enrollment.last_activity_at.should be_nil
+    api_call(:post, "/api/v1/courses/#{@course.id}/ping",
+                    { controller: "courses", course_id: @course.id.to_s, action: "ping", format: 'json' })
+    @enrollment.reload
+    @enrollment.last_activity_at.should_not be_nil
   end
 end
 

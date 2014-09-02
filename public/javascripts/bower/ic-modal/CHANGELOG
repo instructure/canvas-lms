@@ -1,0 +1,57 @@
+v0.1.1
+Fri, 18 Apr 2014 14:41:38 GMT
+
+2156aba [added] ModalForm on-cancel action
+
+
+v0.1.0
+Thu, 17 Apr 2014 16:12:55 GMT
+
+b399b85 [added] modal events
+da0fc4c [added] ModalFormComponent as an export of main
+0d714ff [fixed] triggers should not be submit targets
+678768e [fixed] #5 infinite loop on open in jQuery < 1.9
+
+
+v0.0.6
+Wed, 16 Apr 2014 17:19:03 GMT
+
+ec7ca7e [changed] css api, no more content/footer
+
+
+v0.0.5
+Mon, 14 Apr 2014 21:48:47 GMT
+
+
+
+
+v0.0.4
+Mon, 14 Apr 2014 21:47:36 GMT
+
+ac39deb [fixed] cross-browser flex styles
+ade7fa6 [added] modal-form
+0ab8200 [fixed] focus from other tabs, browser chrome, etc
+4dd92fc [added] ic-modal-content, ic-modal-footer
+
+
+v0.0.3
+Mon, 14 Apr 2014 06:35:15 GMT
+
+95438af [added] overflow + responsive styles
+d05173a [changed] template to only render content if open
+a5f2022 [added] on-open, on-close, on-toggle actions
+
+
+v0.0.2
+Sun, 13 Apr 2014 14:49:12 GMT
+
+e2ac72d [added] "open-when" attribute
+2e42e76 [fixed] default close button position
+
+
+v0.0.1
+Sun, 13 Apr 2014 04:00:17 GMT
+
+
+
+

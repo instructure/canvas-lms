@@ -5,9 +5,10 @@ describe "manage groups students" do
   include_examples "in-process server selenium tests"
 
   before (:each) do
-    course_with_teacher_logged_in
-    Account.default.settings[:enable_manage_groups2] = false
-    Account.default.save!
+    pending
+		#course_with_teacher_logged_in
+    #Account.default.settings[:enable_manage_groups2] = false
+    #Account.default.save!
   end
 
   context "misc" do

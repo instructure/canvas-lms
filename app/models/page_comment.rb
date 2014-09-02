@@ -18,6 +18,7 @@
 
 class PageComment < ActiveRecord::Base
   belongs_to :page, :polymorphic => true
+  validates_inclusion_of :page_type, :allow_nil => true, :in => ['EportfolioEntry']
   belongs_to :user
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   attr_accessible :message

@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ActiveRecord::Base do
   describe "count_by_date" do
+    let_once(:account) { Account.create! }
+
     def create_courses(account, start_times)
       start_times.each_with_index do |time, i|
         (i + 1).times do
@@ -37,7 +39,6 @@ describe ActiveRecord::Base do
         Time.zone.now.advance(:days => -2),
         Time.zone.now.advance(:days => -3)
       ]
-      account = Account.create!
       create_courses(account, start_times)
 
       # updated_at
@@ -55,7 +56,6 @@ describe ActiveRecord::Base do
         Time.zone.now.advance(:days => -20),
         Time.zone.now.advance(:days => 1)
       ]
-      account = Account.create!
       create_courses(account, start_times)
 
       # updated_at
@@ -68,7 +68,7 @@ describe ActiveRecord::Base do
   end
 
   describe "find in batches" do
-    before do
+    before :once do
       @c1 = course(:name => 'course1', :active_course => true)
       @c2 = course(:name => 'course2', :active_course => true)
       u1 = user(:name => 'user1', :active_user => true)
@@ -182,7 +182,7 @@ describe ActiveRecord::Base do
   end
 
   context "unique_constraint_retry" do
-    before do
+    before :once do
       @user = user_model
       @assignment = assignment_model
       @orig_user_count = User.count
@@ -302,7 +302,7 @@ describe ActiveRecord::Base do
       ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
     end
     
-    before do
+    before :once do
       @conversation = Conversation.create
       @user = user_model
       @assignment = assignment_model
@@ -376,7 +376,7 @@ describe ActiveRecord::Base do
   end
 
   context "distinct" do
-    before do
+    before :once do
       User.create()
       User.create()
       User.create(:locale => "en")
@@ -475,7 +475,7 @@ describe ActiveRecord::Base do
   end
 
   context "Finder tests" do
-    before(:each) do
+    before :once do
       @user = user_model
     end
 
@@ -506,15 +506,17 @@ describe ActiveRecord::Base do
   end
 
   describe "update_all/delete_all with_joins" do
-    before do
-      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
-
+    before :once do
       @u1 = User.create!(:name => 'a')
       @u2 = User.create!(:name => 'b')
       @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
       @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
       @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
       @p1_2.destroy
+    end
+
+    before do
+      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
     end
 
     it "should do an update all with a join" do
@@ -648,7 +650,7 @@ describe ActiveRecord::Base do
   end
 
   describe ".nulls" do
-    before do
+    before :once do
       @u1 = User.create!
       User.where(id: @u1).update_all(name: nil)
       @u2 = User.create!(name: 'a')

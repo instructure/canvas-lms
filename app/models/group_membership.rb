@@ -45,10 +45,10 @@ class GroupMembership < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  scope :include_user, includes(:user)
+  scope :include_user, -> { includes(:user) }
 
-  scope :active, where("group_memberships.workflow_state<>'deleted'")
-  scope :moderators, where(:moderator => true)
+  scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
+  scope :moderators, -> { where(:moderator => true) }
 
   alias_method :context, :group
 
@@ -93,7 +93,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 

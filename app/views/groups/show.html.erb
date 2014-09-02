@@ -11,6 +11,15 @@
 <% end %>
 
 <% content_for :right_side do %>
+
+  <% if can_do(@context, @current_user, :update) %>
+    <div>
+      <a href="#" id="edit_group">
+        <i class="icon-edit"></i>
+        <%= t 'edit_group',"Edit Group" %>
+      </a>
+    </div>
+  <% end %>
   <% if can_do(@context.announcements.scoped.new, @current_user, :create) %>
     <div><a href="<%= group_announcements_path(@context) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
   <% end %>
@@ -18,7 +27,7 @@
   <% if @current_user %>
     <% cache([@current_user, @context, 'group_upcoming_events' ]) do %>
       <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @context), :locals => locals %>
-    <% end %>  
+    <% end %>
   <% else %>
     <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
   <% end %>
@@ -28,3 +37,10 @@
   <%= render :partial => 'shared/dashboard_messages' %>
   <%= render :partial => 'shared/recent_activity' %>
 </div>
+
+<% js_bundle :student_group_dialog %>
+<% js_env({
+  :student_mode => true,
+  :group => @group.as_json[:group],
+  :group_category => @group.group_category[:group_category]
+})%>

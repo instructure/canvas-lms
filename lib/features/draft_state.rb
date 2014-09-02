@@ -49,7 +49,7 @@ calculations. Caution--disabling this feature may delete newly created or edited
 content from the teacher's view.
 END
     applies_to: 'Course',
-    state: 'allowed',
+    state: 'on',
     root_opt_in: true,
     development: false,
 

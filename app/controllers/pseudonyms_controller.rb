@@ -29,9 +29,6 @@ class PseudonymsController < ApplicationController
   # @API List user logins
   # Given a user ID, return that user's logins for the given account.
   #
-  # @argument user[id] [String]
-  #   The ID of the user to search on.
-  #
   # @response_field account_id The ID of the login's account.
   # @response_field id The unique, numeric ID for the login.
   # @response_field sis_user_id The login's unique SIS id.
@@ -105,7 +102,7 @@ class PseudonymsController < ApplicationController
     @cc = nil if @pseudonym.managed_password?
     @headers = false
     # Allow unregistered users to change password.  How else can they come back later
-    # and finish the registration process? 
+    # and finish the registration process?
     if !@cc || @cc.path_type != 'email'
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
@@ -122,7 +119,7 @@ class PseudonymsController < ApplicationController
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-      if @pseudonym.save
+      if @pseudonym.save_without_session_maintenance
         # If they changed the password (and we subsequently log them in) then
         # we're pretty confident this is the right user, and the communication
         # channel is valid, so register the user and approve the channel.
@@ -164,10 +161,10 @@ class PseudonymsController < ApplicationController
   # @argument login[unique_id] [String]
   #   The unique ID for the new login.
   #
-  # @argument login[password] [String]
+  # @argument login[password] [Optional, String]
   #   The new login's password.
   #
-  # @argument login[sis_user_id] [String]
+  # @argument login[sis_user_id] [Optional, String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def create
@@ -197,7 +194,7 @@ class PseudonymsController < ApplicationController
     @pseudonym = @account.pseudonyms.build(params[:pseudonym])
     @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
-    if @pseudonym.save
+    if @pseudonym.save_without_session_maintenance
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to user_profile_url(@current_user) }
@@ -231,14 +228,14 @@ class PseudonymsController < ApplicationController
   # @API Edit a user login
   # Update an existing login for a user in the given account.
   #
-  # @argument login[unique_id] [String]
+  # @argument login[unique_id] [Optional, String]
   #   The new unique ID for the login.
   #
-  # @argument login[password] [String]
+  # @argument login[password] [Optional, String]
   #   The new password for the login. Can only be set by an admin user if admins
   #   are allowed to change passwords for the account.
   #
-  # @argument login[sis_user_id] [String]
+  # @argument login[sis_user_id] [Optional, String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def update
@@ -255,7 +252,7 @@ class PseudonymsController < ApplicationController
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
     params[:pseudonym].delete :account_id
-    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, nil, :manage_logins)
+    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, :manage_logins)
     unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
       params[:pseudonym].delete :unique_id
       params[:pseudonym].delete :password
@@ -275,7 +272,9 @@ class PseudonymsController < ApplicationController
     params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :password_confirmation, :sis_user_id].include?(k.to_sym) }
     # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
     return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && changed_sis_id
-    if @pseudonym.update_attributes(params[:pseudonym])
+
+    @pseudonym.assign_attributes(params[:pseudonym])
+    if @pseudonym.save_without_session_maintenance
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
         format.html { redirect_to user_profile_url(@current_user) }
@@ -293,8 +292,8 @@ class PseudonymsController < ApplicationController
   # Delete an existing login.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/users/:user_id/logins/:login_id \ 
-  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \ 
+  #   curl https://<canvas>/api/v1/users/:user_id/logins/:login_id \
+  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
   #     -X DELETE
   #
   # @example_response

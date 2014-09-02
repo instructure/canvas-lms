@@ -6,7 +6,7 @@ describe "users" do
   context "logins" do
     it "should allow setting passwords for new pseudonyms" do
       admin = User.create!
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
 
       @user = User.create!

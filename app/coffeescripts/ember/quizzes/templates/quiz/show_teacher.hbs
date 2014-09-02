@@ -6,11 +6,13 @@
       {{/link-to}}
     {{/link-to}}
 
-    {{#link-to 'quiz.moderate' this tagName='li' replace=true}}
-      {{#link-to 'quiz.moderate' this.id replace=true}}
-        {{#t 'moderate'}}Moderate{{/t}}
+    {{#if moderateEnabled}}
+      {{#link-to 'quiz.moderate' this tagName='li' replace=true}}
+        {{#link-to 'quiz.moderate' this.id replace=true}}
+          {{#t 'moderate'}}Moderate{{/t}}
+        {{/link-to}}
       {{/link-to}}
-    {{/link-to}}
+    {{/if}}
 
     {{#link-to 'quiz.statistics' this tagName='li' replace=true}}
       {{#link-to 'quiz.statistics' this.id replace=true}}

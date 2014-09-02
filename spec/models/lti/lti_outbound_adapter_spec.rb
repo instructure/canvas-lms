@@ -53,6 +53,7 @@ describe Lti::LtiOutboundAdapter do
     end
   }
 
+  let(:subject) { adapter }
   let(:adapter) { Lti::LtiOutboundAdapter.new(tool, user, context) }
   let(:lti_consumer_instance) { LtiOutbound::LTIConsumerInstance.new }
   let(:lti_context) {

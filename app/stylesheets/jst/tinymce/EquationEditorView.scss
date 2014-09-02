@@ -1,7 +1,7 @@
 //mathquill.scss is just the stock mathquill.css file that comes with the
 //javascript library.  we had to rename it to be an scss file because
 //sass can only import sass/scss files.
-@import 'mathquill.scss';
+@import 'vendor/mathquill.scss';
 
 /*
  * instructure tweaks of stock mathquill styles

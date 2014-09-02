@@ -70,6 +70,36 @@ its the first-ish css to be applied. This means that you can override
 the CSS of styled components the same as any native element since your
 app's CSS will be applied after.
 
+Vim Config
+----------
+
+If you use vim, add this to your `vimrc` to get css highlighting for
+these templates:
+
+`au BufNewFile,BufRead *-css.hbs set filetype=css`
+
+Use Tags to Style
+-----------------
+
+I know, its been hammered into our brains not to use tagNames when
+writing CSS. But, when you build a component, you are creating a new
+custom element; you should mimick native elements as much as possible.
+Therefore, style it by tagName so everybody consuming your component can
+override styles the same way they override a `<button>`.
+
+About the Implementation
+------------------------
+
+A lot of questions come up, hopefully this answers them:
+
+- all styles are injected into a shared `<style>` tag to avoid the IE
+  issue of only allowing 31 style/link tags
+- this style tag is at the top of the `<head>` so application CSS can
+  override the same way they override native element css
+- styles for a component definition are only injected once, even if the
+  component is used several times
+- a comment is inserted so you can see which component injected the css
+
 Contributing
 ------------
 

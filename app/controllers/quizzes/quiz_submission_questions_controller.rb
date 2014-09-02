@@ -48,9 +48,9 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
-  before_filter :require_question, except: [ :index ]
-  before_filter :prepare_service, except: [ :index, :show ]
-  before_filter :validate_ldb_status!, except: [ :index, :show ]
+  before_filter :require_question, only: [ :show, :flag, :unflag ]
+  before_filter :prepare_service, only: [ :answer, :flag, :unflag ]
+  before_filter :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
 
   # @API Get all quiz submission questions.
   # @beta
@@ -104,10 +104,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     end
   end
 
-  # @API Answering a question.
+  # @API Answering questions
   # @beta
   #
-  # Provide or modify an answer to a QuizQuestion.
+  # Provide or update an answer to one or more QuizQuestions.
   #
   # @argument attempt [Integer]
   #   The attempt number of the quiz submission being taken. Note that this
@@ -121,9 +121,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # @argument access_code [Optional, String]
   #   Access code for the Quiz, if any.
   #
-  # @argument answer [Optional, Mixed]
-  #   The answer to the question. The type and format of this argument depend
-  #   on the question type.
+  # @argument quiz_questions [Array]
+  #   Set of question IDs and the answer value.
   #
   #   See {Appendix: Question Answer Formats} for the accepted answer formats
   #   for each question type.
@@ -133,25 +132,43 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "attempt": 1,
   #    "validation_token": "YOUR_VALIDATION_TOKEN",
   #    "access_code": null,
-  #    "answer": "Hello World!"
+  #    "quiz_questions": [{
+  #      "id": "1",
+  #      "answer": "Hello World!"
+  #    }, {
+  #      "id": "2",
+  #      "answer": 42.0
+  #    }]
   #  }
   def answer
-    unless params.has_key?(:answer)
-      reject! 'missing required parameter :answer', 400
+    unless @quiz_submission.grants_right?(@service.participant.user, :update)
+      reject! 'you are not allowed to update questions for this quiz submission', 403
     end
 
-    serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for @question
-    serialization_rc = serializer.serialize(params[:answer])
+    answers = params.fetch(:quiz_questions, []).reduce({}) do |hsh, p|
+      if p[:id].present? && p[:answer].present?
+        hsh[p[:id].to_i] = p[:answer]
+      end
 
-    unless serialization_rc.valid?
-      reject! serialization_rc.error, 400
+      hsh
     end
 
-    submission_data = @service.update_question(serialization_rc.answer,
-      @quiz_submission,
-      params[:attempt])
+    quiz_questions = @quiz.quiz_questions.where(id: answers.keys)
 
-    render json: quiz_submission_questions_json([ @question ], submission_data)
+    record = quiz_questions.reduce({}) do |hsh, quiz_question|
+      serializer = serializer_for quiz_question
+      serialization_rc = serializer.serialize(answers[quiz_question.id])
+
+      unless serialization_rc.valid?
+        reject! serialization_rc.error, 400
+      end
+
+      hsh.merge serialization_rc.answer
+    end
+
+    submission_data = @service.update_question(record, @quiz_submission, params[:attempt])
+
+    render json: quiz_submission_questions_json(quiz_questions.all, submission_data)
   end
 
   # @API Flagging a question.
@@ -265,6 +282,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
   def extract_includes(key = :include, hash = params)
     Array(hash[key])
+  end
+
+  def serializer_for(quiz_question)
+    Quizzes::QuizQuestion::AnswerSerializers.serializer_for(quiz_question)
   end
 
   # @!appendix Question Answer Formats
