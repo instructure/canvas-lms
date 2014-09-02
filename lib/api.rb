@@ -503,14 +503,13 @@ module Api
       attrs.each do |attr|
         if link = node[attr]
           if link =~ link_regex
-            if link.start_with?('/files')
-              att_id = $1
-              att = Attachment.find_by_id(att_id)
-              if att
-                next if skip_context_types.include?(att.context_type)
-                if context_types.include?(att.context_type)
-                  link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
-                end
+            att_id = $1
+            att = Attachment.find_by_id(att_id)
+            next if att && skip_context_types.include?(att.context_type)
+
+            if att && link.start_with?('/files')
+              if context_types.include?(att.context_type)
+                link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
               end
             end
             if link.include?('verifier=')
