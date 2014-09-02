@@ -261,6 +261,10 @@
       border: 1px solid #8c8d8d;
       left: -9999px;
     }
+
+    &:focus {
+      border: 1px solid #333;
+    }
   }
 
   .star-btn {
@@ -274,14 +278,31 @@
       text-decoration: none;
     }
 
+    &:focus {
+      color: #333;
+    }
+
     &:focus, &.active {
       left: 0;
     }
 
-    &.active:before {
-      color: #fed676;
-      content: "\2605";
-      position: absolute;
+    &.active {
+      &:before, &:after {
+        position: absolute;
+      }
+      &:before {
+        color: #fed676;
+        content: "\2605";
+      }
+      &:focus {
+        color: #333;
+        &:after {
+          content: "\2606";
+          color: #333;
+          z-index: 5;
+          top: 0; left: 0;
+        }
+      }
     }
   }
 }
