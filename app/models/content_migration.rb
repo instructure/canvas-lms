@@ -483,6 +483,18 @@ class ContentMigration < ActiveRecord::Base
     self.migration_type && self.migration_type == 'course_copy_importer'
   end
 
+  def check_cross_institution
+    return unless self.context.is_a?(Course)
+    data = self.context.full_migration_hash
+    return unless data
+    source_root_account_uuid = data[:course] && data[:course][:root_account_uuid]
+    @cross_institution = source_root_account_uuid && source_root_account_uuid != self.context.root_account.uuid
+  end
+
+  def cross_institution?
+    @cross_institution
+  end
+
   def set_date_shift_options(opts)
     if opts && (Canvas::Plugin.value_to_boolean(opts[:shift_dates]) || Canvas::Plugin.value_to_boolean(opts[:remove_dates]))
       self.migration_settings[:date_shift_options] = opts.slice(:shift_dates, :remove_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)

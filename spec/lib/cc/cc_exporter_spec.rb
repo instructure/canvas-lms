@@ -382,6 +382,11 @@ describe "Common Cartridge exporting" do
     it "should not export syllabus if not selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
+      @ce.selected_content = {
+          :everything => "0"
+      }
+      @ce.save!
+
       run_export
       @manifest_doc.at_css('resource[href="course_settings/syllabus.html"]').should be_nil
     end

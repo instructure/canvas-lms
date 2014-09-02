@@ -188,7 +188,7 @@ module Importers
         external_tool_id = nil
         external_tool_url = hash[:url]
 
-        if hash[:linked_resource_global_id]
+        if hash[:linked_resource_global_id] && (!migration || !migration.cross_institution?)
           external_tool_id = hash[:linked_resource_global_id]
         elsif migration && arr = migration.find_external_tool_translation(hash[:linked_resource_id])
           external_tool_id = arr[0]
@@ -201,9 +201,17 @@ module Importers
         end
 
         if external_tool_url
-          external_tool_url = migration.process_domain_substitutions(external_tool_url) if migration
+          title = hash[:title] || hash[:linked_resource_title] || hash['description']
+          if migration
+            external_tool_url = migration.process_domain_substitutions(external_tool_url)
+            if external_tool_id.nil?
+              migration.add_warning(t(:foreign_lti_tool,
+                  %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
+                  :title => title))
+            end
+          end
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
+            :title => title,
             :type => 'context_external_tool',
             :indent => hash[:indent].to_i,
             :url => external_tool_url,

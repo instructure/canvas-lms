@@ -71,6 +71,9 @@ module Importers
       course.external_url_hash = {}
       course.migration_results = []
 
+      migration.check_cross_institution
+      logger.debug "migration is cross-institution; external references will not be used" if migration.cross_institution?
+
       (data['web_link_categories'] || []).map{|c| c['links'] }.flatten.each do |link|
         course.external_url_hash[link['link_id']] = link
       end
@@ -235,7 +238,9 @@ module Importers
         settings[:tab_configuration].each do |tab|
           if tab['id'].is_a?(String) && tab['id'].start_with?('context_external_tool_')
             tool_mig_id = tab['id'].sub('context_external_tool_', '')
-            all_tools ||= ContextExternalTool.find_all_for(course, :course_navigation)
+            all_tools ||= migration.cross_institution? ?
+                course.context_external_tools.having_setting('course_navigation') :
+                ContextExternalTool.find_all_for(course, :course_navigation)
             if tool = (all_tools.detect{|t| t.migration_id == tool_mig_id} ||
                 all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id})
               # translate the migration_id to a real id

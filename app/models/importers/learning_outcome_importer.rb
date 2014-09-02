@@ -25,15 +25,18 @@ module Importers
       hash = hash.with_indifferent_access
       outcome = nil
       if !item && hash[:external_identifier]
-        if hash[:is_global_outcome]
-          outcome = LearningOutcome.active.find_by_id_and_context_id(hash[:external_identifier], nil)
-        else
-          outcome = context.available_outcome(hash[:external_identifier])
-        end
+        unless migration.cross_institution?
+          if hash[:is_global_outcome]
+            outcome = LearningOutcome.active.find_by_id_and_context_id(hash[:external_identifier], nil)
+          else
+            outcome = context.available_outcome(hash[:external_identifier])
+          end
 
-        if outcome
-          # Help prevent linking to the wrong outcome if copying into a different install of canvas
-          outcome = nil if outcome.short_description != hash[:title]
+          if outcome
+            # Help prevent linking to the wrong outcome if copying into a different install of canvas
+            # (using older migration packages that lack the root account uuid)
+            outcome = nil if outcome.short_description != hash[:title]
+          end
         end
 
         if !outcome
@@ -47,7 +50,7 @@ module Importers
             # import from vendor with global outcomes
             context = nil
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-            item ||= LearningOutcome.global.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+            item ||= LearningOutcome.global.find_by_migration_id(hash[:migration_id]) if hash[:migration_id] && !migration.cross_institution?
             item ||= LearningOutcome.global.find_by_vendor_guid(hash[:vendor_guid]) if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else

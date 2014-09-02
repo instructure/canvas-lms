@@ -251,7 +251,7 @@ class ContentExport < ActiveRecord::Base
   #   
   # Returns: bool
   def export_symbol?(symbol)
-    is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
+    selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
   def add_item_to_export(obj, type=nil)

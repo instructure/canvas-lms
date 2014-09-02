@@ -17,14 +17,16 @@ module Importers
           bank = nil
           bank_context = nil
 
-          if hash[:question_bank_context] =~ /account_(\d*)/
-            bank_context = Account.find_by_id($1)
-          elsif hash[:question_bank_context] =~ /course_(\d*)/
-            bank_context = Course.find_by_id($1)
-          end
+          unless migration.cross_institution?
+            if hash[:question_bank_context] =~ /account_(\d*)/
+              bank_context = Account.find_by_id($1)
+            elsif hash[:question_bank_context] =~ /course_(\d*)/
+              bank_context = Course.find_by_id($1)
+            end
 
-          if bank_context
-            bank = bank_context.assessment_question_banks.find_by_id(hash[:question_bank_migration_id])
+            if bank_context
+              bank = bank_context.assessment_question_banks.find_by_id(hash[:question_bank_migration_id])
+            end
           end
 
           if bank
