@@ -4,7 +4,7 @@ body, html
   height: 100%
 body
   @if not $use_high_contrast
-    +bg-image('blue/bg', 'jpg', repeat, left, top, transparent, 150px, 150px)
+    background-color: #f7f7f7    
   min-width: $min_main_width
 
   &.no-headers, &.embedded
@@ -41,6 +41,7 @@ body
       h2, .h2
         display: none
     .embedded-footer
+
       position: absolute
       bottom: 0
       width: 100%
@@ -77,9 +78,9 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $bodyBackground
-  border: 1px solid $listBorderColor
-  border-top: 0
+  background-color: $bodyBackground  
+  border: 1px solid #eee;
+  border-top: none;
   margin-bottom: 40px
   +pie-clearfix
   min-height: 450px
