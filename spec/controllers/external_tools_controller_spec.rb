@@ -393,6 +393,7 @@ describe ExternalToolsController do
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
     <blti:extensions platform="canvas.instructure.com">
       <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:property name="not_selectable">true</lticm:property>
       <lticm:options name="editor_button">
         <lticm:property name="url">http://example.com/editor</lticm:property>
         <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
@@ -414,6 +415,7 @@ describe ExternalToolsController do
       assigns[:tool].url.should == "http://example.com/other_url"
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
+      assigns[:tool].not_selectable.should == "true"
       assigns[:tool].has_placement?(:editor_button).should be_true
     end
 

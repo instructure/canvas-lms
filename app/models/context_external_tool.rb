@@ -13,7 +13,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :resource_selection, :editor_button, :homework_submission,
                   :course_home_sub_navigation, :course_settings_sub_navigation,
                   :config_type, :config_url, :config_xml, :tool_id,
-                  :integration_type
+                  :integration_type, :not_selectable
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -265,6 +265,18 @@ class ContextExternalTool < ActiveRecord::Base
 
   def text
     settings[:text]
+  end
+
+  def not_selectable=(bool)
+    settings[:not_selectable] = Canvas::Plugin.value_to_boolean(bool)
+  end
+
+  def not_selectable
+    settings[:not_selectable]
+  end
+
+  def selectable
+    !not_selectable
   end
 
   def shared_secret=(val)

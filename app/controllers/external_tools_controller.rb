@@ -41,6 +41,9 @@ class ExternalToolsController < ApplicationController
   # @argument search_term [String]
   #   The partial name of the tools to match and return.
   #
+  # @argument selectable [Boolean]
+  #   If true, then only tools that are meant to be selectable are returned
+  #
   # @example_response
   #     [
   #      {
@@ -80,6 +83,10 @@ class ExternalToolsController < ApplicationController
         @tools = @context.context_external_tools.active
       end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
+
+      if Canvas::Plugin.value_to_boolean(params[:selectable])
+        @tools = @tools.select{|t| t.selectable }
+      end
       respond_to do |format|
         @tools = Api.paginate(@tools, self, tool_pagination_url)
         format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
@@ -553,6 +560,10 @@ class ExternalToolsController < ApplicationController
   # @argument text [String]
   #   The default text to show for this tool
   #
+  # @argument not_selectable [Boolean]
+  #   Default: false, if set to true the tool won't show up in the external tool
+  #   selection UI in modules and assignments
+  #
   # @argument custom_fields [String]
   #   Custom fields that will be sent to the tool consumer, specified as
   #   custom_fields[field_name]
@@ -757,7 +768,7 @@ class ExternalToolsController < ApplicationController
   def set_tool_attributes(tool, params)
     attrs = ContextExternalTool::EXTENSION_TYPES
     attrs += [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
-              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
+              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable]
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end

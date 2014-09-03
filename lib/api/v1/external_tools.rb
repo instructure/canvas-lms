@@ -37,6 +37,7 @@ module Api::V1::ExternalTools
     json['selection_width'] = tool.settings[:selection_width] if tool.settings.key? :selection_width
     json['selection_height'] = tool.settings[:selection_height] if tool.settings.key? :selection_height
     json['icon_url'] = tool.settings[:icon_url] if tool.settings.key? :icon_url
+    json['not_selectable'] = tool.not_selectable
     extension_types.each do |type|
       if json[type]
         json[type]['label'] = tool.label_for(type, user.locale)

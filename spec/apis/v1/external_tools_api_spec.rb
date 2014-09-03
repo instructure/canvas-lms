@@ -41,6 +41,10 @@ describe ExternalToolsController, type: :request do
       search_call(@course)
     end
 
+    it "should only find selectable tools" do
+      only_selectables(@course)
+    end
+
     it "should create an external tool" do
       create_call(@course)
     end
@@ -214,6 +218,10 @@ describe ExternalToolsController, type: :request do
       search_call(@account, "account")
     end
 
+    it "should only find selectable tools" do
+      only_selectables(@account, "account")
+    end
+
     it "should create an external tool" do
       create_call(@account, "account")
     end
@@ -301,6 +309,18 @@ describe ExternalToolsController, type: :request do
     json.map{|h| h['id']}.sort.should == ids.sort
   end
 
+  def only_selectables(context, type="course")
+    context.context_external_tools.create!(:name => "first", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti", :not_selectable => true)
+    not_selectable = context.context_external_tools.create!(:name => "second", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti")
+
+    json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?selectable=true",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :"#{type}_id" => context.id.to_s, :selectable => 'true'})
+
+    json.length.should == 1
+    json.first['id'].should == not_selectable.id
+  end
+
   def create_call(context, type="course")
     json = api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
                     {:controller => 'external_tools', :action => 'create', :format => 'json',
@@ -383,6 +403,7 @@ describe ExternalToolsController, type: :request do
     et.description = "For testing stuff"
     et.consumer_key = "oi"
     et.shared_secret = "hoyt"
+    et.not_selectable = true
     et.url = "http://www.example.com/ims/lti"
     et.workflow_state = 'public'
     et.custom_fields = {:key1 => 'val1', :key2 => 'val2'}
@@ -459,6 +480,7 @@ describe ExternalToolsController, type: :request do
      "domain"=>nil,
      "url"=>"http://www.example.com/ims/lti",
      "id"=>et ? et.id : nil,
+     "not_selectable"=> et ? et.not_selectable : nil,
      "workflow_state"=>"public",
      "vendor_help_link"=>nil,
      "resource_selection"=>
