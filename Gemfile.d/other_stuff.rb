@@ -24,6 +24,7 @@ if CANVAS_RAILS2
   gem 'rack', '1.1.3'
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
+  gem 'shackles', '1.0.5'
 else
   gem 'rails', '3.2.19'
   gem 'active_model_serializers', '0.9.0alpha1',
@@ -35,9 +36,10 @@ else
   gem 'rails-patch-json-encode', '0.0.1'
   gem 'rack', '1.4.5'
   gem 'routing_concerns', '0.1.0'
-  gem 'switchman', '1.2.15'
+  gem 'switchman', '1.2.17'
   gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
+  gem 'shackles', '1.0.7'
 end
 
 gem "aws-sdk", '1.21.0'
@@ -103,7 +105,6 @@ gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
   gem 'hashie', '2.0.5'
 gem 'sanitize', '2.0.3'
-gem 'shackles', '1.0.5'
 
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.10.0'
