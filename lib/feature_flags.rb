@@ -106,8 +106,12 @@ module FeatureFlags
 
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
-    account_ids = feature_flag_account_ids
-    accounts = Account.find_all_by_id(account_ids, :select => :id).sort_by{|a| account_ids.index(a.global_id)}
+    accounts = feature_flag_account_ids.map do |id|
+      account = Account.new
+      account.id = id
+      account.readonly!
+      account
+    end
     (accounts + [self]).each do |context|
       flag = context.feature_flag(feature)
       next unless flag
