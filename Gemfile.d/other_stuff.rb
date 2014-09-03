@@ -21,7 +21,7 @@ gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_erro
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
 gem 'routing_concerns', '0.1.0'
-gem 'switchman', '1.2.15'
+gem 'switchman', '1.2.16'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -89,7 +89,7 @@ gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
   gem 'hashie', '2.0.5'
 gem 'sanitize', '2.0.3'
-gem 'shackles', '1.0.5'
+gem 'shackles', '1.0.7'
 
 gem 'useragent', '0.10.0'
 gem 'uuid', '2.3.2'
