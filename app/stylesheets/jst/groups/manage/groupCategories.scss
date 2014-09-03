@@ -9,6 +9,7 @@
     border-bottom: 0px;
   }
   > .tab-panel {
+    position: relative;
     // moved from tab ul, because IE9 is dumb
     border-top: 1px solid #aaaaaa;
   }
