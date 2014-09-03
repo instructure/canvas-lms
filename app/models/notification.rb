@@ -54,6 +54,8 @@ class Notification < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
+  after_create { self.class.reset_cache! }
+
   workflow do
     state :active do
       event :deactivate, :transitions_to => :inactive
@@ -74,21 +76,21 @@ class Notification < ActiveRecord::Base
   end
 
   def self.all
-    @all ||= super
+    @all ||= super.to_a.each(&:readonly!)
+  end
+
+  def self.find(id, options = {})
+    (@all_by_id ||= all.index_by(&:id))[id] or raise ActiveRecord::RecordNotFound
   end
 
   def self.by_name(name)
-    if notification = notifications[name]
-      copy = notification.clone
-      copy.id = notification.id
-      copy.send(:remove_instance_variable, :@new_record)
-      copy
-    end
+    notifications[name]
   end
 
   def self.reset_cache!
     @all = nil
     @notifications = nil
+    @all_by_id = nil
   end
 
   def infer_default_content

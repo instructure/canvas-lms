@@ -25,7 +25,7 @@ class DelayedNotification < ActiveRecord::Base
     'CommunicationChannel', 'CalendarEvent', 'ConversationMessage', 'DiscussionEntry',
     'SubmissionComment', 'Quizzes::QuizSubmission', 'DiscussionTopic', 'Course', 'Enrollment',
     'WikiPage', 'GroupMembership', 'WebConference']
-  belongs_to :notification
+  include NotificationPreloader
   belongs_to :asset_context, :polymorphic => true
   validates_inclusion_of :asset_context_type, :allow_nil => true, :in => ['Account', 'Group', 'Course']
 

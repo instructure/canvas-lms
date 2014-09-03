@@ -68,13 +68,6 @@ describe Notification do
       Notification.by_name("foo").should eql(@foo)
       Notification.by_name("bar").should eql(@bar)
     end
-
-    it "should give you different object for the same notification" do
-      n1 = Notification.by_name("foo")
-      n2 = Notification.by_name("foo")
-      n1.should eql n2
-      n1.should_not equal n2
-    end
   end
 end
 

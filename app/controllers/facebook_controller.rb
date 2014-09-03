@@ -27,7 +27,7 @@ class FacebookController < ApplicationController
       @old_policies = @cc.notification_policies.to_a
       @policies = []
       params[:types].each do |type, frequency|
-        notifications = Notification.find_all_by_category(type)
+        notifications = Notification.all.select { |n| n.category == type }
         notifications.each do |notification|
           pref = @old_policies.find { |p| p.notification_id == notification.id }
           pref ||= @cc.notification_policies.build

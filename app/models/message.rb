@@ -38,7 +38,7 @@ class Message < ActiveRecord::Base
   belongs_to :asset_context, :polymorphic => true
   belongs_to :communication_channel
   belongs_to :context, :polymorphic => true
-  belongs_to :notification
+  include NotificationPreloader
   belongs_to :user
   belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context

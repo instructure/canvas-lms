@@ -20,7 +20,7 @@ class DelayedMessage < ActiveRecord::Base
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
-  belongs_to :notification
+  include NotificationPreloader
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
@@ -38,7 +38,7 @@ class DelayedMessage < ActiveRecord::Base
   validates_presence_of :communication_channel_id, :workflow_state
 
   before_save :set_send_at
-  
+
   def summary=(val)
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:summary, val)
@@ -105,7 +105,7 @@ class DelayedMessage < ActiveRecord::Base
   # should be deliverable. After this is run on a list of delayed messages,
   # the regular dispatch process will take place. 
   def self.summarize(delayed_message_ids)
-    delayed_messages = DelayedMessage.includes(:notification).find_all_by_id(delayed_message_ids.uniq).compact
+    delayed_messages = DelayedMessage.find_all_by_id(delayed_message_ids.uniq).compact
     uniqs = {}
     # only include the most recent instance of each notification-context pairing
     delayed_messages.each do |m|
