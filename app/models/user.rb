@@ -2534,4 +2534,35 @@ class User < ActiveRecord::Base
   def content_exports_visible_to(user)
     self.content_exports.where(user_id: user)
   end
+
+  def show_bouncing_channel_message!
+    self.preferences[:show_bouncing_channel_message] = true
+    self.save!
+  end
+
+  def show_bouncing_channel_message?
+    !!self.preferences[:show_bouncing_channel_message]
+  end
+
+  def dismiss_bouncing_channel_message!
+    self.preferences[:show_bouncing_channel_message] = false
+    self.save!
+  end
+
+  def bouncing_channel_message_dismissed?
+    self.preferences[:show_bouncing_channel_message] == false
+  end
+
+  def update_bouncing_channel_message!(channel=nil)
+    force_set_bouncing = channel && channel.bouncing? && !channel.imported?
+    set_bouncing = force_set_bouncing || self.communication_channels.unretired.any? { |cc| cc.bouncing? && !cc.imported? }
+
+    if force_set_bouncing
+      show_bouncing_channel_message!
+    elsif set_bouncing
+      show_bouncing_channel_message! unless bouncing_channel_message_dismissed?
+    else
+      dismiss_bouncing_channel_message!
+    end
+  end
 end
