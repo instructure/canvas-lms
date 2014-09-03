@@ -20,10 +20,6 @@ define [
         rootTillCurrentFolder: undefined
       }
 
-
-
-
-
     mixins: [MultiselectableMixin]
 
     # for MultiselectableMixin
