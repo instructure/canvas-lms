@@ -117,7 +117,6 @@ class Worker
 
     if job
       configure_for_job(job) do
-        ensure_db_connection
         @job_count += perform(job)
 
         if @max_job_count > 0 && @job_count >= @max_job_count
@@ -174,7 +173,6 @@ class Worker
         job.source = parent_job.source
         job.create_and_lock!(name)
         configure_for_job(job) do
-          ensure_db_connection
           perform(job)
         end
       end
@@ -227,16 +225,6 @@ class Worker
   ensure
     ENV['TMPDIR'] = previous_tmpdir if @make_tmpdir
     Thread.current[:context] = nil
-  end
-
-  def ensure_db_connection
-    begin
-      ActiveRecord::Base.connection.execute("select 1")
-    rescue ActiveRecord::StatementInvalid
-      ActiveRecord::Base.connection.reconnect!
-      # if this fails again, it'll raise the error up
-      ActiveRecord::Base.connection.execute("select 1")
-    end
   end
 
   def self.current_job
