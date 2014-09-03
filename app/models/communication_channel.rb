@@ -44,6 +44,7 @@ class CommunicationChannel < ActiveRecord::Base
   validate :uniqueness_of_path
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   validates_presence_of :access_token_id, if: lambda { |cc| cc.path_type == TYPE_PUSH }
+  after_commit :check_if_bouncing_changed
 
   acts_as_list :scope => :user
 
@@ -385,6 +386,29 @@ class CommunicationChannel < ActiveRecord::Base
   def bouncing?
     self.bounce_count >= RETIRE_THRESHOLD
   end
+
+  def was_bouncing?
+    old_bounce_count = self.previous_changes[:bounce_count].try(:first)
+    old_bounce_count ||= self.bounce_count
+    old_bounce_count >= RETIRE_THRESHOLD
+  end
+
+  def was_retired?
+    old_workflow_state = self.previous_changes[:workflow_state].try(:first)
+    old_workflow_state ||= self.workflow_state
+    old_workflow_state.to_s == 'retired'
+  end
+
+  def check_if_bouncing_changed
+    if retired?
+      self.user.update_bouncing_channel_message!(self) if !was_retired? && was_bouncing?
+    else
+      if (was_retired? && bouncing?) || (was_bouncing? != bouncing?)
+        self.user.update_bouncing_channel_message!(self)
+      end
+    end
+  end
+  private :check_if_bouncing_changed
 
   def self.bounce_for_path(path)
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do

@@ -37,6 +37,12 @@
   <noscript><div role="alert" class="ic-flash-static ic-flash-error"><h1><%= t :javascript_required, "You need to have JavaScript enabled in order to access this site." %></h1></div></noscript>
   <%= render :partial => 'shared/flash_notices' %>
 
+  <% if @current_user.try(:show_bouncing_channel_message?) %>
+    <div role="alert" class="ic-flash-static ic-flash-warning">
+    <%= t(:bouncing_communication_channels, "There appears to be a problem with one of your contact methods. Please check your *Settings Page*.", wrapper: link_to('\1', settings_profile_path)) %>
+    </div>
+  <% end %>
+
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <div id="header-inner">
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
