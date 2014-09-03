@@ -327,6 +327,21 @@ class ActiveRecord::Base
     value
   end
 
+  def self.coalesced_wildcard(*args)
+    value = args.pop
+    value = wildcard_pattern(value)
+    cols = coalesce_chain(args)
+    sanitize_sql_array ["(#{like_condition(cols, '?', false)})", value]
+  end
+
+  def self.coalesce_chain(cols)
+    "(#{cols.map{|col| coalesce_clause(col)}.join(" || ' ' || ")})"
+  end
+
+  def self.coalesce_clause(column)
+    "COALESCE(LOWER(#{column}), '')"
+  end
+
   def self.like_condition(value, pattern = '?', downcase = true)
     case connection.adapter_name
       when 'SQLite'
