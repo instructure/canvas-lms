@@ -158,6 +158,31 @@
 #           "items": {
 #             "$ref": "Array"
 #           }
+#         },
+#         "batch_mode": {
+#           "description": "Whether the import was run in batch mode.",
+#           "example": "true",
+#           "type": "boolean"
+#         },
+#         "batch_mode_term_id": {
+#           "description": "The term the batch was limited to.",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "override_sis_stickiness": {
+#           "description": "Whether UI changes were overridden.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "add_sis_stickiness": {
+#           "description": "Whether stickiness was added to the batch changes.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "clear_sis_stickiness": {
+#           "description": "Whether stickiness was cleared.",
+#           "example": "false",
+#           "type": "boolean"
 #         }
 #       }
 #     }

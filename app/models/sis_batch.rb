@@ -242,7 +242,12 @@ class SisBatch < ActiveRecord::Base
       "progress" => self.progress,
       "id" => self.id,
       "workflow_state" => self.workflow_state,
-      "data" => self.data
+      "data" => self.data,
+      "batch_mode" => self.batch_mode,
+      "batch_mode_term_id" => self.batch_mode_term ? self.batch_mode_term.id : nil,
+      "override_sis_stickiness" => self.options[:override_sis_stickiness],
+      "add_sis_stickiness" => self.options[:add_sis_stickiness],
+      "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
