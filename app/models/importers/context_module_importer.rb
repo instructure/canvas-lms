@@ -5,6 +5,36 @@ module Importers
 
     MAX_URL_LENGTH = 2000
 
+    def self.linked_resource_type_class(type)
+      case type
+        when /wiki_type|wikipage/i
+          WikiPage
+        when /page_type|file_type|attachment/i
+          Attachment
+        when /assignment|project/i
+          Assignment
+        when /discussion|topic/i
+          DiscussionTopic
+        when /assessment|quiz/i
+          Quizzes::Quiz
+        when /contextexternaltool/i
+          ContextExternalTool
+      end
+    end
+
+    def self.select_linked_module_items(data, migration)
+      return if migration.import_everything?
+      (data['modules'] || []).each do |mod|
+        if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
+          (mod['items'] || []).each do |item|
+            if resource_class = linked_resource_type_class(item['linked_resource_type'])
+              migration.import_object!(resource_class.table_name, item['linked_resource_id'])
+            end
+          end
+        end
+      end
+    end
+
     def self.process_migration(data, migration)
       modules = data['modules'] ? data['modules'] : []
       modules.each do |mod|
@@ -102,7 +132,8 @@ module Importers
       migration.add_imported_item(existing_item) if migration
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
-      if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
+      resource_class = linked_resource_type_class(hash[:linked_resource_type])
+      if resource_class == WikiPage
         wiki = context_module.context.wiki.wiki_pages.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
         if wiki
           item = context_module.add_item({
@@ -112,8 +143,7 @@ module Importers
             :indent => hash[:indent].to_i
           }, existing_item, :wiki_page => wiki, :position => context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
-        # this is a file of some kind
+      elsif resource_class == Attachment
         file = context_module.context.attachments.active.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
         if file
           title = hash[:title] || hash[:linked_resource_title]
@@ -124,8 +154,7 @@ module Importers
             :indent => hash[:indent].to_i
           }, existing_item, :attachment => file, :position => context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] =~ /assignment|project/i
-        # this is a file of some kind
+      elsif resource_class == Assignment
         ass = context_module.context.assignments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
         if ass
           item = context_module.add_item({
@@ -154,7 +183,7 @@ module Importers
             :url => url
           }, existing_item, :position => context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] =~ /contextexternaltool/i
+      elsif resource_class == ContextExternalTool
         # external tool
         external_tool_id = nil
         external_tool_url = hash[:url]
@@ -181,7 +210,7 @@ module Importers
             :id => external_tool_id
           }, existing_item, :position => context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] =~ /assessment|quiz/i
+      elsif resource_class == Quizzes::Quiz
         quiz = context_module.context.quizzes.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
         if quiz
           item = context_module.add_item({
@@ -191,7 +220,7 @@ module Importers
             :id => quiz.id
           }, existing_item, :quiz => quiz, :position => context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] =~ /discussion|topic/i
+      elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
         if topic
           item = context_module.add_item({

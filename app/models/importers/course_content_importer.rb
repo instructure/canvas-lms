@@ -77,6 +77,7 @@ module Importers
       ActiveRecord::Base.skip_touch_context
 
       if !migration.for_course_copy?
+        Importers::ContextModuleImporter.select_linked_module_items(data, migration)
         # These only need to be processed once
         Attachment.skip_media_object_creation do
           self.process_migration_files(course, data, migration); migration.update_import_progress(18)
