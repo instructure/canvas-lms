@@ -1,5 +1,5 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/rubrics/<%= asset.rubric_id %>
+<%= HostUrl.protocol %>://#{primary_host}/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/rubrics/<%= asset.rubric_id %>
 <% end -%>
 
 <%= t('#messages.peer_review_invitation.twitter.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => asset.asset.user.name)%>
