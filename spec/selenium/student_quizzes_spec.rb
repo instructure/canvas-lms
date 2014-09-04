@@ -22,39 +22,6 @@ describe "quizzes" do
     end
 
     context "taking a timed quiz" do
-      it "should warn the student before the due date is exceeded" do
-        @context = @course
-        bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-        q = quiz_model
-        a = bank.assessment_questions.create!
-        b = bank.assessment_questions.create!
-        answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
-        question = q.quiz_questions.create!(:question_data => {
-          :name => "first question",
-          'question_type' => 'multiple_choice_question',
-          'answers' => answers,
-          :points_possible => 1
-        }, :assessment_question => a)
-
-        q.generate_quiz_data
-        q.due_at = Time.now.utc + 20.seconds
-        q.save!
-
-        get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
-        f("#take_quiz_link").click
-        answer_one = f("#question_#{question.id}_answer_1")
-        answer_two = f("#question_#{question.id}_answer_2")
-
-        # force a save to create a submission
-        answer_one.click
-        wait_for_ajaximations
-
-        keep_trying_until do
-          submission = Quizzes::QuizSubmission.last
-          fj('#times_up_dialog:visible').should be_present
-        end
-      end
-
       it "should warn the student before the lock date is exceeded" do
         @context = @course
         bank = @course.assessment_question_banks.create!(:title => 'Test Bank')

@@ -43,6 +43,8 @@ define([
     var timeMod = 0,
         endAt = $(".end_at"),
         endAtParsed = endAt.text() && new Date(endAt.text()),
+        dueAt = $(".due_at"),
+        dueAtParsed = dueAt.text() && new Date(dueAt.text()),
         startedAt = $(".started_at"),
         inBackground = false,
         $countdownSeconds = $(".countdown_seconds"),
@@ -64,6 +66,7 @@ define([
       startedAt: startedAt,
       hasTimeLimit: !!ENV.QUIZ.time_limit,
       timeLeft: parseInt($(".time_left").text()) * 1000,
+      timeToDueDate: dueAtParsed - new Date(),
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
       finalSubmitButtonClicked: false,
@@ -192,6 +195,10 @@ define([
 
       updateTime: function() {
         var currentTimeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
+        var currentTimeToDueDate = null;
+        if (quizSubmission.timeToDueDate > 0) {
+          currentTimeToDueDate = quizSubmission.timeToDueDate = quizSubmission.timeToDueDate - quizSubmission.clockInterval;
+        }
         var now = new Date();
         var endAt = quizSubmission.endAt.text();
 
@@ -214,6 +221,11 @@ define([
 
         if(quizSubmission.isTimeUp(currentTimeLeft)) {
           quizSubmission.showTimeUpDialog(now);
+        } else if(currentTimeToDueDate != null && currentTimeLeft > currentTimeToDueDate) {
+          quizSubmission.showDueDateWarnings(currentTimeToDueDate);
+          quizSubmission.showWarnings(currentTimeLeft);
+        } else if(currentTimeLeft == null) {
+          quizSubmission.showDueDateWarnings(currentTimeToDueDate);
         } else {
           quizSubmission.showWarnings(currentTimeLeft);
         }
@@ -231,20 +243,28 @@ define([
       isTimeUp: function(currentTimeLeft) {
         return currentTimeLeft < 1000 && !quizSubmission.dialogged;
       },
-
+      showDueDateWarnings: function(currentTimeToDueDate) {
+        if(currentTimeToDueDate > 30000 && currentTimeToDueDate < 60000 && !quizSubmission.oneMinuteDueDateDeadline) {
+          quizSubmission.oneMinuteDueDateDeadline = true;
+          $.flashMessage(I18n.t('notices.due_date_one_minute_left', "One Minute Left Before Quiz Will Be Marked Late"));
+        } else if(currentTimeToDueDate > 250000 && currentTimeToDueDate < 300000 && !quizSubmission.fiveMinuteDueDateDeadline) {
+          quizSubmission.fiveMinuteDueDateDeadline = true;
+          $.flashMessage(I18n.t('notices.due_date_five_minutes_left', "Five Minutes Left Before Quiz Will Be Marked Late"));
+        } else if(currentTimeToDueDate > 1770000 && currentTimeToDueDate < 1800000 && !quizSubmission.thirtyMinuteDueDateDeadline) {
+          quizSubmission.thirtyMinuteDueDateDeadline = true;
+          $.flashMessage(I18n.t('notices.due_date_thirty_minutes_left', "Thirty Minutes Left Before Quiz Will Be Marked Late"));
+        }
+      },
       showWarnings: function(currentTimeLeft) {
         if(currentTimeLeft > 30000 && currentTimeLeft < 60000 && !quizSubmission.oneMinuteDeadline) {
           quizSubmission.oneMinuteDeadline = true;
-          $.flashMessage(I18n.t('notices.one_minute_left', "One Minute Left"));
+          $.flashWarning(I18n.t('notices.submission_one_minute_left', "This Quiz Will Be Submitted In One Minute"), 5000);
         } else if(currentTimeLeft > 250000 && currentTimeLeft < 300000 && !quizSubmission.fiveMinuteDeadline) {
           quizSubmission.fiveMinuteDeadline = true;
-          $.flashMessage(I18n.t('notices.five_minutes_left', "Five Minutes Left"));
-        } else if(currentTimeLeft > 1800000 && currentTimeLeft < 1770000 && !quizSubmission.thirtyMinuteDeadline) {
+          $.flashWarning(I18n.t('notices.submission_five_minutes_left', "This Quiz Will Be Submitted In Five Minutes"), 5000);
+        } else if(currentTimeLeft > 1770000 && currentTimeLeft < 1800000 && !quizSubmission.thirtyMinuteDeadline) {
           quizSubmission.thirtyMinuteDeadline = true;
-          $.flashMessage(I18n.t('notices.thirty_minutes_left', "Thirty Minutes Left"));
-        } else if(currentTimeLeft > 43200000 && currentTimeLeft < 43170000 && !quizSubmission.twelveHourDeadline) {
-          quizSubmission.twelveHourDeadline = true;
-          $.flashMessage(I18n.t('notices.twelve_hours_left', "Twelve Hours Left"));
+          $.flashWarning(I18n.t('notices.submission_thirty_minutes_left', "This Quiz Will Be Submitted In Thirty Minutes"), 5000);
         }
       },
 

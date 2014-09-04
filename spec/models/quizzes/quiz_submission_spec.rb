@@ -525,7 +525,6 @@ describe Quizzes::QuizSubmission do
     end
 
     it "should not set graded_at to be in the future" do
-      @quiz_sub.end_at.should_not be_nil
       @submission.graded_at.to_i.should <= Time.zone.now.to_i
     end
   end
