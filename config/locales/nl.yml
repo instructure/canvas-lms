@@ -9921,16 +9921,6 @@ nl:
       updated_wiki_page: "Wiki-pagina bijgewerkt"
       web_conference_invitation: "Uitnodiging voor onlinevergadering"
     no_subject: "Geen onderwerp"
-    other_description: |-
-        *Alleen cursusleider en beheerder:*
-        
-        * Cursusinschrijving
-        * Rapport gegenereerd
-        * Export van inhoud
-        * Migratie rapport
-        * Nieuwe accountgebruiker
-        * Registratie van nieuwe docent
-        * Nieuwe groep cursisten
     other_display: "Administratieve meldingen"
     reminder_display: Herinnering
     student_appointment_description: |-
