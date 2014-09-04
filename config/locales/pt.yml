@@ -9941,16 +9941,6 @@ pt:
       updated_wiki_page: "Atualizar página do wiki"
       web_conference_invitation: "Convite da webconferência"
     no_subject: "Sem assunto"
-    other_description: |-
-        *Apenas Instrutor e Administrador:*
-        
-        * Inscrição em disciplina
-        * Relatório criado
-        * Exportação de conteúdo
-        * Relatório de migração
-        * Nova conta de utilizador
-        * Registo de novo professor
-        * Novo grupo de alunos
     other_display: "Notificações administrativas"
     reminder_display: Lembrete
     student_appointment_description: |-
