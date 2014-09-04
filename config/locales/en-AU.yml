@@ -9962,16 +9962,6 @@ en-AU:
       updated_wiki_page: "Updated Wiki Page"
       web_conference_invitation: "Web Conference Invitation"
     no_subject: "No Subject"
-    other_description: |-
-        *Instructor and Admin only:*
-        
-        * Course enrollment
-        * Report generated
-        * Content export
-        * Migration report
-        * New account user
-        * New teacher registration
-        * New student group
     other_display: "Administrative Notifications"
     reminder_display: Reminder
     student_appointment_description: |-
