@@ -335,6 +335,39 @@ describe ApplicationController do
       I18n.locale.to_s.should == "ru"
     end
   end
+
+  describe 'rescue_action_in_public' do
+    context 'sharding' do
+      specs_require_sharding
+
+      before do
+        @shard2.activate do
+          @account = account_model
+        end
+      end
+
+      it 'should log error reports to the domain_root_accounts shard' do
+        ErrorReport.stubs(:log_exception).returns(ErrorReport.new)
+        ErrorReport.stubs(:useful_http_env_stuff_from_request).returns({})
+
+        req = mock()
+        req.stubs(:url).returns('url')
+        req.stubs(:headers).returns({})
+        req.stubs(:request_method_symbol).returns(:get)
+        req.stubs(:format).returns('format')
+
+        controller.stubs(:request).returns(req)
+        controller.stubs(:api_request?).returns(false)
+        controller.stubs(:render_rescue_action)
+
+        controller.instance_variable_set(:@domain_root_account, @account)
+
+        @shard2.expects(:activate).twice
+
+        controller.send(:rescue_action_in_public, Exception.new)
+      end
+    end
+  end
 end
 
 describe WikiPagesController do

@@ -947,7 +947,7 @@ class ApplicationController < ActionController::Base
       type = '404' if status == '404 Not Found'
 
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        error = ErrorReport.log_exception(type, exception, {
+        error_info = {
           :url => request.url,
           :user => @current_user,
           :user_agent => request.headers['User-Agent'],
@@ -955,7 +955,15 @@ class ApplicationController < ActionController::Base
           :account => @domain_root_account,
           :request_method => request.request_method_symbol,
           :format => request.format,
-        }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+        }.merge(ErrorReport.useful_http_env_stuff_from_request(request))
+
+        error = if @domain_root_account
+          @domain_root_account.shard.activate do
+            ErrorReport.log_exception(type, exception, error_info)
+          end
+        else
+          ErrorReport.log_exception(type, exception, error_info)
+        end
       end
 
       if api_request?
