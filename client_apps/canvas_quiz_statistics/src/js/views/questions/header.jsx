@@ -9,7 +9,9 @@ define(function(require) {
       return {
         responseCount: 0,
         participantCount: 0,
-        onToggleDetails: null
+        onToggleDetails: null,
+        expandable: true,
+        asideContents: false
       };
     },
 
@@ -24,9 +26,12 @@ define(function(require) {
           </span>
 
           <aside className="pull-right">
-            <ToggleDetailsButton
-              onClick={this.props.onToggleDetails}
-              expanded={this.props.expanded} />
+            {this.props.expandable &&
+              <ToggleDetailsButton
+                onClick={this.props.onToggleDetails}
+                expanded={this.props.expanded} />
+            }
+            {this.props.asideContents}
           </aside>
 
           <div

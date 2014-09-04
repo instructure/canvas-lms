@@ -50,6 +50,17 @@ define(function(require) {
       attrs.discriminationIndex = correctAnswerPointBiserials.pointBiserial;
     }
 
+    if (attrs.pointDistribution) {
+      attrs.pointDistribution.forEach(function(point) {
+        if (participantCount <= 0) {
+          point.ratio = 0;
+        }
+        else {
+          point.ratio = round(point.count / participantCount * 100.0);
+        }
+      });
+    }
+
     return attrs;
   };
 

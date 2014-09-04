@@ -43,6 +43,10 @@ define(function() {
 
       // FIMB, Multiple-Dropdowns, Matching
       'answer_sets',
+
+      // Essay
+      'full_credit',
+      'point_distribution',
     ],
 
     POINT_BISERIAL_ATTRS: [
