@@ -1423,6 +1423,42 @@ describe "discussions" do
       end
     end
   end
+
+  context "menu tools" do
+    before do
+      @topic = teacher_topic
+      user_session(teacher)
+      Account.default.enable_feature!(:lor_for_account)
+
+      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.discussion_topic_menu = {:url => "http://www.example.com", :text => "Export Topic"}
+      @tool.save!
+    end
+
+    it "should show tool launch links in the gear for items on the index" do
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+
+      gear = fj("##{@topic.id}_discussion_content .al-trigger")
+      gear.click
+      link = fj("##{@topic.id}_discussion_content li a.menu_tool_link")
+      link.should be_displayed
+      link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+    end
+
+    it "should show tool launch links in the gear for items on the show page" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+
+      gear = f("#discussion-managebar .al-trigger")
+      gear.click
+      link = f("#discussion-managebar li a.menu_tool_link")
+      link.should be_displayed
+      link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+    end
+  end
 end
 
 

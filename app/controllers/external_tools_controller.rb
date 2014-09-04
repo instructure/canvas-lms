@@ -445,7 +445,7 @@ class ExternalToolsController < ApplicationController
     #contstruct query params for the export endpoint
     query_params = {"export_type" => "common_cartridge"}
     media_types = []
-    [:assignments, :modules, :module_items, :pages, :quizzes].each do |type|
+    [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes].each do |type|
       if params[type]
         query_params['select'] ||= {}
         query_params['select'][type] = params[type]
@@ -458,6 +458,8 @@ class ExternalToolsController < ApplicationController
     case media_type
       when 'assignment'
         title = @context.assignments.where(id: params[:assignments].first).first.title
+      when 'discussion_topic'
+        title = @context.discussion_topics.where(id: params[:discussion_topics].first).first.title
       when 'module'
         title = @context.context_modules.where(id: params[:modules].first).first.name
       when 'page'
@@ -470,6 +472,8 @@ class ExternalToolsController < ApplicationController
         case tag.content
         when Assignment
           media_type = 'assignment'
+        when DiscussionTopic
+          media_type = 'discussion_topic'
         when Quizzes::Quiz
           media_type = 'quiz'
         when WikiPage

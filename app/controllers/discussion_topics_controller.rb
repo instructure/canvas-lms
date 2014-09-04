@@ -315,8 +315,11 @@ class DiscussionTopicsController < ApplicationController
                     create: @context.discussion_topics.scoped.new.grants_right?(@current_user, session, :create),
                     moderate: user_can_moderate,
                     change_settings: user_can_edit_course_settings?,
+                    manage_content: @context.grants_right?(@current_user, session, :manage_content),
                     publish: user_can_moderate && @context.feature_enabled?(:draft_state)
-                }}
+                },
+                :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
+        }
         append_sis_data(hash)
 
         js_env(hash)
@@ -447,6 +450,7 @@ class DiscussionTopicsController < ApplicationController
         else
           format.html do
 
+            @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
             env_hash = {

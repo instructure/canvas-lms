@@ -108,6 +108,20 @@ describe ExternalToolsController do
         placement['placementOf']['title'].should == 'an assignment'
       end
 
+      it "sends content item json for a discussion topic" do
+        user_session(@teacher)
+        topic = @course.discussion_topics.create!(:title => "blah")
+        get :show, :course_id => @course.id, id: @tool.id, :discussion_topics => [topic.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "select%5Bdiscussion_topics%5D%5B%5D=#{topic.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.discussion_topic'
+        placement['placementOf']['title'].should == 'blah'
+      end
+
       it "sends content item json for a quiz" do
         user_session(@teacher)
         quiz = @course.quizzes.create!(title: 'a quiz')

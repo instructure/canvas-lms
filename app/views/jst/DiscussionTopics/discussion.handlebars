@@ -124,6 +124,16 @@
               </li>
             {{/if}}
           {{/if}}
+          {{#if ENV.permissions.manage_content}}
+            {{#each discussion_topic_menu_tools}}
+              <li>
+                <a class="menu_tool_link" href="{{url}}">
+                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                  {{title}}
+                </a>
+              </li>
+            {{/each}}
+          {{/if}}
         </ul>
       {{/if}}
     </div>

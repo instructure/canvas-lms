@@ -46,7 +46,7 @@ class ContextExternalTool < ActiveRecord::Base
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :module_menu, :quiz_menu, :wiki_page_menu
+    :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
   ]
 
   EXTENSION_TYPES.each do |type|
@@ -437,7 +437,7 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
-               :assignment_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+               :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu]
   def self.all_tools_for(context, options={})
     if LOR_TYPES.include?(options[:type])
       return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
