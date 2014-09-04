@@ -10287,16 +10287,6 @@ ar:
       updated_wiki_page: "صفحة Wiki المحدثة"
       web_conference_invitation: "دعوة لمؤتمر عبر الويب"
     no_subject: "لا يوجد موضوع"
-    other_description: |-
-        *المعلم والمسؤول فقط:*
-        
-        * الالتحاق بالمساق
-        * تم إنشاء تقرير
-        * تصدير المحتوى
-        * تقرير الترحيل
-        * حساب مستخدم جديد
-        * تسجيل مدرس جديد
-        * مجموعة طلاب جديدة
     other_display: "إخطارات إدارية"
     reminder_display: التذكير
     student_appointment_description: |-
