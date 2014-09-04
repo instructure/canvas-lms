@@ -10037,16 +10037,6 @@ pl:
       updated_wiki_page: "Zaktualizowana strona typu Wiki"
       web_conference_invitation: "Zaproszenie do konferencji sieciowej"
     no_subject: "Brak tematu"
-    other_description: |-
-        *Jedynie instruktor i administrator:*⏎
-        ⏎
-        * Zapisy na kurs⏎
-        * Raport wygenerowany⏎
-        * Eksport zawartości⏎
-        * Raport migracji⏎
-        * Użytkownik nowego konta⏎
-        * Rejestracja nowego nauczyciela⏎
-        * Grupa nowego uczestnika
     other_display: "Powiadomienia administracyjne"
     reminder_display: Przypomnienie
     student_appointment_description: |-
