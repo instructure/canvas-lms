@@ -84,6 +84,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :update_subtopics
   after_save :touch_context
   after_save :schedule_delayed_transitions
+  after_update :clear_streams_if_not_published
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -590,7 +591,9 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def should_send_to_stream
-    if self.not_available_yet?
+    if !self.published?
+      false
+    elsif self.not_available_yet?
       false
     elsif self.cloned_item_id
       false
@@ -612,6 +615,12 @@ class DiscussionTopic < ActiveRecord::Base
   on_update_send_to_streams do
     if should_send_to_stream && (@content_changed || changed_state(:active, draft_state_enabled? ? :unpublished : :post_delayed))
       self.active_participants
+    end
+  end
+
+  def clear_streams_if_not_published
+    if !self.published?
+      self.clear_stream_items
     end
   end
 
