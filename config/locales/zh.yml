@@ -9949,16 +9949,6 @@ zh:
       updated_wiki_page: 更新的维基页面
       web_conference_invitation: 网络会议邀请
     no_subject: 无主题
-    other_description: |-
-        *仅适用于导师和管理员：*⏎
-        ⏎
-        * 课程注册⏎
-        * 已生成的报告⏎
-        * 内容导出⏎
-        * 迁移报告⏎
-        * 新帐户用户⏎
-        * 新教师注册⏎
-        * 新学生组
     other_display: 管理通知
     reminder_display: 提醒
     student_appointment_description: |-
