@@ -9871,16 +9871,6 @@ tr:
       updated_wiki_page: "Wiki Sayfası Düzenlendi"
       web_conference_invitation: "Web Konferans Daveti"
     no_subject: "Konu Yok"
-    other_description: |-
-        *Sadece eğitmen ve yöneticiler:*
-        
-        * Ders kayıtları
-        * Rapor üretimleri
-        * İçerik dışarı aktarma
-        * Taşıma raporu
-        * Yeni hesap kullanıcısı
-        * Yeni öğretmen kaydı
-        * Yeni öğrenci grubu
     other_display: "Yönetimden Gelen Bildirimler"
     reminder_display: Hatırlatma
     student_appointment_description: |-
