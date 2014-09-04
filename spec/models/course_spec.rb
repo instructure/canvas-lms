@@ -3636,6 +3636,31 @@ describe Course do
       @enrollment.workflow_state.should eql 'active'
     end
 
+    context 'SIS re-enrollments' do
+      before :once do
+        course_with_student({ :active_enrollment => true })
+        batch = Account.default.sis_batches.create!
+        # Both of these need to be defined, as they're both involved in SIS imports
+        # and expected manual enrollment behavior
+        @enrollment.sis_batch_id = batch.id
+        @enrollment.sis_source_id = 'abc:1234'
+        @enrollment.save
+      end
+
+      it 'should retain SIS attributes if re-enrolled, but the SIS enrollment is still active' do
+        e2 = @course.enroll_student @user
+        e2.sis_batch_id.should_not eql nil
+        e2.sis_source_id.should_not eql nil
+      end
+
+      it 'should remove SIS attributes from enrollments when re-created manually' do
+        @enrollment.destroy
+        @enrollment = @course.enroll_student @user
+        @enrollment.sis_batch_id.should eql nil
+        @enrollment.sis_source_id.should eql nil
+      end
+    end
+
     context "unique enrollments" do
       before :once do
         course(active_all: true)

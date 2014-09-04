@@ -1646,6 +1646,10 @@ class Course < ActiveRecord::Base
       end
       if e
         e.already_enrolled = true
+        if e.workflow_state == 'deleted'
+          e.sis_batch_id = nil
+          e.sis_source_id = nil
+        end
         e.attributes = {
           :course_section => section,
           :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state,
