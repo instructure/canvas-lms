@@ -9235,16 +9235,6 @@ ko:
       updated_wiki_page: "변경된 위키 페이지"
       web_conference_invitation: "웹 회의 초대"
     no_subject: "제목 없음"
-    other_description: |-
-        *강사와 관리자에게만 해당:*
-        
-        * 과목 등록
-        * 보고서 생성
-        * 내용 내보내기
-        * 마이그레이션 보고서
-        * 새 계정 사용자
-        * 새 교사 등록
-        * 새 학생 그룹
     other_display: "관리 알림"
     reminder_display: 알리미
     student_appointment_description: |-
