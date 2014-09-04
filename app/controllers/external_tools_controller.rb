@@ -436,12 +436,6 @@ class ExternalToolsController < ApplicationController
   protected :basic_lti_launch_request
 
   def content_item_selection_response(tool, placement)
-    lti_launch = Lti::Launch.new
-
-    lti_launch.resource_url = tool.extension_setting(placement, :url)
-    lti_launch.link_text = tool.label_for(placement.to_sym)
-    lti_launch.analytics_id = tool.tool_id
-
     #contstruct query params for the export endpoint
     query_params = {"export_type" => "common_cartridge"}
     media_types = []
@@ -500,44 +494,22 @@ class ExternalToolsController < ApplicationController
         ]
     }
 
-    params = {
-        #message params
+    params = default_lti_params.merge({
+        #required params
         lti_message_type: 'ContentItemSelectionResponse',
         lti_version: 'LTI-1p0',
-        content_items: content_json.to_json,
-
-        #common params
-        context_id: Lti::Asset.opaque_identifier_for(@context),
         resource_link_id: Lti::Asset.opaque_identifier_for(@context),
-        tool_consumer_instance_guid: @domain_root_account.lti_guid,
+        content_items: content_json.to_json,
+        launch_presentation_return_url: @return_url,
         tool_consumer_instance_name: @domain_root_account.name,
         context_title: @context.name,
-        launch_presentation_return_url: @return_url,
-    }
+    }).merge(tool.substituted_custom_fields(placement, common_variable_substitutions))
 
-    params.merge!({ user_id: Lti::Asset.opaque_identifier_for(@current_user) }) if @current_user
-
-    #adds custom fields to the launch params
-    custom_fields = {}
-    tool.set_custom_fields(custom_fields, placement)
-
-    #replaces custom fields with their values
-    substitutions = common_variable_substitutions()
-    custom_fields.each do |k,v|
-      if substitutions.has_key?(v)
-        if substitutions[v].respond_to?(:call)
-          custom_fields[k] = substitutions[v].call
-        else
-          custom_fields[k] = substitutions[v]
-        end
-      end
-    end
-
-    #add custom params to launch params
-    params.merge!(custom_fields)
-
-    #sign the launch params
+    lti_launch = Lti::Launch.new
+    lti_launch.resource_url = tool.extension_setting(placement, :url)
     lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
+    lti_launch.link_text = tool.label_for(placement.to_sym)
+    lti_launch.analytics_id = tool.tool_id
 
     lti_launch
   end

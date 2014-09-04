@@ -123,6 +123,11 @@ module Lti
         subject.course_enrollments.should include teacher_enrollment
         subject.course_enrollments.should_not include inactive_enrollment
       end
+
+      it 'returns an empty array if there is no user' do
+        helper = SubstitutionsHelper.new(account, root_account, nil)
+        helper.course_enrollments.should == []
+      end
     end
 
     describe '#account_enrollments' do
@@ -139,6 +144,11 @@ module Lti
         enrollment = root_account.account_users.create!(:user => user)
 
         subject.account_enrollments.should == [enrollment]
+      end
+
+      it 'returns an empty array if there is no user' do
+        helper = SubstitutionsHelper.new(account, root_account, nil)
+        helper.account_enrollments.should == []
       end
     end
 

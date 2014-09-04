@@ -73,10 +73,13 @@ describe ExternalToolsController do
         lti_launch.params['lti_version'].should == 'LTI-1p0'
         lti_launch.params['context_id'].should == 'ABC123'
         lti_launch.params['resource_link_id'].should == 'ABC123'
+        lti_launch.params['context_title'].should == 'a course'
+        lti_launch.params['roles'].should == 'Instructor'
         lti_launch.params['tool_consumer_instance_guid'].should == 'root-account-guid'
         lti_launch.params['tool_consumer_instance_name'].should == 'root account'
-        lti_launch.params['context_title'].should == 'a course'
         lti_launch.params['launch_presentation_return_url'].should start_with 'http'
+        lti_launch.params['launch_presentation_locale'].should == 'en'
+        lti_launch.params['launch_presentation_document_target'].should == 'iframe'
       end
 
       it "sends content item json for a course" do

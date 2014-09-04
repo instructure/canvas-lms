@@ -557,6 +557,21 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def substituted_custom_fields(placement, substitutions)
+    custom_fields = {}
+    set_custom_fields(custom_fields, placement)
+
+    custom_fields.each do |k,v|
+      if substitutions.has_key?(v)
+        if substitutions[v].respond_to?(:call)
+          custom_fields[k] = substitutions[v].call
+        else
+          custom_fields[k] = substitutions[v]
+        end
+      end
+    end
+  end
+
   def resource_selection_settings
     settings[:resource_selection]
   end
