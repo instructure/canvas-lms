@@ -3,6 +3,8 @@ define(function(require) {
   var React = require('react');
   var d3 = require('d3');
   var ChartMixin = require('../../mixins/chart');
+  var round = require('../../util/round');
+  var I18n = require('i18n!quiz_statistics');
 
   var CIRCLE = 2 * Math.PI;
   var FMT_PERCENT = d3.format('%');
@@ -67,15 +69,23 @@ define(function(require) {
       };
     },
 
+    getDefaultLabel: function() {
+      return I18n.t('correct_response_ratio',
+        '%{ratio}% of your students correctly answered this question.', {
+        ratio: round(this.props.correctResponseRatio * 100.0, 0)
+      });
+    },
+
     render: function() {
       return (
-        <div>
+        <section className="correct-answer-ratio-section">
           {this.transferPropsTo(Chart())}
 
           <div className="auxiliary">
-            {this.props.children}
+            <p><strong>{I18n.t('correct_answer', 'Correct answer')}</strong></p>
+            <p>{this.props.label || this.getDefaultLabel()}</p>
           </div>
-        </div>
+        </section>
       );
     }
   });

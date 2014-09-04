@@ -1,11 +1,11 @@
 {
   "quiz_statistics": [
     {
-      "id": "200",
+      "id": "267",
       "url": "http://localhost:3000/api/v1/courses/1/quizzes/8/statistics",
       "html_url": "http://localhost:3000/courses/1/quizzes/8/statistics",
       "multiple_attempts_exist": true,
-      "generated_at": "2014-06-17T16:38:25Z",
+      "generated_at": "2014-09-02T14:11:18Z",
       "includes_all_versions": false,
       "points_possible": 16,
       "speed_grader_url": "http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=10",
@@ -16,13 +16,13 @@
           "question_type": "multiple_choice_question",
           "question_text": "<p>Which?</p>",
           "position": 1,
-          "responses": 6,
+          "responses": 156,
           "answers": [
             {
               "id": "3866",
               "text": "I am a very long description of an answer that should span multiple lines.",
               "correct": true,
-              "responses": 4
+              "responses": 129
             },
             {
               "id": "2040",
@@ -34,7 +34,7 @@
               "id": "7387",
               "text": "c",
               "correct": false,
-              "responses": 1
+              "responses": 26
             },
             {
               "id": "4082",
@@ -43,37 +43,37 @@
               "responses": 0
             }
           ],
-          "answered_student_count": 6,
-          "top_student_count": 2,
-          "middle_student_count": 2,
-          "bottom_student_count": 2,
-          "correct_student_count": 4,
-          "incorrect_student_count": 2,
-          "correct_student_ratio": 0.6666666666666666,
-          "incorrect_student_ratio": 0.3333333333333333,
-          "correct_top_student_count": 1,
-          "correct_middle_student_count": 2,
-          "correct_bottom_student_count": 1,
-          "variance": 0.22222222222222224,
-          "stdev": 0.4714045207910317,
-          "difficulty_index": 0.6666666666666666,
+          "answered_student_count": 156,
+          "top_student_count": 42,
+          "middle_student_count": 72,
+          "bottom_student_count": 42,
+          "correct_student_count": 129,
+          "incorrect_student_count": 27,
+          "correct_student_ratio": 0.8269230769230769,
+          "incorrect_student_ratio": 0.17307692307692307,
+          "correct_top_student_count": 42,
+          "correct_middle_student_count": 72,
+          "correct_bottom_student_count": 15,
+          "variance": 0.14312130177514806,
+          "stdev": 0.3783137610174233,
+          "difficulty_index": 0.8269230769230769,
           "alpha": null,
           "point_biserials": [
             {
               "answer_id": 3866,
-              "point_biserial": -0.0473037765270769,
+              "point_biserial": 0.7157094891780442,
               "correct": true,
               "distractor": false
             },
             {
               "answer_id": 2040,
-              "point_biserial": 0.3889279569582486,
+              "point_biserial": -0.0608778335993478,
               "correct": false,
               "distractor": true
             },
             {
               "answer_id": 7387,
-              "point_biserial": -0.32909288665697956,
+              "point_biserial": -0.7134960236217814,
               "correct": false,
               "distractor": true
             },
@@ -90,19 +90,19 @@
           "question_type": "multiple_choice_question",
           "question_text": "<p>A, B, C, or D?</p>",
           "position": 2,
-          "responses": 5,
+          "responses": 155,
           "answers": [
             {
               "id": "3023",
               "text": "A",
               "correct": true,
-              "responses": 4
+              "responses": 78
             },
             {
               "id": "8899",
               "text": "B",
               "correct": false,
-              "responses": 1
+              "responses": 77
             },
             {
               "id": "7907",
@@ -123,31 +123,31 @@
               "responses": 1
             }
           ],
-          "answered_student_count": 4,
-          "top_student_count": 2,
-          "middle_student_count": 2,
-          "bottom_student_count": 0,
-          "correct_student_count": 3,
-          "incorrect_student_count": 1,
-          "correct_student_ratio": 0.75,
-          "incorrect_student_ratio": 0.25,
-          "correct_top_student_count": 2,
-          "correct_middle_student_count": 1,
-          "correct_bottom_student_count": 0,
-          "variance": 0.1875,
-          "stdev": 0.4330127018922193,
-          "difficulty_index": 0.75,
+          "answered_student_count": 154,
+          "top_student_count": 42,
+          "middle_student_count": 72,
+          "bottom_student_count": 40,
+          "correct_student_count": 77,
+          "incorrect_student_count": 77,
+          "correct_student_ratio": 0.5,
+          "incorrect_student_ratio": 0.5,
+          "correct_top_student_count": 42,
+          "correct_middle_student_count": 33,
+          "correct_bottom_student_count": 2,
+          "variance": 0.25,
+          "stdev": 0.5,
+          "difficulty_index": 0.5,
           "alpha": null,
           "point_biserials": [
             {
               "answer_id": 3023,
-              "point_biserial": 0.42308109549488865,
+              "point_biserial": 0.6056978634222424,
               "correct": true,
               "distractor": false
             },
             {
               "answer_id": 8899,
-              "point_biserial": -0.42308109549488865,
+              "point_biserial": -0.6056978634222424,
               "correct": false,
               "distractor": true
             },
@@ -170,13 +170,13 @@
           "question_type": "multiple_choice_question",
           "question_text": "<p>D, A, B, or C?</p>\n<p><img src=\"http://kodoware.com/hadooken.gif\" alt=\"Impressive!\" width=\"400\" height=\"180\">This is a longer description. I'ma embed an image too.</p>",
           "position": 3,
-          "responses": 6,
+          "responses": 156,
           "answers": [
             {
               "id": "3964",
               "text": "A",
               "correct": false,
-              "responses": 2
+              "responses": 19
             },
             {
               "id": "6628",
@@ -194,34 +194,34 @@
               "id": "6102",
               "text": "D",
               "correct": true,
-              "responses": 3
+              "responses": 136
             }
           ],
-          "answered_student_count": 5,
-          "top_student_count": 2,
-          "middle_student_count": 2,
-          "bottom_student_count": 1,
-          "correct_student_count": 3,
-          "incorrect_student_count": 2,
-          "correct_student_ratio": 0.6,
-          "incorrect_student_ratio": 0.4,
-          "correct_top_student_count": 2,
-          "correct_middle_student_count": 1,
-          "correct_bottom_student_count": 0,
-          "variance": 0.24000000000000005,
-          "stdev": 0.48989794855663565,
-          "difficulty_index": 0.6,
+          "answered_student_count": 155,
+          "top_student_count": 42,
+          "middle_student_count": 72,
+          "bottom_student_count": 41,
+          "correct_student_count": 136,
+          "incorrect_student_count": 19,
+          "correct_student_ratio": 0.8774193548387097,
+          "incorrect_student_ratio": 0.12258064516129032,
+          "correct_top_student_count": 35,
+          "correct_middle_student_count": 62,
+          "correct_bottom_student_count": 39,
+          "variance": 0.1075546305931321,
+          "stdev": 0.32795522650680853,
+          "difficulty_index": 0.8774193548387097,
           "alpha": null,
           "point_biserials": [
             {
               "answer_id": 6102,
-              "point_biserial": 0.606710935709257,
+              "point_biserial": -0.07436795132709868,
               "correct": true,
               "distractor": false
             },
             {
               "answer_id": 3964,
-              "point_biserial": -0.606710935709257,
+              "point_biserial": 0.0743679513270987,
               "correct": false,
               "distractor": true
             },
@@ -244,46 +244,52 @@
           "question_type": "true_false_question",
           "question_text": "<p>Is is true?</p>",
           "position": 4,
-          "responses": 6,
+          "responses": 143,
           "answers": [
             {
               "id": "1496",
               "text": "True",
               "correct": true,
-              "responses": 5
+              "responses": 142
             },
             {
               "id": "5354",
               "text": "False",
               "correct": false,
               "responses": 1
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 13
             }
           ],
-          "answered_student_count": 5,
-          "top_student_count": 2,
-          "middle_student_count": 2,
-          "bottom_student_count": 1,
-          "correct_student_count": 4,
+          "answered_student_count": 142,
+          "top_student_count": 42,
+          "middle_student_count": 72,
+          "bottom_student_count": 28,
+          "correct_student_count": 141,
           "incorrect_student_count": 1,
-          "correct_student_ratio": 0.8,
-          "incorrect_student_ratio": 0.2,
-          "correct_top_student_count": 2,
-          "correct_middle_student_count": 1,
-          "correct_bottom_student_count": 1,
-          "variance": 0.16000000000000006,
-          "stdev": 0.4000000000000001,
-          "difficulty_index": 0.8,
+          "correct_student_ratio": 0.9929577464788732,
+          "incorrect_student_ratio": 0.007042253521126761,
+          "correct_top_student_count": 42,
+          "correct_middle_student_count": 72,
+          "correct_bottom_student_count": 27,
+          "variance": 0.006992660186470934,
+          "stdev": 0.08362212737350644,
+          "difficulty_index": 0.9929577464788732,
           "alpha": null,
           "point_biserials": [
             {
               "answer_id": 1496,
-              "point_biserial": 0.4024941412521818,
+              "point_biserial": 0.36790362816096833,
               "correct": true,
               "distractor": false
             },
             {
               "answer_id": 5354,
-              "point_biserial": -0.40249414125218186,
+              "point_biserial": -0.3679036281609686,
               "correct": false,
               "distractor": true
             }
@@ -294,19 +300,19 @@
           "question_type": "short_answer_question",
           "question_text": "<p>Type something</p>",
           "position": 5,
-          "responses": 6,
+          "responses": 156,
           "answers": [
             {
               "id": "4684",
               "text": "Something",
               "correct": true,
-              "responses": 4
+              "responses": 58
             },
             {
               "id": "1797",
               "text": "False",
               "correct": true,
-              "responses": 1
+              "responses": 97
             },
             {
               "id": "other",
@@ -315,18 +321,18 @@
               "responses": 1
             }
           ],
-          "correct": 5
+          "correct": 155
         },
         {
           "id": "16",
           "question_type": "fill_in_multiple_blanks_question",
           "question_text": "<p>Roses are [color1], violets are [color2]</p>",
           "position": 6,
-          "responses": 5,
-          "answered": 5,
-          "correct": 1,
-          "partially_correct": 4,
-          "incorrect": 1,
+          "responses": 155,
+          "answered": 136,
+          "correct": 73,
+          "partially_correct": 41,
+          "incorrect": 42,
           "answer_sets": [
             {
               "id": "dddce03739867ad935a78cda255ec4dd",
@@ -336,19 +342,25 @@
                   "id": "9711",
                   "text": "Red",
                   "correct": true,
-                  "responses": 5
+                  "responses": 91
                 },
                 {
                   "id": "2700",
                   "text": "Blue",
                   "correct": true,
-                  "responses": 0
+                  "responses": 23
                 },
                 {
                   "id": "none",
                   "text": "No Answer",
                   "correct": false,
-                  "responses": 1
+                  "responses": 20
+                },
+                {
+                  "id": "other",
+                  "text": "Other",
+                  "correct": false,
+                  "responses": 22
                 }
               ]
             },
@@ -360,7 +372,7 @@
                   "id": "9702",
                   "text": "bonkers",
                   "correct": true,
-                  "responses": 1
+                  "responses": 73
                 },
                 {
                   "id": "7150",
@@ -372,7 +384,7 @@
                   "id": "other",
                   "text": "Other",
                   "correct": false,
-                  "responses": 4
+                  "responses": 82
                 },
                 {
                   "id": "none",
@@ -410,6 +422,12 @@
               "text": "C",
               "correct": false,
               "responses": 2
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 150
             }
           ]
         },
@@ -418,13 +436,13 @@
           "question_type": "essay_question",
           "question_text": "<p>Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
           "position": 8,
-          "responses": 3,
+          "responses": 90,
           "graded": 1,
           "full_credit": 1,
           "point_distribution": [
             {
               "score": 0,
-              "count": 5
+              "count": 155
             },
             {
               "score": 1,
@@ -437,11 +455,11 @@
           "question_type": "multiple_dropdowns_question",
           "question_text": "<p>Alligators are [color], zombies eat [organ].</p>",
           "position": 9,
-          "responses": 6,
-          "answered": 5,
-          "correct": 5,
-          "partially_correct": 0,
-          "incorrect": 1,
+          "responses": 156,
+          "answered": 14,
+          "correct": 14,
+          "partially_correct": 47,
+          "incorrect": 95,
           "answer_sets": [
             {
               "id": "6892cf3e76966a4d15b8b50bbe335858",
@@ -451,7 +469,7 @@
                   "id": "3208",
                   "text": "brainz",
                   "correct": true,
-                  "responses": 5
+                  "responses": 14
                 },
                 {
                   "id": "8331",
@@ -463,7 +481,7 @@
                   "id": "none",
                   "text": "No Answer",
                   "correct": false,
-                  "responses": 1
+                  "responses": 142
                 }
               ]
             },
@@ -475,13 +493,13 @@
                   "id": "1381",
                   "text": "green",
                   "correct": true,
-                  "responses": 5
+                  "responses": 61
                 },
                 {
                   "id": "1638",
                   "text": "cool",
                   "correct": false,
-                  "responses": 1
+                  "responses": 95
                 }
               ]
             }
@@ -494,7 +512,7 @@
           "position": 10,
           "correct": 2,
           "partially_correct": 1,
-          "incorrect": 3,
+          "incorrect": 153,
           "responses": 3,
           "answered": 3,
           "answer_sets": [
@@ -538,7 +556,7 @@
                   "id": "none",
                   "text": "No Answer",
                   "correct": false,
-                  "responses": 3
+                  "responses": 153
                 }
               ]
             },
@@ -582,7 +600,7 @@
                   "id": "none",
                   "text": "No Answer",
                   "correct": false,
-                  "responses": 3
+                  "responses": 153
                 }
               ]
             },
@@ -626,7 +644,7 @@
                   "id": "none",
                   "text": "No Answer",
                   "correct": false,
-                  "responses": 3
+                  "responses": 153
                 }
               ]
             }
@@ -637,16 +655,16 @@
           "question_type": "numerical_question",
           "question_text": "<p>[Numerical:Exact] What's 9 plus 3, 2.5 minus 1, or 4 minus zero?</p>",
           "position": 11,
-          "responses": 5,
-          "full_credit": 1,
-          "correct": 2,
-          "incorrect": 4,
+          "responses": 150,
+          "full_credit": 138,
+          "correct": 139,
+          "incorrect": 17,
           "answers": [
             {
               "id": "4343",
               "text": "12.00",
               "correct": true,
-              "responses": 1,
+              "responses": 108,
               "value": [
                 12,
                 12
@@ -658,7 +676,7 @@
               "id": "6959",
               "text": "[3.00..6.00]",
               "correct": true,
-              "responses": 0,
+              "responses": 22,
               "value": [
                 3,
                 6
@@ -682,7 +700,7 @@
               "id": "6704",
               "text": "1.50",
               "correct": true,
-              "responses": 0,
+              "responses": 8,
               "value": [
                 0.5,
                 2.5
@@ -694,13 +712,13 @@
               "id": "none",
               "text": "No Answer",
               "correct": false,
-              "responses": 1
+              "responses": 6
             },
             {
               "id": "other",
               "text": "Other",
               "correct": false,
-              "responses": 4
+              "responses": 12
             }
           ]
         },
@@ -709,13 +727,17 @@
           "question_type": "calculated_question",
           "question_text": "<p>Formula: what is 5 plus [x]?</p>",
           "position": 12,
-          "responses": 1,
-          "graded": 0,
-          "full_credit": 0,
+          "responses": 151,
+          "graded": 72,
+          "full_credit": 72,
           "point_distribution": [
             {
               "score": 0,
-              "count": 2
+              "count": 80
+            },
+            {
+              "score": 1,
+              "count": 72
             }
           ]
         },
@@ -730,15 +752,165 @@
           "point_distribution": [
             {
               "score": 0,
-              "count": 2
+              "count": 152
             }
           ]
         }
       ],
       "submission_statistics": {
         "user_ids": [
-          1,
+          1756,
+          1755,
+          1754,
+          1753,
+          1752,
+          1751,
+          1750,
+          1749,
+          1748,
+          1747,
+          1573,
+          1746,
+          1745,
+          1744,
+          1743,
+          1742,
+          1741,
+          1740,
+          1739,
+          1738,
+          1737,
+          1572,
+          1736,
+          1735,
+          1734,
+          1733,
+          1732,
+          1731,
+          1730,
+          1729,
+          1728,
+          1727,
+          1571,
+          1726,
+          1725,
+          1724,
+          1723,
+          1722,
+          1721,
+          1720,
+          1719,
+          1718,
+          1717,
+          1570,
+          1716,
+          1715,
+          1714,
+          1713,
+          1712,
+          1711,
+          1710,
+          1709,
+          1708,
+          1707,
+          1569,
+          1706,
+          1705,
+          1704,
+          1703,
+          1702,
+          1701,
+          1700,
+          1699,
+          1698,
+          1697,
+          1568,
+          1696,
+          1695,
+          1694,
+          1693,
+          1692,
+          1691,
+          1690,
+          1689,
+          1688,
+          1687,
+          1567,
+          1540,
+          1686,
+          1685,
+          1684,
+          1683,
+          1682,
+          1681,
+          1680,
+          1679,
+          1678,
+          1677,
+          1566,
+          1676,
+          1675,
+          1674,
+          1673,
+          1672,
+          1671,
+          1670,
+          1669,
+          1668,
+          1667,
+          1565,
+          1666,
+          1665,
+          1664,
+          1663,
+          1662,
+          1661,
+          1660,
+          1659,
+          1658,
+          1657,
+          1564,
+          1656,
+          1655,
+          1654,
+          1653,
+          1652,
+          1651,
+          1650,
+          1649,
+          1648,
+          1647,
+          1563,
+          1646,
+          1645,
+          1644,
+          1643,
+          1642,
+          1641,
+          1640,
+          1639,
+          1638,
+          1562,
+          1561,
+          1560,
+          1559,
+          1558,
+          1557,
+          1539,
+          1556,
+          1555,
+          1554,
+          1553,
+          1552,
+          1551,
+          1550,
+          1549,
+          1548,
+          1637,
+          1547,
+          1538,
           2,
+          1,
           14,
           12,
           6,
@@ -746,20 +918,28 @@
         ],
         "logged_out_users": [],
         "scores": {
+          "13": 7,
           "15": 1,
+          "19": 6,
           "25": 1,
-          "44": 1,
-          "50": 1,
-          "59": 2
+          "44": 4,
+          "50": 17,
+          "53": 17,
+          "56": 9,
+          "59": 26,
+          "63": 13,
+          "66": 29,
+          "69": 12,
+          "72": 14
         },
-        "score_average": 6.722222222222221,
-        "score_high": 9.5,
-        "score_low": 2.33333333333333,
-        "score_stdev": 2.7023081126700714,
-        "correct_count_average": 5.5,
-        "incorrect_count_average": 3.6666666666666665,
-        "duration_average": 69.33333333333333,
-        "unique_count": 6
+        "score_average": 8.989316239316238,
+        "score_high": 11.5,
+        "score_low": 2,
+        "score_stdev": 2.383068801228519,
+        "correct_count_average": 6.038461538461538,
+        "incorrect_count_average": 4.352564102564102,
+        "duration_average": 4.282051282051282,
+        "unique_count": 156
       },
       "links": {
         "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/8"

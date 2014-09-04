@@ -2,6 +2,7 @@
 define(function(require) {
   var React = require('react');
   var classSet = require('../util/class_set');
+
   var Question = React.createClass({
     getDefaultProps: function() {
       return {
@@ -9,6 +10,7 @@ define(function(require) {
         stretched: false
       };
     },
+
     render: function() {
       var className = classSet({
         'question-statistics': true,

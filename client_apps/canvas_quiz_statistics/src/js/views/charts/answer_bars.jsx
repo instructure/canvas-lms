@@ -205,13 +205,13 @@ define(function(require) {
       });
 
       return (
-        <div>
+        <section className="answer-distribution-section">
           <Chart ref="chart" answers={chartData} onInspect={this.getAnswerTooltip} />
 
           <div className="auxiliary" style={{display:'none'}}>
             {this.props.answers.map(this.renderAnswerTooltip)}
           </div>
-        </div>
+        </section>
       );
     },
 

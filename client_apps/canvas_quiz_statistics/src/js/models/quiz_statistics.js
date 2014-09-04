@@ -8,7 +8,7 @@ define(function(require) {
   var I18n = require('i18n!quiz_statistics');
 
   var findWhere = _.findWhere;
-  var parseQuestion, decorateAnswer;
+  var parseQuestion, decorateAnswer, decorateAnswerSet;
 
   var QuizStatistics = Backbone.Model.extend({
     parse: function(payload) {
@@ -35,6 +35,7 @@ define(function(require) {
     var attrs = pickAndNormalize(question, K.QUESTION_STATISTICS_ATTRS);
 
     wrap(attrs.answers).forEach(decorateAnswer.bind(null, participantCount));
+    wrap(attrs.answerSets).forEach(decorateAnswerSet.bind(null, participantCount));
 
     if (attrs.pointBiserials) {
       attrs.pointBiserials = attrs.pointBiserials.map(function(pointBiserial) {
@@ -59,6 +60,10 @@ define(function(require) {
     } else if (answer.id === 'other') {
       answer.text = I18n.t('unknown_answer', 'Something Else');
     }
+  };
+
+  decorateAnswerSet = function(participantCount, answerSet) {
+    wrap(answerSet.answers).forEach(decorateAnswer.bind(null, participantCount));
   };
 
   return QuizStatistics;

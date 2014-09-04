@@ -8,6 +8,8 @@ require([
   var stockConfig = clone(config);
   var container;
 
+  document.body.id = 'canvas-quiz-statistics';
+
   beforeEach(function() {
     if (AppDelegate.isMounted()) {
       AppDelegate.unmount();

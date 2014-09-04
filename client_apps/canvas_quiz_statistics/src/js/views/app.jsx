@@ -8,6 +8,7 @@ define(function(require) {
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
   var ShortAnswerRenderer = require('jsx!./questions/short_answer');
+  var FillInMultipleBlanksRenderer = require('jsx!./questions/fill_in_multiple_blanks');
 
   var extend = _.extend;
   var Renderers = {
@@ -16,6 +17,9 @@ define(function(require) {
     'short_answer_question': ShortAnswerRenderer,
     'multiple_answers_question': ShortAnswerRenderer,
     'numerical_question': ShortAnswerRenderer,
+    'fill_in_multiple_blanks_question': FillInMultipleBlanksRenderer,
+    'multiple_dropdowns_question': FillInMultipleBlanksRenderer,
+    'matching_question': FillInMultipleBlanksRenderer,
   };
 
   var Statistics = React.createClass({

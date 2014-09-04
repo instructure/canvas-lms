@@ -133,7 +133,7 @@ define(function(require) {
       chartData.height = this.props.height;
 
       return (
-        <div>
+        <section className="discrimination-index-section">
           <p>
             <em className={classSet(className)}>
               <span className="sign">{sign}</span>
@@ -155,7 +155,7 @@ define(function(require) {
           </p>
 
           {Chart(chartData)}
-        </div>
+        </section>
       );
     }
   });

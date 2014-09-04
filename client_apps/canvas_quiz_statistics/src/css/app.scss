@@ -38,6 +38,10 @@
       border: none;
       border-radius: 4px;
 
+      & + button {
+        margin-left: 5px;
+      }
+
       &.active, &:hover {
         background: #2894d1;
         cursor: pointer;

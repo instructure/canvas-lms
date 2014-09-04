@@ -26,9 +26,9 @@ define(function() {
       'question_text',
       'responses',
       'answers',
-      'answered_student_count',
 
       // multiple-choice & true/false
+      'answered_student_count',
       'top_student_count',
       'middle_student_count',
       'bottom_student_count',
@@ -40,6 +40,9 @@ define(function() {
       // multiple-answers
       'correct',
       'partially_correct',
+
+      // FIMB, Multiple-Dropdowns, Matching
+      'answer_sets',
     ],
 
     POINT_BISERIAL_ATTRS: [

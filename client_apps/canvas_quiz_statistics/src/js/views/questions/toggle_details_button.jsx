@@ -7,7 +7,7 @@ define(function(require) {
   var ToggleDetailsButton = React.createClass({
     propTypes: {
       expanded: React.PropTypes.bool.isRequired,
-      onClick: React.PropTypes.func.isRequired,
+      onClick: React.PropTypes.func,
       controlsAll: React.PropTypes.bool
     },
 
