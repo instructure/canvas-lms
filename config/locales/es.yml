@@ -9879,16 +9879,6 @@ es:
       updated_wiki_page: "Página Wiki Actualizada"
       web_conference_invitation: "Invitación a Conferencia en Línea"
     no_subject: "Sin Tema"
-    other_description: |-
-        *Solo instructores y administradores:*⏎
-        ⏎
-        * Inscripciones de cursos⏎
-        * Informe generado⏎
-        * Exportación de contenido⏎
-        * Informe de migraciones⏎
-        * Nuevo usuario de cuenta⏎
-        * Nuevo registro de profesor⏎
-        * Nuevo grupo de alumnos
     other_display: "Notificaciones administrativas"
     reminder_display: Recordatorio
     student_appointment_description: |-
