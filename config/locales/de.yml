@@ -9890,16 +9890,6 @@ de:
       updated_wiki_page: "Aktualisierte Wikiseite"
       web_conference_invitation: "Einladung zur Webkonferenz"
     no_subject: "Kein Betreff"
-    other_description: |-
-        *Nur Dozent und Administrator:*
-        
-        * Kurseinschreibung
-        * Bericht erstellt
-        * Inhaltsexport
-        * Migrationsbericht
-        * Neuer Kontobenutzer
-        * Registrierung von neuem Dozenten
-        * Neue Studentengruppe
     other_display: Verwaltungsbenachrichtigungen
     reminder_display: Erinnerung
     student_appointment_description: |-
