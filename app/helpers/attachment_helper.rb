@@ -21,19 +21,12 @@ module AttachmentHelper
   def doc_preview_attributes(attachment, attrs={})
     if attachment.crocodoc_available?
       begin
-        crocodoc = attachment.crocodoc_document
-        session_url = crocodoc.session_url(:user => @current_user)
-        attrs[:crocodoc_session_url] = session_url
+        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@curent_user)
       rescue => e
         ErrorReport.log_exception('crocodoc', e)
       end
     elsif attachment.canvadocable?
-      blob = {
-        user_id: @current_user.global_id,
-        attachment_id: attachment.global_id,
-      }.to_json
-      hmac = Canvas::Security.hmac_sha1(blob)
-      attrs[:canvadoc_session_url] = canvadoc_session_path(blob: blob, hmac: hmac)
+      attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user)
     elsif attachment.scribdable? && scribd_doc = attachment.scribd_doc
       begin
         attrs[:scribd_doc_id] = scribd_doc.doc_id
