@@ -9933,16 +9933,6 @@ fr:
       updated_wiki_page: "Page Wiki mise à jour"
       web_conference_invitation: "Invitation à la conférence Web"
     no_subject: "Aucun sujet"
-    other_description: |-
-        *Instructeur et administrateur uniquement :*
-        
-        * Inscription aux cours
-        * Rapport généré
-        * Contenu exporté
-        * Rapport de migration
-        * Nouveau compte d’utilisateur
-        * Immatriculation des nouveaux enseignants
-        * Nouveau groupe d’étudiants
     other_display: "Notifications administratives"
     reminder_display: Rappel
     student_appointment_description: |-
