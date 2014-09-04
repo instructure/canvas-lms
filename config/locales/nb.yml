@@ -9938,16 +9938,6 @@ nb:
       updated_wiki_page: "Oppdaterte wikiside"
       web_conference_invitation: "Invitasjon til nettkonferanse"
     no_subject: "Intet emne"
-    other_description: |-
-        *Kun instruktør og administrator:*
-        
-        * Kurspåmelding
-        * Rapport generert
-        * Innholdseksport
-        * Flytterapport
-        * Ny kontobruker
-        * Ny registrering av foreleser
-        * Ny studentgruppe
     other_display: "Administrative varsler"
     reminder_display: Påminnelse
     student_appointment_description: |-
