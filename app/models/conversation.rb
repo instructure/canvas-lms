@@ -221,6 +221,10 @@ class Conversation < ActiveRecord::Base
       message.conversation = self
       message.shard = self.shard
 
+      if options[:cc_author]
+        message.cc_author = options[:cc_author]
+      end
+
       # all specified (or implicit) tags, regardless of visibility to individual participants
       users = preload_users_and_context_codes
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1, users) : []
@@ -276,6 +280,7 @@ class Conversation < ActiveRecord::Base
       message.context_type = 'Account'
       message.context_id = options[:root_account_id]
     end
+
     message.asset = options[:asset]
     message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
     message.media_comment = options[:media_comment] if options[:media_comment].present?

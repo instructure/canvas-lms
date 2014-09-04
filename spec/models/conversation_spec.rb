@@ -421,6 +421,24 @@ describe Conversation do
       end
     end
 
+    it "should broadcast conversation created" do
+
+      n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
+
+      [sender].each do |user|
+        channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
+        channel.confirm
+
+        NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
+      end
+
+      recipients = create_users(5, return_type: :record)
+      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true);
+
+      # check that our sender recieved a conversation created notification
+      conversation.messages_sent.should include("Conversation Created")
+    end
+
     it "should only ever change the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
       Conversation.initiate([sender, recipient], true).add_message(sender, 'test')
       convo = sender.conversations.first

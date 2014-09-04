@@ -353,7 +353,7 @@ class ConversationsController < ApplicationController
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
-      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false, :cc_author => true)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   rescue ActiveRecord::RecordInvalid => err

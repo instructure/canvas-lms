@@ -105,6 +105,10 @@ class ConversationMessage < ActiveRecord::Base
     p.dispatch :added_to_conversation
     p.to { self.new_recipients }
     p.whenever {|record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added}
+
+    p.dispatch :conversation_created
+    p.to { [self.author] }
+    p.whenever {|record| record.cc_author && ((record.just_created || @re_send_message) && !record.generated && !record.submission)}
   end
 
   on_create_send_to_streams do
@@ -242,6 +246,9 @@ class ConversationMessage < ActiveRecord::Base
       recipient.user_notes.create(:creator => author, :title => title, :note => note)
     end
   end
+
+
+  attr_accessor :cc_author
 
   def author_short_name_with_shared_contexts(recipient)
     if conversation.context
