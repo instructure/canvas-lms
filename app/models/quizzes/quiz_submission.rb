@@ -743,7 +743,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # so we simply test its workflow state.
     #
     # Also, we can't use QuizSubmission#overdue? because as of 10/2013 it adds
-    # a graceful period of 1 minute after the true end date of the submission,
+    # a graceful period of 1 (or 5) minute(s) after the true end date of the submission,
     # which doesn't work for us here.
     if self.untaken?
       Quizzes::SubmissionGrader.new(self).grade_submission(:finished_at => self.end_at)

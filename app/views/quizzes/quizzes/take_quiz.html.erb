@@ -48,6 +48,7 @@
     <span class="started_at"><%= @submission.started_at.iso8601 %></span>
     <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
     <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
+    <span class="due_at"><%= @quiz.due_at && @quiz.due_at.iso8601 %></span>
     <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
     <span class="time_left"><%= @submission.time_left %></span>
   </div>
@@ -107,4 +108,3 @@
           :wrapper => '<strong>\1</strong><br />' %>
   </div>
 </form>
-
