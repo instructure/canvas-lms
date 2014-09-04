@@ -9940,16 +9940,6 @@ ja:
       updated_wiki_page: "更新された Wiki ページ"
       web_conference_invitation: "Web 会議への招待"
     no_subject: 件名なし
-    other_description: |-
-        *インストラクタおよび管理者のみ:*⏎
-        ⏎
-        * コース登録⏎
-        * 生成されたレポート⏎
-        * コンテンツのエクスポート⏎
-        * 移行レポート⏎
-        * 新しいアカウント ユーザ⏎
-        * 新しい講師の登録⏎
-        * 新しい受講生グループ
     other_display: 管理のお知らせ
     reminder_display: 事前通知
     student_appointment_description: |-
