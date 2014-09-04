@@ -355,5 +355,5 @@ END
 end
 
 # load feature definitions
-Dir.glob("#{Rails.root}/lib/features/*.rb").each { |file| require file }
+Dir.glob("#{Rails.root}/lib/features/*.rb").each { |file| require_dependency file }
 
