@@ -1,4 +1,5 @@
 require Pathname(File.dirname(__FILE__)) + "../model/sfu/sfu"
+require Pathname(File.dirname(__FILE__)) + "../helpers/common"
 
 class AmaintController < ApplicationController
   before_filter :require_user
