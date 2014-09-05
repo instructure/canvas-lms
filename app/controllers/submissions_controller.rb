@@ -417,9 +417,19 @@ class SubmissionsController < ApplicationController
         # check that the attachments are in allowed formats. we do this here
         # so the attachments don't get saved and possibly uploaded to
         # S3, etc. if they're invalid.
+
+        # Legacy check that uses uploaded_data with a fake path when the user chooses a file to upload
         if @assignment.allowed_extensions.present? && params[:attachments].any? {|i, a|
             !a[:uploaded_data].empty? &&
             !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+          }
+          flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+          return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+        end
+
+        # New check that covers previously uploaded files
+        if @assignment.allowed_extensions.present? && params[:submission][:attachments].any? {|a|
+              !@assignment.allowed_extensions.include?((a.after_extension || '').downcase)
           }
           flash[:error] = t('errors.invalid_file_type', "Invalid file type")
           return redirect_to named_context_url(@context, :context_assignment_url, @assignment)

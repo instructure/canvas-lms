@@ -39,6 +39,16 @@ describe SubmissionsController do
       assigns[:submission].url.should eql("http://url")
     end
 
+    it "should reject illegal file extensions from submission" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
+      att = attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => {}
+      response.should be_redirect
+      assigns[:submission].should be_nil
+      flash[:error].should_not be_nil
+    end
+
     it "should use the appropriate group based on the assignment's category and the current user" do
       course_with_student_logged_in(:active_all => true)
       group_category = @course.group_categories.create(:name => "Category")
