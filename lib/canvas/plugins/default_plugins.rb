@@ -273,4 +273,18 @@ Canvas::Plugin.register('app_center', nil, {
     },
     :validator => 'AppCenterValidator'
 })
-
+Canvas::Plugin.register('pandapub', nil, {
+  :name => lambda{ t :name, 'PandaPub' },
+  :description => lambda{ t :description, 'Pub/Sub service' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings => {
+    :base_url => nil,
+    :application_id => nil,
+    :key_id => nil,
+    :key_secret => nil
+  },
+  :settings_partial => 'plugins/panda_pub_settings',
+  :validator => 'PandaPubValidator'
+})
