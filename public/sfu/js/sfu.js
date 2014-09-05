@@ -197,7 +197,9 @@
             $fieldsToLock.siblings('input').remove();
 
             // CANVAS-254 Add verbiage about Display Name
-            $helpText.append('<br />Changing this will only affect your display name within Canvas, and not in other systems such as SIMS and HAP.');
+            $helpText.append('<br />Changing this will only affect your display name within Canvas, ' +
+                'and not in other systems (e.g. <a href="https://go.sfu.ca" target="_blank">goSFU</a>, ' +
+                '<a href="https://myinfo.sfu.ca" target="_blank">myInfo</a>, etc.)');
         });
     });
     // END CANVAS-252
