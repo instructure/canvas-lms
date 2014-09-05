@@ -35,6 +35,8 @@
   notifications:
     - name: New Announcement
       delay_for: 0
+    - name: Announcement Created By You
+      delay_for: 0
 
 - category: Appointment Availability
   notifications:
