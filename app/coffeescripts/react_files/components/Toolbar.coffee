@@ -18,7 +18,8 @@ define [
       query = {search_term: @refs.searchTerm.getDOMNode().value}
       Router.transitionTo 'search', @props.params, query
 
-    addFolder: ->
+    addFolder: (event) ->
+      event.preventDefault()
       @props.currentFolder.folders.add({})
 
     downloadSelecteAsZip: ->

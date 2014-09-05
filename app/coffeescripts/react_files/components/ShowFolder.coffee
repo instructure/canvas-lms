@@ -55,7 +55,6 @@ define [
       setTimeout =>
         @props.onResolvePath({currentFolder:undefined, rootTillCurrentFolder:undefined})
 
-
     componentWillReceiveProps: (newProps) ->
       @unregisterListeners()
       return unless newProps.currentFolder
@@ -64,12 +63,12 @@ define [
         updateAPIQuerySortParams(collection, newProps.query)
 
     render: withReactDOM ->
-      return div({}) unless @props.currentFolder
+      return div({ref: 'emptyDiv'}) unless @props.currentFolder
       div className:'ef-directory',
         ColumnHeaders(to: (if @props.params.splat then 'folder' else 'rootFolder'), subject: @props.currentFolder, params: @props.params, query: @props.query),
         CurrentUploads({})
         if @props.currentFolder.isEmpty()
-          div className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
+          div ref: 'folderEmpty', className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
         else
           @props.currentFolder.children(@props.query).map (child) =>
             FolderChild

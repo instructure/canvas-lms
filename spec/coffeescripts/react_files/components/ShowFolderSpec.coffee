@@ -1,40 +1,102 @@
 define [
   'react'
-  'jquery'
+  'react-router'
   'compiled/react_files/components/ShowFolder'
-], (React, $, ShowFolder) ->
+  'compiled/models/Folder'
+  'compiled/react_files/components/FolderChild'
+], (React, Router, ShowFolder, Folder, FolderChild) ->
 
-  Simulate = React.addons.TestUtils.Simulate
+  showFolderTest = (properties, test) ->
+    # Setup
+    sinon.stub(Router, 'Link').returns('some link')
+    sinon.stub(Folder, 'resolvePath').returns($.Deferred())
+    @showFolder = React.renderComponent(ShowFolder(properties), $('#fixtures')[0])
 
-  constructComponent = () ->
-    props =
-      params:
-        splat: ''
-      onResolvePath: -> # noop
-    component = React.renderComponent(ShowFolder(props), $('<div>').appendTo('body')[0])
-    component
+    test()
 
-  removeComponent = (comp) ->
-    React.unmountComponentAtNode(comp.getDOMNode().parentNode)
+  module 'ShowFolder Rendering',
+    setup: ->
+    teardown: ->
+      Folder.resolvePath.restore()
+      Router.Link.restore()
+      React.unmountComponentAtNode($('#fixtures')[0])
 
-  module 'ShowFolder'
+  test 'returns empty div if there is no currentFolder', ->
+    folderObject =
+      params: {}
+      onResolvePath: ->
 
-  test 'empty splat gets a trailing slash', ->
-    comp = constructComponent()
-    equal comp.buildFolderPath(''), '/'
-    removeComponent(comp)
+    showFolderTest folderObject, ->
+      ok @showFolder.refs.emptyDiv, "empty div displayed"
 
-  test 'clean splat gets slash plus name', ->
-    comp = constructComponent()
-    equal comp.buildFolderPath('clean_folder_name'), '/clean_folder_name'
-    removeComponent(comp)
+  test 'displays empty text if the folder is empty', ->
+    folder = new Folder()
+    folder.files.loadedAll = true
+    folder.folders.loadedAll = true
 
-  test 'splats with a trailing slash get encoded', ->
-    comp = constructComponent()
-    equal comp.buildFolderPath('extra_space '), '/extra_space%20'
-    removeComponent(comp)
+    folderObject =
+      params: {}
+      onResolvePath: ->
+      currentFolder: folder
+      query: ''
 
-  test 'splats with a slash with do not get encoded', ->
-    comp = constructComponent()
-    equal comp.buildFolderPath('this/has/slashes'), '/this/has/slashes'
-    removeComponent(comp)
+    showFolderTest folderObject, ->
+      equal @showFolder.refs.folderEmpty.getDOMNode().textContent, 'This folder is empty', 'displays the empty message'
+
+  test 'when folder are present, FolderChild generates a line item', ->
+    # this test should stub out FolderChild and just see if it was passed the correct props but
+    # I can't figure out how to do that. This is the next best thing
+    folder = new Folder()
+    folder.children = -> [new Folder(cid: '1')]
+    folderObject =
+      params: {}
+      onResolvePath: ->
+      currentFolder: folder
+      query: ''
+      toggleItemSelected: ->
+      selectedItems: []
+
+    showFolderTest folderObject, ->
+      ok $('.ef-item-row').length, 'generates an item row'
+
+  module 'ShowFolder#registerListeners',
+    setup: ->
+    teardown: ->
+      Folder.resolvePath.restore()
+      Router.Link.restore()
+      React.unmountComponentAtNode($('#fixtures')[0])
+  
+  test 'does nothing if there is no currentFolder', ->
+    mockProps = sinon.mock()
+    folder = new Folder()
+    folder.children = -> [new Folder(cid: '1')]
+    folderObject =
+      params: {}
+      onResolvePath: ->
+      currentFolder: folder
+      query: ''
+      toggleItemSelected: ->
+      selectedItems: []
+
+    showFolderTest folderObject, ->
+      @showFolder.registerListeners(mockProps)
+      ok mockProps.never(), "doesn't call methods in the mock"
+
+  test 'applies change handlers to folder when currentFolder exists', ->
+    folder = new Folder()
+    sinon.spy(folder, 'on')
+    mockProps = {currentFolder: {folders: folder, files: folder}}
+
+    folder.children = -> [new Folder(cid: '1')]
+    folderObject =
+      params: {}
+      onResolvePath: ->
+      currentFolder: folder
+      query: ''
+      toggleItemSelected: ->
+      selectedItems: []
+
+    showFolderTest folderObject, ->
+      @showFolder.registerListeners(mockProps)
+      ok folder.on.calledTwice, 'Calls "on" twice'
+    folder.on.restore()
