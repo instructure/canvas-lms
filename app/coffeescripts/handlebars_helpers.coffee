@@ -125,6 +125,7 @@ define [
     # convert an event date and time to a string using the given date and time format specifiers
     tEventToString : (date = '', i18n_date_format = 'short', i18n_time_format = 'tiny') ->
       I18n.t 'time.event',
+        defaultValue: '%{date} at %{time}',
         date: I18n.l "date.formats.#{i18n_date_format}", date
         time: I18n.l "time.formats.#{i18n_time_format}", date
 
