@@ -69,6 +69,14 @@ class Announcement < DiscussionTopic
         !record.context.concluded? and
       ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
+
+    dispatch :announcement_created_by_you
+    to { user }
+    whenever { |record|
+      record.context.available? and
+        !record.context.concluded? and
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+    }
   end
 
   set_policy do
