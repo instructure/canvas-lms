@@ -1,4 +1,7 @@
 set :stage, :production
+set :app_node_prefix, "canvas-ap"
+set :canvas_url, 'https://canvas.sfu.ca'
+
 role :db,  %w{canvas-mp1.tier2.sfu.ca canvas-mp2.tier2.sfu.ca}
 
 namespace :deploy do
