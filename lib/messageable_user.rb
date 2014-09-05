@@ -17,7 +17,7 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
+  COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" } # SFU MOD - CANVAS-255 Use display name in Conversations
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
