@@ -1,3 +1,5 @@
+require Pathname(File.dirname(__FILE__)) + "../helpers/common"
+
 class CourseDataController < ApplicationController
   before_filter :require_user
   include Common
