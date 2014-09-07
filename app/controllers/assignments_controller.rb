@@ -111,7 +111,7 @@ class AssignmentsController < ApplicationController
     end
     if authorized_action(@assignment, @current_user, :read)
 
-      if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
+      if @context.feature_enabled?(:differentiated_assignments) && @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
         respond_to do |format|
           flash[:error] = t 'notices.assignment_not_availible', "The assignment you requested is not availible to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
