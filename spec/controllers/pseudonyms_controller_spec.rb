@@ -374,8 +374,9 @@ describe PseudonymsController do
       @user1 = @user
       @pseudonym1 = @pseudonym
 
+      role = custom_account_role('sis_only', :account => account1)
       user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwerty2')
-      account_admin_user_with_role_changes(user: @user, account: account1, membership_type: 'sis_only', role_changes: { manage_sis: true, manage_user_logins: true })
+      account_admin_user_with_role_changes(user: @user, account: account1, role: role, role_changes: { manage_sis: true, manage_user_logins: true })
       user_session(@user, @pseudonym)
 
       post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :sis_user_id => 'sis1' }

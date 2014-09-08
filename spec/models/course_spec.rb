@@ -202,9 +202,11 @@ describe Course do
     # we have to reload the users after each course change here to catch the
     # enrollment changes that are applied directly to the db with update_all
     it "should grant delete to the proper individuals" do
-      account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
       @admin1 = @admin
-      account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
       @designer = user(:active_all => true)
@@ -258,9 +260,11 @@ describe Course do
     end
 
     it "should grant reset_content to the proper individuals" do
-      account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
       @admin1 = @admin
-      account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
       @designer = user(:active_all => true)
@@ -1344,7 +1348,7 @@ describe Course, "tabs_available" do
 
     it "should not show discussion tab for observers without read_forum" do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+                           :role => observer_role, :enabled => false)
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
     end
@@ -3015,14 +3019,14 @@ describe Course, "section_visibility" do
     it "should return no students except self and the observed" do
       expect(@course.students_visible_to(@observer)).to eq [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       expect(@course.students_visible_to(@student1)).to eq [@student1]
     end
 
     it "should return no sections" do
       expect(@course.sections_visible_to(@observer)).to eq []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       expect(@course.sections_visible_to(@student1)).to eq []
     end
   end
@@ -3032,7 +3036,7 @@ describe Course, "section_visibility" do
       expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true)).to eql :full
       expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true)).to eql :restricted
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true)).to eql :restricted
     end
   end
@@ -3771,33 +3775,33 @@ describe Course do
         @account = Account.default
         course
         user
-        custom_student_role('LazyStudent')
-        custom_student_role('HonorStudent')
+        @lazy_role = custom_student_role('LazyStudent')
+        @honor_role = custom_student_role('HonorStudent') # ba-dum-tssh
       end
 
       it "should re-use an enrollment with the same role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
         expect(@user.enrollments.count).to eql 1
         expect(enrollment1).to eql enrollment2
       end
 
       it "should not re-use an enrollment with a different role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @lazy_role)
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
         expect(@user.enrollments.count).to eql 2
-        expect(enrollment1).not_to eql enrollment2
+        expect(enrollment1).to_not eql enrollment2
       end
 
       it "should not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment')
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
         expect(@user.enrollments.count).to eql 2
-        expect(enrollment1).not_to eql enrollment2
+        expect(enrollment1).to_not eql enrollment2
       end
 
       it "should not re-use an enrollment with a role when enrolling with no role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @lazy_role)
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment')
         expect(@user.enrollments.count).to eql 2
         expect(enrollment1).not_to eql enrollment2

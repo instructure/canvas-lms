@@ -47,16 +47,27 @@ describe "Admins API", type: :request do
         { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
-      expect(admin.membership_type).to eq 'AccountAdmin'
+      expect(admin.role).to eq admin_role
     end
 
     it "should respect the provided role, if any" do
+      role = custom_account_role('CustomAccountUser', :account => @admin.account)
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
         { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id, :role => "CustomAccountUser" })
+        { :user_id => @new_user.id, :role_id => role.id })
       @new_user.reload
       admin = @new_user.account_users.first
-      expect(admin.membership_type).to eq 'CustomAccountUser'
+      expect(admin.role).to eq role
+    end
+
+    it "should be able to find a role by name (though deprecated)" do
+      role = custom_account_role('CustomAccountUser', :account => @admin.account)
+      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                      { :user_id => @new_user.id, :role => "CustomAccountUser" })
+      @new_user.reload
+      admin = @new_user.account_users.first
+      expect(admin.role).to eq role
     end
 
     it "should return json of the new admin association" do
@@ -67,7 +78,8 @@ describe "Admins API", type: :request do
       admin = @new_user.account_users.first
       expect(json).to eq({
         "id" => admin.id,
-        "role" => admin.membership_type,
+        "role_id" => admin.role_id,
+        "role" => admin.role.name,
         "user" => {
           "id" => @new_user.id,
           "name" => @new_user.name,
@@ -168,44 +180,51 @@ describe "Admins API", type: :request do
 
     context "with custom membership" do
       before :once do
-        @au = @account.account_users.create! :user => @new_user, :membership_type => 'CustomAdmin'
+        @role = custom_account_role('CustomAdmin', :account => @account)
+        @au = @account.account_users.create! :user => @new_user, :role => @role
       end
 
       it "should remove a custom membership from a user" do
+        api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(:role_id => @role.id))
+        expect(@account.account_users.find_by_user_id_and_role_id(@new_user.id, @role.id)).to be_nil
+      end
+
+      it "should still work using the deprecated role param" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).not_to be_exists
+        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq false
       end
 
       it "should 404 if the membership type doesn't exist" do
         api_call(:delete, @path + "?role=Blah", @path_opts.merge(:role => "Blah"), {}, {}, :expected_status => 404)
-        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).to be_exists
+        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq true
       end
 
       it "should 404 if the membership type isn't specified" do
         api_call(:delete, @path, @path_opts, {}, {}, :expected_status => 404)
-        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).to be_exists
+        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq true
       end
     end
 
     context "with multiple memberships" do
       before :once do
+        @role = custom_account_role('CustomAdmin', :account => @account)
         @au1 = @account.account_users.create! :user => @new_user
-        @au2 = @account.account_users.create! :user => @new_user, :membership_type => 'CustomAdmin'
+        @au2 = @account.account_users.create! :user => @new_user, :role => @role
       end
 
       it "should leave the AccountAdmin membership alone when deleting the custom membership" do
-        api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["AccountAdmin"]
+        api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(:role_id => @role.id))
+        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [admin_role.id]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership implicitly" do
         api_call(:delete, @path, @path_opts)
-        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["CustomAdmin"]
+        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership explicitly" do
-        api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["CustomAdmin"]
+        api_call(:delete, @path + "?role_id=#{admin_role.id}", @path_opts.merge(:role_id => admin_role.id))
+        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
       end
     end
   end
@@ -229,9 +248,11 @@ describe "Admins API", type: :request do
 
     context "with account users" do
       before :once do
+        @roles = {}
         2.times do |x|
           u = user(:name => "User #{x}", :account => @account)
-          @account.account_users.create!(:user => u, :membership_type => "MT #{x}")
+          @roles[x] = custom_account_role("MT #{x}", :account => @account)
+          @account.account_users.create!(:user => u, :role => @roles[x])
         end
         @another_admin = @user
         @user = @admin
@@ -241,6 +262,7 @@ describe "Admins API", type: :request do
         json = api_call(:get, @path, @path_opts)
         expect(json).to be_include({"id"=>@admin.account_users.first.id,
                                 "role"=>"AccountAdmin",
+                                "role_id" => admin_role.id,
                                 "user"=>
                                     {"id"=>@admin.id,
                                      "name"=>@admin.name,
@@ -253,6 +275,7 @@ describe "Admins API", type: :request do
         json = api_call(:get, @path, @path_opts.merge(user_id: @admin.id))
         expect(json).to eq [{"id"=>@admin.account_users.first.id,
                         "role"=>"AccountAdmin",
+                        "role_id" => admin_role.id,
                         "user"=>
                             {"id"=>@admin.id,
                              "name"=>@admin.name,
@@ -265,6 +288,7 @@ describe "Admins API", type: :request do
         json = api_call(:get, @path, @path_opts.merge(user_id: [@admin.id, @another_admin.id]))
         expect(json).to eq [{"id"=>@admin.account_users.first.id,
                         "role"=>"AccountAdmin",
+                        "role_id" => admin_role.id,
                         "user"=>
                             {"id"=>@admin.id,
                              "name"=>@admin.name,
@@ -273,6 +297,7 @@ describe "Admins API", type: :request do
                              "login_id"=>@admin.pseudonym.unique_id}},
                        {"id"=>@another_admin.account_users.first.id,
                         "role"=>"MT 1",
+                        "role_id"=>@roles[1].id,
                         "user"=>
                             {"id"=>@another_admin.id,
                              "name"=>@another_admin.name,
@@ -283,14 +308,14 @@ describe "Admins API", type: :request do
       it "should paginate" do
         json = api_call(:get, @path + "?per_page=2", @path_opts.merge(:per_page => '2'))
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }).to eq [
-            { :user => @admin.name, :role => 'AccountAdmin' },
-            { :user => "User 0", :role => "MT 0" },
+        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
+            { :user => @admin.name, :role => 'AccountAdmin', :role_id => admin_role.id },
+            { :user => "User 0", :role => "MT 0", :role_id => @roles[0].id },
         ]
         json = api_call(:get, @path + "?per_page=2&page=2", @path_opts.merge(:per_page => '2', :page => '2'))
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }).to eq [
-            { :user => "User 1", :role => "MT 1" }
+        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
+            { :user => "User 1", :role => "MT 1", :role_id => @roles[1].id }
         ]
       end
     end

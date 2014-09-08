@@ -28,7 +28,7 @@ class Cacher < ActiveRecord::Observer
     when AccountUser
       if obj.account_id == Account.site_admin.id
         Shard.default.activate do
-          MultiCache.delete("all_site_admin_account_users2")
+          MultiCache.delete("all_site_admin_account_users3")
         end
       end
     end

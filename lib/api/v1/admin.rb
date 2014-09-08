@@ -24,7 +24,8 @@ module Api::V1::Admin
     # admin is an AccountUser
     {
       :id => admin.id,
-      :role => admin.membership_type,
+      :role => admin.role.name,
+      :role_id => admin.role_id,
       :user => user_json(admin.user, current_user, session)
     }.tap do |hash|
       hash[:status] = 'deleted' if admin.destroyed?

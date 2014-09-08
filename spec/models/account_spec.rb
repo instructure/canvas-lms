@@ -385,15 +385,11 @@ describe Account do
     expect(a2.enrollment_terms.size).to eq 0
   end
 
-  def account_with_admin_and_restricted_user(account)
-    role = account.roles.build(:name => 'Restricted Admin')
-    role.base_role_type = AccountUser::BASE_ROLE_NAME
-    role.workflow_state = 'active'
-    role.save!
+  def account_with_admin_and_restricted_user(account, restricted_role)
     admin = User.create
     user = User.create
-    account.account_users.create(:user => admin, :membership_type => 'AccountAdmin')
-    account.account_users.create(:user => user, :membership_type => 'Restricted Admin')
+    account.account_users.create!(:user => admin, :role => admin_role)
+    account.account_users.create!(:user => user, :role => restricted_role)
     [ admin, user ]
   end
 
@@ -407,9 +403,12 @@ describe Account do
 
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
-    # role in each one, and create an admin user and a user in the restricted
-    # admin role for each one
+    # role available for each one, and create an admin user and a user in that restricted role
+    @sa_role = custom_account_role('Restricted SA Admin', :account => Account.site_admin)
+
     root_account = Account.create
+    @root_role = custom_account_role('Restricted Root Admin', :account => root_account)
+
     sub_account = Account.create(:parent_account => root_account)
     sub_sub_account = Account.create(:parent_account => sub_account)
 
@@ -421,7 +420,7 @@ describe Account do
 
     hash.each do |k, v|
       v[:account].update_attribute(:settings, {:no_enrollments_can_create_courses => false})
-      admin, user = account_with_admin_and_restricted_user(v[:account])
+      admin, user = account_with_admin_and_restricted_user(v[:account], (k == :site_admin ? @sa_role : @root_role))
       hash[k][:admin] = admin
       hash[k][:user] = user
     end
@@ -468,7 +467,7 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create!(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+      account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       # clear caches
       v[:account] = Account.find(account)
     end
@@ -939,7 +938,7 @@ describe Account do
     end
   end
 
-  describe "available_course_roles_by_name" do
+  describe "available_custom_course_roles" do
     before :once do
       account_model
       @roleA = @account.roles.create :name => 'A'
@@ -949,32 +948,31 @@ describe Account do
       @roleB.base_role_type = 'StudentEnrollment'
       @roleB.save!
       @sub_account = @account.sub_accounts.create!
-      @roleBsub = @sub_account.roles.create :name => 'B'
-      @roleBsub.base_role_type = 'StudentEnrollment'
-      @roleBsub.save!
+      @roleC = @sub_account.roles.create :name => 'C'
+      @roleC.base_role_type = 'StudentEnrollment'
+      @roleC.save!
     end
 
     it "should return roles indexed by name" do
-      expect(@account.available_course_roles_by_name).to eq({ 'A' => @roleA, 'B' => @roleB })
+      expect(@account.available_custom_course_roles.sort_by(&:id)).to eq [ @roleA, @roleB ].sort_by(&:id)
     end
 
     it "should not return inactive roles" do
       @roleB.deactivate!
-      expect(@account.available_course_roles_by_name).to eq({ 'A' => @roleA })
+      expect(@account.available_custom_course_roles).to eq [ @roleA ]
     end
 
     it "should not return deleted roles" do
       @roleA.destroy
-      expect(@account.available_course_roles_by_name).to eq({ 'B' => @roleB })
+      expect(@account.available_custom_course_roles).to eq [ @roleB ]
     end
 
-    it "should find the most derived version of each role" do
-      expect(@sub_account.available_course_roles_by_name).to eq({ 'A' => @roleA, 'B' => @roleBsub })
+    it "should derive roles from parents" do
+      expect(@sub_account.available_custom_course_roles.sort_by(&:id)).to eq [ @roleA, @roleB, @roleC ].sort_by(&:id)
     end
 
-    it "should find a base role if the derived version is inactive" do
-      @roleBsub.deactivate!
-      expect(@sub_account.available_course_roles_by_name).to eq({ 'A' => @roleA, 'B' => @roleB })
+    it "should include built-in roles when called" do
+      expect(@sub_account.available_course_roles.sort_by(&:id)).to eq ([ @roleA, @roleB, @roleC ] + Role.built_in_course_roles).sort_by(&:id)
     end
   end
 

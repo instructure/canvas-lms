@@ -25,7 +25,7 @@ class Account < ActiveRecord::Base
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
 
   EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
-    :membership_types, :default_time_zone, :external_status, :storage_quota,
+    :default_time_zone, :external_status, :storage_quota,
     :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
     :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
     :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
@@ -646,6 +646,28 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def self.sub_account_ids_recursive(parent_account_id)
+    if connection.adapter_name == 'PostgreSQL'
+      sql = "
+          WITH RECURSIVE t AS (
+            SELECT id, parent_account_id FROM accounts
+            WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
+            UNION
+            SELECT accounts.id, accounts.parent_account_id FROM accounts
+            INNER JOIN t ON accounts.parent_account_id = t.id
+            WHERE accounts.workflow_state <> 'deleted'
+          )
+          SELECT id FROM t"
+      Account.find_by_sql(sql).map(&:id)
+    else
+      account_descendants = lambda do |ids|
+        as = Account.where(:parent_account_id => ids).active.pluck(:id)
+        as + account_descendants.call(as)
+      end
+      account_descendants.call([parent_account_id])
+    end
+  end
+
   def associated_accounts
     self.account_chain
   end
@@ -654,46 +676,79 @@ class Account < ActiveRecord::Base
     self.account_users.where(user_id: user).first if user
   end
 
-  def available_custom_account_roles
-    account_roles = roles.for_accounts.active
-    account_roles |= self.parent_account.available_custom_account_roles if self.parent_account
+  def available_custom_account_roles(include_inactive=false)
+    account_roles = include_inactive ? self.roles.for_accounts.not_deleted : self.roles.for_accounts.active
+    account_roles += self.parent_account.available_custom_account_roles(include_inactive) if self.parent_account
     account_roles
   end
 
-  def available_account_roles(user = nil)
-    account_roles = roles.for_accounts.active.map(&:name)
-    account_roles |= ['AccountAdmin']
-    account_roles |= self.parent_account.available_account_roles if self.parent_account
+  def available_account_roles(include_inactive=false, user = nil)
+    account_roles = available_custom_account_roles(include_inactive)
+    account_roles << Role.get_built_in_role('AccountAdmin')
     if user
-      account_roles.select! { |role| account_users.new(membership_type: role).grants_right?(user, :create) }
+      account_roles.select! { |role| au = account_users.new; au.role_id = role.id; au.grants_right?(user, :create) }
     end
     account_roles
   end
 
+  def available_custom_course_roles(include_inactive=false)
+    course_roles = include_inactive ? self.roles.for_courses.not_deleted : self.roles.for_courses.active
+    course_roles += self.parent_account.available_custom_course_roles(include_inactive) if self.parent_account
+    course_roles
+  end
+
   def available_course_roles(include_inactive=false)
-    available_course_roles_by_name(include_inactive).keys
+    course_roles = available_custom_course_roles(include_inactive)
+    course_roles += Role.built_in_course_roles
+    course_roles
   end
 
-  def available_course_roles_by_name(include_inactive=false)
-    scope = include_inactive ? roles.for_courses.not_deleted : roles.for_courses.active
-    role_map = {}
-    scope.each { |role| role_map[role.name] = role }
-    role_map.reverse_merge!(parent_account.available_course_roles_by_name(include_inactive)) if parent_account
-    role_map
+  def available_roles(include_inactive=false)
+    available_account_roles(include_inactive) + available_course_roles(include_inactive)
   end
 
-  def get_course_role(role_name)
-    course_role = self.roles.for_courses.not_deleted.where(name: role_name).first
-    course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
-    course_role
+  def get_account_role_by_name(role_name)
+    role = get_role_by_name(role_name)
+    return role if role && role.account_role?
   end
 
-  def has_role?(role_name)
-    !!roles.not_deleted.where(:roles => { :name => role_name}).first
+  def get_course_role_by_name(role_name)
+    role = get_role_by_name(role_name)
+    return role if role && role.course_role?
   end
 
-  def find_role(role_name)
-    roles.not_deleted.where(name: role_name).first || (parent_account && parent_account.find_role(role_name))
+  def get_role_by_name(role_name)
+    if role = Role.get_built_in_role(role_name)
+      return role
+    end
+
+    self.shard.activate do
+      role_scope = Role.not_deleted.where(:name => role_name)
+      if connection.adapter_name == 'PostgreSQL'
+        role_scope = role_scope.where("account_id = ? OR
+          account_id IN (
+            WITH RECURSIVE t AS (
+              SELECT id, parent_account_id FROM accounts WHERE id = ?
+              UNION
+              SELECT accounts.id, accounts.parent_account_id FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+            )
+            SELECT id FROM t
+          )", self.id, self.id)
+      else
+        role_scope = role_scope.where(:account_id => self.account_chain.map(&:id))
+      end
+
+      role_scope.first
+    end
+  end
+
+  def get_role_by_id(role_id)
+    role = Role.get_role_by_id(role_id)
+    return role if valid_role?(role)
+  end
+
+  def valid_role?(role)
+    role && (role.built_in? || (self.id == role.account_id) || self.account_chain.map(&:id).include?(role.account_id))
   end
 
   def account_authorization_config
@@ -742,16 +797,16 @@ class Account < ActiveRecord::Base
     if self == Account.site_admin
       shard.activate do
         @account_users_cache[user.global_id] ||= begin
-          all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users2") do
+          all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
             # this is a plain ruby hash to keep the cached portion as small as possible
-            self.account_users.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.membership_type]; result }
+            self.account_users.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
           end
-          (all_site_admin_account_users_hash[user.id] || []).map do |(id, type)|
+          (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
             au = AccountUser.new
             au.id = id
             au.account = Account.site_admin
             au.user = user
-            au.membership_type = type
+            au.role_id = role_id
             au.readonly!
             au
           end
@@ -787,10 +842,11 @@ class Account < ActiveRecord::Base
       can :create_courses if permission == :manage_courses
 
       next unless details[:account_only]
-      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
-        given { |user| user && RoleOverride.permission_for(self, self, permission, role)[:enabled] &&
+      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
+        given { |user|
+          user && RoleOverride.permission_for(self, permission, Role.get_built_in_role(role_name))[:enabled] &&
           self.course_account_associations.joins('INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id').
-            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user).first &&
+            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).first &&
           (!details[:if] || send(details[:if])) }
         can permission
       end

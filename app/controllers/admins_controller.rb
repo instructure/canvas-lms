@@ -57,9 +57,13 @@ class AdminsController < ApplicationController
   # @argument user_id [Required, Integer]
   #   The id of the user to promote.
   #
-  # @argument role [String]
+  # @argument role [String] (deprecated)
   #   The user's admin relationship with the account will be created with the
   #   given role. Defaults to 'AccountAdmin'.
+  #
+  # @argument role_id [Integer]
+  #   The user's admin relationship with the account will be created with the
+  #   given role. Defaults to the built-in role for 'AccountAdmin'.
   #
   # @argument send_confirmation [Boolean] Send a notification email to
   #   the new admin if true. Default is true.
@@ -68,18 +72,22 @@ class AdminsController < ApplicationController
   def create
     user = api_find(User, params[:user_id])
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless user.find_pseudonym_for_account(@context.root_account, true)
-    role = params[:role] || 'AccountAdmin'
-    admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+
+    require_role
+    admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
 
     if authorized_action(admin, @current_user, :create)
       if admin.new_record?
-        admin.save!
-        if !(params[:send_confirmation] == '0')
-          if user.registered?
-            admin.account_user_notification!
-          else
-            admin.account_user_registration!
+        if admin.save
+          if !(params[:send_confirmation] == '0')
+            if user.registered?
+              admin.account_user_notification!
+            else
+              admin.account_user_registration!
+            end
           end
+        else
+          return render :json => admin.errors, :status => :bad_request
         end
       end
       render :json => admin_json(admin, @current_user, session)
@@ -90,15 +98,19 @@ class AdminsController < ApplicationController
   #
   # Remove the rights associated with an account admin role from a user.
   #
-  # @argument role [String]
+  # @argument role [String] (Deprecated)
   #   Account role to remove from the user. Defaults to 'AccountAdmin'. Any
   #   other account role must be specified explicitly.
+  #
+  # @argument role_id [Integer]
+  #   The user's admin relationship with the account will be created with the
+  #   given role. Defaults to the built-in role for 'AccountAdmin'.
   #
   # @returns Admin
   def destroy
     user = api_find(User, params[:user_id])
-    role = params[:role] || 'AccountAdmin'
-    admin = @context.account_users.where(user_id: user, membership_type: role).first!
+    require_role
+    admin = @context.account_users.where(user_id: user, role_id: @role.id).first!
     if authorized_action(admin, @current_user, :destroy)
       admin.destroy
       render :json => admin_json(admin, @current_user, session)
@@ -121,5 +133,13 @@ class AdminsController < ApplicationController
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }
     end
+  end
+
+  protected
+
+  def require_role
+    @role = Role.get_role_by_id(params[:role_id]) if params[:role_id]
+    @role ||= @context.get_account_role_by_name(params[:role]) if params[:role]
+    @role ||= Role.get_built_in_role("AccountAdmin")
   end
 end

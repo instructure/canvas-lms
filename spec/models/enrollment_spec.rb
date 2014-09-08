@@ -91,8 +91,9 @@ describe Enrollment do
 
   describe "sis_role" do
     it "should return role_name if present" do
+      role = custom_account_role('Assistant Grader', :account => Account.default)
       e = TaEnrollment.new
-      e.role_name = 'Assistant Grader'
+      e.role_id = role.id
       expect(e.sis_role).to eq 'Assistant Grader'
     end
 
@@ -275,9 +276,10 @@ describe Enrollment do
 
   context "permissions" do
     it "should grant read rights to account members with the ability to read_roster" do
-      user = account_admin_user(:membership_type => "AccountMembership")
+      role = Role.get_built_in_role("AccountMembership")
+      user = account_admin_user(:role => role)
       RoleOverride.create!(:context => Account.default, :permission => :read_roster,
-                           :enrollment_type => "AccountMembership", :enabled => true)
+                           :role => role, :enabled => true)
       @enrollment.save
 
       expect(@enrollment.user.grants_right?(user, :read)).to eq false

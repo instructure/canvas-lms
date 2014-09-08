@@ -31,29 +31,33 @@ class AccountNotification < ActiveRecord::Base
 
   def self.for_user_and_account(user, account)
     current = self.for_account(account)
+
     ActiveRecord::Associations::Preloader.new(current, [:account, :account_notification_roles]).run
-    user_role_types = {}
+    user_role_ids = {}
 
     current.select! do |announcement|
-      role_types = announcement.account_notification_roles.map(&:role_type)
-      unless user_role_types.key?(announcement.account_id)
+
+      role_ids = announcement.account_notification_roles.map(&:role_id)
+      unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         if announcement.account.site_admin?
           # roles user holds with respect to courses
-          user_role_types[announcement.account_id] = user.enrollments.with_each_shard{ |scope| scope.active.select(:type).uniq.map(&:type) }.uniq
+          enrollment_types = user.enrollments.with_each_shard{ |scope| scope.active.pluck(:type)}.uniq
+          user_role_ids[announcement.account_id] = enrollment_types.map{|type| Role.get_built_in_role(type).id}
           # announcements intended for users not enrolled in any courses have the NilEnrollment role type
-          user_role_types[announcement.account_id] = ["NilEnrollment"] if user_role_types[announcement.account_id].empty?
+          user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
           # roles user holds with respect to accounts
-          user_role_types[announcement.account_id] |= user.account_users.with_each_shard{ |scope| scope.select(:membership_type).uniq.map(&:membership_type) }.uniq
+          user_role_ids[announcement.account_id] |= user.account_users.with_each_shard{|scope| scope.map(&:role)}.map(&:id)
         else #if announcement.account == account
           # roles user holds with respect to courses
-          user_role_types[account.id] = user.enrollments_for_account_and_sub_accounts(account).map(&:type)
+          user_role_ids[account.id] = user.enrollments_for_account_and_sub_accounts(account).map(&:role).map(&:id)
           # announcements intended for users not enrolled in any courses have the NilEnrollment role type
-          user_role_types[account.id] = ["NilEnrollment"] if user_role_types[account.id].empty?
+          user_role_ids[account.id] = [nil] if user_role_ids[account.id].empty?
           # roles user holds with respect to accounts
-          user_role_types[account.id] |= account.all_account_users_for(user).map(&:membership_type)
+          user_role_ids[account.id] |= account.all_account_users_for(user).map(&:role).map(&:id)
         end
       end
-      role_types.empty? || (role_types & user_role_types[announcement.account_id]).present?
+
+      role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
     end
 
     user.shard.activate do

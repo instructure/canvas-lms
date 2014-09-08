@@ -811,8 +811,9 @@ describe CoursesController do
       # permission to any course, but will not have :read permission unless
       # they've been granted the :read_course_content role override, which
       # defaults to false for everyone except those with the AccountAdmin role
+      role = custom_account_role('LimitedAccess', :account => Account.site_admin)
       user(:active_all => true)
-      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, :role => role)
       user_session(@user)
 
       get 'show', :id => @course.id
@@ -821,8 +822,9 @@ describe CoursesController do
     end
 
     it "should not redirect xhr to settings page when user can :read_as_admin, but not :read" do
+      role = custom_account_role('LimitedAccess', :account => Account.site_admin)
       user(:active_all => true)
-      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, role: role)
       user_session(@user)
 
       xhr :get, 'show', :id => @course.id
@@ -955,6 +957,16 @@ describe CoursesController do
       expect(@course.observers.first.initial_enrollment_type).to eq 'observer'
     end
 
+    it "should enroll using custom role id" do
+      user_session(@teacher)
+      role = custom_student_role('customrole', :account => @course.account)
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :role_id => role.id
+      expect(response).to be_success
+      @course.reload
+      expect(@course.students.map(&:name)).to include("Sam")
+      expect(@course.student_enrollments.find_by_role_id(role.id)).to_not be_nil
+    end
+
     it "should allow TAs to enroll Observers (by default)" do
       course_with_teacher(:active_all => true)
       @user = user
@@ -985,11 +997,10 @@ describe CoursesController do
   describe "POST create" do
     before do
       @account = Account.default
-      custom_account_role 'lamer', :account => @account
-      @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
-                                      :enrollment_type => 'lamer'
+      role = custom_account_role 'lamer', :account => @account
+      @account.role_overrides.create! :permission => 'manage_courses', :enabled => true, :role => role
       user
-      @account.account_users.create!(user: @user, membership_type: 'lamer')
+      @account.account_users.create!(user: @user, role: role)
       user_session @user
     end
 
@@ -1522,11 +1533,11 @@ describe CoursesController do
       describe "create" do
         before :once do
           @account = Account.default
-          custom_account_role 'lamer', :account => @account
+          role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
-                                          :enrollment_type => 'lamer'
+                                          :role => role
           user
-          @account.account_users.create!(user: @user, membership_type: 'lamer')
+          @account.account_users.create!(user: @user, role: role)
         end
 
         before :each do

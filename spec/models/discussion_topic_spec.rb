@@ -335,7 +335,7 @@ describe DiscussionTopic do
 
     it "should not grant observers read permission when read_forum override is false" do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+                           :role => observer_role, :enabled => false)
 
       relevant_permissions = [:read, :reply, :update, :delete]
       @topic = @course.discussion_topics.create!(:user => @teacher)

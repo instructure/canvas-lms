@@ -1713,7 +1713,7 @@ describe DiscussionTopicsController, type: :request do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       course_with_observer_logged_in(:course => @course)
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+                           :role => observer_role, :enabled => false)
 
       expect { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                       { :controller => 'discussion_topics', :action => 'index', :format => 'json',

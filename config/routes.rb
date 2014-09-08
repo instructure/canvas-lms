@@ -1092,11 +1092,11 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :role_overrides) do
       get 'accounts/:account_id/roles', action: :api_index, as: 'account_roles'
-      get 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :show
+      get 'accounts/:account_id/roles/:id', action: :show
       post 'accounts/:account_id/roles', action: :add_role
-      post 'accounts/:account_id/roles/:role/activate', role: /[^\/]+/, action: :activate_role
-      put 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :update
-      delete 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :remove_role
+      post 'accounts/:account_id/roles/:id/activate', action: :activate_role
+      put 'accounts/:account_id/roles/:id', action: :update
+      delete 'accounts/:account_id/roles/:id', action: :remove_role
     end
 
     scope(controller: :account_reports) do

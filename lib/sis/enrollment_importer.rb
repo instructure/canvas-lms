@@ -109,7 +109,7 @@ module SIS
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id, root_account_sis_id = enrollment
+            course_id, section_id, user_id, role_name, status, start_date, end_date, associated_user_id, root_account_sis_id = enrollment
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -172,23 +172,23 @@ module SIS
             @section.course = @course
 
             # cache available course roles for this account
-            @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles_by_name
+            @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
 
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
             associated_enrollment = nil
-            custom_role = @course_roles_by_account_id[@course.account_id][role]
-            type = if custom_role
-              custom_role.base_role_type
+            role = @course_roles_by_account_id[@course.account_id].detect{|r| r.name == role_name}
+            type = if role
+              role.base_role_type
             else
-              if role =~ /\Ateacher\z/i
+              if role_name =~ /\Ateacher\z/i
                 'TeacherEnrollment'
-              elsif role =~ /\Astudent/i
+              elsif role_name =~ /\Astudent/i
                 'StudentEnrollment'
-              elsif role =~ /\Ata\z/i
+              elsif role_name =~ /\Ata\z/i
                 'TaEnrollment'
-              elsif role =~ /\Aobserver\z/i
+              elsif role_name =~ /\Aobserver\z/i
                 if associated_user_id
                   pseudo = root_account.pseudonyms.where(sis_user_id: associated_user_id).first
                   if status =~ /\Aactive/i
@@ -199,16 +199,21 @@ module SIS
                   end
                 end
                 'ObserverEnrollment'
-              elsif role =~ /\Adesigner\z/i
+              elsif role_name =~ /\Adesigner\z/i
                 'DesignerEnrollment'
               end
             end
             unless type
-              @messages << "Improper role \"#{role}\" for an enrollment"
+              @messages << "Improper role \"#{role_name}\" for an enrollment"
               next
             end
 
-            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_name => custom_role.try(:name)).first
+            role ||= Role.get_built_in_role(type)
+            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_id => role.id).first
+
+            # TODO can remove after enrollment role ids are populated
+            enrollment ||= @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_id => nil).first if role.built_in?
+
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new
               enrollment.root_account = @root_account
@@ -217,7 +222,7 @@ module SIS
             enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")[0..254]
             enrollment.type = type
             enrollment.associated_user_id = associated_enrollment.try(:user_id)
-            enrollment.role_name = custom_role.try(:name)
+            enrollment.role = role
             enrollment.course = @course
             enrollment.course_section = @section
 
@@ -258,7 +263,7 @@ module SIS
               rescue ActiveRecord::RecordInvalid
                 msg = "An enrollment did not pass validation "
                 msg += "(" + "course: #{course_id}, section: #{section_id}, "
-                msg += "user: #{user_id}, role: #{role}, error: " + 
+                msg += "user: #{user_id}, role: #{role_name}, error: " +
                 msg += enrollment.errors.full_messages.join(",") + ")"
                 @messages << msg
                 next

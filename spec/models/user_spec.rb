@@ -635,7 +635,8 @@ describe User do
     it "should not allow restricted admins to become full admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
-      account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
+      role = custom_account_role('Restricted', :account => Account.default)
+      account_admin_user_with_role_changes(:user => @restricted_admin, :role => role, :role_changes => { :become_user => true })
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       Account.default.account_users.create!(user: @admin)
       expect(user.can_masquerade?(@restricted_admin, Account.default)).to be_truthy
@@ -707,9 +708,9 @@ describe User do
 
   context "permissions" do
     it "should not allow account admin to modify admin privileges of other account admins" do
-      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, admin_role)).to be_truthy
     end
   end
 
@@ -745,8 +746,9 @@ describe User do
     before(:once) do
       @admin = user_model
       @student = user_model
-      tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
-      tie_user_to_account(@student, :membership_type => 'Student')
+      tie_user_to_account(@admin, :role => admin_role)
+      role = custom_account_role('Student', :account => Account.default)
+      tie_user_to_account(@student, :role => role)
       set_up_course_with_users
     end
 
@@ -832,7 +834,7 @@ describe User do
 
     it "should not let users message the entire class if they cannot send_messages" do
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # can only message self or the admins

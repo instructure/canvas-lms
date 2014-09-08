@@ -59,11 +59,7 @@ describe UserObserver do
 
   describe 'when adding a custom (second) student enrollment' do
     before(:once) do
-      @custom_student_role = Account.default.roles.build name: 'CustomStudent'
-      @custom_student_role.base_role_type = 'StudentEnrollment'
-      @custom_student_role.workflow_state = 'active'
-      @custom_student_role.save!
-
+      @custom_student_role = custom_student_role('CustomStudent', account: Account.default)
       @course = course active_all: true
       @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
       @observer = user_with_pseudonym
@@ -74,14 +70,14 @@ describe UserObserver do
 
     it "should not attempt to add a duplicate observer enrollment" do
       expect {
-        @course.enroll_student student, role_name: @custom_student_role.name
+        @course.enroll_student student, role: @custom_student_role
       }.not_to raise_error
     end
 
     it "should recycle an existing deleted observer enrollment" do
       @observer_enrollment.destroy
       expect {
-        @course.enroll_student student, role_name: @custom_student_role.name
+        @course.enroll_student student, role: @custom_student_role
       }.not_to raise_error
       expect(@observer_enrollment.reload).to be_invited
     end

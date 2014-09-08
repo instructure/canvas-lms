@@ -28,7 +28,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   def revoke_permission(account_user, permission)
-    RoleOverride.manage_role_override(account_user.account, account_user.membership_type, permission.to_s, :override => false)
+    RoleOverride.manage_role_override(account_user.account, account_user.role, permission.to_s, :override => false)
   end
 
   def create_outcome(opts={})

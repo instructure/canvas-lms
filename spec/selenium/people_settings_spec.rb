@@ -6,7 +6,7 @@ describe "course people" do
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account # for custom roles
-    custom_student_role("custom stu")
+    @custom_student_role = custom_student_role("custom stu")
   end
 
   def add_user(email, type, section_name=nil)
@@ -78,7 +78,7 @@ describe "course people" do
 
     it "should remove a user from the course" do
       username = "user@example.com"
-      student_in_course(:name => username, :role_name => 'custom stu')
+      student_in_course(:name => username, :role => @custom_student_role)
       add_section('Section1')
       @enrollment.course_section = @course_section; @enrollment.save!
 
@@ -89,8 +89,9 @@ describe "course people" do
       expect(f('.roster')).not_to include_text(username)
     end
 
-    def add_user_to_second_section(role_name=nil)
-      student_in_course(:user => user_with_pseudonym, :role_name => role_name)
+    def add_user_to_second_section(role=nil)
+      role ||= student_role
+      student_in_course(:user => user_with_pseudonym, :role => role)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -105,7 +106,7 @@ describe "course people" do
       expect(f("#user_#{@student.id}")).to include_text(section_name)
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
-      @student.enrollments.each{|e|expect(e.role_name).to eq role_name}
+      @student.enrollments.each{|e|expect(e.role_id).to eq role.id}
     end
 
     it "should add a user without custom role to another section" do
@@ -182,12 +183,13 @@ describe "course people" do
     end
 
     it "should handle deleted observee enrollments" do
-      custom_observer_role("obob")
+      custom_observer_role = custom_observer_role("obob")
+
       obs = user_model(:name => "The Observer")
-      student_in_course(:name => "Student 1", :active_all => true, :role_name => 'custom stu')
-      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role_name => 'obob')
-      student = student_in_course(:name => "Student 2", :active_all => true, :role_name => 'custom stu')
-      obs_enrollment = @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true, :role_name => 'obob')
+      student_in_course(:name => "Student 1", :active_all => true, :role => @custom_student_role)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role => custom_observer_role)
+      student = student_in_course(:name => "Student 2", :active_all => true, :role => @custom_student_role)
+      obs_enrollment = @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true, :role => custom_observer_role)
 
       # bye bye Student 2
       obs_enrollment.destroy
@@ -211,7 +213,7 @@ describe "course people" do
         send "custom_#{et}_role", "custom"
         send "course_with_#{et}", :course => @course, :active_all => true, :custom_role => 'custom'
         user_session @user
-        student_in_course :user => user_with_pseudonym, :course => @course, :role_name => 'custom stu'
+        student_in_course :user => user_with_pseudonym, :course => @course, :role => @custom_student_role
 
         go_to_people_page
 
@@ -247,9 +249,9 @@ describe "course people" do
 
     context "custom roles" do
       it "should create new observer enrollments as custom type when adding observees" do
-        custom_observer_role("custom observer")
+        role = custom_observer_role("custom observer")
         student_in_course :course => @course
-        e = course_with_observer(:course => @course, :role_name => "custom observer")
+        e = course_with_observer(:course => @course, :role => role)
 
         go_to_people_page
 
@@ -258,11 +260,11 @@ describe "course people" do
         end
 
         @observer.reload
-        @observer.enrollments.each{|e|expect(e.role_name).to eq 'custom observer'}
+        @observer.enrollments.each{|e|expect(e.role_id).to eq role.id}
       end
 
       it "should create new enrollments as custom type when adding sections" do
-        add_user_to_second_section('custom stu')
+        add_user_to_second_section(@custom_student_role)
       end
 
       def select_new_role_type(type)

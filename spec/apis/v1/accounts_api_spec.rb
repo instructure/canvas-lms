@@ -296,9 +296,9 @@ describe "Accounts API", type: :request do
         @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin with quota rights
-        custom_account_role 'quotas', :account => @a1
-        @a1.role_overrides.create! :enrollment_type => 'quotas', :permission => 'manage_storage_quotas', :enabled => true
-        @a1.account_users.create!(user: @user, membership_type: 'quotas')
+        role = custom_account_role 'quotas', :account => @a1
+        @a1.role_overrides.create! :role => role, :permission => 'manage_storage_quotas', :enabled => true
+        @a1.account_users.create!(user: @user, :role => role)
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -346,10 +346,10 @@ describe "Accounts API", type: :request do
         @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin without quota rights
-        custom_account_role 'no-quotas', :account => @a1
-        @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_account_settings', :enabled => true
-        @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_storage_quotas', :enabled => false
-        @a1.account_users.create!(user: @user, membership_type: 'no-quotas')
+        role = custom_account_role 'no-quotas', :account => @a1
+        @a1.role_overrides.create! :role => role, :permission => 'manage_account_settings', :enabled => true
+        @a1.role_overrides.create! :role => role, :permission => 'manage_storage_quotas', :enabled => false
+        @a1.account_users.create!(user: @user, role: role)
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -696,12 +696,6 @@ describe "Accounts API", type: :request do
 
       # Should return empty result set
       search_term = "0000000000"
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :search_term => search_term })
-      expect(json.length).to eql 0
-
-      # Should return empty result set
-      search_term = "42"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :search_term => search_term })
       expect(json.length).to eql 0

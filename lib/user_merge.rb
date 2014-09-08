@@ -254,15 +254,15 @@ class UserMerge
   def conflict_scope(column)
     other_column = (column == :user_id) ?  :associated_user_id : :user_id
     Enrollment.
-      select("type, role_name, course_section_id, #{other_column}").
-      group("type, role_name, course_section_id, #{other_column}").
+      select("type, role_id, course_section_id, #{other_column}").
+      group("type, role_id, course_section_id, #{other_column}").
       having("COUNT(*) > 1")
   end
 
   def enrollment_conflicts(enrollment, column, users)
     scope = Enrollment.
       where(type: enrollment.type,
-            role_name: enrollment.role_name,
+            role_id: enrollment.role_id,
             course_section_id: enrollment.course_section_id)
 
     if column == :user_id

@@ -19,6 +19,9 @@
 class AccountUser < ActiveRecord::Base
   belongs_to :account
   belongs_to :user
+  belongs_to :role
+  include Role::AssociationHelper
+
   has_many :role_overrides, :as => :context
   has_a_broadcast_policy
   before_validation :infer_defaults
@@ -26,17 +29,20 @@ class AccountUser < ActiveRecord::Base
   after_destroy :touch_user
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
-  attr_accessible :account, :user, :membership_type
+  attr_accessible :account, :user, :role
 
-  EXPORTABLE_ATTRIBUTES = [:id, :account_id, :user_id, :membership_type, :created_at, :updated_at]
+  validate :valid_role?
+
+  EXPORTABLE_ATTRIBUTES = [:id, :account_id, :user_id, :role_id, :created_at, :updated_at]
 
   EXPORTABLE_ASSOCIATIONS = [:account, :user]
 
-  validates_presence_of :account_id, :user_id, :membership_type
+  validates_presence_of :account_id, :user_id, :role_id
 
   alias_method :context, :account
 
-  BASE_ROLE_NAME = 'AccountMembership'
+  DEFAULT_BASE_ROLE_TYPE = 'AccountMembership'
+  BASE_ROLE_TYPES = ['AccountAdmin', 'AccountMembership']
 
   def update_account_associations_if_changed
     if (self.account_id_changed? || self.user_id_changed?)
@@ -57,9 +63,21 @@ class AccountUser < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.membership_type ||= 'AccountAdmin'
+    self.role ||= Role.get_built_in_role('AccountAdmin')
   end
-  
+
+  def valid_role?
+    return true if role.built_in?
+
+    unless role.account_role?
+      self.errors.add(:role_id, "is not a valid account role")
+    end
+
+    unless self.account.valid_role?(role)
+      self.errors.add(:role_id, "is not an available role for this account")
+    end
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :new_account_user
     p.to {|record| record.account.users}
@@ -80,7 +98,7 @@ class AccountUser < ActiveRecord::Base
   end
 
   def readable_type
-    AccountUser.readable_type(self.membership_type)
+    AccountUser.readable_type(self.role.name)
   end
   
   def account_user_registration!
@@ -97,7 +115,7 @@ class AccountUser < ActiveRecord::Base
 
   def enabled_for?(context, action)
     @permission_lookup ||= {}
-    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(account, context, action, base_role_name, membership_type)
+    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(context, action, self.role, self.account)
   end
 
   def has_permission_to?(context, action)
@@ -130,10 +148,6 @@ class AccountUser < ActiveRecord::Base
     end
   end
 
-  def base_role_name
-    BASE_ROLE_NAME
-  end
-  
   def self.readable_type(type)
     if type == 'AccountAdmin' || !type || type.empty?
       t('types.account_admin', "Account Admin")

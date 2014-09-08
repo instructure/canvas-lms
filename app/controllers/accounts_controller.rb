@@ -510,10 +510,10 @@ class AccountsController < ApplicationController
       @account_users = @account.account_users
       ActiveRecord::Associations::Preloader.new(@account_users, user: :communication_channels).run
       order_hash = {}
-      @account.available_account_roles.each_with_index do |type, idx|
-        order_hash[type] = idx
+      @account.available_account_roles.each_with_index do |role, idx|
+        order_hash[role.id] = idx
       end
-      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
+      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
       @role_types = RoleOverride.account_membership_types(@account)
       @enrollment_types = RoleOverride.enrollment_types
@@ -759,14 +759,19 @@ class AccountsController < ApplicationController
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
-    role = params[:membership_type] || 'AccountAdmin'
+    if role_id = params[:role_id]
+      role = Role.get_role_by_id(role_id)
+      raise ActiveRecord::RecordNotFound unless role
+    else
+      role = Role.get_built_in_role('AccountAdmin')
+    end
 
     list = UserList.new(params[:user_list],
                         :root_account => @context.root_account,
                         :search_method => @context.user_list_search_mode_for(@current_user))
     users = list.users
     admins = users.map do |user|
-      admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+      admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
       admin.user = user
       return unless authorized_action(admin, @current_user, :create)
       admin
@@ -785,7 +790,8 @@ class AccountsController < ApplicationController
       { :enrollment => {
           :id => admin.id,
           :name => admin.user.name,
-          :membership_type => admin.membership_type,
+          :role_id => admin.role_id,
+          :membership_type => AccountUser.readable_type(admin.role.name),
           :workflow_state => 'active',
           :user_id => admin.user.id,
           :type => 'admin',

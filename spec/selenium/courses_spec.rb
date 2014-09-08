@@ -249,8 +249,8 @@ describe "courses" do
       role2.base_role_type = "StudentEnrollment"
       role2.save!
 
-      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role_name => role1.name).accept!
-      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role_name => role2.name, :allow_multiple_enrollments => true).accept!
+      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role => role1).accept!
+      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role => role2, :allow_multiple_enrollments => true).accept!
       roles_to_sections = {'CustomStudent1' => 'One', 'CustomStudent2' => 'Two'}
 
       get "/courses/#{@course.id}/users"

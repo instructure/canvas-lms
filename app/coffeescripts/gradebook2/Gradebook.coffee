@@ -241,7 +241,7 @@ define [
         student = studentEnrollment.user
         student.enrollment = studentEnrollment
 
-        if student.enrollment.role == "StudentViewEnrollment"
+        if student.enrollment.type == "StudentViewEnrollment"
           @studentViewStudents[student.id] ||= htmlEscape(student)
         else
           @students[student.id] ||= htmlEscape(student)

@@ -57,6 +57,7 @@ describe EnrollmentsApiController, type: :request do
           'sis_import_id'                       => nil,
           'type'                               => 'StudentEnrollment',
           'role'                               => 'StudentEnrollment',
+          'role_id'                            => student_role.id,
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
@@ -260,7 +261,7 @@ describe EnrollmentsApiController, type: :request do
           @course_role.save!
         end
 
-        it "should set role_name and type for a new enrollment if role is specified" do
+        it "should set role_id and type for a new enrollment if role is specified" do
           json = api_call :post, @path, @path_options,
           {
               :enrollment => {
@@ -272,8 +273,9 @@ describe EnrollmentsApiController, type: :request do
               }
           }
           expect(Enrollment.find(json['id'])).to be_an_instance_of TeacherEnrollment
-          expect(Enrollment.find(json['id']).role_name).to eq 'newrole'
+          expect(Enrollment.find(json['id']).role_id).to eq @course_role.id
           expect(json['role']).to eq 'newrole'
+          expect(json['role_id']).to eq @course_role.id
         end
 
         it "should return an error if type is specified but does not the role's base_role_type" do
@@ -349,8 +351,9 @@ describe EnrollmentsApiController, type: :request do
           sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
           course(:account => sub_account)
 
-          expect(@course.account.roles.active.where(name: 'newrole')).not_to be_exists
-          expect(@course.account.get_course_role('newrole')).not_to be_nil
+          expect(@course.account.roles.active.where(:name => 'newrole').first).to be_nil
+          course_role = @course.account.get_course_role_by_name('newrole')
+          expect(course_role).to_not be_nil
 
           @path = "/api/v1/courses/#{@course.id}/enrollments"
           @path_options = { :controller => 'enrollments_api', :action => 'create', :format => 'json', :course_id => @course.id.to_s }
@@ -360,15 +363,16 @@ describe EnrollmentsApiController, type: :request do
           {
               :enrollment => {
                   :user_id => @unenrolled_user.id,
-                  :role    => 'newrole',
+                  :role_id => course_role.id,
                   :enrollment_state => 'active',
                   :course_section_id => @section.id,
                   :limit_privileges_to_course_section => true
               }
           }
           expect(Enrollment.find(json['id'])).to be_an_instance_of TeacherEnrollment
-          expect(Enrollment.find(json['id']).role_name).to eq 'newrole'
+          expect(Enrollment.find(json['id']).role_id).to eq course_role.id
           expect(json['role']).to eq 'newrole'
+          expect(json['role_id']).to eq course_role.id
         end
       end
     end
@@ -408,6 +412,7 @@ describe EnrollmentsApiController, type: :request do
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
           'role'                               => 'StudentEnrollment',
+          'role_id'                            => student_role.id,
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
@@ -575,7 +580,8 @@ describe EnrollmentsApiController, type: :request do
             'enrollment_state'                   => @enrollment.workflow_state,
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
-            'role'                               => @enrollment.role,
+            'role'                               => @enrollment.role.name,
+            'role_id'                            => @enrollment.role.id,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
                 'html_url' => course_student_grades_url(@course, @student),
@@ -610,7 +616,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'sis_import_id' => sis_batch.id,
@@ -659,7 +666,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'sis_import_id' => nil,
@@ -737,10 +745,10 @@ describe EnrollmentsApiController, type: :request do
           before :once do
             @original_course = @course
             course.offer!
-            role = @course.account.roles.build :name => 'CustomStudent'
-            role.base_role_type = 'StudentEnrollment'
-            role.save!
-            @course.enroll_user(@student, 'StudentEnrollment', :role_name => 'CustomStudent')
+            @role = @course.account.roles.build :name => 'CustomStudent'
+            @role.base_role_type = 'StudentEnrollment'
+            @role.save!
+            @course.enroll_user(@student, 'StudentEnrollment', :role => @role)
           end
 
           it "should include derived roles when called with type=StudentEnrollment" do
@@ -748,21 +756,49 @@ describe EnrollmentsApiController, type: :request do
             expect(json.map{ |e| e['course_id'].to_i }.sort).to eq [@original_course.id, @course.id].sort
           end
 
-          it "should include only vanilla StudentEnrollments when called with role=StudentEnrollment" do
-            json = api_call(:get, "#{@user_path}?role=StudentEnrollment", @user_params.merge(:role => 'StudentEnrollment'))
-            expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
+          context "with role parameter" do
+            it "should include only vanilla StudentEnrollments when called with role=StudentEnrollment" do
+              json = api_call(:get, "#{@user_path}?role=StudentEnrollment", @user_params.merge(:role => 'StudentEnrollment'))
+              expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
+            end
+
+            it "should filter by custom role" do
+              json = api_call(:get, "#{@user_path}?role=CustomStudent", @user_params.merge(:role => 'CustomStudent'))
+              expect(json.map{ |e| e['course_id'].to_i }).to eq [@course.id]
+              expect(json[0]['role']).to eq 'CustomStudent'
+            end
+
+            it "should accept an array of enrollment roles" do
+              json = api_call(:get, "#{@user_path}?role[]=StudentEnrollment&role[]=CustomStudent",
+                              @user_params.merge(:role => %w{StudentEnrollment CustomStudent}))
+              expect(json.map{ |e| e['course_id'].to_i }.sort).to eq [@original_course.id, @course.id].sort
+            end
           end
 
-          it "should filter by custom role" do
-            json = api_call(:get, "#{@user_path}?role=CustomStudent", @user_params.merge(:role => 'CustomStudent'))
-            expect(json.map{ |e| e['course_id'].to_i }).to eq [@course.id]
-            expect(json[0]['role']).to eq 'CustomStudent'
-          end
+          context "with role_id parameter" do
+            it "should include only vanilla StudentEnrollments when called with built in role_id" do
+              json = api_call(:get, "#{@user_path}?role_id=#{student_role.id}", @user_params.merge(:role_id => student_role.id))
+              expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
+            end
 
-          it "should accept an array of enrollment roles" do
-            json = api_call(:get, "#{@user_path}?role[]=StudentEnrollment&role[]=CustomStudent",
-                            @user_params.merge(:role => %w{StudentEnrollment CustomStudent}))
-            expect(json.map{ |e| e['course_id'].to_i }.sort).to eq [@original_course.id, @course.id].sort
+            it "should still work even when the role_id is null (to cover the post-migration, pre-job case)" do
+              @original_course.enrollments.update_all(:role_id => nil)
+              json = api_call(:get, "#{@user_path}?role_id=#{student_role.id}", @user_params.merge(:role_id => student_role.id))
+              expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
+            end
+
+            it "should filter by custom role" do
+              json = api_call(:get, "#{@user_path}?role_id=#{@role.id}", @user_params.merge(:role_id => @role.id))
+              expect(json.map{ |e| e['course_id'].to_i }).to eq [@course.id]
+              expect(json[0]['role']).to eq 'CustomStudent'
+              expect(json[0]['role_id']).to eq @role.id
+            end
+
+            it "should accept an array of enrollment roles" do
+              json = api_call(:get, "#{@user_path}?role_id[]=#{student_role.id}&role_id[]=#{@role.id}",
+                              @user_params.merge(:role_id => [student_role.id, @role.id].map(&:to_param)))
+              expect(json.map{ |e| e['course_id'].to_i }.sort).to eq [@original_course.id, @course.id].sort
+            end
           end
         end
 
@@ -772,7 +808,7 @@ describe EnrollmentsApiController, type: :request do
             role.base_role_type = 'StudentEnrollment'
             role.save!
             @original_student = @student
-            student_in_course(:course => @course, :role_name => 'CustomStudent')
+            student_in_course(:course => @course, :role => role)
           end
 
           it "should include derived roles when called with type=StudentEnrollment" do
@@ -819,7 +855,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
@@ -865,7 +902,8 @@ describe EnrollmentsApiController, type: :request do
             'enrollment_state'                   => @enrollment.workflow_state,
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
-            'role'                               => @enrollment.role,
+            'role'                               => @enrollment.role.name,
+            'role_id'                            => @enrollment.role.id,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
                 'html_url' => course_student_grades_url(@course, @student),
@@ -902,7 +940,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => {
@@ -1013,7 +1052,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => user_json,
@@ -1072,7 +1112,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => {
@@ -1149,7 +1190,8 @@ describe EnrollmentsApiController, type: :request do
             'enrollment_state'                   => 'completed',
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
-            'role'                               => @enrollment.role,
+            'role'                               => @enrollment.role.name,
+            'role_id'                            => @enrollment.role.id,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
@@ -1200,7 +1242,8 @@ describe EnrollmentsApiController, type: :request do
             'enrollment_state'                   => 'deleted',
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
-            'role'                               => @enrollment.role,
+            'role'                               => @enrollment.role.name,
+            'role_id'                            => @enrollment.role.id,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
@@ -1258,7 +1301,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
@@ -1302,7 +1346,8 @@ describe EnrollmentsApiController, type: :request do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
-            'role' => e.role,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),

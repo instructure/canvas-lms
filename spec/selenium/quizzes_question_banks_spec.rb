@@ -144,7 +144,7 @@ describe "quizzes question banks" do
 
   it "should check permissions when retrieving question banks" do
     @course.account = Account.default
-    @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+    @course.account.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
 

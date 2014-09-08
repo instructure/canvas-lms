@@ -201,7 +201,7 @@ describe "Default Account Reports" do
     @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
                                          :enrollment_state => :completed)
     @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
-                                         :role_name => 'Pixel Engineer',
+                                         :role => role,
                                          :enrollment_state => :active)
   end
 

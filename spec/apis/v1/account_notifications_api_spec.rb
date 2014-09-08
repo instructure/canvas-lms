@@ -64,9 +64,9 @@ describe 'Account Notification API', type: :request do
       expect(json['icon']).to eq 'warning'
     end
 
-    it 'should create an account notification for specific roles' do
+    it 'should create an account notification for specific roles using the old role names' do
       json = api_call(:post, @path, @api_params,
-                       { :account_notification_roles => ['StudentEnrollment'],
+                       { :account_notification_roles => ['AccountAdmin'],
                          :account_notification => {
                            :subject => 'New global notification',
                            :start_at => @start_at.iso8601,
@@ -76,8 +76,43 @@ describe 'Account Notification API', type: :request do
       notification = AccountNotification.last
       roles = notification.account_notification_roles
       expect(roles.count).to eq 1
-      expect(roles.first.role_type).to eq 'StudentEnrollment'
-      expect(json['roles']).to eq ["StudentEnrollment"]
+      expect(roles.first.role_id).to eq admin_role.id
+      expect(json['roles']).to eq ["AccountAdmin"]
+      expect(json['role_ids']).to eq [admin_role.id]
+    end
+
+    it 'should create an account notification for specific roles using role ids' do
+      json = api_call(:post, @path, @api_params,
+                      { :account_notification_roles => [admin_role.id],
+                        :account_notification => {
+                            :subject => 'New global notification',
+                            :start_at => @start_at.iso8601,
+                            :end_at => @end_at.iso8601,
+                            :message => 'This is a notification'}})
+
+      notification = AccountNotification.last
+      roles = notification.account_notification_roles
+      expect(roles.count).to eq 1
+      expect(roles.first.role_id).to eq admin_role.id
+      expect(json['roles']).to eq ["AccountAdmin"]
+      expect(json['role_ids']).to eq [admin_role.id]
+    end
+
+    it 'should create an account notification for the "nil enrollment"' do
+      json = api_call(:post, @path, @api_params,
+                      { :account_notification_roles => ["NilEnrollment"],
+                        :account_notification => {
+                            :subject => 'New global notification',
+                            :start_at => @start_at.iso8601,
+                            :end_at => @end_at.iso8601,
+                            :message => 'This is a notification'}})
+
+      notification = AccountNotification.last
+      roles = notification.account_notification_roles
+      expect(roles.count).to eq 1
+      expect(roles.first.role_id).to eq nil
+      expect(json['roles']).to eq ["NilEnrollment"]
+      expect(json['role_ids']).to eq [nil]
     end
 
     it 'should return not authorized for non admin user' do

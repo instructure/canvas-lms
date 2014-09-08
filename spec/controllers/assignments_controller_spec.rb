@@ -69,7 +69,7 @@ describe AssignmentsController do
 
       it "should separate manage_assignments and manage_grades permissions" do
         user_session(@teacher)
-        @course.account.role_overrides.create! enrollment_type: 'TeacherEnrollment', permission: 'manage_assignments', enabled: false
+        @course.account.role_overrides.create! role: teacher_role, permission: 'manage_assignments', enabled: false
         get 'index', course_id: @course.id
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
@@ -125,7 +125,7 @@ describe AssignmentsController do
       @assignment.save!
 
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+                           :role => observer_role, :enabled => false)
 
       get 'show', :course_id => @course.id, :id => @assignment.id
       expect(response).not_to be_redirect

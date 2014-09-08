@@ -345,6 +345,7 @@ RSpec.configure do |config|
   Onceler.configure do |c|
     c.before :record do
       Account.clear_special_account_cache!(true)
+      Role.ensure_built_in_roles!
       AdheresToPolicy::Cache.clear
       Folder.reset_path_lookups!
     end
@@ -370,6 +371,7 @@ RSpec.configure do |config|
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!(true)
+    Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
   end
 
@@ -394,6 +396,7 @@ RSpec.configure do |config|
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
     Folder.reset_path_lookups!
+    Role.ensure_built_in_roles!
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -472,7 +475,8 @@ RSpec.configure do |config|
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
-        account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+        account.role_overrides.create(:permission => permission.to_s, :enabled => enabled,
+                                      :role => opts[:role] || admin_role)
       end
     end
     RoleOverride.clear_cached_contexts
@@ -483,7 +487,8 @@ RSpec.configure do |config|
     account = opts[:account] || Account.default
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
-    account.account_users.create!(:user => @user, :membership_type => opts[:membership_type])
+
+    account.account_users.create!(:user => @user, :role => opts[:role])
     @user
   end
 
@@ -680,15 +685,16 @@ RSpec.configure do |config|
 
   def account_notification(opts={})
     req_service = opts[:required_account_service] || nil
-    roles = opts[:roles] || []
+    role_ids = opts[:role_ids] || []
     message = opts[:message] || "hi there"
     subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
     @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
-    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
     @announcement.save!
+    @announcement
   end
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
@@ -744,7 +750,31 @@ RSpec.configure do |config|
   end
 
   def custom_account_role(name, opts={})
-    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
+    custom_role(AccountUser::DEFAULT_BASE_ROLE_TYPE, name, opts)
+  end
+
+  def student_role
+    Role.get_built_in_role("StudentEnrollment")
+  end
+
+  def teacher_role
+    Role.get_built_in_role("TeacherEnrollment")
+  end
+
+  def ta_role
+    Role.get_built_in_role("TaEnrollment")
+  end
+
+  def designer_role
+    Role.get_built_in_role("DesignerEnrollment")
+  end
+
+  def observer_role
+    Role.get_built_in_role("ObserverEnrollment")
+  end
+
+  def admin_role
+    Role.get_built_in_role("AccountAdmin")
   end
 
   def user_session(user, pseudonym=nil)

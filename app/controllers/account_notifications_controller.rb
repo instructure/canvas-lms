@@ -60,10 +60,16 @@
 #           }
 #         },
 #         "roles": {
-#           "description": "The roles to send the notification to.  If roles is not passed it defaults to all roles",
+#           "description": "(Deprecated) The roles to send the notification to.  If roles is not passed it defaults to all roles",
 #           "example": "[\"StudentEnrollment\"]",
 #           "type": "array",
 #           "items": {"type": "string"}
+#         },
+#         "role_ids": {
+#           "description": "The roles to send the notification to.  If roles is not passed it defaults to all roles",
+#           "example": "[1]",
+#           "type": "array",
+#           "items": {"type": "integer"}
 #         }
 #       }
 #     }
@@ -117,10 +123,19 @@ class AccountNotificationsController < ApplicationController
     @notification.account = @account
     @notification.user = @current_user
     unless params[:account_notification_roles].nil?
-      roles = params[:account_notification_roles].select do |r|
-        !r.nil? && ( r.to_s == "NilEnrollment" || RoleOverride.enrollment_types.any?{ |rt| rt[:name] == r.to_s } || @account.available_account_roles.include?(r.to_s))
-      end.map { |r| { :role_type => r.to_s } }
-      @notification.account_notification_roles.build(roles)
+      roles = []
+
+      params[:account_notification_roles].each do |role_param|
+        if (role = @account.get_role_by_id(role_param)) && role.account_role?
+          roles << role
+        elsif role = @account.get_account_role_by_name(role_param)
+          roles << role
+        elsif role_param.nil? || role_param.to_s == "NilEnrollment"
+          roles << nil
+        end
+      end
+
+      @notification.account_notification_roles.build(roles.map{|role| {:role => role}})
     end
     respond_to do |format|
       if @notification.save

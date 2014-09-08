@@ -31,7 +31,7 @@ describe ContextModule do
       doc = Nokogiri::HTML(response.body)
       expect(doc.at_css('.add_module_link')).not_to be_nil
 
-      @course.account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_content', enabled: false
+      @course.account.role_overrides.create! role: ta_role, permission: 'manage_content', enabled: false
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"

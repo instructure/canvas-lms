@@ -1643,7 +1643,9 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
-    role_name = opts[:role_name]
+
+    role = opts[:role] || Enrollment.get_built_in_role_for_type(type)
+
     start_at = opts[:start_at]
     end_at = opts[:end_at]
     self_enrolled = opts[:self_enrolled]
@@ -1656,11 +1658,11 @@ class Course < ActiveRecord::Base
     end
     Course.unique_constraint_retry do
       if opts[:allow_multiple_enrollments]
-        e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
+        e = self.all_enrollments.where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id, course_section_id: section.id).first
       else
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
-          where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).
+          where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id).
           order("course_section_id<>#{section.id}").
           first
       end
@@ -1689,7 +1691,7 @@ class Course < ActiveRecord::Base
 
       end
       e.associated_user_id = associated_user_id
-      e.role_name = role_name
+      e.role = role
       e.self_enrolled = self_enrolled
       e.start_at = start_at
       e.end_at = end_at

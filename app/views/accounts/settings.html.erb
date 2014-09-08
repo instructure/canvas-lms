@@ -657,7 +657,7 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% available_roles = @context.available_account_roles(@current_user) %>
+      <% available_roles = @context.available_account_roles(false, @current_user) %>
       <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
@@ -669,10 +669,10 @@ acknowledge that you have read and agreed to the
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
-            <%= label_tag :membership_type, :en => "Add More" %>
-            <select name="membership_type" id="admin_membership_type">
-            <% available_roles.each do |type| %>
-              <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
+            <%= label_tag :role_id, :en => "Add More" %>
+            <select name="role_id" id="admin_role_id">
+            <% available_roles.each do |role| %>
+              <option value="<%= role.id %>"><%= AccountUser.readable_type(role.name) %></option>
             <% end %>
             </select>
           </div>

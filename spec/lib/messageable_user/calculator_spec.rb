@@ -40,7 +40,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should not include sections from restricted visibility courses" do
-        RoleOverride.manage_role_override(Account.default, 'StudentEnrollment', 'send_messages', :override => false)
+        RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', :override => false)
         expect(@calculator.uncached_visible_section_ids).to eq({})
       end
     end
@@ -70,7 +70,7 @@ describe "MessageableUser::Calculator" do
         @observer_enrollment = course_with_observer(:user => @viewing_user, :active_all => true)
         @observer_enrollment.associated_user = student_in_course(:active_all => true).user
         @observer_enrollment.save!
-        RoleOverride.manage_role_override(Account.default, 'ObserverEnrollment', 'send_messages', :override => true)
+        RoleOverride.manage_role_override(Account.default, observer_role, 'send_messages', :override => true)
       end
 
       it "should return an empty hash when no courses" do
@@ -88,7 +88,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should include observed students from restricted visibility courses" do
-        RoleOverride.manage_role_override(Account.default, 'ObserverEnrollment', 'send_messages', :override => false)
+        RoleOverride.manage_role_override(Account.default, observer_role, 'send_messages', :override => false)
         expect(@calculator.uncached_observed_student_ids.keys).to include(@course.id)
         expect(@calculator.uncached_observed_student_ids[@course.id]).to include(@student.id)
       end
@@ -215,7 +215,7 @@ describe "MessageableUser::Calculator" do
 
       context "group in restricted visibilty course" do
         before do
-          RoleOverride.manage_role_override(Account.default, 'StudentEnrollment', 'send_messages', :override => false)
+          RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', :override => false)
         end
 
         it "should not include the group" do
@@ -261,8 +261,8 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should not include groups in restricted visibility courses, even with the user in it" do
-        RoleOverride.manage_role_override(Account.default, 'StudentEnrollment', 'send_messages', :override => false)
-        expect(@calculator.uncached_section_visible_group_ids).not_to include(@group.id)
+        RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', :override => false)
+        expect(@calculator.uncached_section_visible_group_ids).to_not include(@group.id)
       end
     end
 
@@ -522,8 +522,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#observed_student_ids_by_shard" do
       before do
-        RoleOverride.manage_role_override(@account1, 'ObserverEnrollment', 'send_messages', :override => false)
-        RoleOverride.manage_role_override(@account2, 'ObserverEnrollment', 'send_messages', :override => false)
+        RoleOverride.manage_role_override(@account1, observer_role, 'send_messages', :override => false)
+        RoleOverride.manage_role_override(@account2, observer_role, 'send_messages', :override => false)
         @observer_enrollment1 = course_with_observer(:course => @course1, :active_all => true)
         @observer = @observer_enrollment1.user
         @observer_enrollment2 = course_with_observer(:course => @course2, :user => @observer, :active_all => true)
@@ -567,8 +567,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#observed_student_ids_in_courses" do
       before do
-        RoleOverride.manage_role_override(@account1, 'ObserverEnrollment', 'send_messages', :override => false)
-        RoleOverride.manage_role_override(@account2, 'ObserverEnrollment', 'send_messages', :override => false)
+        RoleOverride.manage_role_override(@account1, observer_role, 'send_messages', :override => false)
+        RoleOverride.manage_role_override(@account2, observer_role, 'send_messages', :override => false)
 
         @student1 = student_in_course(:course => @course1, :active_all => true).user
         @observer_enrollment1 = course_with_observer(:course => @course1, :active_all => true)
@@ -1143,8 +1143,9 @@ describe "MessageableUser::Calculator" do
 
         it "should include users messageable via adminned accounts" do
           user
-          tie_user_to_account(@viewing_user, :membership_type => 'AccountAdmin')
-          tie_user_to_account(@user, :membership_type => 'Student')
+          tie_user_to_account(@viewing_user, :role => admin_role)
+          custom_role = custom_account_role('Student', :account => Account.default)
+          tie_user_to_account(@user, :role => custom_role)
           expect(messageable_user_ids).to include(@user.id)
         end
 

@@ -135,7 +135,7 @@ describe AccountsController do
     before(:each) { user_session(@admin) }
 
     it "should allow adding a new account admin" do
-      post 'add_account_user', :account_id => @account.id, :membership_type => 'AccountAdmin', :user_list => 'testadmin@example.com'
+      post 'add_account_user', :account_id => @account.id, :role_id => admin_role.id, :user_list => 'testadmin@example.com'
       expect(response).to be_success
 
       new_admin = CommunicationChannel.where(path: 'testadmin@example.com').first.user
@@ -144,10 +144,22 @@ describe AccountsController do
       expect(@account.account_users.map(&:user)).to be_include(new_admin)
     end
 
+    it "should allow adding a new custom account admin" do
+      role = custom_account_role('custom', :account => @account)
+      post 'add_account_user', :account_id => @account.id, :role_id => role.id, :user_list => 'testadmin@example.com'
+      expect(response).to be_success
+
+      new_admin = CommunicationChannel.find_by_path('testadmin@example.com').user
+      expect(new_admin).to_not be_nil
+      @account.reload
+      expect(@account.account_users.map(&:user)).to be_include(new_admin)
+      expect(@account.account_users.find_by_role_id(role.id).user).to eq new_admin
+    end
+
     it "should allow adding an existing user to a sub account" do
       @subaccount = @account.sub_accounts.create!
       @munda = user_with_pseudonym(:account => @account, :active_all => 1, :username => 'munda@instructure.com')
-      post 'add_account_user', :account_id => @subaccount.id, :membership_type => 'AccountAdmin', :user_list => 'munda@instructure.com'
+      post 'add_account_user', :account_id => @subaccount.id, :role_id => admin_role.id, :user_list => 'munda@instructure.com'
       expect(response).to be_success
       expect(@subaccount.account_users.map(&:user)).to eq [@munda]
     end
@@ -359,12 +371,12 @@ describe AccountsController do
       
       context "with :manage_storage_quotas" do
         before :once do
-          custom_account_role 'quota-setter', :account => @account
+          role = custom_account_role 'quota-setter', :account => @account
           @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
-                                          :enrollment_type => 'quota-setter'
+                                          :role => role
           @account.role_overrides.create! :permission => 'manage_storage_quotas', :enabled => true,
-                                          :enrollment_type => 'quota-setter'
-          @account.account_users.create!(user: @user, membership_type: 'quota-setter')
+                                          :role => role
+          @account.account_users.create!(user: @user, role: role)
         end
         
         it "should allow setting default quota (mb)" do
@@ -398,10 +410,10 @@ describe AccountsController do
       
       context "without :manage_storage_quotas" do
         before :once do
-          custom_account_role 'quota-loser', :account => @account
+          role = custom_account_role 'quota-loser', :account => @account
           @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
-                                          :enrollment_type => 'quota-loser'
-          @account.account_users.create!(user: @user, membership_type: 'quota-loser')
+                                          :role => role
+          @account.account_users.create!(user: @user, role: role)
         end
         
         it "should disallow setting default quota (mb)" do

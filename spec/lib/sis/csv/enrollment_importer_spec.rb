@@ -510,8 +510,8 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,student,,active,",
             "TehCourse,user2,cheater,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role_name]}).to eq [['StudentEnrollment', nil]]
-        expect(@user2.enrollments.map{|e|[e.type, e.role_name]}).to eq [['StudentEnrollment', 'cheater']]
+        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
+        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'cheater']]
       end
 
       it "should not enroll with an inactive role" do
@@ -539,7 +539,7 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,cheater,,active,",
             "TehCourse,user1,insufferable know-it-all,,active,"
         )
-        expect(@user1.enrollments.sort_by(&:id).map(&:role_name)).to eq ['cheater', 'insufferable know-it-all']
+        expect(@user1.enrollments.sort_by(&:id).map(&:role).map(&:name)).to eq ['cheater', 'insufferable know-it-all']
       end
     end
 
@@ -560,8 +560,8 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,instruc-TOR,,active,",
             "TehCourse,user2,student,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role_name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
-        expect(@user2.enrollments.map{|e|[e.type, e.role_name]}).to eq [['StudentEnrollment', nil]]
+        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
+        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
       end
 
       it "should not enroll with an inactive inherited role" do
@@ -572,7 +572,7 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user2,student,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
-        expect(@user2.enrollments.map{|e|[e.type, e.role_name]}).to eq [['StudentEnrollment', nil]]
+        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
         expect(importer.warnings.map(&:last)).to eq ["Improper role \"instruc-TOR\" for an enrollment"]
       end
 
@@ -586,8 +586,8 @@ describe SIS::CSV::EnrollmentImporter do
             "TehCourse,user1,instruc-TOR,,active,",
             "TehCourse,user2,student,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role_name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
-        expect(@user2.enrollments.map{|e|[e.type, e.role_name]}).to eq [['StudentEnrollment', nil]]
+        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
+        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
       end
 
       it "should not enroll with a custom role defined in a sibling account" do
@@ -603,7 +603,7 @@ describe SIS::CSV::EnrollmentImporter do
         )
         expect(importer.warnings.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
         expect(@user1.enrollments.size).to eq 0
-        expect(@user2.enrollments.map{|e|[e.type, e.role_name]}).to eq [['DesignerEnrollment', 'Pixel Pusher']]
+        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['DesignerEnrollment', 'Pixel Pusher']]
       end
     end
   end

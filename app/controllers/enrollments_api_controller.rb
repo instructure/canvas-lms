@@ -275,7 +275,10 @@ class EnrollmentsApiController < ApplicationController
   #   value is given, the type will be inferred by enrollment[role] if supplied,
   #   otherwise 'StudentEnrollment' will be used.
   #
-  # @argument enrollment[role] [String]
+  # @argument enrollment[role] [Deprecated, String]
+  #   Assigns a custom course-level role to the user.
+  #
+  # @argument enrollment[role_id] [Integer]
   #   Assigns a custom course-level role to the user.
   #
   # @argument enrollment[enrollment_state] [String, "active"|"invited"]
@@ -330,33 +333,31 @@ class EnrollmentsApiController < ApplicationController
     else
       return create_self_enrollment if params[:enrollment][:self_enrollment_code]
 
-      role_name = params[:enrollment].delete(:role)
       type = params[:enrollment].delete(:type)
-      if Enrollment.valid_type?(role_name)
-        type = role_name
-        role_name = nil
-      end
-      
-      if role_name.present?
-        params[:enrollment][:role_name] = role_name
-        course_role = @context.account.get_course_role(role_name)
-        if course_role.nil?
-          errors << @@errors[:bad_role]
-        elsif course_role.workflow_state != 'active'
-          errors << @@errors[:inactive_role]
-        else
-          if type.blank?
-            type = course_role.base_role_type
-          elsif type != course_role.base_role_type
-            errors << @@errors[:base_type_mismatch]
-          end
+
+      if role_id = params[:enrollment].delete(:role_id)
+        role = @context.account.get_role_by_id(role_id)
+      elsif role_name = params[:enrollment].delete(:role)
+        role = @context.account.get_course_role_by_name(role_name)
+      else
+        type = "StudentEnrollment" if type.blank?
+        role = Role.get_built_in_role(type)
+        if role.nil? || !role.course_role?
+          errors << @@errors[:bad_type]
         end
       end
 
-      if type.present?
-        errors << @@errors[:bad_type] unless Enrollment.valid_type?(type)
-      else
-        type = 'StudentEnrollment'
+      if role && role.course_role? && !role.deleted?
+        type = role.base_role_type if type.blank?
+        if role.inactive?
+          errors << @@errors[:inactive_role]
+        elsif type != role.base_role_type
+          errors << @@errors[:base_type_mismatch]
+        else
+          params[:enrollment][:role] = role
+        end
+      elsif errors.empty?
+        errors << @@errors[:bad_role]
       end
 
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
@@ -511,13 +512,25 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns [ sql fragment string, replacement hash ]
   def enrollment_index_conditions(use_course_state = false)
-    type, state, role = params.values_at(:type, :state, :role)
+    type, state, role_names, role_ids = params.values_at(:type, :state, :role, :role_id)
     clauses = []
     replacements = {}
 
-    if role.present?
-      clauses << 'COALESCE (enrollments.role_name, enrollments.type) IN (:role)'
-      replacements[:role] = Array(role)
+    if !role_ids.present? && role_names.present?
+      role_ids = Array(role_names).map{|name| @context.account.get_course_role_by_name(name).id}
+    end
+
+    if role_ids.present?
+      role_ids = Array(role_ids).map(&:to_i)
+      condition = 'enrollments.role_id IN (:role_ids)'
+      replacements[:role_ids] = role_ids
+
+      built_in_roles = role_ids.map{|r_id| Role.built_in_roles_by_id[r_id]}.compact
+      if built_in_roles.present?
+        condition = "(#{condition} OR (enrollments.role_id IS NULL AND enrollments.type IN (:built_in_role_types)))"
+        replacements[:built_in_role_types] = built_in_roles.map(&:name)
+      end
+      clauses << condition
     elsif type.present?
       clauses << 'enrollments.type IN (:type)'
       replacements[:type] = Array(type)

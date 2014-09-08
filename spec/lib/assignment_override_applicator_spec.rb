@@ -386,7 +386,7 @@ describe AssignmentOverrideApplicator do
 
         it "should work even if :read_roster is disabled" do
           RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
-                               :enrollment_type => "StudentEnrollment", :enabled => false)
+                               :role => student_role, :enabled => false)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to eq [@override2]
         end

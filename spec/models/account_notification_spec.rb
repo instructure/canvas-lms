@@ -37,9 +37,10 @@ describe AccountNotification do
 
   it "should find announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
-    account_notification(:roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name).id}
+    account_notification(:role_ids => role_ids, :message => "Announcement 1")
     @a1 = @announcement
-    account_notification(:account => @account, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a2 = @announcement
     account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
     @a3 = @announcement
@@ -57,9 +58,9 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
     expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(:account => Account.site_admin, :roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    account_notification(:account => Account.site_admin, :role_ids => role_ids, :message => "Announcement 1")
     @a4 = @announcement
-    account_notification(:account => Account.site_admin, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => Account.site_admin, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a5 = @announcement
     account_notification(:account => Account.site_admin, :message => "Announcement 3") # no roles, should go to all
     @a6 = @announcement
