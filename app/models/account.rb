@@ -208,6 +208,7 @@ class Account < ActiveRecord::Base
   add_setting :google_docs_domain, root_only: true
   add_setting :dashboard_url, root_only: true
   add_setting :product_name, root_only: true
+  add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash)

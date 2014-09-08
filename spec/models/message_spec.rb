@@ -332,31 +332,47 @@ describe Message do
   end
 
   describe "author interface" do
-    let(:user) { user_model(short_name: "Jon Stewart") }
-    let(:authorless_message) { message_model(context: course_model) }
-    let(:conversation) { user.initiate_conversation([user_model]) }
-    let(:convo_message) { conversation.add_message("Message!!!") }
-
-    before(:each) do
-      user.email = "jon@dailyshow.com"
-    end
+    let(:user) { user_model(short_name: "Jon Stewart", email: 'jon@example.com') }
+    let(:authorless_message) { message_model(context: course_model(account: Account.default), context_type: 'Account', context_id: Account.default.id) }
+    let(:conversation_participant) { user.initiate_conversation([user_model], nil, context_type: 'Account', context_id: Account.default.id) }
+    let(:convo_message) { conversation_participant.add_message("Message!!!", root_account_id: Account.default.id) }
+    let(:course) { course_model(account: Account.default) }
 
     it 'loads attributes from a user owned asset' do
-      submission = Submission.new(user: user)
-      message = Message.new(context: submission)
+      account = Account.default
+      account.settings[:author_email_in_notifications] = true
+      account.save!
+      submission = submission_model(user: user, course: course)
+      message = Message.create!(context: submission)
       message.author_short_name.should == user.short_name
       message.author_email_address.should == user.email
       message.author_avatar_url.should =~ /secure.gravatar.com/
     end
 
     it 'loads attributes from an author owned asset' do
-      message = Message.new(context: convo_message)
+      account = Account.default
+      account.settings[:author_email_in_notifications] = true
+      account.save!
+      message = Message.create!(context: convo_message)
       message.author_short_name.should == user.short_name
       message.author_email_address.should == user.email
       message.author_avatar_url.should =~ /secure.gravatar.com/
     end
 
+    it "doesn't reveal the author's email address when the account setting is not set" do
+      account = Account.default
+      account.settings[:author_email_in_notifications] = false
+      account.save!
+      message = Message.create!(context: convo_message)
+      message.author_short_name.should == user.short_name
+      message.author_email_address.should == nil
+      message.author_avatar_url.should =~ /secure.gravatar.com/
+    end
+
     it 'doesnt break when there is no author' do
+      account = Account.default
+      account.settings[:author_email_in_notifications] = true
+      account.save!
       authorless_message.author_short_name.should be_nil
       authorless_message.author_email_address.should be_nil
       authorless_message.author_avatar_url.should be_nil
@@ -366,8 +382,6 @@ describe Message do
       user.avatar_image_url = user.avatar_path
       user.save!
       message = Message.new(context: convo_message)
-      message.author_short_name.should == user.short_name
-      message.author_email_address.should == user.email
       message.author_avatar_url.should == "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
     end
 
