@@ -120,7 +120,7 @@
         </a>
         <% end %>
 
-        <div class="inline-block" role="application">
+        <div class="inline-block">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
@@ -326,7 +326,7 @@
           <% end %>
 
           <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
-            <div class="admin-links" style="margin-left: 5px" role="application">
+            <div class="admin-links" style="margin-left: 5px">
               <a class="al-trigger btn" href="#">
                 <span class="screenreader-only"><%= admin_manage_title %></span>
                 <i class="icon-settings"></i>

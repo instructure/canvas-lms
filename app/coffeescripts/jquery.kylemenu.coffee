@@ -8,7 +8,10 @@ define [
   class KyleMenu
     constructor: (trigger, options) ->
       @$trigger = $(trigger).data('kyleMenu', this)
+      @$ariaMenuWrapper = @$trigger.parent()
       @opts = $.extend(true, {}, KyleMenu.defaults, options)
+
+      @$trigger.click => @$ariaMenuWrapper.attr 'role', 'application'
 
       unless @opts.noButton
         @$trigger.append('<i class="icon-mini-arrow-down"></i>') if @opts.buttonOpts.addDropArrow
@@ -71,6 +74,7 @@ define [
     onClose: =>
       @$menu.insertBefore(@$placeholder) if @opts.appendMenuTo
       @$trigger.removeClass 'ui-state-active'
+      @$ariaMenuWrapper.removeAttr 'role'
       @$menu.removeClass "ui-state-open"
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
 
