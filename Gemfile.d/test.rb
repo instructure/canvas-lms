@@ -6,13 +6,8 @@ group :test do
   gem 'bluecloth', '2.0.10' # for generating api docs
     gem 'redcarpet', '3.0.0'
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
-  if RUBY_VERSION >= '2.1'
-    gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
-      gem 'metaclass', '0.0.2'
-  else
-    gem 'mocha', '1.1.0', :require => false
-      gem 'metaclass', '0.0.2'
-  end
+  gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
+    gem 'metaclass', '0.0.2'
   gem 'thin', '1.5.1'
     if RUBY_VERSION >= '2.2'
       gem 'eventmachine', :github => 'eventmachine/eventmachine'
