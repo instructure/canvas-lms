@@ -508,8 +508,9 @@ class ExternalToolsController < ApplicationController
         resource_link_id: Lti::Asset.opaque_identifier_for(@context),
         content_items: content_json.to_json,
         launch_presentation_return_url: @return_url,
-        tool_consumer_instance_name: @domain_root_account.name,
         context_title: @context.name,
+        tool_consumer_instance_name: @domain_root_account.name,
+        tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
     }).merge(tool.substituted_custom_fields(placement, common_variable_substitutions))
 
     lti_launch = Lti::Launch.new

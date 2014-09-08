@@ -162,6 +162,18 @@ module Lti
           subject.common_variable_substitutions['$Canvas.user.id'].should == 456
         end
 
+        context '$Canvas.user.prefersHighContrast' do
+          it 'substitutes as true' do
+            user.stubs(:prefers_high_contrast?).returns(true)
+            subject.common_variable_substitutions['$Canvas.user.prefersHighContrast'].call.should == 'true'
+          end
+
+          it 'substitutes as false' do
+            user.stubs(:prefers_high_contrast?).returns(false)
+            subject.common_variable_substitutions['$Canvas.user.prefersHighContrast'].call.should == 'false'
+          end
+        end
+
         context 'pseudonym' do
           let(:pseudonym) { Pseudonym.new }
 

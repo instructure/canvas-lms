@@ -57,6 +57,7 @@ describe ExternalToolsController do
       it "generates launch params for a ContentItemSelectionResponse message" do
         user_session(@teacher)
         Lti::Asset.stubs(:opaque_identifier_for).returns('ABC123')
+        HostUrl.stubs(:outgoing_email_address).returns('some_address')
 
         @course.root_account.lti_guid = 'root-account-guid'
         @course.root_account.name = 'root account'
@@ -77,6 +78,7 @@ describe ExternalToolsController do
         lti_launch.params['roles'].should == 'Instructor'
         lti_launch.params['tool_consumer_instance_guid'].should == 'root-account-guid'
         lti_launch.params['tool_consumer_instance_name'].should == 'root account'
+        lti_launch.params['tool_consumer_instance_contact_email'].should == 'some_address'
         lti_launch.params['launch_presentation_return_url'].should start_with 'http'
         lti_launch.params['launch_presentation_locale'].should == 'en'
         lti_launch.params['launch_presentation_document_target'].should == 'iframe'
