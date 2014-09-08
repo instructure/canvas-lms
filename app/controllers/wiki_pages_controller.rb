@@ -170,6 +170,7 @@ class WikiPagesController < ApplicationController
   end
 
   def pages_index
+    return unless tab_enabled?(@context.class::TAB_PAGES)
     if !@context.feature_enabled?(:draft_state)
       redirect_to polymorphic_url([@context, :wiki_pages])
       return

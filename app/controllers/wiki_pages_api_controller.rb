@@ -226,7 +226,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns [Page]
   def index
-    if authorized_action(@context.wiki, @current_user, :read)
+    if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
