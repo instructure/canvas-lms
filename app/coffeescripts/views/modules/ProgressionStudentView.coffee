@@ -48,6 +48,7 @@ define [
         template: collectionTemplate
         student: @model.attributes
         student_link: "<a href='#{studentUrl}'>#{@model.get('name')}</a>"
+        autoFetch: true
 
       @progressions.render()
       @progressions.$el.appendTo(@$modules)

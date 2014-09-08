@@ -145,11 +145,7 @@ class MessageableUser < User
       end
     end
   end
-  if CANVAS_RAILS2
-    alias_method :after_find, :populate_common_contexts
-  else
-    after_find :populate_common_contexts
-  end
+  after_find :populate_common_contexts
 
   def include_common_contexts_from(other)
     combine_common_contexts(self.global_common_courses, other.global_common_courses)
@@ -160,14 +156,6 @@ class MessageableUser < User
     options[:except] ||= []
     options[:except] << :bookmark
     super(options)
-  end
-
-  if CANVAS_RAILS2
-    def as_json(options={})
-      options[:except] ||= []
-      options[:except] << :bookmark
-      super(options)
-    end
   end
 
   private

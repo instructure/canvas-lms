@@ -50,7 +50,7 @@
       <button id="gradebook_settings"><i class="icon-settings"></i></button>
       <ul style="display: none;" class="gradebook_drop_down ui-kyle-menu">
         <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
-        <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
+        <li><a id=download_csv href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
         <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
           <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
         <% end %>

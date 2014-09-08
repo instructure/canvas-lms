@@ -43,20 +43,15 @@ end
 
 describe Quizzes::QuizSubmissionsApiController, type: :request do
   module Helpers
-    def enroll_student(opts = {})
+    def enroll_student
       last_user = @teacher = @user
       student_in_course
       @student = @user
       @user = last_user
-
-      if opts[:login]
-        remove_user_session
-        user_session(@student)
-      end
     end
 
-    def enroll_student_and_submit(submission_data = {}, login=false)
-      enroll_student({ login: login })
+    def enroll_student_and_submit(submission_data = {})
+      enroll_student
 
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.submission_data = submission_data
@@ -138,8 +133,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   include Helpers
 
-  before :each do
-    course_with_teacher_logged_in :active_all => true
+  before :once do
+    course_with_teacher :active_all => true
 
     @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.published_at = Time.now
@@ -162,7 +157,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it 'should be accessible by the owner student' do
-      enroll_student_and_submit({}, true)
+      enroll_student_and_submit
 
       json = qs_api_index
       json.has_key?('quiz_submissions').should be_true
@@ -177,7 +172,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions/:id [SHOW]' do
-    before :each do
+    before :once do
       enroll_student_and_submit
     end
 
@@ -311,8 +306,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions [create]' do
-    before :each do
-      enroll_student({ login: true })
+    before :once do
+      enroll_student
     end
 
     it 'should create a quiz submission' do
@@ -365,8 +360,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/complete [complete]' do
-    before :each do
-      enroll_student({ login: true })
+    before :once do
+      enroll_student
 
       @quiz_submission = @quiz.generate_submission(@student)
       # @quiz_submission.submission_data = { "question_1" => "1658" }
@@ -429,7 +424,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe 'PUT /courses/:course_id/quizzes/:quiz_id/submissions/:id [update]' do
-    before :each do
+    before :once do
       # We're gonna test with 2 questions to make sure there are no side effects
       # when we modify a single question
       @qq1 = @quiz.quiz_questions.create!({

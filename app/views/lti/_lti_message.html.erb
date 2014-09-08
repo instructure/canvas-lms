@@ -1,16 +1,11 @@
-<% content_for :page_title do %>
-    <%= @lti_launch.link_text %>
-<% end %>
+<% content_for :page_title do %><%= @lti_launch.link_text %><% end %>
 
 <% js_bundle 'legacy/external_tools_tool_show' %>
 
 <% if @lti_launch.resource_url.start_with?('http://') %>
     <div class="alert alert-error" id="insecure_content_msg">
-        <p>You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may
-            prevent this content from loading.</p>
-
-        <p id="load_failure" class="hide">It looks like your content might not load. You can use this button to try
-            launching it in a new tab.</p>
+        <p><%= t('tool_insecure_warning', 'You are trying to launch insecure content from within a secure site (canvas).  Some internet browsers may prevent this content from loading.') %></p>
+        <p id="load_failure" class="hide"><%= t('tool_load_failure', 'It looks like your content might not load.  You can use this button to try launching it in a new tab.') %></p>
     </div>
 <% end %>
 
@@ -21,7 +16,7 @@
       data-tool-launch-type="<%= @lti_launch.launch_type %>"
       data-tool-id="<%= @lti_launch.analytics_id %>"
       data-tool-path="<%= @lti_launch.resource_path %>"
-      data-message-type="<%= @lti_launch.message_type %>">
+      data-message-type="<%= @lti_launch.analytics_message_type %>">
     <% @lti_launch.params.each do |key, value| %>
         <%= hidden_field_tag key, value %>
     <% end %>
@@ -41,3 +36,4 @@
     </div>
 </form>
 <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
+

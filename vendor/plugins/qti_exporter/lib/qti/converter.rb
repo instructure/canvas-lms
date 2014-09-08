@@ -65,7 +65,7 @@ class Converter < Canvas::Migration::Migrator
   def self.is_qti_2(manifest_path)
     if File.exists?(manifest_path)
       xml = Nokogiri::XML(File.open(manifest_path))
-      if xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.include?(v) }
+      if xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.any?{|ns| v.to_s.start_with?(ns)} }
         return true
       elsif (xml.at_css('metadata schema') ? xml.at_css('metadata schema').text : '') =~ /QTIv2\./i
         return true

@@ -1,0 +1,28 @@
+<% @presenter.peer_reviews_for(@current_user).each do |peer_review| %>
+  <div class="discussion-section discussion-assignment-section peer-review-alert alert">
+    <div class="row-fluid">
+      <div class="span9">
+        <p class="peer-review-title">
+          <i class="icon-peer-review"></i>
+          <strong>
+            <%= t('peer_review_alert',
+            'You have been assigned a peer review for %{person}',
+            {:person => peer_review.user.name}) %>
+            <%= link_to "Review Now", course_assignment_submission_path(@assignment.context_id, @assignment.id, peer_review.user_id) %>
+          </strong>
+         
+        </p>
+      </div>
+
+      <div class="span3 right-align">
+        <div class="discussion-pubdate">
+          <b <%= context_sensitive_datetime_title(@assignment.peer_reviews_due_at, @assignment.context) %> >
+            <%= t(:due_date, 'due %{date}', :date => OverrideListPresenter.new.formatted_date_string(:peer_reviews_due_at,@assignment)) %>
+          </b>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<% end %>

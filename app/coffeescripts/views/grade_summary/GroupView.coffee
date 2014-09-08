@@ -35,6 +35,22 @@ define [
       else
         @$el.children("div.group-description").attr("aria-expanded", "false")
 
+      $collapseToggle = $('div.outcome-toggles a.icon-collapse')
+      if $('li.group.expanded').length == 0
+        $collapseToggle.attr('disabled', 'disabled')
+        $collapseToggle.attr('aria-disabled', 'true')
+      else
+        $collapseToggle.removeAttr('disabled')
+        $collapseToggle.attr('aria-disabled', 'false')
+
+      $expandToggle = $('div.outcome-toggles a.icon-expand')
+      if $('li.group:not(.expanded)').length == 0
+        $expandToggle.attr('disabled', 'disabled')
+        $expandToggle.attr('aria-disabled', 'true')
+      else
+        $expandToggle.removeAttr('disabled')
+        $expandToggle.attr('aria-disabled', 'false')
+
     statusTooltip: ->
       switch @model.status()
         when 'undefined' then I18n.t 'undefined', 'Unstarted'

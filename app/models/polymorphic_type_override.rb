@@ -35,21 +35,6 @@ module PolymorphicTypeOverride
       end
     end
 
-    # override .shard_category_code_for_reflection here
-    if CANVAS_RAILS2
-      def shard_category_code_for_reflection(reflection)
-        mapper = @@polymorphic_type_mappings[self.name]
-
-        if mapper && reflection && reflection.options && reflection.options[:foreign_type]
-          if mapper.overrides?(reflection.options[:foreign_type])
-            const_hash = mapper.constants_mapping(reflection.options[:foreign_type])
-            return "#{const_hash}[self[:#{reflection.options[:foreign_type]}]].try(:constantize).try(:shard_category) || :default"
-          end
-        end
-        super reflection
-      end
-    end
-
     private
 
     class OverrideMapper

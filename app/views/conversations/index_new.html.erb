@@ -6,10 +6,12 @@
 
 <div class="conversations">
   <header class="panel">
-    <div class="filters">
-      <select class="course-filter" id="course-filter" aria-label="<%= t(:filter_messages_by_course, "Filter messages by course") %>"></select>
+    <div class="filters" role="application">
+      <span class="screenreader-only" id="course-filter-description"><%= t(:filter_messages_by_course, "Filter messages by course") %></span>
+      <select class="course-filter" id="course-filter" aria-describedby="course-filter-description"></select>
 
-      <select class="type-filter show-tick" id="type-filter" aria-label="<%= t(:filter_messages_by_type, "Filter messages by type") %>">
+      <span class="screenreader-only" id="type-filter-description"><%= t(:filter_messages_by_type, "Filter messages by type") %></span>
+      <select class="type-filter show-tick" id="type-filter" aria-describedby="type-filter-description">
         <option value="inbox"><%= t(:inbox, "Inbox") %></option>
         <option value="unread"><%= t(:unread, "Unread") %></option>
         <option value="starred"><%= t(:starred, "Starred") %></option>

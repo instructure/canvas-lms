@@ -244,9 +244,10 @@ require [
 
     onSubmit: (dfd) =>
       @_incrementSending(1)
+      dfd.always =>
+        @_incrementSending(-1)
 
     onAddMessage: (message, conversation) =>
-      @_incrementSending(-1)
       model = @list.collection.get(conversation.id)
       if model? && model.get('messages')
         message.context_name = model.messageCollection.last().get('context_name')
@@ -256,7 +257,6 @@ require [
           @detail.render()
 
     onNewConversations: (conversations) =>
-      @_incrementSending(-1)
 
     _incrementSending: (increment) ->
       @sendingCount += increment

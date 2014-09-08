@@ -16,7 +16,7 @@
       {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
     </a>
     <a href="#" class="switch_event_description_view pull-right" style="display:none;">
-      {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+      {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
     </a>
   </div>
   <textarea class="input-block-level"
@@ -135,7 +135,7 @@
       <button type="button" class="btn delete_link">{{#t "delete"}}Delete{{/t}}</button>
     {{/if}}
     {{#if return_to_url}}
-      <a href="{{return_to_url}}" class="btn">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
+      <a href="{{return_to_url}}" class="btn" role="button">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
     {{/if}}
     <button type="submit" class="btn btn-primary">
       {{#if newRecord}}

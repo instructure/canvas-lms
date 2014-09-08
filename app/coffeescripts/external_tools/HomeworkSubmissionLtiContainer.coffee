@@ -6,10 +6,11 @@ define [
   'jst/assignments/homework_submission_tool'
   'compiled/views/ExternalTools/ExternalContentReturnView',
   'compiled/external_tools/ExternalToolCollection'
-  'compiled/views/assignments/ExternalContentHomeworkSubmissionView'
+  'compiled/views/assignments/ExternalContentFileSubmissionView'
+  'compiled/views/assignments/ExternalContentUrlSubmissionView'
   'jquery.disableWhileLoading'
-], ( Backbone, I18n, $, _, homeworkSubmissionTool, ExternalContentReturnView, 
-     ExternalToolCollection, ExternalContentHomeworkSubmissionView ) ->
+], ( Backbone, I18n, $, _, homeworkSubmissionTool, ExternalContentReturnView,
+     ExternalToolCollection, ExternalContentFileSubmissionView,  ExternalContentUrlSubmissionView) ->
 
   class HomeworkSubmissionLtiContainer
 
@@ -81,89 +82,20 @@ define [
       return returnView
 
     createHomeworkSubmissionView: (tool, data) ->
-      homeworkSubmissionView = new ExternalContentHomeworkSubmissionView
-        externalTool: tool
-        model: new Backbone.Model(data)
+      if data.return_type == 'file'
+        homeworkSubmissionView = new ExternalContentFileSubmissionView
+          externalTool: tool
+          model: new Backbone.Model(data)
+      else
+        homeworkSubmissionView = new ExternalContentUrlSubmissionView
+          externalTool: tool
+          model: new Backbone.Model(data)
 
       homeworkSubmissionView.on 'relaunchTool', (tool, model) ->
         @remove()
         @parentView.embedLtiLaunch(tool.get('id'))
 
-      homeworkSubmissionView.on 'submit', (tool, model) =>
-        @uploadFileFromUrl(tool, model)
-
       homeworkSubmissionView.on 'cancel', (tool, model) ->
         @parentView.cancelSubmission()
 
       return homeworkSubmissionView
-
-    checkFileStatus: (url, callback, error) =>
-      $.ajaxJSON url, "GET", {}, ((data) =>
-        if data.upload_status is "ready"
-          callback data.attachment
-        else if data.upload_status is "errored"
-          error data.message
-        else
-          setTimeout (=>
-            @checkFileStatus url, callback, error
-            return
-          ), 2500
-        return
-      ), (data) ->
-        error data.message
-
-    redirectSuccessfulAssignment: (responseData) =>
-      window.onbeforeunload = -> # remove alert message from being triggered
-      window.location.reload()
-      @loaderPromise.resolve()
-      return
-
-    disableLoader: =>
-      @loaderPromise.resolve()
-
-    submitAssignment: (fileData) =>
-      data =
-        submission:
-          submission_type: "online_upload"
-          file_ids: [ fileData.id ]
-        comment:
-          text_comment: @assignmentSubmission.get('comment')
-
-      submissionUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions"
-      $.ajaxJSON submissionUrl, "POST", data, @redirectSuccessfulAssignment, @disableLoader
-
-      return
-
-    submissionFailure: (message) =>
-      @loaderPromise.resolve()
-      thisForm.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
-      $.flashError I18n.t("invalid_file_retrieval", "There was a problem retrieving the file sent from this tool.")
-
-    uploadSuccess: (data) =>
-      @checkFileStatus data.status_url, @submitAssignment, @submissionFailure
-      return
-
-    uploadFailure: (data) =>
-      @loaderPromise.resolve()
-      thisForm.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
-      return
-
-    uploadFileFromUrl: (tool, modelData) ->
-      @loaderPromise = $.Deferred()
-      thisForm = $('#submit_from_external_tool_form_' + tool.get('id'));
-
-      @assignmentSubmission = modelData
-      # build the params for submitting the assignment
-      fileParams =
-        url: @assignmentSubmission.get('url')
-        name: @assignmentSubmission.get('text')
-        content_type: ''
-
-      fileUploadUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions/" + ENV.current_user_id + "/files"
-      $.ajaxJSON fileUploadUrl, "POST", fileParams, @uploadSuccess, @uploadFailure
-
-      thisForm.disableWhileLoading @loaderPromise,
-        buttons:
-          ".submit_button": I18n.t("getting_file", "Retrieving File...")
-
-      return

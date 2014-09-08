@@ -743,10 +743,10 @@ class UsersController < ApplicationController
   end
 
   def ignore_item
-    unless %w[grading submitting].include?(params[:purpose])
+    unless %w[grading submitting reviewing].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
     end
-    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment']),
+    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment', 'AssessmentRequest']),
                                params[:purpose], params[:permanent] == '1')
     render :json => { :ignored => true }
   end
@@ -909,8 +909,12 @@ class UsersController < ApplicationController
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
 
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account)
-    adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, link_code: @opaque_id)
+    opts = {
+        resource_type: @resource_type,
+        link_code: @opaque_id,
+        custom_substitutions: common_variable_substitutions
+    }
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
     @tool_settings = adapter.generate_post_payload
 
     @active_tab = @tool.asset_string
@@ -1196,7 +1200,7 @@ class UsersController < ApplicationController
   # @argument user[avatar][token] [Optional, String]
   #   A unique representation of the avatar record to assign as the user's
   #   current avatar. This token can be obtained from the user avatars endpoint.
-  #   This supersedes the user[avatar][url] argument, and if both are included
+  #   This supersedes the user [avatar] [url] argument, and if both are included
   #   the url will be ignored. Note: this is an internal representation and is
   #   subject to change without notice. It should be consumed with this api
   #   endpoint and used in the user update endpoint, and should not be
@@ -1663,9 +1667,7 @@ class UsersController < ApplicationController
         joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
         where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
-    last_message_dates = CANVAS_RAILS2 ?
-        scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
-        scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
+    last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
       next unless student = data[key.first.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max

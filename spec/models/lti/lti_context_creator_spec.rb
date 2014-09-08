@@ -47,7 +47,6 @@ describe Lti::LtiContextCreator do
         consumer_instance.should be_a(LtiOutbound::LTIConsumerInstance)
         consumer_instance.name.should == 'root_account'
         consumer_instance.lti_guid.should == 'lti_guid'
-        consumer_instance.domain.should == 'account_domain'
         consumer_instance.id.should == 42
         consumer_instance.sis_source_id.should == 'account_sis_id'
       end

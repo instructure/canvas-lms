@@ -25,6 +25,39 @@ div#content {
   min-height: 33px;
 }
 
+//===== Loading overlay =====
+body.ember-loading-overlay {
+  &:before {
+    position: fixed;
+    display: block;
+    content: "";
+    background: rgba(0,0,0,0.3);
+    z-index: 100;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  &:after {
+    content: "";
+    background-image: url("/images/ajax-loader-medium-444.gif");
+    background-repeat: no-repeat;
+    background-position: left top;
+    display: block;
+    top: 50%;
+    position: fixed;
+    z-index: 1000;
+    width: 31px;
+    height: 31px;
+    left: 50%;
+    background-color: #ddd;
+    border-radius: 50%;
+    border: 1px solid #777;
+    box-shadow: 0 0 1px 0px #555, 0px 0 5px white inset;
+  }
+}
+
 //===== Progressive Loading Index =========
 .paginated-loading {
   padding: 10px;

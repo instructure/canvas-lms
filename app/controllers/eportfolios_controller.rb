@@ -40,7 +40,7 @@ class EportfoliosController < ApplicationController
       @portfolio = @current_user.eportfolios.build(params[:eportfolio])
       respond_to do |format|
         if @portfolio.save
-          @portfolio.setup_defaults
+          @portfolio.ensure_defaults
           flash[:notice] = t('notices.created', "Porfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
@@ -57,11 +57,11 @@ class EportfoliosController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:session_affects_permissions] = true
+      session[:permissions_key] = CanvasUUID.generate
     end
     if authorized_action(@portfolio, @current_user, :read)      
-      @category = @portfolio.eportfolio_categories.first rescue nil
-      @category ||= @portfolio.setup_defaults
+      @portfolio.ensure_defaults
+      @category = @portfolio.eportfolio_categories.first
       @page = @category.eportfolio_entries.first
       @owner_view = @portfolio.user == @current_user && params[:view] != 'preview'
       if @owner_view
@@ -89,7 +89,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       respond_to do |format|
         if @portfolio.update_attributes(params[:eportfolio])
-          @portfolio.setup_defaults
+          @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "Porfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }

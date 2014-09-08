@@ -32,7 +32,20 @@ define [
       @collection.fetch()
 
     bindToggles: ->
+      $collapseToggle = $('div.outcome-toggles a.icon-collapse')
+      $expandToggle = $('div.outcome-toggles a.icon-expand')
       @toggles.find('.icon-expand').click =>
         @$('li.group').addClass('expanded')
+        @$('div.group-description').attr('aria-expanded', "true")
+        $expandToggle.attr('disabled', 'disabled')
+        $expandToggle.attr('aria-disabled', 'true')
+        $collapseToggle.removeAttr('disabled')
+        $collapseToggle.attr('aria-disabled', 'false')
+        $("div.groups").focus()
       @toggles.find('.icon-collapse').click =>
         @$('li.group').removeClass('expanded')
+        @$('div.group-description').attr('aria-expanded', "false")
+        $collapseToggle.attr('disabled', 'disabled')
+        $collapseToggle.attr('aria-disabled', 'true')
+        $expandToggle.removeAttr('disabled')
+        $expandToggle.attr('aria-disabled', 'false')

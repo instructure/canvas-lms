@@ -41,6 +41,7 @@ describe PageView do
     include_examples "cassandra page views"
     it "should store and load from cassandra" do
       expect {
+        @page_view.request_id = "abcde1"
         @page_view.save!
       }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       PageView.find(@page_view.id).should == @page_view
@@ -83,6 +84,7 @@ describe PageView do
         Shard.stubs(:birth).returns(@shard1)
         @shard2.activate do
           expect {
+            @page_view.request_id = "abcde2"
             @page_view.save!
           }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
           PageView.find(@page_view.id).should == @page_view
@@ -337,44 +339,6 @@ describe PageView do
 
       it "should return nothing with unknown request id" do
         PageView.find_all_by_id(['unknown', 'unknown']).size.should eql(0)
-      end
-    end
-  end
-
-  if CANVAS_RAILS2
-    describe ".find_some" do
-      context "db-backed" do
-        before do
-          Setting.set('enable_page_views', 'db')
-        end
-
-        it "should return the existing page view" do
-          page_views = (0..3).map { |index| page_view_model }
-          page_view_ids = page_views.map { |page_view| page_view.request_id }
-
-          PageView.find_some(page_view_ids).should == page_views
-        end
-
-        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-          pv = page_view_model
-          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
-        end
-      end
-
-      context "cassandra-backed" do
-        include_examples "cassandra page views"
-
-        it "should return the existing page view" do
-          page_views = (0..3).map { |index| page_view_model }
-          page_view_ids = page_views.map { |page_view| page_view.request_id }
-
-          PageView.find_some(page_view_ids).should == page_views
-        end
-
-        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-          pv = page_view_model
-          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
-        end
       end
     end
   end

@@ -412,7 +412,6 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id> \
   #       -X PUT \
   #       -H 'Authorization: Bearer <token>' \
-  #       -d 'module_item[content_id]=10' \
   #       -d 'module_item[position]=2' \
   #       -d 'module_item[indent]=1' \
   #       -d 'module_item[new_tab]=true'
@@ -517,7 +516,7 @@ class ContextModuleItemsApiController < ApplicationController
       tags = @context.module_items_visible_to(@current_user).
           select('content_tags.*, context_modules.id as module_id, context_modules.position AS module_position').
           reject { |item| item.content_type == 'ContextModuleSubHeader' }.
-          sort_by { |item| [item.module_position.to_i, item.module_id, item.position] }
+          sort_by { |item| [item.module_position.to_i, item.module_id, item.position || CanvasSort::Last] }
 
       # find content tags to include
       tag_indices = []
@@ -620,7 +619,7 @@ class ContextModuleItemsApiController < ApplicationController
   def find_student
     if params[:student_id]
       student_enrollments = @context.student_enrollments.for_user(params[:student_id])
-      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read)}
+      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read_grades)}
       @student = student_enrollments.first.user
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user

@@ -28,6 +28,9 @@ describe "QTI 2.1 zip" do
     qti2 = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_2_1.xml')
     Qti::Converter.is_qti_2(qti1).should be_false
     Qti::Converter.is_qti_2(qti2).should be_true
+
+    qti2_ns = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_2_ns.xml')
+    Qti::Converter.is_qti_2(qti2_ns).should be_true
   end
 
 

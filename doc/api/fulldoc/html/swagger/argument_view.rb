@@ -112,11 +112,18 @@ class ArgumentView < HashView
   end
 
   def optional?
-    enum_and_types.last.map{ |t| t.downcase }.include?('optional')
+    not required?
   end
 
   def required?
-    not optional?
+    types = enum_and_types.last.map{ |t| t.downcase }
+    if swagger_param_type == 'path'
+      true
+    elsif types.include?('required')
+      true
+    else
+      false
+    end
   end
 
   def array?

@@ -22,7 +22,7 @@ describe UsersController, type: :request do
   include Api
   include Api::V1::Assignment
 
-  before do
+  before :once do
     course_with_student(:active_all => true)
   end
 

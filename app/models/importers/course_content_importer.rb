@@ -274,6 +274,7 @@ module Importers
     end
 
     def self.shift_date_options(course, options={})
+      return({remove_dates: true}) if Canvas::Plugin.value_to_boolean(options[:remove_dates])
       result = {}
       result[:old_start_date] = Date.parse(options[:old_start_date]) rescue course.real_start_date
       result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
@@ -299,6 +300,7 @@ module Importers
 
     def self.shift_date(time, options={})
       return nil unless time
+      return nil if options[:remove_dates]
       time_zone = options[:time_zone] || Time.zone
       Time.use_zone time_zone do
         time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)

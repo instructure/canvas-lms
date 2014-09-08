@@ -289,10 +289,10 @@ class Quizzes::QuizzesApiController < ApplicationController
       json = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+        unless is_authorized_action?(@context, @current_user, :manage_assignments)
+          scope = scope.available
+        end
         json = if accepts_jsonapi?
-          unless is_authorized_action?(@context, @current_user, :manage_assignments)
-            scope = scope.available
-          end
           jsonapi_quizzes_json(scope: scope, api_route: api_route)
         else
           @quizzes = Api.paginate(scope, self, api_route)

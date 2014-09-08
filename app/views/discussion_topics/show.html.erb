@@ -65,8 +65,8 @@
             <a href="<%= context_url(@topic.context,
                                      :edit_context_discussion_topic_url,
                                      @topic) %>"
-               class="btn edit-btn">
-                 <i class="icon-edit" aria-hidden="hidden"></i>
+               class="btn edit-btn" role="button">
+                 <i class="icon-edit" aria-hidden="true"></i>
                  <%= t(:edit, 'Edit') %>
             </a>
           <% end %>
@@ -142,6 +142,9 @@
       <div class="entry-content">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
+          <% if @presenter.has_peer_reviews?(@current_user) %>
+            <%= render :partial => 'peer_reviews' %>
+          <% end %>
         <% end %>
         <% if @topic.for_group_discussion? %>
           <%= render :partial => 'group_discussion' %>

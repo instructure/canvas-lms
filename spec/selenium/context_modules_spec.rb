@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
+﻿require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
 describe "context_modules" do
   include_examples "in-process server selenium tests"
@@ -503,7 +503,7 @@ describe "context_modules" do
       module_item.should include_text(item_edit_text)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f('h2.title').text.should == item_edit_text
+      f('h1.title').text.should == item_edit_text
 
       expect_new_page_load { f('.modules').click }
       f("#context_module_item_#{tag.id} .title").text.should == item_edit_text

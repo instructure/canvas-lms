@@ -21,10 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "GradeChangeAudit API", type: :request do
-  before do
-    pending 'Audit Search is disabled.'
-  end
-
   context "not configured" do
     before do
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
@@ -205,7 +201,7 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       context "sharding" do
-       # specs_require_sharding
+        specs_require_sharding
 
         before do
           @new_root_account = @shard2.activate{ Account.create!(name: 'New Account') }

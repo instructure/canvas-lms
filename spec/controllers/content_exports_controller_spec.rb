@@ -57,4 +57,80 @@ describe ContentExportsController do
       end
     end
   end
+
+  describe 'export visibility' do
+    context 'course' do
+      before(:once) do
+        course active_all: true
+        course_with_ta(course: @course, active_all: true)
+        student_in_course(course: @course, active_all: true)
+        @acx = factory_with_protected_attributes(@course.content_exports, user: @ta, export_type: 'common_cartridge')
+        @tcx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: 'common_cartridge')
+        @tzx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: 'zip')
+        @szx = factory_with_protected_attributes(@course.content_exports, user: @student, export_type: 'zip')
+      end
+
+      describe "index" do
+        it "returns all course exports + the teacher's file exports" do
+          user_session(@teacher)
+          get :index, course_id: @course.id
+          response.should be_success
+          assigns(:exports).map(&:id).should =~ [@acx.id, @tcx.id, @tzx.id]
+        end
+      end
+
+      describe "show" do
+        it "should find course exports" do
+          user_session(@teacher)
+          get :show, course_id: @course.id, id: @acx.id
+          response.should be_success
+        end
+
+        it "should find teacher's file exports" do
+          user_session(@teacher)
+          get :show, course_id: @course.id, id: @tzx.id
+          response.should be_success
+        end
+
+        it "should not find other's file exports" do
+          user_session(@teacher)
+          get :show, course_id: @course.id, id: @szx.id
+          assert_status(404)
+        end
+      end
+    end
+
+    context "user" do
+      before(:once) do
+        course active_all: true
+        student_in_course(course: @course, active_all: true)
+        @tzx = factory_with_protected_attributes(@student.content_exports, user: @teacher, export_type: 'zip')
+        @sdx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: 'user_data')
+        @szx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: 'zip')
+      end
+
+      describe "index" do
+        it "should show one's own exports" do
+          user_session(@student)
+          get :index
+          response.should be_success
+          assigns(:exports).map(&:id).should =~ [@sdx.id, @szx.id]
+        end
+      end
+
+      describe "show" do
+        it "should find one's own export" do
+          user_session(@student)
+          get :show, id: @sdx.id
+          response.should be_success
+        end
+
+        it "should not find another's export" do
+          user_session(@student)
+          get :show, id: @tzx.id
+          assert_status(404)
+        end
+      end
+    end
+  end
 end

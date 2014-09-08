@@ -82,7 +82,7 @@ describe "API", type: :request do
   end
 
   describe "json post format" do
-    before do
+    before :once do
       course_with_teacher(:user => user_with_pseudonym, :active_all => true)
       @token = @user.access_tokens.create!(:purpose => "specs")
     end

@@ -193,9 +193,7 @@ module Delayed
             end
 
           scope = scope.group(:tag).offset(offset).limit(limit)
-          (CANVAS_RAILS2 ?
-              scope.count(:tag, :order => "COUNT(tag) DESC") :
-              scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
+          scope.order("COUNT(tag) DESC").count.map { |t,c| { :tag => t, :count => c } }
         end
 
         def self.get_and_lock_next_available(worker_name,

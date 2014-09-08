@@ -148,4 +148,63 @@ describe "External Tools" do
     tab.should_not be_nil
     tab['class'].split.should include("active")
   end
+
+  it "should highlight the navigation tab when using an external tool" do
+    course_with_teacher_logged_in(:active_all => true)
+
+    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
+    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.save!
+
+    get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+    response.should be_success
+    doc = Nokogiri::HTML.parse(response.body)
+    tab = doc.at_css("a.#{@tool.asset_string}")
+    tab.should_not be_nil
+    tab['class'].split.should include("active")
+  end
+
+  context 'global navigation' do
+    before :once do
+      Account.default.enable_feature!(:lor_for_account)
+      @admin_tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @admin_tool.global_navigation = {:visibility => 'admins', :url => "http://www.example.com", :text => "Example URL"}
+      @admin_tool.save!
+      @member_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @member_tool.global_navigation = {:url => "http://www.example.com", :text => "Example URL 2"}
+      @member_tool.save!
+    end
+
+    it "should show the admin level global navigation menu items to teachers" do
+      course_with_teacher_logged_in(:account => @account, :active_all => true)
+      get "/courses"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+
+      menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
+      menu_link1.should_not be_nil
+      menu_link1['href'].should == account_external_tool_path(Account.default, @admin_tool, :launch_type => 'global_navigation')
+      menu_link1.text.should match_ignoring_whitespace(@admin_tool.label_for(:global_navigation))
+
+      menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
+      menu_link2.should_not be_nil
+      menu_link2['href'].should == account_external_tool_path(Account.default, @member_tool, :launch_type => 'global_navigation')
+      menu_link2.text.should match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
+    end
+
+    it "should only show the member level global navigation menu items to students" do
+      course_with_student_logged_in(:account => @account, :active_all => true)
+      get "/courses"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+
+      menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
+      menu_link1.should be_nil
+
+      menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
+      menu_link2.should_not be_nil
+      menu_link2['href'].should == account_external_tool_path(Account.default, @member_tool, :launch_type => 'global_navigation')
+      menu_link2.text.should match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
+    end
+  end
 end

@@ -22,7 +22,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
   include Api
   include Api::V1::CustomGradebookColumn
 
-  before do
+  before :once do
     course_with_teacher active_all: true
     s1, s2 = 2.times.map { |i|
       @course.course_sections.create! name: "section #{i}"
@@ -42,7 +42,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
   end
 
   describe 'index' do
-    before do
+    before :once do
       [@student1, @student2].each_with_index { |s,i|
         @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap { |d|
           d.user_id = s.id

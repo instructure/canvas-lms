@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 include Api::V1::Collaborator
 
 describe Api::V1::Collaborator do
-  before(:each) do
+  before(:once) do
     @current_user  = user_with_pseudonym(:active_all => true)
     @collaboration = Collaboration.new(:title => 'Test collaboration')
     @collaboration.type = 'EtherPad'

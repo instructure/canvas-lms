@@ -1,7 +1,7 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
 skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
-load_path = CANVAS_RAILS2 ? I18n.load_path : Rails.application.config.i18n.railties_load_path
+load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
@@ -189,53 +189,20 @@ I18n.class_eval do
   end
 end
 
-if CANVAS_RAILS2
-  ActionView::Base.class_eval do
-    def i18n_scope
-      "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
-    end
+ActionView::Template.class_eval do
+  def render_with_i18n_scope(view, *args, &block)
+    old_i18n_scope = view.i18n_scope
+    view.i18n_scope = @virtual_path.gsub(/\/_?/, '.') if @virtual_path
+    render_without_i18n_scope(view, *args, &block)
+  ensure
+    view.i18n_scope = old_i18n_scope
   end
-else
-  ActionView::LookupContext.class_eval do
-    attr_accessor :i18n_scope
-  end
-
-  ActionView::TemplateRenderer.class_eval do
-    def render_template_with_assign(template, *a)
-      old_i18n_scope = @lookup_context.i18n_scope
-      if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
-        @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
-      end
-      render_template_without_assign(template, *a)
-    ensure
-      @lookup_context.i18n_scope = old_i18n_scope
-    end
-    alias_method_chain :render_template, :assign
-  end
-
-  ActionView::PartialRenderer.class_eval do
-    [:render_partial, :render_collection].each do |method|
-      define_method("#{method}_with_assign") do
-        begin
-          old_i18n_scope = @lookup_context.i18n_scope
-          if @template.respond_to?(:virtual_path) && (virtual_path = @template.virtual_path)
-            @lookup_context.i18n_scope = virtual_path.gsub(/\/_?/, '.')
-          end
-          send "#{method}_without_assign"
-        ensure
-          @lookup_context.i18n_scope = old_i18n_scope
-        end
-      end
-      alias_method_chain method, :assign
-    end
-  end
-
-  ActionView::Base.class_eval do
-    delegate :i18n_scope, :to => :lookup_context
-  end
+  alias_method_chain :render, :i18n_scope
 end
 
 ActionView::Base.class_eval do
+  attr_accessor :i18n_scope
+
   # can accept either translate(key, default: "default text", option: ...) or
   # translate(key, "default text", option: ...). when using the former (default
   # in the options), it's treated as if prepended with a # anchor.

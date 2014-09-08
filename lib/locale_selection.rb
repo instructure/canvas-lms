@@ -4,6 +4,7 @@ module LocaleSelection
     user = options[:user]
     root_account = options[:root_account]
     accept_language = options[:accept_language]
+    session_locale = options[:session_locale]
 
     # groups cheat and set the context to be the group after get_context runs
     # but before set_locale runs, but we want to do locale lookup based on the
@@ -16,6 +17,8 @@ module LocaleSelection
       context.locale
     elsif user && user.locale
       user.locale
+    elsif session_locale
+      session_locale
     elsif context && context.is_a?(Course) && context.account && (account_locale = context.account.default_locale(true))
       account_locale
     elsif context && context.is_a?(Account) && (account_locale = context.default_locale(true))

@@ -31,7 +31,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "should list the correct number of students" do
+    it "should list the correct number of students", :non_parallel do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#x_of_x_students").should include_text("1 of 1")
@@ -133,7 +133,16 @@ describe "speed grader" do
       end
     end
 
-    it "lets you view previous quiz submissions" do
+    it "links to the quiz history page when there are too many quiz submissions" do
+      Setting.set("too_many_quiz_submission_versions", 2)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      fj("#submission_to_view").should be_nil
+      uri = URI.parse(f(".see-all-attempts")[:href])
+      uri.path.should == "/courses/#{@course.id}/quizzes/#{@quiz.id}/history"
+      uri.query.should == "user_id=#{@student.id}"
+    end
+
+    it "lets you view previous quiz submissions", :non_parallel do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       submission_dropdown = f("#submission_to_view")
@@ -146,19 +155,9 @@ describe "speed grader" do
         s.click
         submission_date = s.text
         in_frame('speedgrader_iframe') do
-          wait_for_ajaximations
-          f('.quiz-submission').text.should include submission_date
+          keep_trying_until { fj('.quiz-submission').text.should include submission_date }
         end
       end
-    end
-
-    it "links to the quiz history page when there are too many quiz submissions" do
-      Setting.set("too_many_quiz_submission_versions", 2)
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      fj("#submission_to_view").should be_nil
-      uri = URI.parse(f(".see-all-attempts")[:href])
-      uri.path.should == "/courses/#{@course.id}/quizzes/#{@quiz.id}/history"
-      uri.query.should == "user_id=#{@student.id}"
     end
   end
 

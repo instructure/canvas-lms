@@ -8,7 +8,7 @@ define [
 
     propTypes:
       contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
-      contextId: React.PropTypes.number.isRequired
+      contextId: React.PropTypes.string.isRequired
 
     update: ->
       $.get "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota", (data) =>

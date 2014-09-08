@@ -4,6 +4,7 @@ define [
 ], (I18n,Ember) ->
 
   StudentGroupsController = Ember.ObjectController.extend
+    groups: []
     filterText: ""
     content: Ember.Object.create()
     searchPlaceholder: (->

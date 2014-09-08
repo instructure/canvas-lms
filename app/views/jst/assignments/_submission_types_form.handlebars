@@ -10,7 +10,7 @@
       {{!-- Submission type accepted --}}
       <select id="assignment_submission_type"
         name="submission_type"
-        aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,  gnment_peer_reviews_fields"
+        aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         <option value="none" {{selectedIf submissionType "none"}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}

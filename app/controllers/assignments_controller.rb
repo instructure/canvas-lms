@@ -107,12 +107,20 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+
+      if @context.feature_enabled?(:differentiated_assignments) && @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
+        respond_to do |format|
+          flash[:error] = t 'notices.assignment_not_availible', "The assignment you requested is not availible to your course section."
+          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+        end
+        return
+      end
+
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
 
       if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user)
-          .select(&:has_homework_submission)
+        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :homework_submission)
       else
         @external_tools = []
       end

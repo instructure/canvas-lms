@@ -413,12 +413,17 @@ define [
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
+
       if as.due_at
         due_at = tz.parse(as.due_at)
         set as, 'due_at', due_at
         set as, 'sortable_date', +due_at / 1000
       else
         set as, 'sortable_date', Number.MAX_VALUE
+
+    differentiatedAssignmentVisibleToStudent: (assignment, student_id) ->
+      return true unless assignment.only_visible_to_overrides
+      _.include(assignment.assignment_visibility, +student_id)
 
     checkForNoPointsWarning: (ag) ->
       pointsPossible = _.inject ag.assignments
@@ -542,6 +547,15 @@ define [
           user_id: student.id
           assignment_id: assignment.id
         }
+    ).property('selectedStudent', 'selectedAssignment')
+
+    selectedSubmissionHidden: (->
+      assignment = @get('selectedAssignment')
+      student = @get('selectedStudent')
+      if assignment?.only_visible_to_overrides
+        !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
+      else
+        false
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedOutcomeResult: ( ->

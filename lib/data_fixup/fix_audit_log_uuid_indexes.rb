@@ -94,27 +94,29 @@ module DataFixup
         }
 
         loop do
-          rows = []
-
-          database.execute(cql, last_seen_key, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
-            row = row.to_hash
-            last_seen_key = row[index.key_column]
-            last_seen_ordered_id = row['ordered_id']
-            rows << row
+          if last_seen_ordered_id == ''
+            rows = []
+            database.execute(cql, last_seen_key, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
+              row = row.to_hash
+              last_seen_key = row[index.key_column]
+              last_seen_ordered_id = row['ordered_id']
+              rows << row
+            end
+            break if rows.empty?
+            yield rows, last_seen_key, last_seen_ordered_id
           end
 
           # Sort of lame but we need to get the rest of the rows if the limit exculded them.
-          last_seen_key, last_seen_ordered_id = get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id) do |ordered_id_rows|
-            rows.concat(ordered_id_rows)
+          get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id) do |rows, last_seen_ordered_id|
+            yield rows, last_seen_key, last_seen_ordered_id
           end
 
-          break if rows.empty?
-          yield rows, last_seen_key, last_seen_ordered_id
+          last_seen_ordered_id = ''
         end
       end
 
       def get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id)
-        return [last_seen_key, last_seen_ordered_id] if last_seen_key.blank?
+        return if last_seen_key.blank?
 
         cql = %{
         SELECT #{index.id_column},
@@ -131,20 +133,32 @@ module DataFixup
 
           database.execute(cql, last_seen_key, last_seen_ordered_id, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
             row = row.to_hash
-            last_seen_key = row[index.key_column]
             last_seen_ordered_id = row['ordered_id']
             rows << row
           end
 
           break if rows.empty?
-          yield rows
+          yield rows, last_seen_ordered_id
         end
-
-        return [last_seen_key, last_seen_ordered_id]
       end
     end
 
     class IndexCleaner
+      def self.clean_index_records(index, rows)
+        cleaner = new(index)
+
+        # Clean the records
+        updated_indexes = cleaner.clean(rows)
+
+        # Get Updated Ids
+        rows.map do |row|
+          row_id = row[index.id_column]
+
+          # Look to see if this row was fixed.  If so return that id.
+          updated_indexes[cleaner.updated_index_key(row_id, row['timestamp'])] || row_id
+        end
+      end
+
       def initialize(index)
         @index = index
         @corrected_ids = {}
@@ -210,6 +224,7 @@ module DataFixup
 
       # cleans corrupted index rows
       def clean(rows)
+        updated_indexes = {}
         need_inspection = []
         need_tombstone = []
         updates = []
@@ -260,7 +275,8 @@ module DataFixup
                 # key.  If they are different its corrupted.  If its the same we know its clean.
                 # We need to convert the actual_key to a string, a proc might return a non string
                 # but the index key will always be a string.
-                actual_key = (index.key_proc ? index.key_proc.call(*entry) : entry).to_s
+                actual_key = (index.key_proc ? index.key_proc.call(*entry) : entry)
+                actual_key = actual_key.is_a?(Array) ? actual_key.join('/') : actual_key.to_s
                 if key != actual_key
                   need_tombstone << row
                 else
@@ -293,9 +309,16 @@ module DataFixup
             updates.each do |current_id, key, timestamp, actual_id|
               delete_index_entry(current_id, key, timestamp)
               create_index_entry(actual_id, key, timestamp)
+              updated_indexes[updated_index_key(current_id, timestamp)] = actual_id
             end
           end
         end
+
+        updated_indexes
+      end
+
+      def updated_index_key(id, timestamp)
+        "#{id}/#{timestamp}"
       end
 
       def create_tombstone(id, timestamp)

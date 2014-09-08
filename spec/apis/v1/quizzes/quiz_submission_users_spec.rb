@@ -18,9 +18,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_user_messager_spec_helper')
 
 describe Quizzes::QuizSubmissionUsersController, type: :request do
-  before do
-    course_with_teacher_logged_in(active_all: true)
-    course_quiz(true)
+  before :once do
+    course_with_teacher(active_all: true)
   end
 
   def controller_options(options)
@@ -36,7 +35,8 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
   describe "POST message" do
     include Quizzes::QuizUserMessagerSpecHelper
 
-    before do
+    before :once do
+      course_quiz(true)
       @finder = Quizzes::QuizUserFinder.new(@quiz, @teacher)
       course_with_student(active_all: true, course: @course)
       @user = @teacher
@@ -71,6 +71,12 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
   end
 
   describe "GET submission_users" do
+    before :once do
+      @student1 = course_with_student(course: @course, active_all: true).user
+      quiz_with_graded_submission([], course: @course, user: @student1)
+      @student2 = course_with_student(course: @course, active_all: true).user
+      @user = @teacher
+    end
 
     def get_submitted_users(options={})
       options = controller_options(options.reverse_merge!(action: 'index'))
@@ -84,52 +90,34 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     end
 
     it "does not allow students to view information at the endpoint" do
-      course_with_student_logged_in(course: @course, active_all: true)
+      @user = @student1
       get_submitted_users
       response.should_not be_success
     end
 
     it "allows teachers to see submitted students with ?submitted=true" do
-      course_with_student(active_all: true, course: @course)
-      quiz_with_graded_submission([], course: @course, user: @student)
-      @user = @teacher
       json = get_submitted_users(submitted: true)
       response.should be_success
-      json['users'].first['id'].should == @student.id.to_s
+      json['users'].first['id'].should == @student1.id.to_s
     end
 
     it "allows teachers to see unsubmitted students with ?submitted=false" do
-      course_with_student(active_all: true, course: @course)
-      @student_frd = @student
-      quiz_with_graded_submission([], course: @course, user: @student_frd)
-      course_with_student(active_all: true, course: @course)
-      @user = @teacher
       json = get_submitted_users(submitted: false)
       response.should be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should_not include @student_frd.id.to_s
-      user_ids.should include @student.id.to_s
+      user_ids.should_not include @student1.id.to_s
+      user_ids.should include @student2.id.to_s
     end
 
     it "allows teachers to see all students for quiz when submitted parameter not passed" do
-      course_with_student(active_all: true, course: @course)
-      @student_frd = @student
-      quiz_with_graded_submission([], course: @course, user: @student_frd)
-      course_with_student(active_all: true, course: @course)
-      @user = @teacher
       json = get_submitted_users
       response.should be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should include @student_frd.id.to_s
-      user_ids.should include @student.id.to_s
+      user_ids.should include @student1.id.to_s
+      user_ids.should include @student2.id.to_s
     end
 
     it "will sideload quiz_submissions" do
-      course_with_student(active_all: true, course: @course)
-      @student_frd = @student
-      quiz_with_graded_submission([], course: @course, user: @student_frd)
-      course_with_student(active_all: true, course: @course)
-      @user = @teacher
       json = get_submitted_users(include: ['quiz_submissions'])
       response.should be_success
       json['quiz_submissions'].first.with_indifferent_access[:id].should == @quiz_submission.id.to_s

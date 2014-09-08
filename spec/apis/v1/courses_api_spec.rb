@@ -29,7 +29,7 @@ end
 describe Api::V1::Course do
 
   describe '#course_json' do
-    before do
+    before :once do
       @test_api = TestCourseApi.new
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @me = @user
@@ -165,9 +165,7 @@ end
 describe CoursesController, type: :request do
   USER_API_FIELDS = %w(id name sortable_name short_name)
 
-  before do
-    Course.any_instance.stubs(:start_at).returns nil
-    Course.any_instance.stubs(:end_at).returns nil
+  before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
     @me = @user
     @course1 = @course
@@ -176,6 +174,11 @@ describe CoursesController, type: :request do
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
     @course2.update_attribute(:default_view, 'wiki')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+  end
+
+  before :each do
+    Course.any_instance.stubs(:start_at).returns nil
+    Course.any_instance.stubs(:end_at).returns nil
   end
 
   describe "permissions for courses" do
@@ -240,12 +243,15 @@ describe CoursesController, type: :request do
 
   describe "course creation" do
     context "an account admin" do
-      before do
-        Course.any_instance.unstub(:start_at, :end_at)
+      before :once do
         @account = Account.default
         account_admin_user
         @resource_path = "/api/v1/accounts/#{@account.id}/courses"
         @resource_params = { :controller => 'courses', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
+      end
+
+      before :each do
+        Course.any_instance.unstub(:start_at, :end_at)
       end
 
       it "should create a new course" do
@@ -403,13 +409,12 @@ describe CoursesController, type: :request do
       end
 
       context "without :manage_storage_quotas" do
-        before do
+        before :once do
           custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :enrollment_type => 'lamer'
           user
           @account.account_users.create!(user: @user, membership_type: 'lamer')
-          user_session @user
         end
 
         it "should ignore storage_quota" do
@@ -451,8 +456,7 @@ describe CoursesController, type: :request do
   end
 
   describe "course update" do
-    before do
-      Course.any_instance.unstub(:start_at, :end_at)
+    before :once do
       account_admin_user
       @term = @course.root_account.enrollment_terms.create
       @path   = "/api/v1/courses/#{@course.id}"
@@ -478,6 +482,10 @@ describe CoursesController, type: :request do
         'restrict_enrollments_to_course_dates' => true,
         'default_view' => 'new default view'
       }, 'offer' => true }
+    end
+
+    before :each do
+      Course.any_instance.unstub(:start_at, :end_at)
     end
 
     context "an account admin" do
@@ -643,7 +651,7 @@ describe CoursesController, type: :request do
     end
 
     context "a teacher" do
-      before do
+      before :once do
         user
         enrollment = @course.enroll_teacher(@user)
         enrollment.accept!
@@ -701,7 +709,7 @@ describe CoursesController, type: :request do
   end
 
   describe "course deletion" do
-    before do
+    before :once do
       account_admin_user
       @path = "/api/v1/courses/#{@course.id}"
       @params = { :controller => 'courses', :action => 'destroy', :format => 'json', :id => @course.id.to_s }
@@ -761,7 +769,7 @@ describe CoursesController, type: :request do
   end
 
   describe "batch edit" do
-    before do
+    before :once do
       @account = Account.default
       account_admin_user
       theuser = @user
@@ -1100,7 +1108,7 @@ describe CoursesController, type: :request do
   end
 
   describe "enrollment_role" do
-    before do
+    before :once do
       role = Account.default.roles.build :name => 'SuperTeacher'
       role.base_role_type = 'TeacherEnrollment'
       role.save!
@@ -1129,7 +1137,7 @@ describe CoursesController, type: :request do
   end
 
   describe "course state" do
-    before do
+    before :once do
       @course3 = course
       @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
       @course4 = course
@@ -1218,7 +1226,7 @@ describe CoursesController, type: :request do
   end
 
   describe "root account filter" do
-    before do
+    before :once do
       @course1 = course_with_student(account: Account.default, active_all: true).course
       @course2 = course_with_student(account: account_model(name: 'other root account'), user: @student, active_all: true).course
     end
@@ -1366,7 +1374,7 @@ describe CoursesController, type: :request do
   end
 
   describe "users" do
-    before(:each) do
+    before :once do
       @section1 = @course1.default_section
       @section2 = @course1.course_sections.create!(:name => 'Section B')
       @ta = user(:name => 'TAPerson')
@@ -1574,7 +1582,7 @@ describe CoursesController, type: :request do
       end
 
       describe "enrollment_role" do
-        before do
+        before :once do
           role = Account.default.roles.build :name => 'EliteStudent'
           role.base_role_type = 'StudentEnrollment'
           role.save!
@@ -1692,7 +1700,7 @@ describe CoursesController, type: :request do
       end
 
       describe "as a student" do
-        append_before do
+        before :once do
           @other_user = user_with_pseudonym(:name => 'Waldo', :username => 'dontfindme@example.com')
           @other_user.pseudonym.update_attribute(:sis_user_id, 'mysis_8675309')
           @course1.enroll_student(@other_user).accept!
@@ -1766,12 +1774,10 @@ describe CoursesController, type: :request do
       it "should paginate unique users correctly" do
         students = [@student1, @student2]
         section2 = @course1.course_sections.create!(:name => 'Section B')
-        8.times do |i|
-          s = student_in_course(:course => @course1, :active_all => true).user
-          @course1.enroll_student(s, :section => section2, :allow_multiple_enrollments => true).accept!
-        end
 
-        @user = @me
+        user_ids = create_users_in_course(@course1, 8)
+        create_enrollments(@course1, user_ids, section_id: section2.id)
+
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         { :enrollment_type => 'student', :page => 1, :per_page => 5 })
@@ -1786,14 +1792,10 @@ describe CoursesController, type: :request do
 
       it "should allow jumping to a user's page based on id" do
         @other_section = @course1.course_sections.create!
-        students = []
-        5.times do |i|
-          s = student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
-          @course1.enroll_student(s, :section => @other_section, :allow_multiple_enrollments => true)
-          students << s
-        end
+        students = create_users(5.times.map{ |i| {name: "User #{i+1}", sortable_name: "#{i+1}, User"} }, return_type: :record)
+        create_enrollments(@course1, students)
+        create_enrollments(@course1, students, section_id: @other_section.id)
         @target = students[4]
-        @user = @me
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
@@ -1949,10 +1951,9 @@ describe CoursesController, type: :request do
     end
 
     context "when scoped to account" do
-      before do
+      before :once do
         @admin = account_admin_user(:account => @course.account, :active_all => true)
         user_with_pseudonym(:user => @admin)
-        user_session(@admin)
       end
 
       it "should 401 for unauthorized users" do
@@ -2005,7 +2006,7 @@ describe CoursesController, type: :request do
       end
 
       context "when course is deleted" do
-        before do
+        before :once do
           @course.destroy
         end
 
@@ -2059,8 +2060,8 @@ describe CoursesController, type: :request do
   end
 
   describe "/settings" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
     end
 
     it "should render settings json" do
@@ -2103,8 +2104,8 @@ describe CoursesController, type: :request do
   end
 
   describe "/recent_students" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
       @student1 = student_in_course(:active_all => true, :name => "Sheldon Cooper").user
       @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
       @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
@@ -2129,8 +2130,8 @@ describe CoursesController, type: :request do
   end
 
   describe "/preview_html" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
     end
 
     it "should sanitize html and process links" do
@@ -2156,26 +2157,20 @@ describe CoursesController, type: :request do
   end
 
   it "should return the activity stream" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @context = @course
-    @topic1 = discussion_topic_model
+    discussion_topic_model
     json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream.json",
                     { controller: "courses", course_id: @course.id.to_s, action: "activity_stream", format: 'json' })
     json.size.should == 1
   end
 
   it "should return the activity stream summary" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @context = @course
-    @topic1 = discussion_topic_model
+    discussion_topic_model
     json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream/summary.json",
                     { controller: "courses", course_id: @course.id.to_s, action: "activity_stream_summary", format: 'json' })
     json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
   end
 
   it "should update activity time" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @context = @course
     @enrollment.last_activity_at.should be_nil
     api_call(:post, "/api/v1/courses/#{@course.id}/ping",
                     { controller: "courses", course_id: @course.id.to_s, action: "ping", format: 'json' })
@@ -2191,8 +2186,8 @@ def each_copy_option
 end
 
 describe ContentImportsController, type: :request do
-  before(:each) do
-    course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
+  before :once do
+    course_with_teacher(:active_all => true, :name => 'origin story')
     @copy_from = @course
     @copy_from.sis_source_id = 'from_course'
 

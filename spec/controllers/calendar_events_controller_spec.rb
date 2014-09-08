@@ -19,21 +19,24 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CalendarEventsController do
+  before :once do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    course_event
+  end
+
   def course_event
     @event = @course.calendar_events.create(:title => "some assignment")
   end
 
   describe "GET 'show'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_event
       get 'show', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       get 'show', :course_id => @course.id, :id => @event.id, :format => :json
       # response.should be_success
       assigns[:event].should_not be_nil
@@ -41,8 +44,7 @@ describe CalendarEventsController do
     end
 
     it "should render show page" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       get 'show', :course_id => @course.id, :id => @event.id
       assigns[:event].should_not be_nil
       # make sure that the show.html.erb template is rendered
@@ -53,46 +55,31 @@ describe CalendarEventsController do
   
   describe "GET 'new'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should not allow students to create" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
-
-    # it "should assign variables" do
-      # course_with_teacher_logged_in(:active_all => true)
-      # course_event
-      # get 'new', :course_id => @course.id
-# #      response.should be_success
-      # assigns[:event].should_not be_nil
-      # assigns[:event].should be_new_record
-    # end
   end
   
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_event
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should not allow students to create" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should create a new event" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_event
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :calendar_event => {:title => "some event"}
       response.should be_redirect
       assigns[:event].should_not be_nil
@@ -102,15 +89,12 @@ describe CalendarEventsController do
   
   describe "GET 'edit'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_event
       get 'edit', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
    
     it "should not allow students to update" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       get 'edit', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
@@ -118,22 +102,18 @@ describe CalendarEventsController do
   
   describe "PUT 'update'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_event
       put 'update', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
     
     it "should not allow students to update" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       put 'update', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
     
     it "should update the event" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_event
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @event.id, :calendar_event => {:title => "new title"}
       response.should be_redirect
       assigns[:event].should_not be_nil
@@ -144,22 +124,18 @@ describe CalendarEventsController do
   
   describe "DELETE 'destroy'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_event
       delete 'destroy', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
     
     it "should not allow students to delete" do
-      course_with_student_logged_in(:active_all => true)
-      course_event
+      user_session(@student)
       delete 'destroy', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
     
     it "should delete the event" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_event
+      user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @event.id
       response.should be_redirect
       assigns[:event].should_not be_nil

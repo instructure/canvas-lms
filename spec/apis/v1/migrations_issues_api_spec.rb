@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe MigrationIssuesController, type: :request do
-  before do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+  before :once do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @migration = @course.content_migrations.create!
     @issue_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/migration_issues"
     @params = { :controller => 'migration_issues', :format => 'json', :course_id => @course.id.to_param, :content_migration_id => @migration.id.to_param}

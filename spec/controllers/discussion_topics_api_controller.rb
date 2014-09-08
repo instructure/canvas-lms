@@ -2,10 +2,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionTopicsApiController do
   describe 'POST add_entry' do
-    before(:each) do
+    before :once do
       Setting.set('enable_page_views', 'db')
-      course_with_student_logged_in :active_all => true
+      course_with_student :active_all => true
       @topic = @course.discussion_topics.create!(:title => 'discussion')
+    end
+
+    before :each do
+      user_session(@student)
       controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
       post 'add_entry', :format => 'json', :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read'
     end

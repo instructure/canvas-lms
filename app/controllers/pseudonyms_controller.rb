@@ -242,7 +242,7 @@ class PseudonymsController < ApplicationController
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
-      params[:login][:password_confirmation] = params[:login][:password]
+      params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
@@ -262,16 +262,13 @@ class PseudonymsController < ApplicationController
       params[:pseudonym].delete :password
       params[:pseudonym].delete :password_confirmation
     end
-    if sis_id = params[:pseudonym].delete(:sis_user_id)
-      changed_sis_id = sis_id != @pseudonym.sis_user_id
-      if changed_sis_id && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
-        @pseudonym.sis_user_id = sis_id.blank? ? nil : sis_id
-      end
+    if (sis_id = params[:pseudonym].delete(:sis_user_id)) && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+      @pseudonym.sis_user_id = sis_id.presence
     end
     # silently delete unallowed attributes
     params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :password_confirmation, :sis_user_id].include?(k.to_sym) }
     # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
-    return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && changed_sis_id
+    return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && !sis_id
 
     @pseudonym.assign_attributes(params[:pseudonym])
     if @pseudonym.save_without_session_maintenance

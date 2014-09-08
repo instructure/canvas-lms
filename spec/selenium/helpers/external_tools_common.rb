@@ -46,7 +46,7 @@ shared_examples_for "external tools tests" do
       tool.workflow_state.should == "anonymous"
       tool.url.should == "http://www.edu-apps.org/tool_redirect?id=youtube"
       tool.description.should include_text "YouTube videos"
-      tool.has_editor_button.should be_true
+      tool.has_placement?(:editor_button).should be_true
       tool.settings.should be_present
       tool.editor_button.should be_present
       f("#external_tool_#{tool.id} .edit_tool_link").should be_displayed
@@ -166,6 +166,11 @@ shared_examples_for "external tools tests" do
         <lticm:property name="display_type">full_width</lticm:property>
       </lticm:options>
       <lticm:options name="course_settings_sub_navigation">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="global_navigation">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
         <lticm:property name="display_type">full_width</lticm:property>

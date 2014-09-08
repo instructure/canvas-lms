@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe GradingStandardsApiController, type: :request do
   context "account admin" do
     describe 'grading standards creation' do
-      before do
+      before :once do
         @account = Account.default
         account_admin_user
         @resource_path = "/api/v1/accounts/#{@account.id}/grading_standards"
@@ -80,7 +80,7 @@ describe GradingStandardsApiController, type: :request do
   end
 
   context "teacher" do
-    before do
+    before :once do
       @account = Account.default
       @resource_path = "/api/v1/accounts/#{@account.id}/grading_standards"
       @resource_params = { :controller => 'grading_standards_api', :action => 'create', :format => 'json', :account_id => @account.id.to_s }

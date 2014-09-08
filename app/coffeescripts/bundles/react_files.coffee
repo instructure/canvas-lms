@@ -1,21 +1,22 @@
 require [
-  'compiled/react_files/FilesRouter'
-  'Backbone'
-  'compiled/str/splitAssetString'
-], (FilesRouter, Backbone, splitAssetString) ->
+  'react'
+  'react-router'
+  'compiled/react_files/components/FilesApp'
+  'compiled/react_files/components/ShowFolder'
+  'compiled/react_files/components/SearchResults'
+], (React, {Routes, Route, Redirect}, FilesApp, ShowFolder, SearchResults) ->
 
-  [contextType, contextId] = splitAssetString(ENV.context_asset_string)
-  contextId = Number(contextId)
-
-  baseUrl = if contextType is 'user'
+  baseUrl = if location.pathname is '/files'
     '/files'
   else
-    "/#{contextType}/#{contextId}/files"
+    '/:contextType/:contextId/files'
 
+  routes =
+    Routes location: 'history',
+      Route path:'/:contextType/:contextId', handler: FilesApp,
+        Route path: "#{baseUrl}/search", name: 'search', handler: SearchResults
+        Route path: "#{baseUrl}/folder/*", name: 'folder', handler: ShowFolder
+        Route path: baseUrl, name: 'rootFolder', handler: ShowFolder
+      Redirect from: "#{baseUrl}/folder", to: "#{baseUrl}"
 
-  new FilesRouter({contextType, contextId})
-
-  Backbone.history.start
-    pushState: true
-    hashChange: false
-    root: baseUrl
+  React.renderComponent(routes, document.getElementById('content'))

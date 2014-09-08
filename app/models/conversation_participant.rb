@@ -509,14 +509,10 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.conversation_ids
     raise "conversation_ids needs to be scoped to a user" unless scoped.where_values.any? do |v|
-      if CANVAS_RAILS2
-        v =~ /user_id (?:= |IN \()\d+/
+      if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
+        v.left.name == 'user_id'
       else
-        if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
-          v.left.name == 'user_id'
-        else
-          v =~ /user_id (?:= |IN \()\d+/
-        end
+        v =~ /user_id (?:= |IN \()\d+/
       end
     end
     order = 'last_message_at DESC' unless scoped.order_values.present?

@@ -44,6 +44,14 @@ class DiscussionTopicPresenter
     end
   end
 
+  def has_peer_reviews?(user)
+    peer_reviews_for(user).present?
+  end
+
+  def peer_reviews_for(user)
+    user.assigned_submission_assessments.for_assignment(assignment.id)
+  end
+
   # Public: Determine if this discussion's assignment has an attached rubric.
   #
   # Returns a boolean.

@@ -65,14 +65,6 @@ describe "gradebook2" do
       visible_students[0].text.should == 'student 1'
     end
 
-    it "should link to a students grades page" do
-      get "/courses/#{@course.id}/gradebook2"
-      els = ff('.student-name')
-      links = els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }
-      expected_links = @all_students.map { |s| "/courses/#{@course.id}/grades/#{s.id}" }
-      links.should == expected_links
-    end
-
     it "should not show not-graded assignments" do
       f('#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
     end
@@ -600,8 +592,8 @@ describe "gradebook2" do
       @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
       @student_3_submission.save!
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      ff('.late').count.should == 1
+
+      keep_trying_until { ffj('.late').count.should == 1 }
     end
 
     it "should not display a speedgrader link for large courses" do
@@ -754,6 +746,34 @@ describe "gradebook2" do
         # un-hide the column
         show_notes.call
         has_notes_column.call.should be_true
+      end
+    end
+
+    context "differentiated assignments" do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        @da_assignment = assignment_model({
+          :course => @course,
+          :name => 'DA assignment',
+          :points_possible => ASSIGNMENT_1_POINTS,
+          :submission_types => 'online_text_entry',
+          :assignment_group => @group,
+          :only_visible_to_overrides => true
+        })
+        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+      end
+
+      it "should gray out cells" do
+        get "/courses/#{@course.id}/gradebook"
+        #student 3, assignment 4
+        selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l5'
+        cell = f(selector)
+        cell.find_element(:css, '.gradebook-cell').should have_class('grayed-out')
+        cell.click
+        f(selector + ' .grade').should be_nil
+        #student 2, assignment 4 (not grayed out)
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l5')
+        cell.find_element(:css, '.gradebook-cell').should_not have_class('grayed-out')
       end
     end
   end

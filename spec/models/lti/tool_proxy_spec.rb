@@ -32,7 +32,7 @@ module Lti
         subject.product_version = '1.0beta'
         subject.lti_version = 'LTI-2p0'
         subject.product_family = product_family
-        subject.root_account = account
+        subject.context = account
         subject.workflow_state = 'active'
         subject.raw_data = 'some raw data'
       end
@@ -58,7 +58,7 @@ module Lti
         tool_proxy.product_version = '2.0_beta'
         tool_proxy.lti_version = 'LTI-2p0'
         tool_proxy.product_family = product_family
-        tool_proxy.root_account = account
+        tool_proxy.context = account
         tool_proxy.workflow_state = 'active'
         tool_proxy.raw_data = 'raw_data'
         tool_proxy.save
@@ -84,10 +84,10 @@ module Lti
         error = subject.errors.find {|e| e == [:product_family, "can't be blank"]}
       end
 
-      it 'requires a root_account' do
-        subject.root_account = nil
+      it 'requires a context' do
+        subject.context = nil
         subject.save
-        subject.errors[:root_account_id].should include("can't be blank")
+        subject.errors[:context].should include("can't be blank")
       end
 
       it 'require a workflow_state' do

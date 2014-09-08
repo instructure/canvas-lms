@@ -1,0 +1,4 @@
+<% content_for :head, include_common_stylesheets %>
+<%= render :partial => "layouts/head" %>
+<%= yield %>
+<%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>

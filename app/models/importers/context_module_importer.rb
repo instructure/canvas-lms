@@ -93,7 +93,7 @@ module Importers
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.find_by_id(hash[:id]) if hash[:id].present?
       existing_item ||= context_module.content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
-      existing_item ||= context_module.content_tags.new(:context => context)
+      existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
       if hash[:workflow_state] == 'unpublished'
         existing_item.workflow_state = 'unpublished'
       else

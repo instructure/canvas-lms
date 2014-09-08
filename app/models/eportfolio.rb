@@ -65,12 +65,13 @@ class Eportfolio < ActiveRecord::Base
     can :read
   end
   
-  def setup_defaults
-    cat = self.eportfolio_categories.create(:name => t(:first_category, "Home")) if self.eportfolio_categories.empty?
+  def ensure_defaults
+    cat = self.eportfolio_categories.first
+    cat ||= self.eportfolio_categories.create!(:name => t(:first_category, "Home"))
     if cat && cat.eportfolio_entries.empty?
       entry = cat.eportfolio_entries.build(:eportfolio => self, :name => t('first_entry.title', "Welcome"))
       entry.content = t('first_entry.content', "Nothing entered yet")
-      entry.save
+      entry.save!
     end
     cat
   end

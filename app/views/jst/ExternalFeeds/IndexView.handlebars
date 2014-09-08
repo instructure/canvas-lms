@@ -4,7 +4,7 @@
 <ul class="right-side-list">
   {{#each this}}
     <li class="external_feed">
-      <a class="close" data-delete-feed-id="{{id}}" href="#">×</a>
+      <a class="close" data-delete-feed-id="{{id}}" href="#" role="button" aria-label="{{#t "remove_feed"}}Remove {{display_name}}{{/t}}">×</a>
       <a href="{{url}}">
         <b>
           {{display_name}}

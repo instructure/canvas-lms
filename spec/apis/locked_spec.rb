@@ -39,7 +39,7 @@ shared_examples_for 'a locked api item' do
     lock_info_extra.each { |attribute| lock_info[attribute.to_s].should_not be_nil, "expected lock_info to contain '#{attribute.to_s}'" }
   end
 
-  before(:each) do
+  before(:once) do
     course_with_student(:active_all => true)
   end
 
