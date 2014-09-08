@@ -217,6 +217,11 @@ module Lti
       it "generates launch_presentation_document_target" do
         subject.default_lti_params[:launch_presentation_document_target].should == 'iframe'
       end
+
+      it "generates user_id" do
+        subject.current_user = user
+        subject.default_lti_params[:user_id].should == Lti::Asset.opaque_identifier_for(user)
+      end
     end
   end
 end
