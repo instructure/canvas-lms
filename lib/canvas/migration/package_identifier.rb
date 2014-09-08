@@ -3,6 +3,8 @@ module Canvas::Migration
     include Canvas::Migration::XMLHelper
     attr_reader :type, :converter
 
+    COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i
+
     def initialize(archive)
       @archive = archive
     end
@@ -28,7 +30,7 @@ module Canvas::Migration
       elsif @archive.find_entry("imsmanifest.xml")
         data = @archive.read("imsmanifest.xml")
         doc = ::Nokogiri::XML(data)
-        if get_node_val(doc, 'metadata schema') =~ /IMS Common Cartridge/i
+        if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX
           if !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]})
             :canvas_cartridge
           elsif !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::CANVAS_EXPORT_FLAG}"]})
@@ -78,7 +80,7 @@ module Canvas::Migration
     # if it's not CC 1.3 then we don't know how to handle it
     def check_flat_xml_file
       doc = ::Nokogiri::XML(File.read(@archive.file))
-      if get_node_val(doc, 'metadata schema') =~ /IMS Common Cartridge/i &&
+      if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX &&
               get_node_val(doc, 'metadata schemaversion') == "1.3.0"
         :common_cartridge_1_3
       else

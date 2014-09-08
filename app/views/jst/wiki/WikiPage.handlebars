@@ -4,7 +4,7 @@
     <div class="header-bar flex-container">
       <div class="header-bar-left header-left-flex">
         {{#if course_home}}
-        <h2 class="course-title ellipsis" title="{{course_title}}">{{course_title}}</h2>
+        <h1 class="course-title ellipsis" title="{{course_title}}">{{course_title}}</h1>
         {{else}}
           {{#if CAN.VIEW_PAGES}}
             <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'CommunicationChannels API', type: :request do
   describe 'index' do
-    before do
+    before :once do
       @someone = user_with_pseudonym
       @admin   = user_with_pseudonym
 
@@ -65,7 +65,7 @@ describe 'CommunicationChannels API', type: :request do
   end
 
   describe 'create' do
-    before do
+    before :once do
       @someone    = user_with_pseudonym
       @admin      = user_with_pseudonym
       @site_admin = user_with_pseudonym
@@ -191,17 +191,15 @@ describe 'CommunicationChannels API', type: :request do
   end
 
   describe 'destroy' do
-    # let! so that these are evaluated before the before(:each) { @user = ... }
-    # blocks. otherwise they stomp on @user and make api calls as the wrong user
-    let! (:someone) { user_with_pseudonym }
-    let! (:admin) do
+    let_once(:someone) { user_with_pseudonym }
+    let_once(:admin) do
       user = user_with_pseudonym
       Account.default.account_users.create!(user: user)
       user
     end
-    let (:channel) { someone.communication_channel }
-    let (:path) {"/api/v1/users/#{someone.id}/communication_channels/#{channel.id}"}
-    let (:path_options) do
+    let_once(:channel) { someone.communication_channel }
+    let(:path) {"/api/v1/users/#{someone.id}/communication_channels/#{channel.id}"}
+    let(:path_options) do
       { :controller => 'communication_channels',
         :action => 'destroy', :user_id => someone.to_param, :format => 'json',
         :id => channel.to_param }

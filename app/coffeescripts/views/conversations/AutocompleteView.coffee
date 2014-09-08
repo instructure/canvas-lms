@@ -272,14 +272,14 @@ define [
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       @resultCollection.each @_addToModelCache
-      shouldDrawResults = @resultCollection.length
-      isFinished        = !@nextRequest
+      hasResults = @resultCollection.length
+      isFinished = !@nextRequest
       @_addBackResult(@resultCollection)
       @currentRequest = null
-      if shouldDrawResults and isFinished
-        @_drawResults()
-      else if isFinished
+      if !hasResults
         @resultCollection.push(new ConversationSearchResult({id: 'no_results', name: '', noResults: true}))
+      if isFinished
+        @_drawResults()
       @_fetchResults(true) if @nextRequest
 
     # Internal: Determine if the current user can send to all users in the course.
@@ -311,7 +311,10 @@ define [
       return unless @currentContext
       name       = @messages.everyone(@currentContext.name)
       searchTerm = new RegExp(@$input.val().trim(), 'gi')
-      return results if (searchTerm and !name.match(searchTerm)) or (!results.length and !@currentContext)
+      return results if (searchTerm and !name.match(searchTerm))
+
+      actual_results = results.reject (result) -> result.attributes.back || result.attributes.noResults || result.attributes.everyone
+      return results if !actual_results.length
 
       return if @currentContext.id.match(/course_\d+_(group|section)/)
 

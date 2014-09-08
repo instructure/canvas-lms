@@ -1,6 +1,8 @@
 embed_assets: off
 gzip_assets: off
-css_compressor: 'sass'
+
+# libsass does this for us
+compress_assets: off
 
 # if you want use IE in dev mode and want to get around the max of 30 stylesheets
 # problem, uncomment the following lines and make sure you
@@ -20,6 +22,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/instructure_eportfolio.css
   course_show:
     - public/stylesheets/compiled/pages/course_show.css
+  course_list:
+    - public/stylesheets/compiled/pages/course_list.css
   content_migrations:
     - public/stylesheets/compiled/pages/content_migrations.css
   vendor:
@@ -30,6 +34,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/context_modules.css
   context_modules2:
     - public/stylesheets/compiled/pages/context_modules2.css
+  modules_next:
+    - public/stylesheets/compiled/pages/modules_next.css
   context_module_progressions:
     - public/stylesheets/compiled/pages/context_module_progressions.css
   dashboard:
@@ -48,8 +54,6 @@ stylesheets:
     - public/stylesheets/compiled/pages/conferences.css
   gradebook_uploads:
     - public/stylesheets/compiled/pages/gradebook_uploads.css
-  calendar:
-    - public/stylesheets/compiled/pages/calendar/calendar.css    
   calendar2:
     - public/stylesheets/compiled/pages/calendar/calendar2.css
   agenda_view:
@@ -123,9 +127,9 @@ stylesheets:
   select_content_dialog:
     - public/stylesheets/compiled/pages/select_content_dialog.css
   conversations_new:
-    # TODO: we need to look at what's being used here and if we can get purge this file and use  
-    # the styles in /bootstrap/ 
-    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css 
+    # TODO: we need to look at what's being used here and if we can get purge this file and use
+    # the styles in /bootstrap/
+    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css
     # end
     - public/stylesheets/compiled/pages/conversations/compiler-conversations.css
   alerts:

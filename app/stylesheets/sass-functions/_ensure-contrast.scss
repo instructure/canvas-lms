@@ -19,7 +19,7 @@
   }
   $ratio: contrast-ratio($desired-color, $background-color-it-will-be-used-on);
 
-  @if ($ratio < 2) {
+  @if ($ratio < 1.9) {
     @warn "Everyone will have a hard time seeing #{$desired-color} on #{$background-color-it-will-be-used-on}. ratio: #{$ratio}";
   }
 

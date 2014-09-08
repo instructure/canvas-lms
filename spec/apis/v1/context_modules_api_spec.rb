@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Modules API", type: :request do
-  before do
+  before :once do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
@@ -56,7 +56,7 @@ describe "Modules API", type: :request do
   end
 
   context "as a teacher" do
-    before :each do
+    before :once do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
@@ -292,7 +292,7 @@ describe "Modules API", type: :request do
     end
 
     describe "batch update" do
-      before do
+      before :once do
         @path = "/api/v1/courses/#{@course.id}/modules"
         @path_opts = { :controller => "context_modules_api", :action => "batch_update", :format => "json",
                        :course_id => @course.to_param }
@@ -391,8 +391,8 @@ describe "Modules API", type: :request do
     end
 
     describe "update" do
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
+      before :once do
+        course_with_teacher(:active_all => true)
 
         @module1 = @course.context_modules.create(:name => "unpublished")
         @module1.workflow_state = 'unpublished'
@@ -522,8 +522,8 @@ describe "Modules API", type: :request do
     end
 
     describe "create" do
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
+      before :once do
+        course_with_teacher(:active_all => true)
       end
 
       it "should create a module with attributes" do
@@ -639,8 +639,8 @@ describe "Modules API", type: :request do
   end
   
   context "as a student" do
-    before :each do
-      course_with_student_logged_in(:course => @course, :active_all => true)
+    before :once do
+      course_with_student(:course => @course, :active_all => true)
     end
 
     it "should show locked state" do

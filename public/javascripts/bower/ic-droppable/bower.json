@@ -1,0 +1,23 @@
+{
+  "name": "ic-droppable",
+  "version": "0.1.1",
+  "authors": [
+    "Ryan Florence <rpflorence@gmail.com>",
+    "Aaron Shafovaloff"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "bower_components",
+    "node_modules",
+    "package.json",
+    "testem.json",
+    "test.js",
+    "**/.*"
+  ],
+  "dependencies": {
+    "ember": "^1.3.0"
+  },
+  "devDependencies": {
+    "ember-qunit": "~0.1.6"
+  }
+}

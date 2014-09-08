@@ -661,7 +661,7 @@ describe Account do
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_account_navigation.should == false
+      tool.has_placement?(:account_navigation).should == false
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
@@ -685,7 +685,7 @@ describe Account do
       tool1, tool2 = tools
       tool2.destroy
 
-      tools.each { |t| t.has_account_navigation.should == true }
+      tools.each { |t| t.has_placement?(:account_navigation).should == true }
 
       tabs = @account.tabs_available
       tab_ids = tabs.map{|t| t[:id] }
@@ -701,7 +701,7 @@ describe Account do
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_account_navigation.should == true
+      tool.has_placement?(:account_navigation).should == true
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
       tab = tabs.detect{|t| t[:id] == tool.asset_string }

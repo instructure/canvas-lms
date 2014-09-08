@@ -239,9 +239,17 @@ a.no-underline,a.no-underline:hover, a.no-underline:focus
 // these classes make it so you can have links like <a class="atr-reply">reply to this topic</a> and have only
 // a reply.png icon show up.
 
+.atr-reply, .atr-edit, .atr-delete
+  text-indent: -119988px
+  overflow: hidden
+  text-align: left
+  background-repeat: no-repeat
+  background-position: 50% 50%
+  width: 16px
+  height: 16px
 .atr-reply
-  +replace-text-with-dimensions("reply.png")
+  background-image: url('/images/reply.png')
 .atr-edit
-  +replace-text-with-dimensions("edit.png")
+  background-image: url('/images/edit.png')
 .atr-delete
-  +replace-text-with-dimensions("delete.png")
+  background-image: url('/images/delete.png')

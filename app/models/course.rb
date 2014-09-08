@@ -372,6 +372,11 @@ class Course < ActiveRecord::Base
     license_data[:readable_license]
   end
 
+  def unpublishable?
+    ids = self.all_real_students.pluck :id
+    !self.submissions.with_point_data.where(:user_id => ids).exists?
+  end
+
   def self.update_account_associations(courses_or_course_ids, opts = {})
     return [] if courses_or_course_ids.empty?
     opts.reverse_merge! :account_chain_cache => {}
@@ -581,9 +586,7 @@ class Course < ActiveRecord::Base
     scope = current_enrollments.
       where(:course_id => self, :user_id => user_id).
       where("course_section_id IS NOT NULL")
-    section_ids = CANVAS_RAILS2 ?
-      scope.pluck(:course_section_id).uniq :
-      scope.uniq.pluck(:course_section_id)
+    section_ids = scope.uniq.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
   end
 
@@ -1450,10 +1453,19 @@ class Course < ActiveRecord::Base
     # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
     includes = [:user, :course_section]
     includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
-    scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.includes(includes).order_by_sortable_name
-    student_enrollments = student_enrollments.all
-    student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
+
+    scope = if options[:user]
+              enrollment_opts = options.slice(:include_priors)
+              enrollments_visible_to(options[:user], enrollment_opts)
+            else
+              options[:include_priors] ?
+                all_student_enrollments :
+                student_enrollments
+            end
+    enrollments = scope.includes(includes).order_by_sortable_name.all
+    enrollments.partition { |enrollment|
+      enrollment.type != "StudentViewEnrollment"
+    }.flatten
   end
   private :enrollments_for_csv
 
@@ -1702,13 +1714,7 @@ class Course < ActiveRecord::Base
   end
 
   def resubmission_for(asset)
-    if CANVAS_RAILS2
-      # without the scoped, Rails 2 will try to do an update_all instead (due
-      # to the association)
-      asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
-    else
-      asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    end
+    asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
     instructors.order(:id).each(&:touch)
   end
 
@@ -2060,8 +2066,13 @@ class Course < ActiveRecord::Base
   end
 
   def set_course_dates_if_blank(shift_options)
-    self.start_at ||= shift_options[:default_start_at]
-    self.conclude_at ||= shift_options[:default_conclude_at]
+    if Canvas::Plugin.value_to_boolean(shift_options[:remove_dates])
+      self.start_at = nil
+      self.conclude_at = nil
+    else
+      self.start_at ||= shift_options[:default_start_at]
+      self.conclude_at ||= shift_options[:default_conclude_at]
+    end
   end
 
   def real_start_date
@@ -2219,11 +2230,7 @@ class Course < ActiveRecord::Base
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
       where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
-    if CANVAS_RAILS2
-      scope.count(:distinct => true, :select => 'users.id')
-    else
-      scope.select('users.id').uniq.count
-    end
+    scope.select('users.id').uniq.count
   end
 
   def unpublished?
@@ -2719,5 +2726,13 @@ class Course < ActiveRecord::Base
 
   def multiple_sections?
     self.active_course_sections.count > 1
+  end
+
+  def content_exports_visible_to(user)
+    if self.grants_right?(user, :read_as_admin)
+      self.content_exports.admin(user)
+    else
+      self.content_exports.non_admin(user)
+    end
   end
 end

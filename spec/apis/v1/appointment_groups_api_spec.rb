@@ -19,12 +19,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe AppointmentGroupsController, type: :request do
-  before do
+  before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @course1 = @course
     course_with_teacher(:active_all => true, :user => @user)
     @course2 = @course
     @me = @user
+    @student1 = student_in_course(:course => @course, :active_all => true).user
+    @student2 = student_in_course(:course => @course, :active_all => true).user
+    @user = @me
   end
 
   expected_fields = [
@@ -153,25 +156,23 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should paginate appointment groups' do
-    ids = 25.times.map { |i| AppointmentGroup.create!(:title => "#{i}".object_id, :contexts => [@course]) }
-    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=10", {
+    ids = 5.times.map { |i| AppointmentGroup.create!(:title => "#{i}".object_id, :contexts => [@course]) }
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
-                      :scope => 'manageable', :per_page => '10'})
-    json.size.should eql 10
+                      :scope => 'manageable', :per_page => '2'})
+    json.size.should eql 2
     response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
 
-    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=10&page=3", {
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2&page=3", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
-                      :scope => 'manageable', :per_page => '10', :page => '3'})
-    json.size.should eql 5
+                      :scope => 'manageable', :per_page => '2', :page => '3'})
+    json.size.should eql 1
     response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
   end
 
   it 'should include appointments and child_events, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
-    student = student_in_course(:course => @course, :active_all => true).user
-    ag.appointments.first.reserve_for student, @me
-    @user = @me
+    ag.appointments.first.reserve_for @student1, @me
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=appointments", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['appointments']})
@@ -186,7 +187,7 @@ describe AppointmentGroupsController, type: :request do
     ajson.first.keys.should include('child_events')
     cjson = ajson.first['child_events']
     cjson.first.keys.should include('user')
-    cjson.first['user']['id'].should eql student.id
+    cjson.first['user']['id'].should eql @student1.id
   end
 
   it 'should get a manageable appointment group' do
@@ -204,9 +205,7 @@ describe AppointmentGroupsController, type: :request do
 
   it 'should include child_events, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
-    student = student_in_course(:course => @course, :active_all => true).user
-    ag.appointments.first.reserve_for student, @me
-    @user = @me
+    ag.appointments.first.reserve_for @student1, @me
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}?include[]=child_events", {
                       :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['child_events']})
@@ -217,12 +216,11 @@ describe AppointmentGroupsController, type: :request do
     ajson.first.keys.should include('child_events')
     cjson = ajson.first['child_events']
     cjson.first.keys.should include('user')
-    cjson.first['user']['id'].should eql student.id
+    cjson.first['user']['id'].should eql @student1.id
   end
 
   it 'should get a reservable appointment group' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    @user = @me
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
 
@@ -235,7 +233,6 @@ describe AppointmentGroupsController, type: :request do
 
   it 'should require action until the min has been met' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    @user = @me
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1, :contexts => [@course])
     ag.publish!
     appt = ag.appointments.first
@@ -257,7 +254,6 @@ describe AppointmentGroupsController, type: :request do
 
   it 'should enforce create permissions' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    @user = @me
     raw_api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
                       {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai"} })
@@ -286,7 +282,6 @@ describe AppointmentGroupsController, type: :request do
 
   it 'should enforce update permissions' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    @user = @me
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
@@ -323,7 +318,6 @@ describe AppointmentGroupsController, type: :request do
 
   it 'should enforce delete permissions' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    @user = @me
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
@@ -384,24 +378,22 @@ describe AppointmentGroupsController, type: :request do
     'users' => proc {
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
-      student1 = student_in_course(:course => @course, :active_all => true).user
-      @ag.appointments.first.reserve_for student1, @me
-      student2 = student_in_course(:course => @course, :active_all => true).user
+      @ag.appointments.first.reserve_for @student1, @me
     },
     'groups' => proc {
       cat = @course.group_categories.create(name: "foo")
       @ag = AppointmentGroup.create!(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       group1 = cat.groups.create(:context => @course)
-      group1.users << student_in_course(:course => @course, :active_all => true).user
+      group1.users << @student1
       @ag.appointments.first.reserve_for group1, @me
       group2 = cat.groups.create(:context => @course)
-      group2.users << student_in_course(:course => @course, :active_all => true).user
+      group2.users << @student2
     }
   }
   types.each do |type, block|
     context "#{type.singularize}-level appointment groups" do
-      before &block
+      before :once, &block
 
       it "should return all #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {

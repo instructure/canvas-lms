@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Polling::PollSubmissionsController, type: :request do
-  before(:each) do
-    course_with_teacher_logged_in active_all: true
+  before :once do
+    course_with_teacher active_all: true
     @section = @course.course_sections.first
     @poll = @teacher.polls.create!(question: "What is your favorite color?")
 
@@ -37,7 +37,7 @@ describe Polling::PollSubmissionsController, type: :request do
   end
 
   describe 'GET show' do
-    before(:each) do
+    before :once do
       @student = student_in_course(active_user: true).user
 
       @selected = @poll.poll_choices.where(text: "Green").first
@@ -60,7 +60,6 @@ describe Polling::PollSubmissionsController, type: :request do
     end
 
     it "retrieves the poll submission specified" do
-      user_session(@student)
       json = get_show
       poll_submission_json = json['poll_submissions'].first
       poll_submission_json['id'].should == @submission.id.to_s
@@ -69,7 +68,7 @@ describe Polling::PollSubmissionsController, type: :request do
   end
 
   describe 'POST create' do
-    before(:each) do
+    before :once do
       @selected = @poll.poll_choices.where(text: "Green").first
     end
 

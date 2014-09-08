@@ -95,7 +95,7 @@ class UserList
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
       type = :sms
-    elsif path.include?('@') && (address = (CANVAS_RAILS2 ? TMail::Address.parse(path) : Mail::Address.new(path)) rescue nil)
+    elsif path.include?('@') && (address = (Mail::Address.new(path)) rescue nil)
       type = :email
       name = address.name
       path = address.address

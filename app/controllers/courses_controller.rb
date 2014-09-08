@@ -936,7 +936,7 @@ class CoursesController < ApplicationController
         enabled: Canvas::Plugin.find(:app_center).enabled?
       }
 
-      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_settings_sub_navigation?)
+      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
       end
@@ -1074,6 +1074,8 @@ class CoursesController < ApplicationController
     end
 
     session.delete(:enrollment_uuid)
+    session[:permissions_key] = CanvasUUID.generate
+
     redirect_to(@current_user ? dashboard_url : root_url)
   end
   protected :reject_enrollment
@@ -1114,9 +1116,9 @@ class CoursesController < ApplicationController
         return !!redirect_to(registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid))
       end
 
-      session[:enrollment_uuid]             = enrollment.uuid
-      session[:session_affects_permissions] = true
-      session[:enrollment_uuid_course_id]   = enrollment.course_id
+      session[:enrollment_uuid] = enrollment.uuid
+      session[:enrollment_uuid_course_id] = enrollment.course_id
+      session[:permissions_key] = CanvasUUID.generate
 
       @pending_enrollment = enrollment
 
@@ -1139,7 +1141,10 @@ class CoursesController < ApplicationController
         flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
 
-      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
+      if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
+        session.delete(:enrollment_uuid)
+        session[:permissions_key] = CanvasUUID.generate
+      end
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
     end
@@ -1390,7 +1395,7 @@ class CoursesController < ApplicationController
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
 
-      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_home_sub_navigation?)
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
@@ -1614,6 +1619,9 @@ class CoursesController < ApplicationController
       @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
+      if (adjust_dates = params.delete(:adjust_dates)) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
+        params[:date_shift_options][adjust_dates[:operation]] = '1'
+      end
       @content_migration.set_date_shift_options(params[:date_shift_options])
 
       if Canvas::Plugin.value_to_boolean(params[:selective_import])
@@ -1749,7 +1757,7 @@ class CoursesController < ApplicationController
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
         event = params[:course].delete(:event)
         event = event.to_sym
-        if event == :claim && @course.submissions.with_point_data.exists?
+        if event == :claim && !@course.unpublishable?
           flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
           redirect_to(course_url(@course)) and return
         else

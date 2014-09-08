@@ -436,3 +436,30 @@ define [
       equal @srgb.get('showInvalidGroupWarning'), false
       @srgb.set('weightingScheme', "percent")
       equal @srgb.get('showInvalidGroupWarning'), true
+
+
+  module 'screenreader_gradebook_controller: differentiated assignments',
+    setup: ->
+      setup.call this, true
+    teardown: ->
+      teardown.call this
+
+  test 'selectedSubmissionHidden is false when students have visibility', ->
+    student = @srgb.get('students.firstObject')
+    assignment = @srgb.get('assignments.firstObject')
+
+    Ember.run =>
+      @srgb.set('selectedAssignment', assignment)
+      @srgb.set('selectedStudent', student)
+      equal @srgb.get('selectedSubmissionHidden'), false
+
+  test 'selectedSubmissionHidden is false when students have visibility', ->
+    student = @srgb.get('students').objectAt(2)
+    assignment = @srgb.get('assignments.firstObject')
+
+    Ember.run =>
+      @srgb.set('selectedAssignment', assignment)
+      @srgb.set('selectedStudent', student)
+      equal @srgb.get('selectedSubmissionHidden'), true
+
+

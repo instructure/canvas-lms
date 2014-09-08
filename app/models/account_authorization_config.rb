@@ -29,11 +29,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   acts_as_list :scope => :account
 
   attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
-                  :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
-                  :log_in_url, :log_out_url, :identifier_format,
-                  :certificate_fingerprint, :entity_id, :change_password_url,
-                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
-                  :login_attribute, :idp_entity_id
+    :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
+    :log_in_url, :log_out_url, :identifier_format,
+    :certificate_fingerprint, :entity_id, :change_password_url,
+    :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
+    :login_attribute, :idp_entity_id, :unknown_user_url
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
 
@@ -51,7 +51,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def self.recognized_params(auth_type)
     case auth_type
     when 'cas'
-      [ :auth_type, :auth_base, :log_in_url, :login_handle_name ]
+      [ :auth_type, :auth_base, :log_in_url, :login_handle_name, :unknown_user_url ]
     when 'ldap'
       [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
         :auth_filter, :auth_username, :auth_password, :change_password_url,
@@ -59,7 +59,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     when 'saml'
       [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
         :certificate_fingerprint, :identifier_format, :login_handle_name,
-        :login_attribute, :idp_entity_id, :position]
+        :login_attribute, :idp_entity_id, :position, :unknown_user_url ]
     else
       []
     end
@@ -67,14 +67,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def self.auth_over_tls_setting(value)
     case value
-      when nil, '', false, 'false', 'f', 0, '0'
-        nil
-      when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
-        'simple_tls'
-      when 'start_tls', :start_tls
-        'start_tls'
-      else
-        raise ArgumentError("invalid auth_over_tls setting: #{value}")
+    when nil, '', false, 'false', 'f', 0, '0'
+      nil
+    when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
+      'simple_tls'
+    when 'start_tls', :start_tls
+      'start_tls'
+    else
+      raise ArgumentError("invalid auth_over_tls setting: #{value}")
     end
   end
 
@@ -92,12 +92,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     ldap.auth self.auth_username, self.auth_decrypted_password
     ldap
   end
-  
+
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
   end
-  
+
   def self.saml_login_attributes
     {
       'NameID' => 'nameid',
@@ -105,24 +105,24 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       t(:saml_eppn_domain_stripped, "%{eppn} (domain stripped)", :eppn => "eduPersonPrincipalName") =>'eduPersonPrincipalName_stripped'
     }
   end
-  
+
   def sanitized_ldap_login(login)
     [ [ '\\', '\5c' ], [ '*', '\2a' ], [ '(', '\28' ], [ ')', '\29' ], [ "\00", '\00' ] ].each do |re|
       login.gsub!(re[0], re[1])
     end
     login
   end
-  
+
   def ldap_filter(login = nil)
     filter = self.auth_filter
     filter = filter.gsub(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
     filter
   end
-  
+
   def change_password_url
     read_attribute(:change_password_url).blank? ? nil : read_attribute(:change_password_url)
   end
-  
+
   def ldap_filter=(new_filter)
     self.auth_filter = new_filter
   end
@@ -134,21 +134,21 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       return nil
     end
   end
-  
+
   def auth_password=(password)
     return if password.nil? or password == ''
     self.auth_crypted_password, self.auth_password_salt = Canvas::Security.encrypt_password(password, 'instructure_auth')
   end
-  
+
   def auth_decrypted_password
     return nil unless self.auth_password_salt && self.auth_crypted_password
     Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
-  
+
   def self.saml_default_entity_id_for_account(account)
     "http://#{HostUrl.context_host(account)}/saml2"
   end
-  
+
   def saml_default_entity_id
     AccountAuthorizationConfig.saml_default_entity_id_for_account(self.account)
   end
@@ -170,26 +170,26 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @saml_settings.name_identifier_format = self.identifier_format
       @saml_settings.requested_authn_context = self.requested_authn_context
     end
-    
+
     @saml_settings
   end
-  
+
   def self.saml_settings_for_account(account, current_host=nil)
     app_config = ConfigFile.load('saml') || {}
     domains = HostUrl.context_hosts(account, current_host)
-    
+
     settings = Onelogin::Saml::Settings.new
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/saml_logout"
     settings.assertion_consumer_service_url = domains.map { |domain| "#{HostUrl.protocol}://#{domain}/saml_consume" }
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
-    
+
     if account.saml_authentication?
       settings.issuer = account.account_authorization_config.entity_id 
     else
       settings.issuer = saml_default_entity_id_for_account(account)
     end
-    
+
     encryption = app_config[:encryption]
     if encryption.is_a?(Hash)
       settings.xmlsec_certificate = resolve_saml_key_path(encryption[:certificate])
@@ -197,7 +197,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
       settings.xmlsec_additional_privatekeys = Array(encryption[:additional_private_keys]).map { |apk| resolve_saml_key_path(apk) }.compact
     end
-    
+
     settings
   end
 
@@ -212,15 +212,15 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
     path.exist? ? path.to_s : nil
   end
-  
+
   def email_identifier?
     if self.saml_authentication?
       return self.identifier_format == Onelogin::Saml::NameIdentifiers::EMAIL
     end
-    
+
     false
   end
-  
+
   def password_authentication?
     !['cas', 'ldap', 'saml'].member?(self.auth_type)
   end
@@ -232,23 +232,23 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def cas_authentication?
     self.auth_type == 'cas'
   end
-  
+
   def ldap_authentication?
     self.auth_type == 'ldap'
   end
-  
+
   def saml_authentication?
     self.auth_type == 'saml'
   end
-  
+
   def self.default_login_handle_name
     t(:default_login_handle_name, "Email")
   end
-  
+
   def self.default_delegated_login_handle_name
     t(:default_delegated_login_handle_name, "Login")
   end
-  
+
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
   def test_ldap_connection
@@ -336,38 +336,38 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def debugging?
     !!Rails.cache.fetch(debug_key(:debugging))
   end
-  
+
   def debugging_keys
-    [:debugging, :request_id, :to_idp_url, :to_idp_xml, :idp_response_encoded, 
+    [:debugging, :request_id, :to_idp_url, :to_idp_xml, :idp_response_encoded,
      :idp_in_response_to, :fingerprint_from_idp, :idp_response_xml_encrypted,
      :idp_response_xml_decrypted, :idp_login_destination, :is_valid_login_response,
-     :login_response_validation_error, :login_to_canvas_success, :canvas_login_fail_message, 
-     :logged_in_user_id, :logout_request_id, :logout_to_idp_url, :logout_to_idp_xml, 
-     :idp_logout_response_encoded, :idp_logout_in_response_to, 
+     :login_response_validation_error, :login_to_canvas_success, :canvas_login_fail_message,
+     :logged_in_user_id, :logout_request_id, :logout_to_idp_url, :logout_to_idp_xml,
+     :idp_logout_response_encoded, :idp_logout_in_response_to,
      :idp_logout_response_xml_encrypted, :idp_logout_destination]
   end
-  
+
   def finish_debugging
     debugging_keys.each { |key| Rails.cache.delete(debug_key(key)) }
   end
-  
+
   def start_debugging
     finish_debugging # clear old data
     debug_set(:debugging, t('debug.wait_for_login', "Waiting for attempted login"))
   end
-  
+
   def debug_get(key)
     Rails.cache.fetch(debug_key(key))
   end
-  
+
   def debug_set(key, value)
     Rails.cache.write(debug_key(key), value, :expires_in => debug_expire)
   end
-  
+
   def debug_key(key)
     ['aac_debugging', self.id, key.to_s].cache_key
   end
-  
+
   def debug_expire
     Setting.get('aac_debug_expire_minutes', 30).minutes
   end
@@ -384,10 +384,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     Canvas.timeout_protection("ldap:#{self.global_id}",
                               raise_on_timeout: true,
                               fallback_timeout_length: default_timeout) do
-      ldap = self.ldap_connection
-      filter = self.ldap_filter(unique_id)
-      ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
-    end
+                                ldap = self.ldap_connection
+                                filter = self.ldap_filter(unique_id)
+                                ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+                              end
   rescue => e
     ErrorReport.log_exception(:ldap, e, :account => self.account)
     if e.is_a?(Timeout::Error)

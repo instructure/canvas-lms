@@ -238,6 +238,15 @@ class SubmissionsController < ApplicationController
 
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
     if authorized_action(@submission, @current_user, :read)
+
+      if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
+        respond_to do |format|
+          flash[:error] = t 'notices.submission_not_availible', "The assignment you requested is no longer availible to your course section. Prior submissions will not count towards your grade."
+          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+        end
+        return
+      end
+
       respond_to do |format|
         json_handled = false
         if params[:preview]
@@ -329,8 +338,8 @@ class SubmissionsController < ApplicationController
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
   #   The submission_type given determines which of the following parameters is
-  #   used. For instance, to submit a URL, submission[submission_type] must be
-  #   set to "online_url", otherwise the submission[url] parameter will be
+  #   used. For instance, to submit a URL, submission [submission_type] must be
+  #   set to "online_url", otherwise the submission [url] parameter will be
   #   ignored.
   #
   # @argument submission[body] [Optional, String]

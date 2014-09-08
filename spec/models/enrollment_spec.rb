@@ -274,6 +274,16 @@ describe Enrollment do
   end
 
   context "permissions" do
+    it "should grant read rights to account members with the ability to read_roster" do
+      user = account_admin_user(:membership_type => "AccountMembership")
+      RoleOverride.create!(:context => Account.default, :permission => :read_roster,
+                           :enrollment_type => "AccountMembership", :enabled => true)
+      @enrollment.save
+
+      @enrollment.user.grants_right?(user, :read).should == false
+      @enrollment.grants_right?(user, :read).should == true
+    end
+
     it "should be able to read grades if the course grants management rights to the enrollment" do
       @new_user = user_model
       @enrollment.save

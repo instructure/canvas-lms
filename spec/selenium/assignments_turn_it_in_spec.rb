@@ -31,6 +31,7 @@ describe "assignments turn it in" do
     f('#exclude_quoted').click # 1 -> 0
     f('#exclude_small_matches').click # 0 -> 1
     f('#exclude_small_matches_words_value').click # 0 -> 1
+    f('#submit_papers_to').click # 1 -> 0
     f('#exclude_small_matches_words_value').send_keys([:backspace, "5"]) # '0' -> 5
     submit_form('#assignment_turnitin_settings')
     wait_for_ajaximations
@@ -49,6 +50,7 @@ describe "assignments turn it in" do
         'exclude_quoted' => '0',
         'exclude_type' => '1',
         'exclude_value' => '5',
+        'submit_papers_to' => '0',
         's_view_report' => '1'
     }
   end

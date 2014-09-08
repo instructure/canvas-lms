@@ -18,6 +18,7 @@
 
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
+  include SendToStream
   attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :comments, :rubric_association, :assessor
   EXPORTABLE_ATTRIBUTES = [
     :id, :rubric_assessment_id, :user_id, :asset_id, :asset_type, :assessor_asset_id, :assessor_asset_type,
@@ -35,6 +36,7 @@ class AssessmentRequest < ActiveRecord::Base
   belongs_to :submission, :foreign_key => 'asset_id'
   belongs_to :rubric_association
   has_many :submission_comments
+  has_many :ignores, as: :asset
   belongs_to :rubric_assessment
   validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -63,6 +65,14 @@ class AssessmentRequest < ActiveRecord::Base
 
   scope :incomplete, where(:workflow_state => 'assigned')
   scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
+  scope :for_assignment, lambda { |assignment_id| includes(:submission).where(:submissions => { :assignment_id => assignment_id})}
+  scope :for_course, lambda { |course_id| includes(:submission).where(:submissions => { :context_code => "course_#{course_id}"})}
+  scope :for_context_codes, lambda { |context_codes| includes(:submission).where(:submissions => { :context_code =>context_codes })}
+
+  scope :not_ignored_by, lambda { |user, purpose|
+    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='AssessmentRequest' AND asset_id=assessment_requests.id AND user_id=? AND purpose=?)",
+          user, purpose)
+  }
 
   def send_reminder!
     @send_reminder = true
@@ -78,6 +88,14 @@ class AssessmentRequest < ActiveRecord::Base
 
   def assessor_name
     self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))
+  end
+
+
+  on_create_send_to_streams do
+    self.assessor
+  end
+  on_update_send_to_streams do
+    self.assessor
   end
 
   workflow do

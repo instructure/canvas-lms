@@ -13,6 +13,10 @@ define [
     template: template
 
     @optionProperty 'contentTypes'
+    @optionProperty 'onlyShowFolders'
+    @optionProperty 'rootFoldersToShow'
+    @optionProperty 'onClick'
+    @optionProperty 'href'
 
     # Handle keyboard events for accessibility.
     events:
@@ -45,6 +49,7 @@ define [
             when 'enter' then @activateCurrent $focused
 
     rootFolders: ->
+      return @rootFoldersToShow if @rootFoldersToShow
       # purposely sharing these across instances of FileBrowserView
       # use a 'custom_name' to set I18n'd names for the root folders (the actual names are hard-coded)
       FileBrowserView.rootFolders ||= do =>
@@ -69,7 +74,12 @@ define [
     afterRender: ->
       @$folderTree = @$el.children('.folderTree')
       for folder in @rootFolders()
-        new FolderTreeView({model: folder}).$el.appendTo(@$folderTree)
+        new FolderTreeView({
+          model: folder,
+          onlyShowFolders: @onlyShowFolders
+          onClick: @onClick
+          href: @href
+        }).$el.appendTo(@$folderTree)
       super
 
     # Set the focus from one tree item to another.

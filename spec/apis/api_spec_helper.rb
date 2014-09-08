@@ -18,12 +18,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-unless CANVAS_RAILS2
-  RSpec::configure do |c|
-    c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
-        :file_path => c.escaped_path(%w[spec apis])
-    }
-  end
+RSpec::configure do |c|
+  c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
+      :file_path => c.escaped_path(%w[spec apis])
+  }
 end
 
 class HashWithDupCheck < Hash
@@ -136,8 +134,7 @@ end
 
 def params_from_with_nesting(method, path)
   path, querystring = path.split('?')
-  params = CANVAS_RAILS2 ? ActionController::Routing::Routes.recognize_path(path, :method => method) :
-    CanvasRails::Application.routes.recognize_path(path, :method => method)
+  params = CanvasRails::Application.routes.recognize_path(path, :method => method)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
 

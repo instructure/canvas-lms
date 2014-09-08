@@ -20,14 +20,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ContextModulesController do
   describe "GET 'index'" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>10,'hidden'=>true}])
       get 'index', :course_id => @course.id
       response.should be_redirect
@@ -35,14 +39,13 @@ describe ContextModulesController do
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       get 'index', :course_id => @course.id
       response.should be_success
     end
 
     context "unpublished modules" do
-      before do
-        course(:active_all => true)
+      before :once do
         @m1 = @course.context_modules.create(:name => "unpublished oi")
         @m1.workflow_state = 'unpublished'
         @m1.save!
@@ -50,13 +53,13 @@ describe ContextModulesController do
       end
 
       it "should show all modules for teachers" do
-        course_with_teacher_logged_in(:course => @course, :active_all => true)
+        user_session(@teacher)
         get 'index', :course_id => @course.id
         assigns[:modules].should == [@m1, @m2]
       end
 
       it "should not show unpublished for students" do
-        course_with_student_logged_in(:course => @course, :active_all => true)
+        user_session(@student)
         get 'index', :course_id => @course.id
         assigns[:modules].should == [@m2]
       end
@@ -65,13 +68,18 @@ describe ContextModulesController do
   end
 
   describe "PUT 'update'" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
       @m1 = @course.context_modules.create(:name => "unpublished")
       @m1.workflow_state = 'unpublished'
       @m1.save!
       @m2 = @course.context_modules.create!(:name => "published")
     end
+
+    before :each do
+      user_session(@teacher)
+    end
+
     it "should publish modules" do
       put 'update', :course_id => @course.id, :id => @m1.id, :publish => '1'
       @m1.reload
@@ -122,9 +130,12 @@ describe ContextModulesController do
   end
   
   describe "GET 'item_redirect'" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
     it "should require authorization" do
-      course_with_student
-      
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
       assignment1 = ag.assignments.create!(:context => @course)
@@ -136,7 +147,7 @@ describe ContextModulesController do
     end
 
     it "should still redirect for unpublished modules if teacher" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
 
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
@@ -152,7 +163,7 @@ describe ContextModulesController do
     end
 
     it "should not redirect for unpublished modules if student" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
 
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
@@ -167,7 +178,7 @@ describe ContextModulesController do
     end
     
     it "should find a matching tool" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       
       @module = @course.context_modules.create!
       @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -188,7 +199,7 @@ describe ContextModulesController do
     end
     
     it "should fail if there is no matching tool" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       
       @module = @course.context_modules.create!
       @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -202,7 +213,7 @@ describe ContextModulesController do
     end
     
     it "should redirect to an assignment page" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
@@ -216,7 +227,7 @@ describe ContextModulesController do
     end
     
     it "should redirect to a discussion page" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       
       @module = @course.context_modules.create!
       topic = @course.discussion_topics.create!
@@ -229,7 +240,7 @@ describe ContextModulesController do
     end
     
     it "should redirect to a quiz page" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       
       @module = @course.context_modules.create!
       quiz = @course.quizzes.create!
@@ -243,7 +254,7 @@ describe ContextModulesController do
     end
 
     it "should mark an external url item read" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @module = @course.context_modules.create!
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
       @module.completion_requirements = { tag.id => { :type => 'must_view' }}
@@ -256,7 +267,7 @@ describe ContextModulesController do
     end
 
     it "should not mark a locked external url item read" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @module = @course.context_modules.create! :unlock_at => 1.week.from_now
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
       @module.completion_requirements = { tag.id => { :type => 'must_view' }}
@@ -267,7 +278,7 @@ describe ContextModulesController do
     end
 
     it "should not mark a locked external url item read" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @module = @course.context_modules.create!
       @module.unpublish
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
@@ -351,13 +362,17 @@ describe ContextModulesController do
   end
 
   describe "PUT 'update_item'" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
       @module = @course.context_modules.create!
       @assignment = @course.assignments.create! :title => 'An Assignment'
       @assignment_item = @module.add_item :type => 'assignment', :id => @assignment.id
       @external_url_item = @module.add_item :type => 'external_url', :title => 'Example URL', :url => 'http://example.org'
       @external_tool_item = @module.add_item :type => 'context_external_tool', :title => 'Example Tool', :url => 'http://example.com/tool'
+    end
+
+    before :each do
+      user_session(@teacher)
     end
 
     it "should update the tag title" do
@@ -394,8 +409,9 @@ describe ContextModulesController do
   end
 
   describe "GET item_details" do
-    before do
-      course(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
       @m1 = @course.context_modules.create!(:name => "first module")
       @m1.publish
       @m2 = @course.context_modules.create(:name => "middle foo")
@@ -409,21 +425,21 @@ describe ContextModulesController do
     end
 
     it "should show unpublished modules for teachers" do
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      user_session(@teacher)
       get 'item_details', :course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}"
       json = JSON.parse response.body.gsub("while(1);",'')
       json["next_module"]["context_module"]["id"].should == @m2.id
     end
 
     it "should skip unpublished modules for students" do
-      course_with_student_logged_in(:course => @course, :active_all => true)
+      user_session(@student)
       get 'item_details', :course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}"
       json = JSON.parse response.body.gsub("while(1);",'')
       json["next_module"]["context_module"]["id"].should == @m3.id
     end
 
     it "should parse namespaced quiz as id" do
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      user_session(@teacher)
       quiz = @course.quizzes.create!
       quiz.publish!
 
@@ -436,19 +452,23 @@ describe ContextModulesController do
   end
   
   describe "GET progressions" do
-    before do
-      course_with_student(:active_all => true)
+    before :once do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
       @module = @course.context_modules.create!(:name => "first module")
       @module.publish
       @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
       
       @tag = @module.add_item(:id => @wiki.id, :type => 'wiki_page')
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+    end
+
+    before :each do
       @progression = @module.update_for(@student, :read, @tag)
     end
     
     it "should return all student progressions to teacher" do
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      user_session(@teacher)
       get 'progressions', :course_id => @course.id, :format => "json"
       json = JSON.parse response.body.gsub("while(1);",'')
       json.length.should == 1
@@ -462,7 +482,7 @@ describe ContextModulesController do
     end
     
     context "with large_roster" do
-      before do
+      before :once do
         @course.large_roster = true
         @course.save!
       end
@@ -475,7 +495,7 @@ describe ContextModulesController do
       end
       
       it "should not return any student progressions to teacher" do
-        course_with_teacher_logged_in(:course => @course, :active_all => true)
+        user_session(@teacher)
         get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         json.length.should == 0

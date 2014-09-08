@@ -20,6 +20,7 @@ describe "Migration package importers" do
             "Common Cartridge 1.2" => ["cc1-2", CC::Importer::Standard::Converter],
             "Common Cartridge 1.3" => ["cc1-3", CC::Importer::Standard::Converter],
             "Common Cartridge 1.3 - flat" => ["cc1-3flat.xml", CC::Importer::Standard::Converter],
+            "Common Cartridge 1.3 - thin" => ["cc1-3thin.xml", CC::Importer::Standard::Converter],
             "QTI packages" => ['qti', Qti::Converter],
             "WebCT exports (as qti packages)" => ['webct', Qti::Converter],
     }

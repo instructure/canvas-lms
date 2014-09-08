@@ -30,7 +30,7 @@ class TestUserApi
 end
 
 describe "User Profile API", type: :request do
-  before do
+  before :once do
     @admin = account_admin_user
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
@@ -151,7 +151,7 @@ describe "User Profile API", type: :request do
   end
 
   context "user_services" do
-    before do
+    before :once do
       @student.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => false
       @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => true
     end

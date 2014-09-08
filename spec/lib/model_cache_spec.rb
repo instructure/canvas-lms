@@ -48,11 +48,6 @@ describe ModelCache do
   after(:all) do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
-    if CANVAS_RAILS2
-      subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
-      subclasses.delete(TestModelCacheUser)
-      subclasses.delete(TestModelCachePseudonym)
-    end
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end

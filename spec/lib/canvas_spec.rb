@@ -120,4 +120,26 @@ describe Canvas do
       end
     end
   end
+
+  describe ".cache_stores" do
+    before do
+      @old_cache_stores = Canvas.instance_variable_get(:@cache_stores)
+      Canvas.instance_variable_set(:@cache_stores, nil)
+    end
+
+    after do
+      Canvas.instance_variable_set(:@cache_stores, @old_cache_stores)
+    end
+
+    it "should pass through string links" do
+      ConfigFile.stubs(:load).returns('other' => { 'cache_store' => 'redis_store', 'servers' => ['localhost:6379'] }, 'db1' => 'other')
+      stores = Canvas.cache_stores
+      stores.keys.sort.should == ['db1', 'other', 'test']
+      stores['other'].should be_a(Array)
+      stores['other'].first.should == :redis_store
+      stores['db1'].should == 'other'
+      stores['test'].should == :null_store
+    end
+
+  end
 end

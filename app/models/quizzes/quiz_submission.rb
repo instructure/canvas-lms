@@ -17,7 +17,7 @@
 #
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
-  self.table_name = 'quiz_submissions' unless CANVAS_RAILS2
+  self.table_name = 'quiz_submissions'
 
   def self.polymorphic_names
     [self.name, "QuizSubmission"]
@@ -206,7 +206,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       false
     elsif quiz.hide_results == 'until_after_last_attempt'
       # Visible if quiz has unlimited attempts (no way to get to last
-      # attempts), if this attempt it higher than the allowed attempts
+      # attempts), if this attempt is higher than the allowed attempts
       # (once you get into extra attempts), or if this attempt is
       # the last attempt and has been taken (checking for completion
       # prevents the student from starting to take the quiz for the last
@@ -240,7 +240,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions_as_object.map { |q| q[:points_possible].to_i }.compact.sum || 0
+    self.questions_as_object.map { |q| q[:points_possible].to_f }.compact.sum || 0
   end
 
   def questions
@@ -653,6 +653,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
   scope :completed, -> { where(:workflow_state => %w(complete pending_review)) }
+
+  # Excludes teacher preview submissions.
+  #
+  # You may still have to deal with StudentView submissions if you want
+  # submissions made by students for real, which you can do by using the
+  # for_user_ids scope and pass in quiz.context.all_real_student_ids.
+  scope :not_preview, -> { where('was_preview IS NULL OR NOT was_preview') }
+
+  # Excludes teacher preview and Student View submissions.
+  scope :for_students, ->(quiz) { not_preview.for_user_ids(quiz.context.all_real_student_ids) }
 
   has_a_broadcast_policy
 

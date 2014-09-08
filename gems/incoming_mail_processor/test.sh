@@ -2,15 +2,7 @@
 result=0
 
 echo "################ incoming_mail_processor ################"
-echo "################ Running tests against Rails 2 ################"
-export  CANVAS_RAILS3=0
-bundle check || bundle install
-bundle exec rspec spec
-let result=$result+$?
-
 echo "################ Running tests against Rails 3 ################"
-mv Gemfile.lock Gemfile.lock.rails2
-export CANVAS_RAILS3=true
 bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?

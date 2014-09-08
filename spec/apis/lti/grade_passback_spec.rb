@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe LtiApiController, type: :request do
-  before do
+  before :once do
     course_with_student(:active_all => true)
     @student = @user
     @course.enroll_teacher(user_with_pseudonym(:active_all => true))

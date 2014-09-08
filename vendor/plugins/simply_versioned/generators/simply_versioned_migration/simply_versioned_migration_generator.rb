@@ -1,6 +1,4 @@
-unless CANVAS_RAILS2
-  require 'rails/generators/active_record'
-end
+require 'rails/generators/active_record'
 
 class SimplyVersionedMigrationGenerator < ActiveRecord::Generators::Base
   source_root File.expand_path('../templates', __FILE__)

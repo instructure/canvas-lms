@@ -1,4 +1,5 @@
 {{#ifAll atLeastOnePageFetched length}}
+  <h1 class="screenreader-only">{{#t "announcements_title"}}Announcements{{/t}}</h1>
   <div class="headerBar clearfix">
     <div class="headerBar-right form-inline">
       {{#if options.atom_feed_url}}
@@ -62,6 +63,6 @@
       {{/if}}
     </div>
   {{else}}
-    <h2>{{#t "loading"}}Loading...{{/t}}</h2>
+    <h1>{{#t "loading"}}Loading...{{/t}}</h1>
   {{/if}}
 {{/ifAll}}

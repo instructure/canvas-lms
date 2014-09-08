@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'Account Reports API', type: :request do
-  before do
+  before :once do
     @admin = account_admin_user
     user_with_pseudonym(:user => @admin)
     @report = AccountReport.new

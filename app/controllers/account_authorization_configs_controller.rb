@@ -106,6 +106,11 @@
 #           "description": "Valid for SAML authorization.",
 #           "example": "nameid",
 #           "type": "string"
+#         },
+#         "unknown_user_url": {
+#           "description": "Valid for SAML and CAS authorization.",
+#           "example": "https://canvas.instructure.com/login",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -178,6 +183,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   An alternate SSO URL for logging into CAS. You probably should not set
   #   this.
   #
+  # - unkown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through CAS but is not
+  #   found in Canvas.
+  #
   # For SAML authentication services, the additional recognized parameters are:
   #
   # - idp_entity_id
@@ -200,6 +210,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - change_password_url [Optional]
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # - unkown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through SAML but is not
+  #   found in Canvas.
   #
   # - identifier_format
   #
@@ -273,30 +288,30 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @example_request
   #   # Create LDAP config
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
-  #        -F 'auth_type=ldap' \ 
-  #        -F 'auth_host=ldap.mydomain.edu' \ 
-  #        -F 'auth_filter=(sAMAccountName={{login}})' \ 
-  #        -F 'auth_username=username' \ 
-  #        -F 'auth_password=bestpasswordever' \ 
-  #        -F 'position=1' \ 
+  #        -F 'auth_type=ldap' \
+  #        -F 'auth_host=ldap.mydomain.edu' \
+  #        -F 'auth_filter=(sAMAccountName={{login}})' \
+  #        -F 'auth_username=username' \
+  #        -F 'auth_password=bestpasswordever' \
+  #        -F 'position=1' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #   # Create SAML config
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
-  #        -F 'auth_type=saml' \ 
-  #        -F 'idp_entity_id=<idp_entity_id>' \ 
-  #        -F 'log_in_url=<login_url>' \ 
-  #        -F 'log_out_url=<logout_url>' \ 
-  #        -F 'certificate_fingerprint=<fingerprint>' \ 
+  #        -F 'auth_type=saml' \
+  #        -F 'idp_entity_id=<idp_entity_id>' \
+  #        -F 'log_in_url=<login_url>' \
+  #        -F 'log_out_url=<logout_url>' \
+  #        -F 'certificate_fingerprint=<fingerprint>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #   # Create CAS config
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
-  #        -F 'auth_type=cas' \ 
-  #        -F 'auth_base=cas.mydomain.edu' \ 
-  #        -F 'log_in_url=<login_url>' \ 
+  #        -F 'auth_type=cas' \
+  #        -F 'auth_base=cas.mydomain.edu' \
+  #        -F 'log_in_url=<login_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # _Deprecated_ Examples:
@@ -386,8 +401,8 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @example_request
   #   # update SAML config
   #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
-  #        -F 'idp_entity_id=<new_idp_entity_id>' \ 
-  #        -F 'log_in_url=<new_url>' \ 
+  #        -F 'idp_entity_id=<new_idp_entity_id>' \
+  #        -F 'log_in_url=<new_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns AccountAuthorizationConfig
@@ -494,14 +509,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   # If you have multiple IdPs configured, you can set a `discovery_url`.
   # If that is set, canvas will forward all users to that URL when they need to
   # be authenticated. That page will need to then help the user figure out where
-  # they need to go to log in. 
+  # they need to go to log in.
   #
-  # If no discovery url is configured, the 1st auth config will be used to 
+  # If no discovery url is configured, the 1st auth config will be used to
   # attempt to authenticate the user.
   #
   # @example_request
   #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
-  #        -F 'discovery_url=<new_url>' \ 
+  #        -F 'discovery_url=<new_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns DiscoveryUrl
@@ -521,7 +536,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   # @API Delete discovery url
   # Clear discovery url
-  # 
+  #
   # @example_request
   #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
   #        -H 'Authorization: Bearer <token>'
@@ -608,7 +623,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
     redirect_to :account_account_authorization_configs
   end
-  
+
   def saml_testing
     if @account.saml_authentication?
       @account_config = @account.account_authorization_config
@@ -625,13 +640,13 @@ class AccountAuthorizationConfigsController < ApplicationController
       end
     end
   end
-  
+
   def saml_testing_stop
-      if @account_config = @account.account_authorization_config
-        @account_config.finish_debugging 
-      end
-      
-      render :json => {:status => "ok"}
+    if @account_config = @account.account_authorization_config
+      @account_config.finish_debugging 
+    end
+
+    render :json => {:status => "ok"}
   end
 
   protected

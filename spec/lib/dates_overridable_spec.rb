@@ -82,7 +82,7 @@ shared_examples_for "an object whose dates are overridable" do
     end
     context "when it has deleted overrides" do
       it "returns false" do
-        override.delete
+        override.destroy
         overridable.has_active_overrides?.should == false
       end
     end

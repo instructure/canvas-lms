@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -49,8 +49,8 @@ describe "profile communication settings" do
     driver.execute_script("return document.title").should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
     f('#breadcrumbs').should include_text('Notification Preferences')
-    # Expect h2 with
-    f('#content > h2').text.should == 'Notification Preferences'
+    # Expect h1 with
+    f('#content > h1').text.should == 'Notification Preferences'
   end
 
   it "should display the users email address as channel" do

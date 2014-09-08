@@ -291,6 +291,8 @@ define [
               @trigger('addMessage', message.toJSON().conversation.messages[0], response)
             else
               @trigger('newConversations', response)
+          $.when(@request).fail ->
+            dfd.reject()
 
     recipientIdsChanged: (recipientIds) =>
       if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/))

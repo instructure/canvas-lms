@@ -87,6 +87,8 @@ module DashboardHelper
       return I18n.t('helpers.dashboard_helper.assignment_details', "Assignment Details")
     when "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.discussion_details', "Discussion Details")
+    when "AssessmentRequest"
+      return I18n.t('helpers.dashboard_helper.peer_review_details', "Peer Review Details")
     else
       raise "Unknown activity category"
     end
@@ -109,6 +111,10 @@ module DashboardHelper
     when "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
                { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
+               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+    when "AssessmentRequest"
+      return I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
+               { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
                { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"

@@ -163,10 +163,14 @@ is for items that are not draggable.
 }
 
 .ig-header, .ig-text {
-  font-size: 15px;
-  color: #3d454c;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
   padding-left: 30px;
+}
+
+.ig-header .name {
+  color: #3d454c;
+  font-size: 15px;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+  font-weight: bold;
 }
 
 .ig-text {
@@ -175,7 +179,6 @@ is for items that are not draggable.
 }
 
 .ig-header {
-  font-weight: bold;
   padding-top: 5px;
   padding-bottom: 5px;
 

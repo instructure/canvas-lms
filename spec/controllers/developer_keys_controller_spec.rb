@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
-  before :each do
+  before :once do
     account_admin_user(:account => Account.site_admin)
   end
   

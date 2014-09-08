@@ -1,176 +1,195 @@
 {
-    "@context": [
-        "http://purl.imsglobal.org/ctx/lti/v2/ToolProxy",
-        "http://purl.org/blackboard/ctx/v1/iconStyle"
-    ],
-    "@type": "ToolProxy",
-    "@id": "http://lms.example.com/ToolProxy/869e5ce5-214c-4e85-86c6-b99e8458a592",
+  "@context": [
+    "http://purl.imsglobal.org/ctx/lti/v2/ToolProxy",
+    "http://purl.org/blackboard/ctx/v1/iconStyle"
+  ],
+  "@type": "ToolProxy",
+  "@id": "http://lms.example.com/ToolProxy/869e5ce5-214c-4e85-86c6-b99e8458a592",
+  "lti_version": "LTI-2p0",
+  "tool_proxy_guid": "869e5ce5-214c-4e85-86c6-b99e8458a592",
+  "tool_consumer_profile": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4",
+  "tool_profile": {
     "lti_version": "LTI-2p0",
-    "tool_proxy_guid": "869e5ce5-214c-4e85-86c6-b99e8458a592",
-    "tool_consumer_profile": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4",
-    "tool_profile": {
-        "lti_version": "LTI-2p0",
-        "product_instance": {
-            "guid": "fd75124a-140e-470f-944c-114d2d92bb40",
-            "product_info": {
-                "product_name": {
-                    "default_value": "Acme Assessments",
-                    "key": "tool.name"
-                },
-                "description": {
-                    "default_value": "Acme Assessments provide an interactive test format.",
-                    "key": "tool.description"
-                },
-                "product_version": "10.3",
-                "technical_description": {
-                    "default_value": "Support provided for all LTI 1 extensions as well as LTI 2",
-                    "key": "tool.technical"
-                },
-                "product_family": {
-                    "@id": "http://toolprovider.example.com/vendor/acme.com/product/assessment-tool",
-                    "code": "assessment-tool",
-                    "vendor": {
-                        "code": "acme.com",
-                        "vendor_name": {
-                            "default_value": "Acme",
-                            "key": "tool.vendor.name"
-                        },
-                        "description": {
-                            "default_value": "Acme is a leading provider of interactive tools for education",
-                            "key": "tool.vendor.description"
-                        },
-                        "website": "http://acme.example.com",
-                        "timestamp": "2012-04-05T09:08:16-04:00",
-                        "contact": {
-                            "email": "info@example.com"
-                        }
-                    }
-                }
-            },
-            "support": {
-                "email": "helpdesk@example.com"
-            },
-            "service_provider": {
-                "guid": "18e7ea50-3d6d-4f6b-aff2-ed3ab577716c",
-                "service_provider_name": {
-                    "default_value": "Acme Hosting",
-                    "key": "service_provider.name"
-                },
-                "description": {
-                    "default_value": "Provider of high performance managed hosting environments",
-                    "key": "service_provider.description"
-                },
-                "support": {
-                    "email": "support@acme-hosting.example.com"
-                },
-                "timestamp": "2012-04-05T09:08:16-04:00"
-            },
-            "service_owner": {
-                "service_owner_name": {
-                    "default_value": "Acme Institution",
-                    "key": "service_owner.name"
-                },
-                "description": {
-                    "default_value": "Provider of high quality education",
-                    "key": "service_owner.description"
-                },
-                "timestamp": "2012-04-05T09:08:16-04:00"
-            }
+    "product_instance": {
+      "guid": "fd75124a-140e-470f-944c-114d2d92bb40",
+      "product_info": {
+        "product_name": {
+          "default_value": "Acme Assessments",
+          "key": "tool.name"
         },
-        "base_url_choice": [
-            {
-                "default_base_url": "http://acme.example.com/",
-                "secure_base_url": "https://acme.example.com/",
-                "selector": {
-                    "applies_to": ["IconEndpoint", "MessageHandler"]
-                }
-            }
-        ],
-        "resource_handler": [
-            {
-                "resource_type": {
-                    "code": "asmt"
-                },
-                "resource_name": {
-                    "default_value": "Acme Assessment",
-                    "key": "assessment.resource.name"
-                },
-                "description": {
-                    "default_value": "An interactive assessment using the Acme scale.",
-                    "key": "assessment.resource.description"
-                },
-                "message": [
-                    {
-                        "message_type": "basic-lti-launch-request",
-                        "path": "handler/launchRequest",
-                        "enabled_capability": [
-                            "Result.autocreate"
-                        ],
-                        "parameter": [
-                            {
-                                "name": "result_url",
-                                "variable": "Result.url"
-                            },
-                            {
-                                "name": "discipline",
-                                "fixed": "chemistry"
-                            }
-                        ]
-                    }
-                ],
-                "icon_info": [
-                    {
-                        "default_location": {
-                            "path": "images/bb/en/icon.png"
-                        },
-                        "key": "iconStyle.default.path"
-                    },
-                    {
-                        "icon_style": ["BbListElementIcon"],
-                        "default_location": {
-                            "path": "images/bb/en/listElement.png"
-                        },
-                        "key": "iconStyle.bb.listElement.path"
-                    },
-                    {
-                        "icon_style": ["BbPushButtonIcon"],
-                        "default_location": {
-                            "path": "images/bb/en/pushButton.png"
-                        },
-                        "key": "iconStyle.bb.pushButton.path"
-                    }
-                ]
-            }
-        ]
-    },
-    "custom": {
-        "customerId": "394892759526"
-    },
-    "security_contract": {
-        "shared_secret": "ThisIsASecret!",
-        "tool_service": [
-            {
-                "@type": "RestServiceProfile",
-                "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.collection",
-                "action": ["POST"]
+        "description": {
+          "default_value": "Acme Assessments provide an interactive test format.",
+          "key": "tool.description"
+        },
+        "product_version": "10.3",
+        "technical_description": {
+          "default_value": "Support provided for all LTI 1 extensions as well as LTI 2",
+          "key": "tool.technical"
+        },
+        "product_family": {
+          "@id": "http://toolprovider.example.com/vendor/acme.com/product/assessment-tool",
+          "code": "assessment-tool",
+          "vendor": {
+            "code": "acme.com",
+            "vendor_name": {
+              "default_value": "Acme",
+              "key": "tool.vendor.name"
             },
-            {
-                "@type": "RestServiceProfile",
-                "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.item",
-                "action": ["GET", "PUT"]
+            "description": {
+              "default_value": "Acme is a leading provider of interactive tools for education",
+              "key": "tool.vendor.description"
             },
-            {
-                "@type": "RestServiceProfile",
-                "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
-                "action": ["GET", "PUT"]
+            "website": "http://acme.example.com",
+            "timestamp": "2012-04-05T09:08:16-04:00",
+            "contact": {
+              "email": "info@example.com"
             }
+          }
+        }
+      },
+      "support": {
+        "email": "helpdesk@example.com"
+      },
+      "service_provider": {
+        "guid": "18e7ea50-3d6d-4f6b-aff2-ed3ab577716c",
+        "service_provider_name": {
+          "default_value": "Acme Hosting",
+          "key": "service_provider.name"
+        },
+        "description": {
+          "default_value": "Provider of high performance managed hosting environments",
+          "key": "service_provider.description"
+        },
+        "support": {
+          "email": "support@acme-hosting.example.com"
+        },
+        "timestamp": "2012-04-05T09:08:16-04:00"
+      },
+      "service_owner": {
+        "service_owner_name": {
+          "default_value": "Acme Institution",
+          "key": "service_owner.name"
+        },
+        "description": {
+          "default_value": "Provider of high quality education",
+          "key": "service_owner.description"
+        },
+        "timestamp": "2012-04-05T09:08:16-04:00"
+      }
+    },
+    "base_url_choice": [
+      {
+        "default_base_url": "http://acme.example.com/",
+        "secure_base_url": "https://acme.example.com/",
+        "selector": {
+          "applies_to": ["IconEndpoint", "MessageHandler"]
+        }
+      }
+    ],
+    "message": [
+      {
+        "message_type": "basic-lti-launch-request",
+        "path": "handler/launchRequest",
+        "enabled_capability": [
+          "Result.autocreate"
         ],
-        "end_user_service": [
-            {
-                "@type": "RestServiceProfile",
-                "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
-                "action": ["PUT"]
-            }
+        "parameter": [
+          {
+            "name": "result_url",
+            "variable": "Result.url"
+          },
+          {
+            "name": "discipline",
+            "fixed": "chemistry"
+          }
         ]
-    }
+      }
+    ],
+    "resource_handler": [
+      {
+        "resource_type": {
+          "code": "asmt"
+        },
+        "resource_name": {
+          "default_value": "Acme Assessment",
+          "key": "assessment.resource.name"
+        },
+        "description": {
+          "default_value": "An interactive assessment using the Acme scale.",
+          "key": "assessment.resource.description"
+        },
+        "message": [
+          {
+            "message_type": "basic-lti-launch-request",
+            "path": "handler/launchRequest",
+            "enabled_capability": [
+              "Result.autocreate"
+            ],
+            "parameter": [
+              {
+                "name": "result_url",
+                "variable": "Result.url"
+              },
+              {
+                "name": "discipline",
+                "fixed": "chemistry"
+              }
+            ]
+          }
+        ],
+        "icon_info": [
+          {
+            "default_location": {
+              "path": "images/bb/en/icon.png"
+            },
+            "key": "iconStyle.default.path"
+          },
+          {
+            "icon_style": ["BbListElementIcon"],
+            "default_location": {
+              "path": "images/bb/en/listElement.png"
+            },
+            "key": "iconStyle.bb.listElement.path"
+          },
+          {
+            "icon_style": ["BbPushButtonIcon"],
+            "default_location": {
+              "path": "images/bb/en/pushButton.png"
+            },
+            "key": "iconStyle.bb.pushButton.path"
+          }
+        ]
+      }
+    ]
+  },
+  "custom": {
+    "customerId": "394892759526"
+  },
+  "security_contract": {
+    "shared_secret": "ThisIsASecret!",
+    "tool_service": [
+      {
+        "@type": "RestServiceProfile",
+        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.collection",
+        "action": ["POST"]
+      },
+      {
+        "@type": "RestServiceProfile",
+        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.item",
+        "action": ["GET", "PUT"]
+      },
+      {
+        "@type": "RestServiceProfile",
+        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
+        "action": ["GET", "PUT"]
+      }
+    ],
+    "end_user_service": [
+      {
+        "@type": "RestServiceProfile",
+        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
+        "action": ["PUT"]
+      }
+    ]
+  }
 }

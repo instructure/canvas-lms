@@ -105,15 +105,17 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'new_styles' =>
+    'use_new_styles' =>
     {
       display_name: -> { I18n.t('features.new_styles', 'Use New Styles') },
       description: -> { I18n.t('new_styles_description', <<-END) },
 We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
-updated, simplified look and feel of the Canvas interface.
+updated, simplified look and feel of the Canvas interface. This is a very "Work in progress"
+feature and should not be turned on in production for actual users yet.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: 'hidden',
+      root_opt_in: true,
       beta: true,
       development: true
     },
@@ -243,6 +245,16 @@ END
       state: 'hidden',
       development: true
     },
+    'modules_next' =>
+    {
+      display_name: -> { I18n.t('features.ember_modules', 'Ember Modules') },
+      description: -> { I18n.t('ember_modules_description', <<END) },
+Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true
+    },
     'allow_opt_out_of_inbox' =>
     {
       display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow users to opt out of the inbox") },
@@ -252,7 +264,27 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true
-    }
+    },
+    'lor_for_user' =>
+    {
+      display_name: -> { I18n.t('features.lor', "LOR External Tools") },
+      description:  -> { I18n.t('allow_lor_tools', <<-END) },
+Allow users to view and use external tools configured for LOR.
+END
+      applies_to: 'User',
+      state: 'hidden',
+      development: true
+    },
+    'lor_for_account' =>
+    {
+      display_name: -> { I18n.t('features.lor', "LOR External Tools") },
+      description:  -> { I18n.t('allow_lor_tools', <<-END) },
+Allow users to view and use external tools configured for LOR.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
+    },
   )
 
   def self.definitions

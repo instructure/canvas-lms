@@ -478,7 +478,6 @@ describe ApplicationHelper do
     end
 
     it "returns a regular canvas dashboard url" do
-      @controller.expects(:dashboard_url).with({}).returns("http://test.host/") if CANVAS_RAILS2
       dashboard_url.should == "http://test.host/"
     end
 

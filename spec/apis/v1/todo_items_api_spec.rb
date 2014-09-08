@@ -27,7 +27,7 @@ describe UsersController, type: :request do
     @a2_json['assignment'] = controller.assignment_json(@a2,@user,session)
   end
 
-  before do
+  before :once do
     @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
     @student_course = course(:active_all => true)
@@ -43,6 +43,9 @@ describe UsersController, type: :request do
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
     @a2.reload
+  end
+
+  before :each do
     @a1_json = 
       {
         'type' => 'submitting',

@@ -270,6 +270,7 @@ describe "courses" do
 
     context "course_home_sub_navigation lti apps" do
       def create_course_home_sub_navigation_tool(options = {})
+        @course.root_account.enable_feature!(:lor_for_account)
         defaults = {
           name: options[:name] || "external tool",
           consumer_key: 'test',

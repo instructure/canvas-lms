@@ -26,13 +26,3 @@ Rack::MiniProfiler.config.tap do |c|
     c.storage = ::Rack::MiniProfiler::FileStore
   end
 end
-
-if CANVAS_RAILS2
-  # a railtie does this all automatically in rails 3+
-  Rails.configuration.middleware.use(::Rack::MiniProfiler)
-
-  ::Rack::MiniProfiler.profile_method(ActionController::Base, :process) {|request| "Executing action: #{request[:controller]}##{request[:action]}"}
-  # can't profile ActionView::Template#render directly, because it'll conflict
-  # with rails' own internal monkey patching of that method
-  ::Rack::MiniProfiler.profile_method(ActionView::Renderable, :render) {|x,y| respond_to?(:filename) ? "Rendering: #{filename.sub("#{Rails.root}/", '')}" : "Rendering: #{self.inspect}" }
-end

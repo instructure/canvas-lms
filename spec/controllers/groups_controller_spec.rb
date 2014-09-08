@@ -19,10 +19,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GroupsController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    students = create_users_in_course(@course, 3, return_type: :record)
+    @student1, @student2, @student3 = students
+    @student = @student1
+  end
 
   describe "GET context_index" do
     it "should require authorization" do
-      course(:active_all => true)
       user_session(user) # logged in user without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
@@ -34,7 +39,7 @@ describe GroupsController do
     end
 
     it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
@@ -51,10 +56,13 @@ describe GroupsController do
 
   describe "GET index" do
     describe 'pagination' do
-      before do
-        course_with_student_logged_in(:active_all => 1)
+      before :once do
         group_with_user(:group_context => @course, :user => @student, :active_all => true)
         group_with_user(:group_context => @course, :user => @student, :active_all => true)
+      end
+
+      before :each do
+        user_session(@student)
       end
 
       it "should not paginate non-json" do
@@ -92,7 +100,7 @@ describe GroupsController do
     end
 
     it "should allow user to join self-signup groups" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1")
       category1.configure_self_signup(true, false)
       category1.save!
@@ -104,7 +112,7 @@ describe GroupsController do
     end
 
     it "should allow user to leave self-signup groups" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1")
       category1.configure_self_signup(true, false)
       category1.save!
@@ -117,7 +125,7 @@ describe GroupsController do
     end
 
     it "should allow user to join student organized groups" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       category1 = GroupCategory.student_organized_for(@course)
       g1 = @course.groups.create!(:name => "some group", :group_category => category1, :join_level => "parent_context_auto_join")
 
@@ -127,7 +135,7 @@ describe GroupsController do
     end
 
     it "should allow user to leave student organized groups" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1", :role => "student_organized")
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
       g1.add_user(@student)
@@ -140,7 +148,6 @@ describe GroupsController do
 
   describe "GET new" do
     it "should require authorization" do
-      @course = course_model(:reusable => true)
       @group = @course.groups.create!(:name => "some group")
       get 'new', :course_id => @course.id
       assert_unauthorized
@@ -155,7 +162,7 @@ describe GroupsController do
     end
 
     it "should add user" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @user = user(:active_all => true)
       post 'add_user', :group_id => @group.id, :user_id => @user.id
@@ -165,7 +172,7 @@ describe GroupsController do
     end
 
     it "should check user section in restricted self-signup category" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -194,7 +201,7 @@ describe GroupsController do
     end
 
     it "should remove user" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id, :id => @user.id
@@ -206,13 +213,12 @@ describe GroupsController do
 
   describe "POST create" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :group => {:name => "some group"}
       assert_unauthorized
     end
 
     it "should create new group" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :group => {:name => "some group"}
       response.should be_redirect
       assigns[:group].should_not be_nil
@@ -220,7 +226,7 @@ describe GroupsController do
     end
 
     it "should honor group[group_category_id] when permitted" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
       response.should be_redirect
@@ -229,7 +235,7 @@ describe GroupsController do
     end
 
     it "should not honor group[group_category_id] when not permitted" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
       response.should be_redirect
@@ -238,7 +244,7 @@ describe GroupsController do
     end
 
     it "should fail when group[group_category_id] would be honored but doesn't exist" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
       response.should_not be_success
@@ -246,13 +252,12 @@ describe GroupsController do
     
     describe "quota" do
       before do
-        course :active_all => true
         Setting.set('group_default_quota', 11.megabytes)
       end
       
       context "teacher" do
         before do
-          course_with_teacher_logged_in :course => @course, :active_all => true
+          user_session(@teacher)
         end
         
         it "should ignore the storage_quota_mb parameter" do
@@ -277,14 +282,13 @@ describe GroupsController do
 
   describe "PUT update" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       @group = @course.groups.create!(:name => "some group")
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => "new name"}
       assert_unauthorized
     end
 
     it "should update group" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => "new name"}
       response.should be_redirect
@@ -293,7 +297,7 @@ describe GroupsController do
     end
 
     it "should honor group[group_category_id]" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group")
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => group_category.id}
@@ -303,7 +307,7 @@ describe GroupsController do
     end
 
     it "should fail when group[group_category_id] doesn't exist" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
@@ -311,8 +315,7 @@ describe GroupsController do
     end
     
     describe "quota" do
-      before do
-        course :active_all => true
+      before :once do
         @group = @course.groups.build(:name => "teh gruop")
         @group.storage_quota_mb = 11
         @group.save!
@@ -320,7 +323,7 @@ describe GroupsController do
       
       context "teacher" do
         before do
-          course_with_teacher_logged_in :course => @course, :active_all => true
+          user_session(@teacher)
         end
         
         it "should ignore the quota parameter" do
@@ -349,14 +352,13 @@ describe GroupsController do
   
   describe "DELETE destroy" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       @group = @course.groups.create!(:name => "some group")
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should delete group" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assigns[:group].should eql(@group)
@@ -369,10 +371,10 @@ describe GroupsController do
 
   describe "GET 'unassigned_members'" do
     it "should include all users if the category is student organized" do
-      course_with_teacher_logged_in(:active_all => true)
-      u1 = @course.enroll_student(user_model).user
-      u2 = @course.enroll_student(user_model).user
-      u3 = @course.enroll_student(user_model).user
+      user_session(@teacher)
+      u1 = @student1
+      u2 = @student2
+      u3 = @student3
 
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)
@@ -387,10 +389,10 @@ describe GroupsController do
     end
 
     it "should include only users not in a group in the category otherwise" do
-      course_with_teacher_logged_in(:active_all => true)
-      u1 = @course.enroll_student(user_model).user
-      u2 = @course.enroll_student(user_model).user
-      u3 = @course.enroll_student(user_model).user
+      user_session(@teacher)
+      u1 = @student1
+      u2 = @student2
+      u3 = @student3
 
       group_category1 = @course.group_categories.create(:name => "Group Category 1")
       group1 = @course.groups.create(:name => "Group 1", :group_category => group_category1)
@@ -427,9 +429,9 @@ describe GroupsController do
     end
 
     it "should include the users' sections when available" do
-      course_with_teacher_logged_in(:active_all => true)
-      u1 = @course.enroll_student(user_model).user
-      u2 = @course.enroll_student(user_model).user
+      user_session(@teacher)
+      u1 = @student1
+      u2 = @student2
 
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)
@@ -443,8 +445,8 @@ describe GroupsController do
 
   describe "GET 'context_group_members'" do
     it "should include the users' sections when available" do
-      course_with_teacher_logged_in(:active_all => true)
-      u1 = @course.enroll_student(user_model).user
+      user_session(@teacher)
+      u1 = @student1
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)
 
@@ -455,9 +457,8 @@ describe GroupsController do
     end
 
     it "should require :read_roster permission" do
-      course(:active_course => true)
-      u1 = @course.enroll_student(user_model).user
-      u2 = @course.enroll_student(user_model).user
+      u1 = @student1
+      u2 = @student2
       group = @course.groups.create(:name => "Group 1")
       group.add_user(u1)
 
@@ -477,7 +478,7 @@ describe GroupsController do
   end
 
   describe "GET 'public_feed.atom'" do
-    before(:each) do
+    before :once do
       group_with_user(:active_all => true)
       @group.discussion_topics.create!(:title => "hi", :message => "intros", :user => @user)
     end
@@ -505,11 +506,14 @@ describe GroupsController do
   end
 
   describe "GET 'accept_invitation'" do
-    before(:each) do
+    before :once do
       @communities = GroupCategory.communities_for(Account.default)
       group_model(:group_category => @communities)
       user(:active_user => true)
       @membership = @group.add_user(@user, 'invited', false)
+    end
+
+    before :each do
       user_session(@user)
     end
 

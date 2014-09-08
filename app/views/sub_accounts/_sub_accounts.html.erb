@@ -7,14 +7,14 @@
       <span class="id" style="display: none;"><%= account ? account.id : nbsp %></span>
       <a href="<%= account_url(account ? account.id : "{{ id }}") %>" class="name"><%= account.name rescue nbsp %></a>
       <span class="links">
-        <a href="<%= context_url(@context, :context_sub_account_url, (account ? account.id : "{{ id }}")) %>" class="expand_sub_accounts_link no-hover" title="<%= t('show_sub_accounts', 'Show Sub-Accounts') %>" style="<%= hidden if (keep_going && account && sub_account_count < max_sub_accounts) || (account && sub_account_count == 0) %>"><i class="icon-arrow-down standalone-icon"></i></a>
-        <a href="#" class="collapse_sub_accounts_link no-hover" title="<%= t('hide_sub_accounts', 'Hide Sub-Accounts') %>" style="<%= hidden unless keep_going && account && sub_account_count < max_sub_accounts %>"><i class="icon-arrow-up standalone-icon"></i></a>
-        <a href="#" class="add_sub_account_link no-hover" title="<%= t('add_sub_accounts', 'Add Sub-Account') %>" style="<%= hidden unless (keep_going && account && sub_account_count < max_sub_accounts) || (account && sub_account_count == 0) %>"><i class="icon-add standalone-icon"></i></a>
-        <a href="#" class="edit_account_link no-hover" title="<%= t('edit_account_name', 'Edit Account Name') %>"><i class="icon-edit standalone-icon"></i></a>
+        <button data-link="<%= context_url(@context, :context_sub_account_url, (account ? account.id : "{{ id }}")) %>" class="btn btn-link expand_sub_accounts_link no-hover" title="<%= t('show_sub_accounts', 'Show Sub-Accounts') %>" style="<%= hidden if (keep_going && account && sub_account_count < max_sub_accounts) || (account && sub_account_count == 0) %>"><i class="icon-arrow-down standalone-icon"><span class="screenreader-only"><%= t('show_sub_accounts', 'Show Sub-Accounts') %></span></i></button>
+        <button class="btn btn-link collapse_sub_accounts_link no-hover" title="<%= t('hide_sub_accounts', 'Hide Sub-Accounts') %>" style="<%= hidden unless keep_going && account && sub_account_count < max_sub_accounts %>"><i class="icon-arrow-up standalone-icon"><span class="screenreader-only"><%= t('hide_sub_accounts', 'Hide Sub-Accounts') %></span></i></button>
+        <button class="btn btn-link add_sub_account_link no-hover" title="<%= t('add_sub_accounts', 'Add Sub-Account') %>" style="<%= hidden unless (keep_going && account && sub_account_count < max_sub_accounts) || (account && sub_account_count == 0) %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= t('add_sub_accounts', 'Add Sub-Account') %></span></i></button>
+        <button class="btn btn-link edit_account_link no-hover" title="<%= t('edit_account_name', 'Edit Account Name') %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= t('edit_account_name', 'Edit Account Name') %></span></i></button>
         <% if account && !course_count.zero? %>
-          <a href="#" class="cant_delete_account_link no-hover" title="<%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %>"><i class="icon-end standalone-icon"></i></a>
+          <button aria-disabled=true class="btn btn-link cant_delete_account_link no-hover" title="<%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %></span></i></button>
         <% elsif account != @context %>
-          <a href="#" class="delete_account_link no-hover" title="<%= t('delete_sub_account', 'Delete Sub-Account') %>"><i class="icon-trash standalone-icon"></i></a>
+          <button class="btn btn-link delete_account_link no-hover" title="<%= t('delete_sub_account', 'Delete Sub-Account') %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= t('delete_sub_account', 'Delete Sub-Account') %></span></i></button>
         <% end %>
       </span>
       <div style="<%= hidden unless account && course_count > 0 %>" class="courses_count">

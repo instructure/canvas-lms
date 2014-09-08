@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizQuestionsController, type: :request do
   context 'as a teacher' do
-    before do
+    before :once do
       @course = course
       teacher_in_course active_all: true
       @quiz = @course.quizzes.create!(:title => "A Sample Quiz")
@@ -38,6 +38,16 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         question_ids = json.collect { |q| q['id'] }
         question_ids.should == questions.map(&:id)
+      end
+      it "returns a list of questions which do not include previously deleted questions" do
+        question1 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 1"})
+        question2 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 2"})
+        question1.destroy
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
+                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+        question_ids = json.collect {|q| q['id'] }
+        question_ids.should == [question2.id]
       end
     end
 
@@ -96,8 +106,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
   end
 
   context 'as a student' do
-    before do
-      course_with_student_logged_in :active_all => true
+    before :once do
+      course_with_student :active_all => true
 
       @quiz = @course.quizzes.create!(:title => 'quiz')
       @quiz.published_at = Time.now
@@ -128,7 +138,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
     end
 
     context 'whom has started a quiz' do
-      before do
+      before :once do
         @quiz.generate_submission(@student)
       end
 

@@ -1,4 +1,4 @@
-# dummy methods for CANVAS_RAILS2
+# dummy methods
 module Onceler
   module Noop
     def self.included(mod)

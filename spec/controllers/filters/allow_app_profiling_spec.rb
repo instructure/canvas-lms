@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Filters::AllowAppProfiling, type: :none do
   describe "for a site admin" do
-    let(:target_user) { site_admin_user() }
+    let_once(:target_user) { site_admin_user() }
 
     it "should be disabled at first" do
       Filters::AllowAppProfiling.allow?({}, {}, target_user).should == false

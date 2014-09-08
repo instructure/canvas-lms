@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ContentMigrationsController, type: :request do
-  before do
+  before :once do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     @migration_url = "/api/v1/courses/#{@course.id}/content_migrations"
     @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param}
@@ -121,7 +121,7 @@ describe ContentMigrationsController, type: :request do
   end
 
   describe 'show' do
-    before do
+    before :once do
       @migration_url = @migration_url + "/#{@migration.id}"
       @params = @params.merge( :action => 'show', :id => @migration.id.to_param )
     end
@@ -254,7 +254,7 @@ describe ContentMigrationsController, type: :request do
   end
 
   describe 'create' do
-    before do
+    before :once do
       @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'create'}
       @post_params = {:migration_type => 'common_cartridge_importer', :pre_attachment => {:name => "test.zip"}}
     end
@@ -413,7 +413,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     context "User" do
-      before do
+      before :once do
         @migration_url = "/api/v1/users/#{@user.id}/content_migrations"
         @params = @params.reject{|k| k == :course_id}.merge(:user_id => @user.to_param)
         @folder = Folder.root_folders(@user).first
@@ -511,7 +511,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     context "selective content" do
-      before do
+      before :once do
         @migration.workflow_state = 'exported'
         @migration.migration_settings[:import_immediately] = false
         @migration.save!
@@ -576,7 +576,7 @@ describe ContentMigrationsController, type: :request do
   end
 
   describe 'content selection' do
-    before do
+    before :once do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
       @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param}
       @orig_course = @course

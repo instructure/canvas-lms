@@ -1,22 +1,34 @@
 define [
+  'i18n!react_files'
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+  'react-router'
+  'compiled/react/shared/utils/withReactDOM'
+  './UploadButton'
+], (I18n, React, Router, withReactDOM, UploadButton) ->
 
   Toolbar = React.createClass
 
-    render: withGlobalDom ->
+    propTypes:
+      currentFolder: React.PropTypes.object # not required as we don't have it on the first render
+
+    onSubmit: (event) ->
+      event.preventDefault()
+      query = {search_term: @refs.searchTerm.getDOMNode().value}
+      Router.transitionTo 'search', @props.params, query
+
+    addFolder: ->
+      @props.currentFolder.folders.add({})
+
+    render: withReactDOM ->
       header className:'ef-header',
-        form action: @props.baseUrl + 'search', method: 'GET', className:'ef-search-container',
+        form onSubmit: @onSubmitSearch, className:'ef-search-container',
           i className:'icon-search',
-          input type:'search', name:'search_term'
+          input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
         div className:'ef-main-buttons',
-          button className:'btn',
+          button onClick: @addFolder, className:'btn',
             i className:'icon-plus'
             'Folder'
-          button className:'btn btn-primary',
-            i className:'icon-plus'
-            'Files'
+          UploadButton currentFolder: this.props.currentFolder
           a className:'ef-admin-cog al-trigger btn', role:'button', 'aria-haspopup':'true', 'aria-owns':'toolbar-1', 'aria-label':'Settings', href:'#',
             i className:'icon-settings'
             i className:'icon-mini-arrow-down'

@@ -20,42 +20,38 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Outcome Results API", type: :request do
 
-  let(:outcome_course) do
-    course(active_all: true) unless @course
+  let_once(:outcome_course) do
+    course(active_all: true)
     @course
   end
 
-
-  let(:outcome_teacher) do
-    teacher_in_course(active_all: true) unless @teacher
+  let_once(:outcome_teacher) do
+    teacher_in_course(active_all: true, course: outcome_course)
     @teacher
   end
 
-  let(:outcome_student) do
-    student_in_course(active_all: true) unless @student
+  let_once(:outcome_student) do
+    student_in_course(active_all: true, course: outcome_course)
     @student
   end
 
-  let(:outcome_rubric) do
-    create_outcome_rubric unless @rubric
-    @rubric
+  let_once(:outcome_rubric) do
+    create_outcome_rubric
   end
 
-  let(:outcome_object) do
-    outcome_rubric unless @outcome
+  let_once(:outcome_object) do
+    outcome_rubric
     @outcome
   end
 
-  let(:outcome_assignment) do
-    create_outcome_assignment
+  let_once(:outcome_assignment) do
+    assignment = create_outcome_assignment
+    find_or_create_outcome_submission assignment: assignment
+    assignment
   end
 
-  let(:outcome_rubric_association) do
+  let_once(:outcome_rubric_association) do
     create_outcome_rubric_association
-  end
-
-  let(:outcome_submission) do
-    find_or_create_outcome_submission
   end
 
   let(:outcome_criterion) do
@@ -73,15 +69,13 @@ describe "Outcome Results API", type: :request do
   def find_or_create_outcome_submission(opts = {})
     student = opts[:student] || outcome_student
     assignment = opts[:assignment] ||
-      (opts[:association].assignment if opts[:association]) ||
       (create_outcome_assignment if opts[:new]) ||
       outcome_assignment
     assignment.find_or_create_submission(student)
   end
 
   def create_outcome_assessment(opts = {})
-    association = opts[:association] ||
-      (create_outcome_rubric_association(opts) if opts[:new]) ||
+    association = (create_outcome_rubric_association(opts) if opts[:new]) ||
       outcome_rubric_association
     criterion = find_outcome_criterion(association.rubric)
     submission = opts[:submission] || find_or_create_outcome_submission(opts)
@@ -104,7 +98,7 @@ describe "Outcome Results API", type: :request do
   def create_outcome_rubric
     outcome_course
     outcome_with_rubric(mastery_points: 3)
-    @outcome.rubric_criterion = find_outcome_criterion
+    @outcome.rubric_criterion = find_outcome_criterion(@rubric)
     @outcome.save
     @rubric
   end
@@ -118,11 +112,9 @@ describe "Outcome Results API", type: :request do
   end
 
   def create_outcome_rubric_association(opts = {})
-    rubric = opts[:rubric] ||
-      (create_outcome_rubric if opts[:new]) ||
+    rubric = (create_outcome_rubric if opts[:new]) ||
       outcome_rubric
-    assignment = opts[:assignment] ||
-      (create_outcome_assignment if opts[:new]) ||
+    assignment = (create_outcome_assignment if opts[:new]) ||
       outcome_assignment
     rubric.associate_with(assignment, outcome_course, purpose: 'grading', use_for_grading: true)
   end
@@ -168,19 +160,21 @@ describe "Outcome Results API", type: :request do
     api_v1_course_outcome_results_url(context, params)
   end
 
+  before do
+    @user = @teacher # api calls as teacher, by default
+  end
+
   describe "outcome rollups" do
     describe "error handling" do
       it "requires manage grades permisssion" do
-        course_with_student_logged_in
+        @user = @student
         raw_api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
         assert_status(403)
       end
 
       it "allows students to read their own results" do
-        outcome_students
         @user = outcome_students[0]
-        user_session(@user)
         raw_api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: outcome_course.id.to_s, user_ids: [outcome_students[0].id])
@@ -188,9 +182,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "does not allow students to read other users' results" do
-        outcome_students
         @user = outcome_students[0]
-        user_session(@user)
         raw_api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: outcome_course.id.to_s, user_ids: [outcome_students[1].id])
@@ -198,16 +190,12 @@ describe "Outcome Results API", type: :request do
       end
 
       it "does not allow students to read other users' results via csv" do
-        outcome_students
-        @user = outcome_students[0]
-        user_session(@user)
+        user_session outcome_students[0]
         get "courses/#{@course.id}/outcome_rollups.csv"
         assert_status(403)
       end
 
       it "requires an existing context" do
-        outcome_course
-        course_with_teacher_logged_in(course: @course, active_all: true)
         bogus_course = Course.new { |c| c.id = -1 }
         raw_api_call(:get, outcome_rollups_url(bogus_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: bogus_course.id.to_s)
@@ -215,8 +203,6 @@ describe "Outcome Results API", type: :request do
       end
 
       it "verifies the aggregate parameter" do
-        outcome_course
-        course_with_teacher_logged_in(course: @course, active_all: true)
         raw_api_call(:get, outcome_rollups_url(@course, aggregate: 'invalid'),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, aggregate: 'invalid')
@@ -224,8 +210,6 @@ describe "Outcome Results API", type: :request do
       end
 
       it "requires user ids to be students in the context" do
-        outcome_course
-        course_with_teacher_logged_in(course: @course, active_all: true)
         raw_api_call(:get, outcome_rollups_url(@course, user_ids: "#{@teacher.id}"),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, user_ids: @teacher.id)
@@ -233,18 +217,14 @@ describe "Outcome Results API", type: :request do
       end
 
       it "requires section id to be a section in the context" do
-        outcome_course
         bogus_section = course(active_course: true).course_sections.create!(name: 'bogus section')
-        course_with_teacher_logged_in(course: outcome_course, active_all: true)
         raw_api_call(:get, outcome_rollups_url(outcome_course, section_id: bogus_section.id),
           controller: 'outcome_results', action: 'rollups', format: 'json',
-          course_id: @course.id.to_s, section_id: bogus_section.id.to_s)
+          course_id: outcome_course.id.to_s, section_id: bogus_section.id.to_s)
         assert_status(400)
       end
 
       it "verifies the include[] parameter" do
-        outcome_course
-        course_with_teacher_logged_in(course: @course, active_all: true)
         raw_api_call(:get, outcome_rollups_url(@course, include: ['invalid']),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, include: ['invalid'])
@@ -254,8 +234,6 @@ describe "Outcome Results API", type: :request do
 
     describe "basic response" do
       it "returns a json api structure" do
-        outcome_student
-        course_with_teacher_logged_in(course: @course, active_all: true)
         outcome_result
         api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
@@ -279,9 +257,8 @@ describe "Outcome Results API", type: :request do
       end
 
       it "returns a csv file" do
-        outcome_student
-        course_with_teacher_logged_in(course: @course, active_all: true)
         outcome_result
+        user_session @user
         get "courses/#{@course.id}/outcome_rollups.csv"
         response.should be_success
         response.body.should == "Student name,Student ID,new outcome result,new outcome mastery points\n"+
@@ -290,10 +267,9 @@ describe "Outcome Results API", type: :request do
 
       describe "user_ids parameter" do
         it "restricts results to specified users" do
-          outcome_students
           student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
           student_id_str = student_ids.join(',')
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          @user = @teacher
           api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ['users'])
           json = JSON.parse(response.body)
@@ -321,7 +297,7 @@ describe "Outcome Results API", type: :request do
       describe "section_id parameter" do
         it "restricts results to the specified section" do
           sectioned_outcome_students
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          @user = @teacher
           api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s, include: ['users'])
           json = JSON.parse(response.body)
@@ -348,8 +324,6 @@ describe "Outcome Results API", type: :request do
 
       describe "include[] parameter" do
         it "side loads courses" do
-          outcome_object
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['courses'], aggregate: 'course'),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['courses'], aggregate: 'course')
           json = JSON.parse(response.body)
@@ -359,8 +333,6 @@ describe "Outcome Results API", type: :request do
         end
 
         it "side loads outcomes" do
-          outcome_object
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes'])
           json = JSON.parse(response.body)
@@ -370,11 +342,9 @@ describe "Outcome Results API", type: :request do
         end
 
         it "side loads outcome groups" do
-          outcome_object
           root_group = outcome_course.root_outcome_group
           child_group = root_group.child_outcome_groups.create!(title: 'child group')
           grandchild_group = child_group.child_outcome_groups.create!(title: 'grandchild_group')
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_groups']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_groups'])
           json = JSON.parse(response.body)
@@ -386,8 +356,6 @@ describe "Outcome Results API", type: :request do
         end
 
         it "side loads outcome links" do
-          outcome_object
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_links']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_links'])
           json = JSON.parse(response.body)
@@ -401,7 +369,6 @@ describe "Outcome Results API", type: :request do
 
         it "side loads users" do
           outcome_assessment
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['users'])
           json = JSON.parse(response.body)
@@ -412,7 +379,6 @@ describe "Outcome Results API", type: :request do
 
         it "side loads alignments" do
           outcome_assessment
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes', 'outcomes.alignments']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes', 'outcomes.alignments'])
           json = JSON.parse(response.body)
@@ -433,7 +399,7 @@ describe "Outcome Results API", type: :request do
     end
 
     describe "outcomes" do
-      before do
+      before :once do
         @outcomes = 0.upto(3).map do |i|
           create_outcome_assessment(new: true)
           @outcome
@@ -443,7 +409,6 @@ describe "Outcome Results API", type: :request do
           create_outcome_assessment(new: true)
           @outcome
         end
-        course_with_teacher_logged_in(course: @course, active_all: true)
       end
 
       it "supports multiple outcomes" do
@@ -480,8 +445,6 @@ describe "Outcome Results API", type: :request do
 
     describe "aggregate response" do
       it "returns an aggregate json api structure" do
-        outcome_student
-        course_with_teacher_logged_in(course: @course, active_all: true)
         outcome_result
         api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course'),
           controller: 'outcome_results', action: 'rollups', format: 'json',
@@ -506,7 +469,7 @@ describe "Outcome Results API", type: :request do
         it "restricts aggregate to specified users" do
           outcome_students
           student_id_str = outcome_students[0..1].map(&:id).join(',')
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          @user = @teacher
           api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course', user_ids: student_id_str),
                    controller: 'outcome_results', action: 'rollups', format: 'json',
                    course_id: outcome_course.id.to_s, aggregate: 'course',
@@ -531,7 +494,7 @@ describe "Outcome Results API", type: :request do
       describe "section_id parameter" do
         it "restricts aggregate to the specified section" do
           sectioned_outcome_students
-          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          @user = @teacher
           api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course', section_id: outcome_course_sections[0].id),
                    controller: 'outcome_results', action: 'rollups', format: 'json',
                    course_id: outcome_course.id.to_s, aggregate: 'course',
@@ -560,7 +523,6 @@ describe "Outcome Results API", type: :request do
     # we test some of that logic that is more specifically useful to the index endpoint
     it "side loads alignments" do
       outcome_assessment
-      course_with_teacher_logged_in(course: outcome_course, active_all: true)
       api_call(:get, outcome_results_url(outcome_course, include: ['alignments']),
                controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['alignments'])
       json = JSON.parse(response.body)
@@ -571,7 +533,6 @@ describe "Outcome Results API", type: :request do
 
     it "returns outcome results" do
       outcome_assessment
-      course_with_teacher_logged_in(course: outcome_course, active_all: true)
       api_call(:get, outcome_results_url(outcome_course),
                controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
@@ -593,7 +554,7 @@ describe "Outcome Results API", type: :request do
       student2 = @shard2.activate { User.create!(name: 'outofshard') }
       enrollment = @course.enroll_student(student2, enrollment_state: 'active')
       create_outcome_assessment(student: student2)
-      course_with_teacher_logged_in(course: @course, active_all: true)
+      @user = @teacher
 
       api_call(:get, outcome_rollups_url(outcome_course),
         controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)

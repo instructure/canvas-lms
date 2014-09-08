@@ -274,11 +274,10 @@ module AdheresToPolicy
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
-      if session && (session[:session_affects_permissions] || session[:permissions_key])
-        session[:permissions_key] ||= session[:session_id]
-        permissions_key = session[:permissions_key]
-      end
-      adheres_to_policy_cache_key(['permissions', self, user, permissions_key, right].compact)
+      permissions_key = session && session[:permissions_key]
+      ['permissions', self, user, permissions_key, right].compact.
+        map{ |element| ActiveSupport::Cache.expand_cache_key(element) }.
+        to_param
     end
 
     # Internal: Checks the users condition state.
@@ -306,29 +305,6 @@ module AdheresToPolicy
       elsif condition.arity == 2
         instance_exec(user, session, &condition)
       end
-    end
-
-    # Internal: Generates a cache key from an array.
-    #
-    # some_array - The array used to generate the cache key.
-    #
-    # Examples
-    #
-    #   adheres_to_policy_cache_key([ 42, :read ])
-    #   # => '42/read'
-    #
-    #   adheres_to_policy_cache_key([ 42, 'key', :read, :write ])
-    #   # => '42/key/read/write'
-    #
-    # Returns a string representing the cache key generated.
-    def adheres_to_policy_cache_key(some_array)
-      cache_key = some_array.instance_variable_get("@cache_keys")
-      return cache_key if cache_key
-
-      value = some_array.collect { |element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
-      some_array.instance_variable_set("@cache_key",  value) unless some_array.frozen?
-
-      some_array.collect { |element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
     end
   end
 end

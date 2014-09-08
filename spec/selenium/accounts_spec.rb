@@ -120,6 +120,38 @@ describe "account" do
       dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:*"
     end
 
+    context "cas" do
+      it "should be able to set unknown user url option" do
+        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        click_option('#add_auth_select', 'cas', :value)
+        f("#account_authorization_config_0_login_handle_name").should be_displayed
+
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#account_authorization_config_0_unknown_user_url").send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#auth_form') }
+
+        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+      end
+    end
+
+    context "saml" do
+      it "should be able to set unknown user url option" do
+        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        click_option('#add_auth_select', 'saml', :value)
+
+        saml_div = f('#saml_div')
+        saml_div.find_element(:css, 'button.element_toggler.btn').click
+
+        f("#account_authorization_config_idp_entity_id").should be_displayed
+
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#saml_config__form') }
+
+        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+      end
+    end
+
     it "should be able to create a new course" do
       get "/accounts/#{Account.default.id}"
       f('.add_course_link').click

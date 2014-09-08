@@ -1,9 +1,5 @@
 class RespondusAPIMiddleware
-  if CANVAS_RAILS2
-    class_inheritable_accessor :servant
-  else
-    class_attribute :servant
-  end
+  class_attribute :servant
 
   Endpoint = %r{\A/api/respondus/soap}
 

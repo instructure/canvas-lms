@@ -62,27 +62,15 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  if CANVAS_RAILS2
-    has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
-    has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
-    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited)
-    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_future)
-    has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
-    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
-            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
-  else
-    has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at', :readonly => false
-    has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at', :readonly => false
-    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited), :readonly => false
-    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_future), :readonly => false
-    has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
-    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
-            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
-  end
+  has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at', :readonly => false
+  has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at', :readonly => false
+  has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+          :conditions => enrollment_conditions(:current_and_invited), :readonly => false
+  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+          :conditions => enrollment_conditions(:current_and_future), :readonly => false
+  has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
+  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
+          :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
 
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
   has_many :observer_enrollments
@@ -164,6 +152,7 @@ class User < ActiveRecord::Base
   has_many :messages
   has_many :sis_batches
   has_many :content_migrations, :as => :context
+  has_many :content_exports, :as => :context
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -218,7 +207,7 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if !CANVAS_RAILS2 && scope.select_values.empty?
+    if scope.select_values.empty?
       scope = scope.select(self.arel_table[Arel.star])
     end
     if scope.select_values.present?
@@ -256,8 +245,6 @@ class User < ActiveRecord::Base
     # the trick to get unique users
     scope.group("users.id")
   }
-
-  has_a_broadcast_policy
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
@@ -526,11 +513,7 @@ class User < ActiveRecord::Base
             # for incremental, only update the old association if it is deeper than the new one
             # for non-incremental, update it if it changed
             if (incremental && association[1] > depth) || (!incremental && association[1] != depth)
-              if CANVAS_RAILS2
-                UserAccountAssociation.update_all({ :depth => depth }, :id => association[0])
-              else
-                UserAccountAssociation.where(:id => association[0]).update_all(:depth => depth)
-              end
+              UserAccountAssociation.where(:id => association[0]).update_all(:depth => depth)
             end
             # remove from list of existing for non-incremental
             current_associations.delete(key) unless incremental
@@ -539,11 +522,7 @@ class User < ActiveRecord::Base
       end
 
       to_delete += current_associations.map { |k, v| v[0] }
-      if CANVAS_RAILS2
-        UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
-      else
-        UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
-      end
+      UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
     end
   end
 
@@ -553,14 +532,6 @@ class User < ActiveRecord::Base
   def new_registration(form_params = {}); end
   # DEPRECATED, override new_registration instead
   def new_teacher_registration(form_params = {}); new_registration(form_params); end
-
-  set_broadcast_policy do |p|
-    p.dispatch :new_teacher_registration
-    p.to { Account.site_admin.users }
-    p.whenever { |record|
-      record.just_created && record.school_name && record.school_position
-    }
-  end
 
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
@@ -962,7 +933,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
+    can :read and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1359,6 +1330,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_visibile_in_course(course)
+    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     if course.feature_enabled?(:differentiated_assignments)
       course.active_assignments.visible_to_student_in_course_with_da(self.id, course.id)
     else
@@ -1367,18 +1339,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-         current_student_enrollment_course_ids)
-      else
-        current_student_enrollment_course_ids
-      end
-    end
-
-    opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
-
     shard.activate do
+      course_ids = Shackles.activate(:slave) do
+        if opts[:contexts]
+          (Array(opts[:contexts]).map(&:id) &
+           current_student_enrollment_course_ids)
+        else
+          current_student_enrollment_course_ids
+        end
+      end
+
+      opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
+
       Rails.cache.fetch([self, 'assignments_needing_submitting', course_ids, opts].cache_key, expires_in: 15.minutes) do
         Shackles.activate(:slave) do
           limit = opts[:limit]
@@ -1402,18 +1374,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_grading(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-        current_admin_enrollment_course_ids)
-      else
-        current_admin_enrollment_course_ids
-      end
-    end
-
-    opts = {limit: 15}.merge(opts.slice(:limit))
-
     shard.activate do
+      course_ids = Shackles.activate(:slave) do
+        if opts[:contexts]
+          (Array(opts[:contexts]).map(&:id) &
+          current_admin_enrollment_course_ids)
+        else
+          current_admin_enrollment_course_ids
+        end
+      end
+
+      opts = {limit: 15}.merge(opts.slice(:limit))
+
       Rails.cache.fetch([self, 'assignments_needing_grading', course_ids, opts].cache_key, expires_in: 15.minutes) do
         Shackles.activate(:slave) do
           limit = opts[:limit]
@@ -1425,6 +1397,37 @@ class User < ActiveRecord::Base
               need_grading_info(limit)
             Assignment.send :preload_associations, as, :context
             as.reject{|a| a.needs_grading_count_for_user(self) == 0}
+          end
+          # outer limit, since there could be limit * n_shards results
+          result = result[0...limit] if limit
+          result
+        end
+      end
+    end
+  end
+
+  def submissions_needing_peer_review(opts={})
+    course_ids = Shackles.activate(:slave) do
+      if opts[:contexts]
+        (Array(opts[:contexts]).map(&:id) &
+        current_student_enrollment_course_ids)
+      else
+        current_student_enrollment_course_ids
+      end
+    end
+
+    opts = {limit: 15}.merge(opts.slice(:limit))
+
+    shard.activate do
+      Rails.cache.fetch([self, 'submissions_needing_peer_review', course_ids, opts].cache_key, expires_in: 15.minutes) do
+        Shackles.activate(:slave) do
+          limit = opts[:limit]
+
+          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            shard_course_context_codes = shard_course_ids.map { |course_id| "course_#{course_id}"}
+            AssessmentRequest.where(assessor_id: id).incomplete.
+              not_ignored_by(self, 'reviewing').
+              for_context_codes(shard_course_context_codes)
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
@@ -1546,7 +1549,7 @@ class User < ActiveRecord::Base
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          relation = CANVAS_RAILS2 ? send(actual_association) : association(actual_association).scoped
+          relation = association(actual_association).scoped
           relation.with_each_shard do |scope|
 
             # Limit favorite courses based on current shard.
@@ -2494,10 +2497,10 @@ class User < ActiveRecord::Base
   end
 
   def stamp_logout_time!
-    if CANVAS_RAILS2
-      User.update_all({ :last_logged_out => Time.zone.now }, :id => self)
-    else
-      User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
-    end
+    User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
+  end
+
+  def content_exports_visible_to(user)
+    self.content_exports.where(user_id: user)
   end
 end

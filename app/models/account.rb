@@ -166,6 +166,7 @@ class Account < ActiveRecord::Base
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
+  add_setting :login_handle_name, :root_only => true
   add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -419,14 +420,9 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    scope = if CANVAS_RAILS2
-      Course.shard(shard)
-    else
-      shard.activate do
-        Course.scoped
-      end
+    shard.activate do
+      Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
     end
-    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def associated_user?(user)
@@ -701,14 +697,28 @@ class Account < ActiveRecord::Base
     self.account_authorization_configs.first
   end
 
+  # If an account uses an authorization_config, it's login_handle_name is used.
+  # Otherwise they can set it on the account settings page.
   def login_handle_name_is_customized?
-    self.account_authorization_config && self.account_authorization_config.login_handle_name.present?
+    if self.account_authorization_config
+      self.account_authorization_config.login_handle_name.present?
+    else
+      settings[:login_handle_name].present?
+    end
   end
 
   def login_handle_name
-    login_handle_name_is_customized? ? self.account_authorization_config.login_handle_name :
-        (self.delegated_authentication? ? AccountAuthorizationConfig.default_delegated_login_handle_name :
-            AccountAuthorizationConfig.default_login_handle_name)
+    if login_handle_name_is_customized?
+      if account_authorization_config
+        account_authorization_config.login_handle_name
+      else
+        settings[:login_handle_name]
+      end
+    elsif self.delegated_authentication?
+      AccountAuthorizationConfig.default_delegated_login_handle_name
+    else
+      AccountAuthorizationConfig.default_login_handle_name
+    end
   end
 
   def self_and_all_sub_accounts
@@ -720,12 +730,16 @@ class Account < ActiveRecord::Base
     state :deleted
   end
 
+  def self.all_site_admin_account_users_copies
+    Setting.get('all_site_admin_account_users_copies', 1).to_i
+  end
+
   def account_users_for(user)
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user.global_id] ||= Rails.cache.fetch('all_site_admin_account_users') do
+        @account_users_cache[user.global_id] ||= Rails.cache.fetch("all_site_admin_account_users#{rand(Account.all_site_admin_account_users_copies)}") do
           self.account_users.all
         end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
       end
@@ -899,8 +913,24 @@ class Account < ActiveRecord::Base
     get_special_account(:default, 'Default Account')
   end
 
-  def self.clear_special_account_cache!
-    @special_accounts = {}
+  class << self
+    def special_accounts
+      @special_accounts ||= {}
+    end
+
+    def special_account_ids
+      @special_account_ids ||= {}
+    end
+
+    def special_account_timed_cache
+      @special_account_timed_cache ||= TimedCache.new(-> { Setting.get('account_special_account_cache_time', 60.seconds).to_i.ago }) do
+        special_accounts.clear
+      end
+    end
+
+    def clear_special_account_cache!(force = false)
+      special_account_timed_cache.clear(force)
+    end
   end
 
   # an opportunity for plugins to load some other stuff up before caching the account
@@ -919,30 +949,27 @@ class Account < ActiveRecord::Base
 
   def self.get_special_account(special_account_type, default_account_name)
     Shard.birth.activate do
-      @special_account_ids ||= {}
-      @special_accounts ||= {}
-
-      account = @special_accounts[special_account_type]
+      account = special_accounts[special_account_type]
       unless account
-        special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
-        account = @special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
+        special_account_id = special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
+        account = special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
       end
       # another process (i.e. selenium spec) may have changed the setting
       unless account
         special_account_id = Setting.get("#{special_account_type}_account_id", nil)
-        if special_account_id && special_account_id != @special_account_ids[special_account_type]
-          @special_account_ids[special_account_type] = special_account_id
-          account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+        if special_account_id && special_account_id != special_account_ids[special_account_type]
+          special_account_ids[special_account_type] = special_account_id
+          account = special_accounts[special_account_type] = Account.find_by_id(special_account_id)
         end
       end
       if !account && default_account_name
         # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
-        account = @special_accounts[special_account_type] = Account.new(:name => default_account_name)
+        account = special_accounts[special_account_type] = Account.new(:name => default_account_name)
         account.save!
         Setting.set("#{special_account_type}_account_id", account.id)
-        @special_account_ids[special_account_type] = account.id
+        special_account_ids[special_account_type] = account.id
       end
       account
     end

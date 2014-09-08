@@ -1065,7 +1065,7 @@ describe User do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == false
+      tool.has_placement?(:user_navigation).should == false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
@@ -1075,7 +1075,7 @@ describe User do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == true
+      tool.has_placement?(:user_navigation).should == true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
@@ -1878,6 +1878,28 @@ describe User do
     end
   end
 
+  describe "submissions_needing_peer_review" do
+    before(:each) do
+      course_with_student_logged_in(:active_all => true)
+      @assessor = @student
+      assignment_model(course: @course, peer_reviews: true)
+      @submission = submission_model(assignment: @assignment)
+      @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
+      @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @student, assessor_asset: @assessor_submission)
+      @assessment_request.workflow_state = 'assigned'
+      @assessment_request.save
+    end
+
+    it "should included assessment requests where the user is the assessor" do
+      @assessor.submissions_needing_peer_review.length.should == 1
+    end
+
+    it "should note include assessment requests that have been ignored" do
+      Ignore.create!(asset: @assessment_request, user: @assessor, purpose: 'reviewing')
+      @assessor.submissions_needing_peer_review.length.should == 0
+    end
+  end
+
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
       User.avatar_key(1).should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
@@ -2211,8 +2233,12 @@ describe User do
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading.sort_by(&:id).should ==
-            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            @teacher.assignments_needing_grading.sort_by(&:id).should ==
+                [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+          end
+        end
       end
 
       it "should honor ignores for a separate shard" do

@@ -1,5 +1,5 @@
 class Quizzes::QuizRegrade < ActiveRecord::Base
-  self.table_name = 'quiz_regrades' unless CANVAS_RAILS2
+  self.table_name = 'quiz_regrades'
 
   attr_accessible :user_id, :quiz_id, :quiz_version
   belongs_to :quiz, class_name: 'Quizzes::Quiz'

@@ -19,8 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Services API", type: :request do
-  before do
+  before :once do
     user_with_pseudonym(:active_all => true)
+  end
+
+  before :each do
     @kal = mock('CanvasKaltura::ClientV3')
     CanvasKaltura::ClientV3.stubs(:config).returns({
       'domain' => 'kaltura.fake.local',

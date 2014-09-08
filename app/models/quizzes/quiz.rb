@@ -18,7 +18,7 @@
 require 'canvas/draft_state_validations'
 
 class Quizzes::Quiz < ActiveRecord::Base
-  self.table_name = 'quizzes' unless CANVAS_RAILS2
+  self.table_name = 'quizzes'
 
   include Workflow
   include HasContentTags
@@ -58,15 +58,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :quiz_data, :points_possible, :context_id, 
-    :context_type, :assignment_id, :workflow_state, :shuffle_answers, 
-    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, 
-    :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, 
-    :could_be_locked, :cloned_item_id, :unpublished_question_count, :due_at, 
-    :question_count, :last_assignment_id, :published_at, :last_edited_at, 
-    :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter, 
-    :require_lockdown_browser, :require_lockdown_browser_for_results, 
-    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, 
+    :id, :title, :description, :quiz_data, :points_possible, :context_id,
+    :context_type, :assignment_id, :workflow_state, :shuffle_answers,
+    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy,
+    :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at,
+    :could_be_locked, :cloned_item_id, :unpublished_question_count, :due_at,
+    :question_count, :last_assignment_id, :published_at, :last_edited_at,
+    :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter,
+    :require_lockdown_browser, :require_lockdown_browser_for_results,
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at,
     :hide_correct_answers_at, :require_lockdown_browser_monitor, 
     :lockdown_browser_monitor_data, :only_visible_to_overrides
   ]
@@ -220,8 +220,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def build_assignment
     if (context.feature_enabled?(:draft_state) || self.available?) &&
-      !self.assignment_id && self.graded? && @saved_by != :assignment &&
-      @saved_by != :clone
+      !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -292,7 +291,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    res = self.save
+    res = self.save!
     if self.for_assignment?
       self.assignment.destroy unless self.assignment.deleted?
     end
@@ -300,7 +299,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
+    self.workflow_state = if self.has_student_submissions?
+      "available"
+    else
+      "unpublished"
+    end
     self.save
     self.assignment.restore(:quiz) if self.for_assignment?
   end
@@ -375,8 +378,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def restrict_answers_for_concluded_course?
     course = self.context
-    concluded = course.conclude_at && course.conclude_at < Time.now
-    concluded && course.root_account.settings[:restrict_quiz_questions]
+    course.soft_concluded? && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions

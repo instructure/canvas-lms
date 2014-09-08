@@ -24,15 +24,16 @@ describe CalendarsController do
     @event = @course.calendar_events.create(:title => "some assignment", :start_at => date, :end_at => date)
   end
 
+  before(:once) { course_with_student(active_all: true) }
+  before(:each) { user_session(@student) }
+
   describe "GET 'show2'" do
     it "should not redirect to the old calendar even with default settings" do
-      course_with_student_logged_in(:active_all => true)
       get 'show2', :user_id => @user.id
       response.should_not redirect_to(calendar_url(anchor: ' '))
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
       course_event
       get 'show2', :user_id => @user.id
       response.should be_success
@@ -47,8 +48,6 @@ describe CalendarsController do
     it "should set permissions using contexts from the correct shard" do
       # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
       # or no course at all. this sort of aliasing used to break a permission check in show2
-      user(:active_all => true)
-      user_session(@user)
       invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
       @shard2.activate do
         account = Account.create!
@@ -65,7 +64,6 @@ describe CalendarsController do
 
   describe "POST 'switch_calendar'" do
     it "should not switch to the old calendar anymore" do
-      course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
 
       post 'switch_calendar', {:preferred_calendar => '1'}
@@ -74,7 +72,6 @@ describe CalendarsController do
     end
 
     it "should not switch to the old calendar if not allowed" do
-      course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
       post 'switch_calendar', {:preferred_calendar => '1'}
       response.should redirect_to(calendar2_url(anchor: ' '))
@@ -85,7 +82,6 @@ describe CalendarsController do
     end
 
     it "should redirect to new calendar regardless of old preference settings" do
-      course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
 
       post 'switch_calendar', {:preferred_calendar => '2'}
@@ -94,7 +90,6 @@ describe CalendarsController do
     end
 
     it "should switch to the new calendar if allowed" do
-      course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:preferences, {:use_calendar1 => true})
 
       post 'switch_calendar', {:preferred_calendar => '2'}
@@ -110,7 +105,7 @@ describe CalendarEventsApiController do
   end
 
   describe "GET 'public_feed'" do
-    before(:each) do
+    before(:once) do
       course_with_student(:active_all => true)
       course_event
       @course.is_public = true

@@ -176,11 +176,7 @@ module Importers
         tag.content_type = 'ContextExternalTool'
         if !tag.save
           migration.add_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if migration && tag.errors["url"]
-          if CANVAS_RAILS2
-            item.external_tool_tag = nil
-          else
-            item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
-          end
+          item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
         end
       end
 

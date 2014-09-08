@@ -139,6 +139,7 @@ describe "eportfolios" do
         get "/eportfolios/#{@eportfolio.id}"
         expect_new_page_load { f(".icon-arrow-right").click }
         f(".edit_content_link").click
+        wait_for_ajaximations
       end
 
       it "should click on the How Do I..? button" do
@@ -156,6 +157,7 @@ describe "eportfolios" do
       end
 
       it "should add a user file" do
+        keep_trying_until { f('.add_file_link').should be_displayed } 
         f('.add_file_link').click
         wait_for_ajaximations
         fj('.file_list:visible .sign:visible').click

@@ -191,7 +191,6 @@ describe UsersController do
     end
 
     it "should fail when the current user won't be able to delete managed pseudonyms" do
-      rescue_action_in_public! if CANVAS_RAILS2
       course_with_student_logged_in
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)

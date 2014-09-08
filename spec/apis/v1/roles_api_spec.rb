@@ -19,14 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Roles API", type: :request do
-  before do
+  before :once do
     @account = Account.default
     account_admin_user(:account => @account)
     user_with_pseudonym(:user => @admin)
   end
 
   describe "Roles CRUD" do
-    before :each do
+    before :once do
       @role = 'NewRole'
       @permission = 'read_reports'
       @initial_count = @account.role_overrides.size
@@ -86,7 +86,7 @@ describe "Roles API", type: :request do
       end
 
       context "with state parameter" do
-        before do
+        before :once do
           role = @account.roles.create :name => 'inactive_role'
           role.base_role_type = 'StudentEnrollment'
           role.workflow_state = 'inactive'
@@ -197,6 +197,18 @@ describe "Roles API", type: :request do
     end
 
     context "when there are enrollments using a course-level role" do
+      before :once do
+        course1 = Course.create!(:name => "blah", :account => @account)
+        user1 = user()
+
+        enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment')
+        enrollment1.role_name = @role
+        enrollment1.invite
+        enrollment1.accept
+        enrollment1.save!
+        @user = @admin
+      end
+
       before :each do
         base_role_type = 'TeacherEnrollment'
 
@@ -206,16 +218,6 @@ describe "Roles API", type: :request do
         @account.reload
 
         @account.roles.active.map(&:name).should include(@role)
-
-        course1 = Course.create!(:name => "blah", :account => @account)
-        user1 = user()
-
-        account_admin_user(:account => @account)
-        enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment')
-        enrollment1.role_name = @role
-        enrollment1.invite
-        enrollment1.accept
-        enrollment1.save!
       end
 
       it "should deactivate a course-level role" do
@@ -472,7 +474,7 @@ describe "Roles API", type: :request do
   end
 
   describe "create permission overrides" do
-    before do
+    before :once do
       @account = Account.default
       @path = "/api/v1/accounts/#{@account.id}/roles/TeacherEnrollment"
       @path_options = { :controller => 'role_overrides', :action => 'update',

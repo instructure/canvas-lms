@@ -7,7 +7,7 @@
 
 <div style="margin: 10px auto; width: 600px;">
   <% if params[:event] == "delete" %>
-    <h2><%= t('headings.confirm_delete', %{Confirm Course Deletion}) %></h2>
+    <h1><%= t('headings.confirm_delete', %{Confirm Course Deletion}) %></h1>
     <%= t 'details.confirm_delete', %{Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'conclude')) %>
     <%= t 'details.confirm_delete_addendum', %{If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course. }, :wrapper => link_to('\1', course_settings_url(@context)) %>
     <%= form_tag context_url(@context, :context_url), {:method => :delete} do %>
@@ -18,7 +18,7 @@
       </div>
     <% end %>
   <% else %>
-    <h2><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h2>
+    <h1><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h1>
     <p><%= t 'details.confirm_conclude', %{Warning: Concluding the course will prevent you from modifying grades and accessing course content.} %></p>
     <p><%= t 'details.conclude_alt_text', %{If you would like to retain the ability to change grades while limiting student access to the course, please utilize the course dates settings. You can learn about course date settings in our guides *here*}, :wrapper => link_to('\1', "http://guides.instructure.com/m/4152/l/57088-how-do-i-change-the-start-and-end-dates-for-my-course") %></p>
 

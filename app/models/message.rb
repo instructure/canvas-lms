@@ -18,11 +18,7 @@
 
 class Message < ActiveRecord::Base
   # Included modules
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
 
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
@@ -383,13 +379,13 @@ class Message < ActiveRecord::Base
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = nil
-    inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
+    inner_html = ActionView::Template::Handlers::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
     @output_buffer = nil
-    RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
+    ActionView::Template::Handlers::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
   end
@@ -413,7 +409,7 @@ class Message < ActiveRecord::Base
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
       @output_buffer = nil
-      self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
+      self.body = ActionView::Template::Handlers::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
         :bufvar => '@output_buffer').result(_binding)

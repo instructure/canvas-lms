@@ -19,21 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConferencesController do
-  before do
+  before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.find_or_create_by_name('wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
+    course_with_teacher(active_all: true, user: user_with_pseudonym(active_all: true))
+    student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
   end
 
   describe "GET 'index'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>12,'hidden'=>true}])
       get 'index', :course_id => @course.id
       response.should be_redirect
@@ -41,22 +42,21 @@ describe ConferencesController do
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       get 'index', :course_id => @course.id
       response.should be_success
     end
 
     it "should not redirect from group context" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @group = @course.groups.create!(:name => "some group")
-      @group.add_user(@user)
+      @group.add_user(@student)
       get 'index', :group_id => @group.id
       response.should be_success
     end
     
     it "should not include the student view student" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_user => true)
+      user_session(@teacher)
       @student_view_student = @course.student_view_student
       get 'index', :course_id => @course.id
       assigns[:users].include?(@student).should be_true
@@ -74,7 +74,7 @@ describe ConferencesController do
     end
 
     it "should not list conferences that use a disabled plugin" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       plugin = PluginSetting.find_or_create_by_name('adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
 
@@ -88,13 +88,12 @@ describe ConferencesController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
     
     it "should create a conference" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
       response.should be_success
     end
@@ -102,13 +101,12 @@ describe ConferencesController do
 
   describe "POST 'update'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
     
     it "should update a conference" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       post 'update', :course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}, :format => 'json'
       response.should be_success
@@ -117,7 +115,6 @@ describe ConferencesController do
 
   describe "POST 'join'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       assert_unauthorized
@@ -126,7 +123,7 @@ describe ConferencesController do
     it "should let admins join a conference" do
       WimbaConference.any_instance.stubs(:send_request).returns('')
       WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
-      course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+      user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       response.should be_redirect
@@ -136,10 +133,10 @@ describe ConferencesController do
     it "should let students join an inactive long running conference" do
       WimbaConference.any_instance.stubs(:send_request).returns('')
       WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
-      course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+      user_session(@student)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
-      @conference.users << @user
+      @conference.users << @student
       WimbaConference.any_instance.stubs(:conference_status).returns(:closed)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       response.should be_redirect
@@ -148,10 +145,13 @@ describe ConferencesController do
 
     describe 'when student is part of the conference' do
 
-      before do
-        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+      before :once do
         @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
-        @conference.users << @user
+        @conference.users << @student
+      end
+
+      before :each do
+        user_session(@student)
       end
 
       it "should not let students join an inactive conference" do

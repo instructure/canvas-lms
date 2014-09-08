@@ -19,9 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Outcome Groups API", type: :request do
+  before :once do
+    user_with_pseudonym(:active_all => true)
+  end
+
   before :each do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
-    user_with_pseudonym(:active_all => true)
   end
 
   def revoke_permission(account_user, permission)
@@ -37,7 +40,7 @@ describe "Outcome Groups API", type: :request do
 
   describe "redirect" do
     describe "global context" do
-      before :each do
+      before :once do
         @account_user = @user.account_users.create(:account => Account.site_admin)
       end
 
@@ -84,7 +87,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     describe "account context" do
-      before :each do
+      before :once do
         @account = Account.default
         @account_user = @user.account_users.create(:account => @account)
       end
@@ -151,7 +154,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "index" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
     end
@@ -195,7 +198,7 @@ describe "Outcome Groups API", type: :request do
 
   describe "show" do
     describe "global context" do
-      before :each do
+      before :once do
         @account_user = @user.account_users.create(:account => Account.site_admin)
       end
 
@@ -293,7 +296,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     describe "non-global context" do
-      before :each do
+      before :once do
         @account = Account.default
         @account_user = @user.account_users.create(:account => @account)
       end
@@ -335,7 +338,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "update" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @root_group = @account.root_outcome_group
@@ -490,7 +493,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "destroy" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @root_group = @account.root_outcome_group
@@ -578,7 +581,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "outcomes" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -662,33 +665,33 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "should paginate the links" do
-      links = 25.times.map { |i| create_outcome(:title => "#{i}".object_id) }
+      links = 5.times.map { |i| create_outcome(:title => "#{i}".object_id) }
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=10",
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2",
                    :controller => 'outcome_groups_api',
                    :action => 'outcomes',
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json',
-                   :per_page => '10')
-      json.size.should eql 10
+                   :per_page => '2')
+      json.size.should eql 2
       response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=2.*>; rel="next",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=3.*>; rel="last"})
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=10&page=3",
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2&page=3",
                    :controller => 'outcome_groups_api',
                    :action => 'outcomes',
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json',
-                   :per_page => '10',
+                   :per_page => '2',
                    :page => '3')
-      json.size.should eql 5
-      response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=3.*>; rel="last"})
+      json.size.should eql 1
+      response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=2.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=3.*>; rel="last"})
     end
   end
 
   describe "link existing" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -782,7 +785,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "link new" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -860,7 +863,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "unlink" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -969,7 +972,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "subgroups" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -1041,33 +1044,33 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "should paginate the subgroups" do
-      subgroups = 25.times.map { |i| create_subgroup }
+      subgroups = 5.times.map { |i| create_subgroup }
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=10",
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2",
                    :controller => 'outcome_groups_api',
                    :action => 'subgroups',
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json',
-                   :per_page => '10')
-      json.size.should eql 10
+                   :per_page => '2')
+      json.size.should eql 2
       response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=2.*>; rel="next",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=3.*>; rel="last"})
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=10&page=3",
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2&page=3",
                    :controller => 'outcome_groups_api',
                    :action => 'subgroups',
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json',
-                   :per_page => '10',
+                   :per_page => '2',
                    :page => '3')
-      json.size.should eql 5
-      response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=3.*>; rel="last"})
+      json.size.should eql 1
+      response.headers['Link'].should match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=2.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=3.*>; rel="last"})
     end
   end
 
   describe "create" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
@@ -1150,7 +1153,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "import" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @source_group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!(

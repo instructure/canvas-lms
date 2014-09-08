@@ -135,7 +135,7 @@ class GroupCategory < ActiveRecord::Base
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.find_by_role(role) ||
                  context.group_categories.build(:name => name_for_role(role), :role => role)
-      category.save(CANVAS_RAILS2 ? false : {:validate => false}) if category.new_record?
+      category.save({:validate => false}) if category.new_record?
       category
     end
   end

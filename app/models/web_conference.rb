@@ -118,17 +118,12 @@ class WebConference < ActiveRecord::Base
     user_setting_fields[name] = options
   end
 
-  if CANVAS_RAILS2
-    def self.user_setting_fields
-      read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
-    end
-  else
-    def self.user_setting_fields
-      @user_setting_fields ||= {}
-    end
-    def self.user_setting_fields=(val)
-      @user_setting_fields = val
-    end
+  def self.user_setting_fields
+    @user_setting_fields ||= {}
+  end
+
+  def self.user_setting_fields=(val)
+    @user_setting_fields = val
   end
 
   def self.user_setting_field_name(key)
@@ -153,17 +148,11 @@ class WebConference < ActiveRecord::Base
     send("#{key}_external_url", user, url_id) || []
   end
 
-  if CANVAS_RAILS2
-    def self.external_urls
-      read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
-    end
-  else
-    def self.external_urls
-      @external_urls ||= {}
-    end
-    def self.external_urls=(val)
-      @external_urls = val
-    end
+  def self.external_urls
+    @external_urls ||= {}
+  end
+  def self.external_urls=(val)
+    @external_urls = val
   end
 
   def self.external_url(name, options)

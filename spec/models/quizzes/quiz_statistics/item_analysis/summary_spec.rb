@@ -11,7 +11,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
   describe "#aggregate_data" do
     it "should group items by question" do
-      simple_quiz_with_shuffled_answers %w{T T A}, %w{T T A}, %w{T T B}, %w{T F B}, %w{T F B}
+      simple_quiz_with_shuffled_answers %w{T T A}, %w{T T A}
       summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
       summary.size.should == 3
     end
@@ -20,25 +20,19 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
   describe "#buckets" do
     it "distributes the students accordingly" do
       simple_quiz_with_submissions %w{T T A},
-        %w{T F B},%w{T F A},%w{F F A},%w{T T A},
-        %w{F T A},%w{T T A},%w{F F B},%w{F T A},
-        %w{F F C},%w{F F A},%w{F T A},%w{T T B},
-        %w{F F B},%w{T F A},%w{F T A},%w{T T A},
-        %w{F T A},%w{F T A},%w{F F B},%w{F T A},
-        %w{F F C},%w{F F A},%w{F T A},%w{T T B},
-        %w{F F C},%w{T T A},%w{F T A},%w{T T B}
-
+        %w{T T A},%w{T T A},%w{T T B}, # top
+        %w{T F B},%w{T F B},%w{F T C},%w{F T D},%w{F T B}, # middle
+        %w{F F B},%w{F F C},%w{F F D} # bottom
 
       summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
       buckets = summary.buckets
-      total = buckets.inject(0) { |num, (k, v)| num += v.size; num}
+      total = buckets.values.map(&:size).sum
       top, middle, bottom = buckets[:top].size/total.to_f, buckets[:middle].size/total.to_f, buckets[:bottom].size/total.to_f
 
-
       # because of the small sample size, this is slightly off, but close enough for gvt work
-      top.should be_approximately 0.27, 0.02
-      middle.should be_approximately 0.46, 0.05
-      bottom.should be_approximately 0.27, 0.02
+      top.should be_approximately 0.27, 0.03
+      middle.should be_approximately 0.46, 0.06
+      bottom.should be_approximately 0.27, 0.03
     end
   end
 

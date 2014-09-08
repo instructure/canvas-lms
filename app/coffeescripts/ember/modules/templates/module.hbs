@@ -1,0 +1,19 @@
+{{partial "module/header"}}
+
+{{#if makeLazyList}}
+  {{#module-item-list
+    tagName="div"
+    class="content module-item-list"
+    href=module.itemsWithContentUrl
+    data=items
+  }}
+    {{partial "module/content"}}
+  {{/module-item-list}}
+{{else}}
+  <div class="content">
+    {{partial "module/content"}}
+  </div>
+{{/if}}
+
+{{partial "module/footer"}}
+

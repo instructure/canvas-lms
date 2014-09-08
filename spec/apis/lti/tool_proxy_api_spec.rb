@@ -24,7 +24,8 @@ module Lti
     let(:account) { Account.new }
     let (:product_family) {ProductFamily.create(vendor_code: '123', product_code:'abc', vendor_name:'acme', root_account:account)}
     let(:tool_proxy) do
-      ToolProxy.create(
+      ToolProxy.create!(
+        context: account,
         guid: SecureRandom.uuid,
         shared_secret: 'abc',
         product_family: product_family,

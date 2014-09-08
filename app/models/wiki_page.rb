@@ -91,11 +91,7 @@ class WikiPage < ActiveRecord::Base
       self.write_attribute('hide_from_students', nil)
     end
   end
-  if CANVAS_RAILS2
-    alias_method :after_find, :normalize_hide_from_students
-  else
-    after_find :normalize_hide_from_students
-  end
+  after_find :normalize_hide_from_students
   private :normalize_hide_from_students
 
   def hide_from_students

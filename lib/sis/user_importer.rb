@@ -175,7 +175,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                  raise ImportError, user.errors.first.join(" ") if !user.save && user.errors.size > 0
                 elsif @batch
                   @users_to_set_sis_batch_ids << user.id
                 end
