@@ -200,7 +200,9 @@ class Message < ActiveRecord::Base
   end
 
   def author_email_address
-    author.try(:email)
+    if context_root_account.try(:author_email_in_notifications?)
+      author.try(:email)
+    end
   end
 
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
