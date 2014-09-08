@@ -91,7 +91,7 @@ module Lti
           # launch_presentation_return_url: return_url,
       }
 
-      params.merge(user_id: Lti::Asset.opaque_identifier_for(@current_user)) if @current_user
+      params.merge!(user_id: Lti::Asset.opaque_identifier_for(@current_user)) if @current_user
       params
     end
   end
