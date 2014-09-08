@@ -2068,16 +2068,6 @@ class Course < ActiveRecord::Base
       :allow_student_discussion_topics, :lock_all_announcements ]
   end
 
-  def assert_assignment_group
-    has_group = Rails.cache.fetch(['has_assignment_group', self.id].cache_key) do
-      self.assignment_groups.active.count > 0
-    end
-    if !has_group
-      group = self.assignment_groups.new :name => t('#assignment_group.default_name', "Assignments"), :position => 1
-      group.save
-    end
-  end
-
   def set_course_dates_if_blank(shift_options)
     if Canvas::Plugin.value_to_boolean(shift_options[:remove_dates])
       self.start_at = nil

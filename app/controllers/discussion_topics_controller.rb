@@ -406,7 +406,7 @@ class DiscussionTopicsController < ApplicationController
     else
       nil
     end
-    @context.assert_assignment_group rescue nil
+    @context.require_assignment_group rescue nil
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @topic.deleted?
