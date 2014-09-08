@@ -87,12 +87,11 @@ module CanvasRails
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
+      app.config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
+      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
+      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
+      app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end
-
-    config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
-    config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
-    config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
-    config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
