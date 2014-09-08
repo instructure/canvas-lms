@@ -1,4 +1,4 @@
-(CANVAS_RAILS2 ? FakeRails3Routes : CanvasRails::Application.routes).draw do
+CanvasRails::Application.routes.draw do
     scope :format => 'json', :constraints => { :format => 'json' } do
 
     # non-versioned api urls

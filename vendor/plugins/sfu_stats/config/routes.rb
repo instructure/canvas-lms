@@ -1,4 +1,4 @@
-(CANVAS_RAILS2 ? FakeRails3Routes : CanvasRails::Application.routes).draw do
+CanvasRails::Application.routes.draw do
   match "/sfu/stats" => "stats#index"
   match "/sfu/stats/restricted" => "stats#restricted"
   match "/sfu/stats/courses(/:term_id(.:format))" => "stats#courses", :defaults => { :term => nil, :format => "html" }
