@@ -33,19 +33,21 @@
   jammit_css :tinymce, :discussions, :learning_outcomes
 %>
 
-<% if @topic.draft_state_enabled? && (@unlock_at && @unlock_at > Time.now) &&
-     !can_do(@context, @current_user, :moderate_forum) %>
-  <div class="topic">
-    <div class="entry-content">
-     <h1><%= @topic.title %></h1>
-
-     <div class="alert alert-info">
-       <% if @topic.is_a?(Announcement) %>
-         <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: datetime_string(@unlock_at)) %>
-       <% else %>
-         <%= t(:topic_locked_until, "This topic is locked until %{time}", time: datetime_string(@unlock_at)) %>
-       <% end %>
-     </div>
+<% if @topic.draft_state_enabled? && @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
+  <div id="discussion-managebar" class="toolbarView">
+    <div class="headerBar">
+      <div class="topic">
+        <div class="entry-content">
+         <h1 class="discussion-title"><%= @topic.title %></h1>
+         <div class="discussion-fyi">
+           <% if @topic.is_a?(Announcement) %>
+             <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+           <% else %>
+             <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:topic_time_locked, "This topic is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+           <% end %>
+         </div>
+        </div>
+      </div>
     </div>
   </div>
 <% else %>
@@ -195,7 +197,7 @@
                 <% if @topic.is_a? Announcement %>
                   <%= t 'announcement_closed', 'This announcement is closed for comments' %>
                 <% else %>
-                  <%= t 'locked', 'This topic is closed for comments' %>
+                  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked, "This topic is closed for comments") %>
                 <% end %>
               </div>
             <% end %>
@@ -210,7 +212,7 @@
                   <% end %>
                 <% else %>
                   <% if @topic.delayed_post_at %>
-                    <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+                    <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*',:date => datetime_string(@topic.delayed_post_at) %>
                   <% else %>
                     <%= t 'topic_not_visible', 'This topic is not visible to users' %>
                   <% end %>
