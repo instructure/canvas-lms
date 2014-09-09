@@ -502,6 +502,23 @@ describe PseudonymSessionsController do
       end
     end
 
+    context "/logout" do
+      it "should redirect to logout confirmation if the authenticity token is invalid" do
+        controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+        delete 'destroy'
+        response.should be_redirect
+        response['Location'].should =~ %r{/logout}
+      end
+    end
+
+    context "/logout_confirm" do
+      it "should redirect to /login if not logged in" do
+        get 'logout_confirm'
+        response.should be_redirect
+        response['Location'].should =~ %r{/login}
+      end
+    end
+
     context "login attributes" do
       before :once do
         @unique_id = 'foo'

@@ -606,7 +606,8 @@ CanvasRails::Application.routes.draw do
   match 'login' => 'pseudonym_sessions#new', :as => :login, :via => :get
   match 'login' => 'pseudonym_sessions#create', :via => :post
   match 'logout' => 'pseudonym_sessions#destroy', :as => :logout, :via => :delete
-  match 'logout' => 'pseudonym_sessions#saml_logout', :via => [:get, :post]
+  match 'logout' => 'pseudonym_sessions#saml_logout', :via => :post
+  match 'logout' => 'pseudonym_sessions#logout_confirm', :via => :get
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
   match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]

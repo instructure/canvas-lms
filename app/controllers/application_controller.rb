@@ -1106,6 +1106,7 @@ class ApplicationController < ActionController::Base
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
+    return true
   end
 
   def form_authenticity_token

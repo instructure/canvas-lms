@@ -1,0 +1,19 @@
+<%
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal"
+  content_for :page_title, t(:page_title, "Log Out")
+%>
+
+<div id="modal-box">
+  <h1><%= t 'log_out', 'Log Out' %></h1>
+  <p>
+    <%= t 'details.log_out', 'Are you sure you want to log out of Canvas?' %>
+  </p>
+  <%= form_tag logout_path, method: :delete do %>
+    <div class="button_box">
+      <%= link_to(t(:cancel, "Cancel"), '/', :class => "btn") %>
+      <%= submit_tag("Log Out", :class => "btn btn-primary") %>
+    </div>
+  <% end %>
+</div>

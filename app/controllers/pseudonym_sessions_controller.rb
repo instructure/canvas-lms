@@ -17,7 +17,7 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
+  protect_from_forgery :except => [:create, :destroy, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
@@ -203,12 +203,38 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
+  # DELETE /logout
   def destroy
     # Only allow DELETE method for all logout requests except for SAML.
     if saml_response?
       saml_logout
     else
+      # We can't verify the authenticity token for saml, so we do it in
+      # this branch rather than in the before filter.
+      #
+      # This also allows us to show the logout confirmation screen rather than
+      # an error if the token is invalid -- this can happen, for example, if
+      # they log out and back in on a 2nd tab, and then click logout on the 1st
+      # tab.
+      begin
+        return unless verify_authenticity_token
+      rescue ActionController::InvalidAuthenticityToken
+        return redirect_to(logout_url)
+      end
+
       logout_user_action
+    end
+  end
+
+  # GET /logout
+  def logout_confirm
+    # allow GET requests for SAML logout
+    if saml_response?
+      saml_logout
+    elsif !@current_user
+      return redirect_to(login_url)
+    else
+      render
     end
   end
 
@@ -433,6 +459,7 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
+  # POST /logout
   def saml_logout
     if saml_response?
       increment_saml_stat("logout_response_received")
