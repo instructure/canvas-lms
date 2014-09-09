@@ -83,5 +83,7 @@ define(function() {
     PROGRESS_ACTIVE: 'running',
     PROGRESS_COMPLETE: 'completed',
     PROGRESS_FAILED: 'failed',
+
+    KC_RETURN: 13
   };
 });

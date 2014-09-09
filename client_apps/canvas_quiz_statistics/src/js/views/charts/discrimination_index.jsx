@@ -151,7 +151,9 @@ define(function(require) {
               title={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
               content={Help}
               width={550}
-              className="chart-help-trigger icon-question" />
+              className="chart-help-trigger icon-question"
+              aria-label={I18n.t('discrimination_index_dialog_trigger', 'Learn more about the Discrimination Index.')}
+              tabIndex="0" />
           </p>
 
           {Chart(chartData)}
