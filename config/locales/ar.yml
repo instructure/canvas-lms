@@ -131,7 +131,6 @@ ar:
       settings_description: "لقيام مستخدم بالمصادقة من خلال موفر هوية خارجي (IdP)، يجب على المستخدم أن يكون لديه معرّف تسجيل دخول مرتبط بهذا الحساب ويطابق المعرّف الفريد الذي يرجعه IdP (موفر الهوية). لمشاهدة تسجيلات دخول المستخدم الحالية، راجع قسم \"معلومات تسجيل الدخول\" في صفحة ملف تعريف المستخدم. (يتم العثور عليه بالبحث عن المستخدم في علامة التبويب \"المستخدمون\".)"
       settings_title: "إعدادات المصادقة"
       test_ldap_link: "اختبار المصادقة"
-      title: "إعدادات المصادقة"
     ldap_settings: 
       add_secondary_ldap_server_link: "إضافة خادم LDAP ثانوي"
       auth_type_label: النوع
@@ -500,8 +499,6 @@ ar:
         time: الوقت
         user: مستخدم
       course_search_form: 
-        labels: 
-          find_deleted_course: "البحث عن مساق محذوف"
         select_default: "تحديد مساق"
         select_label: "تحديد مساق"
       course_search_results: 
@@ -559,7 +556,6 @@ ar:
         generate_activity_username: "إصدار نشاط لـ *%{user}*"
         message_date_from: "من تاريخ"
         message_date_to: "إلى تاريخ"
-        search: بحث
         search_people: "البحث عن أشخاص"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1064,7 +1060,6 @@ ar:
           افتراضيًا، تكون الأولوية لتغييرات واجهة المستخدم قبل تغييرات استيراد SIS؛ لكن بالنسبة لبعض الحقول، لن يستطيع استيراد SIS تغيير بيانات الحقل إذا قام أحد المسؤولين بتغيير هذا الحقل عبر واجهة المستخدم. عند تحديد هذا الخيار، فإن استيراد SIS هذا سيتجاوز تغييرات واجهة المستخدم.  
           راجع الوثائق لمعرفة التفاصيل.
       override_sis_stickiness_label: "تجاوز تغييرات واجهة المستخدم"
-      page_header: "استيراد SIS"
       page_title: "استيراد SIS"
       pending_batches_count: 
         few: "%{count} مجموعة في انتظار المعالجة."
@@ -1437,7 +1432,6 @@ ar:
     labels: 
       due: "موعد الاستحقاق"
     name_is_required: "الاسم مطلوب !"
-    percentage_points_possible: "يجب أن تكون النقاط الممكنة أكبر من 0 لتصنيف النسبة المئوية"
     points_possible_number: "النقاط الممكنة لابد أن تكون رقمًا"
     select_external_tool_dialog_title: "تهيئة الأداة الخارجية"
     submission_action_take_quiz: "أخذ %{title}"
@@ -1821,7 +1815,6 @@ ar:
         pass_fail: "كامل/غير كامل"
         percent: "النسبة المئوية"
         points: النقاط
-      view_grading_levels: "عرض مستويات تقييم الدرجات"
     group_category_selector: 
       grade_group_students_individually: "تعيين الدرجات لكل طالب على حدة"
       group_assignment_header: "تعيين المجموعة"
@@ -2485,7 +2478,6 @@ ar:
         calendar_month: الشهر
         calendar_scheduler: المجدوِّل
         calendar_week: الأسبوع
-        screenreader_recommend_agenda: "مستخدمو قارئ الشاشة: يجب استخدام \"جدول الأعمال\" لعرض الأحداث"
       loading: تحميل
       my_appointment_groups: "مجموعات المواعيد الخاصة بي"
     calendar_navigator: 
@@ -3733,7 +3725,6 @@ ar:
       module: الوحدة
       module_details: "يتم عرض الوحدات بترتيب تسلسلي، لذلك يمكن فقط ضبط الوحدات أعلاه %{name} كمتطلبات أساسية."
       module_name: "اسم الوحدة"
-      modules_keyboard_hint: "لتغيير ترتيب وحدات المساق وعناصر الوحدات، قم أولاً بإيقاف تشغيل المؤشر على قارئ الشاشة، ثم أدرج z في JAWS. ثم اضغط على Tab لتحديد أول وحدة. ثم اضغط على لأعلى ولأسفل لاختيار وحدة أو عنصر وحدة. ثم اضغط على مفتاح المسافة لتحديد الوحدة أو عنصر الوحدة لبدء السحب. ثم اضغط على لأعلى ولأسفل لتحديد وجهة. ثم اضغط على مفتاح المسافة مرة ثانية لإفلات التحديد بعد الوجهة."
       must_complete_prerequisites: "يجب عليهم أن يكملوا"
       no_preprequisites: "لم يتم تحديد المتطلبات الأساسية"
       no_requirements: "لم يتم تحديد المتطلبات"
@@ -4433,7 +4424,6 @@ ar:
         confirm_delete: "هل ترغب بالتأكيد في حذف هذا المساق؟ بمجرد حذفه، لن يعود بإمكان الطلاب والمعلمين الوصول إليه. إذا كنت ترغب فقط في إزالته من القائمة المنسدلة للمساقات، يجب *إنهاء المساق بدلاً من ذلك*."
         confirm_delete_addendum: "إذا لم يكن لديك إذن بإنهاء المساق، يمكنك *تغيير تاريخ إنهاء المساق*، أو مطالبة المسؤول بإنهاء المساق."
       headings: 
-        confirm: "تأكيد الإجراء"
         confirm_conclude: "تأكيد الوصول إلى المساق"
         confirm_delete: "تأكيد حذف المساق"
       titles: 
@@ -4782,7 +4772,6 @@ ar:
           delete_section: "حذف القسم"
           edit_section: "تحرير القسم"
       megabytes: ميجابايت
-      navigation_keyboard_hint: "إذا كان يتم استخدام قارئ شاشة، لتغيير ترتيب ارتباطات التنقل الخاصة بالمسار، فقم بإيقاف تشغيل المؤشر الظاهري أو المخزن المؤقت الظاهري على قارئ الشاشة (اضغط على Insert-z لـ JAWS). اضغط على control-home للانتقال إلى أعلى الصفحة، ثم اضغط على المفتاح tab حتى تصل إلى ارتباط التنقل في المساق الأول. اضغط على السهمين أعلى ولأسفل حتى تصل إلى الارتباط الذي ترغب في الانتقال إليه، ثم اضغط على مفتاح المسافة لتحديده. ثم اضغط على مفتاحي السهمين لأعلى ولأسفل حتى تحدد الموضع الجديد. وأخيرًا، اضغط على مفتاح المسافة مجددًا لوضع الارتباط الذي تنتقل إليه مباشرة بعد الارتباط الحالي. عند الانتهاء، أعد تمكين المخزن المؤقت/المؤشر الظاهري."
       no_date: "لم يتم تعيين التاريخ"
       no_language_preference: "غير معيّن (قابل للتكوين بواسطة المستخدم، افتراضي على %{language})"
       none: بلا
@@ -4939,8 +4928,6 @@ ar:
       new: جديد
       new_discussion_entries: "إدخالات مناقشة جديدة"
       new_discussions: "مناقشات جديدة"
-      num_assignments: "# المهام"
-      num_submissions: "# الإرسالات"
       page_title: "إحصاءات المساق"
       quiz: اختبار
       quiz_questions: "أسئلة الاختبار"
@@ -6284,15 +6271,6 @@ ar:
     saving: "جارٍ الحفظ..."
     shared_secret: "كلمة السر المشتركة"
     submit: إرسال
-    tool_post_iframe: 
-      load_tool_button: "تحميل %{tool}"
-      load_tool_new_tab_button: "تحميل %{tool} في نافذة جديدة"
-      new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
-      new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
-      new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
-    tool_show: 
-      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). بعض مستعرضات الإنترنت تمنع هذا المحتوى من التحميل."
-      tool_load_failure: "يبدو أن المحتوى لن يتمكن من التحميل. يمكنك استخدام هذا الزر لمحاولة تشغيله في علامة تبويب جديدة."
     user_navigation_configured: "تم تكوين تنقل المستخدم"
   facebook: 
     authorization_required: "يمكن للمستخدمين المخولين فقط الوصول لهذه الصفحة"
@@ -6353,7 +6331,6 @@ ar:
       ? "on"
       : تشغيل
       release_notes: "ملاحظات الإصدار"
-      toggle_feature_details: "تبديل وضع تفاصيل الميزات"
     feature_flag_admin_view: 
       feature_options: "خيارات الميزة"
       no_features_available: "لا توجد ميزات متاحة حاليًا."
@@ -7500,7 +7477,6 @@ ar:
     member_tooltip_show: "عرض كشف المجموعة"
     membership_pending: 
       group_join_request: "طلب الانضمام إلى مجموعة "
-      group_join_request_acknowledged: "شكرًا على طلبك، الرجاء البقاء منتبهًا"
       group_join_request_info: "تلقت هذه المجموعة طلبك للانضمام إليها. وسيتم إعلامك بمجرد أن يقبلوا طلبك أو يرفضوه."
     messages: 
       creating_group: "جارٍ إنشاء مجموعة..."
@@ -7611,9 +7587,6 @@ ar:
       create: "إنشاء %{model}"
       submit: "حفظ %{model}"
       update: "تحديث %{model}"
-  high_contrast_description: |-
-      إذا كنت ترغب في إصدار عالي التباين من واجهة مستخدم Canvas، فعليك تمكين هذا.
-      قد يفيد ذلك الأشخاص الذين يعانون من إعاقة بصرية أو صعوبة في القراءة.
   html5_first_videos_description: |-
       بشكل افتراضي، سيحاول Canvas استخدام Flash أولاً لتشغيل مقاطع الفيديو. يمكنك تشغيل هذا الخيار لمحاولة استخدام HTML5 أولاً،
       ثم العودة إلى Flash.
@@ -7804,23 +7777,12 @@ ar:
   layouts: 
     application: 
       group_switch: تبديل
-      instructure_description: "شركة Instructure: صاحبة نظام إدارة التعليم بالمصدر المفتوح؛ Canvas"
       keyboard_navigation: 
         close: "اضغط على علامة الفاصلة لإغلاق هذا الحوار"
       links: 
         close: إغلاق
         dashboard: "لوحة معلوماتي"
         skip_to_content: "التخطي إلى المحتوى"
-      menu: 
-        assignments: المهام
-        assignments_needing_grading: "بحاجة إلى تقييم الدرجات"
-        assignments_needing_submitting: "من أجل التسليم"
-        assignments_recently_graded: "تم تقييم الدرجات مؤخرًا"
-        calendar: التقويم
-        grades: الدرجات
-      navigation: 
-        main: "التنقل الرئيسي"
-        user_menu: "قائمة المستخدم"
       open_source_learning_management_system: "نظام LMS مفتوح المصدر"
     facebook: 
       title: "صفحة Facebook"
@@ -7837,7 +7799,6 @@ ar:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "عرض كافة الحسابات"
-      view_all_enrollments: "عرض كافة المساقات"
       view_all_groups: "عرض كافة المجموعات"
     mobile_auth: 
       log_in_to_canvas: "تسجيل الدخول إلى Canvas"
@@ -9600,38 +9561,6 @@ ar:
       twitter: 
         body_account: "تنبيه Canvas - المجموعة الجديدة: %{group_name} للحساب %{account}"
         body_course: "تنبيه Canvas - المجموعة الجديدة: %{group_name} للمساق %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
-        html: 
-          body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
-          details: "انقر هنا لعرض المدرس"
-          email: "البريد الإلكتروني"
-          phone: الهاتف
-          school_name: "اسم المدرسة"
-          school_position: "موضع المدرسة"
-          subject: "تسجيل المعلم الجديد"
-        labels: 
-          email: "البريد الإلكتروني"
-          phone: الهاتف
-          school_name: "اسم المدرسة"
-          school_position: "موضع المدرسة"
-        subject: "تسجيل المعلم الجديد"
-      facebook: 
-        body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
-        subject: "تسجيل المعلم الجديد"
-      sms: 
-        body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
-      summary: 
-        body: "قام %{user} بالتسجيل كمعلم فقط في Canvas."
-        labels: 
-          email: "البريد الإلكتروني"
-          phone: الهاتف
-          school_name: "اسم المدرسة"
-          school_position: "موضع المدرسة"
-        subject: "تسجيل المعلم الجديد"
-      twitter: 
-        body: "تنبيه Canvas - المعلم الجديد: %{user}, %{account}"
     new_user: 
       email: 
         body: "قام مستخدم جديد, %{user}, لتوه بالتسجيل للحساب %{account}"
@@ -10115,9 +10044,6 @@ ar:
   new_facebook_message: "لديك رسالة جديدة من Canvas"
   new_quiz_moderate_desc: "عندما تكون حالة المسودة وإحصائيات الاختبار مسموحًا بها/قيد التشغيل، فهذا يؤدي إلى تمكين صفحة متوسط الاختبار الجديدة لأحد الحسابات."
   new_quiz_statistics_desc: "عندما تكون حالة المسودة مسموحًا بها/قيد التشغيل، فهذا يؤدي إلى تمكين صفحة إحصائيات الاختبار الجديدة لأحد الحسابات."
-  new_styles_description: |-
-      نحن نستخدم شكل معدل من واجهة مستخدم Canvas. عليك تشغيل هذا لاختيار مشاهدة
-      شكل وأداء واجهة Canvas المحدثة والمبسطة.
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
   not_a_number: "يجب أن تكون القيمة عددًا موجبًا"
   notification: 
@@ -10270,7 +10196,6 @@ ar:
       new_file_added: "تمت إضافة ملف جديد"
       new_files_added: "تمت إضافة ملفات جديد"
       new_student_organized_group: "مجموعة منظمة جديدة من قبل الطلاب"
-      new_teacher_registration: "تسجيل المعلم الجديد"
       new_user: "المستخدم الجديد"
       pseudonym_registration: "تسجيل الاسم المستعار"
       report_generated: "تم إنشاء التقرير"
@@ -10831,9 +10756,6 @@ ar:
     respondus_soap_endpoint: 
       description: "نقطة النهاية SOAP لتحميلات Respondus QTI"
       name: "نقطة النهاية لـ Respondus SOAP"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "ممكّن (يجب تمكين محول QTI كذلك)"
     scribd: 
       description: "معاينات مستند Scribd"
       name: Scribd
@@ -12096,7 +12018,6 @@ ar:
         hints: 
           group_pick_count: "حتى الآن تم تحديد %{pick_count}"
         labels: 
-          add_questions_to_group: "إضافة أسئلة إلى مجموعة الاختبارات"
           group_name: "اسم المجموعة"
           group_pick_count: التقاط
           group_points: النقاط
@@ -12252,25 +12173,7 @@ ar:
         unnamed_quiz_results: "نتائج الاختبار لـ %{user}"
         unnamed_survey_results: "نتائج الاستطلاع لـ %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "نشر الاختبارات"
-        headers: 
-          assignment_quizzes: "اختبارات المهمة"
-          course_quizzes: "اختبارات المساق"
-          practice_quizzes: "ممارسة الاختبارات"
-          publish_multiple_quizzes: "نشر اختبارات متعددة"
-          surveys: الاستطلاعات
-          unpublished_quizzes: "الاختبارات غير المنشورة"
-        labels: 
-          publish_multiple_quizzes: "تحديد الاختبارات التي تود نشرها هذه المرة"
-        links: 
-          create_new_quiz: "إنشاء اختبار جديد"
-          manage_question_banks: "إدارة بنوك الأسئلة"
-          publish_multiple_quizzes: "نشر اختبارات متعددة"
-        no_quizzes: "لا توجد اختبارات متوفرة"
         page_titles: الاختبارات
-        titles: 
-          this_quiz_is_locked: "تم تأمين هذا الاختبار حاليًا. انقر لمزيد من التفاصيل."
       invalid_ip: 
         quiz_protected: "هذا الاختبار محمي وهو متوفر فقط من مواقع معينة. لا يبدو أن الكمبيوتر الذي تستخدمه حاليًا موجود في موقع صالح لبدء هذا الاختبار. "
         survey_protected: "هذا الاستطلاع محمي وهو متوفر فقط من مواقع معينة. لا يبدو أن الكمبيوتر الذي تستخدمه حاليًا موجود في موقع صالح لبدء هذا الاستطلاع. "
@@ -12923,8 +12826,6 @@ ar:
     upload_info: "إذا أجريت تغييرات في ملفات إرسال الطلاب التي قمت بتنزيلها من قبل، فما عليك سوى ضغطها مرة أخرى وتحميل الملف المضغوط مع النموذج أدناه. وسيرى الطلاب الملفات المعدلة في تعليقاتهم للإرسال."
     upload_warning: "تأكد من عدم تغيير أسماء ملفات الإرسال حتى نستطيع التعرف عليها."
   react_files: 
-    aria_label: 
-      settings: إعدادات
     errors: 
       no_match: 
         suggestions: "الاقتراحات:"
@@ -13446,7 +13347,6 @@ ar:
         two: "%{count} من المشاركين"
         zero: "%{count} من المشاركين"
     current_enrollment: 
-      course_unpublished: "لم يتم نشر هذا المساق بعد"
       enrolled_as_designer: "تم التسجيل كمصمم"
       enrolled_as_observer: "تم التسجيل كمراقب"
       enrolled_as_student: "تم التسجيل كطالب"
@@ -13543,8 +13443,6 @@ ar:
       titles: 
         mastery_level: "النسبة المئوية التي من أعلى سيتم تعيين درجة الإتقان"
         select_and_add_criterion: "تحديد المعيار وإضافته"
-    flash_notice: 
-      close: إغلاق
     flash_notices: 
       close: إغلاق
     footer_links: 
@@ -13926,8 +13824,6 @@ ar:
     unauthorized_feed: 
       bad_params: "تعد المعلمات الخاصة بالموجز الذي تحاول الوصول إليه غير صالحة."
       feedback: "إذا كنت متأكدًا تمامًا من أن عنوان url هذا قد تم اقتراحه ليعمل، فيرجى إخبارنا بالطريقة التي وصلت بها إلى هنا عن طريق النقر فوق الارتباط أدناه، وسوف ننظر في المشكلة."
-      headings: 
-        problem: "حدثت مشكلة أثناء تحميل الموجز"
       links: 
         feedback: "أخبرنا عما تبحث عنه"
       title: "موجز غير صالح"
@@ -14426,7 +14322,6 @@ ar:
       prompts: 
         delete: "هل ترغب بالتأكيد في حذف هذه المدة؟"
       titles: 
-        enrollment_terms: "شروط التسجيل"
         term_details: "تفاصيل الشروط"
       update_term: "تحديث الشرط"
     term: 
@@ -14577,8 +14472,6 @@ ar:
   unpublished_courses_title: "مساقات لم يتم نشرها"
   unsupported_package: "حزمة محتوى غير مدعومة"
   unused_courses_title: "مساقات غير مستخدمة"
-  upload_button: 
-    files: الملفات
   user: 
     default_user_name: المستخدم
     errors: 
@@ -14790,8 +14683,6 @@ ar:
         delete_user: "حذف%{user_name}"
       titles: 
         confirm_delete: "تأكيد حذف المستخدم"
-        confirm_deletion_of_user: "تأكيد حذف %{user_name}"
-        delete_user: "حذف المستخدم"
         really_delete_user: "حذف %{user_name} بالفعل"
     enrollment: 
       course_not_published: "لم يتم نشر هذا المساق بعد"
