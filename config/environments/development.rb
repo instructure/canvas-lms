@@ -21,10 +21,11 @@ environment_configuration(defined?(config) && config) do |config|
 
   # initialize cache store. has to eval, not just require, so that it has
   # access to config.
-  eval(File.new(File.dirname(__FILE__) + "/cache_store.rb").read)
+  cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
+  eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 
   # allow debugging only in development environment by default
   #
