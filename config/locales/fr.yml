@@ -124,7 +124,6 @@ fr:
       settings_description: "Afin que l’utilisateur puisse s’authentifier via un fournisseur d’identités externe (IdP), son identifiant de connexion doit être relié à ce compte et identique à l’identifiant unique renvoyé par l’IdP. Pour voir les informations de connexion d’un utilisateur, consultez la section « Informations de connexion » sur la page de profil de l’utilisateur (accessible en cherchant l’utilisateur dans l’onglet « Utilisateurs »)."
       settings_title: "Paramètres d’authentification"
       test_ldap_link: "Tester l’authentification"
-      title: "Paramètres d’authentification"
     ldap_settings: 
       add_secondary_ldap_server_link: "Ajouter un serveur LDAP secondaire"
       auth_type_label: Type
@@ -493,8 +492,6 @@ fr:
         time: Heure
         user: Utilisateur
       course_search_form: 
-        labels: 
-          find_deleted_course: "Trouver un cours supprimé"
         select_default: "Sélectionner un cours"
         select_label: "Sélectionner un cours"
       course_search_results: 
@@ -552,7 +549,6 @@ fr:
         generate_activity_username: "Générer une activité pour *%{user}*"
         message_date_from: Du
         message_date_to: Au
-        search: Rechercher
         search_people: "Rechercher des personnes"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1061,7 +1057,6 @@ fr:
           Par défaut, les modifications de l’interface utilisateur ont priorité sur les modifications de l’importation SIS ; l’importation SIS ne modifiera pas les données d’un certain nombre de champs si l’administrateur a modifié ces champs via l’interface utilisateur. Si vous sélectionnez cette option, l’importation SIS remplacera les modifications de l’interface utilisateur.  
           Pour obtenir plus d’informations, voir la documentation.
       override_sis_stickiness_label: "Remplacer les modifications de l’IU"
-      page_header: "Importation SIS"
       page_title: "Importation SIS"
       pending_batches_count: 
         one: "%{count} lot à traiter en attente."
@@ -1410,7 +1405,6 @@ fr:
     labels: 
       due: Échéance
     name_is_required: "Le nom doit être spécifié."
-    percentage_points_possible: "Les points possibles doivent être supérieurs à 0 pour la valeur en pourcentage"
     points_possible_number: "Les points possibles doivent être spécifiés par un nombre "
     select_external_tool_dialog_title: "Configurer un outil externe"
     submission_action_take_quiz: "Prendre %{title}"
@@ -1772,7 +1766,6 @@ fr:
         pass_fail: Complet/Incomplet
         percent: Pourcentage
         points: Points
-      view_grading_levels: "Afficher les niveaux de notation"
     group_category_selector: 
       grade_group_students_individually: "Attribuer les notes individuellement à chaque étudiant"
       group_assignment_header: "Travail de groupe"
@@ -2428,7 +2421,6 @@ fr:
         calendar_month: Mois
         calendar_scheduler: Planificateur
         calendar_week: Semaine
-        screenreader_recommend_agenda: "Si vous utilisez un lecteur d’écran : utilisez l’Agenda pour voir les événements"
       loading: Chargement
       my_appointment_groups: "Mes groupes de rendez-vous"
     calendar_navigator: 
@@ -3661,7 +3653,6 @@ fr:
       module: module
       module_details: "Les modules sont affichés dans l’ordre séquentiel, par conséquent seuls ceux placés au-dessus de %{name} peuvent être définis comme prérequis."
       module_name: "Nom du module"
-      modules_keyboard_hint: "Pour changer l’ordre des modules du cours et leurs éléments, commencez par désactiver le curseur dans votre lecteur d’écran. Appuyez sur Ins -Z dans JAWS. Appuyez sur Tab pour sélectionner le premier module. Appuyez sur Haut et Bas pour sélectionner un module ou un élément de module. Appuyez sur Espace pour sélectionner un module ou un élément et le faire glisser. Ensuite, appuyez sur Haut et Bas pour sélectionner une destination. Appuyez à nouveau sur Espace pour lâcher le module ou l’élément une fois la destination atteinte."
       must_complete_prerequisites: "Ils doivent terminer"
       no_preprequisites: "Aucun prérequis défini"
       no_requirements: "Aucune condition requise définie"
@@ -4337,7 +4328,6 @@ fr:
         confirm_delete: "Voulez-vous vraiment supprimer ce cours ? Après la suppression, les étudiants et les enseignants ne pourront plus y accéder. Si vous souhaitez simplement le retirer de la liste déroulante, vous devez plutôt *clore le cours*."
         confirm_delete_addendum: "Si vous n’êtes pas autorisé à clore le cours, vous pouvez en *changer la date de fin* ou demander à l’administrateur de le clore pour vous."
       headings: 
-        confirm: "Confirmer l’action"
         confirm_conclude: "Confirmer la terminaison du cours"
         confirm_delete: "Confirmer la suppression du cours"
       titles: 
@@ -4682,9 +4672,6 @@ fr:
           delete_section: "Supprimer la section"
           edit_section: "Modifier la section"
       megabytes: mégaoctets
-      navigation_keyboard_hint: |-
-          Si vous utilisez un lecteur d’écran, désactivez le curseur virtuel ou le tampon virtuel sur votre appareil pour changer l’ordre des liens de navigation dans le cours (pour cela, appuyez sur Ins-Z pour JAWS). Appuyez sur CTRL-Origine pour passer directement en haut de la page, puis sur Tab jusqu’à ce que vous arriviez sur le premier lien de navigation. Appuyez sur les flèches Haut et Bas jusqu’à ce que vous entendiez le lien que vous voulez déplacer, puis appuyez sur Espace pour le sélectionner. Ensuite, appuyez sur les flèches Haut et Bas jusqu’à ce que vous trouviez le nouvel emplacement. Enfin, appuyez à nouveau sur Espace pour placer le lien que vous déplacez juste après le lien actuel. Lorsque vous avez terminé, réactivez le curseur/tampon virtuel.
-          ..
       no_date: "Aucune date définie"
       no_language_preference: "Non définie (paramétrable par l’utilisateur, %{language} par défaut)"
       none: Aucun
@@ -4838,8 +4825,6 @@ fr:
       new: Nouveau
       new_discussion_entries: "Entrées d’une nouvelle discussion"
       new_discussions: "Nouvelles discussions"
-      num_assignments: "# tâches"
-      num_submissions: "# Envois"
       page_title: "Statistiques du cours"
       quiz: Questionnaire
       quiz_questions: "Questions du questionnaire"
@@ -6068,15 +6053,6 @@ fr:
     saving: Enregistrement...
     shared_secret: "Secret partagé"
     submit: Envoyer
-    tool_post_iframe: 
-      load_tool_button: "Ouvrir %{tool}"
-      load_tool_new_tab_button: "Ouvrir %{tool} dans une nouvelle fenêtre"
-      new_tab: "Cet outil doit être ouvert dans une nouvelle fenêtre du navigateur"
-      new_tab_expired: "La session de cet outil a expiré. Rechargez cette page pour accéder de nouveau à l’outil."
-      new_tab_loaded: "Cet outil a bien été chargé dans une nouvelle fenêtre du navigateur. Rechargez cette page pour accéder de nouveau à l’outil."
-    tool_show: 
-      tool_insecure_warning: "Vous essayez de lancer un contenu peu sûr depuis un site sécurisé (Canvas). Certains navigateurs Internet peuvent empêcher le chargement de ce contenu."
-      tool_load_failure: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet"
     user_navigation_configured: "Navigation utilisateur configurée"
   facebook: 
     authorization_required: "Seuls les utilisateurs autorisés peuvent accéder à cette page."
@@ -6137,7 +6113,6 @@ fr:
       ? "on"
       : Activer
       release_notes: "notes de publication"
-      toggle_feature_details: "Alterner entre les détails de la fonction"
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
@@ -7235,7 +7210,6 @@ fr:
     member_tooltip_show: "Afficher la liste des groupes"
     membership_pending: 
       group_join_request: "Demande pour rejoindre un groupe"
-      group_join_request_acknowledged: "Nous vous remercions de votre demande, veuillez patienter"
       group_join_request_info: "Ce groupe a reçu votre demande d’adhésion. Vous serez bientôt informé de l’acceptation ou du rejet de votre demande."
     messages: 
       creating_group: "Création d’un groupe..."
@@ -7330,9 +7304,6 @@ fr:
       create: "Créer %{model}"
       submit: "Enregistrer %{model}"
       update: "Actualiser %{model}"
-  high_contrast_description: |-
-      Si vous préférez une version de l’interface Canvas avec un contraste plus élevé, activez cette option.
-      Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
   html5_first_videos_description: "Par défaut, Canvas essaiera d’utiliser Flash en premier pour lire les vidéos. Activez cette option pour essayer d’utiliser HTML5 d’abord, avant de revenir à Flash."
   ic_actions: 
     manage: gérer
@@ -7521,23 +7492,12 @@ fr:
   layouts: 
     application: 
       group_switch: Changer
-      instructure_description: "Instructure, créateur du système de gestion d’apprentissage « Open Source » Canvas"
       keyboard_navigation: 
         close: "Appuyez sur la virgule pour refermer cette boîte de dialogue."
       links: 
         close: Fermer
         dashboard: "Mon tableau de bord"
         skip_to_content: "Passer au contenu"
-      menu: 
-        assignments: Tâches
-        assignments_needing_grading: "Doivent être notés"
-        assignments_needing_submitting: Remettre
-        assignments_recently_graded: "Notés récemment"
-        calendar: Calendrier
-        grades: Notes
-      navigation: 
-        main: "Navigation principale"
-        user_menu: "Menu Utilisateur"
       open_source_learning_management_system: "LMS Open Source"
     facebook: 
       title: "Page Facebook"
@@ -7554,7 +7514,6 @@ fr:
       default_page_title: "Système de gestion d’apprentissage Canvas"
     menu: 
       view_all_accounts: "Afficher tous les comptes"
-      view_all_enrollments: "Afficher tous les cours"
       view_all_groups: "Afficher tous les groupes"
     mobile_auth: 
       log_in_to_canvas: "Connexion à Canvas"
@@ -9245,38 +9204,6 @@ fr:
       twitter: 
         body_account: "Alerte Canvas - Nouveau groupe : %{group_name} pour le compte %{account}"
         body_course: "Alerte Canvas - Nouveau groupe : %{group_name} pour le cours %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} vient de s’enregistrer comme enseignant sur %{website}."
-        html: 
-          body: "%{user} vient de s’enregistrer en tant qu’enseignant sur %{website}."
-          details: "Cliquez ici pour afficher l’enseignant"
-          email: E-mail
-          phone: Téléphone
-          school_name: "Nom de l’établissement scolaire"
-          school_position: "Situation de l’établissement scolaire"
-          subject: "Enregistrement d’un nouvel enseignant"
-        labels: 
-          email: E-mail
-          phone: Téléphone
-          school_name: "Nom de l’établissement scolaire"
-          school_position: "Position de l’établissement scolaire"
-        subject: "Enregistrement d’un nouvel enseignant"
-      facebook: 
-        body: "%{user} vient de s’enregistrer comme enseignant sur %{website}."
-        subject: "Enregistrement d’un nouvel enseignant"
-      sms: 
-        body: "%{user} vient de s’enregistrer comme enseignant sur %{website}."
-      summary: 
-        body: "%{user} vient de s’enregistrer comme enseignant sur Canvas."
-        labels: 
-          email: E-mail
-          phone: Téléphone
-          school_name: "Nom de l’établissement scolaire"
-          school_position: "Position de l’établissement scolaire"
-        subject: "Enregistrement d’un nouvel enseignant"
-      twitter: 
-        body: "Alerte Canvas - Nouvel enseignant : %{user}, %{account}"
     new_user: 
       email: 
         body: "Le nouvel utilisateur %{user} vient de s’enregistrer pour le compte %{account}."
@@ -9760,9 +9687,6 @@ fr:
   new_facebook_message: "Vous avez un nouveau message de Canvas"
   new_quiz_moderate_desc: "Lorsque le mode Brouillon et les statistiques des questionnaires sont autorisés/activés, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
   new_quiz_statistics_desc: "Lorsque le mode Brouillon est autorisé/activé, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
-  new_styles_description: |-
-      Nous sommes en train de revoir l’interface utilisateur de Canvas. Activez cette option pour 
-      afficher la nouvelle interface, offrant un aspect et un fonctionnement simplifiés.
   no_migration_file: "Fichier requis pour la migration de ce contenu."
   not_a_number: "doit être un nombre positif"
   notification: 
@@ -9916,7 +9840,6 @@ fr:
       new_file_added: "Nouveau fichier ajouté"
       new_files_added: "Nouveaux fichiers ajoutés"
       new_student_organized_group: "Nouveau groupe organisé par les étudiants"
-      new_teacher_registration: "Enregistrement d’un nouvel enseignant"
       new_user: "Nouvel utilisateur"
       pseudonym_registration: "Enregistrement du pseudonyme"
       report_generated: "Rapport généré"
@@ -10472,9 +10395,6 @@ fr:
     respondus_soap_endpoint: 
       description: "Point de terminaison SOAP pour les téléchargements QTI Respondus"
       name: "Point de terminaison SOAP Respondus"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Activés (doit aussi activer le convertisseur QTI)"
     scribd: 
       description: "Aperçus de documents Scribd"
       name: Scribd
@@ -11723,7 +11643,6 @@ fr:
         hints: 
           group_pick_count: "%{pick_count} sélections jusqu’ici"
         labels: 
-          add_questions_to_group: "Ajouter les questions au groupe de questionnaires"
           group_name: "Nom du groupe"
           group_pick_count: Choisir
           group_points: Points
@@ -11875,25 +11794,7 @@ fr:
         unnamed_quiz_results: "Résultats du questionnaire pour %{user}"
         unnamed_survey_results: "Résultats de l’enquête pour %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Publier les questionnaires"
-        headers: 
-          assignment_quizzes: "Questionnaires pour un travail"
-          course_quizzes: "Questionnaires de cours"
-          practice_quizzes: "Questionnaires d’entraînement"
-          publish_multiple_quizzes: "Publier plusieurs questionnaires"
-          surveys: Enquêtes
-          unpublished_quizzes: "Questionnaires non publiés"
-        labels: 
-          publish_multiple_quizzes: "Sélectionnez les questionnaires que vous souhaitez publier pour l’instant"
-        links: 
-          create_new_quiz: "Créer un nouveau questionnaire"
-          manage_question_banks: "Gérer les banques de questions"
-          publish_multiple_quizzes: "Publier plusieurs questionnaires"
-        no_quizzes: "Aucun questionnaire disponible"
         page_titles: Questionnaires
-        titles: 
-          this_quiz_is_locked: "Ce questionnaire est verrouillé. Cliquez pour obtenir plus d’informations."
       invalid_ip: 
         quiz_protected: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
         survey_protected: "Cette enquête est protégée et ne peut être utilisée que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser cette enquête."
@@ -12450,8 +12351,6 @@ fr:
     upload_info: "Si vous avez apporté des modifications aux fichiers d’envois de l’étudiant que vous avez téléchargés , compressez-les puis téléchargez le fichier zip avec le formulaire ci-dessous. Les étudiants verront les fichiers modifiés dans les commentaires de leur envoi."
     upload_warning: "Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître."
   react_files: 
-    aria_label: 
-      settings: Paramètres
     errors: 
       no_match: 
         suggestions: "Suggestions :"
@@ -12937,7 +12836,6 @@ fr:
         one: 1 participant
         other: "%{count} participants"
     current_enrollment: 
-      course_unpublished: "Ce cours n’a pas encore été publié"
       enrolled_as_designer: "Inscrit comme concepteur"
       enrolled_as_observer: "Inscrit comme observateur"
       enrolled_as_student: "Inscrit comme étudiant"
@@ -13034,8 +12932,6 @@ fr:
       titles: 
         mastery_level: "pourcentage au-delà duquel définir la maîtrise"
         select_and_add_criterion: "Sélectionner et ajouter un critère"
-    flash_notice: 
-      close: Fermer
     flash_notices: 
       close: Fermer
     footer_links: 
@@ -13404,8 +13300,6 @@ fr:
     unauthorized_feed: 
       bad_params: "Les paramètres du flux auquel vous avez essayé d’accéder ne sont pas valides."
       feedback: "Si vous êtes certain que cette URL fonctionne correctement, veuillez nous indiquer comment vous y avez accédé en cliquant sur le lien ci-dessous, et nous étudierons le problème."
-      headings: 
-        problem: "Un problème s’est produit pendant le chargement du flux"
       links: 
         feedback: "Que cherchez-vous ?"
       title: "Flux non valide"
@@ -13880,7 +13774,6 @@ fr:
       prompts: 
         delete: "Voulez-vous vraiment supprimer ce trimestre ?"
       titles: 
-        enrollment_terms: "Trimestres d’inscription"
         term_details: "Informations du trimestre"
       update_term: "Mettre à jour un trimestre"
     term: 
@@ -14015,8 +13908,6 @@ fr:
   unpublished_courses_title: "Cours non publiés"
   unsupported_package: "Package de contenu non pris en charge"
   unused_courses_title: "Cours non utilisés"
-  upload_button: 
-    files: Fichiers
   user: 
     default_user_name: Utilisateur
     errors: 
@@ -14200,8 +14091,6 @@ fr:
         delete_user: "Supprimer %{user_name}"
       titles: 
         confirm_delete: "Confirmer la suppression de l’utilisateur"
-        confirm_deletion_of_user: "Confirmer la suppression de %{user_name}"
-        delete_user: "Supprimer l’utilisateur"
         really_delete_user: "Confirmer la suppression de %{user_name}"
     enrollment: 
       course_not_published: "Ce cours n’a pas encore été publié"
