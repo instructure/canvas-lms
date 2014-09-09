@@ -1,11 +1,14 @@
 @import "base/environment";
 
+$replace-this-with-a-variable-for-focus-bg: hsl(0, 0%, 95%);
+
+$ef-thumbnail-size: 36px;
+
 @mixin hideForPhone {
-  @media (max-width:767px){
+  @media (max-width:800px){
     display: none;
   }
 }
-$border: #e5e4e4;
 
 .form-horizontal{
   .dialog-adapter-form-calendar-label{
@@ -13,19 +16,9 @@ $border: #e5e4e4;
     margin-left: 0px;
   }
 }
+.dateSelectInput { width: 100px }
+.controls.dateSelectInputContainer{ margin-left: 100px }
 
-.adminCog-download-link{
-  color: black;
-  margin-right: 10px;
-}
-
-.dateSelectInput{
-  width: 100px;
-}
-
-.controls.dateSelectInputContainer{
-  margin-left: 100px;
-}
 .ef-search-container{
   position: relative;
   height: 30px;
@@ -66,45 +59,13 @@ $border: #e5e4e4;
   left: 8px;
 }
 
-.ef-admin-cog{
-  margin-left: 10px;
-}
-
 .ef-header{
   height: 75px;
   padding-left: 20px;
   padding-right: 20px;
   display: flex;
   align-items: center;
-}
-
-.ef-breadcrumbs{
-  padding-left: 20px;
-  border-top: 1px solid $border;
-  border-bottom: 1px solid $border;
-  height: 40px;
-  display: flex;
-  align-items: center;
-
-  a {
-    background-color: transparent;
-    background-image: url("/images/breadcrumb-chevron.png");
-    background-repeat: no-repeat;
-    background-position: 0 50%;
-    line-height: 29px;
-    padding-left: 12px;
-    margin-left: 8px;
-
-    &:first-of-type {
-      background: none;
-      padding-left: 0;
-      margin-left: 0;
-    }
-    &.active:link, &.active:visited{
-      color: #999da5;
-    }
-  }
-
+  border-bottom: 1px solid $base-border-color;
 }
 
 .ef-main{
@@ -112,21 +73,15 @@ $border: #e5e4e4;
   display: flex;
 
   .ef-folder-content{
-    border-right: 1px solid #f2f2f2;
+    border-right: 1px solid $base-border-color;
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
     padding: 0px;
 
-    [role=tree]{
-      position: relative;
-      margin: 10px;
+    .folderTree {
+      margin: 10px
     }
-
-    i {
-      color: black;
-    }
-
 
     [aria-selected=true] > .ef-folder-header{
       background-color: #f2f2f2;
@@ -145,6 +100,7 @@ $border: #e5e4e4;
     .ef-folder-list{
       flex: 10 10 0;
       font-size: 12px;
+      overflow: auto;
     }
 
     .ef-folder-totals{
@@ -154,7 +110,7 @@ $border: #e5e4e4;
       flex: 1 1 0;
       height: 30px;
       font-size: 16px;
-      border-top: 1px solid $border;
+      border-top: 1px solid $base-border-color;
       padding-left: 20px;
     }
   }
@@ -169,35 +125,35 @@ $border: #e5e4e4;
 .ef-directory-header{
   display: flex;
   padding: 5px;
-  border-bottom: 1px solid #f2f2f2;
-
-  a{
-    color: black;
-  }
+  border-bottom: 1px solid $base-border-color;
 }
 
+.ef-plain-link, .ef-plain-link:hover { color: $base-font-color-dark; }
 
 
 .ef-item-row{
   display: flex;
   padding: 5px;
   user-select: none; /* so that we can shift-click to select */
+  margin-bottom: 1px;
+  border-radius: 3px;
+  line-height: $ef-thumbnail-size;
 
-  &.ef-item-selected{
-    background-color: #d9edf9;
-  }
+  // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
+  &:hover            { background-color: $base-list-item-background--hover }
+  &.ef-item-selected { background-color: $base-list-item-background--selected }
 
-  .al-trigger {
-    opacity: 0
-  }
-  &:hover .al-trigger,
-  .al-trigger.ui-state-active {
-    opacity: 1
-  }
+  .al-trigger { opacity: 0 }
+  &:hover .al-trigger, .al-trigger.ui-state-active { opacity: 1 }
 
-
-  &:hover{
-    background-color: #d9edf9;
+  .btn-link { border-width: 0 }
+}
+.ef-big-icon {
+  width: $ef-thumbnail-size !important;
+  color: $base-font-color-dark;
+  &:before {
+    font-size: $ef-thumbnail-size - 16px !important;
+    left: 7px;
   }
 }
 
@@ -227,30 +183,27 @@ $border: #e5e4e4;
 
 .ef-links-col{
   display: flex;
-  width: 85px;
+  width: 63px;
 }
-
-.ef-hover-options{
-  .al-trigger{
-    color: black;
-  }
-  margin-left: 14px;
-}
-
 
 
 .ef-thumbnail {
-  width: 45px;
+  width: $ef-thumbnail-size;
+  height: $ef-thumbnail-size;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
 }
 
-.ef-edit-name-form {
-  position: relative;
-}
+.ef-edit-name-form { position: relative }
 .ef-edit-name-cancel {
   position: absolute;
   top: 0;
   right: 0;
 }
+
+
 .file-rename-form__form-label {
   float: left;
   margin-top: 5px;

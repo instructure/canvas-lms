@@ -4,11 +4,13 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
   'compiled/models/FilesystemObject'
+  'compiled/models/Folder'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
+  '../utils/downloadStuffAsAZip'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, FilesystemObject, RestrictedDialogForm, openMoveDialog, $) ->
+], (I18n, React, withReactDOM, preventDefault, FilesystemObject, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, $) ->
 
   ItemCog = React.createClass
 
@@ -55,6 +57,18 @@ define [
           i className:'icon-mini-arrow-down'
 
         ul className:'al-options',
+          li {},
+            a (if @props.model instanceof Folder
+              href: '#'
+              onClick: preventDefault =>
+                downloadStuffAsAZip([@props.model], {
+                  contextType: @props.params.contextType
+                  contextId: @props.params.contextId
+                })
+            else
+              href: @props.model.get('url')
+            ),
+              I18n.t('download', 'Download')
           li {},
             a href:'#', onClick: preventDefault(@props.startEditingName),
               I18n.t('edit_name', 'Edit Name')

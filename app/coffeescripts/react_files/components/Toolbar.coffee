@@ -41,7 +41,7 @@ define [
     render: withReactDOM ->
       header className:'ef-header',
         form onSubmit: @onSubmitSearch, className:'ef-search-container',
-          i className:'icon-search',
+          i({className:'icon-search'}),
           input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
         div className: 'ef-main-buttons',
 

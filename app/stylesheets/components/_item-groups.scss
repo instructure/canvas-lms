@@ -239,11 +239,11 @@ is for items that are not draggable.
   }
 
   &:hover {
-    background-color: #eef7ff;
+    background-color: $base-list-item-background--hover;
   }
 
   &:focus {
-    background-color: #eef7ff;
+    background-color: $base-list-item-background--hover;
   }
 
   &:before {

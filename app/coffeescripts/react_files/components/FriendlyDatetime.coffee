@@ -21,7 +21,15 @@ define [
       fudged = $.fudgeDateForProfileTimezone(datetime)
       timeTitle = $.datetimeString(datetime)
 
-      @transferPropsTo(React.DOM.time({
+
+      @transferPropsTo React.DOM.time {
         title: $.datetimeString(datetime)
         dateTime: datetime.toISOString()
-      }, $.friendlyDatetime(fudged)))
+      },
+        React.DOM.span className: 'visible-desktop',
+          # something like: Mar 6, 2014
+          $.friendlyDatetime(fudged)
+        React.DOM.span className: 'hidden-desktop',
+          # something like: 3/3/2014
+          fudged.toLocaleDateString()
+
