@@ -152,7 +152,11 @@ define [
 
     onCourse: (course) =>
       @recipientView.setContext(course, true)
-      @$contextCode.val(if course?.id then course.id else '')
+      if course?.id
+        @$contextCode.val(course.id)
+        @recipientView.disable(false)
+      else
+        @$contextCode.val('')
       @$messageCourseRO.text(if course then course.name else I18n.t('no_course','No course'))
 
     defaultCourse: null
@@ -166,6 +170,7 @@ define [
         disabled: @model?.get('private')
       ).render()
       @recipientView.on('changeToken', @recipientIdsChanged)
+      @recipientView.disable(true) unless _.include(ENV.current_user_roles, 'admin')
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
@@ -179,8 +184,10 @@ define [
           @courseView.setValue(@model.get('context_code'))
         else
           @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+        @recipientView.disable(false)
       else if @launchParams
         @courseView.setValue(@launchParams.context) if @launchParams.context
+        @recipientView.disable(false)
       else
         @courseView.setValue(@defaultCourse)
       if @model
