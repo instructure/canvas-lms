@@ -124,7 +124,6 @@ en-GB:
       settings_description: "In order for a user to authenticate through an external identity provider (IdP), the user must have a login identifier that is both linked to this account and that matches the unique identifier returned by the IdP. To see a user's current logins, see the \"Login Information\" section on the user's profile page. (Found by searching for the user on the \"Users\" tab.)"
       settings_title: "Authentication settings"
       test_ldap_link: "Test authentication"
-      title: "Authentication settings"
     ldap_settings: 
       add_secondary_ldap_server_link: "Add secondary LDAP server"
       auth_type_label: Type
@@ -493,8 +492,6 @@ en-GB:
         time: Time
         user: User
       course_search_form: 
-        labels: 
-          find_deleted_course: "Find a deleted course"
         select_default: "Select a course"
         select_label: "Select a course"
       course_search_results: 
@@ -552,7 +549,6 @@ en-GB:
         generate_activity_username: "Generate Activity for *%{user}*"
         message_date_from: "From date"
         message_date_to: "To date"
-        search: Search
         search_people: "Search people"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1063,7 +1059,6 @@ en-GB:
           By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  
           See the documentation for details.
       override_sis_stickiness_label: "Override UI changes"
-      page_header: "SIS import"
       page_title: "SIS import"
       pending_batches_count: 
         one: "%{count} batch waiting to be processed."
@@ -1412,7 +1407,6 @@ en-GB:
     labels: 
       due: Due
     name_is_required: "Name is required!"
-    percentage_points_possible: "Points possible must be more than 0 for percentage grading"
     points_possible_number: "Points possible must be a number"
     select_external_tool_dialog_title: "Configure external tool"
     submission_action_take_quiz: "Take %{title}"
@@ -1777,7 +1771,6 @@ en-GB:
         pass_fail: Complete/Incomplete
         percent: Percentage
         points: Points
-      view_grading_levels: "View grading levels"
     group_category_selector: 
       grade_group_students_individually: "Assign grades to each student individually"
       group_assignment_header: "Group Assignment"
@@ -2432,7 +2425,6 @@ en-GB:
         calendar_month: Month
         calendar_scheduler: Scheduler
         calendar_week: Week
-        screenreader_recommend_agenda: "Screenreader users: Use the Agenda to view events"
       loading: Loading
       my_appointment_groups: "My appointment groups"
     calendar_navigator: 
@@ -3671,7 +3663,6 @@ en-GB:
       module: module
       module_details: "Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites."
       module_name: "Module name"
-      modules_keyboard_hint: "To change the order of the course modules and module items, first turn the cursor off on your screen reader. Insert-z in JAWS. Press tab to select the first module. Press up and down to choose a module or module item. Press space to select the module or module item to start dragging. Then press up and down to select a destination. Then press space a second time to drop selection after destination."
       must_complete_prerequisites: "They must complete"
       no_preprequisites: "No prerequisites defined"
       no_requirements: "No requirements defined"
@@ -4347,7 +4338,6 @@ en-GB:
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
       headings: 
-        confirm: "Confirm action"
         confirm_conclude: "Confirm conclude course"
         confirm_delete: "Confirm course deletion"
       titles: 
@@ -4692,7 +4682,6 @@ en-GB:
           delete_section: "Delete section"
           edit_section: "Edit section"
       megabytes: megabytes
-      navigation_keyboard_hint: "If using a screen reader, to change the order of the course navigation links, turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS). Press control-home to jump to the top of the page, then press the tab key until you reach the first course navigation link. Press the up and down arrows until you hear the link you wish to move, and then press space to select it Then, press the up and down arrow keys until you locate the new position. Finally, press space again to place the link you are moving directly after the current link. When finished, re-enable the virtual buffer/cursor."
       no_date: "No date set"
       no_language_preference: "Not set (user-configurable, defaults to %{language})"
       none: None
@@ -4846,8 +4835,6 @@ en-GB:
       new: New
       new_discussion_entries: "New discussion entries"
       new_discussions: "New discussions"
-      num_assignments: "# Assignments"
-      num_submissions: "# Submissions"
       page_title: "Course statistics"
       quiz: Quiz
       quiz_questions: "Quiz questions"
@@ -6075,15 +6062,6 @@ en-GB:
     saving: Saving...
     shared_secret: "Shared secret"
     submit: Submit
-    tool_post_iframe: 
-      load_tool_button: "Load %{tool}"
-      load_tool_new_tab_button: "Load %{tool} in a new window"
-      new_tab: "This tool needs to be loaded in a new browser window"
-      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
-      new_tab_loaded: "This tool was successfully loaded in a new browser window. Reload the page to access the tool again."
-    tool_show: 
-      tool_insecure_warning: "You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may prevent this content from loading."
-      tool_load_failure: "It looks like your content might not load. You can use this button to try launching it in a new tab."
     user_navigation_configured: "User navigation configured"
   facebook: 
     authorization_required: "Only authorised users can access that page"
@@ -6144,7 +6122,6 @@ en-GB:
       ? "on"
       : "On"
       release_notes: "release notes"
-      toggle_feature_details: "Toggle feature details"
     feature_flag_admin_view: 
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
@@ -7250,7 +7227,6 @@ en-GB:
     member_tooltip_show: "View group schedule"
     membership_pending: 
       group_join_request: "Group join request"
-      group_join_request_acknowledged: "Thanks for the request, please stay tuned"
       group_join_request_info: "This group has received your request to join. You'll be notified once they accept or reject your request."
     messages: 
       creating_group: "Creating group..."
@@ -7345,9 +7321,6 @@ en-GB:
       create: "Create %{model}"
       submit: "Save %{model}"
       update: "Update %{model}"
-  high_contrast_description: |-
-      If you would prefer a higher-contrast version of the Canvas user interface, enable this.
-      This might be useful for people with impaired vision or dificulty reading.
   html5_first_videos_description: |-
       By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
       then fall back to Flash.
@@ -7538,23 +7511,12 @@ en-GB:
   layouts: 
     application: 
       group_switch: Switch
-      instructure_description: "Instructure, makers of the open source learning management system Canvas"
       keyboard_navigation: 
         close: "Press comma to close this dialog"
       links: 
         close: Close
         dashboard: "My dashboard"
         skip_to_content: "Skip to content"
-      menu: 
-        assignments: Assignments
-        assignments_needing_grading: "To grade"
-        assignments_needing_submitting: "To submit"
-        assignments_recently_graded: "Recently graded"
-        calendar: Calendar
-        grades: Grades
-      navigation: 
-        main: "Main Navigation"
-        user_menu: "User Menu"
       open_source_learning_management_system: "Open source LMS"
     facebook: 
       title: "Facebook page"
@@ -7571,7 +7533,6 @@ en-GB:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "View all accounts"
-      view_all_enrollments: "View all courses"
       view_all_groups: "View all groups"
     mobile_auth: 
       log_in_to_canvas: "Log in to Canvas"
@@ -9271,38 +9232,6 @@ en-GB:
       twitter: 
         body_account: "Canvas Alert - New group: %{group_name} for the account %{account}"
         body_course: "Canvas Alert - New group: %{group_name} for the course %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} just registered as a teacher at %{website}."
-        html: 
-          body: "%{user} just registered as a teacher at %{website}."
-          details: "Click here to view teacher"
-          email: Email
-          phone: Phone
-          school_name: "School name"
-          school_position: "School position"
-          subject: "New teacher registration"
-        labels: 
-          email: Email
-          phone: Phone
-          school_name: "School name"
-          school_position: "School position"
-        subject: "New teacher registration"
-      facebook: 
-        body: "%{user} just registered as a teacher at %{website}."
-        subject: "New teacher registration"
-      sms: 
-        body: "%{user} just registered as a teacher at %{website}."
-      summary: 
-        body: "%{user} just registered as a teacher in Canvas."
-        labels: 
-          email: Email
-          phone: Phone
-          school_name: "School name"
-          school_position: "School position"
-        subject: "New teacher registration"
-      twitter: 
-        body: "Canvas Alert - New teacher: %{user}, %{account}"
     new_user: 
       email: 
         body: "A new user, %{user}, has just registered for the account %{account}"
@@ -9786,9 +9715,6 @@ en-GB:
   new_facebook_message: "You have a new message from Canvas"
   new_quiz_moderate_desc: "When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account."
   new_quiz_statistics_desc: "When Draft State is allowed/on, this enables the new quiz statistics page for an account."
-  new_styles_description: |-
-      We are working on a UI facelift to Canvas. Turn this on to opt in to seeing the
-      updated, simplified look and feel of the Canvas interface.
   no_migration_file: "File required for content migration."
   not_a_number: "must be a positive number"
   notification: 
@@ -9942,7 +9868,6 @@ en-GB:
       new_file_added: "New file added"
       new_files_added: "New files added"
       new_student_organized_group: "New student organised group"
-      new_teacher_registration: "New teacher registration"
       new_user: "New user"
       pseudonym_registration: "Pseudonym registration"
       report_generated: "Report generated"
@@ -10496,9 +10421,6 @@ en-GB:
     respondus_soap_endpoint: 
       description: "SOAP endpoint for Respondus QTI uploads"
       name: "Respondus SOAP endpoint"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Enabled (must enable QTI Converter as well)"
     scribd: 
       description: "Scribd document previews"
       name: Scribd
@@ -11726,7 +11648,6 @@ en-GB:
         hints: 
           group_pick_count: "%{pick_count} selected so far"
         labels: 
-          add_questions_to_group: "Add questions to the quiz group"
           group_name: "Group name"
           group_pick_count: Pick
           group_points: Points
@@ -11878,25 +11799,7 @@ en-GB:
         unnamed_quiz_results: "Quiz results for %{user}"
         unnamed_survey_results: "Survey results for %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Publish quizzes"
-        headers: 
-          assignment_quizzes: "Assignment quizzes"
-          course_quizzes: "Course quizzes"
-          practice_quizzes: "Practice quizzes"
-          publish_multiple_quizzes: "Publish multiple quizzes"
-          surveys: Surveys
-          unpublished_quizzes: "Unpublished quizzes"
-        labels: 
-          publish_multiple_quizzes: "Select the quizzes you would like to publish at this time"
-        links: 
-          create_new_quiz: "Create a new quiz"
-          manage_question_banks: "Manage question banks"
-          publish_multiple_quizzes: "Publish multiple quizzes"
-        no_quizzes: "No quizzes available"
         page_titles: Quizzes
-        titles: 
-          this_quiz_is_locked: "This quiz is currently locked. Click for more details."
       invalid_ip: 
         quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
         survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
@@ -12453,8 +12356,6 @@ en-GB:
     upload_info: "If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission."
     upload_warning: "Make sure you don't change the names of the submission files so we can recognise them."
   react_files: 
-    aria_label: 
-      settings: Settings
     errors: 
       no_match: 
         suggestions: "Suggestions:"
@@ -12940,7 +12841,6 @@ en-GB:
         one: "1 participant"
         other: "%{count} participants"
     current_enrollment: 
-      course_unpublished: "This course hasn't been published yet"
       enrolled_as_designer: "Enrolled as a designer"
       enrolled_as_observer: "Enrolled as an observer"
       enrolled_as_student: "Enrolled as a student"
@@ -13037,8 +12937,6 @@ en-GB:
       titles: 
         mastery_level: "percent above which to set mastery"
         select_and_add_criterion: "Select and add criterion"
-    flash_notice: 
-      close: Close
     flash_notices: 
       close: Close
     footer_links: 
@@ -13408,8 +13306,6 @@ en-GB:
     unauthorized_feed: 
       bad_params: "The parameters for the feed you were trying to access are invalid."
       feedback: "If you're pretty sure this url was supposed to work, please tell us how you got here by clicking the link below, and we'll look into it."
-      headings: 
-        problem: "There was a problem loading your feed"
       links: 
         feedback: "Tell us what you were looking for"
       title: "Invalid Feed"
@@ -13884,7 +13780,6 @@ en-GB:
       prompts: 
         delete: "Are you sure you want to delete this term?"
       titles: 
-        enrollment_terms: "Enrolment Terms"
         term_details: "Term details"
       update_term: "Update term"
     term: 
@@ -14019,8 +13914,6 @@ en-GB:
   unpublished_courses_title: "Unpublished courses"
   unsupported_package: "Unsupported content package"
   unused_courses_title: "Unused courses"
-  upload_button: 
-    files: Files
   user: 
     default_user_name: User
     errors: 
@@ -14204,8 +14097,6 @@ en-GB:
         delete_user: "Delete %{user_name}"
       titles: 
         confirm_delete: "Confirm delete user"
-        confirm_deletion_of_user: "Confirm deletion of %{user_name}"
-        delete_user: "Delete user"
         really_delete_user: "Really delete %{user_name}"
     enrollment: 
       course_not_published: "This course hasn't been published yet"
