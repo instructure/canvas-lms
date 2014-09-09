@@ -124,7 +124,6 @@ zh:
       settings_description: "为了让用户通过外部身份提供商 (IdP) 进行身份验证，用户必须具有链接到此帐户并且与 IdP 返回的唯一标识符匹配的登录标识符。要查看用户的当前登录，请参阅用户配置文件页面上的\"登录信息\"部分。（可通过在\"用户\"选项卡上搜索用户来查找。）"
       settings_title: 身份验证设置
       test_ldap_link: 测试身份验证
-      title: 身份验证设置
     ldap_settings: 
       add_secondary_ldap_server_link: "添加第二 LDAP 服务器"
       auth_type_label: 类型
@@ -493,8 +492,6 @@ zh:
         time: 时间
         user: 用户
       course_search_form: 
-        labels: 
-          find_deleted_course: 查找已删除的课程
         select_default: 选择课程
         select_label: 选择课程
       course_search_results: 
@@ -552,7 +549,6 @@ zh:
         generate_activity_username: "为 *%{user}* 生成活动"
         message_date_from: 开始日期
         message_date_to: 结束日期
-        search: 搜索
         search_people: 搜索人员
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1062,7 +1058,6 @@ zh:
           默认情况下，UI 更改优先于 SIS 导入更改；对于许多字段，如果管理员通过 UI 更改了字段，SIS 导入不会改变该字段的数据。如果选择此选项，此 SIS 导入将覆盖 UI 更改。  
           有关详细信息，请参阅相关文档。
       override_sis_stickiness_label: "覆盖 UI 更改"
-      page_header: "SIS 导入"
       page_title: "SIS 导入"
       pending_batches_count: 
         one: "%{count} 个批次等待处理。 "
@@ -1411,7 +1406,6 @@ zh:
     labels: 
       due: 截止时间
     name_is_required: 需要姓名
-    percentage_points_possible: "对于百分制，满分必须大于 0"
     points_possible_number: 满分必须为数字
     select_external_tool_dialog_title: 配置外部工具
     submission_action_take_quiz: "提取 %{title}"
@@ -1776,7 +1770,6 @@ zh:
         pass_fail: 完成/未完成
         percent: 百分比
         points: 得分
-      view_grading_levels: 查看评分级别
     group_category_selector: 
       grade_group_students_individually: 分别为每位学生指定评分
       group_assignment_header: 小组作业
@@ -2433,7 +2426,6 @@ zh:
         calendar_month: 月
         calendar_scheduler: 计划程序
         calendar_week: 周
-        screenreader_recommend_agenda: "屏幕阅读器用户: 使用议程查看事件"
       loading: 正在加载
       my_appointment_groups: 我的约会组
     calendar_navigator: 
@@ -3671,7 +3663,6 @@ zh:
       module: 单元
       module_details: "单元按顺序显示，因此只有显示在 %{name} 上方的单元可以设置为先修课程。"
       module_name: 模块名称
-      modules_keyboard_hint: "要更改课程单元和单元项目的顺序，先关闭屏幕读取器上的光标。在 JAWS 中按 Insert-z。按 Tab 选择第一个单元，按向上键和向下键选择一个单元或单元项目。按空格键选择一个单元或单元项目开始拖动，然后按向上键和向下键选择一个目标，再次按空格键在目标后放下所选项。"
       must_complete_prerequisites: 他们必须完成
       no_preprequisites: 未定义先修课程
       no_requirements: 未定义要求
@@ -4347,7 +4338,6 @@ zh:
         confirm_delete: 是否确定要删除此课程？在删除之后，学生和教师无法再访问。如果只想将其从课程下拉菜单中删除，则应*改用结束课程*。
         confirm_delete_addendum: "如果您无权结束课程，您可以*更改课程结束日期*，或请求您的管理员结束课程。 "
       headings: 
-        confirm: 确认操作
         confirm_conclude: 确认结束课程
         confirm_delete: 确认课程删除
       titles: 
@@ -4692,7 +4682,6 @@ zh:
           delete_section: 删除班级
           edit_section: 编辑班级
       megabytes: MB
-      navigation_keyboard_hint: "如果使用的是屏幕阅读器，要更改课程导航链接的顺序，先关闭屏幕读取器上的光标 (在 JAWS 中按 Insert-z)。按 control-home 跳到页面顶部，然后按 Tab 键选择第一个课程导航链接。按“向上”和“向下”箭头选择您要移动到的链接，然后按“空格”选择它。之后按“向上”和“向下”选择一个新位置。最后，再次按“空格”将您直接移动的链接放在当前链接后面。完成后，重新启用虚拟缓冲/光标。"
       no_date: 未设置日期
       no_language_preference: "未设置（用户可配置，默认使用 %{language}）"
       none: 无
@@ -4846,8 +4835,6 @@ zh:
       new: 新建
       new_discussion_entries: 新建讨论条目
       new_discussions: 新建讨论
-      num_assignments: "# 作业"
-      num_submissions: "# 提交作业"
       page_title: 课程统计信息
       quiz: 测验
       quiz_questions: 测验题
@@ -6077,15 +6064,6 @@ zh:
     saving: 正在保存...
     shared_secret: 共享密钥
     submit: 提交
-    tool_post_iframe: 
-      load_tool_button: "加载 %{tool}"
-      load_tool_new_tab_button: "在新窗口中加载 %{tool}"
-      new_tab: 此工具需要在新的浏览器窗口中加载
-      new_tab_expired: 此工具的会话已过期。请重新加载页面以再次访问工具
-      new_tab_loaded: 此工具在新的浏览器窗口中成功加载。请重新加载页面以再次访问工具。
-    tool_show: 
-      tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
-      tool_load_failure: 看上去您的内容可能无法加载。您可以使用此按钮尝试在新选项卡中启动它。
     user_navigation_configured: 用户导航已配置
   facebook: 
     authorization_required: 只有经授权的用户才能访问该页面。
@@ -6146,7 +6124,6 @@ zh:
       ? "on"
       : 开
       release_notes: 发行说明
-      toggle_feature_details: 切换功能详细说明
     feature_flag_admin_view: 
       feature_options: 功能选项
       no_features_available: 当前没有可用的功能。
@@ -7245,7 +7222,6 @@ zh:
     member_tooltip_show: 查看小组清单
     membership_pending: 
       group_join_request: 小组加入请求
-      group_join_request_acknowledged: 感谢您的申请，敬请关注
       group_join_request_info: 此小组已收到您的加入申请。他们在接受或拒绝您的申请后会通知您。
     messages: 
       creating_group: 正在创建小组...
@@ -7340,9 +7316,6 @@ zh:
       create: "创建 %{model}"
       submit: "保存 %{model}"
       update: "更新 %{model}"
-  high_contrast_description: |-
-      如果您更喜欢对比度较高版本的 Canvas 用户界面，请启用此项。
-      这对于视力受损或阅读困难的人非常有用。
   html5_first_videos_description: |-
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
@@ -7533,23 +7506,12 @@ zh:
   layouts: 
     application: 
       group_switch: 切换
-      instructure_description: "Instructure 是开源学习管理系统 Canvas 的制造商"
       keyboard_navigation: 
         close: 按逗号关闭此对话
       links: 
         close: 关闭
         dashboard: 我的面板
         skip_to_content: 跳至内容
-      menu: 
-        assignments: 作业
-        assignments_needing_grading: 待评分
-        assignments_needing_submitting: 待提交
-        assignments_recently_graded: 最近计分
-        calendar: 日历
-        grades: 评分
-      navigation: 
-        main: 主导航
-        user_menu: 用户菜单
       open_source_learning_management_system: "开源 LMS"
     facebook: 
       title: "Facebook 页面"
@@ -7566,7 +7528,6 @@ zh:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: 查看所有帐户
-      view_all_enrollments: 查看所有课程
       view_all_groups: 查看所有小组
     mobile_auth: 
       log_in_to_canvas: "登录到 Canvas"
@@ -9262,38 +9223,6 @@ zh:
       twitter: 
         body_account: "Canvas 警报 - 新小组:%{group_name} （帐户 %{account}）"
         body_course: "Canvas 警报 - 新小组:%{group_name} （课程 %{course}）"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} 刚刚在 %{website} 注册为教师。"
-        html: 
-          body: "%{user} 刚刚在 %{website} 注册为教师。"
-          details: 单击此处查看教师
-          email: 电子邮件
-          phone: 电话
-          school_name: 学校名称
-          school_position: 学校位置
-          subject: 新教师注册
-        labels: 
-          email: 电子邮件
-          phone: 电话
-          school_name: 学校名称
-          school_position: 学校位置
-        subject: 新教师注册
-      facebook: 
-        body: "%{user} 刚刚在 %{website} 注册为教师。"
-        subject: 新教师注册
-      sms: 
-        body: "%{user} 刚刚在 %{website} 注册为教师。"
-      summary: 
-        body: "%{user} 刚刚在 Canvas 注册为教师。"
-        labels: 
-          email: 电子邮件
-          phone: 电话
-          school_name: 学校名称
-          school_position: 学校位置
-        subject: 新教师注册
-      twitter: 
-        body: "Canvas 警报 - 新教师:%{user}，%{account}"
     new_user: 
       email: 
         body: "刚刚注册帐户 %{account} 的新用户 %{user}"
@@ -9777,9 +9706,6 @@ zh:
   new_facebook_message: "您有来自 Canvas 的新消息"
   new_quiz_moderate_desc: 当“草稿状态”和“测验统计”处于允许/打开状态时，这将启用某个帐户的新测验调整页面。
   new_quiz_statistics_desc: 当“草稿状态”处于允许/打开状态时，这将启用某个帐户的新测验统计页面。
-  new_styles_description: |-
-      我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
-      更新的简化外观并感受 Canvas 界面。
   no_migration_file: 内容迁移需要文件
   not_a_number: 必须为正数
   notification: 
@@ -9932,7 +9858,6 @@ zh:
       new_file_added: 新文件已添加
       new_files_added: 新文件已添加
       new_student_organized_group: 新学生组织学习小组
-      new_teacher_registration: 新教师注册
       new_user: 新用户
       pseudonym_registration: 匿名注册
       report_generated: 生成的报告
@@ -10485,9 +10410,6 @@ zh:
     respondus_soap_endpoint: 
       description: "Respondus QTI 上传的 SOAP 端点"
       name: "Respondus SOAP 端点"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "已启用（必须同时启用 QTI 转换器）"
     scribd: 
       description: "Scribd 文档预览"
       name: Scribd
@@ -11737,7 +11659,6 @@ zh:
         hints: 
           group_pick_count: "目前已选择 %{pick_count} 个"
         labels: 
-          add_questions_to_group: 添加问题到测验组
           group_name: 小组名称
           group_pick_count: 挑选
           group_points: 得分
@@ -11889,25 +11810,7 @@ zh:
         unnamed_quiz_results: "%{user} 的测验结果"
         unnamed_survey_results: "%{user} 的调查结果"
       index: 
-        buttons: 
-          publish_quizzes: 发布测验
-        headers: 
-          assignment_quizzes: 作业测验
-          course_quizzes: 课程测验
-          practice_quizzes: 练习测验
-          publish_multiple_quizzes: 发布多个测验
-          surveys: 调查
-          unpublished_quizzes: 未发布的测验
-        labels: 
-          publish_multiple_quizzes: 选择您想要在此时发布的测验
-        links: 
-          create_new_quiz: 创建新测验
-          manage_question_banks: 管理题库
-          publish_multiple_quizzes: 发布多个测验
-        no_quizzes: 没有可用的测验
         page_titles: 测验
-        titles: 
-          this_quiz_is_locked: 此测验当前锁定。单击以了解更多详细信息。
       invalid_ip: 
         quiz_protected: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
         survey_protected: 此调查受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此调查的有效位置。
@@ -12464,8 +12367,6 @@ zh:
     upload_info: 如果您对此前下载的学生提交文件作出了更改，只需压缩其备份并使用以下表单上传该压缩文件。学生将在其提交评论中看到修改的文件。
     upload_warning: 确保不要更改提交文件的名称，以便我们组织。
   react_files: 
-    aria_label: 
-      settings: 设置
     errors: 
       no_match: 
         suggestions: "建议:"
@@ -12951,7 +12852,6 @@ zh:
         one: "%{count} 个参加者"
         other: "%{count} 个参加者"
     current_enrollment: 
-      course_unpublished: 此课程尚未发布
       enrolled_as_designer: 注册为设计者
       enrolled_as_observer: 注册为观察员
       enrolled_as_student: 注册为学生
@@ -13048,8 +12948,6 @@ zh:
       titles: 
         mastery_level: 在其之上的百分比设置为掌握
         select_and_add_criterion: 选择并添加标准
-    flash_notice: 
-      close: 关闭
     flash_notices: 
       close: 关闭
     footer_links: 
@@ -13419,8 +13317,6 @@ zh:
     unauthorized_feed: 
       bad_params: 您尝试访问的源的参数无效。
       feedback: "如果您非常确定此 url 应该有效，请通过单击下面的链接告诉我们您是如何到达此处，我们将调查此情况。"
-      headings: 
-        problem: 加载源时出现问题
       links: 
         feedback: 告诉我们您在找什么
       title: 无效的源
@@ -13897,7 +13793,6 @@ zh:
       prompts: 
         delete: 是否确定要删除此学期?
       titles: 
-        enrollment_terms: 注册学期
         term_details: 学期详细信息
       update_term: 更新学期
     term: 
@@ -14032,8 +13927,6 @@ zh:
   unpublished_courses_title: 未发布的课程
   unsupported_package: 不受支持的内容包
   unused_courses_title: 未使用的课程
-  upload_button: 
-    files: 文件
   user: 
     default_user_name: 用户
     errors: 
@@ -14217,8 +14110,6 @@ zh:
         delete_user: "删除 %{user_name}"
       titles: 
         confirm_delete: 确认删除用户
-        confirm_deletion_of_user: "确认删除 %{user_name}"
-        delete_user: 删除用户
         really_delete_user: "确实删除 %{user_name}"
     enrollment: 
       course_not_published: 此课程尚未发布
