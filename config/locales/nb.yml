@@ -124,7 +124,6 @@ nb:
       settings_description: "For at en bruker skal kunne autentiseres via en ekstern identitetsleverandør (IdP), må brukeren ha en login-ID som både er koblet til denne kontoen og som tilsvarer den unike identifikatoren som returneres fra IdPen. For å se en brukers eksiterende innloggingsdata, se området for \"Innloggingsinformasjon\" brukerens profilside. (Finnes ved å søke etter brukeren via \"Brukere\"-fanen.)"
       settings_title: Autentiseringsinnstillinger
       test_ldap_link: "Test autentisering"
-      title: Autentiseringsinnstillinger
     ldap_settings: 
       add_secondary_ldap_server_link: "Legg til sekundær LDAP-tjener"
       auth_type_label: Type
@@ -483,8 +482,6 @@ nb:
         time: Tid
         user: Bruker
       course_search_form: 
-        labels: 
-          find_deleted_course: "Finn et slettet kurs"
         select_default: "Velg et kurs"
         select_label: "Velg et kurs"
       course_search_results: 
@@ -542,7 +539,6 @@ nb:
         generate_activity_username: "Generer aktivitet for *%{user}*"
         message_date_from: "Fra dato"
         message_date_to: "Til dato"
-        search: Søk
         search_people: "Søk blant personer"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1053,7 +1049,6 @@ nb:
           Som standard har endringer gjort manuelt prioritet over SIS import- endringer; for en rekke felt, vil SIS importen ikke endre det feltets data hvis en administrator har endret dette feltet manuelt. Hvis du velger dette alternativet, vil denne SIS importen overkjøre manuelle endringer.
           Se dokumentasjonen for detaljer.
       override_sis_stickiness_label: "Overstyr UI-endringer"
-      page_header: SIS-import
       page_title: SIS-import
       pending_batches_count: 
         one: "%{count} batch venter på prosessering."
@@ -1402,7 +1397,6 @@ nb:
     labels: 
       due: "Leveres innen"
     name_is_required: "Navn kreves!"
-    percentage_points_possible: "Oppnåelige poeng må være mer enn 0 for prosentbasert vurdering"
     points_possible_number: "Oppnåelige poeng må være et tall"
     select_external_tool_dialog_title: "Konfigurer eksternt verktøy"
     submission_action_take_quiz: "Ta %{title}"
@@ -1768,7 +1762,6 @@ nb:
         pass_fail: Komplett/ukomplett
         percent: Prosent
         points: Poeng
-      view_grading_levels: "Vis karakternivåer"
     group_category_selector: 
       grade_group_students_individually: "Tildel karakterer til hver enkelt student individuelt"
       group_assignment_header: Gruppeoppgave
@@ -2423,7 +2416,6 @@ nb:
         calendar_month: Måned
         calendar_scheduler: Planlegger
         calendar_week: Uke
-        screenreader_recommend_agenda: "Brukere med skjermleser: Bruk Agenda for å vise hendelser"
       loading: Laster
       my_appointment_groups: "Mine avtalegrupper"
     calendar_navigator: 
@@ -3662,7 +3654,6 @@ nb:
       module: modul
       module_details: "Moduler vises i sekvensiell rekkefølge, så kun moduler som er over %{name} kan settes som forhåndskrav."
       module_name: Modulnavn
-      modules_keyboard_hint: "For å endre rekkefølgen på kursmoduler og modul elementer, slå først av markøren på skjermleseren. Sett inn-z i JAWS. Trykk på fanen for å velge den første modulen. Trykk opp og ned for å velge en modul eller et modulelement. Trykk mellomromstasten for å velge modulen eller modulelementet for å begynne å dra. Deretter trykk opp og ned for å velge hvor det skal plasseres. Deretter trykker du på mellomromstasten en gang til for å slippe utvalg på det stedet det skal plasseres."
       must_complete_prerequisites: "De må fullføre"
       no_preprequisites: "Ingen forhåndskrav definert"
       no_requirements: "Ingen krav definert"
@@ -4338,7 +4329,6 @@ nb:
         confirm_delete: "Er du sikker på at du vil slette dette kurset? Når det er slettet vil ikke studentene og foreleserne ha tilgang til det lenger. Om du bare ønsker å fjerne det fra nedtrekksmenyen over kurs bør du *avslutte kurset i stedet*."
         confirm_delete_addendum: "Om du ikke har tillatelse til å avslutte kurset kan du *endre sluttdatoen for kurset* eller spørre en administrator om å avslutte kurset."
       headings: 
-        confirm: "Bekreft handling"
         confirm_conclude: "Bekreft avslutning av kurset"
         confirm_delete: "Bekreft sletting av kurset"
       titles: 
@@ -4683,7 +4673,6 @@ nb:
           delete_section: "Slett klasse"
           edit_section: "Rediger klasse"
       megabytes: megabytes
-      navigation_keyboard_hint: "Hvis du bruker en skjermleser, må du for å endre rekkefølgen på kursnavigasjonskoblinger, slå av den virtuell markøren eller den virtuelle buffer på skjermleseren (trykk Insert-z for JAWS). Trykk kontroll-hjem for å hoppe til toppen av siden, trykk på tab-tasten til du kommer til første navigasjonskobling i kurset. Trykk på opp-og ned-pilene til du hører den linken du ønsker å flytte, og trykk deretter på mellomromstasten for å velge det. Deretter trykker du på opp og ned piltastene til du finner den nye posisjonen. Til slutt trykker du på mellomromstasten igjen for å plassere den lenken du beveger direkte etter nåværende lenke. Når du er ferdig, reaktivere den virtuelle buffer/markør."
       no_date: "Ingen dato satt"
       no_language_preference: "Ikke angitt (brukerinnstilt, standard er %{language})"
       none: Ingen
@@ -4837,8 +4826,6 @@ nb:
       new: Ny
       new_discussion_entries: "Nye diskusjonsinnlegg"
       new_discussions: "Nye diskusjoner"
-      num_assignments: "# Oppgaver"
-      num_submissions: "# Innleveringer"
       page_title: Kursstatistikk
       quiz: Prøve
       quiz_questions: Prøvespørsmål
@@ -6064,15 +6051,6 @@ nb:
     saving: Lagrer...
     shared_secret: "Delt hemmelighet"
     submit: "Send inn"
-    tool_post_iframe: 
-      load_tool_button: "Laste %{tool}"
-      load_tool_new_tab_button: "Laste %{tool} i et nytt vindu"
-      new_tab: "Dette verktøyet må lastes i et nytt nettleservindu"
-      new_tab_expired: "Sesjonen for dette verktøyet er utløpt. Last siden på nytt for å få tilgang til verktøyet igjen."
-      new_tab_loaded: "Dette verktøyet ble suksessfullt lastet i et nytt nettleservindu. Last siden på nytt for å få tilgang til verktøyet igjen."
-    tool_show: 
-      tool_insecure_warning: "Du forsøker å åpne usikkert innhold inne i et sikkert nettsted (canvas). Enkelte nettlesere vil forhindre dette innholdet fra å lastes inn."
-      tool_load_failure: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
     user_navigation_configured: "Brukernavigering konfigurert"
   facebook: 
     authorization_required: "Kun autoriserte brukere har tilgang til den siden"
@@ -6133,7 +6111,6 @@ nb:
       ? "on"
       : På
       release_notes: versjonsmerknader
-      toggle_feature_details: "Vis/skjul funksjonsdetaljer"
     feature_flag_admin_view: 
       feature_options: Funksjonsvalg
       no_features_available: "Ingen funksjoner er tilgjengelige for tiden."
@@ -7235,7 +7212,6 @@ nb:
     member_tooltip_show: "Se gruppedeltagere"
     membership_pending: 
       group_join_request: "Forespørsel om gruppedeltagelse"
-      group_join_request_acknowledged: "Takk for forespørselen, vennligst følg med"
       group_join_request_info: "Denne gruppen har mottat din forespørsel om å bli med. Du får et varsel når forespørselen godkjennes eller avvises."
     messages: 
       creating_group: "Oppretter gruppe..."
@@ -7330,9 +7306,6 @@ nb:
       create: "Opprett %{model}"
       submit: "Lagre %{model}"
       update: "Oppdater %{model}"
-  high_contrast_description: |-
-      Hvis du foretrekker en versjon av Canvas brukergrensesnitt med høyere kontrast, aktiver denne.
-      Dette kan være nyttig for personer med nedsatt syn eller vansker med å lese.
   html5_first_videos_description: |-
       Som standard vil Canvas primært forsøke Flash til å spille av videoer. Slå på dette for å sette HTML5 som primæralternativ,
       for deretter å falle tilbake til Flash.
@@ -7523,23 +7496,12 @@ nb:
   layouts: 
     application: 
       group_switch: Bytt
-      instructure_description: "Instructure, skaperne av Canvas - en læringsplattform basert på åpen kildekode"
       keyboard_navigation: 
         close: "Trykk komma for å skjule denne boksen"
       links: 
         close: Lukk
         dashboard: "Mitt kontrollpanel"
         skip_to_content: "Gå til innhold"
-      menu: 
-        assignments: Oppgaver
-        assignments_needing_grading: "Å rette"
-        assignments_needing_submitting: "For innlevering"
-        assignments_recently_graded: "Nylig rettet"
-        calendar: Kalender
-        grades: Karakterer
-      navigation: 
-        main: Hovednavigasjon
-        user_menu: Brukermeny
       open_source_learning_management_system: "Læringsplattform basert på åpen kildekode"
     facebook: 
       title: Facebook-side
@@ -7556,7 +7518,6 @@ nb:
       default_page_title: "Canvas læringsplattform"
     menu: 
       view_all_accounts: "Se alle kontoer"
-      view_all_enrollments: "Se alle kurs"
       view_all_groups: "Se alle grupper"
     mobile_auth: 
       log_in_to_canvas: "Logg inn på Canvas"
@@ -9250,38 +9211,6 @@ nb:
       twitter: 
         body_account: "Canvas varsel – ny gruppe: %{group_name} for kontoen %{account}"
         body_course: "Canvas varsel - ny gruppe: %{group_name} for kurset %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} registrerte seg som foreleser på %{website}."
-        html: 
-          body: "%{user} registrerte seg som faglærer på %{website}."
-          details: "Klikk her for å se faglærer"
-          email: Epost
-          phone: Telefon
-          school_name: Institusjonsnavn
-          school_position: "Stilling på institusjonen"
-          subject: "Registrere ny Lærer"
-        labels: 
-          email: Epost
-          phone: Telefon
-          school_name: Institusjonsnavn
-          school_position: "Stilling på institusjonen"
-        subject: "Registrere ny Lærer"
-      facebook: 
-        body: "%{user} registrerte seg nettopp som en lærer på %{website}."
-        subject: "Registrere ny Lærer"
-      sms: 
-        body: "%{user} registrerte seg nettopp som en lærer på %{website}."
-      summary: 
-        body: "%{user} registrerte seg nettopp som faglærer i Canvas."
-        labels: 
-          email: Epost
-          phone: Telefon
-          school_name: Institusjonsnavn
-          school_position: "Stilling på institusjonen"
-        subject: "Registrere ny Lærer"
-      twitter: 
-        body: "Canvas-varsel – ny faglærer: %{user}, %{account}javascript:;"
     new_user: 
       email: 
         body: "En ny bruker, %{user}, har nettopp registrert kontoen %{account}"
@@ -9765,9 +9694,6 @@ nb:
   new_facebook_message: "Du har en ny beskjed fra Canvas"
   new_quiz_moderate_desc: "Når utkastmodus og prøvestatistikk er tillatt/på, aktiveres den nye prøve-modereringssiden for en konto."
   new_quiz_statistics_desc: "Når Utkastmodus er tillatt/på, aktiveres den nye prøve-statistikksiden for en konto."
-  new_styles_description: |-
-      Vi jobber med en ansiktsløftning på brukergrensesnittet i Canvas. Slå på dette for å oppleve et
-      oppdatert, forenklet utseende på Canvas grensesnittet.
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   not_a_number: "må være et positivt tall"
   notification: 
@@ -9921,7 +9847,6 @@ nb:
       new_file_added: "Ny fil lagt til"
       new_files_added: "Nye filer lagt til"
       new_student_organized_group: "Ny studentorganisert gruppe"
-      new_teacher_registration: "Registrere ny Lærer"
       new_user: "Ny bruker"
       pseudonym_registration: Psevdonymregistrering
       report_generated: "Rapport generert"
@@ -10475,9 +10400,6 @@ nb:
     respondus_soap_endpoint: 
       description: "SOAP endepunkt for Respondus QTI opplastninger"
       name: "Respondus SOAP Endpoint"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Slått på (må også slå på QTI Converter)"
     scribd: 
       description: "Dokumentforhåndsvisning med Scribd"
       name: Scribd
@@ -11695,7 +11617,6 @@ nb:
         hints: 
           group_pick_count: "%{pick_count} valgt hittil"
         labels: 
-          add_questions_to_group: "Legg til spørsmål i prøvegruppen"
           group_name: Gruppenavn
           group_pick_count: Velg
           group_points: Poeng
@@ -11847,25 +11768,7 @@ nb:
         unnamed_quiz_results: "Prøveresultater for %{user}"
         unnamed_survey_results: "Undersøkelsesresultater for %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Publiser prøver"
-        headers: 
-          assignment_quizzes: Oppgaveprøver
-          course_quizzes: Kursprøver
-          practice_quizzes: Praksis-prøver
-          publish_multiple_quizzes: "Publiser flere prøver"
-          surveys: Undersøkelser
-          unpublished_quizzes: "Upubliserte prøver"
-        labels: 
-          publish_multiple_quizzes: "Velg prøvene du vil publisere nå"
-        links: 
-          create_new_quiz: "Opprett ny prøve"
-          manage_question_banks: "Behandle spørsmålsbanker"
-          publish_multiple_quizzes: "Publiser flere prøver"
-        no_quizzes: "Ingen prøver tilgjengelig"
         page_titles: Prøver
-        titles: 
-          this_quiz_is_locked: "Denne prøven er låst. Klikk for detaljer."
       invalid_ip: 
         quiz_protected: "Denne prøven er beskyttet og kun tilgjengelig fra visse steder. Du kan ikke ta prøven fra datamaskinen du bruker nå."
         survey_protected: "Denne undersøkelsen er beskyttet og kun tilgjengelig fra visse steder. Du kan ikke ta undersøkelsen fra datamaskinen du bruker nå."
@@ -12422,8 +12325,6 @@ nb:
     upload_info: "Om du endret de innleverte filene du lastet ned, komprimer de til zip-format og last opp zip-filen med skjemaet nedenfor. Studentene vil se de modifiserte filene via kommentarfeltet for innleveringen. "
     upload_warning: "Ikke endre navn på innleveringsfiler slik at vi kan gjenkjenne de."
   react_files: 
-    aria_label: 
-      settings: Innstillinger
     errors: 
       no_match: 
         suggestions: "Forslag:"
@@ -12909,7 +12810,6 @@ nb:
         one: "1 deltager"
         other: "%{count} deltagere"
     current_enrollment: 
-      course_unpublished: "Dette kurset er ikke publisert enda"
       enrolled_as_designer: "Påmeldt som designer"
       enrolled_as_observer: "Påmeldt som observatør"
       enrolled_as_student: "Påmeldt som student"
@@ -13006,8 +12906,6 @@ nb:
       titles: 
         mastery_level: "laveste prosentgrense for mestret"
         select_and_add_criterion: "Velg og legg til kriterium"
-    flash_notice: 
-      close: Lukk
     flash_notices: 
       close: Lukk
     footer_links: 
@@ -13375,8 +13273,6 @@ nb:
     unauthorized_feed: 
       bad_params: "Parameterne for strømmen du prøvde å få tilgang til er ugyldige."
       feedback: "Om du mener at denne URL-en skal fungere, fortell oss hvordan du kom hit ved å trykke på lenken nedenfor, så skal vi se på saken."
-      headings: 
-        problem: "Et problem oppsto under lastingen av matingen."
       links: 
         feedback: "Fortell oss hva du lette etter"
       title: "Ugyldig strøm"
@@ -13851,7 +13747,6 @@ nb:
       prompts: 
         delete: "Er du sikker på at du ønsker å slette dette semesteret?"
       titles: 
-        enrollment_terms: Påmeldingssemestere
         term_details: Semesterdetaljer
       update_term: "Oppdater semester"
     term: 
@@ -13986,8 +13881,6 @@ nb:
   unpublished_courses_title: "Ikke publiserte kurs"
   unsupported_package: "Ustøttet innholdspakke"
   unused_courses_title: "Ikke benyttede kurs"
-  upload_button: 
-    files: Filer
   user: 
     default_user_name: Bruker
     errors: 
@@ -14171,8 +14064,6 @@ nb:
         delete_user: "Slett %{user_name}"
       titles: 
         confirm_delete: "Bekreft sletting av bruker"
-        confirm_deletion_of_user: "Bekreft sletting av %{user_name}"
-        delete_user: "Slett bruker"
         really_delete_user: "Vil du virkelig slette %{user_name}"
     enrollment: 
       course_not_published: "Dette kurset er ikke publisert enda"
