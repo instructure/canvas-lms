@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.5.1'..'1.7.2'
+required_bundler_version = '1.6.0'..'1.7.2'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 
 unless required_bundler_version.include?(Bundler::VERSION)
@@ -63,23 +63,9 @@ unless CANVAS_RAILS3
   end
 end
 
-# patch bundler to do github over https
-if respond_to?(:git_source)
-  git_source(:github) do |repo_name|
-    repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-    "https://github.com/#{repo_name}.git"
-  end
-else
-  # bundler 1.5 doesn't have an API for it, so we have to munge the internals
-  unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
-    class Bundler::Dsl
-      alias_method :_old_normalize_options, :_normalize_options
-      def _normalize_options(name, version, opts)
-        _old_normalize_options(name, version, opts)
-        opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
-      end
-    end
-  end
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
 end
 
 module CanvasBundlerRuntime
