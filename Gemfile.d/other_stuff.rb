@@ -44,7 +44,8 @@ gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
 gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
-gem 'i18nema', RUBY_VERSION >= '2.2' ? '0.0.8' : '0.0.7'
+gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
+gem 'i18nema19', '0.0.8', :platform => :mri_19
 gem 'icalendar', '1.5.4'
 gem 'ims-lti', '2.0.0.beta.7'
 gem 'jammit', '0.6.6'
