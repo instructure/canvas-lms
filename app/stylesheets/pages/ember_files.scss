@@ -322,3 +322,8 @@ i[class*=current_uploads__instructions__icon-upload] {
   font-size: 1.8em;
   font-weight: bold;
 }
+
+
+// Hack, Hack, Hack!
+// to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
+#footer { min-height: 80px }

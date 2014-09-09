@@ -46,7 +46,11 @@ define [
     render: withReactDOM ->
       span {},
 
-        button className:'al-trigger al-trigger-gray btn btn-link', 'aria-label': I18n.t('settings', 'Settings'),
+        button {
+          className: 'al-trigger al-trigger-gray btn btn-link'
+          'aria-label': I18n.t('settings', 'Settings')
+          'data-popup-within' : "#wrapper"
+        },
           i className:'icon-settings',
           i className:'icon-mini-arrow-down'
 
