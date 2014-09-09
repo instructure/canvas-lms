@@ -71,7 +71,7 @@
           <% if @context.try(:short_name) %>
             <div class='h1' id="section-tabs-header">
               <%= @context.short_name %>
-              <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage)%>
+              <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
                 <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
                   <i class="icon-mini-arrow-down"></i>
                   <span class="screenreader-only"><%= t("group_switch","Switch")%></span>

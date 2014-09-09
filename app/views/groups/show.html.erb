@@ -42,5 +42,5 @@
 <% js_env({
   :student_mode => true,
   :group => @group.as_json[:group],
-  :group_category => @group.group_category[:group_category]
+  :group_category => @group.group_category.try(:[], :group_category)
 })%>
