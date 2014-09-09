@@ -14,7 +14,11 @@ define [
     getInitialState: -> @extractStateFromModel( @props.model )
 
     componentWillMount: ->
-      @props.model.on 'change', (model) => @setState(@extractStateFromModel( model ))
+      setState = (model) => @setState(@extractStateFromModel( model ))
+      @props.model.on('change', setState, this)
+
+    componentWillUnmount: ->
+      @props.model.off(null, null, this)
 
     # == Custom Functions == #
 
