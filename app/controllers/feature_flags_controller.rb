@@ -241,7 +241,7 @@ class FeatureFlagsController < ApplicationController
 
       # if this is a hidden feature, require site admin privileges to create (but not update) a root account flag
       if !current_flag && feature_def.hidden?
-        return render json: { message: "invalid feature" }, status: :bad_request unless @context.is_a?(Account) && @context.root_account? && Account.site_admin.grants_right?(@current_user, session, :read)
+        return render json: { message: "invalid feature" }, status: :bad_request unless ((@context.is_a?(Account) && @context.root_account?) || @context.is_a?(User)) && Account.site_admin.grants_right?(@current_user, session, :read)
         prior_state = 'hidden'
       end
 
