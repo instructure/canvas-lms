@@ -613,6 +613,7 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_attachments=(attachments)
+    attachments.compact!
     @versioned_attachments = Array(attachments).select { |a|
       (a.context_type == 'User' && a.context_id == user_id) ||
       (a.context_type == 'Group' && a.context_id == group_id) ||

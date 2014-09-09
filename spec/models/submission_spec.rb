@@ -1010,17 +1010,28 @@ describe Submission do
       }
     end
 
-    it "includes url submission attachments" do
+    def submission_for_some_user
       student_in_course active_all: true
-      s = @assignment.submit_homework(@student,
-                                      submission_type: "online_url",
-                                      url: "http://example.com")
+      @assignment.submit_homework(@student,
+                                  submission_type: "online_url",
+                                  url: "http://example.com")
+    end
+
+    it "includes url submission attachments" do
+      s = submission_for_some_user
       s.attachment = attachment_model(filename: "screenshot.jpg",
                                       context: @student)
 
       Submission.bulk_load_versioned_attachments([s])
       ensure_attachments_arent_queried
       s.versioned_attachments.should == [s.attachment]
+    end
+
+    it "handles bad data" do
+      s = submission_for_some_user
+      s.update_attribute(:attachment_ids, '99999999')
+      Submission.bulk_load_versioned_attachments([s])
+      s.versioned_attachments.should == []
     end
   end
 
