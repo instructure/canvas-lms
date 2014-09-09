@@ -23,7 +23,8 @@ define(function(require) {
             participantCount={props.participantCount}
             onToggleDetails={props.onToggleDetails}
             expanded={props.expanded}
-            questionText={props.questionText} />
+            questionText={props.questionText}
+            position={this.props.position} />
 
           <div key="charts">
             <CorrectAnswerDonut correctResponseRatio={crr} />

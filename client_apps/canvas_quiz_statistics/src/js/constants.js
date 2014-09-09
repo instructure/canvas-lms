@@ -26,6 +26,7 @@ define(function() {
       'question_text',
       'responses',
       'answers',
+      'position',
 
       // multiple-choice & true/false
       'answered_student_count',

@@ -2,9 +2,17 @@
 define(function(require) {
   var React = require('react');
   var ScreenReaderContent = React.createClass({
+    getDefaultProps: function() {
+      return {
+        tagName: 'span'
+      };
+    },
+
     render: function() {
-      return(
-        <span className="screenreader-only">{this.props.children}</span>
+      var tag = React.DOM[this.props.tagName];
+
+      return this.transferPropsTo(
+        <tag className="screenreader-only" children={this.props.children} />
       );
     }
   });
