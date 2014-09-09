@@ -126,7 +126,6 @@ pl:
       settings_description: "Aby użytkownik mógł zostać uwierzytelniony przez zewnętrznego dostawcę tożsamości (IdP), powinien posiadać identyfikator logowania połączony ze swoim kontem oraz odpowiadający unikatowemu identyfikatorowi wysyłanemu przez dostawcę IdP. Aby zobaczyć bieżące loginy użytkownika, przejdź do sekcji \"Informacje dot. logowania\" znajdującej się na stronie profilu użytkownika. (Odnaleziono przez wyszukiwanie użytkownika w zakładce \"Użytkownicy\")."
       settings_title: "Ustawienia uwierzytelniania"
       test_ldap_link: "Sprawdź uwierzytelnianie"
-      title: "Ustawienia uwierzytelniania"
     ldap_settings: 
       add_secondary_ldap_server_link: "Dodaj drugi serwer LDAP"
       auth_type_label: Typ
@@ -497,8 +496,6 @@ pl:
         time: Godzina
         user: Użytkownik
       course_search_form: 
-        labels: 
-          find_deleted_course: "Znajdź usunięty kurs"
         select_default: "Wybierz kurs"
         select_label: "Wybierz kurs"
       course_search_results: 
@@ -556,7 +553,6 @@ pl:
         generate_activity_username: "Generuj aktywność dla użytkownika *%{user}*"
         message_date_from: "Od daty"
         message_date_to: "Do daty"
-        search: Wyszukaj
         search_people: "Wyszukuj osoby"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1059,7 +1055,6 @@ pl:
           Domyślnie wszystkie zmiany UI są nadrzędne względem zmian związanych z importowaniem danych SIS; w przypadku pewnych pól importowanie SIS nie zmieni danych znajdujących się w polach, jeśli administrator zmienił pola za pomocą UI. W przypadku wyboru tej opcji importowanie danych SIS zastąpi zmiany UI.  
           Szczegółowe informacje znajdują się w dokumentacji.
       override_sis_stickiness_label: "Zastąp zmiany UI"
-      page_header: "Importowanie danych SIS"
       page_title: "Importowanie danych SIS"
       pending_batches_count: 
         few: "%{count} zadania czekają na przetworzenie."
@@ -1412,7 +1407,6 @@ pl:
     labels: 
       due: "Termin dostarczenia"
     name_is_required: "Wymagana jest nazwa!"
-    percentage_points_possible: "Możliwa liczba punktów musi być większa od 0 w przypadku oceniania procentowego"
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     select_external_tool_dialog_title: "Konfiguruj narzędzia zewnętrzne"
     submission_action_take_quiz: "Przystąp do: %{title}"
@@ -1777,7 +1771,6 @@ pl:
         pass_fail: "Ukończono/Nie ukończono"
         percent: "Wartość procentowa"
         points: Punkty
-      view_grading_levels: "Pokaż poziomy oceniania"
     group_category_selector: 
       grade_group_students_individually: "Wystaw oceny indywidualnie"
       group_assignment_header: "Zadanie grupowe"
@@ -2436,7 +2429,6 @@ pl:
         calendar_month: Miesiąc
         calendar_scheduler: Planer
         calendar_week: Tydzień
-        screenreader_recommend_agenda: "Użytkownicy czytników ekranu: aby wyświetlić wydarzenia, należy skorzystać z harmonogramu"
       loading: "Trwa ładowanie"
       my_appointment_groups: "Moje spotkania grupowe"
     calendar_navigator: 
@@ -3672,7 +3664,6 @@ pl:
       module: moduł
       module_details: "Moduły są wyświetlane w kolejności, dlatego tylko moduły, które znajdują się powyżej %{name} można ustawić jako warunki."
       module_name: "Nazwa modułu"
-      modules_keyboard_hint: "Aby zmienić kolejność modułów kursu i elementów modułu, najpierw usuń kursor z programu do odczytywania zawartości ekranu. Naciśnij klawisze Insert + z w JAWS. Naciśnij Tab, aby wybrać pierwszy moduł. Naciśnij strzałki do góry i w dół, aby wybrać moduł lub element modułu. Naciśnij spację, aby wybrać moduł lub element modułu w celu przeniesienia. Następnie naciśnij strzałki do góry i w dół, aby wybrać lokalizację. Potem naciśnij drugi raz spację, aby upuścić łącze do miejsca docelowego."
       must_complete_prerequisites: "Muszą ukończyć"
       no_preprequisites: "Nie określono warunków"
       no_requirements: "Nie określono wymogów"
@@ -4354,7 +4345,6 @@ pl:
         confirm_delete: "Czy na pewno chcesz usunąć ten kurs? Po usunięciu kursu uczestnicy i instruktorzy nie będą mieć do niego dostępu. Jeśli chcesz tylko usunąć kurs z rozwijanej listy, powinieneś zamiast tego wybrać opcję *zakończ kurs*."
         confirm_delete_addendum: "Jeśli nie masz pozwolenia na zakończenie kursu, możesz *zmienić datę zakończenia kursu* lub poprosić administratora, aby zakończył ten kurs."
       headings: 
-        confirm: "Potwierdź czynność"
         confirm_conclude: "Potwierdź zakończenie kursu"
         confirm_delete: "Potwierdź usunięcie kursu"
       titles: 
@@ -4700,7 +4690,6 @@ pl:
           delete_section: "Usuń sekcję"
           edit_section: "Edytuj sekcję"
       megabytes: megabajty(-ów)
-      navigation_keyboard_hint: "W przypadku korzystania z czytnika ekranu, aby zmienić kolejność łączy nawigacyjnych kursu, usuń wirtualny kursor lub wirtualny bufor z czytnika ekranu (naciśnij klawisze Insert + z w przypadku oprogramowania JAWS). Naciśnij klawisze Control + Home, aby przejść do górnej części strony, a następnie trzymaj wciśnięty klawisz Tab do momentu, gdy pojawi się pierwsze łącze nawigacyjne kursu. Naciskaj strzałki do góry i w dół, aż zostanie wyświetlone łącze, które chcesz przenieść — następnie naciśnij spację, aby je wybrać. Naciskaj ponownie strzałki do góry i w dół do momentu zlokalizowania nowej pozycji. Na koniec znowu naciśnij spację, aby umieścić łącze, które przesuwasz pod obecnym łączem. Po zakończeniu czynności ponownie włącz wirtualny bufor/kursor."
       no_date: "Nie ustawiono daty"
       no_language_preference: "Nie zdefiniowano (konfigurowane przez użytkownika, domyślnie ustawiono %{language})"
       none: Brak
@@ -4855,8 +4844,6 @@ pl:
       new: Nowe
       new_discussion_entries: "Nowe wpisy w dyskusji"
       new_discussions: "Nowe dyskusje"
-      num_assignments: "# zadania"
-      num_submissions: "# przesłane zadania"
       page_title: "Statystyki dot. kursu"
       quiz: Test
       quiz_questions: "Pytania do testu"
@@ -6114,15 +6101,6 @@ pl:
     saving: "Trwa zapisywanie..."
     shared_secret: "Wspólny klucz"
     submit: Prześlij
-    tool_post_iframe: 
-      load_tool_button: "Załaduj %{tool}"
-      load_tool_new_tab_button: "Załaduj %{tool} w nowym oknie"
-      new_tab: "Narzędzie musi zostać załadowane w nowym oknie przeglądarki"
-      new_tab_expired: "Wygasła sesja tego narzędzia. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia"
-      new_tab_loaded: "Ładowanie narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
-    tool_show: 
-      tool_insecure_warning: "Próbujesz połączyć się z niezabezpieczoną zawartością z poziomu zabezpieczonej strony (canvas). W niektórych przeglądarkach otwarcie tej zawartości może nie być możliwe."
-      tool_load_failure: "Wygląda, że treść nie może się załadować. Możesz użyć tego przycisku, aby spróbować ją załadować w nowej karcie. "
     user_navigation_configured: "Skonfigurowano nawigację użytkownika"
   facebook: 
     authorization_required: "Tylko użytkownicy posiadający odpowiednie uprawnienia mogą uzyskać dostęp do tej strony"
@@ -6183,7 +6161,6 @@ pl:
       ? "on"
       : Wł.
       release_notes: "uwagi dotyczące opublikowania"
-      toggle_feature_details: "Przełącz szczegóły funkcji"
     feature_flag_admin_view: 
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
@@ -7299,7 +7276,6 @@ pl:
     member_tooltip_show: "Pokaż listę grupy"
     membership_pending: 
       group_join_request: "Wniosek o przyłączenie do grupy"
-      group_join_request_acknowledged: "Dziękujemy za przesłanie wniosku, czekaj na dalsze informacje"
       group_join_request_info: "Grupa otrzymała wniosek o przyłączenie. Powiadomimy Cię o jego akceptacji lub odrzuceniu."
     messages: 
       creating_group: "Trwa tworzenie grupy..."
@@ -7398,9 +7374,6 @@ pl:
       create: "Utwórz %{model} "
       submit: "Zapisz %{model} "
       update: "Aktualizuj %{model}"
-  high_contrast_description: |-
-      Jeśli wolisz wersję z wższym kontrastem interfejsu użytkownika systemu Canvas, uaktywnij to.
-      Opcja może okazać się pomocna dla osób niedowidzących lub mających problem z czytaniem.
   html5_first_videos_description: |-
       Program Canvas domyślnie będzie próbował najpierw używać wtyczki Flash w celu odtworzenia plików wideo. Włącz ją, aby korzystać z programu HTML5,
       następnie wróć do wtyczki Flash.
@@ -7591,23 +7564,12 @@ pl:
   layouts: 
     application: 
       group_switch: Przełącz
-      instructure_description: "Firma Instructure, twórca opartego na wolnej licencji systemu zarządzania nauczaniem Canvas"
       keyboard_navigation: 
         close: "Naciśnij Przecinek na klawiaturze, aby wyjść z tego dialogu"
       links: 
         close: Zamknij
         dashboard: "Mój panel"
         skip_to_content: "Przejdź do zawartości"
-      menu: 
-        assignments: Zadania
-        assignments_needing_grading: "Oczekujące na ocenę"
-        assignments_needing_submitting: "Do oddania"
-        assignments_recently_graded: "Ostatnio ocenione"
-        calendar: Kalendarz
-        grades: Oceny
-      navigation: 
-        main: "Główna nawigacja"
-        user_menu: "Menu użytkownika"
       open_source_learning_management_system: "System zarządzania nauczaniem na wolnej licencji"
     facebook: 
       title: "Strona portalu Facebook"
@@ -7624,7 +7586,6 @@ pl:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "Pokaż wszystkie konta"
-      view_all_enrollments: "Pokaż wszystkie kursy"
       view_all_groups: "Pokaż wszystkie grupy"
     mobile_auth: 
       log_in_to_canvas: "Zaloguj w systemie Canvas"
@@ -9349,38 +9310,6 @@ pl:
       twitter: 
         body_account: "Alert systemu Canvas — nowa grupa: %{group_name} dla konta %{account}"
         body_course: "Alert systemu Canvas — nowa grupa: %{group_name} dla kursu %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "Użytkownik %{user} właśnie zarejestrował się jako instruktor w witrynie %{website}."
-        html: 
-          body: "Użytkownik %{user} właśnie zarejestrował się jako instruktor w witrynie %{website}."
-          details: "Kliknij tutaj, aby wyświetlić instruktora"
-          email: "Adres e-mail"
-          phone: Telefon
-          school_name: "Nazwa szkoły"
-          school_position: "Typ szkoły"
-          subject: "Rejestracja dla nowego instruktora"
-        labels: 
-          email: "Adres e-mail"
-          phone: Telefon
-          school_name: "Nazwa szkoły"
-          school_position: "Typ szkoły"
-        subject: "Rejestracja dla nowego instruktora"
-      facebook: 
-        body: "Użytkownik %{user} właśnie zarejestrował się jako instruktor w witrynie %{website}."
-        subject: "Rejestracja dla nowego instruktora"
-      sms: 
-        body: "Użytkownik %{user} właśnie zarejestrował się jako instruktor w witrynie %{website}."
-      summary: 
-        body: "Użytkownik %{user} właśnie zarejestrował się jako instruktor w systemie Canvas."
-        labels: 
-          email: "Adres e-mail"
-          phone: Telefon
-          school_name: "Nazwa szkoły"
-          school_position: "Typ szkoły"
-        subject: "Rejestracja dla nowego instruktora"
-      twitter: 
-        body: "Alert systemu Canvas — nowy instruktor: %{user}, %{account}"
     new_user: 
       email: 
         body: "Nowy użytkownik, %{user}, właśnie zarejestrował się dla konta %{account}"
@@ -9864,9 +9793,6 @@ pl:
   new_facebook_message: "Masz nową wiadomość z programu Canvas"
   new_quiz_moderate_desc: "Włączona Wersja robocza oraz Statystyka testu umożliwia wyświetlenie strony zarządzanego, nowego testu na koncie."
   new_quiz_statistics_desc: "Włączona Wersja robocza oraz Statystyka testu umożliwia wyświetlenie strony statystyki nowego testu na koncie."
-  new_styles_description: |-
-      Pracujemy nad zmianą UI systemu Canvas. Włącz, aby zobaczyć
-      zaktualizowany, uproszczony wygląd i poczuć interfejs systemu Canvas.
   no_migration_file: "Wymagany plik do migracji zawartości."
   not_a_number: "należy wpisać liczbę dodatnią"
   notification: 
@@ -10020,7 +9946,6 @@ pl:
       new_file_added: "Dodano nowe pliki"
       new_files_added: "Dodano nowe pliki"
       new_student_organized_group: "Nowa zorganizowana grupa uczestników"
-      new_teacher_registration: "Rejestracja dla nowego instruktora"
       new_user: "Nowy użytkownik"
       pseudonym_registration: "Rejestracja pseudonimu"
       report_generated: "Raport został wygenerowany"
@@ -10579,9 +10504,6 @@ pl:
     respondus_soap_endpoint: 
       description: "Punkt końcowy SOAP do przekazywania plików QTI programu Respondus"
       name: "Punkt końcowy SOAP programu Respondus"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Uaktywniony (należy także uaktywnić QTI Converter)"
     scribd: 
       description: "Podgląd dokumentów na stronie Scribd"
       name: Scribd
@@ -11846,7 +11768,6 @@ pl:
         hints: 
           group_pick_count: "wybrano dotąd %{pick_count}"
         labels: 
-          add_questions_to_group: "Dodaj pytania do tej grupy testów"
           group_name: "Nazwa grupy"
           group_pick_count: Pobierz
           group_points: Punkty
@@ -11999,25 +11920,7 @@ pl:
         unnamed_quiz_results: "Wyniki testów dla użytkownika %{user}"
         unnamed_survey_results: "Wyniki ankiet dla użytkownika %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Publikuj testy"
-        headers: 
-          assignment_quizzes: "Zadania w formie testu"
-          course_quizzes: "Testy kursowe"
-          practice_quizzes: "Testy próbne"
-          publish_multiple_quizzes: "Publikuj wiele testów"
-          surveys: Ankiety
-          unpublished_quizzes: "Niepublikowane testy"
-        labels: 
-          publish_multiple_quizzes: "Wybierz testy, które chcesz opublikować tym razem"
-        links: 
-          create_new_quiz: "Utwórz nowy test"
-          manage_question_banks: "Zarządzaj bankami pytań"
-          publish_multiple_quizzes: "Publikuj wiele testów"
-        no_quizzes: "Brak dostępnych testów"
         page_titles: Testy
-        titles: 
-          this_quiz_is_locked: "Aktualnie test jest zablokowany. Kliknij w celu uzyskania dalszych informacji."
       invalid_ip: 
         quiz_protected: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji. Komputer, z którego korzystasz nie wydaje się prawidłową lokalizacją na podejście do testu."
         survey_protected: "Ta ankieta jest chroniona i jest dostępna tylko z niektórych lokalizacji. Komputer, z którego korzystasz, prawdopodobnie nie znajduje się w takiej lokalizacji."
@@ -12598,8 +12501,6 @@ pl:
     upload_info: "W przypadku wprowadzenia zmian do pobranych wcześniej plików z zadaniami należy spakować je ponownie i przekazać paczkę wraz z poniższym formularzem. Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania."
     upload_warning: "Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać."
   react_files: 
-    aria_label: 
-      settings: Ustawienia
     errors: 
       no_match: 
         suggestions: "Sugestie:"
@@ -13094,7 +12995,6 @@ pl:
         one: "1 uczestnik"
         other: "%{count} uczestników"
     current_enrollment: 
-      course_unpublished: "Kurs nie został jeszcze opublikowany"
       enrolled_as_designer: "Zapisano w roli autora"
       enrolled_as_observer: "Zapisano w roli słuchacza"
       enrolled_as_student: "Zapisano w roli uczestnika"
@@ -13191,8 +13091,6 @@ pl:
       titles: 
         mastery_level: "dolny próg procentowy biegłości"
         select_and_add_criterion: "Wybierz i dodaj kryterium"
-    flash_notice: 
-      close: Zamknij
     flash_notices: 
       close: Zamknij
     footer_links: 
@@ -13565,8 +13463,6 @@ pl:
     unauthorized_feed: 
       bad_params: "Parametry kanału informacyjnego, do którego próbujesz uzyskać dostęp są nieprawidłowe."
       feedback: "Jeśli podany adres URL powinien działać, powiadom nas jak doszło do połączenia z obecną lokalizacją, klikając poniższe łącze, a my to sprawdzimy."
-      headings: 
-        problem: "Wystąpił problem z ładowaniem kanału informacyjnego"
       links: 
         feedback: "Powiedź nam, czego szukasz"
       title: "Nieprawidłowy kanał informacyjny"
@@ -14047,7 +13943,6 @@ pl:
       prompts: 
         delete: "Czy na pewno chcesz usunąć ten termin?"
       titles: 
-        enrollment_terms: "Terminy zapisów"
         term_details: "Informacje szczegółowe dot. terminu"
       update_term: "Aktualizuj termin"
     term: 
@@ -14186,8 +14081,6 @@ pl:
   unpublished_courses_title: "Nieopublikowane kursy"
   unsupported_package: "Nieobsługiwany pakiet zawartości"
   unused_courses_title: "Nieużywane kursy"
-  upload_button: 
-    files: Pliki
   user: 
     default_user_name: Użytkownik
     errors: 
@@ -14378,8 +14271,6 @@ pl:
         delete_user: "Usuń %{user_name}"
       titles: 
         confirm_delete: "Potwierdź usunięcie użytkownika"
-        confirm_deletion_of_user: "Potwierdź usunięcie użytkownika %{user_name}"
-        delete_user: "Usuń użytkownika"
         really_delete_user: "Naprawdę usuń %{user_name}"
     enrollment: 
       course_not_published: "Kurs nie został jeszcze opublikowany"
