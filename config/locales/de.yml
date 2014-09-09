@@ -121,7 +121,6 @@ de:
       settings_description: "Um sich über einen externen Identitätsanbieter (IdP) zu authentifizieren, muss der Benutzer über eine Zugangskennung verfügen, die mit diesem Benutzerkonto verknüpft ist und der eindeutigen Zugangskennung entspricht, die vom Identitätsanbieter zurückgegeben wird. Die aktuellen Zugangsdaten eines Benutzers entnehmen Sie bitte dem Abschnitt \"Zugangsdaten\" auf der Profilseite des Benutzers. (Die Profilseite kann über die Benutzersuche auf der Registerkarte \"Benutzer\" gefunden werden.)"
       settings_title: Authentifizierungseinstellungen
       test_ldap_link: "Authentifizierung prüfen"
-      title: Authentifizierungseinstellungen
     ldap_settings: 
       add_secondary_ldap_server_link: "Sekundären LDAP-server hinzufügen"
       auth_type_label: Typ
@@ -490,8 +489,6 @@ de:
         time: Uhrzeit
         user: Benutzer
       course_search_form: 
-        labels: 
-          find_deleted_course: "Nach einem gelöschten Kurs suchen"
         select_default: "Kurs auswählen"
         select_label: "Kurs auswählen"
       course_search_results: 
@@ -549,7 +546,6 @@ de:
         generate_activity_username: "Aktivität generieren für *%{user}*"
         message_date_from: "Von Datum"
         message_date_to: "Bis Datum"
-        search: Suchen
         search_people: "Personen durchsuchen"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1053,7 +1049,6 @@ de:
       last_batch_title: "Letzter Batch"
       override_sis_stickiness_instructions: "Standardmäßig haben UI-Änderungen Vorrang vor Änderungen via SIS-import. Bei einigen Eingabefeldern bewirkt der SIS-import keine Änderung der enthaltenen Daten, wenn ein Admin das Eingabefeld über das UI geändert hat. Wenn diese Option ausgewählt ist, werden die UI-Änderungen vom SIS-import überschrieben.  Nähere Informationen hierzu in der Dokumentation."
       override_sis_stickiness_label: "UI-Änderungen überschreiben"
-      page_header: SIS-import
       page_title: SIS-import
       pending_batches_count: 
         one: "%{count} Batch in Warteposition für Verarbeitung."
@@ -1402,7 +1397,6 @@ de:
     labels: 
       due: Abgabetermin
     name_is_required: "Name erforderlich!"
-    percentage_points_possible: "Für die prozentuale Benotung muss die mögliche Punktzahl über 0 liegen"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     select_external_tool_dialog_title: "Externes Tool konfigurieren"
     submission_action_take_quiz: "Akzeptieren %{title}"
@@ -1766,7 +1760,6 @@ de:
         pass_fail: Abgeschlossen/Unvollständig
         percent: Prozentsatz
         points: Punkte
-      view_grading_levels: "Notenschlüssel anzeigen"
     group_category_selector: 
       grade_group_students_individually: "Noten für alle Studenten einzeln vergeben"
       group_assignment_header: Gruppenaufgabe
@@ -2420,7 +2413,6 @@ de:
         calendar_month: Monat
         calendar_scheduler: Planer
         calendar_week: Woche
-        screenreader_recommend_agenda: "Benutzer von Sprachausgabeprogrammen: Verwenden Sie die Agenda zum Anzeigen von Events"
       loading: "Wird geladen"
       my_appointment_groups: "Meine Termingruppen"
     calendar_navigator: 
@@ -3645,7 +3637,6 @@ de:
       module: Modul
       module_details: "Die Module werden in der vorgegebenen Reihenfolge angezeigt. Dementsprechend können nur Module oberhalb von %{name} als Voraussetzung festgelegt werden."
       module_name: Modulname
-      modules_keyboard_hint: "Um die Reihenfolge der Kursmodule und Modulelemente zu ändern, deaktivieren Sie zuerst den Mauszeiger für Ihr Sprachausgabesprogramm. Drücken Sie in JAWS die Taste EINFG+Z. Drücken Sie die Tabulatortaste, um das erste Modul auszuwählen. Drücken Sie die Nach-Oben- und Nach-Unten-Taste, um ein Modul oder ein Modulelement auszuwählen. Drücken Sie die Leertaste, um das Modul oder Modulelement zum Ziehen auszuwählen. Drücken Sie dann die Nach-Oben- und Nach-Unten-Taste, um ein Ziel auszuwählen. Drücken Sie anschließend erneut die Leertaste, um das ausgewählte Modul oder Modulelement am Ziel abzulegen."
       must_complete_prerequisites: "Abschließen erforderlich für"
       no_preprequisites: "Keine Voraussetzungen definiert"
       no_requirements: "Keine Anforderungen definiert"
@@ -4321,7 +4312,6 @@ de:
         confirm_delete: "Möchten Sie diesen Kurs wirklich löschen? Nach dem Löschen haben die Studenten und Dozenten keinen Zugriff mehr auf den Kurs. Wenn Sie ihn lediglich aus dem Kurs-Dropdown-Menü entfernen möchten, sollten Sie *den Kurs stattdessen abschließen*."
         confirm_delete_addendum: "Wenn Sie nicht über die Berechtigung zum Abschließen des Kurses verfügen, können Sie *das Enddatum des Kurses ändern* oder den Administrator bitten, den Kurs abzuschließen."
       headings: 
-        confirm: "Schritt bestätigen"
         confirm_conclude: "Abschließen des Kurses bestätigen"
         confirm_delete: "Löschen des Kurses bestätigen"
       titles: 
@@ -4664,7 +4654,6 @@ de:
           delete_section: "Kursabschnitt löschen"
           edit_section: "Kursabschnitt bearbeiten"
       megabytes: Megabytes
-      navigation_keyboard_hint: "Wenn Sie ein Sprachausgabeprogramm verwenden, um die Reihenfolge der Navigations-Links für den Kurs zu ändern, deaktivieren Sie den virtuellen Mauszeiger oder den virtuellen Zwischenspeicher Ihres Sprachausgabeprogramms (drücken Sie in JAWS die Taste EINFG+Z). Drücken Sie die Taste STRG+START, um zum Seitenanfang zu springen, und drücken Sie dann die Tabulatortaste, um zum ersten Navigations-Link für den Kurs zu gelangen. Drücken Sie die Nach-Oben- bzw. die Nach-Unten-Taste, bis der zu verschiebende Link angesagt wird, und drücken Sie dann die Leertaste, um diesen auszuwählen. Drücken Sie die Nach-Oben- bzw. die Nach-Unten-Taste, bis Sie an der neuen Position angekommen sind. Drücken Sie zuletzt nochmals die Leertaste, um den verschoben Link direkt nach dem aktuellen Link anzuordnen. Wenn der Vorgang abgeschlossen ist, aktivieren Sie erneut den virtuellen Zwischenspeicher/Mauszeiger."
       no_date: "Kein Datum definiert"
       no_language_preference: "Nicht definiert (benutzerkonfigurierbar, Standardeinstellung %{language})"
       none: Keine
@@ -4818,8 +4807,6 @@ de:
       new: Neu
       new_discussion_entries: "Neue Diskussionsbeiträge"
       new_discussions: "Neue Diskussionen"
-      num_assignments: "# Aufgaben"
-      num_submissions: "# Einsendungen"
       page_title: Kursstatistik
       quiz: Quiz
       quiz_questions: Quizfragen
@@ -6045,15 +6032,6 @@ de:
     saving: "Wird gespeichert..."
     shared_secret: "Shared Secret"
     submit: Einsenden
-    tool_post_iframe: 
-      load_tool_button: "%{tool} laden"
-      load_tool_new_tab_button: "%{tool} in neuem Fenster laden"
-      new_tab: "Dieses Tool muss in einem neuen Browserfenster geladen werden"
-      new_tab_expired: "Die Sitzung für dieses Tool ist abgelaufen. Bitte laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können"
-      new_tab_loaded: "Dieses Tool wurde erfolgreich in einem neuen Browserfenster geladen. Laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können."
-    tool_show: 
-      tool_insecure_warning: "Sie haben versucht, Insecure-Inhalte von einer sicheren Site (Canvas) aus zu öffnen. Manche Internetbrowser verhindern möglicherweise das Laden dieser Inhalte."
-      tool_load_failure: "Es scheint, dass Ihre Inhalte nicht geladen werden. Mit dieser Schaltfläche können Sie versuchen, sie auf einer neuen Registerkarte zu laden."
     user_navigation_configured: "Benutzernavigation konfiguriert"
   facebook: 
     authorization_required: "Nur autorisierte Benutzer können auf diese Seite zugreifen"
@@ -6114,7 +6092,6 @@ de:
       ? "on"
       : Ein
       release_notes: Versionshinweise
-      toggle_feature_details: "Funktionsdetails ein/aus"
     feature_flag_admin_view: 
       feature_options: Funktionsoptionen
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
@@ -7210,7 +7187,6 @@ de:
     member_tooltip_show: "Gruppenübersicht anzeigen"
     membership_pending: 
       group_join_request: Gruppenbeitrittsanfrage
-      group_join_request_acknowledged: "Danke für die Anfrage, bitte auf weitere Informationen warten"
       group_join_request_info: "Diese Gruppe hat Ihre Beitrittsanfrage erhalten. Sie werden benachrichtigt, sobald Ihre Anfrage akzeptiert oder abgelehnt wird."
     messages: 
       creating_group: "Gruppe wird erstellt..."
@@ -7305,9 +7281,6 @@ de:
       create: "%{model} erstellen"
       submit: "%{model} speichern"
       update: "%{model} aktualisieren"
-  high_contrast_description: |-
-      Wenn Sie eine Version der Canvas-Benutzeroberfläche mit einem höheren Kontrast bevorzugen, aktivieren Sie diese Funktion.
-      Dies ist möglicherweise für Personen hilfreich, deren Sehfähigkeit eingeschränkt ist, oder die Schwierigkeiten beim Lesen haben.
   html5_first_videos_description: |-
       Standardmäßig versucht Canvas zuerst Flash für die Videowiedergabe zu verwenden. Aktivieren Sie diese Option, damit zuerst versucht wird HTML5
       und dann Flash zu verwenden.
@@ -7498,23 +7471,12 @@ de:
   layouts: 
     application: 
       group_switch: Wechseln
-      instructure_description: "Instructure, Entwickler des Open-Source-Lernverwaltungssystems Canvas"
       keyboard_navigation: 
         close: "Komma-Taste drücken, um das Dialogfeld zu schließen"
       links: 
         close: Schließen
         dashboard: "Mein Dashboard"
         skip_to_content: "Direkt zum Inhalt"
-      menu: 
-        assignments: Aufgaben
-        assignments_needing_grading: "Benotung erforderlich"
-        assignments_needing_submitting: Einzureichen
-        assignments_recently_graded: "Zuletzt benotet"
-        calendar: Kalender
-        grades: Noten
-      navigation: 
-        main: Hauptnavigation
-        user_menu: Benutzermenü
       open_source_learning_management_system: Open-Source-LMS
     facebook: 
       title: Facebook-seite
@@ -7531,7 +7493,6 @@ de:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "Alle Konten anzeigen"
-      view_all_enrollments: "Alle Kurse anzeigen"
       view_all_groups: "Alle Gruppen anzeigen"
     mobile_auth: 
       log_in_to_canvas: "Bei Canvas anmelden"
@@ -9202,38 +9163,6 @@ de:
       twitter: 
         body_account: "Canvas-benachrichtigung. Neue Gruppe: %{group_name} für das Benutzerkonto %{account}"
         body_course: "Canvas-benachrichtigung. Neue Gruppe: %{group_name} für den Kurs %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} hat sich soeben als Dozent auf %{website} registriert."
-        html: 
-          body: "%{user} hat sich soeben als Dozent auf %{website} registriert."
-          details: "Klicken Sie hier, um den Dozenten anzuzeigen"
-          email: E-mail
-          phone: Telefon
-          school_name: "Name der Schule"
-          school_position: "Position der Schule"
-          subject: "Neue Dozentenregistrierung"
-        labels: 
-          email: E-mail
-          phone: Telefon
-          school_name: "Name der Schule"
-          school_position: Position
-        subject: "Neue Dozentenregistrierung"
-      facebook: 
-        body: "%{user} hat sich soeben als Dozent auf %{website} registriert."
-        subject: "Neue Dozentenregistrierung"
-      sms: 
-        body: "%{user} hat sich soeben als Dozent auf %{website} registriert."
-      summary: 
-        body: "%{user} hat sich soeben als Dozent in Canvas registriert."
-        labels: 
-          email: E-mail
-          phone: Telefon
-          school_name: "Name der Schule"
-          school_position: Position
-        subject: "Neue Dozentenregistrierung"
-      twitter: 
-        body: "Canvas-benachrichtigung. Neuer Dozent: %{user}, %{account}"
     new_user: 
       email: 
         body: "Ein neuer Benutzer, %{user}, hat sich soeben für das Benutzerkonto %{account} angemeldet"
@@ -9717,9 +9646,6 @@ de:
   new_facebook_message: "Sie haben eine neue Nachricht von Canvas"
   new_quiz_moderate_desc: "Wenn die Funktionen 'Entwurfstatus' und 'Quiz-Statistiken' zulässig/aktiviert sind, ist die neue Seite zur Quiz-Moderation für ein Konto verfügbar."
   new_quiz_statistics_desc: "Wenn die Funktion 'Entwurfstatus' zulässig/aktiviert ist, ist die neue Seite mit Quiz-Statistiken für ein Konto verfügbar."
-  new_styles_description: |-
-      Wir aktualisieren gerade die Benutzeroberfläche von Canvas. Aktivieren Sie diese Option, 
-      um die aktualisierte und vereinfachte Canvas-Benutzeroberfläche zu sehen.
   no_migration_file: "Für die Inhaltsmigration ist eine Datei erforderlich."
   not_a_number: "muss eine positive Zahl sein"
   notification: 
@@ -9873,7 +9799,6 @@ de:
       new_file_added: "Neue Datei hinzugefügt"
       new_files_added: "Neue Datei hinzugefügt"
       new_student_organized_group: "Neue selbstorganisierte Studentengruppe"
-      new_teacher_registration: "Neue Dozentenregistrierung"
       new_user: "Neuer Benutzer"
       pseudonym_registration: Pseudonymregistrierung
       report_generated: "Bericht erstellt"
@@ -10423,9 +10348,6 @@ de:
     respondus_soap_endpoint: 
       description: "SOAP-endpunkt für Respondus QTI-uploads"
       name: "Respondus SOAP-endpunkt"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Aktiviert (QTI Converter ebenfalls aktivieren)"
     scribd: 
       description: Scribd-dokumentevorschauen
       name: Scribd
@@ -11644,7 +11566,6 @@ de:
         hints: 
           group_pick_count: "%{pick_count} bisher ausgewählt"
         labels: 
-          add_questions_to_group: "Fragen zur Quizgruppe hinzufügen"
           group_name: Gruppenname
           group_pick_count: Auswählen
           group_points: Punkte
@@ -11796,25 +11717,7 @@ de:
         unnamed_quiz_results: "Quizergebnisse für %{user}"
         unnamed_survey_results: "Befragungsergebnisse für %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Quizzes veröffentlichen"
-        headers: 
-          assignment_quizzes: Aufgaben-Quiz
-          course_quizzes: Kurs-Quiz
-          practice_quizzes: Übungs-Quiz
-          publish_multiple_quizzes: "Mehrere Quiz veröffentlichen"
-          surveys: Befragungen
-          unpublished_quizzes: "Nicht veröffentlichte Quiz"
-        labels: 
-          publish_multiple_quizzes: "Wählen Sie die Quiz aus, die Sie derzeit veröffentlichen möchten"
-        links: 
-          create_new_quiz: "Neues Quiz erstellen"
-          manage_question_banks: "Fragenpools verwalten"
-          publish_multiple_quizzes: "Mehrere Quiz veröffentlichen"
-        no_quizzes: "Keine Quiz verfügbar"
         page_titles: Quiz
-        titles: 
-          this_quiz_is_locked: "Dieses Quiz ist derzeit gesperrt. Klicken Sie hier, um weitere Details zu erhalten."
       invalid_ip: 
         quiz_protected: "Dieses Quiz ist geschützt und nur für bestimmte IP-Adressen verfügbar. Die IP-Adresse des Computers, den Sie gerade verwenden, berechtigt Sie nicht, an diesem Quiz teilzunehmen."
         survey_protected: "Diese Befragung ist geschützt und nur für bestimmte IP-Adressen verfügbar. Die IP-Adresse des Computers, den Sie gerade verwenden, berechtigt Sie nicht, an dieser Befragung teilzunehmen."
@@ -12371,8 +12274,6 @@ de:
     upload_info: "Wenn Sie Änderungen an den heruntergeladenen Einsendungen der Studenten vorgenommen haben, komprimieren Sie die Einsendungen erneut und laden Sie die Zip-datei über das unten stehende Formular hoch. Die geänderten Dateien werden den Studenten in den Einsendungskommentaren angezeigt."
     upload_warning: "Bitte achten Sie darauf, dass die Namen der eingesandten Dateien unverändert bleiben, sodass eine eindeutige Zuordnung möglich ist."
   react_files: 
-    aria_label: 
-      settings: Einstellungen
     errors: 
       no_match: 
         suggestions: "Vorschläge:"
@@ -12858,7 +12759,6 @@ de:
         one: "1 Teilnehmer"
         other: "%{count} Teilnehmer"
     current_enrollment: 
-      course_unpublished: "Dieser Kurs ist noch nicht veröffentlicht worden"
       enrolled_as_designer: "Eingeschrieben als Designer"
       enrolled_as_observer: "Eingeschrieben als Beobachter"
       enrolled_as_student: "Eingeschrieben als Student"
@@ -12955,8 +12855,6 @@ de:
       titles: 
         mastery_level: "Prozent für die Erfüllung des Leistungsziels"
         select_and_add_criterion: "Kriterium auswählen und hinzufügen"
-    flash_notice: 
-      close: Schließen
     flash_notices: 
       close: Schließen
     footer_links: 
@@ -13323,8 +13221,6 @@ de:
     unauthorized_feed: 
       bad_params: "Die Parameter des Feeds, den Sie aufrufen wollen, sind ungültig."
       feedback: "Wenn Sie sicher sind, dass diese URL funktionieren sollte, teilen Sie uns bitte mit, wie Sie hierher gefunden haben, und wir werden versuchen weiterzuhelfen."
-      headings: 
-        problem: "Beim Laden Ihres Feeds ist ein Problem aufgetreten"
       links: 
         feedback: "Lassen Sie uns wissen, nach was Sie gesucht haben"
       title: "Ungültiger Feed"
@@ -13796,7 +13692,6 @@ de:
       prompts: 
         delete: "Möchten Sie diese Kursperiode wirklich löschen?"
       titles: 
-        enrollment_terms: Einschreibungszeiträume
         term_details: "Details der Kursperiode"
       update_term: "Kursperiode aktualisieren"
     term: 
@@ -13931,8 +13826,6 @@ de:
   unpublished_courses_title: "Nicht veröffentlichte Kurse"
   unsupported_package: "Nicht unterstütztes Inhaltspaket"
   unused_courses_title: "Nicht verwendete Kurse"
-  upload_button: 
-    files: Dateien
   user: 
     default_user_name: Benutzer
     errors: 
@@ -14116,8 +14009,6 @@ de:
         delete_user: "%{user_name} löschen"
       titles: 
         confirm_delete: "Löschen von Benutzer bestätigen"
-        confirm_deletion_of_user: "Bestätigen Sie die Löschung von %{user_name}"
-        delete_user: "Benutzer löschen"
         really_delete_user: "%{user_name} wirklich löschen"
     enrollment: 
       course_not_published: "Dieser Kurs ist noch nicht veröffentlicht worden"
