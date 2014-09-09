@@ -1,0 +1,37 @@
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+
+describe "canvas quiz statistics" do
+  include_examples "quizzes selenium tests"
+
+  before do
+    quiz_with_graded_submission([
+      {:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'true_false_question'}},
+      {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'true_false_question'}}
+    ])
+
+    course_with_teacher_logged_in(:active_all => true, :course => @course)
+  end
+
+  it 'should mount' do
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics_cqs"
+
+    status = driver.execute_script <<-JS
+      var mountStatus = document.body.appendChild(document.createElement('div'));
+
+      require([ 'jquery', 'canvas_quiz_statistics' ], function($, app) {
+        if (app.isMounted()) {
+          $(mountStatus).text('success');
+        } else {
+          $(mountStatus).text('error');
+        }
+      });
+
+      return mountStatus;
+    JS
+
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until { status.text.present? } # require call is async
+
+    status.text.should match('success')
+  end
+end

@@ -33,6 +33,7 @@ define(function(require) {
 
   parseQuestion = function(participantCount, question) {
     var attrs = pickAndNormalize(question, K.QUESTION_STATISTICS_ATTRS);
+    var correctAnswerPointBiserials;
 
     wrap(attrs.answers).forEach(decorateAnswer.bind(null, participantCount));
     wrap(attrs.answerSets).forEach(decorateAnswerSet.bind(null, participantCount));
@@ -42,9 +43,11 @@ define(function(require) {
         return pickAndNormalize(pointBiserial, K.POINT_BISERIAL_ATTRS);
       });
 
-      attrs.discriminationIndex = findWhere(attrs.pointBiserials, {
+      correctAnswerPointBiserials = findWhere(attrs.pointBiserials, {
         correct: true
-      }).pointBiserial;
+      }) || {};
+
+      attrs.discriminationIndex = correctAnswerPointBiserials.pointBiserial;
     }
 
     return attrs;
