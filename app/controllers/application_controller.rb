@@ -829,9 +829,8 @@ class ApplicationController < ActionController::Base
   end
 
   def update_enrollment_last_activity_at
-    if @context.is_a?(Course) && @context_enrollment
-      @context_enrollment.record_recent_activity
-    end
+    activity = Enrollment::RecentActivity.new(@context_enrollment, @context)
+    activity.record_for_access(response)
   end
 
   # Asset accesses are used for generating usage statistics.  This is how

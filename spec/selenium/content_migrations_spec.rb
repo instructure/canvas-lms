@@ -313,7 +313,12 @@ describe "content migrations", :non_parallel do
 
   context "course copy" do
     before :all do
-      Account.clear_special_account_cache!
+      #the "true" param is important, it forces the cache clear
+      #  without it this spec group fails if
+      #  you run it with the whole suite
+      #  because of a cached default account
+      #  that no longer exists in the db
+      Account.clear_special_account_cache!(true)
       @copy_from = course
       @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')

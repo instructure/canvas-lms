@@ -1016,37 +1016,6 @@ class Enrollment < ActiveRecord::Base
     @sis_user_id
   end
 
-  def record_last_activity_threshold
-    Setting.get('enrollment_last_activity_at_threshold', 2.minutes).to_i
-  end
-
-  def record_total_activity_threshold
-    Setting.get('enrollment_total_activity_time_threshold', 10.minutes).to_i
-  end
-
-  def record_recent_activity_worthwhile?(as_of, threshold)
-    last_activity_at.nil? || (as_of - last_activity_at >= threshold)
-  end
-
-  def increment_total_activity?(as_of, last_threshold, total_threshold)
-    !last_activity_at.nil? &&
-      (as_of - last_activity_at >= last_threshold) &&
-      (as_of - last_activity_at < total_threshold)
-  end
-
-  def record_recent_activity(as_of = Time.zone.now,
-                             last_threshold = record_last_activity_threshold,
-                             total_threshold = record_total_activity_threshold)
-    return unless record_recent_activity_worthwhile?(as_of, last_threshold)
-    if increment_total_activity?(as_of, last_threshold, total_threshold)
-      self.total_activity_time += (as_of - self.last_activity_at).to_i
-      self.class.where(:id => self).update_all(:total_activity_time => total_activity_time, :last_activity_at => as_of)
-    else
-      self.class.where(:id => self).update_all(:last_activity_at => as_of)
-    end
-    self.last_activity_at = as_of
-  end
-
   def total_activity_time
     self.read_attribute(:total_activity_time).to_i
   end

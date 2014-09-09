@@ -298,6 +298,20 @@ describe CoursesController do
       assigns[:unauthorized_message].should_not be_nil
     end
 
+    it "does not record recent activity for unauthorize actions" do
+      user_session(@student)
+      @course.workflow_state = 'available'
+      @course.save!
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.last_activity_at = nil
+      @enrollment.save!
+      get 'settings', course_id: @course.id
+      assert_status(401)
+      expect(assigns[:unauthorized_reason]).to eq(:unpublished)
+      expect(@enrollment.reload.last_activity_at).to be(nil)
+    end
+
     it "should assign active course_settings_sub_navigation external tools" do
       user_session(@teacher)
       @teacher.enable_feature!(:lor_for_user)
@@ -408,13 +422,15 @@ describe CoursesController do
 
       @course.update_attributes(:restrict_enrollments_to_course_dates => true,
                                 :start_at => Time.now + 2.weeks)
-      @enrollment.update_attributes(:workflow_state => 'invited')
+      @enrollment.update_attributes(:workflow_state => 'invited', last_activity_at: nil)
 
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1',
         :invitation => @enrollment.uuid
 
       response.should redirect_to(courses_url)
-      @enrollment.reload.workflow_state.should == 'active'
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq('active')
+      expect(@enrollment.last_activity_at).to be(nil)
     end
   end
 

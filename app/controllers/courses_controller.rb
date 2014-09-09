@@ -255,6 +255,7 @@ class CoursesController < ApplicationController
 
   before_filter :require_user, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
+  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
 
   include Api::V1::Course
   include Api::V1::Progress
