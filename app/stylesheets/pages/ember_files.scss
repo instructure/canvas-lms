@@ -256,25 +256,69 @@ $border: #e5e4e4;
   margin-top: 5px;
   padding-right: 5px;
 }
-.upload-progress-view__bar-container {
-  height: 3px;
-  margin-bottom: 12px;
-  background: $canvas-neutral;
-  width: 100%;
+.upload-progress-view {
+  padding-top: 25px;
+  clear: both;
 }
 .upload-progress-view__label {
   margin-left: 5px;
   margin-top: 5px;
+  width: 49%;
   color: ensure-contrast(#000, $canvas-secondary);
   font-size: 0.95em;
+  float: left;
 }
-.upload-progress-view__indeterminate{
-  margin-left: 6px;
-  margin-bottom: 2px;
+.upload-progress-view__bar-container {
+  height: 9px;
+  width: 49%;
+  margin-bottom: 12px;
+  border: solid $canvas-primary 1px;
+  border-radius: 20px;
+  float: right;
+  margin-top: 10px;
+
+  &.almost-done {
+    border: solid $canvas-success 1px;
+  }
 }
 .upload-progress-view__bar {
   position: relative;
   background: $canvas-primary;
   border: none;
-  height: 3px;
+  height: 9px;
+  border-radius: 20px;
+
+  &.almost-done {
+    background: $canvas-success;
+  }
+}
+.current_uploads {
+  border-radius: 10px;
+  border: dashed $canvas-neutral 2px;
+  padding: 10px 10px 40px 10px;
+}
+.current_uploads__uploaders {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.current_uploads__instructions {
+  text-align: center;
+}
+.current_uploads__instructions__close {
+  float: right;
+  color: $canvas-neutral;
+  font-size: -1.8em;
+  pointer: cursor;
+}
+i[class*=current_uploads__instructions__icon-upload]:before {
+  font-size: 100px;
+}
+i[class*=current_uploads__instructions__icon-upload] {
+  color: $canvas-primary;
+  width: 100px;
+  height: 100px;
+}
+.current_uploads__instructions__drag {
+  font-size: 1.8em;
+  font-weight: bold;
 }
