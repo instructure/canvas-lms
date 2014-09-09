@@ -498,9 +498,11 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    read_attribute(:default_storage_quota) ||
-      (self.parent_account.default_storage_quota rescue nil) ||
-      Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    Rails.cache.fetch(['default_storage_quota', self].cache_key) do
+      read_attribute(:default_storage_quota) ||
+        (self.parent_account.default_storage_quota rescue nil) ||
+        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    end
   end
 
   def default_storage_quota_mb

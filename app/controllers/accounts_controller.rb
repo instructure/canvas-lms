@@ -116,6 +116,7 @@ class AccountsController < ApplicationController
         else
           @accounts = []
         end
+        Account.send(:preload_associations, @accounts, [:root_account])
         render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || []) }
       end
     end
@@ -177,6 +178,7 @@ class AccountsController < ApplicationController
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              :total_entries => recursive ? nil : @accounts.count)
 
+    Account.send(:preload_associations, @accounts, [:root_account, :parent_account])
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
@@ -280,6 +282,7 @@ class AccountsController < ApplicationController
 
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
+    Course.send(:preload_associations, @courses, [:account, :root_account])
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
 
