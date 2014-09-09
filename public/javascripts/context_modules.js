@@ -728,8 +728,8 @@ define([
               el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
           }
-          fixLink('h2.collapse_module_link', 'href');
-          fixLink('h2.expand_module_link', 'href');
+          fixLink('span.collapse_module_link', 'href');
+          fixLink('span.expand_module_link', 'href');
           fixLink('.reorder_items_url', 'href');
           fixLink('.add_module_item_link', 'rel');
           var publishData = {
@@ -1387,7 +1387,7 @@ define([
     modules.refreshProgressions();
     modules.updateAssignmentData();
 
-    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click', function(event, goSlow) {
+    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();
       var expandCallback = null;
       if(goSlow && $.isFunction(goSlow)) {
@@ -1404,9 +1404,14 @@ define([
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);
+            // Makes sure the resulting item has focus.
+            $module.find(".collapse_module_link").focus();
+
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);
+            // Makes sure the resulting item has focus.
+            $module.find(".expand_module_link").focus();
           }
           if(expandCallback && $.isFunction(expandCallback)) {
             expandCallback();
@@ -1418,6 +1423,7 @@ define([
         } else {
           $module.find(".content").slideToggle(callback);
         }
+
       }
       if(reload_entries || goSlow) {
         $module.loadingImage();
@@ -1460,6 +1466,7 @@ define([
       if(collapse == '1' || !reload_entries) {
         toggle();
       }
+
     });
     $(".refresh_progressions_link").click(function(event) {
       event.preventDefault();

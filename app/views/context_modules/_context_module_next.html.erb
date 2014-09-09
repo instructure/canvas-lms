@@ -35,24 +35,30 @@
       rel="nofollow"
       class="reorder_items_url"
       style="display: none;">&nbsp;</a>
-    <h2
+    <span
+      role="button"
+      tabindex="0"
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
       class="ig-header-title collapse_module_link"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
+      aria-expanded="true"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
-    </h2>
-    <h2
+    </span>
+    <span
+      role="button"
+      tabindex="0"
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
       class="ig-header-title expand_module_link"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
+      aria-expanded="false"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-right"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
-    </h2>
+    </span>
 
 
 
