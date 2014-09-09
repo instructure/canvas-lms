@@ -44,12 +44,21 @@ define [
     _actualUpload: () ->
       xhr = new XMLHttpRequest
       xhr.upload.addEventListener('progress', @trackProgress, false)
-      xhr.upload.addEventListener('load', @onUploadPosted, false)
+      xhr.onload = @onUploadPosted
       xhr.open 'POST', @uploadData.upload_url, true
       xhr.send @createFormData()
 
-    onUploadPosted: (uploadResults) =>
-      $.getJSON(@uploadData.upload_params.success_url).then (results) =>
+    # when using s3 uploads you now need to manually hit the success_url
+    # when using local uploads you have already been auto-redirected (even
+    # though we requested no_redirect) to the succes_url at this point
+    onUploadPosted: (event) =>
+      url = @uploadData.upload_params.success_url
+      if url
+        $.getJSON(url).then (results) =>
+          f = @addFileToCollection(results)
+          @deferred.resolve(f)
+      else
+        results = $.parseJSON(event.target.response)
         f = @addFileToCollection(results)
         @deferred.resolve(f)
 
