@@ -185,6 +185,9 @@ define [
 
     canGroup: -> !@get('has_submitted_submissions')
 
+    differentiatedAssignmentsEnabled: ->
+      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false
+
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id
