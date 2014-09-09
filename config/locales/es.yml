@@ -123,7 +123,6 @@ es:
       settings_description: "Para que un usuario pueda autentificar a través de un proveedor externo de identidad (IdP), el usuario debe tener un identificador de ingreso que está unido a esta cuenta y que concuerda el identificador único provisto por el IdP. Para ver los ingresos actuales del usuario, vea la sección  “Información de Ingreso” en la página del perfil del usuario. (Encontrado haciendo una busqueda del usuario en la lengüeta de “Usuarios”.)"
       settings_title: "Configuraciónes de Autentificación"
       test_ldap_link: "Autenticación de prueba"
-      title: "Configuraciones de Autentificación"
     ldap_settings: 
       add_secondary_ldap_server_link: "Agregar un Servidor Secundario de LDAP"
       auth_type_label: Tipo
@@ -480,8 +479,6 @@ es:
         time: Tiempo
         user: Usuario
       course_search_form: 
-        labels: 
-          find_deleted_course: "Buscar un curso eliminado"
         select_default: "Seleccionar un curso"
         select_label: "Seleccionar un curso"
       course_search_results: 
@@ -539,7 +536,6 @@ es:
         generate_activity_username: "Generar actividad para *%{user}*"
         message_date_from: "Desde la fecha"
         message_date_to: "Hasta la fecha"
-        search: Buscar
         search_people: "Buscar personas"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1045,7 +1041,6 @@ es:
           Como predeterminado, los cambios UI tienen prioridad sobre los cambios por importaciones SIS, las importaciones SIS no cambiará la información de ese campo si un admin ha cambiado ese campo a través del UI. Si selecciona esa opción, la importación SIS sobrescribirá los cambios UI.
           Vea la documentación para más detalles.
       override_sis_stickiness_label: "Sobrescribir los cambios UI"
-      page_header: "Importación SIS"
       page_title: "Importación SIS"
       pending_batches_count: 
         one: "grupo %{count} esperando a ser procesado."
@@ -1392,7 +1387,6 @@ es:
     labels: 
       due: "Fecha límite"
     name_is_required: "Es obligatorio escribir un nombre"
-    percentage_points_possible: "Puntos posibles debe ser mayor que 0 si la calificación es porcentual"
     points_possible_number: "Puntos posibles debe ser un número"
     select_external_tool_dialog_title: "Configurar herramienta externa"
     submission_action_take_quiz: "Realizar %{title}"
@@ -1757,7 +1751,6 @@ es:
         pass_fail: Completo/Incompleto
         percent: Porcentaje
         points: Puntos
-      view_grading_levels: "Ver niveles de calificación"
     group_category_selector: 
       grade_group_students_individually: "Asignar calificaciones a cada alumno individualmente"
       group_assignment_header: "Tarea de grupo"
@@ -2411,7 +2404,6 @@ es:
         calendar_month: Mes
         calendar_scheduler: Programador
         calendar_week: Semana
-        screenreader_recommend_agenda: "Usuarios de lector de pantalla: usar la Agenda para visualizar los eventos"
       loading: Cargando
       my_appointment_groups: "Mi grupo de citas"
     calendar_navigator: 
@@ -3634,7 +3626,6 @@ es:
       module: módulo
       module_details: "Módulos se muestran en orden secuencial, solo módulos por encima de %{name} pueden ser establecidos como prerrequisitos."
       module_name: "Nombre del módulo"
-      modules_keyboard_hint: "Para modificar el orden de los módulos de curso y los elementos del módulo, apague primero el cursor en el lector de pantalla. Pulse Insert+Z en JAWS. Pulse la tecla tabulador para seleccionar un módulo o elemento del módulo. Después, pulse la barra espaciadora para seleccionar un módulo o elemento del módulo y empezar a arrastrar. Después pulse las teclas arriba o abajo para seleccionar su destino. A continuación pulse la barra espaciadora por segunda vez para soltar la selección en su destino."
       must_complete_prerequisites: "Deben completar"
       no_preprequisites: "No se han definido prerrequisitos"
       no_requirements: "No se han definido requerimientos"
@@ -4309,7 +4300,6 @@ es:
         confirm_delete: "¿Está seguro de que desea eliminar este curso? Una vez eliminado, los alumnos y los profesores ya no tendrán acceso al mismo. Si solo desea eliminarlo del menú desplegable, debe elegir la opción de *finalizar el curso*."
         confirm_delete_addendum: "Si no tiene permiso para finalizar el curso, puede *cambiar la fecha de finalización del curso* o solicitar al administrador que finalice el curso."
       headings: 
-        confirm: "Confirmar la Acción"
         confirm_conclude: "Confirmar la Conclusión del Curso"
         confirm_delete: "Confirmar el Borrado del Curso"
       titles: 
@@ -4652,7 +4642,6 @@ es:
           delete_section: "Borrar la Sección"
           edit_section: "Editar la Sección"
       megabytes: megabytes
-      navigation_keyboard_hint: "Si está utilizando un lector de pantalla y desea cambiar el orden de los enlaces de navegación del curso, apague el cursor virtual o el buffer virtual en su lector de pantalla (pulse Insert+z en JAWS). Pulse control-inicio para saltar al inici de la página y luego pulse la tecla tabulador hasta que llegue al primer enlace de navegación del curso. Pulse las teclas de las flechas arriba y abajo hasta que escuche el enlace al que quiere desplazarse, y después pulse la tecla espaciadora para seleccionarlo. Despúes pulse las teclas de las flechas arriba y abajo hasta que encuentre la nueva posición. Por último, pulse de nuevo la barra espaciadora para situar el enlace al que se va a dirigir justo debajo del enlace actual. Una vez haya terminado, vuelva a activar el cursor/buffer virtual"
       no_date: "No hay Fecha Establecida"
       no_language_preference: "No establecido (configurable por el usuario, regresa a %{language})"
       none: Ninguno
@@ -4806,8 +4795,6 @@ es:
       new: Nuevo
       new_discussion_entries: "Nuevas Entradas en la Discusión"
       new_discussions: "Nuevos Foros"
-      num_assignments: "# de Tareas"
-      num_submissions: "# de Contribuciones"
       page_title: "Estadísticas del Curso"
       quiz: Evaluación
       quiz_questions: "Preguntas de la Evaluación"
@@ -6031,15 +6018,6 @@ es:
     saving: Guardando...
     shared_secret: "Secreto compartido"
     submit: Enviar
-    tool_post_iframe: 
-      load_tool_button: "Cargar %{tool}"
-      load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
-      new_tab: "Es necesario cargar esta herramienta en una ventana del navegador nueva"
-      new_tab_expired: "Ha caducado la sesión para esta herramienta. Vuelva a cargar la página para poder acceder de nuevo a ella."
-      new_tab_loaded: "Esta herramienta se cargó correctamente en una ventana nueva del navegador. Vuelva a recargar la página para poder acceder de nuevo a la herramienta."
-    tool_show: 
-      tool_insecure_warning: "Esta tratando de iniciar contenido poco seguro desde un sitio seguro (canvas). Es posible que algunos navegadores de Internet eviten que se cargue este contenido."
-      tool_load_failure: "Parece que su contenido no se puede cargar. Puede utilizar este botón para tratar de iniciarlo en una nueva pestaña."
     user_navigation_configured: "Navegación del usuario configurada"
   facebook: 
     authorization_required: "Solo usuarios autorizados pueden tener acceso a esa página"
@@ -6100,7 +6078,6 @@ es:
       ? "on"
       : Activado
       release_notes: "notas de la versión"
-      toggle_feature_details: "Alternar detalles de la función"
     feature_flag_admin_view: 
       feature_options: "Opciones de características"
       no_features_available: "No hay funciones disponibles actualmente"
@@ -7192,7 +7169,6 @@ es:
     member_tooltip_show: "Ver la nómina del grupo"
     membership_pending: 
       group_join_request: "Solicitud de Suscripción a un Grupo"
-      group_join_request_acknowledged: "Gracias por la solicitud, siga pendiente"
       group_join_request_info: "Este grupo ha recibido su solicitud de suscripción. Será notificado una vez que acepten o rechacen su solicitud."
     messages: 
       creating_group: "Creando Grupo..."
@@ -7287,9 +7263,6 @@ es:
       create: "Crear %{model}"
       submit: "Guardar %{model}"
       update: "Actualizar %{model}"
-  high_contrast_description: |-
-      Si prefiere ver una versión de la interfaz de usuario de Canvas con mayor contraste, habilite esta opción.
-      Esta opción puede ser útil para personas con visión reducida o con dificultad para leer.
   html5_first_videos_description: "De manera predeterminada, Canvas tratará de usar Flash en primer lugar para reproducir vídeos. Active esta opción para que intente utilizar HTML5 primero, y después recurrir a Flash."
   ic_actions: 
     manage: gestionar
@@ -7476,23 +7449,12 @@ es:
   layouts: 
     application: 
       group_switch: Cambiar
-      instructure_description: "Instructure, creadores del sistema de manejo de aprendizaje Canvas"
       keyboard_navigation: 
         close: "Pulse la tecla coma para cerrar este cuadro de diálogo"
       links: 
         close: Cerrar
         dashboard: "Mi Tablero"
         skip_to_content: "Saltar al Contenido"
-      menu: 
-        assignments: Tareas
-        assignments_needing_grading: "Necesitan Calificación"
-        assignments_needing_submitting: "A ser entregados"
-        assignments_recently_graded: "Calificados Recientemente"
-        calendar: Calendario
-        grades: Calificaciones
-      navigation: 
-        main: "Navegación principal"
-        user_menu: "Menú de usuario"
       open_source_learning_management_system: "Código Abierto LMS"
     facebook: 
       title: "Página de Facebook"
@@ -7509,7 +7471,6 @@ es:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "Ver todas las cuentas"
-      view_all_enrollments: "Ver todos los cursos"
       view_all_groups: "Ver todos los grupos"
     mobile_auth: 
       log_in_to_canvas: "Iniciar sesión en Canvas"
@@ -9193,38 +9154,6 @@ es:
       twitter: 
         body_account: "Alerta de Canvas - Grupo Nuevo: %{group_name} para la cuenta %{account}"
         body_course: "Alerta de Canvas - Grupo Nuevo: %{group_name} para el curso %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} se acaba de registrar como un profesor en %{website}."
-        html: 
-          body: "%{user} se acaba de registrar como un profesor en %{website}."
-          details: "Haga clic aquí para ver el profesor"
-          email: "Correo electrónico"
-          phone: Teléfono
-          school_name: "Nombre de la escuela"
-          school_position: "Puesto en la escuela"
-          subject: "Inscripción de un profesor nuevo"
-        labels: 
-          email: "Correo Electrónico"
-          phone: Telefono
-          school_name: "Nombre de la Escuela"
-          school_position: "Posición Escolar"
-        subject: "Registro de Profesor Nuevo"
-      facebook: 
-        body: "%{user} se acaba de registrar como un profesor en %{website}."
-        subject: "Registro de Profesor Nuevo"
-      sms: 
-        body: "%{user} se acaba de registrar como un profesor en %{website}."
-      summary: 
-        body: "%{user} se acaba de registrar como un profesor en Canvas."
-        labels: 
-          email: "Correo Electrónico"
-          phone: Telefono
-          school_name: "Nombre de la Escuela"
-          school_position: "Posición Escolar"
-        subject: "Registro de Profesor Nuevo"
-      twitter: 
-        body: "Alerta de Canvas - Profesor Nuevo: %{user}, %{account}"
     new_user: 
       email: 
         body: "Un usuario nuevo, %{user}, se ha registrado para la cuenta %{account}"
@@ -9708,7 +9637,6 @@ es:
   new_facebook_message: "Tiene un mensaje nuevo de Canvas"
   new_quiz_moderate_desc: "Si el estado borrador y las estadísticas de la evaluación están habilitadas o activadas, la nueva página de moderación de evaluaciones estará disponible para una cuenta determinada."
   new_quiz_statistics_desc: "Cuando el estado borrador está activado o habilitado, la nueva página de estadísticas de evaluaciones estará disponible para una cuenta determinada."
-  new_styles_description: "Estamos rediseñando la interfaz de usuario de Canvas. Active esta opción para poder ver el nuevo aspecto simplificado de la interfaz de Canvas,"
   no_migration_file: "Archivo obligatorio para la migración de contenido."
   not_a_number: "debe ser un número positivo"
   notification: 
@@ -9862,7 +9790,6 @@ es:
       new_file_added: "Archivo nuevo agregado"
       new_files_added: "Archivos nuevos agregados"
       new_student_organized_group: "Nuevo Grupo Organizado por Estudiantes"
-      new_teacher_registration: "Inscripción de un Profesor Nuevo"
       new_user: "Usuario Nuevo"
       pseudonym_registration: "Inscripción de Seudónimo"
       report_generated: "Reporte Generado"
@@ -10409,9 +10336,6 @@ es:
     respondus_soap_endpoint: 
       description: "Terminal SOAP para cargas QTI en Respondus"
       name: "Terminal SOAP de Respondus"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Activado (también debe activar el exportador QTI)"
     scribd: 
       description: "Vista previa de documentos en Scribd"
       name: Scribd
@@ -11642,7 +11566,6 @@ es:
         hints: 
           group_pick_count: "%{pick_count} seleccionados hasta ahora"
         labels: 
-          add_questions_to_group: "Agregar preguntas a este grupo de evaluaciones"
           group_name: "Nombre del grupo"
           group_pick_count: Escoger
           group_points: Puntos
@@ -11794,25 +11717,7 @@ es:
         unnamed_quiz_results: "Resultados de la evaluación para %{user}"
         unnamed_survey_results: "Resultados de la encuesta para %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "Publicar evaluaciones"
-        headers: 
-          assignment_quizzes: "Evaluaciones de tareas"
-          course_quizzes: "Evaluaciones del curso"
-          practice_quizzes: "Evaluaciones de prácticas"
-          publish_multiple_quizzes: "Publicar varias evaluaciones"
-          surveys: Encuestas
-          unpublished_quizzes: "Evaluaciones no publicadas"
-        labels: 
-          publish_multiple_quizzes: "Seleccione las evaluaciones que le gustaría publicar en este momento"
-        links: 
-          create_new_quiz: "Crear una nueva evaluación"
-          manage_question_banks: "Gestionar grupos de preguntas"
-          publish_multiple_quizzes: "Publicar varias evaluaciones"
-        no_quizzes: "No hay evaluaciones disponibles"
         page_titles: Evaluaciones
-        titles: 
-          this_quiz_is_locked: "Esta evaluación está bloqueada. Haga clic para obtener más información."
       invalid_ip: 
         quiz_protected: "Esta evaluación está protegida y solo está disponible desde ciertos lugares. El equipo que está usando no parece estar en un lugar válido para poder realizar esta evaluación."
         survey_protected: "Esta encuesta está protegida y solo está disponible desde ciertos lugares. El equipo que está usando no parece estar en un lugar válido para poder realizar esta encuesta."
@@ -12368,8 +12273,6 @@ es:
     upload_info: "Si hizo cambios a los archivos de envíos de estudiantes que descargó anteriormente, sólo comprímalos y cargue el archivo zip con el formulario a continuación. Los estudiantes verán los archivos modificados en sus comentarios para el envío."
     upload_warning: "Asegurese que no cambie los nombres de los archivos de envío para poder reconocerlos."
   react_files: 
-    aria_label: 
-      settings: Configuración
     errors: 
       no_match: 
         suggestions: "Sugerencias:"
@@ -12855,7 +12758,6 @@ es:
         one: "1 participante"
         other: "%{count} participantes"
     current_enrollment: 
-      course_unpublished: "Este curso aún no ha sido publicado"
       enrolled_as_designer: "Inscrito como un diseñador"
       enrolled_as_observer: "Inscrito como un observador"
       enrolled_as_student: "Inscrito como un estudiante"
@@ -12952,8 +12854,6 @@ es:
       titles: 
         mastery_level: "porcentaje sobre el cual establecer el dominio del tema"
         select_and_add_criterion: "Seleccionar y Agregar Criterio"
-    flash_notice: 
-      close: Cerrar
     flash_notices: 
       close: Cerrar
     footer_links: 
@@ -13319,8 +13219,6 @@ es:
     unauthorized_feed: 
       bad_params: "Los parámetros para el canal que quería accesar son inválidos."
       feedback: "Si está seguro que este url debería trabajar, por favor díganos como llegar aquí haciendo click en el siguiente enlace, y lo investigaremos."
-      headings: 
-        problem: "Ocurrió un problema cargando su canal"
       links: 
         feedback: "Díganos qué es lo que anda buscando"
       title: "Canal Inválido"
@@ -13791,7 +13689,6 @@ es:
       prompts: 
         delete: "¿Seguro ue quiere borrar este período?"
       titles: 
-        enrollment_terms: "Período de Inscripción"
         term_details: "Detalles del Período"
       update_term: "Actualizar período"
     term: 
@@ -13926,8 +13823,6 @@ es:
   unpublished_courses_title: "Cursos no publicados"
   unsupported_package: "Paquete de contenido no compatible"
   unused_courses_title: "Cursos no utilizados"
-  upload_button: 
-    files: Archivos
   user: 
     default_user_name: Usuario
     errors: 
@@ -14111,8 +14006,6 @@ es:
         delete_user: "Borrar %{user_name}"
       titles: 
         confirm_delete: "Confirmar el Borrado del Usuario"
-        confirm_deletion_of_user: "Confirmar el borrado de %{user_name}"
-        delete_user: "Borrar usuario"
         really_delete_user: "En realidad desea borrar %{user_name}"
     enrollment: 
       course_not_published: "Este curso aún no ha sido publicado"
