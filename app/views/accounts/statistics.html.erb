@@ -1,4 +1,4 @@
-<% 
+<%
   content_for :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
   @active_tab = "statistics"
   jammit_css :statistics
@@ -9,37 +9,37 @@
   <h2><%= t(:general_numbers_title, "General Numbers") %></h2>
   <table class="numbers_table">
     <tr>
-      <th><%= before_label(:generated_at, "Generated") %></th>
+      <th scope="row"><%= before_label(:generated_at, "Generated") %></th>
       <td><%= datetime_string(@counts_report['generated_at']) %></td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <th><%= before_label(:courses, "Courses") %></th>
+      <th scope="row"><%= before_label(:courses, "Courses") %></th>
       <td><%= number_with_delimiter(@counts_report['courses']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="courses" data-name="<%= t('labels.courses', "Courses") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
-      <th><%= before_label(:teachers, "Teachers") %></th>
+      <th scope="row"><%= before_label(:teachers, "Teachers") %></th>
       <td><%= number_with_delimiter(@counts_report['teachers']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="teachers" data-name="<%= t('labels.teachers', "Teachers") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
-      <th><%= before_label(:students, "Students") %></th>
+      <th scope="row"><%= before_label(:students, "Students") %></th>
       <td><%= number_with_delimiter(@counts_report['students']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="students" data-name="<%= t('labels.students', "Students") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
-      <th><%= before_label(:users, "Users") %></th>
+      <th scope="row"><%= before_label(:users, "Users") %></th>
       <td><%= number_with_delimiter(@counts_report['users']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="users" data-name="<%= t('labels.users', "Users") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
-      <th><%= t(:file_storage_header, "File Storage") %></th>
+      <th scope="col"><%= t(:file_storage_header, "File Storage") %></th>
       <td></td>
       <td></td>
     </tr>
     <tr>
-      <th>&nbsp;&nbsp;<%= before_label(:uploaded_storage, "Uploaded") %></th>
+      <th scope="row">&nbsp;&nbsp;<%= before_label(:uploaded_storage, "Uploaded") %></th>
       <td class='number'>
         <%= t(:uploaded_data, { :one => "%{file_size} *from one file*", :other => "%{file_size} *from %{count} files*" },
              :file_size => number_to_human_size(@counts_report['files_size'] || 0), :count => @counts_report['files'],
@@ -48,7 +48,7 @@
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="files_size" data-name="<%= t(:uploaded_file_storage_header, "Uploaded File Storage") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
-      <th>&nbsp;&nbsp;<%= before_label(:media_storage, "Media") %></th>
+      <th scope="row">&nbsp;&nbsp;<%= before_label(:media_storage, "Media") %></th>
       <td class='number'>
         <%= t(:media_data, { :one => "%{file_size} *from one file*", :other => "%{file_size} *from %{count} files*" },
              :file_size => number_to_human_size(@counts_report['media_files_size'] || 0), :count => @counts_report['media_files'],
