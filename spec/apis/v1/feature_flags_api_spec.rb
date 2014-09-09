@@ -33,6 +33,7 @@ describe "Feature Flags API", type: :request do
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
       'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
+      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden')
     })
   end
 
@@ -123,7 +124,7 @@ describe "Feature Flags API", type: :request do
       it "should show hidden features on site admin" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.to_param })
-        json.map { |f| f['feature'] }.sort.should eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature user_feature)
+        json.map { |f| f['feature'] }.sort.should eql %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature)
         json.find { |f| f['feature'] == 'hidden_feature' }['hidden'].should be_true
       end
 
@@ -351,6 +352,13 @@ describe "Feature Flags API", type: :request do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                  { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
         t_root_account.feature_flags.where(feature: 'hidden_feature').count.should eql 1
+      end
+
+      it "should create a user feature flag with site admin priveleges" do
+        site_admin_user
+        api_call_as_user(@admin, :put, "/api/v1/users/#{@admin.id}/features/flags/hidden_user_feature",
+                         { controller: 'feature_flags', action: 'update', format: 'json', user_id: @admin.to_param, feature: 'hidden_user_feature', state: 'on' })
+        @admin.feature_flags.where(feature: 'hidden_user_feature').count.should eql 1
       end
 
       context "AccountManager" do
