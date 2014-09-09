@@ -124,7 +124,6 @@ ja:
       settings_description: "ユーザが外部の ID プロバイダー (IdP) を通して認証されるためには、ユーザが持っているログイン ID がこのアカウントにリンクされていて、かつ、IdP から返される一意の識別子と一致している必要があります。ユーザの現在のログイン情報を確認するには、ユーザのプロフィール ページにある \"Login Information\" セクションを参照します。(\"Users\" タブでそのユーザを検索すると見つかります。)"
       settings_title: 認証設定
       test_ldap_link: 認証テスト
-      title: 認証設定
     ldap_settings: 
       add_secondary_ldap_server_link: "セカンダリ LDAP サーバの追加"
       auth_type_label: タイプ
@@ -493,8 +492,6 @@ ja:
         time: 時刻
         user: ユーザ
       course_search_form: 
-        labels: 
-          find_deleted_course: 削除されたコースを検索
         select_default: コースの選択
         select_label: コースの選択
       course_search_results: 
@@ -552,7 +549,6 @@ ja:
         generate_activity_username: "*%{user}* のアクティビティを生成"
         message_date_from: 開始日付
         message_date_to: 終了日付
-        search: 検索
         search_people: メンバーの検索
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1062,7 +1058,6 @@ ja:
           デフォルトで、UI の変更内容はSIS インポートによる変更よりも優先されます。多数のフィールドを対象として SIS インポートを実行しても、管理者が UI を通して変更したフィールドがある場合、そのフィールドのデータは変更されません。このオプションを選択すると、この SIS インポートは UI の変更内容よりも優先されます。  
           詳細については、当該ドキュメントを参照してください。
       override_sis_stickiness_label: "UI の変更内容を上書き"
-      page_header: "SIS インポート"
       page_title: "SIS インポート"
       pending_batches_count: 
         one: "%{count} 個のバッチが処理を待機しています。"
@@ -1411,7 +1406,6 @@ ja:
     labels: 
       due: 期限
     name_is_required: 名前は必須項目です
-    percentage_points_possible: "パーセント方式の採点の場合は、配点を 0 より大きくする必要があります。"
     points_possible_number: 配点は数値で入力してください
     select_external_tool_dialog_title: 外部ツールの設定
     submission_action_take_quiz: "%{title} を受ける"
@@ -1776,7 +1770,6 @@ ja:
         pass_fail: 完了/未完了
         percent: 割合
         points: 点数
-      view_grading_levels: 採点レベルの表示
     group_category_selector: 
       grade_group_students_individually: それぞれの受講生を個別に採点
       group_assignment_header: グループ課題
@@ -2433,7 +2426,6 @@ ja:
         calendar_month: 月
         calendar_scheduler: スケジューラ
         calendar_week: 週
-        screenreader_recommend_agenda: "スクリーン リーダー ユーザ: イベントを参照するには、アジェンダを使用します"
       loading: 読み込み中
       my_appointment_groups: マイ予定グループ
     calendar_navigator: 
@@ -3672,7 +3664,6 @@ ja:
       module: モジュール
       module_details: "モジュールは順番に表示されるので、%{name} の上にあるモジュールのみを前提条件として設定できます。"
       module_name: モジュール名
-      modules_keyboard_hint: "コース モジュールおよびモジュール アイテムの順序を変更するには、最初にスクリーン リーダーでカーソルをオフにします。JAWS で Insert + z を押します。Tab キーを押して最初のモジュールを選択します。上下矢印を押してモジュールまたはモジュール アイテムを選択します。スペース キーを押して、ドラッグを開始するモジュールまたはモジュール アイテムを選択します。次に、上下矢印キーを押して移動先を選択します。その後、スペース キーを再び押すと、選択したモジュールまたはモジュール アイテムが移動先の後ろにドロップされます。"
       must_complete_prerequisites: "次のことを完了する必要があります:"
       no_preprequisites: 前提条件が定義されていません
       no_requirements: 要件が定義されていません
@@ -4348,7 +4339,6 @@ ja:
         confirm_delete: "このコースを削除してもよろしいですか?　削除すると、 受講生と講師はこのコースを利用できなくなります。コースをドロップダウン メニューから除外することが目的であれば、*コースの完了* を行ってください。"
         confirm_delete_addendum: "コースを完了する権限がない場合は、*コースの終了日の変更* を行うか、コースを完了するよう管理者に依頼してください。"
       headings: 
-        confirm: 操作の確認
         confirm_conclude: コース完了の確認
         confirm_delete: コース削除の確認
       titles: 
@@ -4693,7 +4683,6 @@ ja:
           delete_section: セクションの削除
           edit_section: セクションの編集
       megabytes: メガバイト
-      navigation_keyboard_hint: "スクリーン リーダーを使用している場合、コース ナビゲーション リンクの順序を変更するには、スクリーン リーダーで仮想カーソルまたは仮想バッファをオフにします (JAWS では Ins + z キーを押します)。Ctrl + Home キーを押してページの上部に移動し、最初のコース ナビゲーション リンクの場所に達するまで Tab キーを押します。移動したいリンクが読み上げられるまで上下の方向キーを押し、目的のリンクで Space キーを押して、そのリンクを選択します。その後、上下の方向キーを押して移動先を選択します。最後に、Space キーを再び押すと、移動しているリンクが現在のリンクの直後に配置されます。終了したら、仮想バッファ/カーソルを再度有効化します。"
       no_date: 日付が設定されていません
       no_language_preference: "設定なし (ユーザが設定可能、デフォルトは %{language})"
       none: なし
@@ -4847,8 +4836,6 @@ ja:
       new: 新規作成
       new_discussion_entries: "新しいディスカッション エントリ"
       new_discussions: 新しいディスカッション
-      num_assignments: "# 課題"
-      num_submissions: "# 提出物"
       page_title: コースの統計情報
       quiz: クイズ
       quiz_questions: クイズ問題
@@ -6078,15 +6065,6 @@ ja:
     saving: 保存しています...
     shared_secret: 共有シークレット
     submit: 提出
-    tool_post_iframe: 
-      load_tool_button: "%{tool} の読み込み"
-      load_tool_new_tab_button: "%{tool} を新しいウィンドウに読み込む"
-      new_tab: このツールは、ブラウザの別ウィンドウに読み込む必要があります
-      new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
-      new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
-    tool_show: 
-      tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
-      tool_load_failure: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
     user_navigation_configured: ユーザのナビゲーションが構成されました
   facebook: 
     authorization_required: 認証されたユーザのみが、そのページにアクセスできます
@@ -6147,7 +6125,6 @@ ja:
       ? "on"
       : オン
       release_notes: "リリース ノート"
-      toggle_feature_details: 機能詳細の切り替え
     feature_flag_admin_view: 
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
@@ -7246,7 +7223,6 @@ ja:
     member_tooltip_show: グループ名簿を表示
     membership_pending: 
       group_join_request: グループ参加リクエスト
-      group_join_request_acknowledged: リクエストありがとうございます。用意ができ次第、ご連絡いたします。
       group_join_request_info: このグループは、参加リクエストを受信しました。要求を受諾または拒否する旨の連絡が後日届きます。
     messages: 
       creating_group: グループを作成しています...
@@ -7341,9 +7317,6 @@ ja:
       create: "%{model} を作成"
       submit: "%{model} を保存"
       update: "%{model} を更新"
-  high_contrast_description: |-
-      ハイ コントラスト バージョンの Canvas ユーザ インターフェイスを使用する場合は、これを有効にします。
-      視覚に障害のある方や、画面の文字が読みづらい方は、この機能を有効にすることをお勧めします。
   html5_first_videos_description: |-
       Canvas は、デフォルトでは Flash を優先的に使用してビデオの再生を試みます。HTML5 を優先して使用し、
       その後に Flash での再生を試みる場合は、この設定を有効にします。
@@ -7534,23 +7507,12 @@ ja:
   layouts: 
     application: 
       group_switch: 切り替え
-      instructure_description: "Instructure は、オープン ソースのラーニング管理システム Canvas の製造元です"
       keyboard_navigation: 
         close: "このダイアログを閉じるには、カンマ キーを押してください"
       links: 
         close: 閉じる
         dashboard: "マイ ダッシュボード"
         skip_to_content: コンテンツまでスキップする
-      menu: 
-        assignments: 課題
-        assignments_needing_grading: 採点が必要
-        assignments_needing_submitting: 提出が必要
-        assignments_recently_graded: 最近採点した項目
-        calendar: カレンダー
-        grades: 成績
-      navigation: 
-        main: "メイン ナビゲーション"
-        user_menu: "ユーザ メニュー"
       open_source_learning_management_system: "オープン ソース LMS"
     facebook: 
       title: "Facebook ページ"
@@ -7567,7 +7529,6 @@ ja:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: すべてのアカウントを表示
-      view_all_enrollments: すべてのコースを表示
       view_all_groups: すべてのグループを表示
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
@@ -9263,38 +9224,6 @@ ja:
       twitter: 
         body_account: "Canvas アラート - 新しいグループ:%{group_name} 対象アカウント: %{account}"
         body_course: "Canvas アラート - 新しいグループ:%{group_name} 対象コース: %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-        html: 
-          body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-          details: 講師を表示するにはここをクリック
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-          subject: 新しい講師の登録
-        labels: 
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-        subject: 新しい講師の登録
-      facebook: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-        subject: 新しい講師の登録
-      sms: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-      summary: 
-        body: "たった今、%{user} さんが Canvas の講師として登録しました。"
-        labels: 
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-        subject: 新しい講師の登録
-      twitter: 
-        body: "Canvas アラート - 新しい講師: %{user}、%{account}"
     new_user: 
       email: 
         body: "たった今、アカウント「%{account}」に対して、新しいユーザ「%{user}」が登録されました"
@@ -9778,9 +9707,6 @@ ja:
   new_facebook_message: "Canvas からの新しいメッセージがあります"
   new_quiz_moderate_desc: ドラフト状態およびクイズの統計情報が許可/オンの場合、この設定によって、アカウントの新しいクイズ管理ページが有効になります。
   new_quiz_statistics_desc: ドラフト状態が許可/オンの場合、この設定によって、アカウントの新しいクイズの統計情報ページが有効になります。
-  new_styles_description: |-
-      現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい
-      Canvas インターフェイスがリリースされたときに通知をご希望の場合は、これをオンにしてください。
   no_migration_file: コンテンツ移行にはファイルが必要です。
   not_a_number: 正の数字を使用する必要があります
   notification: 
@@ -9923,7 +9849,6 @@ ja:
       new_file_added: 新しいファイルが追加されました
       new_files_added: 新しいファイルが追加されました
       new_student_organized_group: 受講生が組織した新しいグループ
-      new_teacher_registration: 新しい講師の登録
       new_user: 新しいユーザ
       pseudonym_registration: ハンドルネームの登録
       report_generated: レポートが生成されました
@@ -10469,9 +10394,6 @@ ja:
     respondus_soap_endpoint: 
       description: "Respondus QTI アップロード用 SOAP エンドポイント"
       name: "Respondus の SOAP エンドポイント"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "使用可能 (QTI コンバータも使用可能にしてください)"
     scribd: 
       description: "Scribd 文書のプレビュー"
       name: Scribd
@@ -11699,7 +11621,6 @@ ja:
         hints: 
           group_pick_count: "これまでに %{pick_count} 件が選択されました"
         labels: 
-          add_questions_to_group: "クイズ グループに問題を追加"
           group_name: グループ名
           group_pick_count: 選択
           group_points: 点数
@@ -11851,25 +11772,7 @@ ja:
         unnamed_quiz_results: "%{user} のクイズ結果"
         unnamed_survey_results: "%{user} のサーベイ結果"
       index: 
-        buttons: 
-          publish_quizzes: クイズの公開
-        headers: 
-          assignment_quizzes: 課題クイズ
-          course_quizzes: "コース クイズ"
-          practice_quizzes: 練習クイズ
-          publish_multiple_quizzes: 複数のクイズの公開
-          surveys: サーベイ
-          unpublished_quizzes: 未公開のクイズ
-        labels: 
-          publish_multiple_quizzes: 現段階で公開するクイズを選択してください
-        links: 
-          create_new_quiz: 新しいクイズの作成
-          manage_question_banks: 問題バンクの管理
-          publish_multiple_quizzes: 複数のクイズの公開
-        no_quizzes: 利用できるクイズはありません
         page_titles: クイズ
-        titles: 
-          this_quiz_is_locked: このクイズは現在ロックされています。クリックすると詳細が表示されます。
       invalid_ip: 
         quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
         survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
@@ -12426,8 +12329,6 @@ ja:
     upload_info: "以前にダウンロードした、その受講生からの提出ファイルに変更を加えた場合は、zip ファイルに圧縮しなおして、下のフォームと一緒にアップロードしてください。受講生には、提出用のコメント内に、修正済みのファイルが表示されます。"
     upload_warning: ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。
   react_files: 
-    aria_label: 
-      settings: 設定
     errors: 
       no_match: 
         suggestions: "提案:"
@@ -12913,7 +12814,6 @@ ja:
         one: "%{count} 人の参加者"
         other: "%{count} 人の参加者"
     current_enrollment: 
-      course_unpublished: このコースはまだ公開されていません
       enrolled_as_designer: 設計者として参加登録済み
       enrolled_as_observer: オブザーバとして参加登録済み
       enrolled_as_student: 受講生として参加登録済み
@@ -13010,8 +12910,6 @@ ja:
       titles: 
         mastery_level: パーセントを超えた場合に熟達を設定
         select_and_add_criterion: 基準の選択と追加
-    flash_notice: 
-      close: 閉じる
     flash_notices: 
       close: 閉じる
     footer_links: 
@@ -13381,8 +13279,6 @@ ja:
     unauthorized_feed: 
       bad_params: アクセスしようとしたフィードのパラメータが無効です。
       feedback: "この URL が正常に機能するはずであると確信できる場合は、下のリンクをクリックして、このページにアクセスしたときの操作をお知らせください。調査いたします。"
-      headings: 
-        problem: フィードを読み込む際に問題が発生しました
       links: 
         feedback: 何をお探しであったかをお知らせください
       title: 無効なフィード
@@ -13856,7 +13752,6 @@ ja:
       prompts: 
         delete: この期間を削除してもよろしいですか?
       titles: 
-        enrollment_terms: 登録期間
         term_details: 期間の詳細
       update_term: 期間の更新
     term: 
@@ -13991,8 +13886,6 @@ ja:
   unpublished_courses_title: 未公開のコース
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   unused_courses_title: 未使用のコース
-  upload_button: 
-    files: ファイル
   user: 
     default_user_name: ユーザ
     errors: 
@@ -14176,8 +14069,6 @@ ja:
         delete_user: "%{user_name} を削除"
       titles: 
         confirm_delete: ユーザの削除の確認
-        confirm_deletion_of_user: "%{user_name} の削除の確認"
-        delete_user: ユーザの削除
         really_delete_user: "本当に %{user_name} を削除"
     enrollment: 
       course_not_published: このコースはまだ公開されていません
