@@ -123,7 +123,6 @@ fa-IR:
       settings_description: "برای اینکه کاربر از طریق یک ارائه دهنده بیرونی هویت (IdP) اعتبارسنجی را انجام دهد، باید یک شناسه ورود داشته باشد که هم به این حساب مرتبط شده باشد و هم با شناسه یکتایی که توسط IdP بازگردانده می شود، مطابقت داشته باشد. برای مشاهده ورودهای فعلی یک کاربر، به بخش «اطلاعات ورود» در صفحه رخ نمای کاربر مراجعه کنید. (که از طریق جستجوی کاربر در زبانه «کاربران» قابل دسترسی است)."
       settings_title: "تنظیمات اعتبارسنجی"
       test_ldap_link: "آزمون اعتبارسنجی"
-      title: "تنظیمات اعتبارسنجی"
     ldap_settings: 
       add_secondary_ldap_server_link: "افزودن سرور ثانویه LDAP"
       auth_type_label: نوع
@@ -494,8 +493,6 @@ fa-IR:
         time: زمان
         user: کاربر
       course_search_form: 
-        labels: 
-          find_deleted_course: "یافتن درس حذف شده"
         select_default: "انتخاب یک درس"
         select_label: "انتخاب یک درس"
       course_search_results: 
@@ -553,7 +550,6 @@ fa-IR:
         generate_activity_username: "ایجاد فعالیت برای *%{user}*"
         message_date_from: "از تاریخ"
         message_date_to: "تا تاریخ"
-        search: جستجو
         search_people: "جستجوی افراد"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1063,7 +1059,6 @@ fa-IR:
           به صورت پیش فرض، تغییرات واسط کاربر بر تغییرات ورود اطلاعات سامانه اطلاعات دانشجو اولویت دارند، در مورد چند جای خالی، اگر یک مدیر جای خالی مورد نظر را از طریق واسط کاربر تغییر داده باشد، ورود اطلاعات سامانه اطلاعات دانشجو‌ این جای خالی را تغییر نخواهد داد. اگر این گزینه را انتخاب کنید، این ورود اطلاعات سامانه اطلاعات دانشجو جایگزین تغییرات واسط کاربر خواهد شد.
           برای کسب اطلاعات بیشتر، به اسناد مراجعه نمایید.
       override_sis_stickiness_label: "جایگزین کردن تغییرات واسط کاربر"
-      page_header: "ورود اطلاعات سامانه اطلاعات دانشجو"
       page_title: "ورود اطلاعات سامانه اطلاعات دانشجو"
       pending_batches_count: 
         one: "%{count} دسته در انتظار برای پردازش."
@@ -1422,7 +1417,6 @@ fa-IR:
     labels: 
       due: مهلت
     name_is_required: "نام لازم است!"
-    percentage_points_possible: "امتیازهای ممکن باید برای نمره گذاری درصدی بیشتر از 0 باشند"
     points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
     select_external_tool_dialog_title: "پیکربندی ابزار بیرونی"
     submission_action_take_quiz: "دادن آزمون %{title}"
@@ -1784,7 +1778,6 @@ fa-IR:
         pass_fail: کامل/ناقص
         percent: درصد
         points: امتیازها
-      view_grading_levels: "مشاهده سطوح نمره گذاری"
     group_category_selector: 
       grade_group_students_individually: "تخصیص نمره به هر دانشجو به طور جداگانه"
       group_assignment_header: "تکلیف گروهی"
@@ -2447,7 +2440,6 @@ fa-IR:
         calendar_month: ماه
         calendar_scheduler: "زمان بند"
         calendar_week: هفته
-        screenreader_recommend_agenda: "کاربران صفحه خوان: از Agenda برای دیدن رویدادها استفاده کنید"
       loading: "در حال بارگذاری"
       my_appointment_groups: "گروه های قرار ملاقات من"
     calendar_navigator: 
@@ -3694,7 +3686,6 @@ fa-IR:
       module: ماژول
       module_details: "ماژولها به ترتیب نمایش داده می شوند، بنابراین فقط ماژول هایی که بالای %{name} هستند را می توان به عنوان پیش نیاز تعیین کرد."
       module_name: "نام ماژول"
-      modules_keyboard_hint: "برای تغییر دادن ترتیب ماژول های درس و موردهای ماژول، ابتدا اشاره گر را روی صفحه خوان خود غیر فعال کنید. Insert-z را برای حالت JAWS فشار دهید. برای انتخاب اولین ماژول، کلید tab را فشار دهید. از کلید up و down برای انتخاب ماژول یا مورد ماژول استفاده کنید. برای انتخاب ماژول یا مورد ماژول جهت شروع کشیدن، space را فشار دهید. برای انتخاب مقصد، کلید up و down را فشار دهید. سپس کلید space را یک بار دیگر برای رها کردن مورد انتخابی بعد از مقصد فشار دهید."
       must_complete_prerequisites: "باید کامل شوند"
       no_preprequisites: "پیش نیاز مشخص نشده است"
       no_requirements: "هیچ الزامی تعیین نشده است"
@@ -4372,7 +4363,6 @@ fa-IR:
         confirm_delete: "مطمئنید که می خواهید این درس حذف شود؟ پس از حذف شدن، دانشجویان و اساتید به آن دسترسی نخواهند داشت. اگر می خواهید آن را از منوی بازشونده درس حذف کنید، باید *در عوض به درس خاتمه دهید*."
         confirm_delete_addendum: "اگر مجوز خاتمه دادن به درس را ندارید، می توانید *تاریخ پایان درس را تغییر دهید*، یا از مدیر خود بخواهید درس را خاتمه دهد."
       headings: 
-        confirm: "تأیید اقدام"
         confirm_conclude: "تأیید خاتمه دادن به درس"
         confirm_delete: "تأیید حذف درس"
       titles: 
@@ -4719,7 +4709,6 @@ fa-IR:
           delete_section: "حذف بخش"
           edit_section: "ویرایش بخش"
       megabytes: مگابایت
-      navigation_keyboard_hint: "اگر از یک صفحه خوان استفاده می کنید، برای تغییر دادن ترتیب پیوندهای پیمایش درس، اشاره گر مجازی یا حافظه موقت مجازی را روی صفحه خوان خود غیر فعال کنید (Insert-z را برای JAWS فشار دهید.). control-home را برای پرش به بالای صفحه فشار دهید، سپس کلید tab را فشار دهید تا به اولین پیوند پیمایش درس برسید. کلیدهای جهت نمای up و down را فشار دهید تا صدای پیوندی که می خواهید انتقال دهید را بشنوید و سپس space را برای انتخاب آن فشار دهید. سپس کلید های جهت نمای up و down را فشار دهید تا موقعیت جدید را بیابید. سرانجام، space را دوباره فشار دهید تا پیوندی که در حال انتقال آن هستید را مستقیما بعد از پیوند فعلی قرار دهید. در پایان، اشاره گر یا حافظه موقت مجازی را دوباره فعال کنید."
       no_date: "تاریخ تعیین نشده است"
       no_language_preference: "تعیین نشده (قابل پیکربندی توسط کاربر، به طور پیش فرض روی %{language} )"
       none: "هیچ یک"
@@ -4873,8 +4862,6 @@ fa-IR:
       new: جدید
       new_discussion_entries: "ورودی های جدید بحث"
       new_discussions: "بحث های جدید"
-      num_assignments: "# تکلیف"
-      num_submissions: "# مورد ارسالی"
       page_title: "آمار درس"
       quiz: آزمون
       quiz_questions: "پرسش های آزمون"
@@ -6116,15 +6103,6 @@ fa-IR:
     saving: "در حال ذخیره سازی..."
     shared_secret: "رمز مشترک"
     submit: ارسال
-    tool_post_iframe: 
-      load_tool_button: "بارگذاری %{tool}"
-      load_tool_new_tab_button: "بارگذاری %{tool} در یک پنجره جدید"
-      new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
-      new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید."
-      new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
-    tool_show: 
-      tool_insecure_warning: "سعی دارید یک محتوای ناامن را از یک تارنمای امن (کانواس) اجرا کنید. بعضی از مرورگرهای داخلی ممکن است جلوی بارگذاری این محتوا را بگیرند."
-      tool_load_failure: "به نظر می رسد محتوای شما بارگذاری نشود. می توانید از این دکمه برای راه اندازی آن در یک زبانه جدید استفاده کنید."
     user_navigation_configured: "پیمایش کاربر پیکربندی شد"
   facebook: 
     authorization_required: "فقط کاربران تایید شده اجازه دسترسی به این صفحه را دارند"
@@ -6185,7 +6163,6 @@ fa-IR:
       ? "on"
       : فعال
       release_notes: "انتشار یادداشت ها"
-      toggle_feature_details: "فعال سازی اطلاعات ویژگی"
     feature_flag_admin_view: 
       feature_options: "گزینه‌های ویژگی"
       no_features_available: "هیچ ویژگی در حال حاضر در دسترس نیست."
@@ -7296,7 +7273,6 @@ fa-IR:
     member_tooltip_show: "مشاهده فهرست گروه"
     membership_pending: 
       group_join_request: "درخواست پیوستن به گروه"
-      group_join_request_acknowledged: "از درخواست شما متشکریم، لطفا در ارتباط باشید"
       group_join_request_info: "این گروه درخواست شما برای پیوستن را دریافت کرده است. به محض اینکه آنها درخواست شما را بپذیرند یا رد کنند، مطلع خواهید شد."
     messages: 
       creating_group: "درحال ایجاد گروه..."
@@ -7393,9 +7369,6 @@ fa-IR:
       create: "ایجاد %{model}"
       submit: "ذخیره سازی %{model}"
       update: "بهنگام سازی %{model}"
-  high_contrast_description: |-
-      اگر نسخه دارای تضاد بیشتر واسط کاربر کانواس را ترجیح می دهید، این گزینه را فعال کنید.
-      این نسخه ممکن است برای افراد دارای ضعف بینایی یا اشکال در خواندن مفید باشد.
   html5_first_videos_description: |-
       کانواس به طور پیش فرض سعی می کند برای پخش فیلم ها ابتدا از فلش استفاده کند. برای اینکه ابتدا از HTML5 استفاده کنید، این گزینه
       را فعال کنید، سپس به فلش بازگردید.
@@ -7587,23 +7560,12 @@ fa-IR:
   layouts: 
     application: 
       group_switch: تغییر
-      instructure_description: "Instructure، شرکت سازنده سامانه مدیریت یادگیری منبع باز کانواس"
       keyboard_navigation: 
         close: "برای بستن این کادر گفتگو، ویرگول را فشار دهید"
       links: 
         close: بستن
         dashboard: "داشبورد من"
         skip_to_content: "رفتن به محتوا"
-      menu: 
-        assignments: "تکلیف ها"
-        assignments_needing_grading: "نمره گذاری"
-        assignments_needing_submitting: "تحویل دادن"
-        assignments_recently_graded: "به تازگی نمره گذاری شده"
-        calendar: تقویم
-        grades: "نمره ها"
-      navigation: 
-        main: "پیمایش اصلی"
-        user_menu: "منوی کاربر"
       open_source_learning_management_system: "سامانه مدیریت یادگیری منبع باز"
     facebook: 
       title: "صفحه فیس بوک"
@@ -7620,10 +7582,8 @@ fa-IR:
         warning_title: "شما در حال حاضر به نمای دانشجو وارد شده اید"
     head: 
       default_page_title: "سیستم مدیریت آموزش کانواس"
-      javascript_required: "برای دسترسی به این تارنما، باید جاوااسکریپت را فعال کنید."
     menu: 
       view_all_accounts: "مشاهده همه حساب ها"
-      view_all_enrollments: "مشاهده همه درس ها"
       view_all_groups: "مشاهده همه گروه ها"
     mobile_auth: 
       log_in_to_canvas: "ورود به کانواس"
@@ -9318,38 +9278,6 @@ fa-IR:
       twitter: 
         body_account: "هشدار کانواس - گروه جدید: %{group_name} برای حساب %{account}"
         body_course: "هشدار کانواس - گروه جدید: %{group_name} برای درس %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} به عنوان یک استاد را در %{website} ثبت نام کرد."
-        html: 
-          body: "%{user} به عنوان یک استاد در %{website} ثبت نام کرد."
-          details: "برای مشاهده استاد، اینجا کلیک کنید"
-          email: "پست الکترونیکی"
-          phone: تلفن
-          school_name: "نام دانشکده"
-          school_position: "سمت در دانشکده"
-          subject: "ثبت نام استاد جدید"
-        labels: 
-          email: "پست الکترونیکی"
-          phone: تلفن
-          school_name: "نام دانشکده"
-          school_position: "سمت در دانشکده"
-        subject: "ثبت نام استاد جدید"
-      facebook: 
-        body: "%{user} به عنوان یک استاد در %{website} ثبت نام کرد."
-        subject: "ثبت نام استاد جدید"
-      sms: 
-        body: "%{user} به عنوان یک استاد در %{website} ثبت نام کرد."
-      summary: 
-        body: "%{user} به عنوان یک استاد در کانواس ثبت نام کرد."
-        labels: 
-          email: "پست الکترونیکی"
-          phone: تلفن
-          school_name: "نام دانشکده"
-          school_position: "سمت در دانشکده"
-        subject: "ثبت نام استاد جدید"
-      twitter: 
-        body: "هشدار کانواس - استاد جدید: %{user}، %{account}"
     new_user: 
       email: 
         body: "یک کاربر جدید، %{user}، برای حساب %{account} ثبت نام کرده است"
@@ -9836,7 +9764,6 @@ fa-IR:
   new_facebook_message: "یک پیام جدید از طرف کانواس  دارید"
   new_quiz_moderate_desc: "زمانی که حالت پیش نویس و آمار آزمون مجاز/فعال باشند،‌ صفحه تعدیل سازی آزمون جدید برای این حساب فعال می شود."
   new_quiz_statistics_desc: "زمانی که حالت پیش نویس مجاز/فعال باشد،‌ صفحه آمار آزمون جدید برای یک حساب را فعال می کند."
-  new_styles_description: "روی یک طرح گرافیکی واسط کاربر برای کانواس کار می کنیم. این گزینه را روی انتخاب قرار دهید تا ظاهر ساده شده و حس واسط بهنگام سازی شده کانواس را ببینید."
   no_migration_file: "برای انتقال محتوا، فایل لازم است."
   not_a_number: "باید یک عدد مثبت باشد"
   notification: 
@@ -9990,7 +9917,6 @@ fa-IR:
       new_file_added: "فایل جدید افزوده شد"
       new_files_added: "فایل های جدید افزوده شدند"
       new_student_organized_group: "گروه جدید سازماندهی شده توسط دانشجو"
-      new_teacher_registration: "ثبت نام استاد جدید"
       new_user: "کاربر جدید"
       pseudonym_registration: "ثبت نام مستعار"
       report_generated: "گزارش ایجاد شد"
@@ -10545,9 +10471,6 @@ fa-IR:
     respondus_soap_endpoint: 
       description: "نقطه ی پایانی SOAP برای بارگذاری های Respondus QTI "
       name: "نقطه ی پایانی SOAP Endpoint"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "فعال شد (باید QTI Converter را نیز فعال کنید)"
     scribd: 
       description: "پیش نمایش های سند Scribd"
       name: Scribd
@@ -11787,7 +11710,6 @@ fa-IR:
         hints: 
           group_pick_count: "%{pick_count} مورد تاکنون انتخاب شده"
         labels: 
-          add_questions_to_group: "افزودن پرسش ها به گروه آزمون"
           group_name: "نام گروه"
           group_pick_count: انتخاب
           group_points: امتیازها
@@ -11939,25 +11861,7 @@ fa-IR:
         unnamed_quiz_results: "نتایج آزمون برای %{user}"
         unnamed_survey_results: "نتایج نظرسنجی برای %{user}"
       index: 
-        buttons: 
-          publish_quizzes: "انتشار آزمون ها"
-        headers: 
-          assignment_quizzes: "آزمون های تکلیف"
-          course_quizzes: "آزمون‌های درس"
-          practice_quizzes: "آزمون‌های تمرین"
-          publish_multiple_quizzes: "انتشار چند آزمون"
-          surveys: "نظرسنجی ها"
-          unpublished_quizzes: "آزمون های منتشر نشده"
-        labels: 
-          publish_multiple_quizzes: "انتخاب آزمون هایی که می خواهید هم اکنون منتشر شوند"
-        links: 
-          create_new_quiz: "ایجاد یک آزمون جدید"
-          manage_question_banks: "مدیریت مخزن های پرسش"
-          publish_multiple_quizzes: "انتشار چند آزمون"
-        no_quizzes: "آزمون موجود نیست"
         page_titles: آزمون‌ها
-        titles: 
-          this_quiz_is_locked: "این آزمون در حال حاضر قفل است. برای کسب اطلاعات بیشتر کلیک کنید."
       invalid_ip: 
         quiz_protected: "این آزمون محافظت شده است و فقط از محل های خاصی در دسترسی است. به نظر نمی رسد رایانه ای که در حال حاضر از آن استفاده می کنید در محل معتبری برای انجام این آزمون باشد."
         survey_protected: "این نظرسنجی محافظت شده است و فقط از محل های خاصی قابل دسترسی است. به نظر نمی رسد رایانه ای که در حال حاضر از آن استفاده می کنید در محل معتبری برای انجام این نظرسنجی باشد."
@@ -12514,8 +12418,6 @@ fa-IR:
     upload_info: "اگر در فایل های ارسالی دانشجو که قبلا بارگیری کرده اید، تغییراتی ایجاد کردید، آنها را دوباره فشرده کنید و فایل فشرده را با استفاده از فرم زیر بارگذاری نمایید. دانشجویان فایل های تغییر یافته را در نظرهای مربوط به مورد ارسالی خود مشاهده خواهند کرد."
     upload_warning: "مطمئن شوید که نام فایل های ارسالی را تغییر ندهید تا بتوانیم آنها را شناسایی کنیم."
   react_files: 
-    aria_label: 
-      settings: تنظیمات
     confirm_delete: "مطمئنید که می خواهید %{name} حذف شود؟"
     errors: 
       no_match: 
@@ -13018,7 +12920,6 @@ fa-IR:
         one: "%{count} شرکت کننده"
         other: "%{count} شرکت کننده"
     current_enrollment: 
-      course_unpublished: "این درس هنوز منتشر نشده است."
       enrolled_as_designer: "به عنوان طراح ثبت نام شد"
       enrolled_as_observer: "به عنوان بیننده ثبت نام شد"
       enrolled_as_student: "به عنوان دانشجو ثبت نام شد"
@@ -13117,8 +13018,6 @@ fa-IR:
       titles: 
         mastery_level: "درصدی که بالاتر از آن تسلط تعیین می شود"
         select_and_add_criterion: "انتخاب و افرودن معیار"
-    flash_notice: 
-      close: بستن
     flash_notices: 
       close: بستن
     footer_links: 
@@ -13484,8 +13383,6 @@ fa-IR:
     unauthorized_feed: 
       bad_params: "پارامترهای خوراک خبری که می خواستید به آن دسترسی پیدا کنید معتبر نیستند."
       feedback: "اگر کاملا مطمئنید که این نشانی اینترنتی باید کار کند، لطفا با کلیک کردن روی پیوند زیر ما را در جریان نحوه ورودتان به اینجا قرار دهید و ما بررسی خواهیم کرد."
-      headings: 
-        problem: "در هنگام بارگذاری خوراک خبری شما اشکالی رخ داد"
       links: 
         feedback: "ما را در جریان آنچه به دنبال ان بودید قرار دهید"
       title: "خوراک خبری معتبر نیست"
@@ -13964,7 +13861,6 @@ fa-IR:
       prompts: 
         delete: "مطمئنید که می خواهید این نیمسال حذف شود؟"
       titles: 
-        enrollment_terms: "نیمسال های ثبت نام"
         term_details: "اطلاعات نیمسال"
       update_term: "بهنگام سازی نیمسال"
     term: 
@@ -14099,8 +13995,6 @@ fa-IR:
   unpublished_courses_title: "درس های منتشر نشده"
   unsupported_package: "بسته محتوای پشتیبانی نشده"
   unused_courses_title: "درس های استفاده نشده"
-  upload_button: 
-    files: "فایل ها"
   user: 
     default_user_name: کاربر
     errors: 
@@ -14284,8 +14178,6 @@ fa-IR:
         delete_user: "حذف %{user_name}"
       titles: 
         confirm_delete: "تأیید حذف کاربر"
-        confirm_deletion_of_user: "تأیید حذف %{user_name}"
-        delete_user: "حذف کاربر"
         really_delete_user: "مطمئنید که می خواهید %{user_name} حذف شود"
     enrollment: 
       course_not_published: "این درس هنوز انتشار نیافته است"
