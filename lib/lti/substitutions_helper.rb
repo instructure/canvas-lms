@@ -51,8 +51,8 @@ module Lti
     def account_enrollments
       unless @current_account_enrollments
         @current_account_enrollments = []
-        if @user && @context.respond_to?(:account_chain) && !@context.account_chain_ids.empty?
-          @current_account_enrollments = AccountUser.where(user_id: @user.id, account_id: @context.account_chain_ids).shard(@context.shard)
+        if @user && @context.respond_to?(:account_chain) && !@context.account_chain.empty?
+          @current_account_enrollments = AccountUser.where(user_id: @user, account_id: @context.account_chain).shard(@context.shard)
         end
       end
       @current_account_enrollments

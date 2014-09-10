@@ -1227,12 +1227,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain(opts = {})
-    self.account.account_chain(opts)
-  end
-
-  def account_chain_ids(opts = {})
-    account_chain(opts).map(&:id)
+  def account_chain
+    @account_chain ||= Account.account_chain(account_id)
   end
 
   def institution_name
@@ -2288,8 +2284,7 @@ class Course < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
-    account_ids = self.account_chain_ids
-    tools += ContextExternalTool.active.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools += ContextExternalTool.active.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_chain)
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,

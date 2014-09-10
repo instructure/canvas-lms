@@ -140,9 +140,7 @@ describe Lti::LtiUserCreator do
         end
 
         it "collects current active account user enrollments for the root account of a course" do
-          root_account = Account.create!
-          canvas_course.account.root_account = root_account
-          account_admin_user(user: canvas_user, account: root_account)
+          account_admin_user(user: canvas_user, account: canvas_course.account.root_account)
 
           enrollments = course_user_creator.convert.current_roles
 

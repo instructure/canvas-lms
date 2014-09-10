@@ -570,31 +570,35 @@ class Account < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
 
-  def account_chain(opts = {})
-    unless @account_chain
-      res = [self]
-      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-        self.shard.activate do
-          res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+  def self.account_chain(starting_account_id)
+    return [] unless starting_account_id
+
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+      chain = Shard.shard_for(starting_account_id).activate do
+        Account.find_by_sql(<<-SQL)
               WITH RECURSIVE t AS (
-                SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+                SELECT * FROM accounts WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
                 SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
               )
               SELECT * FROM t
-            SQL
-        end
-      else
-        account = self
-        while account.parent_account
-          account = account.parent_account
-          res << account
-        end
+        SQL
       end
-      res << self.root_account if !res.map(&:id).include?(self.root_account_id) && !root_account?
-      @account_chain = res.compact
+    else
+      account = Account.find(starting_account_id)
+      chain = [account]
+      while account.parent_account
+        account = account.parent_account
+        chain << account
+      end
     end
+    chain
+  end
+
+  def account_chain(opts = {})
+    @account_chain ||= [self] + Account.account_chain(self.parent_account_id)
     results = @account_chain.dup
+    results << self.root_account if !results.map(&:id).include?(self.root_account_id) && !root_account?
     results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     results
   end
@@ -603,7 +607,7 @@ class Account < ActiveRecord::Base
     # this record hasn't been saved to the db yet, so if the the chain includes
     # this account, it won't point to the new parent yet, and should still be
     # valid
-    if self.parent_account.account_chain_ids.include?(self.id)
+    if self.parent_account.account_chain.include?(self)
       errors.add(:parent_account_id,
                  "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
     end
@@ -639,10 +643,6 @@ class Account < ActiveRecord::Base
 
   def associated_accounts
     self.account_chain
-  end
-
-  def account_chain_ids(opts={})
-    account_chain(opts).map(&:id)
   end
 
   def membership_for_user(user)

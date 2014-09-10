@@ -628,4 +628,7 @@ class Group < ActiveRecord::Base
     self.content_exports.where(user_id: user)
   end
 
+  def account_chain
+    @account_chain ||= Account.account_chain(account_id)
+  end
 end

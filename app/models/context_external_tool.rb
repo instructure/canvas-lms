@@ -428,23 +428,16 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.contexts_to_search(context)
-    contexts = []
-    while context
-      if context.is_a?(Group)
-        contexts << context
-        context = context.context || context.account
-      elsif context.is_a?(Course)
-        contexts << context
-        context = context.account
-      elsif context.is_a?(Account)
-        contexts << context
-        context = context.parent_account
-      else
-        context = nil
-      end
+    case context
+    when Course
+      [context] + context.account_chain
+    when Group
+      [context] + (context.context ? contexts_to_search(context.context) : context.account_chain)
+    when Account
+      context.account_chain
+    else
+      []
     end
-
-    contexts
   end
   private_class_method :contexts_to_search
 
@@ -533,8 +526,7 @@ class ContextExternalTool < ActiveRecord::Base
       tool = context.context_external_tools.having_setting(type).find_by_id(id)
     end
     if !tool
-      account_ids = context.account_chain_ids
-      tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', account_ids, id)
+      tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', context.account_chain, id)
     end
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
@@ -547,8 +539,7 @@ class ContextExternalTool < ActiveRecord::Base
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
       tools += context.context_external_tools.having_setting(type.to_s)
     end
-    account_ids = context.account_chain_ids
-    tools += ContextExternalTool.having_setting(type.to_s).find_all_by_context_type_and_context_id('Account', account_ids)
+    tools += ContextExternalTool.having_setting(type.to_s).find_all_by_context_type_and_context_id('Account', context.account_chain)
   end
 
   def self.serialization_excludes; [:shared_secret,:settings]; end
