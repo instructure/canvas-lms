@@ -781,7 +781,7 @@ class Attachment < ActiveRecord::Base
 
         # now generate the notification
         record = Attachment.find(attachment_id)
-        notification = Notification.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
+        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
 
         if record.context.is_a?(Course) && (record.folder.locked? || record.context.tab_hidden?(Course::TAB_FILES))
           # only notify course students if they are able to access it

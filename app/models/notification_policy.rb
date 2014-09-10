@@ -139,7 +139,7 @@ class NotificationPolicy < ActiveRecord::Base
   # and/or updates it
   def self.find_or_update_for(communication_channel, notification_name, frequency = nil)
     notification_name = notification_name.titleize
-    notification = Notification.by_name(notification_name)
+    notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     raise ActiveRecord::RecordNotFound unless notification
     communication_channel.shard.activate do
       unique_constraint_retry do

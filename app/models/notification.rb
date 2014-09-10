@@ -67,14 +67,6 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def self.summary_notification
-    by_name('Summaries')
-  end
-
-  def self.notifications
-    @notifications ||= all.index_by(&:name)
-  end
-
   def self.all
     @all ||= super.to_a.each(&:readonly!)
   end
@@ -83,14 +75,16 @@ class Notification < ActiveRecord::Base
     (@all_by_id ||= all.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 
-  def self.by_name(name)
-    notifications[name]
-  end
-
   def self.reset_cache!
     @all = nil
-    @notifications = nil
     @all_by_id = nil
+  end
+
+  def duplicate
+    notification = self.clone
+    notification.id = self.id
+    notification.send(:remove_instance_variable, :@new_record)
+    notification
   end
 
   def infer_default_content

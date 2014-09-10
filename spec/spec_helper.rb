@@ -383,7 +383,11 @@ RSpec.configure do |config|
     end
   end
 
-  Notification.after_create { Notification.reset_cache! }
+  Notification.after_create do
+    Notification.reset_cache!
+    BroadcastPolicy.notification_finder.refresh_cache
+  end
+
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!(true)

@@ -55,20 +55,6 @@ describe Notification do
   it "should always have some subject" do
     Notification.create!(:name => 'Testing').subject.should_not be_nil
   end
-
-  context "by_name" do
-    before :once do
-      @foo = Notification.create(:name => "foo")
-      @bar = Notification.create(:name => "bar")
-    end
-
-    it "should look up all notifications once and cache them thereafter" do
-      Notification.all
-      Notification.expects(:connection).never
-      Notification.by_name("foo").should eql(@foo)
-      Notification.by_name("bar").should eql(@bar)
-    end
-  end
 end
 
 

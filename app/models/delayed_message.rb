@@ -121,7 +121,7 @@ class DelayedMessage < ActiveRecord::Base
     user = to.user rescue nil
     context = delayed_messages.select{|m| m.context}.compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
-    notification = Notification.by_name('Summaries')
+    notification = BroadcastPolicy.notification_finder.by_name('Summaries')
     path = HostUrl.outgoing_email_address
     message = to.messages.build(
       :subject => notification.subject,
