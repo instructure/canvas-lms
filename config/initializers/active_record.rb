@@ -874,6 +874,19 @@ ActiveRecord::Relation.class_eval do
       scope.to_a
     end
   end
+
+  def polymorphic_where(args)
+    raise ArgumentError unless args.length == 1
+
+    column = args.first.first
+    values = args.first.last
+    original_length = values.length
+    values = values.compact
+
+    sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
+    sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
+    where(sql, *values.map { |value| [value, value.class.base_ar_class.name] }.flatten)
+  end
 end
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
