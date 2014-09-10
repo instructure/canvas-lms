@@ -136,6 +136,15 @@ describe Quizzes::QuizzesController do
         quiz[:published].should be_true
       end
     end
+
+    it 'should implicitly grade outstanding submissions for user in course' do
+      user_session(@student)
+      course_quiz(active = true)
+
+      Quizzes::SubmissionManager.expects(:grade_outstanding_submissions_in_course)
+
+      get 'index', :course_id => @course.id
+    end
   end
 
   describe "GET 'index' with quiz stats disabled" do

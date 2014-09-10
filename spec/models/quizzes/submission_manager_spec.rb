@@ -105,4 +105,30 @@ describe Quizzes::SubmissionManager do
       end
     end
   end
+
+  describe '#grade_outstanding_submissions_in_course' do
+    it 'should work' do
+      student = student_in_course(active_all: true).user
+      quizzes = 2.times.map { @course.quizzes.create! }
+
+      ungraded_qs = quizzes[0].generate_submission(student).tap do |qs|
+        qs.submission_data = {}
+        qs.end_at = 5.minutes.ago
+        qs.save!
+      end
+
+      graded_qs = quizzes[1].generate_submission(student).tap do |qs|
+        qs.complete!({})
+      end
+
+      ungraded_qs.needs_grading?.should be true
+        graded_qs.needs_grading?.should be false
+
+      described_class.grade_outstanding_submissions_in_course(student.id,
+        @course.id, @course.class.to_s)
+
+      ungraded_qs.reload
+      ungraded_qs.needs_grading?.should be false
+    end
+  end
 end
