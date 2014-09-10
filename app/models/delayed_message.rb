@@ -27,7 +27,8 @@ class DelayedMessage < ActiveRecord::Base
     'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
     'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
     'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
-    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel']
+    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel',
+    'Alert']
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,

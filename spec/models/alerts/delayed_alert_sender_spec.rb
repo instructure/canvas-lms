@@ -289,5 +289,22 @@ module Alerts
         DelayedAlertSender.evaluate_for_course(@course, nil)
       end
     end
+
+    it "should work end to end" do
+      Notification.unstub(:by_name)
+      Notification.create(:name => "Alert")
+
+      course_with_teacher(:active_all => 1)
+      student_in_course(:active_all => 1)
+      @student.communication_channels.create(:path => "student@example.com").confirm!
+      alert = @course.alerts.build(:recipients => [:student])
+      alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
+      alert.save!
+      @course.start_at = Time.now - 30.days
+
+      expect {
+        DelayedAlertSender.evaluate_for_course(@course, nil)
+      }.to change(DelayedMessage, :count).by(1)
+    end
   end
 end
