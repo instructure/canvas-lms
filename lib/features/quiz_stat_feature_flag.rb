@@ -44,7 +44,7 @@ When Draft State is allowed/on, this enables the new quiz statistics page for an
     end
 
     def in_beta?
-      Rails.env.production? && !!ConfigFile.load('testcluster', false).try(:[], 'test_cluster_name')
+      Rails.env.production? && (!ApplicationController.respond_to?(:test_cluster?) || ApplicationController.test_cluster?)
     end
   end
 end
