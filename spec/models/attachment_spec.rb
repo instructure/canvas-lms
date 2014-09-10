@@ -143,6 +143,12 @@ describe Attachment do
         a.canvadoc.document_id.should_not be_nil
       end
 
+      it "works from the bulk uploader" do
+        a1 = canvadocable_attachment_model
+        Attachment.submit_to_canvadocs([a1.id])
+        a1.canvadoc.document_id.should_not be_nil
+      end
+
       it "doesn't submit non-canvadocable documents" do
         a = attachment_model
         a.submit_to_canvadocs

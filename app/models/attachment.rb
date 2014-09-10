@@ -1176,7 +1176,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.submit_to_canvadocs(ids)
-    Attachment.find_each(ids).each do |a|
+    Attachment.where(id: ids).find_each do |a|
       a.submit_to_canvadocs
     end
   end
