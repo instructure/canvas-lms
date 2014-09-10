@@ -559,6 +559,24 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe ".polymorphic_where" do
+    it "should work" do
+      relation = Assignment.scoped
+      user1 = User.create!
+      account1 = Account.create!
+      relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
+      relation.polymorphic_where(context: [user1, account1])
+    end
+
+    it "should work with NULLs" do
+      relation = Assignment.scoped
+      user1 = User.create!
+      account1 = Account.create!
+      relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
+      relation.polymorphic_where(context: [nil, user1, account1])
+    end
+  end
+
   describe ".nulls" do
     before :once do
       @u1 = User.create!
