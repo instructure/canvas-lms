@@ -31,7 +31,7 @@ module Lti
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account) }
     let(:user) { User.new }
-    let(:substitution_helper) { mock }
+    let(:substitution_helper) { stub_everything }
 
     before(:each) {
       subject.domain_root_account = root_account
@@ -210,6 +210,12 @@ module Lti
         subject.default_lti_params[:roles].should == 'Learner'
       end
 
+      it "generates ext_roles" do
+        Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+        substitution_helper.stubs(:all_roles).returns('Admin,User')
+        subject.default_lti_params[:ext_roles].should == 'Admin,User'
+      end
+
       it "generates launch_presentation_locale" do
         subject.default_lti_params[:launch_presentation_locale].should == :en
       end
@@ -220,6 +226,7 @@ module Lti
 
       it "generates user_id" do
         subject.current_user = user
+        user.stubs(:roles).returns(['User'])
         subject.default_lti_params[:user_id].should == Lti::Asset.opaque_identifier_for(user)
       end
     end

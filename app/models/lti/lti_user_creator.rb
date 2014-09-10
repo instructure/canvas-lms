@@ -1,13 +1,14 @@
 module Lti
   class LtiUserCreator
+    # deprecated mapping
     ENROLLMENT_MAP = {
-        StudentEnrollment => LtiOutbound::LTIRole::LEARNER,
-        TeacherEnrollment => LtiOutbound::LTIRole::INSTRUCTOR,
-        TaEnrollment => LtiOutbound::LTIRole::TEACHING_ASSISTANT,
-        DesignerEnrollment => LtiOutbound::LTIRole::CONTENT_DEVELOPER,
-        ObserverEnrollment => LtiOutbound::LTIRole::OBSERVER,
-        AccountUser => LtiOutbound::LTIRole::ADMIN,
-        StudentViewEnrollment => LtiOutbound::LTIRole::LEARNER
+        StudentEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER,
+        TeacherEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR,
+        TaEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT,
+        DesignerEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER,
+        ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
+        AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
+        StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
     }
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context, variable_substitutor = nil)

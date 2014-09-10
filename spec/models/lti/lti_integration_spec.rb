@@ -127,6 +127,7 @@ describe "LTI integration tests" do
         'resource_link_id' => canvas_tool.opaque_identifier_for(canvas_course),
         'resource_link_title' => canvas_tool.name,
         'roles' => 'Instructor,urn:lti:role:ims/lis/TeachingAssistant',
+        'ext_roles' => "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User",
         'tool_consumer_info_product_family_code' => 'canvas',
         'tool_consumer_info_version' => 'cloud',
         'tool_consumer_instance_contact_email' => HostUrl.outgoing_email_address,
@@ -210,7 +211,7 @@ describe "LTI integration tests" do
       hash['custom_canvas_account_id'].should == sub_account.id.to_s
       hash['custom_canvas_account_sis_id'].should == 'accountsis'
       hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
-      hash['custom_variable_canvas_membership_concluded_roles'].should == LtiOutbound::LTIRole::NONE
+      hash['custom_variable_canvas_membership_concluded_roles'].should == LtiOutbound::LTIRoles::System::NONE
     end
 
     it "should add account and user info in launch data for user profile launch" do
