@@ -110,7 +110,7 @@ class Quizzes::QuizzesController < ApplicationController
 
     # TODO: stop doing this here
     if @current_user.present?
-      Quizzes::SubmissionGrader.send_later(:grade_outstanding_submissions_in_course,
+      Quizzes::SubmissionManager.send_later_if_production(:grade_outstanding_submissions_in_course,
         @current_user.id, @context.id, @context.class.to_s)
     end
 
