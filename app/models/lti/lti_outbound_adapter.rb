@@ -55,6 +55,9 @@ module Lti
         variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)
         variable_substitutor.add_substitution('$Canvas.course.sisSourceId', lti_context.sis_source_id)
       end
+      # temporary until lti 2 infrastructure is in place
+      lti_helper = Lti::SubstitutionsHelper.new(@context, @root_account, @user)
+      variable_substitutor.add_substitution('$Canvas.xuser.allRoles', lti_helper.all_roles)
 
       if opts[:custom_substitutions]
         opts[:custom_substitutions].each do |key, value|

@@ -105,6 +105,29 @@ module Lti
       end
     end
 
+    describe '#all_roles' do
+
+      it 'converts multiple roles' do
+        subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
+        roles = subject.all_roles
+        roles.should include LtiOutbound::LTIRoles::System::USER
+        roles.should include LtiOutbound::LTIRoles::Institution::STUDENT
+        roles.should include LtiOutbound::LTIRoles::Institution::INSTRUCTOR
+        roles.should include LtiOutbound::LTIRoles::Institution::ADMIN
+        roles.should include LtiOutbound::LTIRoles::Context::LEARNER
+        roles.should include LtiOutbound::LTIRoles::Context::INSTRUCTOR
+        roles.should include LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER
+        roles.should include LtiOutbound::LTIRoles::Context::OBSERVER
+        roles.should include LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT
+      end
+
+      it "returns none if no user" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        helper.all_roles.should == [LtiOutbound::LTIRoles::System::NONE]
+      end
+    end
+
     describe '#course_enrollments' do
       it 'returns an empty array if the context is not a course' do
         helper = SubstitutionsHelper.new(account, root_account, user)

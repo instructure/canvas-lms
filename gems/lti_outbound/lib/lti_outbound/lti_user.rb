@@ -9,12 +9,12 @@ module LtiOutbound
 
     def current_role_types
       roles = current_roles.join(',') if current_roles && current_roles.size > 0
-      roles || LtiOutbound::LTIRole::NONE
+      roles || LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_role_types
       roles = concluded_roles.join(',') if concluded_roles && concluded_roles.size > 0
-      roles || LtiOutbound::LTIRole::NONE
+      roles || LtiOutbound::LTIRoles::System::NONE
     end
 
     def enrollment_state
@@ -26,7 +26,7 @@ module LtiOutbound
     end
 
     def learner?
-      current_roles.any? { |e| e == LtiOutbound::LTIRole::LEARNER }
+      current_roles.any? { |e| e == LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER || e == LtiOutbound::LTIRoles::Context::LEARNER   }
     end
 
   end

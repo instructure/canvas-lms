@@ -69,7 +69,7 @@ module Lti
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
                 '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
-                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
+                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' }
             }
         )
       end
@@ -86,6 +86,7 @@ module Lti
           roles: lti_helper.current_lis_roles,
           launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
           launch_presentation_document_target: 'iframe',
+          ext_roles: lti_helper.all_roles,
           # launch_presentation_width:,
           # launch_presentation_height:,
           # launch_presentation_return_url: return_url,

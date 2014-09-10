@@ -18,16 +18,16 @@
 
 require 'spec_helper'
 
-describe LtiOutbound::LTIRole do
+describe LtiOutbound::LTIRoles do
   describe 'constants' do
     it 'provides role constants' do
-      expect(LtiOutbound::LTIRole::INSTRUCTOR).to eq 'Instructor'
-      expect(LtiOutbound::LTIRole::LEARNER).to eq 'Learner'
-      expect(LtiOutbound::LTIRole::ADMIN).to eq 'urn:lti:instrole:ims/lis/Administrator'
-      expect(LtiOutbound::LTIRole::CONTENT_DEVELOPER).to eq 'ContentDeveloper'
-      expect(LtiOutbound::LTIRole::OBSERVER).to eq 'urn:lti:instrole:ims/lis/Observer'
-      expect(LtiOutbound::LTIRole::TEACHING_ASSISTANT).to eq 'urn:lti:role:ims/lis/TeachingAssistant'
-      expect(LtiOutbound::LTIRole::NONE).to eq 'urn:lti:sysrole:ims/lis/None'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR).to eq 'Instructor'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER).to eq 'Learner'
+      expect(LtiOutbound::LTIRoles::Institution::ADMIN).to eq 'urn:lti:instrole:ims/lis/Administrator'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER).to eq 'ContentDeveloper'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER).to eq 'urn:lti:instrole:ims/lis/Observer'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT).to eq 'urn:lti:role:ims/lis/TeachingAssistant'
+      expect(LtiOutbound::LTIRoles::System::NONE).to eq 'urn:lti:sysrole:ims/lis/None'
     end
   end
 end
