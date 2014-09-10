@@ -128,9 +128,8 @@ describe "quizzes" do
           @qsub.end_at = 5.minutes.ago
           @qsub.save!
           get "/courses/#{@course.id}/quizzes"
-          Delayed::Job.find_by_tag(
-            'Quizzes::SubmissionGrader.grade_outstanding_submissions_in_course'
-          ).should be_present
+          @qsub.reload
+          @qsub.needs_grading?.should be_false
         end
       end
 
