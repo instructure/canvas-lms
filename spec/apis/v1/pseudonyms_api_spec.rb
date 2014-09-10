@@ -258,6 +258,16 @@ describe PseudonymsController, type: :request do
         json['sis_user_id'].should eql 'old-12345'
       end
 
+      it "should allow changing sis id even if password setting is disabled" do
+        a = Account.find(Account.default)
+        a.settings[:admins_can_change_passwords] = true
+        a.save!
+        json = api_call(:put, @path, @path_options, {
+            :login => { :sis_user_id => 'old-12345' }
+        })
+        json['sis_user_id'].should eql 'old-12345'
+      end
+
       it "should not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(:unique_id => 'other@example.com')
