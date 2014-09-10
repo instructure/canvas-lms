@@ -6,6 +6,7 @@ module BroadcastPolicies
     let(:course) do
       mock("Course").tap do |c|
         c.stubs(:available?).returns(true)
+        c.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
     end
     let(:assignment) do
@@ -41,6 +42,7 @@ module BroadcastPolicies
         qs.stubs(:quiz).returns(quiz)
         qs.stubs(:submission).returns(submission)
         qs.stubs(:user).returns(user)
+        qs.stubs(:context).returns(course)
       end
     end
     let(:policy) { QuizSubmissionPolicy.new(quiz_submission) }
@@ -92,6 +94,7 @@ module BroadcastPolicies
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
       specify { wont_send_when { submission.stubs(:pending_review?).returns false }}
+      specify { wont_send_when { submission.stubs(:user_has_visibility).returns false }}
     end
 
 
@@ -115,6 +118,7 @@ module BroadcastPolicies
       specify { wont_send_when { course.stubs(:available?).returns false} }
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
+      specify { wont_send_when { submission.stubs(:user_has_visibility).returns false }}
 
       specify do
         wont_send_when do

@@ -7,6 +7,7 @@ module BroadcastPolicies
       stub("Course").tap do |c|
         c.stubs(:available?).returns(true)
         c.stubs(:id).returns(1)
+        c.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
     end
     let(:assignment) do
@@ -48,6 +49,7 @@ module BroadcastPolicies
         s.stubs(:late?).returns(false)
         s.stubs(:quiz_submission).returns(nil)
         s.stubs(:user).returns(user)
+        s.stubs(:context).returns(course)
       end
     end
 
@@ -177,6 +179,7 @@ module BroadcastPolicies
       specify { wont_send_when{ submission.stubs(:quiz_submission).returns stub }}
       specify { wont_send_when{ course.stubs(:available?).returns false }}
       specify { wont_send_when{ assignment.stubs(:published?).returns false }}
+      specify { wont_send_when{ SubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false)}}
     end
 
   end

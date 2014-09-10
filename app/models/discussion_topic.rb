@@ -837,7 +837,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { active_participants - [user] }
+    p.to { active_participants_with_visibility - [user] }
     p.whenever { |record|
       record.context.available? and
         !record.context.concluded? and
@@ -862,6 +862,15 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def active_participants_with_visibility
+    return active_participants unless context.feature_enabled?(:differentiated_assignments)
+    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id).pluck(:user_id)
+    # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
+    instructor_ids = context.participating_instructors.pluck(:id)
+    users_with_visibility.concat(instructor_ids)
+    active_participants.select{|p| users_with_visibility.include?(p.id)}
+  end
+
   def participating_users(user_ids)
     context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
   end
@@ -874,7 +883,23 @@ class DiscussionTopic < ActiveRecord::Base
     poster_ids = posters.map(&:id)
     legacy_sub_ids &= poster_ids
     sub_ids += legacy_sub_ids
-    participating_users(sub_ids)
+
+    subscribed_users = participating_users(sub_ids)
+
+    if context.feature_enabled?(:differentiated_assignments) && self.for_assignment?
+      students_with_visibility = AssignmentStudentVisibility.where(course_id: context_id, assignment_id: assignment_id).pluck(:user_id)
+      admin_ids = self.context.participating_admins.pluck(:id)
+      observer_ids = self.context.participating_observers.pluck(:id)
+      observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(self.context,observer_ids)
+
+      subscribed_users.select!{ |user|
+        students_with_visibility.include?(user.id) || admin_ids.include?(user.id) ||
+        # an observer with no students or one with students who have visibility
+        (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
+      }
+    end
+
+    subscribed_users
   end
 
   def posters

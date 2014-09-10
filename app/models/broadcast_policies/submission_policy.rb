@@ -43,6 +43,7 @@ module BroadcastPolicies
 
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
+      user_has_visibility? &&
       (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
@@ -50,7 +51,8 @@ module BroadcastPolicies
       broadcasting_grades? &&
       submission.graded_at &&
       !graded_recently? &&
-      grade_updated?
+      grade_updated? &&
+      user_has_visibility?
     end
 
     private
@@ -94,5 +96,9 @@ module BroadcastPolicies
       submission.assignment_graded_in_the_last_hour?
     end
 
+    def user_has_visibility?
+      return true unless submission.context.feature_enabled?(:differentiated_assignments)
+      AssignmentStudentVisibility.where(assignment_id: submission.assignment_id, user_id: submission.user_id).any?
+    end
   end
 end

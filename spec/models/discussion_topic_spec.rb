@@ -191,7 +191,8 @@ describe DiscussionTopic do
     context "differentiated assignements" do
       before do
         @course = course(:active_course => true)
-        discussion_topic_model(:user => @teacher)
+        discussion_topic_model(:user => @teacher, :context => @course)
+        @course.enroll_teacher(@teacher).accept!
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
 
@@ -223,6 +224,14 @@ describe DiscussionTopic do
         it "should be visible to a teacher" do
           @topic.visible_for?(@teacher).should be_true
         end
+        context "active_participants_with_visibility" do
+          it "should filter participants by visibility" do
+            [@student1, @teacher].each do |user|
+              @topic.active_participants_with_visibility.include?(user).should be_true
+            end
+            @topic.active_participants_with_visibility.include?(@student2).should be_false
+          end
+        end
       end
 
       context "feature flag off" do
@@ -230,6 +239,13 @@ describe DiscussionTopic do
         it "should be visible to everybody in the class" do
           [@student1,@student2,@teacher].each do |user|
             @topic.visible_for?(user).should be_true
+          end
+        end
+        context "active_participants_with_visibility" do
+          it "should not filter any participants" do
+            [@student1,@student2].each do |user|
+              @topic.active_participants_with_visibility.include?(user).should be_true
+            end
           end
         end
       end
@@ -737,6 +753,52 @@ describe DiscussionTopic do
       @student.enrollments.first.destroy
       @topic.subscribers.should_not include(@student)
       @topic2.subscribers.should_not include(@student)
+    end
+
+    context "differentiated_assignments" do
+      before do
+        @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @assignment.submission_types = 'discussion_topic'
+        @assignment.save!
+        @topic.assignment_id = @assignment.id
+        @topic.save!
+        @section = @course.course_sections.create!(name: "test section")
+        create_section_override_for_assignment(@topic.assignment, {course_section: @section})
+      end
+      context "enabled" do
+        before{@course.enable_feature!(:differentiated_assignments)}
+        it "should filter subscribers based on visibility" do
+          @topic.subscribe(@student)
+          @topic.subscribers.should_not include(@student)
+          student_in_section(@section, user: @student)
+          @topic.subscribers.should include(@student)
+        end
+
+        it "filters observers if their student cant see" do
+          @observer = user(:active_all => true, :name => "Observer")
+          observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+          observer_enrollment.update_attribute(:associated_user_id, @student.id)
+          @topic.subscribe(@observer)
+          @topic.subscribers.include?(@observer).should be_false
+          student_in_section(@section, user: @student)
+          @topic.subscribers.include?(@observer).should be_true
+        end
+
+        it "doesnt filter for observers with no student" do
+          @observer = user(:active_all => true)
+          observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+          @topic.subscribe(@observer)
+          @topic.subscribers.should include(@observer)
+        end
+
+      end
+      context "disabled" do
+        before{@course.disable_feature!(:differentiated_assignments)}
+        it "should not filter subscribers based on visibility" do
+          @topic.subscribe(@student)
+          @topic.subscribers.should include(@student)
+        end
+      end
     end
   end
 
