@@ -178,7 +178,7 @@ class NotificationPolicy < ActiveRecord::Base
                              'never'
                            end
             np.save!
-          rescue ActiveRecord::Base::UniqueConstraintViolation
+          rescue ActiveRecord::RecordNotUnique
             np = nil
             raise ActiveRecord::Rollback
           end

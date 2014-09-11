@@ -505,7 +505,7 @@ class User < ActiveRecord::Base
                 UserAccountAssociation.transaction(:requires_new => true) do
                   aa.save!
                 end
-              rescue ActiveRecord::Base::UniqueConstraintViolation
+              rescue ActiveRecord::RecordNotUnique
                 # race condition - someone else created the UAA after we queried for existing ones
                 old_aa = UserAccountAssociation.find_by_user_id_and_account_id(aa.user_id, aa.account_id)
                 raise unless old_aa # wtf!
@@ -1334,7 +1334,7 @@ class User < ActiveRecord::Base
     begin
       # more likely this doesn't exist, so try the create first
       asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
-    rescue ActiveRecord::Base::UniqueConstraintViolation
+    rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
         ignore = asset.ignores.find_by_user_id_and_purpose(self.id, purpose)
         ignore.permanent = permanent

@@ -532,13 +532,6 @@ class ActiveRecord::Base
     end
   end
 
-  module UniqueConstraintViolation
-    def self.===(error)
-      ActiveRecord::StatementInvalid === error &&
-      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql2?::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
-    end
-  end
-
   def self.unique_constraint_retry(retries = 1)
     # runs the block in a (possibly nested) transaction. if a unique constraint
     # violation occurs, it will run it "retries" more times. the nested
@@ -550,7 +543,7 @@ class ActiveRecord::Base
         result = transaction(:requires_new => true) { uncached { yield } }
         connection.clear_query_cache
         return result
-      rescue UniqueConstraintViolation
+      rescue ActiveRecord::RecordNotUnique
       end
     end
     result = transaction(:requires_new => true) { uncached { yield } }

@@ -455,7 +455,7 @@ class Course < ActiveRecord::Base
                       aa.depth = depth
                     end
                   end
-                rescue ActiveRecord::Base::UniqueConstraintViolation
+                rescue ActiveRecord::RecordNotUnique
                   course.course_account_associations.where(course_section_id: section,
                     account_id: account_id).update_all(:depth => depth)
                 end

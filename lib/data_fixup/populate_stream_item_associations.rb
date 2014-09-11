@@ -23,7 +23,7 @@ SQL
         end
         begin
           StreamItem.update_all(updates, :id => si['id']) unless updates.empty?
-        rescue ActiveRecord::Base::UniqueConstraintViolation
+        rescue ActiveRecord::RecordNotUnique
           # duplicate!
           # we have no way of knowing which one (or both) has stream item instances,
           # so just let the first one win

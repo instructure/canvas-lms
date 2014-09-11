@@ -1067,7 +1067,7 @@ class Assignment < ActiveRecord::Base
             submission.save! if submission.changed?
             submissions << submission
           end
-        rescue ActiveRecord::Base::UniqueConstraintViolation
+        rescue ActiveRecord::RecordNotUnique
           submission = self.submissions.where(user_id: student).first
           raise unless submission
           submissions << submission
