@@ -64,7 +64,7 @@ define [
         e.preventDefault()
         el = $target[0]
         event = document.createEvent 'MouseEvent'
-        event.initEvent 'click', true, false
+        event.initEvent 'click', true, true
         el.dispatchEvent event
       @close()
 
