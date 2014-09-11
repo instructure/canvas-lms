@@ -127,7 +127,7 @@ module Api::V1::Submission
         attachment.skip_submission_attachment_lock_checks = true
         atjson = attachment_json(attachment, user, {},
                                  submission_attachment: true,
-                                 includes: ['preview_url'])
+                                 include: ['preview_url'])
         attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?

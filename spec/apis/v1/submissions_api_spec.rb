@@ -707,6 +707,7 @@ describe 'Submissions API', type: :request do
              'hidden_for_user' => false,
              'created_at' => sub1.attachments.first.reload.created_at.as_json,
              'updated_at' => sub1.attachments.first.updated_at.as_json, 
+             'preview_url' => nil,
              'thumbnail_url' => sub1.attachments.first.thumbnail_url },
          ],
         "submission_history"=>
@@ -774,6 +775,7 @@ describe 'Submissions API', type: :request do
                 'hidden_for_user' => false,
                 'created_at' => sub1.attachments.first.created_at.as_json,
                 'updated_at' => sub1.attachments.first.updated_at.as_json, 
+                'preview_url' => nil,
                 'thumbnail_url' => sub1.attachments.first.thumbnail_url },
             ],
            "body"=>"test!",
@@ -858,6 +860,7 @@ describe 'Submissions API', type: :request do
                'hidden_for_user' => false,
                'created_at' => sub2a1.created_at.as_json,
                'updated_at' => sub2a1.updated_at.as_json,
+               'preview_url' => nil,
                'thumbnail_url' => sub2a1.thumbnail_url
               },
             ],
@@ -883,6 +886,7 @@ describe 'Submissions API', type: :request do
            'hidden_for_user' => false,
            'created_at' => sub2a1.created_at.as_json,
            'updated_at' => sub2a1.updated_at.as_json,
+           'preview_url' => nil,
            'thumbnail_url' => sub2a1.thumbnail_url,
           },
          ],
@@ -2463,4 +2467,22 @@ describe 'Submissions API', type: :request do
     end
   end
 
+  it "includes preview urls for attachments" do
+    Canvadocs.stubs(:enabled?).returns(true)
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    a = @course.assignments.create!
+    a.submit_homework(@student, submission_type: 'online_upload',
+                      attachments: [crocodocable_attachment_model(context: @student)])
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
+                    {course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                     action: 'index', controller: 'submissions_api', format: 'json',
+                     include: %w[submission_history]})
+
+    json[0]["submission_history"][0]["attachments"][0]["preview_url"].should =~
+      /canvadoc_session/
+  end
 end
