@@ -25,7 +25,7 @@ gem 'switchman', '1.2.18'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
-gem "aws-sdk", '1.21.0'
+gem "aws-sdk", '1.52.0'
   gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
