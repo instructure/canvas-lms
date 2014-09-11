@@ -585,7 +585,59 @@ class DiscussionTopicsController < ApplicationController
 
   # @API Update a topic
   #
-  # Accepts the same parameters as create
+  # Update an existing discussion topic for the course or group.
+  #
+  # @argument title [String]
+  #
+  # @argument message [String]
+  #
+  # @argument discussion_type [String, "side_comment"|"threaded"]
+  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
+  #
+  # @argument published [Boolean]
+  #   Whether this topic is published (true) or draft state (false). Only
+  #   teachers and TAs have the ability to create draft state topics.
+  #
+  # @argument delayed_post_at [DateTime]
+  #   If a timestamp is given, the topic will not be published until that time.
+  #
+  # @argument lock_at [DateTime]
+  #   If a timestamp is given, the topic will be scheduled to lock at the
+  #   provided timestamp. If the timestamp is in the past, the topic will be
+  #   locked.
+  #
+  # @argument podcast_enabled [Boolean]
+  #   If true, the topic will have an associated podcast feed.
+  #
+  # @argument podcast_has_student_posts [Boolean]
+  #   If true, the podcast will include posts from students as well. Implies
+  #   podcast_enabled.
+  #
+  # @argument require_initial_post [Boolean]
+  #   If true then a user may not respond to other replies until that user has
+  #   made an initial reply. Defaults to false.
+  #
+  # @argument assignment [Assignment]
+  #   To create an assignment discussion, pass the assignment parameters as a
+  #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
+  #   for the available parameters. The name parameter will be ignored, as it's
+  #   taken from the discussion title. If you want to make a discussion that was
+  #   an assignment NOT an assignment, pass set_assignment = false as part of
+  #   the assignment object
+  #
+  # @argument is_announcement [Boolean]
+  #   If true, this topic is an announcement. It will appear in the
+  #   announcement's section rather than the discussions section. This requires
+  #   announcment-posting permissions.
+  #
+  # @argument position_after [String]
+  #   By default, discussions are sorted chronologically by creation date, you
+  #   can pass the id of another topic to have this one show up after the other
+  #   when they are listed.
+  #
+  # @argument group_category_id [Integer]
+  #   If present, the topic will become a group discussion assigned
+  #   to the group.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
