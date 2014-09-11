@@ -193,6 +193,24 @@
 #       }
 #     }
 #
+# @model NeedsGradingCount
+#     {
+#       "id": "NeedsGradingCount",
+#       "description": "Used by Assignment model",
+#       "properties": {
+#         "section_id": {
+#           "description": "The section ID",
+#           "example": "123456",
+#           "type": "string"
+#         },
+#         "needs_grading_count": {
+#           "description": "Number of submissions that need grading",
+#           "example": 5,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
 # @model Assignment
 #     {
 #       "id": "Assignment",
@@ -318,7 +336,8 @@
 #             {"section_id":"123456","needs_grading_count":5},
 #             {"section_id":"654321","needs_grading_count":0}
 #           ],
-#           "type": "array"
+#           "type": "array",
+#           "items": { "$ref": "NeedsGradingCount" }
 #         },
 #         "position": {
 #           "description": "the sorting order of the assignment in the group",
