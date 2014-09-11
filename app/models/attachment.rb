@@ -241,6 +241,8 @@ class Attachment < ActiveRecord::Base
       self.encoding = ''
       Attachment.where(:id => self).update_all(:encoding => '')
       return
+    rescue IOError => e
+      logger.error("Error inferring encoding for attachment #{self.global_id}: #{e.message}")
     end
   end
 

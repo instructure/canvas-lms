@@ -812,6 +812,11 @@ describe Attachment do
       @attachment.encoding.should be_nil
       @attachment.infer_encoding
       @attachment.encoding.should == 'UTF-8'
+
+      attachment_model(:uploaded_data => stub_png_data('blank.txt', "can't read me"))
+      @attachment.stubs(:open).raises(IOError)
+      @attachment.infer_encoding
+      @attachment.encoding.should == nil
     end
   end
 
