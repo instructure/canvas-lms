@@ -2,7 +2,7 @@
   jammit_css :profile_show, :tinymce
   js_bundle :profile_show
   @body_classes << 'not-editing'
-  js_env PROFILE: @user_data
+  js_env PROFILE: @user_data if @user_data[:can_edit]
   js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
 %>
 <%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
