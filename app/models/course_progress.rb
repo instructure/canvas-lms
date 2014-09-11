@@ -50,8 +50,8 @@ class CourseProgress
   end
 
   def requirements
-    @_requirements ||= modules.flat_map { |m| m.completion_requirements_visible_to(@user) }
-                              .map { |req| req[:id] }
+    # e.g. [{id: 1, type: 'must_view'}, {id: 2, type: 'must_view'}]
+    @_requirements ||= modules.flat_map { |m| m.completion_requirements_visible_to(@user) }.uniq
   end
 
   def requirement_count
@@ -63,8 +63,11 @@ class CourseProgress
   end
 
   def requirements_completed
-    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met.to_a.uniq { |r| r[:id] } }
-                                                    .select { |req| requirements.include?(req[:id]) }
+    # find the list of requirements that have been recorded as met for this module, then
+    # select only those requirements that are current, and filter out any duplicates
+    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met }
+                                                    .select { |req| requirements.include?(req) }
+                                                    .uniq
   end
 
   def requirement_completed_count
@@ -72,7 +75,7 @@ class CourseProgress
   end
 
   def current_requirement_url
-    return unless in_progress?
+    return unless in_progress? && current_content_tag
     course_context_modules_item_redirect_url(:course_id => course.id,
                                              :id => current_content_tag.id,
                                              :host => HostUrl.context_host(course))

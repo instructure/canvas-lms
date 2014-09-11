@@ -161,5 +161,27 @@ describe CourseProgress do
       progress = CourseProgress.new(@course, @user)
       progress.current_content_tag.id.should_not == @tag.id
     end
+
+    it "accounts for module items that have moved between modules" do
+      # complete the requirement while it's in module 1
+      @module.update_for(@user, :submitted, @tag)
+
+      # move the requirement to module 2
+      @tag.context_module = @module2
+      @tag.save!
+      @module2.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+      @module2.save
+
+      # check progress
+      progress = CourseProgress.new(@course, @user)
+      progress.requirement_completed_count.should == 1
+
+      # complete the requirement again
+      @module2.update_for(@user, :submitted, @tag)
+
+      # check progress again
+      progress = CourseProgress.new(@course, @user)
+      progress.requirement_completed_count.should == 1
+    end
   end
 end

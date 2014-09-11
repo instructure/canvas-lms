@@ -221,6 +221,8 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def outdated?
     if self.current && evaluated_at.present?
+      return true if evaluated_at < context_module.updated_at
+
       # context module not locked or still to be unlocked
       return false if context_module.unlock_at.blank? || context_module.to_be_unlocked
 
