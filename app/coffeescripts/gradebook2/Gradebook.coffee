@@ -61,8 +61,6 @@ define [
 
     DISPLAY_PRECISION = 2
 
-    numberOfFrozenCols: 3 # SFU MOD - CANVAS-188 Add extra column for SIS ID
-
     hasSections: $.Deferred()
     allSubmissionsLoaded: $.Deferred()
 
@@ -81,6 +79,7 @@ define [
       @show_concluded_enrollments = true if @options.course_is_concluded
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
+      ++@numberOfFrozenCols # SFU MOD - CANVAS-188 Add extra column for SIS ID
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
