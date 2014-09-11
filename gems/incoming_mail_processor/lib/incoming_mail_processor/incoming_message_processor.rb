@@ -78,7 +78,7 @@ module IncomingMailProcessor
         html_part = incoming_message.html_part
         text_part =  incoming_message.text_part
 
-        html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset)
+        html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset) if html_part
         body = self.class.utf8ify(text_part.body.decoded, text_part.charset)
       else
         body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
