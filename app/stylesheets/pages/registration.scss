@@ -123,7 +123,7 @@ a {
   height: 65px;
   text-indent: -9999em;
 }
-
+#signup_teacher {display: none}
 #signup_teacher {
   &:hover, &:focus {
     background-position: 5px -60px;
@@ -140,7 +140,7 @@ a {
     outline: none;
   }
 }
-
+#signup_parent {display: none}
 #login_form {
   position: absolute;
   right: 0;
