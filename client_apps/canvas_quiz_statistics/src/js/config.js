@@ -6,8 +6,10 @@ define([
   var config = ProductionConfig || {};
 
   //>>excludeStart("production", pragmas.production);
+  console.log('Environment:', this.__TESTING__ ? 'test' : 'development');
+
   // Install test config:
-  if (window.__TESTING__) {
+  if (this.__TESTING__) {
     require([ './config/environments/test' ], function(testConfig) {
       config = _.extend(config, testConfig);
     });

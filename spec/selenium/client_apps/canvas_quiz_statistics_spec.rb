@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 
 describe "canvas quiz statistics" do
   include_examples "quizzes selenium tests"
