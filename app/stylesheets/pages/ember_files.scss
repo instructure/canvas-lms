@@ -268,7 +268,7 @@ $border: #e5e4e4;
   font-size: 0.95em;
   float: left;
 }
-.upload-progress-view__bar-container {
+.progress-bar__bar-container {
   height: 9px;
   width: 49%;
   margin-bottom: 12px;
@@ -281,7 +281,7 @@ $border: #e5e4e4;
     border: solid $canvas-success 1px;
   }
 }
-.upload-progress-view__bar {
+.progress-bar__bar {
   position: relative;
   background: $canvas-primary;
   border: none;

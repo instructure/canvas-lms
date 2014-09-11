@@ -2,7 +2,8 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/FileUploader'
-], (React, withReactDOM, FileUploader) ->
+  './ProgressBar'
+], (React, withReactDOM, FileUploader, ProgressBar) ->
 
   UploadProgressView = React.createClass
 
@@ -14,19 +15,10 @@ define [
         i className: 'icon-document'
         span ref: 'fileName', @props.uploader.getFileName()
 
-    createWidthStyle: ->
-      width: "#{@props.uploader.roundProgress()}%"
-
     render: withReactDOM ->
-      almostDone = ''
-      almostDone = ' almost-done' if @props.uploader.roundProgress() == 100
+      progress = @props.uploader.roundProgress()
       div className: 'upload-progress-view',
         div className: 'upload-progress-view__label',
           div {},
             @getLabel()
-        div ref: 'container', className: 'upload-progress-view__bar-container' + almostDone,
-          div
-            ref: 'bar'
-            className: 'upload-progress-view__bar' + almostDone
-            ref: 'bar'
-            style: @createWidthStyle()
+        ProgressBar progress: progress
