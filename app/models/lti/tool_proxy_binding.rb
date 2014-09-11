@@ -25,7 +25,7 @@ module Lti
     belongs_to :context, :polymorphic => true
     has_many :links, :class_name => 'Lti::LtiLink', foreign_key: 'tool_proxy_binding_id'
 
-    validates_presence_of :tool_proxy, :context, :enabled
+    validates_presence_of :tool_proxy, :context
     validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
 
   end

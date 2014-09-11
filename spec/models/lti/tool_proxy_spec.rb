@@ -20,9 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 module Lti
   describe ToolProxy do
-    let (:account) {Account.create}
-    let (:product_family) {ProductFamily.create(vendor_code: '123', product_code:'abc', vendor_name:'acme', root_account:account)}
-    let (:resource_handler) {ResourceHandler.new}
+    let (:account) { Account.create }
+    let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
+    let (:resource_handler) { ResourceHandler.new }
 
     describe 'validations' do
 
@@ -40,14 +40,14 @@ module Lti
       it 'requires a shared_secret' do
         subject.shared_secret = nil
         subject.save
-        error = subject.errors.find {|e| e == [:shared_secret, "can't be blank"]}
+        error = subject.errors.find { |e| e == [:shared_secret, "can't be blank"] }
         error.should_not == nil
       end
 
       it 'requires a guid' do
         subject.guid = nil
         subject.save
-        error = subject.errors.find {|e| e == [:guid, "can't be blank"]}
+        error = subject.errors.find { |e| e == [:guid, "can't be blank"] }
         error.should_not == nil
       end
 
@@ -102,6 +102,103 @@ module Lti
         subject.errors[:raw_data].should include("can't be blank")
       end
 
+      describe "#find_active_proxies_for_context" do
+        let(:root_account) { Account.create }
+        let(:sub_account_1_1) { Account.create(parent_account: root_account) }
+        let(:sub_account_1_2) { Account.create(parent_account: root_account) }
+        let(:sub_account_2_1) { Account.create(parent_account: sub_account_1_1) }
+
+
+        it 'finds a tool_proxy' do
+          tool_proxy = create_tool_proxy(context: sub_account_2_1)
+          tool_proxy.bindings.create!(context: sub_account_2_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 1
+          proxies.first.should == tool_proxy
+        end
+
+        it 'finds a tool_proxy for a parent account' do
+          tool_proxy = create_tool_proxy(context: sub_account_1_1)
+          tool_proxy.bindings.create!(context: sub_account_1_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 1
+          proxies.first.should == tool_proxy
+        end
+
+        it 'finds a tool_proxy for a course binding' do
+          course = Course.create!(account: sub_account_2_1)
+          tool_proxy = create_tool_proxy(context: course)
+          tool_proxy.bindings.create!(context: course)
+          proxies = described_class.find_active_proxies_for_context(course)
+          proxies.count.should == 1
+          proxies.first.should == tool_proxy
+        end
+
+        it "doesn't return tool_proxies that are disabled" do
+          tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'disabled')
+          tool_proxy.bindings.create!(context: sub_account_2_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 0
+        end
+
+        it "doesn't return tool_proxies that are deleted" do
+          tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'deleted')
+          tool_proxy.bindings.create!(context: sub_account_2_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 0
+        end
+
+        it "doesn't return tool_proxies when closest ancestor is disabled" do
+          tool_proxy = create_tool_proxy(context: sub_account_2_1)
+          tool_proxy.bindings.create!(context: sub_account_2_1, enabled: false)
+          tool_proxy.bindings.create!(context: sub_account_1_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 0
+        end
+
+        it 'handles multiple tool_proxies' do
+          tool_proxy1 = create_tool_proxy(context: sub_account_2_1)
+          tool_proxy1.bindings.create!(context: sub_account_2_1)
+          tool_proxy2 = create_tool_proxy(context: sub_account_1_1)
+          tool_proxy2.bindings.create!(context: sub_account_1_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 2
+          proxies.should include(tool_proxy1)
+          proxies.should include(tool_proxy2)
+        end
+
+        it 'handles multiple bindings' do
+          tool_proxy = create_tool_proxy(context: sub_account_1_1)
+          tool_proxy.bindings.create!(context: sub_account_1_1)
+          tool_proxy.bindings.create!(context: sub_account_2_1)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 1
+          proxies.first.should == tool_proxy
+        end
+
+        it "doesn't return tool proxies that are enabled at a higher binding and disabled at a lower binding" do
+          tool_proxy = create_tool_proxy(context: sub_account_1_1)
+          tool_proxy.bindings.create!(context: sub_account_1_1)
+          tool_proxy.bindings.create!(context: sub_account_2_1, enabled: false)
+          proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
+          proxies.count.should == 0
+        end
+
+      end
+
+    end
+
+    def create_tool_proxy(opts = {})
+      default_opts = {
+        shared_secret: 'shared_secret',
+        guid: SecureRandom.uuid,
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      }
+      ToolProxy.create(default_opts.merge(opts))
     end
 
   end
