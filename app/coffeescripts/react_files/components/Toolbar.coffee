@@ -146,3 +146,5 @@ define [
               UploadButton
                 currentFolder: @props.currentFolder
                 showingButtons: showingButtons
+                contextId: @props.contextId
+                contextType: @props.contextType
