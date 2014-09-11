@@ -13128,7 +13128,7 @@ zh:
       log_in: 登录
       login_at_account: "在 %{school_name} 登录"
       login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
-      register_for_canvas: "*需要 Canvas 帐户?* **单击此处免费获取!**"
+      register_for_canvas: "*三林北校的学生?* **单击此处注册帐号!**"
     menu_assignment: 
       labels: 
         due: 截止时间
