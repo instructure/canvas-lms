@@ -20,7 +20,7 @@ class Enrollment < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :course, :touch => true
+  belongs_to :course, :touch => true, :inverse_of => :enrollments
   belongs_to :course_section
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
