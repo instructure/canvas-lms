@@ -25,7 +25,7 @@ define(function(require) {
         quizStats = subject.get();
 
         expect(quizStats).toBeTruthy();
-        expect(quizStats.id).toEqual('200');
+        expect(quizStats.id).toEqual('267');
 
         expect(onChange).toHaveBeenCalled();
       });
