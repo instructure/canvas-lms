@@ -126,7 +126,7 @@ class ContextModule < ActiveRecord::Base
     original_position ||= self.position || 0
     positions = ContextModule.module_positions(self.context).to_a.sort_by{|a| a[1] }
     downstream_ids = positions.select{|a| a[1] > (self.position || 0)}.map{|a| a[0] }
-    downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.find_all_by_id(downstream_ids)
+    downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
     downstreams.each {|m| m.save_without_touching_context }
   end
 
@@ -342,15 +342,15 @@ class ContextModule < ActiveRecord::Base
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
     if params[:type] == "wiki_page" || params[:type] == "page"
-      item = opts[:wiki_page] || self.context.wiki.wiki_pages.find_by_id(params[:id])
+      item = opts[:wiki_page] || self.context.wiki.wiki_pages.where(id: params[:id]).first
     elsif params[:type] == "attachment" || params[:type] == "file"
       item = opts[:attachment] || self.context.attachments.active.find_by_id(params[:id])
     elsif params[:type] == "assignment"
-      item = opts[:assignment] || self.context.assignments.active.find_by_id(params[:id])
+      item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
     elsif params[:type] == "discussion_topic" || params[:type] == "discussion"
-      item = opts[:discussion_topic] || self.context.discussion_topics.active.find_by_id(params[:id])
+      item = opts[:discussion_topic] || self.context.discussion_topics.active.where(id: params[:id]).first
     elsif params[:type] == "quiz"
-      item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
+      item = opts[:quiz] || self.context.quizzes.active.where(id: params[:id]).first
     end
     workflow_state = ContentTag.asset_workflow_state(item) if item
     workflow_state ||= 'active'
@@ -511,7 +511,7 @@ class ContextModule < ActiveRecord::Base
     users = Array(users)
     users_hash = {}
     users.each{|u| users_hash[u.id] = u }
-    progressions = self.context_module_progressions.find_all_by_user_id(users.map(&:id))
+    progressions = self.context_module_progressions.where(user_id: users)
     progressions_hash = {}
     progressions.each{|p| progressions_hash[p.user_id] = p }
     newbies = users.select{|u| !progressions_hash[u.id] }

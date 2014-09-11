@@ -30,7 +30,7 @@ module Importers
         q['assessment_question_id'] = existing_question.id if existing_question
       end
 
-      default_bank = migration.question_bank_id ? migration.context.assessment_question_banks.find_by_id(migration.question_bank_id) : nil
+      default_bank = migration.context.assessment_question_banks.where(id: migration.question_bank_id).first if migration.question_bank_id
       migration.question_bank_name = default_bank.title if default_bank
       default_title = migration.question_bank_name || AssessmentQuestionBank.default_imported_title
 

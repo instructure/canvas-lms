@@ -672,7 +672,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     @submission_questions.each do |q|
       if q[:pick_count] #Quizzes::QuizGroup
         if q[:assessment_question_bank_id]
-          bank = ::AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
+          bank = ::AssessmentQuestionBank.where(id: q[:assessment_question_bank_id]).first if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count], exclude_ids)
             questions = questions.map { |aq| aq.data }
@@ -823,22 +823,22 @@ class Quizzes::Quiz < ActiveRecord::Base
       locked = false
       quiz_for_user = self.overridden_for(user)
       if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
         end
       elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
       elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = l
         end
       elsif item = locked_by_module_item?(user, opts[:deep_check_if_needed])
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         end

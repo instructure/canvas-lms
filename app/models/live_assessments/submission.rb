@@ -30,7 +30,7 @@ module LiveAssessments
       # when we do, we'll need to start cleaning up outcome results when all the results are deleted. bail until then.
       return if possible == 0
 
-      outcome_result = alignment.learning_outcome_results.find_or_initialize_by_user_id(user.id)
+      outcome_result = alignment.learning_outcome_results.where(user_id: user.id).first_or_initialize
       outcome_result.title = "#{user.name}, #{assessment.title}"
       outcome_result.context = assessment.context
       outcome_result.associated_asset = assessment

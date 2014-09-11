@@ -704,7 +704,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    twitter_service = user.user_services.find_by_service('twitter')
+    twitter_service = user.user_services.where(service: 'twitter').first
     host = HostUrl.short_host(self.asset_context)
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
@@ -716,7 +716,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_facebook
     facebook_user_id = self.to.to_i.to_s
-    service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
+    service = self.user.user_services.for_service('facebook').where(service_user_id: facebook_user_id).first
     Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
     complete_dispatch
   end

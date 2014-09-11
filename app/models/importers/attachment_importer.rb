@@ -36,7 +36,7 @@ module Importers
       if data[:locked_folders]
          data[:locked_folders].each do |path|
            # TODO i18n
-           if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
+           if f = migration.context.active_folders.where(full_name: "course files/#{path}").first
              f.locked = true
              f.save
            end
@@ -46,7 +46,7 @@ module Importers
       if data[:hidden_folders]
         data[:hidden_folders].each do |path|
           # TODO i18n
-          if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
+          if f = migration.context.active_folders.where(full_name: "course files/#{path}").first
             f.workflow_state = 'hidden'
             f.save
           end
@@ -58,8 +58,8 @@ module Importers
 
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
-      item ||= Attachment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= Attachment.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) # if hash[:migration_id]
+      item ||= Attachment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
+      item ||= Attachment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first # if hash[:migration_id]
       item ||= Attachment.find_from_path(hash[:path_name], context)
       if item
         item.context = context

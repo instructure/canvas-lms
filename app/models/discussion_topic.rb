@@ -281,7 +281,7 @@ class DiscussionTopic < ActiveRecord::Base
     uid = current_user.is_a?(User) ? current_user.id : current_user
     dtp = discussion_topic_participants.loaded? ?
       discussion_topic_participants.detect{ |dtp| dtp.user_id == uid } :
-      discussion_topic_participants.find_by_user_id(uid)
+      discussion_topic_participants.where(user_id: uid).select(:workflow_state).first
     dtp.try(:workflow_state) || "unread"
   end
 
@@ -363,7 +363,7 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
     Shackles.activate(:master) do
-      topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
+      topic_participant = discussion_topic_participants.lock.where(user_id: current_user).select(:unread_entry_count).first
       topic_participant.try(:unread_entry_count) || self.default_unread_count
     end
   end
@@ -828,7 +828,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def ensure_submission(user)
-    submission = Submission.find_by_assignment_id_and_user_id(self.assignment_id, user.id)
+    submission = Submission.where(assignment_id: self.assignment_id, user_id: user).first
     return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
@@ -981,12 +981,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
     media_object_ids = media_object_ids.uniq.compact
     attachment_ids = attachment_ids.uniq.compact
-    attachments = attachment_ids.empty? ? [] : context.attachments.active.find_all_by_id(attachment_ids).compact
+    attachments = attachment_ids.empty? ? [] : context.attachments.active.find_all_by_id(attachment_ids)
     attachments = attachments.select{|a| a.content_type && a.content_type.match(/(video|audio)/) }
     attachments.each do |attachment|
       attachment.podcast_associated_asset = messages_hash[attachment.id]
     end
-    media_objects = media_object_ids.empty? ? [] : MediaObject.find_all_by_media_id(media_object_ids)
+    media_objects = media_object_ids.empty? ? [] : MediaObject.where(media_id: media_object_ids).to_a
     media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
     media_objects = media_objects.uniq(&:media_id)
     media_objects = media_objects.map do |media_object|

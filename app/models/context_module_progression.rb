@@ -160,13 +160,13 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def get_submission_or_quiz_submission(tag)
     if tag.content_type_quiz?
-      Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
+      Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).first
     elsif tag.content_type_discussion?
       if tag.content
-        Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
+        Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
       end
     else
-      Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
+      Submission.where(assignment_id: tag.content_id, user_id: user).first
     end
   end
   private :get_submission_or_quiz_submission

@@ -34,8 +34,8 @@ module Importers
       if rubric
         item = rubric
       else
-        item ||= Rubric.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
-        item ||= Rubric.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+        item ||= Rubric.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
+        item ||= Rubric.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
         item ||= Rubric.new(:context => context)
         item.migration_id = hash[:migration_id]
         item.workflow_state = 'active' if item.deleted?
@@ -53,7 +53,7 @@ module Importers
           if crit[:learning_outcome_migration_id]
             if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
               crit[:learning_outcome_id] = id
-            elsif lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
+            elsif lo = context.created_learning_outcomes.where(migration_id: crit[:learning_outcome_migration_id]).first
               crit[:learning_outcome_id] = lo.id
             end
             crit.delete :learning_outcome_migration_id
@@ -64,7 +64,7 @@ module Importers
         item.save!
       end
 
-      if association = context.rubric_associations.find_by_rubric_id(item.id)
+      if association = context.rubric_associations.where(rubric_id: item).first
         unless association.bookmarked
           association.bookmarked = true
           association.save!

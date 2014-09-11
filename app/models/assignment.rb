@@ -392,7 +392,7 @@ class Assignment < ActiveRecord::Base
 
   def update_submissions_later
     if assignment_group_id_changed? && assignment_group_id_was.present?
-      AssignmentGroup.find_by_id(assignment_group_id_was).try(:touch)
+      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.now.utc)
     end
     self.assignment_group.touch if self.assignment_group
     if points_possible_changed?
@@ -412,7 +412,7 @@ class Assignment < ActiveRecord::Base
   def update_quiz_or_discussion_topic
     return true if self.deleted?
     if self.submission_types == "online_quiz" && @saved_by != :quiz
-      quiz = Quizzes::Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
+      quiz = Quizzes::Quiz.where(assignment_id: self).first || self.context.quizzes.build
       quiz.assignment_id = self.id
       quiz.title = self.title
       quiz.description = self.description
@@ -966,14 +966,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def multiple_module_actions(student_ids, action, points=nil)
-    students = self.context.students.find_all_by_id(student_ids).compact
+    students = self.context.students.where(id: student_ids)
     students.each do |user|
       self.context_module_action(user, action, points)
     end
   end
 
   def submission_for_student(user)
-    self.submissions.find_or_initialize_by_user_id(user.id)
+    self.submissions.where(user_id: user.id).first_or_initialize
   end
 
   def grade_student(original_student, opts={})
@@ -1093,7 +1093,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_asset_for_assessment(association, user_id)
-    user = self.context.users.find_by_id(user_id)
+    user = self.context.users.where(id: user_id).first
     if association.purpose == "grading"
       user ? [self.find_or_create_submission(user), user] : [nil, nil]
     else
@@ -1104,11 +1104,11 @@ class Assignment < ActiveRecord::Base
   # Update at this point is solely used for commenting on the submission
   def update_submission(original_student, opts={})
     raise "Student Required" unless original_student
-    submission = submissions.find_by_user_id(original_student.id)
+    submission = submissions.where(user_id: original_student).first
     res = []
     raise "No submission found for that student" unless submission
     group, students = group_students(original_student)
-    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
+    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.where(id: opts[:user_id]).first
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
@@ -1803,10 +1803,10 @@ class Assignment < ActiveRecord::Base
     attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
 
     if user_id
-      user = User.find_by_id(user_id)
-      submission = Submission.find_by_user_id_and_assignment_id(user_id, self.id)
+      user = User.where(id: user_id).first
+      submission = Submission.where(user_id: user_id, assignment_id: self).first
     end
-    attachment = Attachment.find_by_id(attachment_id) if attachment_id
+    attachment = Attachment.where(id: attachment_id).first if attachment_id
 
     if !attachment || !submission
       @ignored_files << fullpath

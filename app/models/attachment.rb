@@ -161,7 +161,6 @@ class Attachment < ActiveRecord::Base
       end
 
       if att.deleted? && owner
-        # intentionally not using find_by_id to avoid possible infinite recursion
         new_att = owner.attachments.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
         new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
         new_att || att
@@ -259,10 +258,10 @@ class Attachment < ActiveRecord::Base
       self.cloned_item ||= ClonedItem.create(:original_item => self)
       self.save!
     end
-    existing = context.attachments.active.find_by_id(self.id)
-    existing ||= self.cloned_item_id ? context.attachments.active.find_by_cloned_item_id(self.cloned_item_id) : nil
+    existing = context.attachments.active.find_by_id(self)
+    existing ||= self.cloned_item_id ? context.attachments.active.where(cloned_item_id: self.cloned_item_id).first : nil
     return existing if existing && !options[:overwrite] && !options[:force_copy]
-    existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
+    existing ||= self.cloned_item_id ? context.attachments.where(cloned_item_id: self.cloned_item_id).first : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
     dup.assign_attributes(self.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
@@ -615,7 +614,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.destroy_files(ids)
-    Attachment.find_all_by_id(ids).compact.each(&:destroy)
+    Attachment.where(id: ids).each(&:destroy)
   end
 
   before_save :assign_uuid
@@ -694,7 +693,7 @@ class Attachment < ActiveRecord::Base
 
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
-      to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.find_by_thumbnail(geometry)
+      to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.where(thumbnail: geometry).first
       to_use ||= create_dynamic_thumbnail(geometry)
     end
   end
@@ -1014,7 +1013,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user, session|
         session && session['file_access_user_id'].present? &&
-        (u = User.find_by_id(session['file_access_user_id'])) &&
+        (u = User.where(id: session['file_access_user_id']).first) &&
         self.context.grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
@@ -1022,7 +1021,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user, session|
         session && session['file_access_user_id'].present? &&
-        (u = User.find_by_id(session['file_access_user_id'])) &&
+        (u = User.where(id: session['file_access_user_id']).first) &&
         self.context.grants_right?(u, session, :read) &&
         (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
@@ -1306,7 +1305,7 @@ class Attachment < ActiveRecord::Base
     return "" if !ids || !ids.is_a?(Array) || ids.empty?
     description = "<h3>#{ERB::Util.h(t('title.migration_list', "Associated Files"))}</h3><ul>"
     ids.each do |id|
-      attachment = context.attachments.find_by_migration_id(id)
+      attachment = context.attachments.where(migration_id: id).first
       description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download'>#{ERB::Util.h(attachment.display_name)}</a></li>" if attachment
     end
     description += "</ul>";
@@ -1320,13 +1319,13 @@ class Attachment < ActiveRecord::Base
     end
     filename = list.pop
     folder = context.folder_name_lookups[list.join('/')] rescue nil
-    folder ||= context.folders.active.find_by_full_name(list.join('/'))
+    folder ||= context.folders.active.where(full_name: list.join('/')).first
     context.folder_name_lookups ||= {}
     context.folder_name_lookups[list.join('/')] = folder
     file = nil
     if folder
-      file = folder.file_attachments.find_by_filename(filename)
-      file ||= folder.file_attachments.find_by_display_name(filename)
+      file = folder.file_attachments.where(filename: filename).first
+      file ||= folder.file_attachments.where(display_name: filename).first
     end
     file
   end

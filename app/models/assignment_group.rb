@@ -221,7 +221,7 @@ class AssignmentGroup < ActiveRecord::Base
     ids_to_change = self.assignments.active.pluck(:id)
     order += ids_to_change
     Assignment.where(:id => ids_to_change).update_all(:assignment_group_id => new_group, :updated_at => Time.now.utc) unless ids_to_change.empty?
-    Assignment.find_by_id(order).update_order(order) unless order.empty?
+    Assignment.where(id: order).first.update_order(order) unless order.empty?
     new_group.touch
     self.reload
   end

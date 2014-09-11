@@ -53,8 +53,8 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:modules_to_import] && !hash[:modules_to_import][hash[:migration_id]]
-      item ||= ContextModule.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= ContextModule.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
+      item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
       migration.add_imported_item(item) if migration
       item.name = hash[:title] || hash[:description]
@@ -76,7 +76,7 @@ module Importers
         preqs = []
         hash[:prerequisites].each do |prereq|
           if prereq[:module_migration_id]
-            if ref_mod = ContextModule.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, prereq[:module_migration_id])
+            if ref_mod = ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: prereq[:module_migration_id]).first
               preqs << {:type=>"context_module", :name=>ref_mod.name, :id=>ref_mod.id}
             end
           end
@@ -121,8 +121,8 @@ module Importers
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
-      existing_item = context_module.content_tags.find_by_id(hash[:id]) if hash[:id].present?
-      existing_item ||= context_module.content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
+      existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
       if hash[:workflow_state] == 'unpublished'
         existing_item.workflow_state = 'unpublished'
@@ -134,7 +134,7 @@ module Importers
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
       if resource_class == WikiPage
-        wiki = context_module.context.wiki.wiki_pages.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+        wiki = context_module.context.wiki.wiki_pages.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if wiki
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title],
@@ -144,7 +144,7 @@ module Importers
           }, existing_item, :wiki_page => wiki, :position => context_module.migration_position)
         end
       elsif resource_class == Attachment
-        file = context_module.context.attachments.active.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+        file = context_module.context.attachments.active.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if file
           title = hash[:title] || hash[:linked_resource_title]
           item = context_module.add_item({
@@ -155,7 +155,7 @@ module Importers
           }, existing_item, :attachment => file, :position => context_module.migration_position)
         end
       elsif resource_class == Assignment
-        ass = context_module.context.assignments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+        ass = context_module.context.assignments.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if ass
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title],
@@ -196,7 +196,7 @@ module Importers
           if custom_fields.present?
             external_tool_url = add_custom_fields_to_url(hash[:url], custom_fields) || hash[:url]
           end
-        elsif hash[:linked_resource_id] && et = context_module.context.context_external_tools.active.find_by_migration_id(hash[:linked_resource_id])
+        elsif hash[:linked_resource_id] && et = context_module.context.context_external_tools.active.where(migration_id: hash[:linked_resource_id]).first
           external_tool_id = et.id
         end
 
@@ -219,7 +219,7 @@ module Importers
           }, existing_item, :position => context_module.migration_position)
         end
       elsif resource_class == Quizzes::Quiz
-        quiz = context_module.context.quizzes.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+        quiz = context_module.context.quizzes.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if quiz
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title],
@@ -229,7 +229,7 @@ module Importers
           }, existing_item, :quiz => quiz, :position => context_module.migration_position)
         end
       elsif resource_class == DiscussionTopic
-        topic = context_module.context.discussion_topics.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+        topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if topic
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title],

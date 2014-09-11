@@ -81,7 +81,7 @@ class ConversationBatch < ActiveRecord::Base
 
   attr_writer :user_map
   def user_map
-    @user_map ||= User.find_all_by_id(recipient_ids + [user_id]).index_by(&:id)
+    @user_map ||= User.where(id: recipient_ids + [user_id]).index_by(&:id)
   end
 
   def recipient_ids

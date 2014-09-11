@@ -303,7 +303,7 @@ class Enrollment < ActiveRecord::Base
       # way for any other sections to be common between them. alternatively,
       # we have just deleted the user's enrollment in the group's course.
       # remove the leaving user from the group to keep the group happy
-      membership = group.group_memberships.find_by_user_id(self.user_id)
+      membership = group.group_memberships.where(user_id: self.user_id).first
       membership.destroy if membership
     end
   end
@@ -858,7 +858,7 @@ class Enrollment < ActiveRecord::Base
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 
-    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
+    given { |user| course.observer_enrollments.where(user_id: user, associated_user_id: self.user_id).exists? }
     can :read and can :read_grades
 
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
@@ -947,7 +947,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.course_user_state(course, uuid)
     Rails.cache.fetch(['user_state', course, uuid].cache_key) do
-      enrollment = course.enrollments.find_by_uuid(uuid)
+      enrollment = course.enrollments.where(uuid: uuid).first
       if enrollment
         {
           :enrollment_state => enrollment.workflow_state,

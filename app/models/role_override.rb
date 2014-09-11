@@ -935,7 +935,7 @@ class RoleOverride < ActiveRecord::Base
   # settings is a hash with recognized keys :override and :locked. each key
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)
-    role_override = context.role_overrides.find_by_permission_and_enrollment_type(permission, role)
+    role_override = context.role_overrides.where(permission: permission, enrollment_type: role).first
     if !settings[:override].nil? || settings[:locked]
       role_override ||= context.role_overrides.build(
         :permission => permission,

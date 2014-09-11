@@ -131,7 +131,7 @@ class AppointmentGroup < ActiveRecord::Base
           @new_sub_context_codes.first =~ /\Agroup_category_(.*)/
         # a group category can only be assigned at creation time to
         # appointment groups with one course
-        gc = GroupCategory.find_by_id($1)
+        gc = GroupCategory.where(id: $1).first
         code = @new_sub_context_codes.first
         self.appointment_group_sub_contexts = [
           AppointmentGroupSubContext.new(:appointment_group => self,
@@ -147,7 +147,7 @@ class AppointmentGroup < ActiveRecord::Base
 
         new_sub_contexts = @new_sub_context_codes.map { |code|
           next unless code =~ /\Acourse_section_(.*)/
-          cs = CourseSection.find_by_id($1)
+          cs = CourseSection.where(id: $1).first
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)

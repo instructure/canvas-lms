@@ -171,8 +171,7 @@ class Group < ActiveRecord::Base
   end
 
   def membership_for_user(user)
-    return nil unless user.present?
-    self.shard.activate { self.group_memberships.find_by_user_id(user.id) }
+    self.group_memberships.where(user_id: user).first if user
   end
 
   def has_member?(user)
@@ -180,7 +179,7 @@ class Group < ActiveRecord::Base
     if self.group_memberships.loaded?
       return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
     else
-      self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+      self.participating_group_memberships.where(user_id: user).first
     end
   end
 
@@ -189,7 +188,7 @@ class Group < ActiveRecord::Base
     if self.group_memberships.loaded?
       return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
     end
-    self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
+    self.participating_group_memberships.moderators.where(user_id: user).first
   end
 
   def should_add_creator?(creator)
@@ -274,7 +273,7 @@ class Group < ActiveRecord::Base
       when 'parent_context_auto_join' then 'accepted'
       end
     attrs[:workflow_state] = new_record_state if new_record_state
-    if member = self.group_memberships.find_by_user_id(user.id)
+    if member = self.group_memberships.where(user_id: user).first
       member.workflow_state = new_record_state unless member.active?
       # only update moderator if true/false is explicitly passed in
       member.moderator = moderator unless moderator.nil?
@@ -337,9 +336,9 @@ class Group < ActiveRecord::Base
     invitees = []
     (params || {}).each do |key, val|
       if self.context
-        invitees << self.context.users.find_by_id(key.to_i) if val != '0'
+        invitees << self.context.users.where(id: key.to_i).first if val != '0'
       else
-        invitees << User.find_by_id(key.to_i) if val != '0'
+        invitees << User.where(id: key.to_i).first if val != '0'
       end
     end
     invitees.compact.map{|i| self.invite_user(i) }.compact

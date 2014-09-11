@@ -71,7 +71,7 @@ class RubricAssociation < ActiveRecord::Base
     return @context if a_type == @context.class.to_s && a_id == @context.id
     klass = ValidAssociationModels[a_type]
     return nil unless klass
-    klass.find_by_id(a_id) if a_id.present? # authorization is checked in the calling method
+    klass.where(id: a_id).first if a_id.present? # authorization is checked in the calling method
   end
 
   set_broadcast_policy do |p|
@@ -91,7 +91,7 @@ class RubricAssociation < ActiveRecord::Base
 
   def assert_uniqueness
     if purpose == 'grading'
-      RubricAssociation.find_all_by_association_id_and_association_type_and_purpose(association_id, association_type, 'grading').each do |ra|
+      RubricAssociation.where(association_id: association_id, association_type: association_type, purpose: 'grading').each do |ra|
         ra.destroy unless ra == self
       end
     end
@@ -156,7 +156,7 @@ class RubricAssociation < ActiveRecord::Base
   protected :update_assignment_points
 
   def remind_user(assessee)
-    assessment_request = self.assessment_requests.find_by_user_id(assessee.id)
+    assessment_request = self.assessment_requests.where(user_id: assessee).first
     assessment_request ||= self.assessment_requests.build(:user => assessee)
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
@@ -200,7 +200,7 @@ class RubricAssociation < ActiveRecord::Base
     raise "context required" unless context
     association_object = params.delete :association_object
     if (association_id = params.delete(:id)) && association_id.present?
-      association = RubricAssociation.find_by_id(association_id)
+      association = RubricAssociation.where(id: association_id).first
     end
     association = nil unless association && association.context == context && association.association_object == association_object
     raise "association required" unless association || association_object
@@ -287,10 +287,10 @@ class RubricAssociation < ActiveRecord::Base
       assessment = nil
       if assessments_unique_per_asset?(params[:assessment_type])
         # Unless it's for grading, in which case assessments are unique per artifact (the assessor can change, depending on if the teacher/TA updates it)
-        assessment = association.rubric_assessments.find_by_artifact_id_and_artifact_type_and_assessment_type(artifact.id, artifact.class.to_s, params[:assessment_type])
+        assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessment_type: params[:assessment_type]).first
       else
         # Assessments are unique per artifact/assessor/assessment_type.
-        assessment = association.rubric_assessments.find_by_artifact_id_and_artifact_type_and_assessor_id_and_assessment_type(artifact.id, artifact.class.to_s, opts[:assessor].id, params[:assessment_type])
+        assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
       assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.user, :rubric => self.rubric, :assessment_type => params[:assessment_type])
       assessment.score = score if replace_ratings

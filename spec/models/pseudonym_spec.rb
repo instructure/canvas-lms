@@ -87,10 +87,10 @@ describe Pseudonym do
     user = User.create!
     p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)
     p2 = Pseudonym.create!(:unique_id => 'codY@instructure.com', :user => user) { |p| p.workflow_state = 'deleted' }
-    Pseudonym.custom_find_by_unique_id('cody@instructure.com').should == p1
+    Pseudonym.active.by_unique_id('cody@instructure.com').first.should == p1
     account = Account.create!
     p3 = Pseudonym.create!(:unique_id => 'cOdy@instructure.com', :account => account, :user => user)
-    Pseudonym.custom_find_by_unique_id('cody@instructure.com', :all).sort.should == [p1, p3]
+    Pseudonym.active.by_unique_id('cody@instructure.com').sort.should == [p1, p3]
   end
 
   it "should associate to another user" do
@@ -249,13 +249,6 @@ describe Pseudonym do
       @user.save!
       @user.sms.should eql(@cc.path)
       @pseudonym.sms.should eql(@user.sms)
-    end
-
-    it "should be able to change the user sms" do
-      communication_channel_model(:path_type => 'sms', :path => 'admin@example.com')
-      @pseudonym.sms = @cc
-      @pseudonym.sms.should eql('admin@example.com')
-      @pseudonym.user.sms.should eql('admin@example.com')
     end
   end
 

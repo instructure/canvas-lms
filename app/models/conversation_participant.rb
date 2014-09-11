@@ -467,7 +467,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.class.send :with_exclusive_scope do
         old_shard = self.user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
-        if existing = conversation.conversation_participants.find_by_user_id(new_user)
+        if existing = conversation.conversation_participants.where(user_id: new_user).first
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
           destroy
         else
@@ -556,7 +556,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
 
     progress_runner.do_batch_update(conversation_ids) do |conversation_id|
-      participant = user.all_conversations.find_by_conversation_id(conversation_id)
+      participant = user.all_conversations.where(conversation_id: conversation_id).first
       raise t('not_participating', 'The user is not participating in this conversation') unless participant
       participant.update_one(update_params)
     end

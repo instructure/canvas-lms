@@ -518,10 +518,10 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
-    tool = context.context_external_tools.having_setting(type).find_by_id(id)
+    tool = context.context_external_tools.having_setting(type).where(id: id).first
     if !tool && context.is_a?(Group)
       context = context.context
-      tool = context.context_external_tools.having_setting(type).find_by_id(id)
+      tool = context.context_external_tools.having_setting(type).where(id: id).first
     end
     if !tool
       tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', context.account_chain, id)

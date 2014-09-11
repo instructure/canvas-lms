@@ -54,7 +54,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.for_assignment_id(submission.assignment_id).find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
+    SubmissionComment.for_assignment_id(submission.assignment_id).where(group_comment_id: self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
@@ -120,10 +120,10 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def update_participants
-    self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.submission.user_id, 'submitter')
-    self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.author_id, 'author')
+    self.submission_comment_participants.where(user_id: self.submission.user_id, participation_type: 'submitter').first_or_create
+    self.submission_comment_participants.where(user_id: self.author_id, participation_type: 'author').first_or_create
     (submission.assignment.context.participating_instructors - [author]).each do |user|
-      self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(user.id, 'admin')
+      self.submission_comment_participants.where(user_id: user.id, participation_type: 'admin').first_or_create
     end
   end
 

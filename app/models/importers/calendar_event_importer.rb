@@ -37,8 +37,8 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
-      item ||= CalendarEvent.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= CalendarEvent.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
+      item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.calendar_events.new
 
       item.migration_id = hash[:migration_id]

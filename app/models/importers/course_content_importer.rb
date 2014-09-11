@@ -135,9 +135,9 @@ module Importers
       # be very explicit about draft state courses, but be liberal toward legacy courses
       course.wiki.check_has_front_page
       if course.feature_enabled?(:draft_state) && course.wiki.has_no_front_page
-        if migration.for_course_copy? && (source = migration.source_course || Course.find_by_id(migration.migration_settings[:source_course_id]))
+        if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
-          if new_front_page = course.wiki.wiki_pages.find_by_migration_id(mig_id)
+          if new_front_page = course.wiki.wiki_pages.where(migration_id: mig_id).first
             course.wiki.set_front_page_url!(new_front_page.url)
           end
         end
@@ -265,13 +265,13 @@ module Importers
       if settings[:grading_standard_enabled]
         course.grading_standard_enabled = true
         if settings[:grading_standard_identifier_ref]
-          if gs = course.grading_standards.find_by_migration_id(settings[:grading_standard_identifier_ref])
+          if gs = course.grading_standards.where(migration_id: settings[:grading_standard_identifier_ref]).first
             course.grading_standard = gs
           else
             migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
           end
         elsif settings[:grading_standard_id].present?
-          if gs = GradingStandard.standards_for(course).find_by_id(settings[:grading_standard_id])
+          if gs = GradingStandard.standards_for(course).where(id: settings[:grading_standard_id]).first
             course.grading_standard = gs
           else
             migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))

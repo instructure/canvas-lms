@@ -101,7 +101,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     can :read
 
     given { |user| user &&
-            self.quiz.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user_id, 'active') }
+            self.quiz.context.observer_enrollments.where(user_id: user, associated_user_id: self.user_id, workflow_state: 'active').exists? }
     can :read
 
     given {|user, session| quiz.context.grants_right?(user, session, :manage_grades) }
@@ -804,5 +804,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     attempts_left = self.attempts_left || 0
 
     self.completed? && (attempts_left > 0 || self.quiz.unlimited_attempts?)
+  end
+
+  # Locate the Quiz Submission for this participant, regardless of them being
+  # enrolled students, or anonymous participants.
+  #
+  # @return [Relation]
+  #   The QS Relation, for the participant.
+  def self.for_participant(participant)
+    participant.anonymous? ?
+        where(temporary_user_code: participant.user_code) :
+        where(user_id: participant.user.id)
   end
 end

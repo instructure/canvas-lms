@@ -5,7 +5,7 @@ module Importers
 
     def self.import_from_migration(hash, context, quiz, question_data, position = nil, migration = nil)
       hash = hash.with_indifferent_access
-      item ||= Quizzes::QuizGroup.find_by_quiz_id_and_migration_id(quiz.id, hash[:migration_id].nil? ? nil : hash[:migration_id].to_s)
+      item ||= Quizzes::QuizGroup.where(quiz_id: quiz, migration_id: hash[:migration_id].try(:to_s)).first
       item ||= quiz.quiz_groups.new
       item.migration_id = hash[:migration_id]
       item.question_points = hash[:question_points]
@@ -19,13 +19,13 @@ module Importers
 
           unless migration.cross_institution?
             if hash[:question_bank_context] =~ /account_(\d*)/
-              bank_context = Account.find_by_id($1)
+              bank_context = Account.where(id: $1).first
             elsif hash[:question_bank_context] =~ /course_(\d*)/
-              bank_context = Course.find_by_id($1)
+              bank_context = Course.where(id: $1).first
             end
 
             if bank_context
-              bank = bank_context.assessment_question_banks.find_by_id(hash[:question_bank_migration_id])
+              bank = bank_context.assessment_question_banks.where(id: hash[:question_bank_migration_id]).first
             end
           end
 
@@ -39,7 +39,7 @@ module Importers
             migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
           end
         else
-          if bank = context.assessment_question_banks.find_by_migration_id(hash[:question_bank_migration_id])
+          if bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first
             item.assessment_question_bank_id = bank.id
           end
         end

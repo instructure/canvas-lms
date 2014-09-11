@@ -166,10 +166,10 @@ class Rubric < ActiveRecord::Base
 
   def associate_with(association, context, opts={})
     if opts[:purpose] == "grading"
-      res = self.rubric_associations.find_by_association_id_and_association_type_and_purpose(association.id, association.class.to_s, 'grading')
+      res = self.rubric_associations.where(association_id: association, association_type: association.class.to_s, purpose: 'grading').first
       return res if res
     elsif opts[:update_if_existing]
-      res = self.rubric_associations.find_by_association_id_and_association_type(association.id, association.class.to_s)
+      res = self.rubric_associations.where(association_id: association, association_type: association.class.to_s).first
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
@@ -236,7 +236,7 @@ class Rubric < ActiveRecord::Base
       ratings = []
       points = 0
       if criterion_data[:learning_outcome_id].present?
-        outcome = LearningOutcome.find_by_id(criterion_data[:learning_outcome_id])
+        outcome = LearningOutcome.where(id: criterion_data[:learning_outcome_id]).first
         if outcome
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)

@@ -278,8 +278,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.find_all_by_content_id_and_content_type(asset.id, asset.class.to_s).each{|t| t.destroy }
-    ContentTag.find_all_by_context_id_and_context_type(asset.id, asset.class.to_s).each{|t| t.destroy }
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each{|t| t.destroy }
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each{|t| t.destroy }
   end
 
   alias_method :destroy!, :destroy

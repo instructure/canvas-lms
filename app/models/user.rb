@@ -350,7 +350,7 @@ class User < ActiveRecord::Base
     end
 
     unless remaining_ids.empty?
-      accounts = Account.find_all_by_id(remaining_ids)
+      accounts = Account.where(id: remaining_ids)
       accounts.each do |account|
         account_chain = add_to_account_chain_cache(account, account_chain_cache)
         account_chain.each_with_index do |account_id, idx|
@@ -408,7 +408,7 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find_all_by_id(user_ids)
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).where(id: user_ids).to_a
       else
         users = users_or_user_ids
       end
@@ -507,7 +507,7 @@ class User < ActiveRecord::Base
                 end
               rescue ActiveRecord::RecordNotUnique
                 # race condition - someone else created the UAA after we queried for existing ones
-                old_aa = UserAccountAssociation.find_by_user_id_and_account_id(aa.user_id, aa.account_id)
+                old_aa = UserAccountAssociation.where(user_id: aa.user_id, account_id: aa.account_id).first
                 raise unless old_aa # wtf!
                 # make sure we don't need to change the depth
                 if depth < old_aa.depth
@@ -709,33 +709,37 @@ class User < ActiveRecord::Base
   def self.cached_name(id)
     key = user_lookup_cache_key(id)
     user = Rails.cache.fetch(key) do
-      User.find_by_id(id)
+      User.where(id: id).first
     end
     user && user.name
   end
 
   def gmail_channel
-    google_services = self.user_services.find_all_by_service_domain("google.com")
-    addr = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
+    addr = self.user_services.
+        where(service_domain: "google.com").
+        limit(1).pluck(:service_user_id).first
     self.communication_channels.email.by_path(addr).first
   end
 
   def gmail
     res = gmail_channel.path rescue nil
-    res ||= self.user_services.find_all_by_service_domain("google.com").map(&:service_user_id).compact.first
-    res ||= email
+    res ||= self.user_services.
+        where(service_domain: "google.com").
+        limit(1).pluck(:service_user_id).first
+    res || email
   end
 
   def google_docs_address
-    service = self.user_services.find_by_service('google_docs')
-    service && service.service_user_id
+    self.user_services.
+        where(service: 'google_docs').
+        limit(1).pluck(:service_user_id).first
   end
 
   def email=(e)
     if e.is_a?(CommunicationChannel) and e.user_id == self.id
       cc = e
     else
-      cc = self.communication_channels.find_or_create_by_path_and_path_type(e, 'email')
+      cc = self.communication_channels.where(path: e, path_type: 'email').first_or_create
       cc.user = self
     end
     cc.move_to_top
@@ -751,18 +755,6 @@ class User < ActiveRecord::Base
 
   def sms
     sms_channel.path if sms_channel
-  end
-
-  def sms=(s)
-    if s.is_a?(CommunicationChannel) and s.user_id == self.id
-      cc = s
-    else
-      cc = CommunicationChannel.find_or_create_by_path_and_user_id(s, self.id)
-    end
-    cc.move_to_top
-    cc.save!
-    self.reload
-    cc.path
   end
 
   def short_name
@@ -827,9 +819,9 @@ class User < ActiveRecord::Base
   end
 
   def remove_from_root_account(account)
-    self.enrollments.find_all_by_root_account_id(account.id).each(&:destroy)
-    self.pseudonyms.active.find_all_by_account_id(account.id).each { |p| p.destroy(true) }
-    self.account_users.find_all_by_account_id(account.id).each(&:destroy)
+    self.enrollments.where(root_account_id: account).each(&:destroy)
+    self.pseudonyms.active.where(account_id: account).each { |p| p.destroy(true) }
+    self.account_users.where(account_id: account).each(&:destroy)
     self.save
     self.update_account_associations
   end
@@ -1279,7 +1271,7 @@ class User < ActiveRecord::Base
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
-    rubrics += Rubric.active.find_all_by_context_code(context_codes)
+    rubrics += Rubric.active.where(context_code: context_codes).to_a
     rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(r.title || CanvasSort::Last)]}
   end
 
@@ -1336,7 +1328,7 @@ class User < ActiveRecord::Base
       asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
     rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
-        ignore = asset.ignores.find_by_user_id_and_purpose(self.id, purpose)
+        ignore = asset.ignores.where(user_id: self, purpose: purpose).first
         ignore.permanent = permanent
         ignore.save!
       end
@@ -1653,7 +1645,7 @@ class User < ActiveRecord::Base
     enrollments = self.shard.activate do
       res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
         res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
-        if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
+        if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.where(uuid: opts[:include_enrollment_uuid], workflow_state: "invited").first
           res << pending_enrollment
           res.uniq!
         end
@@ -2028,7 +2020,7 @@ class User < ActiveRecord::Base
   def section_context_codes(context_codes)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
     return [] unless course_ids.present?
-    Course.find_all_by_id(course_ids).inject([]) do |ary, course|
+    Course.where(id: course_ids).inject([]) do |ary, course|
       ary.concat course.sections_visible_to(self).map(&:asset_string)
     end
   end
@@ -2062,7 +2054,7 @@ class User < ActiveRecord::Base
   end
 
   def initialize_default_folder(name)
-    folder = self.active_folders.find_by_name(name)
+    folder = self.active_folders.where(name: name).first
     unless folder
       folder = self.folders.create!(:name => name,
         :parent_folder => Folder.root_folders(self).find {|f| f.name == Folder::MY_FILES_FOLDER_NAME })
@@ -2114,7 +2106,7 @@ class User < ActiveRecord::Base
   def initiate_conversation(users, private = nil, options = {})
     users = ([self] + users).uniq(&:id)
     private = users.size <= 2 if private.nil?
-    Conversation.initiate(users, private, options).conversation_participants.find_by_user_id(self)
+    Conversation.initiate(users, private, options).conversation_participants.where(user_id: self).first
   end
 
   def messageable_user_calculator
@@ -2179,7 +2171,7 @@ class User < ActiveRecord::Base
   end
 
   def conversation_participant(conversation_id)
-    all_conversations.find_by_conversation_id(conversation_id)
+    all_conversations.where(conversation_id: conversation_id).first
   end
 
   # Public: Reset the user's cached unread conversations count.
@@ -2341,7 +2333,7 @@ class User < ActiveRecord::Base
       templates.concat active_pseudonyms
       templates.uniq!
 
-      template = templates.detect { |template| !account.pseudonyms.custom_find_by_unique_id(template.unique_id) }
+      template = templates.detect { |template| !account.pseudonyms.active.by_unique_id(template.unique_id).first }
       if template
         # creating this not attached to the user's pseudonyms is intentional
         pseudonym = account.pseudonyms.build
@@ -2405,7 +2397,7 @@ class User < ActiveRecord::Base
     return cid if cid
 
     Setting.transaction do
-      s = Setting.find_by_name('crocodoc_counter', :lock => true)
+      s = Setting.lock.where(name: 'crocodoc_counter').first
       cid = s.value = s.value.to_i + 1
       s.save!
     end

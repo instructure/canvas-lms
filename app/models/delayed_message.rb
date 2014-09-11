@@ -106,7 +106,7 @@ class DelayedMessage < ActiveRecord::Base
   # should be deliverable. After this is run on a list of delayed messages,
   # the regular dispatch process will take place. 
   def self.summarize(delayed_message_ids)
-    delayed_messages = DelayedMessage.find_all_by_id(delayed_message_ids.uniq).compact
+    delayed_messages = DelayedMessage.where(id: delayed_message_ids.uniq)
     uniqs = {}
     # only include the most recent instance of each notification-context pairing
     delayed_messages.each do |m|
