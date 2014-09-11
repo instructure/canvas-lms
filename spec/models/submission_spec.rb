@@ -1064,6 +1064,15 @@ describe Submission do
       submission1.assign_assessor(submission2)
     end
   end
+
+  describe "#get_web_snapshot" do
+    it "should not blow up if web snapshotting fails" do
+      sub = Submission.new(@valid_attributes)
+      CutyCapt.expects(:enabled?).returns(true)
+      CutyCapt.expects(:snapshot_attachment_for_url).with(sub.url).returns(nil)
+      sub.get_web_snapshot
+    end
+  end
 end
 
 def submission_spec_model(opts={})
