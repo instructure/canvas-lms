@@ -9,7 +9,7 @@
     "ic-ajax": "~2.0.1",
     "ic-menu": "0.1.11",
     "ic-styled": "1.1.6",
-    "color-slicer": "0.4.0",
+    "color-slicer": "0.8.0",
     "k5uploader": "0.0.3",
     "ember-qunit": "~0.1.7",
     "ic-tabs": "0.1.3",
