@@ -43,7 +43,7 @@
         </span>
 
         <% unless current_enrollment.course.enrollment_term.default_term? %>
-          <span class="subtitle ellipsis"><%= current_enrollment.course.enrollment_term.name %></span>
+          <span class="subtitle ellipsis course-list-term"><%= current_enrollment.course.enrollment_term.name %></span>
         <% end %>
         <% if show_link %></a><% end %>
       </td>
