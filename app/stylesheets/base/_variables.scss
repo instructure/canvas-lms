@@ -132,11 +132,12 @@ $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
 $base-font-color--subdued: #696969;
 $base-border-color: $canvas-neutral;
-
 $base-list-item-background--hover: #eef7ff;
 $base-list-item-background--selected: #d9edf9;
 
 $announcements_disscussion-summary-color: $canvas-dark;
+
+$gradebook_letter-grade-font: lighten($canvas-dark, 8%);
 
 
 // Legacy Variables
