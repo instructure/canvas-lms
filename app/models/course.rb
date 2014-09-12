@@ -308,15 +308,9 @@ class Course < ActiveRecord::Base
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
-    if !self.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments) && self.feature_enabled?(:differentiated_assignments) && user
-      student_ids = [user.id]
-      if self.user_has_been_observer?(user)
-        observed_student_ids = ObserverEnrollment.observed_student_ids(self, user)
-        student_ids.concat(observed_student_ids)
-        # if no observed_students, allow observer to see all content_tags
-        tags = tags.visible_to_students_with_da_enabled(student_ids) if observed_student_ids.any?
-      else
-        tags = tags.visible_to_students_with_da_enabled(student_ids)
+    if self.feature_enabled?(:differentiated_assignments)
+      tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self) do |tags, user_ids|
+        tags.visible_to_students_with_da_enabled(user_ids)
       end
     end
 

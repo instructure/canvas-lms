@@ -277,16 +277,9 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
-    if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
-      student_ids = [@current_user.id]
-
-      if @context.user_has_been_observer?(@current_user)
-        observed_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
-        student_ids.concat(observed_student_ids)
-        # if no observed students, dont filter based on section
-        scope = scope.visible_to_students_with_da_enabled(student_ids) if observed_student_ids.any?
-      else
-        scope = scope.visible_to_students_with_da_enabled(student_ids)
+    if @context.feature_enabled?(:differentiated_assignments)
+      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+        scope.visible_to_students_with_da_enabled(user_ids)
       end
     end
 

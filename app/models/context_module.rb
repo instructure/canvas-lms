@@ -331,14 +331,8 @@ class ContextModule < ActiveRecord::Base
 
     filter = opts[:tags_loaded] ? array_filter : scope_filter
 
-    student_ids = [user.id]
-    if self.context.user_has_been_observer?(user)
-      observed_student_ids = opts[:observed_student_ids] || ObserverEnrollment.observed_student_ids(self.context, user)
-      student_ids.concat(observed_student_ids)
-      # if no observed_students, allow observer to see all content_tags
-      tags = filter.call(tags, student_ids, self.context_id, opts) if observed_student_ids.any?
-    else
-      tags = filter.call(tags, student_ids, self.context_id, opts)
+    tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self.context, opts) do |tags, user_ids|
+      filter.call(tags, user_ids, self.context_id, opts)
     end
 
     tags
