@@ -19,57 +19,29 @@ $ef-thumbnail-size: 36px;
 .dateSelectInput { width: 100px }
 .controls.dateSelectInputContainer{ margin-left: 100px }
 
-.ef-search-container{
-  position: relative;
-  height: 30px;
-  width: 240px;
-  flex: 1 1 0;
-
-  .icon-search{
-    position: absolute;
-    left: 6px;
-    top: 7px;
-    color: #555555;
-    z-index: 1;
-  }
-
-  [type=search]{
-    position: absolute;
-    padding-left: 25px;
-    z-index: 0;
-    top: 0px;
-    right: 0px;
-    left: 0px;
-    bottom: 0px;
-    margin-bottom: 0px;
-  }
-}
 
 .ef-main-buttons{
-  display: flex;
-  justify-content: flex-end;
-  flex: 3 3 0;
-  position: relative;
   .ui-buttonset, .ui-button {
     display: inline-block;
   }
 }
-.ef-selected-items-actions {
-  position: absolute;
-  left: 8px;
-}
 
 .ef-header{
-  height: 75px;
-  padding-left: 20px;
-  padding-right: 20px;
-  display: flex;
-  align-items: center;
+  padding: $base-content-padding $base-content-padding 8px;
   border-bottom: 1px solid $base-border-color;
+  > * {
+    display: block;
+    margin-bottom: 0
+  }
+  input[type='search'] {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+  }
 }
 
 .ef-main{
-  min-height: 500px;
+  min-height: 300px;
   display: flex;
 
   .ef-folder-content{

@@ -13,7 +13,10 @@ define [
   FilesApp = React.createClass
 
     onResolvePath: ({currentFolder, rootTillCurrentFolder}) ->
-      @setState({currentFolder, rootTillCurrentFolder})
+      @setState
+        currentFolder: currentFolder
+        rootTillCurrentFolder: rootTillCurrentFolder
+        selectedItems: []
 
     getInitialState: ->
       {
@@ -38,6 +41,7 @@ define [
           query: @props.query,
           params: @props.params
           selectedItems: @state.selectedItems
+          clearSelectedItems: @clearSelectedItems
         })
 
         div className: 'ef-main',

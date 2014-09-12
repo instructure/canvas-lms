@@ -35,39 +35,79 @@ define [
       promises = @props.selectedItems.map (item) -> item.destroy()
       $.when(promises...).then ->
         $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
-      @setState selectedItems: []
+      @props.clearSelectedItems()
+
 
 
     render: withReactDOM ->
-      header className:'ef-header',
-        form onSubmit: @onSubmitSearch, className:'ef-search-container',
-          i({className:'icon-search'}),
-          input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
-        div className: 'ef-main-buttons',
+      showingButtons = @props.selectedItems.length
+      header className:'ef-header grid-row between-xs',
 
-          if @props.selectedItems.length
-            div className: 'ui-buttonset ef-selected-items-actions',
-              span className: 'hidden-tablet hidden-phone', style: {paddingRight: 10},
-                I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
-              button className: 'ui-button', onClick: @downloadSelecteAsZip,
-                i className: 'icon-zipped'
-                span className: 'hidden-tablet hidden-phone',
-                  I18n.t('download_zip', 'Downlod Zip')
-              button className: 'ui-button', onClick: openMoveDialog.bind(null, @props.selectedItems),
-                i className: 'icon-copy-course'
-                span className: 'hidden-tablet hidden-phone',
-                  I18n.t('move', 'Move')
-              button className: 'ui-button', onClick: @deleteSelectedItems,
-                i className: 'icon-trash'
-                span className: 'hidden-tablet hidden-phone',
-                  I18n.t('delete', 'Delete')
+        form {
+          className: "col-lg-3 #{ if showingButtons
+                                    'col-xs-4 col-sm-3 col-md-4'
+                                  else
+                                    'col-xs-7 col-sm-5 col-md-4'}"
+          onSubmit: @onSubmitSearch
+        },
+          input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term
 
-          div className: 'ui-buttonset',
+        if showingButtons
+          div className: 'ui-buttonset col-xs',
+            span className: 'hidden-tablet hidden-phone', style: {paddingRight: 10},
+              I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+
+            button {
+              className: 'ui-button'
+              onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
+              title: I18n.t('view', 'View')
+              'data-tooltip': ''
+            },
+              i className: 'icon-search'
+
+            button {
+              className: 'ui-button',
+              onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
+              title: I18n.t('restrict_access', 'Restrict Access')
+              'data-tooltip': ''
+            },
+              i className: 'icon-unpublished'
+
+            button {
+              className: 'ui-button'
+              onClick: @downloadSelecteAsZip
+              title:  if @props.selectedItems.length is 1
+                        I18n.t('download', 'Download')
+                      else
+                        I18n.t('download_as_zip', 'Downlod as Zip')
+              'data-tooltip': ''
+            },
+              i className: 'icon-download'
+
+            button {
+              className: 'ui-button'
+              onClick: openMoveDialog.bind(null, @props.selectedItems)
+              title: I18n.t('move', 'Move')
+              'data-tooltip': ''
+            },
+              i className: 'icon-copy-course'
+
+            button {
+              className: 'ui-button'
+              onClick: @deleteSelectedItems
+              title: I18n.t('delete', 'Delete')
+              'data-tooltip': ''
+            },
+              i className: 'icon-trash'
+        div className: 'text-right',
+          span className: 'ui-buttonset',
             button onClick: @addFolder, className:'btn',
               i className:'icon-plus'
-              span className: 'hidden-phone',
+              span className: ('hidden-phone' if showingButtons),
                   I18n.t('folder', 'Folder')
 
-          div className: 'ui-buttonset',
-            UploadButton currentFolder: this.props.currentFolder
+          span className: 'ui-buttonset',
+            UploadButton
+              currentFolder: @props.currentFolder
+              showingButtons: showingButtons
 

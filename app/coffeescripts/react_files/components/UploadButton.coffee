@@ -95,5 +95,6 @@ define [
             multiple: true
         button className:'btn btn-primary', onClick: @handleAddFilesClick,
           i className: 'icon-upload'
-          I18n.t('upload', 'Upload')
+          span className: ('hidden-phone' if @props.showingButtons),
+            I18n.t('upload', 'Upload')
         FileRenameForm fileOptions: @state.nameCollisions[0], onNameConflictResolved: @onNameConflictResolved, onClose: @onClose

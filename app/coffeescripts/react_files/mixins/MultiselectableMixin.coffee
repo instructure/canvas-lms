@@ -39,6 +39,9 @@ define [
       range.reverse() if newPos > lastPos
       @setState selectedItems: range
 
+    clearSelectedItems: ->
+      @setState selectedItems: []
+
     toggleItemSelected: (item, event={}) ->
       return if $(event.target).closest(@multiselectIgnoredElements).length
       event.preventDefault()

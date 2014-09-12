@@ -41,6 +41,9 @@ define [
     componentWillMount: ->
       @updateResults(@props)
 
+    componentDidMount: ->
+      @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null})
+
     render: withReactDOM ->
       div className:'ef-directory',
         ColumnHeaders to: 'search', subject: @state.collection, params: @props.params, query: @props.query
