@@ -67,7 +67,7 @@
   // this passes by itself with a 4.93 ratio
   // in case you're wondering where $use_high_contrast is
 
-  $canvas-neutral:                  hsl(0,0,95);
+  $canvas-neutral:                  hsl(0,0,90%);
   @if $use_high_contrast { $canvas-neutral: #6d6d6d; }
 
   $canvas-action:                   #ba3fa5;
@@ -123,8 +123,14 @@
 $eportfolio-name--disabled: #777;
 @if $use_high_contrast {$eportfolio-name--disabled: #686868;}
 
+// in these variables, "content" refers specifically to the #content div,
+// which is the main white page in between the left and right columns
+$base-content-background-color: $canvas-light;
+$base-content-padding: 15px;
+
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
+$base-font-color--subdued: #696969;
 $base-border-color: $canvas-neutral;
 
 $base-list-item-background--hover: #eef7ff;

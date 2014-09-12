@@ -224,10 +224,10 @@ is for items that are not draggable.
   border: 1px solid #c1c7cf;
   border-radius: 3px;
   box-shadow: 0 1px 0 #dde0e4;
-  color: #696969;
+  color: $base-font-color--subdued;
 
   a.ig-title {
-    color: #696969;
+    color: $base-font-color--subdued;
     text-decoration: none;
   }
 

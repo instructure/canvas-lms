@@ -1,0 +1,27 @@
+#breadcrumbs {
+  background-color: $base-content-background-color;
+  > ul {
+    margin: 0;
+    padding: 4px $base-content-padding;
+    list-style: none;
+    > li {
+      display: inline-block;
+      + li {
+        &:before {
+          @extend i[class*=icon-]:before;
+          @extend .icon-arrow-open-right:before;
+          font-size: 10px;
+          color: hsl(0,0,61%);
+          padding: 0 5px;
+        }
+        &:last-of-type a {
+          color: $base-font-color--subdued;
+        }
+      }
+    }
+  }
+  .icon-home:before {
+    font-size: 10px;
+    color: $base-font-color--subdued;
+  }
+}
