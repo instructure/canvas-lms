@@ -53,11 +53,16 @@
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
 
       &:hover, &:focus
-        text-decoration: none
         b, &.more_link
           text-decoration: underline
         em
           color: #666
+      // Not underlining on hover due to ugliness with accompanying icons
+      &:hover
+        text-decoration: none
+      &:focus
+        text-decoration: underline
+    
     &:last-child a
       border-bottom: none
       box-shadow: none

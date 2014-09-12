@@ -280,6 +280,7 @@
 
     &:focus {
       color: #333;
+      text-decoration: none;
     }
 
     &:focus, &.active {
@@ -308,19 +309,14 @@
 }
 
 .open-message {
-  color: #fff;
-  background: #DC3F3F;
-  border: 1px dashed #fff;
-  font-size: 12px;
-  padding: 2px;
+  @include accessibility-prompt;
   left: -9999px;
   position: absolute;
   &:focus {
-    left: 50%;
-    top: 2px;
-    width: auto;
-    height: auto;
+    left: auto; top: auto;
+    right: 0; bottom: 0;
     z-index: 1;
+    width: auto; height: auto;
   }
 }
 

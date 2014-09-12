@@ -21,13 +21,13 @@ body {
 
 a {
   color: $linkColor;
-  text-decoration: none;
+  text-decoration: none;  
+  &:hover {
+    color: $linkColorHover;
+    text-decoration: underline;
+  }
+  &:focus { @include button-focus; }
 }
-a:hover {
-  color: $linkColorHover;
-  text-decoration: underline;
-}
-
 
 // Images
 // -------------------------

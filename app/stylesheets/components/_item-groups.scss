@@ -189,6 +189,7 @@ is for items that are not draggable.
     line-height: 20px;
     margin: auto;
     display: inline-block;
+    &:focus { @include button-focus; }
 
     .icon-mini-arrow-down {
       vertical-align: middle;

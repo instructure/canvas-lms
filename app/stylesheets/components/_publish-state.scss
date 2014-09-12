@@ -83,6 +83,7 @@ The publish button has two states on click (publish and published) and a hover s
   display: inline-block;
   color: #bbb;
   cursor: pointer;
+  &:focus { @include button-focus; }
 
   &.publish-icon-unpublish {
     color: $btnDangerBackground;

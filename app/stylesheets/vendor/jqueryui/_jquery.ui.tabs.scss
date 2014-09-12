@@ -58,10 +58,23 @@ We use jQuery UI tabs, there are two types of tabs:
     background: transparent;
     border-width: 0 0 1px 0;
     box-shadow: none; //override .ui-widget-header
-    li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap;
-      a { float: left; padding: .5em .9em; text-decoration: none;
+    li { 
+      list-style: none; 
+      float: left; 
+      position: relative; 
+      top: 1px; 
+      margin: 0 .2em 1px 0; 
+      border-bottom: 0 !important; 
+      padding: 0; 
+      white-space: nowrap;
+      &:focus { @include button-focus; }
+      a { 
+        float: left; 
+        padding: .5em .9em; 
+        text-decoration: none;
         font-weight: bold;
         text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+        &:focus { @include button-focus; }
       }
       &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
         background: $bgColorContent;
