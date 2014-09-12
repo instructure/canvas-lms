@@ -87,6 +87,14 @@ define([
         $menu = $("#menu"),
         menuItemHoverTimeoutId;
 
+    // Makes sure that the courses/groups menu is openable by clicking
+    $coursesItem = $menu.find('#courses_menu_item')
+    $coursesItem.click(function (e) {
+      if (e.metaKey || e.ctrlKey) return;
+      e.preventDefault();
+      $coursesItem.focus();
+    })
+
     function clearMenuHovers(){
       window.clearTimeout(menuItemHoverTimeoutId);
       // this is explicitly finding every time in case
