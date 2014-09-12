@@ -59,11 +59,11 @@ class ActiveRecord::Base
     self.reset_column_information_without_remove_dropped_columns
   end
 
-  def self.instantiate_with_remove_dropped_columns(record)
+  def self.instantiate_with_remove_dropped_columns(attributes, *args)
     (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
-      record.delete(attr)
+      attributes.delete(attr)
     end unless self.respond_to?(:tableless?)
-    instantiate_without_remove_dropped_columns(record)
+    instantiate_without_remove_dropped_columns(attributes, *args)
   end
 
   class << self
