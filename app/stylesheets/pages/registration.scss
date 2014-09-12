@@ -26,9 +26,9 @@ a {
     padding: 50px 0 0 0px;
     a {
       display: block;
-      width: 175px;
-      height: 41px;
-      background: transparent url(/images/registration/logo.png) 0 0 no-repeat;
+      width: 210px;
+      height: 60px;
+      background: transparent url(/slbx/slbx_logo_small.png) 0 0 no-repeat;
       text-indent: -9999em;
     }
   }
@@ -84,7 +84,7 @@ a {
 }
 
 #registration_content {
-  background: #fff url(/images/registration/page-background.png) 0 0 repeat;
+  background: #fff url(/images/registration/home.jpg) 0 0 repeat;
   padding-bottom: 40px;
 }
 
@@ -114,12 +114,12 @@ a {
 
 #signup_teacher, #signup_student {
   position: absolute;
-  background-image: url(/images/registration/landing_buttons.png);
+  background-image: url(/images/registration/button.png);
   background-repeat: no-repeat;
   background-position: 5px 5px;
   position: absolute;
   top: 157px;
-  width: 180px;
+  width: 190px;
   height: 65px;
   text-indent: -9999em;
 }
@@ -133,10 +133,8 @@ a {
 }
 
 #signup_student {
-  right: 67px;
-  background-position: 5px -125px;
+  right: 150px;
   &:hover, &:focus {
-    background-position: 5px -190px;
     outline: none;
   }
 }
