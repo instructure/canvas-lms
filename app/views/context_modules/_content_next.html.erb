@@ -282,6 +282,7 @@ TEXT
 
   <%= form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
+    <p tabindex="0"></p>
       <tr>
         <td colspan="2">
           <div class="module_name">
@@ -380,6 +381,7 @@ TEXT
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
   <div id="edit_item_dialog" style="display: none;">
     <%= form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
+      <p tabindex="0"> </p>
       <table class="formtable">
         <tr>
           <td><%= f.blabel :title, :en => "Title" %></td>

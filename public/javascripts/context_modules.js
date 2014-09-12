@@ -431,7 +431,6 @@ define([
           }
         }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
         $module.removeClass('dont_remove');
-        $form.find(":text:visible:first").focus().select();
       },
       hideEditModule: function(remove) {
         var $module = $("#add_context_module_form").data('current_module'); //.parents(".context_module");
