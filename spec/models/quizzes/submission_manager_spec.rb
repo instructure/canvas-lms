@@ -105,7 +105,33 @@ describe Quizzes::SubmissionManager do
       end
     end
   end
-
+  describe "outstanding submissions by quiz" do
+    before do
+      course
+      @quiz = @course.quizzes.create!(:title => "Outstanding")
+      @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+      @quiz.generate_quiz_data
+      @quiz.save
+      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)
+      @submission.end_at = 20.minutes.ago
+      @submission.save
+    end
+    it 'should be overdue and need_grading' do
+      @submission.overdue?.should be true
+      @submission.needs_grading?.should be true
+    end
+    it "should #find_outstanding_submissions_in_quiz" do
+      subs = Quizzes::SubmissionManager.find_outstanding_submissions_in_quiz(@quiz)
+      subs.size.should == 1
+      subs.first.id.should == @submission.id
+    end
+    it 'should force grading to close the submission' do
+      subs = Quizzes::SubmissionManager.find_outstanding_submissions_in_quiz(@quiz)
+      Quizzes::SubmissionManager.grade_outstanding_submissions_in_quiz(subs)
+      subs = Quizzes::SubmissionManager.find_outstanding_submissions_in_quiz(@quiz)
+      subs.size.should == 0
+    end
+  end
   describe '#grade_outstanding_submissions_in_course' do
     it 'should work' do
       student = student_in_course(active_all: true).user
