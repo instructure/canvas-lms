@@ -204,7 +204,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:media_comment</tt> - The media_comment for the message. Defaults to nil.
   # * <tt>:forwarded_message_ids</tt> - Array of message IDs to forward. Only if forwardable and limited to 1.
   def add_message(current_user, body_or_obj, options = {})
-    transaction do
+    message = transaction do
       lock!
 
       options = {:generated => false,
@@ -213,6 +213,7 @@ class Conversation < ActiveRecord::Base
       options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
       options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
+      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
 
       message = body_or_obj.is_a?(ConversationMessage) ?
         body_or_obj :
@@ -253,6 +254,16 @@ class Conversation < ActiveRecord::Base
       # now that the message participants are all saved, we can properly broadcast to recipients
       message.after_participants_created_broadcast
       message
+    end
+    send_later_if_production(:reset_unread_counts) if options[:reset_unread_counts]
+    message
+  end
+
+  def reset_unread_counts
+    Shard.partition_by_shard(self.conversation_participants.map(&:user_id)) do |shard_user_ids|
+      User.where(id: shard_user_ids).find_each do |user|
+        user.reset_unread_conversations_counter
+      end
     end
   end
 
@@ -421,36 +432,6 @@ class Conversation < ActiveRecord::Base
 
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       update_for_skips = options[:update_for_skips] != false
-
-      # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
-      sql = "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed)"
-      params = [
-        self.id,
-      ]
-      if skip_ids.present?
-        sql += " AND cp.user_id NOT IN (?)"
-        params << skip_ids
-      end
-      if options[:only_users]
-        sql += " AND cp.user_id IN (?)"
-        params << (options[:only_users]).map(&:id)
-      end
-      cp_conditions = sanitize_sql(params.unshift(sql))
-
-      if %w{MySQL Mysql2}.include?(connection.adapter_name)
-        connection.execute <<-SQL
-          UPDATE users, conversation_participants cp
-          SET unread_conversations_count = unread_conversations_count + 1,
-            #{sanitize_sql_for_assignment(updated_at: Time.now.utc)}
-          WHERE users.id = cp.user_id AND #{cp_conditions}
-        SQL
-      else
-        lock_type = true
-        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
-        # lock the rows in a predefined order to prevent deadlocks
-        ids = User.where(id: ConversationParticipant.from("conversation_participants cp").where(cp_conditions).select(:user_id)).lock(lock_type).order(:id).pluck(:id)
-        User.where(id: ids).update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc])
-      end
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).
           update_all(:last_message_at => message.created_at, :workflow_state => 'unread')

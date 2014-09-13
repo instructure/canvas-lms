@@ -755,7 +755,7 @@ class ConversationsController < ApplicationController
         @conversation.add_participants @recipients, no_messages: true if @recipients
       end
       @conversation.reload
-      messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients } if messages
+      messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients, reset_unread_counts: false } if messages
       @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients
 
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
