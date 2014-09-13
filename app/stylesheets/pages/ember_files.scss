@@ -203,6 +203,18 @@ $ef-thumbnail-size: 36px;
   right: 0;
 }
 
+.ef-footer {
+  border-top: 1px solid $base-border-color;
+  padding: 0 $base-content-padding;
+  line-height: 33px;
+  .progress-bar__bar-container {
+    width: auto;
+  }
+  .ef-quota-usage {
+    min-width: 330px;
+  }
+}
+
 
 .file-rename-form__form-label {
   float: left;

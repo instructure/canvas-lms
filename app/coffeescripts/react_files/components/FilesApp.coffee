@@ -1,5 +1,6 @@
 define [
   'react'
+  'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/str/splitAssetString'
   './Toolbar'
@@ -7,7 +8,7 @@ define [
   './FolderTree'
   './FilesUsage'
   '../mixins/MultiselectableMixin'
-], (React, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin) ->
+], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin) ->
 
   FilesApp = React.createClass
 
@@ -47,12 +48,18 @@ define [
                 contextType: @props.params.contextType,
                 contextId: @props.params.contextId
               })
-            FilesUsage({
-              contextType: @props.params.contextType
-              contextId: @props.params.contextId
-            })
           @props.activeRouteHandler
             onResolvePath: @onResolvePath
             currentFolder: @state.currentFolder
             selectedItems: @state.selectedItems
             toggleItemSelected: @toggleItemSelected
+        div className: 'ef-footer grid-row',
+          FilesUsage({
+            className: 'col-xs-3'
+            contextType: @props.params.contextType
+            contextId: @props.params.contextId
+          }),
+          div className: 'col-xs',
+            div {},
+              a className: 'pull-right', href: '/files?show_all_contexts=1',
+                I18n.t('all_my_files', 'All My Files')
