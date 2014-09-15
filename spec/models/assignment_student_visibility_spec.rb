@@ -215,6 +215,10 @@ describe "differentiated_assignments" do
         it "should show the assignment to the user" do
           ensure_user_sees_assignment
         end
+        it "should not show deleted assignments" do
+          @assignment.destroy
+          ensure_user_does_not_see_assignment
+        end
       end
       context "user in section with override" do
         before{enroller_user_in_section(@section_foo)}
