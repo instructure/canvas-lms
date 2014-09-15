@@ -995,6 +995,10 @@ class UsersController < ApplicationController
   # @argument communication_channel[address] [String]
   #   The communication channel address, e.g. the user's email address.
   #
+  # @argument communication_channel[confirmation_url] [Boolean]
+  #   Only valid for account admins. If true, returns the new user account
+  #   confirmation URL in the response.
+  #
   # @argument communication_channel[skip_confirmation] [Boolean]
   #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
@@ -1017,11 +1021,24 @@ class UsersController < ApplicationController
     notify = value_to_boolean(params[:pseudonym].delete(:send_confirmation))
     notify = :self_registration unless manage_user_logins
 
-    if params[:communication_channel]
-      cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
-      cc_addr = params[:communication_channel][:address]
-      skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
-          (Account.site_admin.grants_right?(@current_user, :manage_students) || @context.grants_right?(@current_user, :manage_students))
+    includes = %w{locale}
+
+    if cc_params = params[:communication_channel]
+      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
+      cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
+
+      can_manage_students = [Account.site_admin, @context].any? do |role|
+        role.grants_right?(@current_user, :manage_students)
+      end
+
+      if can_manage_students
+        skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
+      end
+
+      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
+        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
+      end
+
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -1133,7 +1150,7 @@ class UsersController < ApplicationController
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
-        render(:json => user_json(@user, @current_user, session, %w{locale}))
+        render(:json => user_json(@user, @current_user, session, includes))
       else
         render(:json => data)
       end

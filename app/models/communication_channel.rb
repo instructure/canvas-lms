@@ -142,6 +142,15 @@ class CommunicationChannel < ActiveRecord::Base
     self.errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if self.id == self.user.otp_communication_channel_id
   end
 
+  # Public: Build the url where this record can be confirmed.
+  #
+  #
+  # Returns a string.
+  def confirmation_url
+    return "" unless path_type == TYPE_EMAIL
+    "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/register/#{confirmation_code}"
+  end
+
   def context
     pseudonym.try(:account)
   end
