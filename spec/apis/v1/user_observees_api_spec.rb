@@ -19,17 +19,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe UserObserveesController, type: :request do
-  let(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }
-  let(:student)            { student_pseudonym.user }
-  let(:student_pseudonym)  { user_with_pseudonym(name: 'Child Smith', active_all: true); @pseudonym }
-  let(:student2)           { student2_pseudonym.user }
-  let(:student2_pseudonym) { user_with_pseudonym(name: 'Another Smith', active_all: true); @pseudonym }
-  let(:allowed_admin) do
+  let_once(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }
+  let_once(:student)            { student_pseudonym.user }
+  let_once(:student_pseudonym)  { user_with_pseudonym(name: 'Child Smith', active_all: true); @pseudonym }
+  let_once(:student2)           { student2_pseudonym.user }
+  let_once(:student2_pseudonym) { user_with_pseudonym(name: 'Another Smith', active_all: true); @pseudonym }
+  let_once(:allowed_admin) do
     a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
     pseudonym(a)
     a
   end
-  let(:multi_admin) do
+  let_once(:multi_admin) do
     a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
     pseudonym(a)
     account_admin_user_with_role_changes(active_all: true, user: a, account: external_account, role_changes: {manage_user_observers: true})
@@ -42,11 +42,11 @@ describe UserObserveesController, type: :request do
     a
   end
 
-  let(:external_account)           { account_model(name: 'External Account') }
-  let(:external_parent)            { user_with_pseudonym(name: 'Parent External', active_all: true, account: external_account) }
-  let(:external_student)           { external_student_pseudonym.user }
-  let(:external_student_pseudonym) { user_with_pseudonym(name: 'Child External', active_all: true, account: external_account); @pseudonym }
-  let(:external_allowed_admin) do
+  let_once(:external_account)           { account_model(name: 'External Account') }
+  let_once(:external_parent)            { user_with_pseudonym(name: 'Parent External', active_all: true, account: external_account) }
+  let_once(:external_student)           { external_student_pseudonym.user }
+  let_once(:external_student_pseudonym) { user_with_pseudonym(name: 'Child External', active_all: true, account: external_account); @pseudonym }
+  let_once(:external_allowed_admin) do
     a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
     pseudonym(a, account: external_account)
     a

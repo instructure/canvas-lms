@@ -186,7 +186,6 @@ describe RubricsController do
       @rubric.save
       @rubric_association.context = @course2
       @rubric_association.save
-      rescue_action_in_public! if CANVAS_RAILS2
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should_not be_nil
       assigns[:rubric].should_not eql(@rubric)

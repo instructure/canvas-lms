@@ -1,0 +1,86 @@
+{{#mm-sortable-module-item
+  item=model
+  on-receive-item-from-other-module="moveItem"
+  on-reorder-item="reorderItem"
+}}
+  <div {{bind-attr class=":ig-row published:ig-published indentClassName"}}>
+    <div class="ig-title ellipses">
+      <span draggable="true" class="draggable-handle" title="Drag to reorder or move item to another module"><i class="icon-drag-handle"></i></span>
+      {{modules-item-icon type=type}}
+      <span class="item_name">
+        {{#if module.locked}}
+          <span class="title locked_title">{{title}}</span>
+        {{else}}
+          {{#if isSaving}}
+            <span class="title saving">{{title}} {{#t "saving"}}saving...{{/t}}</a>
+          {{else}}
+            <a class="title" {{bind-attr href=html_url}}>{{title}}</a>
+          {{/if}}
+        {{/if}}
+        <span class="completion_requirement" style="display: none;">&nbsp;</span>
+        <span class="position" style="display: none;">1</span>
+        <span class="url" style="display: none;"></span>
+        <span class="new_tab" style="display: none;">0</span>
+      </span>
+    </div>
+
+    <div class="ig-details row-fluid">
+      <div class="span4">
+        {{#if completion_requirement.completed}}<i class="icon-check"></i>{{/if}}
+        {{completionRequirement}}
+      </div>
+      <div class="span4 due_date_display" style="text-align: right">
+        {{#if due}}
+          {{format-date due '%b %d, %Y'}}
+        {{/if}}
+      </div>
+      <div class="span4 points_possible_display">
+        {{#if pointsPossible}}
+          {{pointsPossible}} {{#t "points_possible"}}pts{{/t}}
+        {{/if}}
+      </div>
+    </div>
+
+      <div class="ig-admin">
+        <span class="publish-icon" role="button" aria-label="Published. Click to unpublish."><i class="icon-publish"></i><span class="publish-text" tabindex="-1">&nbsp;Published</span><span class="screenreader-only accessible_label">Published. Click to unpublish.</span></span>
+
+        {{#ic-actions id=actionsId}}
+          {{#if showIncreaseIndent}}
+            {{#ic-menu-item on-select="increaseIndent"}}Increase indent{{/ic-menu-item}}
+          {{/if}}
+          {{#if showDecreaseIndent}}
+            {{#ic-menu-item on-select="decreaseIndent"}}Decrease indent{{/ic-menu-item}}
+          {{/if}}
+          {{#ic-menu-item on-select="edit"}}Edit{{/ic-menu-item}}
+          {{#ic-menu-item on-select="remove"}}Remove{{/ic-menu-item}}
+        {{/ic-actions}}
+
+      </div>
+  </div>
+
+  {{#if modalIsOpen}}
+    {{! we don't want to setup 300 modals, just do it when we want to open it }}
+    {{#c-modal-form
+      id=modalId
+      on-submit="saveEdits"
+      return-focus-to=actionsId
+    }}
+      {{#ic-modal-title}}{{#t "edit_item"}}Edit Module Item{{/t}}{{/ic-modal-title}}
+
+      <div class="control-group">
+        <label class="control-label" for="edit-item-name">
+          {{#t "item_title"}}Module Item Title{{/t}}
+        </label>
+        <div class="controls">
+          {{input type="text" value=copy.title id="edit-item-name"}}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        {{#ic-modal-trigger class="btn"}}{{#t "cancel"}}Cancel{{/t}}{{/ic-modal-trigger}}
+        <button type="submit" class="btn btn-primary">{{#t "save"}}Save{{/t}}</button>
+      </div>
+    {{/c-modal-form}}
+  {{/if}}
+{{/mm-sortable-module-item}}
+

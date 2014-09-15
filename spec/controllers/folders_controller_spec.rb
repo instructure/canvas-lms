@@ -23,14 +23,23 @@ describe FoldersController do
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
   
-  def course_folder
+  def root_folder
     @root = Folder.root_folders(@course).first
+  end
+
+  def course_folder
     @folder = @root.sub_folders.create!(:name => "some folder", :context => @course)
+  end
+
+  before :once do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    root_folder
   end
   
   describe "GET 'show'" do
     it "should not return hidden files for students" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       course_folder
       file = @folder.active_file_attachments.build(:filename => 'long_unique_filename', :uploaded_data => io)
       file.context = @course
@@ -49,16 +58,14 @@ describe FoldersController do
   end
   
   describe "PUT 'update'" do
+    before(:once) { course_folder }
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_folder
       put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "hi"}
       assert_unauthorized
     end
     
     it "should update folder" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_folder
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "new name"}
       response.should be_redirect
       assigns[:folder].should_not be_nil
@@ -69,13 +76,12 @@ describe FoldersController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :folder => {:name => "folder"}
       assert_unauthorized
     end
     
     it "should create folder" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :folder => {:name => "new name"}
       response.should be_redirect
       assigns[:folder].should_not be_nil
@@ -83,7 +89,7 @@ describe FoldersController do
     end
     
     it "should force new folders to be sub_folders" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :folder => {:name => "new name"}
       response.should be_redirect
       assigns[:folder].should_not be_nil
@@ -93,7 +99,7 @@ describe FoldersController do
     end
     
     it "should create sub_folder" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       course_folder
       post 'create', :course_id => @course.id, :folder => {:name => "new folder", :parent_folder_id => @folder.id}
       response.should be_redirect
@@ -101,16 +107,14 @@ describe FoldersController do
   end
   
   describe "DELETE 'destroy'" do
+    before(:once) { course_folder }
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_folder
       delete 'destroy', :course_id => @course.id, :id => @folder.id
       assert_unauthorized
     end
     
     def delete_folder
-      course_with_teacher_logged_in(:active_all => true)
-      course_folder
+      user_session(@teacher)
       yield if block_given?
       delete 'destroy', :course_id => @course.id, :id => @folder.id
       response.should be_redirect

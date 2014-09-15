@@ -175,7 +175,10 @@ class ContextModule < ActiveRecord::Base
       return true
     elsif !self.active?
       return false
+    elsif self.context.user_has_been_observer?(user)
+      return true
     end
+
     progression = self.evaluate_for(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.

@@ -101,8 +101,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       answers = sub.submission_data || []
       next unless answers.is_a?(Array)
-      points = answers.map { |a| a[:points] }.sum
-      score_counter << points
+      score_counter << sub.score.to_f
       correct_cnt += answers.count { |a| a[:correct] == true }
       incorrect_cnt += answers.count { |a| a[:correct] == false }
       total_duration += ((sub.finished_at - sub.started_at).to_i rescue 30)
@@ -306,9 +305,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   def submissions_for_statistics
     Shackles.activate(:slave) do
-      #submissions from users
-      for_users = quiz.context.student_ids
-      scope = quiz.quiz_submissions.where(:user_id => for_users)
+      scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
 
       all_submissions = []

@@ -89,7 +89,7 @@ describe LocaleSelection do
 
   context "locale matching" do
     before do
-      I18n.stubs(:available_locales).returns([:en, :it, :es, :fr, :de, :pt])
+      I18n.stubs(:available_locales).returns([:en, :it, :es, :fr, :de, :pt, :zh])
       @root_account = Account.create
       @account = Account.create(:parent_account => @root_account)
       user
@@ -163,6 +163,15 @@ describe LocaleSelection do
 
       ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => account_gr).should eql('fr')
       ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr).should eql('es')
+    end
+
+    it "should infer the locale from the session" do
+      @root_account.update_attribute(:default_locale, 'es')
+      @account.update_attribute(:default_locale, 'fr')
+      @user.update_attribute(:locale, 'de')
+
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :session_locale => 'zh').should eql('zh')
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :user => @user, :session_locale => 'zh').should eql('de')
     end
   end
 end

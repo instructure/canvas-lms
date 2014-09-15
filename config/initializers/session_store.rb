@@ -37,19 +37,5 @@ when :redis_session_store
   config[:db] ||= config[:database]
 end
 
-if CANVAS_RAILS2
-  ActionController::Base.session = config
-  ActionController::Base.session_store = session_store
-else
-  CanvasRails::Application.config.session_store(session_store, config)
-  CanvasRails::Application.config.secret_token = config[:secret]
-end
-
-if CANVAS_RAILS2
-  ActionController::Flash::FlashHash.class_eval do
-    def store(session, key = "flash")
-      return session.delete(key) if self.empty?
-      session[key] = self
-    end
-  end
-end
+CanvasRails::Application.config.session_store(session_store, config)
+CanvasRails::Application.config.secret_token = config[:secret]

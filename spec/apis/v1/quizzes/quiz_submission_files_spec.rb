@@ -21,8 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../file_uploads_spec_help
 
 describe Quizzes::QuizSubmissionFilesController, type: :request do
   context "quiz submissions file uploads" do
-    before do
-      course_with_student_logged_in :active_all => true
+    before :once do
+      course_with_student :active_all => true
       @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
       @quiz.did_edit!
       @quiz.offer!

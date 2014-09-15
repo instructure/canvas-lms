@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+﻿require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
@@ -272,10 +272,10 @@ describe "calendar2" do
           if (fj('.view_event_link').displayed?)
             expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
           end
-          fj('h2.title').displayed?
+          fj('h1.title').displayed?
         end
 
-        f('h2.title').text.should include(name)
+        f('h1.title').text.should include(name)
       end
 
       it "more options link on assignments should go to assignment edit page" do

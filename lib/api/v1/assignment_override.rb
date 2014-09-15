@@ -197,18 +197,9 @@ module Api::V1::AssignmentOverride
       end
 
       unless defunct_student_ids.empty?
-        if CANVAS_RAILS2
-          # on Rails 2, the delete_all will do an update_all
-          # if we don't put the scoped in. weird.
-          override.assignment_override_students.
-            where(:user_id => defunct_student_ids.to_a).
-            scoped.
-            delete_all
-        else
-          override.assignment_override_students.
-            where(:user_id => defunct_student_ids.to_a).
-            delete_all
-        end
+        override.assignment_override_students.
+          where(:user_id => defunct_student_ids.to_a).
+          delete_all
       end
     end
 
@@ -281,8 +272,6 @@ module Api::V1::AssignmentOverride
 
     # save the new/kept overrides
     overrides.each{ |override| override.save! }
-
-    Rails.cache.delete([@current_user, assignment, 'overrides'].cache_key) # turns out touching isn't enough
   end
 
   def deserialize_overrides( overrides )

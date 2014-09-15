@@ -24,3 +24,13 @@ define [
 
     title: I18n.t('manage', 'manage')
 
+    triggerClass: (->
+      if @get('button') then 'btn' else ''
+    ).property('button')
+
+    focus: ->
+      # TODO: something like this probably belongs in ic-menu.  Also, the
+      # trigger should register itself rather than us selecting it from here
+      trigger = @get('childViews')[0].get('childViews')[0]
+      trigger.focus()
+

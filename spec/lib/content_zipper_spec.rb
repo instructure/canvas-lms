@@ -191,7 +191,7 @@ describe ContentZipper do
         it "should give logged out people no files" do
           zipped_files_for_user(nil).should == []
         end
-        
+
         it "should give all files if check_user=false" do
           zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
@@ -249,7 +249,7 @@ describe ContentZipper do
       names.should == ['otherfile.png']
     end
   end
-  
+
   describe "mark_successful!" do
     it "sets an instance variable representing a successful zipping" do
       zipper = ContentZipper.new
@@ -272,6 +272,17 @@ describe ContentZipper do
       Dir.expects(:mktmpdir).once.yields('/tmp')
       Zip::File.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::File::CREATE)
       ContentZipper.process_attachment(attachment, user)
+    end
+  end
+
+  describe "render_eportfolio_page_content" do
+    it "should return the text of the file contents" do
+      user = User.create!
+      eportfolio = user.eportfolios.create!(:name => 'bestest_eportfolio_eva')
+      eportfolio.ensure_defaults
+
+      contents = ContentZipper.new.render_eportfolio_page_content(eportfolio.eportfolio_entries.first, eportfolio, nil, {})
+      contents.should match("bestest_eportfolio_eva") #really just testing that this method doesn't throw an error
     end
   end
 

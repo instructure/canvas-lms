@@ -197,6 +197,7 @@ module Importers
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)
       end
 
+      item.saved_by = :migration if item.new_record?
       item.save!
 
       if migration
@@ -271,6 +272,7 @@ module Importers
       item.assignment.save if item.assignment && item.assignment.changed?
 
       migration.add_imported_item(item) if migration
+      item.saved_by = nil
       item
     end
 

@@ -115,6 +115,27 @@ describe "Importers::QuizImporter" do
     quiz.assignment.should_not be_nil
     quiz.quiz_type.should == 'assignment'
   end
+
+  it "should not create an extra assignment if it already references one and enable_drafts is on" do
+    context = get_import_context
+    context.root_account.enable_feature!(:draft_state)
+
+    quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    assignment_hash = get_import_data 'vista', 'assignment'
+    quiz_hash['assignment_migration_id'] = assignment_hash['migration_id']
+
+    data = {'assessments' => {'assessments' => [quiz_hash]}, 'assignments' => [assignment_hash]}
+
+    migration = context.content_migrations.create!
+    Importers::CourseContentImporter.import_content(context, data, nil, migration)
+
+    Assignment.count.should == 1
+    Quizzes::Quiz.count.should == 1
+
+    quiz = Quizzes::Quiz.find_by_migration_id quiz_hash[:migration_id]
+    quiz.assignment.should_not be_nil
+    quiz.quiz_type.should == 'assignment'
+  end
   
   it "should convert relative file references to course-relative file references" do
     context = course_model

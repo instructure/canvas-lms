@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AnnouncementsController do
+  before :once do
+    course_with_student(:active_all => true)
+  end
+
   def course_announcement
     @announcement = @course.announcements.create!(
       :title => "some announcement", 
@@ -28,13 +32,12 @@ describe AnnouncementsController do
 
   describe "GET 'index'" do
     it "should return unauthorized without a valid session" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@user)
       @course.update_attribute(:tab_configuration, [{'id'=>14,'hidden'=>true}])
       get 'index', :course_id => @course.id
       response.should be_redirect
@@ -43,8 +46,7 @@ describe AnnouncementsController do
   end
 
   describe "GET 'public_feed.atom'" do
-    before(:each) do
-      course_with_student(:active_all => true)
+    before :once do
       @context = @course
       announcement_model
     end

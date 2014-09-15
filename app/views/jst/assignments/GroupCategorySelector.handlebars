@@ -5,29 +5,32 @@
 <div class="form-column-right">
   <div class="border border-trbl border-round">
     {{!-- Group Assignment selection --}}
-    <label class="checkbox flush" for="assignment_has_group_category">
+    <label class="checkbox flush" for="has_group_category">
       {{checkbox "has_group_category"
-        id="assignment_has_group_category"
-        prefix=prefix
-        checked=groupCategoryId
-        disabled=hasGroupCategoryDisabled}}
+      id="has_group_category"
+      prefix=prefix
+      checked=groupCategoryId
+      aria-role="option"
+      aria-checked=ariaChecked
+      aria-controls="group_category_options"
+      disabled=hasGroupCategoryDisabled}}
       {{#if fieldLabel}}{{fieldLabel}}{{else}}{{#t "is_group_assignment"}}This is a Group Assignment{{/t}}{{/if}}
     </label>
 
     {{!-- Individual grading? --}}
-    <div class="nested">
-      <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
+    <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
+      <div class="nested">
         {{#unless hideGradeIndividually}}
-        <label class="checkbox" for="assignment_grade_students_individually">
-          {{checkbox "grade_group_students_individually"
-            id="assignment_grade_students_individually"
-            prefix=prefix
-            checked=gradeGroupStudentsIndividually
-            disabled=gradeIndividuallyDisabled}}
-          {{#t "grade_group_students_individually"}}
-            Assign Grades to Each Student Individually
-          {{/t}}
-        </label>
+          <label class="checkbox" for="assignment_grade_students_individually">
+            {{checkbox "grade_group_students_individually"
+              id="assignment_grade_students_individually"
+              prefix=prefix
+              checked=gradeGroupStudentsIndividually
+              disabled=gradeIndividuallyDisabled}}
+            {{#t "grade_group_students_individually"}}
+              Assign Grades to Each Student Individually
+            {{/t}}
+          </label>
         {{/unless}}
 
         {{!-- Group selection --}}

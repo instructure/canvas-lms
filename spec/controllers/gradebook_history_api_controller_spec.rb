@@ -11,8 +11,8 @@ describe GradebookHistoryApiController do
   end
 
 
-  before do
-    course_with_teacher_logged_in(:active_all => true)
+  before :once do
+    course_with_teacher(:active_all => true)
 
     student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
     student_in_course(:user => student, :active_all => 1)
@@ -37,6 +37,10 @@ describe GradebookHistoryApiController do
     @submission2.update_attributes!(:graded_at => Time.now, :grader_id => @super_grader.id, :score => 90)
     @submission3.update_attributes!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 80)
     @submission4.update_attributes!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 70)
+  end
+
+  before :each do
+    user_session(@teacher)
   end
 
   describe 'GET days' do
@@ -65,17 +69,8 @@ describe GradebookHistoryApiController do
     end
 
     it 'paginates' do
-      old_grader = User.create!
-      two_days_ago = 48.hours.ago
-      25.times do |i|
-        student = user_with_pseudonym(:username => "student-history-#{i}@example.com", :active_all => 1)
-        student_in_course(:user => student, :active_all => 1)
-        submission = @assignment1.submit_homework(student)
-        submission.update_attributes!(:graded_at => two_days_ago, :grader_id => old_grader.id)
-      end
-
-      get 'days', :course_id => @course.id, :format => 'json', :page => 2
-      json_body.map{|d| d['date'] }.should == [two_days_ago.to_date.as_json]
+      get 'days', :course_id => @course.id, :format => 'json', :page => 2, :per_page => 2
+      json_body.map{|d| d['date'] }.should == [@submission3.graded_at.to_date.as_json]
     end
   end
 

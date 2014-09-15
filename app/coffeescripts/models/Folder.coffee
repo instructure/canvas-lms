@@ -1,26 +1,30 @@
 define [
   'require'
   'Backbone'
-  'jquery'
   'underscore'
-  'compiled/util/deparam'
+  'vendor/backbone-identity-map'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
-  'compiled/collections/FoldersCollection'
-], (require, Backbone, $, _, deparam, PaginatedCollection, FilesCollection, _THIS_WILL_BE_NULL_) ->
+], (require, Backbone, _, identityMapMixin, PaginatedCollection, FilesCollection) ->
 
-  class Folder extends Backbone.Model
+
+
+  Folder = identityMapMixin class __Folder extends Backbone.Model
 
     defaults:
       'name' : ''
-      sort: 'name'
-      order: 'asc' #or 'desc'
 
     initialize: (options) ->
       @contentTypes ||= options?.contentTypes
       @setUpFilesAndFoldersIfNeeded()
       @on 'change:sort change:order', @setQueryStringParams
       super
+
+    url: ->
+      if @isNew()
+        super
+      else
+        "/api/v1/folders/#{@id}"
 
     parse: (response) ->
       json = super
@@ -34,51 +38,56 @@ define [
 
     setUpFilesAndFoldersIfNeeded: ->
       unless @folders
-        # this breaks the circular dependency between Folder <-> FoldersCollection
-        FoldersCollection = require('compiled/collections/FoldersCollection')
         @folders = new FoldersCollection [], parentFolder: this
       unless @files
         @files = new FilesCollection [], parentFolder: this
 
-    expand: (force=false) ->
+    expand: (force=false, options={}) ->
       @isExpanded = true
       @trigger 'expanded'
-      unless @expandDfd || force
-        @isExpanding = true
-        @trigger 'beginexpanding'
-        @expandDfd = $.Deferred().done =>
-          @isExpanding = false
-          @trigger 'endexpanding'
+      return $.when() if @expandDfd || force
+      @isExpanding = true
+      @trigger 'beginexpanding'
+      @expandDfd = $.Deferred().done =>
+        @isExpanding = false
+        @trigger 'endexpanding'
 
-        selfHasntBeenFetched = @folders.url is @folders.constructor::url or @files.url is @files.constructor::url
-        fetchDfd = @fetch() if selfHasntBeenFetched || force
-        $.when(fetchDfd).done =>
-          foldersDfd = @folders.fetch() unless @get('folders_count') is 0
-          filesDfd = @files.fetch() unless @get('files_count') is 0
-          $.when(foldersDfd, filesDfd).done(@expandDfd.resolve)
+      selfHasntBeenFetched = @folders.url is @folders.constructor::url or @files.url is @files.constructor::url
+      fetchDfd = @fetch() if selfHasntBeenFetched || force
+      $.when(fetchDfd).done =>
+        foldersDfd = @folders.fetch() unless @get('folders_count') is 0
+        filesDfd = @files.fetch() if (@get('files_count') isnt 0) and !options.onlyShowFolders
+        $.when(foldersDfd, filesDfd).done(@expandDfd.resolve)
 
     collapse: ->
       @isExpanded = false
       @trigger 'collapsed'
 
-    toggle: ->
+    toggle: (options) ->
       if @isExpanded
         @collapse()
       else
-        @expand()
+        @expand(false, options)
 
     previewUrl: ->
       if @get('context_type') in ['Course', 'Group']
         "/#{ @get('context_type').toLowerCase() + 's' }/#{ @get('context_id') }/files/{{id}}/preview"
 
+    isEmpty: ->
+      !!(@files.loadedAll and (@files.length is 0)) and (@folders.loadedAll and (@folders.length is 0))
 
+    # `full_name` will be something like "course files/some folder/another".
+    # For routing in the react app in the browser, we want something that will take that "course files"
+    # out. because urls will end up being /courses/2/files/folder/some folder/another
+    EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+\/?/
+    urlPath: ->
+      (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
 
     @resolvePath = (contextType, contextId, folderPath) ->
       url = "/api/v1/#{contextType}/#{contextId}/folders/by_path#{folderPath}"
       $.get(url).pipe (folders) ->
         folders.map (folderAttrs) ->
           new Folder(folderAttrs, {parse: true})
-
 
     getSortProp = (model, sortProp) ->
       # if we are sorting by name use 'display_name' for files and 'name' for folders.
@@ -89,8 +98,7 @@ define [
       else
         model.get(sortProp)
 
-    childrenSorter: (a, b) ->
-      sortProp = @get('sort')
+    childrenSorter: (sortProp='name', sortOrder='asc', a, b) ->
       a = getSortProp(a, sortProp)
       b = getSortProp(b, sortProp)
       res = if a is b
@@ -102,45 +110,35 @@ define [
             else
               throw new Error("wat? error sorting")
 
-      res = 0 - res if @get('order') is 'desc'
+      res = 0 - res if sortOrder is 'desc'
       res
 
-    children: ->
-      (@folders.toArray().concat @files.toArray()).sort(@childrenSorter.bind(this))
-
-    loadAll: ->
-      loadType = (type) =>
-        getNextPage = => @[type].fetch(page: 'next').pipe(getNextPage) unless @[type].loadedAll
-        getNextPage()
-      $.when ['folders', 'files'].map(loadType)...
-
-    # getNextPage: ->
-    #   loadType = (type) => @[type].fetch(page: 'next') unless @[type].loadedAll
-    #   $.when ['folders', 'files'].map(loadType)...
-    #   res = dfd.promise()
-    #   res.then -> console.log('got next page', this, arguments)
-    #   res
-
-    # loadAll: ->
-    #   return if @files.loadedAll and @files.loadedAll
-    #   res = @getNextPage().pipe @loadAll.bind(this)
-    #   res.then -> console.log('got All', this, arguments)
-    #   res
+    children: ({sort, order}) ->
+      (@folders.toArray().concat @files.toArray()).sort(@childrenSorter.bind(null, sort, order))
 
 
-    # TODO: It would be better to do this in a way that doesn't assume we
-    # need to have 'include[]=user' and keeps other query string params around
-    setQueryStringParams: ->
-      newParams =
-        include: ['user']
-        per_page: 20
-        sort: @get('sort')
-        order: @get('order')
 
-      ['folders', 'files'].map (type) =>
-        return if @[type].loadedAll
-        url = new URL(@[type].url)
-        params = deparam(url.search)
-        url.search = $.param _.extend(params, newParams)
-        @[type].url = url.toString()
-        @[type].reset()
+
+
+
+
+
+  # FoldersCollection is defined inside of this file, and not where it
+  # should be, because RequireJS sucks at figuring out circular dependencies.
+  # 'compiled/collections/FoldersCollection' just grabs this and re-exports it.
+  Folder.FoldersCollection = class FoldersCollection extends PaginatedCollection
+    @optionProperty 'parentFolder'
+
+    model: Folder
+
+    parse: (response) ->
+      if response
+        _.each response, (folder) =>
+          folder.contentTypes = @parentFolder.contentTypes
+      super
+
+
+
+
+
+  return Folder

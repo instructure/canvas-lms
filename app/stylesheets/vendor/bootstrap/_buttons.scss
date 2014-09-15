@@ -129,7 +129,7 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
     cursor: default;
     background-color: darken($white, 10%);
     background-image: none;
-    @include opacity(.65);
+    @include opacity(65);
     @include box-shadow(none);
   }
 

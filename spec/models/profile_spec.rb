@@ -31,11 +31,6 @@ describe Profile do
     end
 
     after(:all) do
-      if CANVAS_RAILS2
-        subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
-        subclasses.delete(FooProfile)
-        subclasses.delete(Foo)
-      end
       Object.send(:remove_const, :FooProfile)
       Object.send(:remove_const, :Foo)
     end

@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/testrail_report')
 
 describe "quizzes question banks" do
   include_examples "quizzes selenium tests"
@@ -7,13 +8,36 @@ describe "quizzes question banks" do
     course_with_teacher_logged_in
   end
 
-  it "should be able to create quiz questions" do
-    bank = AssessmentQuestionBank.create!(:context => @course)
-    get "/courses/#{@course.id}/question_banks/#{bank.id}"
+  it "should be able to create question bank" do
+    report_test(72402) do
+      get "/courses/#{@course.id}/question_banks"
+      question_bank_title = keep_trying_until do
+          f(".add_bank_link").click
+          wait_for_ajaximations
+          question_bank_title = f("#assessment_question_bank_title")
+          question_bank_title.should be_displayed
+          question_bank_title
+      end
+      question_bank_title.send_keys('goober', :return)
+      wait_for_ajaximations
+      question_bank = AssessmentQuestionBank.find_by_title('goober')
+      question_bank.should be_present
+      question_bank.workflow_state.should == "active"
+      f("#question_bank_adding .title").should(include_text('goober'))
+      question_bank.bookmarked_for?(User.last).should be_true
+      question_bank
+    end
+  end
 
-    f('.add_question_link').click
-    wait_for_ajaximations
-    expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
+  it "should be able to create quiz questions" do
+    report_test(72403) do
+      bank = AssessmentQuestionBank.create!(:context => @course)
+      get "/courses/#{@course.id}/question_banks/#{bank.id}"
+
+      f('.add_question_link').click
+      wait_for_ajaximations
+      expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
+    end
   end
 
   it "should tally up question bank question points" do

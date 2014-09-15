@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
 describe "API Error Handling", type: :request do
-  before do
+  before :once do
     user_with_pseudonym(:active_all => true)
     @token = @user.access_tokens.create!
   end

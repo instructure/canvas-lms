@@ -20,16 +20,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Outcomes API", type: :request do
-  before :each do
-    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+  before :once do
     user_with_pseudonym(:active_all => true)
-  end
-
-  def revoke_permission(account_user, permission)
-    RoleOverride.manage_role_override(account_user.account, account_user.membership_type, permission.to_s, :override => false)
-  end
-
-  before :each do
     @account = Account.default
     @account_user = @user.account_users.create(:account => @account)
     @outcome = @account.created_learning_outcomes.create!(
@@ -37,6 +29,14 @@ describe "Outcomes API", type: :request do
       :description => "Description of my outcome",
       :vendor_guid => "vendorguid9000"
     )
+  end
+
+  before :each do
+    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+  end
+
+  def revoke_permission(account_user, permission)
+    RoleOverride.manage_role_override(account_user.account, account_user.membership_type, permission.to_s, :override => false)
   end
 
   describe "show" do

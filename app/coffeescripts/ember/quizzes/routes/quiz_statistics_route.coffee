@@ -3,11 +3,12 @@ define [
   '../mixins/redirect',
   'i18n!quiz_statistics_route'
   '../shared/title_builder'
-], (Ember, Redirect, I18n, titleBuilder) ->
+  '../mixins/routes/loading_overlay'
+], (Ember, Redirect, I18n, titleBuilder, LoadingOverlayMixin) ->
   {RSVP} = Ember
   RC_QUIZ_TOO_LARGE = /operation not available for large quizzes/
 
-  Ember.Route.extend Redirect,
+  Ember.Route.extend Redirect, LoadingOverlayMixin,
     beforeModel: (transition) ->
       @set 'error', null
       @validateRoute('canManage', 'quiz.show')

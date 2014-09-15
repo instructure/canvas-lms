@@ -116,18 +116,12 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies},
 
       def get_css(file_path)
         if sass_file = Dir.glob("app/stylesheets/jst/#{file_path}.s[ac]ss").first
-          @compiler = begin
-            Compass.reset_configuration!
-            config = Compass.add_project_configuration
-            # for now we're going to punt and say these magic JST stylesheets are just
-            # for legacy normal_contrast
-            config.add_import_path "app/stylesheets/variants/legacy_normal_contrast"
-            config.cache_dir = "/tmp/sassc_jst"
-            config.output_style = :compressed
-            config.line_comments = false
-            Compass.compiler
-          end
-          @compiler.engine(sass_file, file_path).render
+          # renders the sass file to disk, then returns the css it wrote
+          # note: for now, all jst stylesheets will be just in 'legacy_normal_contrast'
+          system({"CANVAS_SASS_STYLE" => "compressed"}, "node script/compile-sass.js #{sass_file}")
+          File.read sass_file
+                      .sub(/^app\/stylesheets/, 'public/stylesheets_compiled/legacy_normal_contrast')
+                      .sub(/.s[ac]ss$/, '.css')
         end
       end
 

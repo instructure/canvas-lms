@@ -253,7 +253,7 @@ describe TabsController, type: :request do
     end
 
     describe "teacher in a course" do
-      before :each do
+      before :once do
         course_with_teacher(active_all: true)
         @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
         @tab_lookup = {}.with_indifferent_access

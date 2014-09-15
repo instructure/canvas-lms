@@ -39,9 +39,9 @@ module Api::V1
     end
 
     describe '#days_json' do
-      let!(:course) { ::Course.create! }
+      let_once(:course) { ::Course.create! }
 
-      before do
+      before :once do
         students = (1..3).inject([]) do |memo, idx|
           student = ::User.create!
           course.enroll_student(student)
@@ -55,6 +55,9 @@ module Api::V1
         submit(@assignment1, students[1], now, @grader2)
         submit(@assignment1, students[2], yesterday, @grader2)
         submit(@assignment2, students[0], yesterday, @grader2)
+      end
+
+      before :each do
         harness = GradebookHistoryHarness.new
         harness.instance_variable_set(:@domain_root_account, ::Account.default)
         @days = harness.days_json(course, api_context)
@@ -94,8 +97,9 @@ module Api::V1
     end
 
     describe '#json_for_date' do
-      before do
-        course = ::Course.create!
+      let_once(:course) { ::Course.create! }
+
+      before :once do
         student1 = ::User.create!
         course.enroll_student(student1)
         student2 = ::User.create!
@@ -105,6 +109,9 @@ module Api::V1
         @assignment = course.assignments.create!(:title => "some assignment")
         submit(@assignment, student1, now, @grader1)
         submit(@assignment, student2, now, @grader2)
+      end
+
+      before :each do
         harness = GradebookHistoryHarness.new
         harness.instance_variable_set(:@domain_root_account, ::Account.default)
         @day_hash = harness.json_for_date(now, course, api_context)
@@ -122,7 +129,7 @@ module Api::V1
     end
 
     describe '#submissions_for' do
-      before do
+      before :once do
         @course = ::Course.create!
         student1 = ::User.create!
         @course.enroll_student(student1)
@@ -193,18 +200,18 @@ module Api::V1
     end
 
     describe '#submissions' do
-      let!(:course) { ::Course.create! }
-      let!(:assignment) { course.assignments.create! }
-      let!(:student) { ::User.create! }
+      let_once(:course) { ::Course.create! }
+      let_once(:assignment) { course.assignments.create! }
+      let_once(:student) { ::User.create! }
       let(:submissions) { gradebook_history.submissions_set(course, api_context) }
 
-      before do
+      before :once do
         course.enroll_student(student)
         @submission = bare_submission_model(assignment, student)
       end
 
       context 'when the submission has been graded' do
-        before do
+        before :once do
           @submission.graded_at = Time.now.in_time_zone
           @submission.save!
         end

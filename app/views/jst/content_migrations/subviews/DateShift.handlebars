@@ -1,32 +1,52 @@
 <div class="controls">
-  <label class="checkbox" for="dateShiftCheckbox">
-    {{checkbox "date_shift_options.shift_dates" id="dateShiftCheckbox"}}
+  <label class="checkbox" for="dateAdjustCheckbox">
+    {{checkbox "adjust_dates.enabled" id="dateAdjustCheckbox"}}
     {{#t "checkbox_label"}}Adjust events and due dates{{/t}}
   </label>
 </div>
 
-<div class="dateShiftContent" style="display:none">
+<div class="dateAdjustContent" style="display:none">
   <br />
-  <div class="control-group">
-    <label class="control-label"><strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong></label>
-    <div class="controls">
-      <div class="pull-left"><input type="text" name="date_shift_options[old_start_date]" id="oldStartDate" class="span2" title="{{#t "old_start_date_title"}}Beginning date{{/t}}" aria-label="{{#t "old_start_date_label"}}Beginning date{{/t}}"></div>
-      <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_start_date]" id="newStartDate" class="span2" title="{{#t "new_start_date_title"}}Change beginning date to{{/t}}" aria-label="{{#t "new_start_date_label"}}Change beginning date to{{/t}}"></div>
+    <div class="control-group">
+      <label class="control-label"><strong>{{#t "date_adjustment"}}Date adjustment{{/t}}</strong></label>
+      <div class="controls">
+        <div class="radio">
+          <label>
+            <input type="radio" name="adjust_dates[operation]" checked id="dateShiftOption" value="shift_dates">
+            {{#t "shift_dates"}}Shift dates{{/t}}
+          </label>
+        </div>
+        <div class="radio">
+          <label>
+            <input type="radio" name="adjust_dates[operation]" id="dateRemoveOption" value="remove_dates">
+            {{#t "remove_dates"}}Remove dates{{/t}}
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group">
-    <label class="control-label"><strong>{{#t "ending_date"}}Ending date{{/t}}</strong></label>
-    <div class="controls">
-      <div class="pull-left"><input type="text" name="date_shift_options[old_end_date]" id="oldEndDate" class="span2" title="{{#t "old_end_date_title"}}Ending date{{/t}}" aria-label="{{#t "old_end_date_label"}}Ending date{{/t}}"></div>
-      <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_end_date]" id="newEndDate" class="span2" title="{{#t "new_end_date_title"}}Change ending date to{{/t}}" aria-label="{{#t "new_end_date_label"}}Change ending date to{{/t}}"></div>
-    </div>
-  </div>
+    <div class="dateShiftContent" style="display:none">
+      <div class="control-group">
+        <label class="control-label"><strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong></label>
+        <div class="controls">
+          <div class="pull-left"><input type="text" name="date_shift_options[old_start_date]" id="oldStartDate" class="span2" title="{{#t "old_start_date_title"}}Beginning date{{/t}}" aria-label="{{#t "old_start_date_label"}}Beginning date{{/t}}"></div>
+          <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_start_date]" id="newStartDate" class="span2" title="{{#t "new_start_date_title"}}Change beginning date to{{/t}}" aria-label="{{#t "new_start_date_label"}}Change beginning date to{{/t}}"></div>
+        </div>
+      </div>
 
-  <div class="control-group">
-    <div id="daySubstitution"></div>
-    <div class="controls">
-      <button aria-label="{{#t "add_day_sub_title"}}Add day substitution{{/t}}" href="#" id='addDaySubstitution' class="btn top-margin bottomMargin"><i class="icon-add"></i> {{#t "substitution"}}Substitution{{/t}}</button>
+      <div class="control-group">
+        <label class="control-label"><strong>{{#t "ending_date"}}Ending date{{/t}}</strong></label>
+        <div class="controls">
+          <div class="pull-left"><input type="text" name="date_shift_options[old_end_date]" id="oldEndDate" class="span2" title="{{#t "old_end_date_title"}}Ending date{{/t}}" aria-label="{{#t "old_end_date_label"}}Ending date{{/t}}"></div>
+          <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_end_date]" id="newEndDate" class="span2" title="{{#t "new_end_date_title"}}Change ending date to{{/t}}" aria-label="{{#t "new_end_date_label"}}Change ending date to{{/t}}"></div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div id="daySubstitution"></div>
+        <div class="controls">
+          <button aria-label="{{#t "add_day_sub_title"}}Add day substitution{{/t}}" href="#" id='addDaySubstitution' class="btn top-margin bottomMargin"><i class="icon-add"></i> {{#t "substitution"}}Substitution{{/t}}</button>
+        </div>
+      </div>
     </div>
-  </div>
 </div>

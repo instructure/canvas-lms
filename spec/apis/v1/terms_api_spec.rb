@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe TermsApiController, type: :request do
   describe "index" do
-    before do
+    before :once do
       @account = Account.create(name: 'new')
       account_admin_user(account: @account)
       @account.enrollment_terms.scoped.delete_all

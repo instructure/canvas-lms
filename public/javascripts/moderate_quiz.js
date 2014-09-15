@@ -31,6 +31,25 @@ define([
   'jquery.templateData' /* fillTemplateData */,
   'vendor/date' /* Date.parse */
 ], function(I18n, $, timing) {
+  /**
+   * Updates the digit(s) in the "gets X extra minutes" message in a student's
+   * block.
+   *
+   * @param {jQuery} $studentBlock
+   *        Selector to the student block you're updating.
+   *
+   * @param {Number} extraTime
+   *        The submission's extra allotted time.
+   */
+  var updateExtraTime = function($studentBlock, extraTime) {
+    var $extraTime = $studentBlock.find('.extra_time_allowed');
+
+    if (extraTime > 0) {
+      $extraTime.text($extraTime.text().replace(/\s\d+\s/, ' ' + extraTime + ' '));
+    }
+
+    $extraTime.toggle(extraTime > 0);
+  };
 
   window.moderation = {
     updateTimes: function() {
@@ -100,8 +119,9 @@ define([
         .attr('data-started-at', submission.started_at || '')
         .attr('data-end-at', submission.end_at || '')
         .data('timing', null)
-        .find(".extra_time_allowed").showIf(submission.extra_time).end()
         .find(".unlocked").showIf(submission.manually_unlocked);
+
+      updateExtraTime($student, submission.extra_time);
     },
     lastUpdatedAt: "",
     studentsCurrentlyTakingQuiz: false

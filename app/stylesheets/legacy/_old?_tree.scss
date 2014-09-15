@@ -33,8 +33,10 @@ $triangle-edge-size: 5px;
         border-top-color: $button-text-color;
       }
       &.loading:after {
-        width: image-width('ajax-loader-linear.gif');
-        height: image-height('ajax-loader-linear.gif');
+        // these are the height/width of /images/ajax-loader-linear.gif
+        width: 16px;
+        height: 11px;
+
         background: url(/images/ajax-loader-linear.gif);
         content: '';
         display: inline-block;

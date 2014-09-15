@@ -11,7 +11,7 @@ describe "Common Cartridge exporting" do
     content_export.user = user
     content_export.save!
     
-    content_export.export_course_without_send_later
+    content_export.export_without_send_later
     
     content_export.error_messages.length.should == 1
     error = content_export.error_messages.first
@@ -37,7 +37,7 @@ describe "Common Cartridge exporting" do
     end
 
     def run_export(opts = {})
-      @ce.export_course_without_send_later(opts)
+      @ce.export_without_send_later(opts)
       @ce.error_messages.should == []
       @file_handle = @ce.attachment.open :need_local_file => true
       @zip_file = Zip::File.open(@file_handle.path)

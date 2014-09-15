@@ -11,6 +11,8 @@ define [], ->
       @journalCheck = options.journal_check || false
       @excludeSmallMatchesType = options.exclude_small_matches_type
       @excludeSmallMatchesValue = options.exclude_small_matches_value || 0
+      @submitPapersTo =
+        if options.hasOwnProperty('submit_papers_to') then options.submit_papers_to else true
 
     words: =>
       if @excludeSmallMatchesType == 'percent' then "" else @excludeSmallMatchesValue
@@ -27,6 +29,7 @@ define [], ->
       journal_check: @journalCheck
       exclude_small_matches_type: @excludeSmallMatchesType
       exclude_small_matches_value: @excludeSmallMatchesValue
+      submit_papers_to: @submitPapersTo
 
     excludesSmallMatches: =>
       !!@excludeSmallMatchesType?

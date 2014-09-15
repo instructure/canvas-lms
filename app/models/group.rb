@@ -61,6 +61,7 @@ class Group < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
+  has_many :content_exports, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
 
@@ -628,6 +629,10 @@ class Group < ActiveRecord::Base
     permissions_hash.merge(
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
     )
+  end
+
+  def content_exports_visible_to(user)
+    self.content_exports.where(user_id: user)
   end
 
 end

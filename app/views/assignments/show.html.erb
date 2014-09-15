@@ -6,7 +6,7 @@
 <% if @locked && !@locked[:due_at] %>
   <% js_bundle :module_sequence_footer %>
     
-  <h2><%= @assignment.title %></h2>
+  <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
 <% else %>
@@ -20,9 +20,9 @@
   <% if can_do(@assignment, @current_user, :update) %>
     <div class='assignment-title'>
       <div class='title-content'>
-        <h2 class="title">
+        <h1 class="title">
           <%= @assignment.title %>
-        </h2>
+        </h1>
       </div>
       <div class='edit-content'>
         <% if @context.feature_enabled?(:draft_state) %>
@@ -39,9 +39,9 @@
     </div>
   <% else %>
     <!--Student View-->
-    <h2 class="title">
+    <h1 class="title">
       <%= @assignment.title %>
-    </h2>
+    </h1>
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>

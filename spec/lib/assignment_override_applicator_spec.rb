@@ -19,8 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssignmentOverrideApplicator do
-  cache_write_method = CANVAS_RAILS2 ? :write : :write_entry
-
   def create_group_override
     @category = group_category
     @group = @category.groups.create!(context: @course)
@@ -35,10 +33,17 @@ describe AssignmentOverrideApplicator do
     @membership = @group.add_user(@student)
   end
 
+  def create_assignment(*args)
+    # need to make sure it doesn't invalidate the cache right away
+    Timecop.freeze(5.seconds.ago) do
+      assignment_model(*args)
+    end
+  end
+
   describe "assignment_overridden_for" do
     before :each do
       student_in_course
-      @assignment = assignment_model(:course => @course)
+      @assignment = create_assignment(:course => @course)
     end
 
     it "should note the user id for whom overrides were applied" do
@@ -131,7 +136,7 @@ describe AssignmentOverrideApplicator do
   describe "overrides_for_assignment_and_user" do
     before :each do
       student_in_course
-      @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+      @assignment = create_assignment(:course => @course, :due_at => 5.days.from_now)
     end
 
     context 'it works' do
@@ -143,7 +148,7 @@ describe AssignmentOverrideApplicator do
       it "should cache by assignment and user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-          Rails.cache.expects(cache_write_method).never
+          Rails.cache.expects(:write_entry).never
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
         end
       end
@@ -151,8 +156,8 @@ describe AssignmentOverrideApplicator do
       it "should distinguish cache by assignment" do
         enable_cache do
           overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-          assignment = assignment_model
-          Rails.cache.expects(cache_write_method)
+          assignment = create_assignment
+          Rails.cache.expects(:write_entry)
           overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
         end
       end
@@ -164,7 +169,7 @@ describe AssignmentOverrideApplicator do
           @assignment.versions.count.should == 2
           enable_cache do
             AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
-            Rails.cache.expects(cache_write_method)
+            Rails.cache.expects(:write_entry)
             AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
           end
         end
@@ -174,7 +179,7 @@ describe AssignmentOverrideApplicator do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           user = user_model
-          Rails.cache.expects(cache_write_method)
+          Rails.cache.expects(:write_entry)
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, user)
         end
       end
@@ -388,7 +393,7 @@ describe AssignmentOverrideApplicator do
 
         it "should only use the latest due_date for student_view_student" do
           due_at = 3.days.from_now
-          a = assignment_model(:course => @course)
+          a = create_assignment(:course => @course)
           cs1 = @course.course_sections.create!
           override1 = assignment_override_model(:assignment => a)
           override1.set = cs1
@@ -408,7 +413,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "should not include section overrides for sections without an enrollment" do
-          assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+          assignment = create_assignment(:course => @course, :due_at => 5.days.from_now)
           override = assignment_override_model(:assignment => assignment)
           override.set = @course.course_sections.create!
           override.save!
@@ -659,7 +664,7 @@ describe AssignmentOverrideApplicator do
   describe "assignment_with_overrides" do
     before :each do
       Time.zone == 'Alaska'
-      @assignment = assignment_model(
+      @assignment = create_assignment(
         :due_at => 5.days.from_now,
         :unlock_at => 4.days.from_now,
         :lock_at => 6.days.from_now,
@@ -714,41 +719,36 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should copy pre-loaded associations" do
-      if CANVAS_RAILS2
-        @overridden.loaded_context?.should == @assignment.loaded_context?
-        @overridden.loaded_rubric?.should == @assignment.loaded_rubric?
-      else
-        @overridden.association(:context).loaded?.should == @assignment.association(:context).loaded?
-        @overridden.association(:rubric).loaded?.should == @assignment.association(:rubric).loaded?
-      end
+      @overridden.association(:context).loaded?.should == @assignment.association(:context).loaded?
+      @overridden.association(:rubric).loaded?.should == @assignment.association(:rubric).loaded?
       @overridden.learning_outcome_alignments.loaded? == @assignment.learning_outcome_alignments.loaded?
     end
   end
 
   describe "collapsed_overrides" do
     it "should cache by assignment and overrides" do
-      @assignment = assignment_model
+      @assignment = create_assignment
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-        Rails.cache.expects(cache_write_method).never
+        Rails.cache.expects(:write_entry).never
         overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
       end
     end
 
     it "should distinguish cache by assignment" do
-      @assignment = assignment_model
-      @override = assignment_override_model(:assignment => @assignment)
+      @assignment1 = create_assignment
+      @assignment2 = create_assignment
+      @override = assignment_override_model(:assignment => @assignment1)
       enable_cache do
-        AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-        assignment = assignment_model
-        Rails.cache.expects(cache_write_method)
-        AssignmentOverrideApplicator.collapsed_overrides(assignment, [@override])
+        AssignmentOverrideApplicator.collapsed_overrides(@assignment1, [@override])
+        Rails.cache.expects(:write_entry)
+        AssignmentOverrideApplicator.collapsed_overrides(@assignment2, [@override])
       end
     end
 
     it "should distinguish cache by assignment updated_at" do
-      @assignment = assignment_model
+      @assignment = create_assignment
       Timecop.travel Time.now + 1.hour do
         @assignment.due_at = 5.days.from_now
         @assignment.save!
@@ -757,25 +757,25 @@ describe AssignmentOverrideApplicator do
         enable_cache do
           @assignment.versions.first.updated_at.should_not == @assignment.versions.current.model.updated_at
           AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.first.model, [@override])
-          Rails.cache.expects(cache_write_method)
+          Rails.cache.expects(:write_entry)
           AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.current.model, [@override])
         end
       end
     end
 
     it "should distinguish cache by overrides" do
-      @assignment = assignment_model
+      @assignment = create_assignment
       @override1 = assignment_override_model(:assignment => @assignment)
       @override2 = assignment_override_model(:assignment => @assignment)
       enable_cache do
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override1])
-        Rails.cache.expects(cache_write_method)
+        Rails.cache.expects(:write_entry)
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override2])
       end
     end
 
     it "should have a collapsed value for each recognized field" do
-      @assignment = assignment_model
+      @assignment = create_assignment
       @override = assignment_override_model(:assignment => @assignment)
       overrides = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
       overrides.class.should == Hash
@@ -784,7 +784,7 @@ describe AssignmentOverrideApplicator do
 
     it "should use raw UTC time for datetime fields" do
       Time.zone = 'Alaska'
-      @assignment = assignment_model(
+      @assignment = create_assignment(
         :due_at => 5.days.from_now,
         :unlock_at => 6.days.from_now,
         :lock_at => 7.days.from_now)
@@ -796,7 +796,7 @@ describe AssignmentOverrideApplicator do
 
     it "should not use raw UTC time for date fields" do
       Time.zone = 'Alaska'
-      @assignment = assignment_model(:due_at => 5.days.from_now)
+      @assignment = create_assignment(:due_at => 5.days.from_now)
       collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
       collapsed[:all_day_date].class.should == Date
       collapsed[:all_day_date].should == @assignment.all_day_date
@@ -846,7 +846,7 @@ describe AssignmentOverrideApplicator do
 
   describe "overridden_due_at" do
     before :each do
-      @assignment = assignment_model(:due_at => 5.days.from_now)
+      @assignment = create_assignment(:due_at => 5.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
 
@@ -911,7 +911,7 @@ describe AssignmentOverrideApplicator do
 
   describe "overridden_unlock_at" do
     before :each do
-      @assignment = assignment_model(:unlock_at => 10.days.from_now)
+      @assignment = create_assignment(:unlock_at => 10.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
 
@@ -973,7 +973,7 @@ describe AssignmentOverrideApplicator do
 
   describe "overridden_lock_at" do
     before :each do
-      @assignment = assignment_model(:lock_at => 5.days.from_now)
+      @assignment = create_assignment(:lock_at => 5.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
 
@@ -1036,7 +1036,7 @@ describe AssignmentOverrideApplicator do
   describe "Overridable#has_no_overrides" do
     before do
       student_in_course
-      @assignment = assignment_model(:course => @course,
+      @assignment = create_assignment(:course => @course,
                                      :due_at => 1.week.from_now)
       o = assignment_override_model(:assignment => @assignment,
                                     :due_at => 1.week.ago)
@@ -1057,7 +1057,7 @@ describe AssignmentOverrideApplicator do
   describe "without_overrides" do
     before :each do
       student_in_course
-      @assignment = assignment_model(:course => @course)
+      @assignment = create_assignment(:course => @course)
     end
 
     it "should return an unoverridden copy of an overridden assignment" do
@@ -1071,7 +1071,7 @@ describe AssignmentOverrideApplicator do
   it "should use the full stack" do
     student_in_course
     original_due_at = 3.days.from_now
-    @assignment = assignment_model(:course => @course)
+    @assignment = create_assignment(:course => @course)
     @assignment.due_at = original_due_at
     @assignment.save!
     @assignment.reload

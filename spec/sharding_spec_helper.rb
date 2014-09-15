@@ -32,17 +32,15 @@ unless SHARDING_ENABLED
     end
   end
 
-  unless CANVAS_RAILS2
-    RSpec.configure do |config|
-      config.before :all do
-        Shard.default.destroy if Shard.default.is_a?(Shard)
-        Shard.default(true)
-      end
+  RSpec.configure do |config|
+    config.before :all do
+      Shard.default.destroy if Shard.default.is_a?(Shard)
+      Shard.default(true)
     end
   end
 end
 
 def specs_require_sharding
   include ShardRSpecHelper
-  include Onceler::Sharding if SHARDING_ENABLED && !CANVAS_RAILS2
+  include Onceler::Sharding if SHARDING_ENABLED
 end

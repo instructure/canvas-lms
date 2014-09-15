@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizIpFiltersController, type: :request do
-  before :each do
-    course_with_teacher_logged_in :active_all => true
+  before :once do
+    course_with_teacher :active_all => true
 
     @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.save!

@@ -22,7 +22,8 @@ class CrocodocSessionsController < ApplicationController
 
   def show
     blob = extract_blob(params[:hmac], params[:blob],
-                        "user_id" => @current_user.global_id)
+                        "user_id" => @current_user.global_id,
+                        "type" => "crocodoc")
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.crocodoc_available?

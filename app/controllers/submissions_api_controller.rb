@@ -208,7 +208,7 @@ class SubmissionsApiController < ApplicationController
     else
       submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
-      submissions = CANVAS_RAILS2 ? submissions.includes(:user) : submissions.preload(:user)
+      submissions = submissions.preload(:user)
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       result = submissions.map do |s|
@@ -335,13 +335,18 @@ class SubmissionsApiController < ApplicationController
   #   a posted_grade in the "points" or "percentage" format is sent, the grade
   #   will only be accepted if the grade equals one of those two values.
   #
+  #
   # @argument rubric_assessment [Optional, RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
   #   format is, for each row in the rubric:
   #
-  #   rubric_assessment[criterion_id][points]:: The points awarded for this row.
-  #   rubric_assessment[criterion_id][comments]:: Comments to add for this row.
+  #   The points awarded for this row.
+  #     rubric_assessment[criterion_id][points]
+  #
+  #   Comments to add for this row.
+  #     rubric_assessment[criterion_id][comments]
+  #
   #
   #   For example, if the assignment rubric is (in JSON format):
   #     !!!javascript

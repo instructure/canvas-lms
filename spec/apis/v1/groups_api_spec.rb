@@ -74,7 +74,7 @@ describe "Groups API", type: :request do
     json
   end
 
-  before do
+  before :once do
     @moderator = user_model
     @member = user_with_pseudonym
 
@@ -312,15 +312,14 @@ describe "Groups API", type: :request do
   end
 
   describe "quota" do
-    before do
+    before :once do
       @account = Account.default
       Setting.set('group_default_quota', 11.megabytes)
     end
 
     context "with manage_storage_quotas permission" do
-      before do
+      before :once do
         account_admin_user :account => @account
-        user_session(@admin)
       end
 
       it "should set the quota on create" do
@@ -339,9 +338,8 @@ describe "Groups API", type: :request do
     end
 
     context "without manage_storage_quotas permission" do
-      before do
+      before :once do
         account_admin_user_with_role_changes(:role_changes => {:manage_storage_quotas => false})
-        user_session(@admin)
       end
 
       it "should ignore the quota on create" do
@@ -766,7 +764,7 @@ describe "Groups API", type: :request do
   end
 
   describe "/preview_html" do
-    before do
+    before :once do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => 'Group 1')
     end

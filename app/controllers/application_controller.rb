@@ -21,11 +21,7 @@
 
 class ApplicationController < ActionController::Base
   def self.promote_view_path(path)
-    if CANVAS_RAILS2
-      self.view_paths.delete path
-    else
-      self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
-    end
+    self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
     prepend_view_path(path)
   end
 
@@ -36,6 +32,7 @@ class ApplicationController < ActionController::Base
   include LocaleSelection
   include Api::V1::User
   include Api::V1::WikiPage
+  include Lti::MessageHelper
   around_filter :set_locale
 
   helper :all
@@ -134,6 +131,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method 'k12?'
 
+  def use_new_styles?
+    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles)
+  end
+  helper_method 'use_new_styles?'
+
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #
@@ -155,10 +157,8 @@ class ApplicationController < ActionController::Base
     @real_current_user || @current_user
   end
 
-  unless CANVAS_RAILS2
-    def rescue_action_dispatch_exception
-      rescue_action_in_public(request.env['action_dispatch.exception'])
-    end
+  def rescue_action_dispatch_exception
+    rescue_action_in_public(request.env['action_dispatch.exception'])
   end
 
   protected
@@ -168,15 +168,23 @@ class ApplicationController < ActionController::Base
       infer_locale :context => @context,
                    :user => @current_user,
                    :root_account => @domain_root_account,
+                   :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
     }
   end
 
   def set_locale
+    store_session_locale
     assign_localizer
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def store_session_locale
+    return unless locale = params[:session_locale]
+    supported_locales = I18n.available_locales.map(&:to_s)
+    session[:locale] = locale if supported_locales.include? locale
   end
 
   def init_body_classes
@@ -214,8 +222,6 @@ class ApplicationController < ActionController::Base
   end
 
   def set_response_headers
-    headers['X-UA-Compatible'] = 'IE=Edge,chrome=1' if CANVAS_RAILS2
-
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
@@ -564,8 +570,8 @@ class ApplicationController < ActionController::Base
         assignment_scope = :published_assignments
       end
 
-      @groups = @context.assignment_groups.active.includes(assignment_scope)
-      @assignments = @groups.flat_map{|grp| grp.visible_assignments(@current_user)}
+      @groups = @context.assignment_groups.active
+      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups)
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
         [[Assignment.published.for_course(courses).all,
@@ -723,7 +729,6 @@ class ApplicationController < ActionController::Base
     if !@context || (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
       @problem ||= t("#application.errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
       @problem ||= t "#application.errors.feed_not_found", "Could not find feed."
-      params[:format] = 'html' if CANVAS_RAILS2
       render template: "shared/unauthorized_feed", status: :bad_request, formats: [:html]
       return false
     end
@@ -870,42 +875,40 @@ class ApplicationController < ActionController::Base
     true
   end
 
-  unless CANVAS_RAILS2
-    rescue_from Exception, :with => :rescue_exception
+  rescue_from Exception, :with => :rescue_exception
 
-    # analogous to rescue_action_without_handler from ActionPack 2.3
-    def rescue_exception(exception)
-      ActiveSupport::Deprecation.silence do
-        message = "\n#{exception.class} (#{exception.message}):\n"
-        message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
-        message << "  " << exception.backtrace.join("\n  ")
-        logger.fatal("#{message}\n\n")
-      end
-
-      if config.consider_all_requests_local || local_request?
-        rescue_action_locally(exception)
-      else
-        rescue_action_in_public(exception)
-      end
+  # analogous to rescue_action_without_handler from ActionPack 2.3
+  def rescue_exception(exception)
+    ActiveSupport::Deprecation.silence do
+      message = "\n#{exception.class} (#{exception.message}):\n"
+      message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
+      message << "  " << exception.backtrace.join("\n  ")
+      logger.fatal("#{message}\n\n")
     end
 
-    def interpret_status(code)
-      message = Rack::Utils::HTTP_STATUS_CODES[code]
-      code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
-      "#{code} #{message}"
+    if config.consider_all_requests_local || local_request?
+      rescue_action_locally(exception)
+    else
+      rescue_action_in_public(exception)
     end
+  end
 
-    def response_code_for_rescue(exception)
-      ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
-    end
+  def interpret_status(code)
+    message = Rack::Utils::HTTP_STATUS_CODES[code]
+    code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
+    "#{code} #{message}"
+  end
 
-    def render_optional_error_file(status)
-      path = "#{Rails.public_path}/#{status.to_s[0,3]}#{".html" if CANVAS_RAILS2}"
-      if File.exist?(path)
-        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
-      else
-        head status
-      end
+  def response_code_for_rescue(exception)
+    ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
+  end
+
+  def render_optional_error_file(status)
+    path = "#{Rails.public_path}/#{status.to_s[0,3]}"
+    if File.exist?(path)
+      render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
+    else
+      head status
     end
   end
 
@@ -927,7 +930,7 @@ class ApplicationController < ActionController::Base
           :user_agent => request.headers['User-Agent'],
           :request_context_id => RequestContextGenerator.request_id,
           :account => @domain_root_account,
-          :request_method => CANVAS_RAILS2 ? request.method : request.request_method_symbol,
+          :request_method => request.request_method_symbol,
           :format => request.format,
         }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
       end
@@ -973,11 +976,6 @@ class ApplicationController < ActionController::Base
           :message => message,
         }
     end
-  end
-
-  if CANVAS_RAILS2
-    rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
-    rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
   end
 
   def rescue_action_in_api(exception, error_report, response_code)
@@ -1161,7 +1159,13 @@ class ApplicationController < ActionController::Base
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, launch_url: @resource_url, link_code: @opaque_id, overrides: {'resource_link_title' => @resource_title})
+        opts = {
+            launch_url: @resource_url,
+            link_code: @opaque_id,
+            overrides: {'resource_link_title' => @resource_title},
+            custom_substitutions: common_variable_substitutions
+        }
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
         if @assignment
           @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         else
@@ -1401,17 +1405,6 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  # calls send_file if the io has a local file, or send_data otherwise
-  # make sure to rewind the io first, if necessary
-  def send_file_or_data(io, opts = {})
-    cancel_cache_buster
-    if io.respond_to?(:path) && io.path.present? && File.file?(io.path)
-      send_file(io.path, opts)
-    else
-      send_data(io, opts)
-    end
-  end
-
   def verified_file_download_url(attachment, *opts)
     file_download_url(attachment, { :verifier => attachment.uuid }, *opts)
   end
@@ -1501,11 +1494,7 @@ class ApplicationController < ActionController::Base
       json = options.delete(:json)
       unless json.is_a?(String)
         json_cast(json)
-        if CANVAS_RAILS2
-          json = MultiJson.dump(json).force_encoding(Encoding::ASCII_8BIT)
-        else
-          json = ActiveSupport::JSON.encode(json)
-        end
+        json = ActiveSupport::JSON.encode(json)
       end
 
       # prepend our CSRF protection to the JSON response, unless this is an API
@@ -1675,22 +1664,6 @@ class ApplicationController < ActionController::Base
     data[:common_contexts] = [] + common_courses + common_groups
     data[:known_user] = known_user
     data
-  end
-
-  if CANVAS_RAILS2
-    filter_parameter_logging *LoggingFilter.filtered_parameters
-
-    # filter out sensitive parameters in the query string as well when logging
-    # the rails "Completed in XXms" line.
-    # this is fixed in Rails 3.x
-    def complete_request_uri
-      uri = LoggingFilter.filter_uri(request.fullpath)
-      "#{request.protocol}#{request.host}#{uri}"
-    end
-
-    def view_context
-      @template
-    end
   end
 
   def self.batch_jobs_in_actions(opts = {})

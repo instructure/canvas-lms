@@ -66,14 +66,12 @@
     }.on('willDestroyElement'),
 
     reset: function() {
-      this.setData();
       this.loadRecords();
-    }.observes('href').on('didInsertElement'),
+    }.on('didInsertElement'),
 
-    setData: function() {
-      this.set('data', Ember.ArrayProxy.create({content: []}));
+    setMeta: function() {
       this.set('meta', Ember.Object.create());
-    },
+    }.on('init'),
 
     loadRecords: function(href) {
       href = href || this.get('href');

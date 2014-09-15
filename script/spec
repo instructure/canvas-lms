@@ -7,15 +7,10 @@ else
   require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined?(Rails)
 end
 
-if CANVAS_RAILS2
-  require 'spec/autorun'
-  exit ::Spec::Runner::CommandLine.run
-else
-  require 'rspec/autorun'
+require 'rspec/autorun'
 #make sure ARGV which is a filelist gets flattened and passed
 #correctly this solution just runs the first file
-  exit ::RSpec::Core::Runner.run(ARGV)
-end
+exit ::RSpec::Core::Runner.run(ARGV)
 
 
 

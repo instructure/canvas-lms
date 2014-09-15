@@ -62,13 +62,13 @@ define [
 
     showAssignmentDetails: (opts={
       assignment:@assignment,
-      students:@gradebook.students
+      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
     })=>
       new AssignmentDetailsDialog(opts)
 
     messageStudentsWho: (opts={
       assignment:@assignment,
-      students:@gradebook.students
+      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
     }) =>
       {students, assignment} = opts
       students = _.map students, (student)=>
@@ -123,7 +123,7 @@ define [
 
     setDefaultGrade: (opts={
       assignment:@assignment,
-      students:@gradebook.students
+      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_id:@gradebook.options.context_id
       selected_section: @gradebook.sectionToShow
     }) =>
@@ -131,7 +131,7 @@ define [
 
     curveGrades: (opts={
       assignment:@assignment,
-      students:@gradebook.students,
+      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_url:@gradebook.options.context_url
     }) =>
       new CurveGradesDialog(opts)

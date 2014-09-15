@@ -19,12 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Polling::PollChoicesController, type: :request do
-  before :each do
-    course_with_teacher_logged_in active_all: true
+  before :once do
+    course_with_teacher active_all: true
   end
 
   describe 'GET index' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: "Example Poll")
       @poll.poll_choices.create!(text: "Poll Choice 1", is_correct:false, position: 1)
       @poll.poll_choices.create!(text: "Poll Choice 3", is_correct:false, position: 3)
@@ -77,7 +77,7 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     context "as a student" do
-      before(:each) do
+      before :once do
         student_in_course(:active_all => true, :course => @course)
       end
 
@@ -101,7 +101,7 @@ describe Polling::PollChoicesController, type: :request do
   end
 
   describe 'GET show' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
       @poll_choice = @poll.poll_choices.create!(text: 'A Poll Choice', is_correct: true)
     end
@@ -125,7 +125,7 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     context "as a student" do
-      before(:each) do
+      before :once do
         student_in_course(:active_all => true, :course => @course)
       end
 
@@ -169,7 +169,7 @@ describe Polling::PollChoicesController, type: :request do
   end
 
   describe 'POST create' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
     end
 
@@ -207,7 +207,7 @@ describe Polling::PollChoicesController, type: :request do
   end
 
   describe 'PUT update' do
-    before :each do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @poll_choice = @poll.poll_choices.create!(text: 'Old Poll Choice', is_correct: true)
     end
@@ -249,7 +249,7 @@ describe Polling::PollChoicesController, type: :request do
   end
 
   describe 'DELETE destroy' do
-    before :each do
+    before :once do
       @poll = @teacher.polls.create!(question: 'A Poll Title')
       @poll_choice = @poll.poll_choices.create!(text: 'Poll Choice', is_correct: true)
     end

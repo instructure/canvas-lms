@@ -117,6 +117,7 @@ class Submission < ActiveRecord::Base
   before_save :check_url_changed
   before_create :cache_due_date
   after_save :touch_user
+  after_save :touch_graders
   after_save :update_assignment
   after_save :update_attachment_associations
   after_save :submit_attachments_to_canvadocs
@@ -418,6 +419,12 @@ class Submission < ActiveRecord::Base
       assignment.turnitin_enabled?
   end
 
+  def touch_graders
+    if self.assignment && self.user && self.assignment.context.is_a?(Course)
+      self.assignment.context.admins.each(&:touch)
+    end
+  end
+
   def update_assignment
     self.send_later(:context_module_action) unless @assignment_changed_not_sub
     true
@@ -620,6 +627,7 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission = Hash[
       submissions.map { |s|
         attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+        attachment_ids << s.attachment_id if s.attachment_id
         [s, attachment_ids]
       }
     ]

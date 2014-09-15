@@ -1,7 +1,3 @@
-if !CANVAS_RAILS3
-  require 'fake_arel'
-end
-
 module CanvasStringex
   require "lucky_sneaks/string_extensions"
   require "lucky_sneaks/unidecoder"

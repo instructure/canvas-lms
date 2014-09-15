@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require 'cassandra_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../../lib/data_fixup/fix_audit_log_uuid_indexes')
 
 describe DataFixup::FixAuditLogUuidIndexes do
+
+  include_examples "cassandra audit logs"
 
   subject do
     DataFixup::FixAuditLogUuidIndexes

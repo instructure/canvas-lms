@@ -21,11 +21,7 @@
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Api::V1::DiscussionTopics
   include Api
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
 
   attr_accessible :discussion_topic
 
@@ -40,10 +36,18 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   def self.for(discussion_topic)
     discussion_topic.shard.activate do
-      unique_constraint_retry do
-        self.find_by_discussion_topic_id(discussion_topic.id) ||
-          self.create!(:discussion_topic => discussion_topic)
+      # first try to pull the view from the slave. we can't just do this in the
+      # unique_constraint_retry since it begins a transaction.
+      view = Shackles.activate(:slave) { self.find_by_discussion_topic_id(discussion_topic.id) }
+      if !view
+        # if the view wasn't found, drop into the unique_constraint_retry
+        # transaction loop on master.
+        unique_constraint_retry do
+          view = self.find_by_discussion_topic_id(discussion_topic.id) ||
+            self.create!(:discussion_topic => discussion_topic)
+        end
       end
+      view
     end
   end
 

@@ -19,9 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
 describe UserContent, type: :request do
-  it "should translate course file download links to directly-downloadable urls" do
-    course_with_teacher_logged_in(:active_all => true)
+  before :once do
+    course_with_teacher(:active_all => true)
     attachment_model
+  end
+
+  it "should translate course file download links to directly-downloadable urls" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -39,7 +42,6 @@ describe UserContent, type: :request do
   end
 
   it "should translate group file download links to directly-downloadable urls" do
-    course_with_teacher_logged_in(:active_all => true)
     @group = @course.groups.create!(:name => "course group")
     attachment_model(:context => @group)
     @group.add_user(@teacher)
@@ -60,8 +62,6 @@ describe UserContent, type: :request do
   end
 
   it "should translate file download links to directly-downloadable urls for deleted and replaced files" do
-    course_with_teacher_logged_in(:active_all => true)
-    attachment_model
     @attachment.destroy
     attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
     @context.attachments.find(@attachment.id).id.should == attachment2.id
@@ -83,7 +83,6 @@ describe UserContent, type: :request do
   end
 
   it "should not corrupt absolute links" do
-    course_with_teacher_logged_in
     attachment_model(:context => @course)
     @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
     <p>
@@ -116,8 +115,6 @@ describe UserContent, type: :request do
   end
 
   it "should translate file preview links to directly-downloadable preview urls" do
-    course_with_teacher_logged_in(:active_all => true)
-    attachment_model
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -135,8 +132,6 @@ describe UserContent, type: :request do
   end
 
   it "should translate media comment links to embedded video tags" do
-    course_with_teacher_logged_in(:active_all => true)
-    attachment_model
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -165,8 +160,6 @@ describe UserContent, type: :request do
   end
 
   it "should translate media comment audio tags" do
-    course_with_teacher_logged_in(:active_all => true)
-    attachment_model
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -191,8 +184,6 @@ describe UserContent, type: :request do
   end
 
   it "should not translate links in content not viewable by user" do
-    course_with_teacher_logged_in(:active_all => true)
-    attachment_model
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -217,7 +208,6 @@ describe UserContent, type: :request do
   end
 
   it "should prepend the hostname to all absolute-path links" do
-    course_with_teacher_logged_in(:active_all => true)
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -245,7 +235,6 @@ describe UserContent, type: :request do
   end
 
   it "should not choke on funny email addresses" do
-    course_with_teacher_logged_in(:active_all => true)
     @wiki_page = @course.wiki.front_page
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
@@ -258,7 +247,6 @@ describe UserContent, type: :request do
   context "data api endpoints" do
     context "course context" do
       it "should process links to each type of object" do
-        course_with_teacher_logged_in(:active_all => true)
         @wiki_page = @course.wiki.front_page
         @wiki_page.body = <<-HTML
         <p>
@@ -338,7 +326,6 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "should process links to each type of object" do
-        course_with_teacher_logged_in(:active_all => true)
         @topic = @course.discussion_topics.create!(:message => <<-HTML)
             <a href='/users/#{@teacher.id}/files'>file index</a>
             <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
@@ -421,11 +408,39 @@ describe UserContent, type: :request do
       doc = Nokogiri::HTML::DocumentFragment.parse(html)
       doc.at_css('a')['href'].should == url
     end
+
+    context "with verified user-context file links" do
+      before do
+        user
+        attachment_model :context => @user
+      end
+
+      def confirm_url_stability(url)
+        link = %Q{<a href="#{url}">what</a>a>}
+        html = tester.process_incoming_html_content(link)
+        doc = Nokogiri::HTML::DocumentFragment.parse(html)
+        doc.at_css('a')['href'].should == url
+      end
+
+      it "ignores them when scoped to the file" do
+        url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        confirm_url_stability(url)
+      end
+
+      it "ignores them when scoped to the user" do
+        url = "/users/#{@user.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        confirm_url_stability(url)
+      end
+
+      it "ignores them when they include the host" do
+        url = "http://somedomain.instructure.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        confirm_url_stability(url)
+      end
+    end
   end
 
   describe ".api_bulk_load_user_content_attachments" do
     it "returns a hash of assignment_id => assignment" do
-      course_with_teacher_logged_in(:active_all => true)
       a1, a2, a3 = attachment_model, attachment_model, attachment_model
       html1, html2 = <<-HTML1, <<-HTML2
         <a href="/courses/#{@course.id}/files/#{a1.id}/download">uh...</a>

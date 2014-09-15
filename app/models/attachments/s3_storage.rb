@@ -18,8 +18,13 @@ class Attachments::S3Storage
     # note that GC of the S3 bucket isn't yet implemented,
     # so there's a bit of a cost here
     if !attachment.s3object.exists?
+      if !attachment.size
+        attachment.size = bucket.objects[old_full_filename].head[:content_length]
+      end
       bucket.objects[old_full_filename].copy_to(attachment.full_filename, {
-        :acl => attachment.attachment_options[:s3_access]
+        :acl => attachment.attachment_options[:s3_access],
+        :use_multipart_copy => (attachment.size >= 5.gigabytes),
+        :content_length => attachment.size
       })
     end
   end

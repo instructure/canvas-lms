@@ -94,7 +94,7 @@ class ChoiceInteraction < AssessmentItemConverter
             answer[:text] = DEFAULT_ANSWER_TEXT
           end
         end
-        if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question'
+        if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question' && choice['identifier'] =~ /true|false/i
           answer[:text] = choice['identifier']
         end
 
@@ -136,7 +136,7 @@ class ChoiceInteraction < AssessmentItemConverter
       elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
         migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
         migration_id = migration_id.sub('.', '_') if is_either_or
-        answer = answers_hash[migration_id]
+        answer = answers_hash[migration_id] || answers_hash.values.detect{|a| a[:text] == migration_id}
         answer[:weight] = get_response_weight(cond)
         answer[:feedback_id] ||= get_feedback_id(cond)
       elsif cond.at_css('member variable[identifier=RESP_MC]')

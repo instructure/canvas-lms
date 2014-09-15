@@ -262,7 +262,7 @@ module ApplicationHelper
   def variant_name_for(bundle_name)
     if k12?
       variant = '_k12'
-    elsif @domain_root_account.feature_enabled?(:new_styles)
+    elsif use_new_styles?
       variant = '_new_styles'
     else
       variant = '_legacy'
@@ -614,7 +614,7 @@ module ApplicationHelper
       :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
       :title                  => t('#menu.my_courses', "My Courses"),
-      :link_text              => t('#layouts.menu.view_all_enrollments', 'View all courses'),
+      :link_text              => t('#layouts.menu.view_all_or_customize', 'View All or Customize'),
       :edit                   => t("#menu.customize", "Customize")
     }
   end
@@ -733,7 +733,7 @@ module ApplicationHelper
   end
 
   def include_account_css
-    return if params[:global_includes] == '0'
+    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :k12) || @domain_root_account.try(:feature_enabled?, :use_new_styles)
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
@@ -754,14 +754,8 @@ module ApplicationHelper
       attributes['data-tooltip'] ||= 'top'
     end
 
-    if CANVAS_RAILS2 # see config/initializers/rails2.rb
-      content_tag_without_nil_return(tag_type, attributes) do
-        datetime_string(datetime)
-      end
-    else
-      content_tag(tag_type, attributes) do
-        datetime_string(datetime)
-      end
+    content_tag(tag_type, attributes) do
+      datetime_string(datetime)
     end
   end
 

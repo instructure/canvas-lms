@@ -1,0 +1,20 @@
+// these are the mixins that compass provided that we are still using
+
+@mixin pie-clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin clearfix {
+  overflow: hidden;
+}
+
+@mixin hide-text {
+  $approximate_em_value: 12px / 1em;
+  $wider_than_any_screen: -9999em;
+  text-indent: $wider_than_any_screen * $approximate_em_value;
+  overflow: hidden;
+  text-align: left; }

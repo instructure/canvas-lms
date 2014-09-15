@@ -616,7 +616,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_ids_who_have_posted_and_admins
     scope = DiscussionEntry.active.select(:user_id).uniq.where(:discussion_topic_id => self)
-    ids = CANVAS_RAILS2 ? scope.map(&:user_id) : scope.pluck(:user_id)
+    ids = scope.pluck(:user_id)
     ids += self.context.admin_enrollments.active.pluck(:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end

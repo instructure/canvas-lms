@@ -11,9 +11,7 @@ module Alerts
         student_ids.each { |id| data[id] = {} }
         scope = ::UserNote.active.
             where(:created_by_id => teacher_ids, :user_id => student_ids)
-        note_dates = CANVAS_RAILS2 ?
-            scope.maximum(:created_at, :group => [:user_id, :created_by_id]) :
-            scope.group(:user_id, :created_by_id).maximum(:created_at)
+        note_dates = scope.group(:user_id, :created_by_id).maximum(:created_at)
         note_dates.each do |key, date|
           student = data[key.first]
           (student[:last_user_note] ||= {})[key.last] = date

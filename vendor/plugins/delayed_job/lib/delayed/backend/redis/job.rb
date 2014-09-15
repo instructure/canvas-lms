@@ -28,16 +28,11 @@
 #     * have a master auditor that fails jobs if a whole pool dies
 #     * audit strands ocasionally, look for any stuck strands where the strand queue isn't empty but there's no strand job running or queued
 module Delayed::Backend::Redis
-if CANVAS_RAILS2
-  class Job < ActiveRecord::Base; end
-end
 
 class Job
-  unless CANVAS_RAILS2
-    extend ActiveModel::Callbacks
-    define_model_callbacks :create, :save
-    include ActiveModel::Dirty
-  end
+  extend ActiveModel::Callbacks
+  define_model_callbacks :create, :save
+  include ActiveModel::Dirty
   include Delayed::Backend::Base
   # This redis instance needs to be set by the application during jobs configuration
   cattr_accessor :redis
@@ -134,109 +129,88 @@ class Job
   column(:strand, :string)
   column(:source, :string)
 
-  if CANVAS_RAILS2
-    attr_protected
+  def attributes
+    @attributes
+  end
 
-    def self.tableless?
-      true
-    end
+  def self.members
+    if !@members
+      @members = columns.map { |c| c.name.to_sym }
+      @members.each do |m|
+        class_eval <<-RUBY
+          def #{m}
+            attributes[#{m.inspect}]
+          end
 
-    def self.table_exists?
-      # mostly just override this so .inspect doesn't explode
-      true
-    end
-
-    def self.table_name
-      raise "Job has no table"
-    end
-
-    def self.scoped(*a)
-      raise ArgumentError, "Can't scope delayed jobs"
-    end
-  else
-    def attributes
-      @attributes
-    end
-
-    def self.members
-      if !@members
-        @members = columns.map { |c| c.name.to_sym }
-        @members.each do |m|
-          class_eval <<-RUBY
-            def #{m}
-              attributes[#{m.inspect}]
-            end
-
-            def #{m}=(v)
-              #{m}_will_change!
-              attributes[#{m.inspect}] = v
-            end
-          RUBY
-        end
-        define_attribute_methods(@members)
+          def #{m}=(v)
+            #{m}_will_change!
+            attributes[#{m.inspect}] = v
+          end
+        RUBY
       end
-      @members
+      define_attribute_methods(@members)
     end
+    @members
+  end
 
-    def initialize(attrs = {})
-      @attributes = {}.with_indifferent_access
-      self.class.members # make sure accessors are defined
-      attrs.each { |k, v| self.send("#{k}=", v) }
-      self.priority ||= 0
-      self.attempts ||= 0
-      @new_record = true
-    end
+  def initialize(attrs = {})
+    @attributes = {}.with_indifferent_access
+    self.class.members # make sure accessors are defined
+    attrs.each { |k, v| self.send("#{k}=", v) }
+    self.priority ||= 0
+    self.attempts ||= 0
+    @new_record = true
+  end
 
-    def self.instantiate(attrs)
-      result = new(attrs)
-      result.instance_variable_set(:@new_record, false)
-      result
-    end
+  def self.instantiate(attrs)
+    result = new(attrs)
+    result.instance_variable_set(:@new_record, false)
+    result
+  end
 
-    def self.create(attrs = {})
-      result = new(attrs)
-      result.save
-      result
-    end
+  def self.create(attrs = {})
+    result = new(attrs)
+    result.save
+    result
+  end
 
-    def self.create!(attrs = {})
-      result = new(attrs)
-      result.save!
-      result
-    end
+  def self.create!(attrs = {})
+    result = new(attrs)
+    result.save!
+    result
+  end
 
-    def [](key)
-      attributes[key]
-    end
+  def [](key)
+    attributes[key]
+  end
 
-    def []=(key, value)
-      raise NameError unless self.class.members.include?(key.to_sym)
-      attributes[key] = value
-    end
+  def []=(key, value)
+    raise NameError unless self.class.members.include?(key.to_sym)
+    attributes[key] = value
+  end
 
-    def self.find(ids)
-      if Array === ids
-        find_some(ids, {})
-      else
-        find_one(ids, {})
-      end
+  def self.find(ids)
+    if Array === ids
+      find_some(ids, {})
+    else
+      find_one(ids, {})
     end
+  end
 
-    def new_record?
-      !!@new_record
-    end
+  def new_record?
+    !!@new_record
+  end
 
-    def destroyed?
-      !!@destroyed
-    end
+  def destroyed?
+    !!@destroyed
+  end
 
-    def ==(other)
-      other.is_a?(self.class) && id == other.id
-    end
+  def ==(other)
+    other.is_a?(self.class) && id == other.id
+  end
 
-    def hash
-      id.hash
-    end
+  def hash
+    id.hash
   end
 
   def self.reconnect!
@@ -400,33 +374,18 @@ class Job
     save!
   end
 
-  if CANVAS_RAILS2
-    def save(*a)
-      return false if destroyed?
-      callback :before_save
-      result = if new_record?
-                 callback :before_create
-                 create
-               else
-                 update
-               end
-      callback(:after_save) if result
-      result
-    end
-  else
-    def save(*a)
-      return false if destroyed?
-      result = run_callbacks(:save) do
-        if new_record?
-          run_callbacks(:create) { create }
-        else
-          update
-        end
+  def save(*a)
+    return false if destroyed?
+    result = run_callbacks(:save) do
+      if new_record?
+        run_callbacks(:create) { create }
+      else
+        update
       end
-      @previously_changed = changes
-      @changed_attributes.clear
-      result
     end
+    @previously_changed = changes
+    @changed_attributes.clear
+    result
   end
 
   def save!(*a)

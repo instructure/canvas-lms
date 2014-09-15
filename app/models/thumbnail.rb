@@ -33,6 +33,11 @@ class Thumbnail < ActiveRecord::Base
       :keep_profile => true
   )
 
+  before_save :set_namespace
+  def set_namespace
+    self.namespace = attachment.namespace
+  end
+
   def local_storage_path
     "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
   end

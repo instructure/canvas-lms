@@ -16,7 +16,7 @@ define [
 
     render: ->
       datetime = @props.datetime
-      return unless datetime?
+      return React.DOM.time() unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
       fudged = $.fudgeDateForProfileTimezone(datetime)
       timeTitle = $.datetimeString(datetime)

@@ -38,7 +38,6 @@ module Lti
       Lti::LtiOutboundAdapter.consumer_instance_class.new.tap do |consumer_instance|
         consumer_instance.name = @root_account.name
         consumer_instance.lti_guid = @root_account.lti_guid
-        consumer_instance.domain = @root_account.domain
         consumer_instance.id = @root_account.id
         consumer_instance.sis_source_id = @root_account.sis_source_id
       end

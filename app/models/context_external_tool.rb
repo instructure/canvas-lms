@@ -3,6 +3,8 @@ class ContextExternalTool < ActiveRecord::Base
   include SearchTermHelper
 
   has_many :content_tags, :as => :content
+  has_many :context_external_tool_placements, :autosave => true
+
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key,
@@ -24,7 +26,7 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessor :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link
-  after_save :touch_context
+  after_save :touch_context, :check_global_navigation_cache
   validate :check_for_xml_error
 
   workflow do
@@ -43,8 +45,67 @@ class ContextExternalTool < ActiveRecord::Base
   EXTENSION_TYPES = [
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
-    :course_settings_sub_navigation
+    :course_settings_sub_navigation, :global_navigation
   ]
+
+  EXTENSION_TYPES.each do |type|
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{type}(setting=nil)
+        extension_setting(:#{type}, setting)
+      end
+
+      def #{type}=(hash)
+        set_extension_setting(:#{type}, hash)
+      end
+    RUBY
+  end
+
+  def extension_setting(type, property = nil)
+    type = type.to_sym
+    return settings[type] unless property && settings[type]
+    settings[type][property] || settings[property] || extension_default_value(property)
+  end
+
+  def set_extension_setting(type, hash)
+    if !hash || !hash.is_a?(Hash)
+      settings.delete type
+      return
+    end
+
+    hash = hash.with_indifferent_access
+    hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
+    settings[type] = {}.with_indifferent_access
+
+    extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
+                      :selection_height, :selection_width, :text, :url, :message_type]
+    extension_keys += {
+        :visibility => lambda{|v| %w{members admins}.include?(v)}
+    }.to_a
+
+    extension_keys.each do |key, validator|
+      if hash.has_key?(key) && (!validator || validator.call(hash[key]))
+        settings[type][key] = hash[key]
+      end
+    end
+
+    settings[type]
+  end
+
+  def has_placement?(type)
+    self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
+  end
+
+  def set_placement!(type, value=true)
+    raise "invalid type" unless EXTENSION_TYPES.include?(type.to_sym)
+    if value
+      self.context_external_tool_placements.new(:placement_type => type.to_s) unless has_placement?(type)
+    else
+      if self.persisted?
+        self.context_external_tool_placements.for_type(type).delete_all
+      end
+      self.context_external_tool_placements.delete_if{|p| p.placement_type == type.to_s}
+    end
+  end
 
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
@@ -189,90 +250,6 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:custom_fields]
   end
 
-  def course_navigation=(hash)
-    tool_setting(:course_navigation, hash, :default) { |nav_settings|
-      if hash[:visibility] == 'members' || hash[:visibility] == 'admins'
-        nav_settings[:visibility] = hash[:visibility]
-      end
-    }
-  end
-
-  def course_navigation(setting = nil)
-    extension_setting(:course_navigation, setting)
-  end
-
-  def account_navigation=(hash)
-    tool_setting(:account_navigation, hash)
-  end
-
-  def account_navigation(setting = nil)
-    extension_setting(:account_navigation, setting)
-  end
-
-  def user_navigation=(hash)
-    tool_setting(:user_navigation, hash)
-  end
-
-  def user_navigation(setting = nil)
-    extension_setting(:user_navigation, setting)
-  end
-
-  def resource_selection=(hash)
-    tool_setting(:resource_selection, hash, :selection_width, :selection_height, :icon_url)
-  end
-
-  def resource_selection(setting = nil)
-    extension_setting(:resource_selection, setting)
-  end
-
-  def editor_button=(hash)
-    tool_setting(:editor_button, hash, :selection_width, :selection_height, :icon_url)
-  end
-
-  def editor_button(setting = nil)
-    extension_setting(:editor_button, setting)
-  end
-
-  def homework_submission=(hash)
-    tool_setting(:homework_submission, hash, :selection_width, :selection_height, :icon_url)
-  end
-
-  def homework_submission(setting = nil)
-    extension_setting(:homework_submission, setting)
-  end
-
-  def migration_selection=(hash)
-    tool_setting(:migration_selection, hash, :selection_width, :selection_height, :icon_url)
-  end
-
-  def migration_selection(setting = nil)
-    extension_setting(:migration_selection, setting)
-  end
-
-  def course_home_sub_navigation=(hash)
-    tool_setting(:course_home_sub_navigation, hash, :icon_url) do |tool_settings|
-      if %w(members admins).include?(hash[:visibility])
-        tool_settings[:visibility] = hash[:visibility]
-      end
-    end
-  end
-
-  def course_home_sub_navigation(setting = nil)
-    extension_setting(:course_home_sub_navigation, setting)
-  end
-
-  def course_settings_sub_navigation=(hash)
-    tool_setting(:course_settings_sub_navigation, hash, :icon_url) do |tool_settings|
-      if %w(members admins).include?(hash[:visibility])
-        tool_settings[:visibility] = hash[:visibility]
-      end
-    end
-  end
-
-  def course_settings_sub_navigation(setting = nil)
-    extension_setting(:course_settings_sub_navigation, setting)
-  end
-
   def icon_url=(i_url)
     settings[:icon_url] = i_url
   end
@@ -295,12 +272,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   def display_type(extension_type)
     extension_setting(extension_type, :display_type) || 'in_context'
-  end
-
-  def extension_setting(type, property = nil)
-    type = type.to_sym
-    return settings[type] unless property && settings[type]
-    settings[type][property] || settings[property] || extension_default_value(property)
   end
 
   def extension_default_value(property)
@@ -340,8 +311,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings.delete(:editor_button) if !editor_button(:icon_url)
 
     EXTENSION_TYPES.each do |type|
-      message = "has_#{type}="
-      self.send(message, !!settings[type]) if self.respond_to?(message)
+      set_placement!(type, !!settings[type])
     end
     true
   end
@@ -466,6 +436,11 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   def self.all_tools_for(context, options={})
+    if [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation].include?(options[:type])
+      return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
+          (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    end
+
     contexts = []
     if options[:user]
       contexts << options[:user]
@@ -474,7 +449,9 @@ class ContextExternalTool < ActiveRecord::Base
     return nil if contexts.empty?
 
     tools = contexts.each_with_object([]) do |context, tools|
-      tools.concat context.context_external_tools.active
+      scope = context.context_external_tools.active
+      scope = scope.having_setting(options[:type]) if options[:type]
+      tools.concat scope
     end
     Canvas::ICU.collate_by(tools, &:name)
   end
@@ -522,7 +499,8 @@ class ContextExternalTool < ActiveRecord::Base
     nil
   end
 
-  scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
+  scope :having_setting, lambda { |setting| setting ? joins(:context_external_tool_placements).
+      where("context_external_tool_placements.placement_type = ?", setting) : scoped }
 
   def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)
@@ -616,26 +594,41 @@ class ContextExternalTool < ActiveRecord::Base
     Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
   end
 
-  def tool_setting(setting, hash, *keys)
-    if !hash || !hash.is_a?(Hash)
-      settings.delete setting
-      return
-    else
-      settings[setting] = {}.with_indifferent_access
+  def check_global_navigation_cache
+    if self.context.is_a?(Account) && self.context.root_account?
+      %w{members admins}.each do |visibility|
+        Rails.cache.delete("external_tools/global_navigation/#{self.context.asset_string}/#{visibility}")
+      end
     end
+  end
 
-    hash = hash.with_indifferent_access
+  def self.global_navigation_visibility_for_user(root_account, user)
+    Rails.cache.fetch(['external_tools/global_navigation/visibility', root_account.asset_string, user].cache_key) do
+      # let them see admin level tools if there are any courses they can manage
+      if root_account.grants_right?(user, :manage_content) ||
+        Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists?
+        'admins'
+      else
+        'members'
+      end
+    end
+  end
 
-    settings[setting][:url] = hash[:url] if hash[:url]
-    settings[setting][:text] = hash[:text] if hash[:text]
-    settings[setting][:display_type] = hash[:display_type] if hash[:display_type]
-    settings[setting][:custom_fields] = hash[:custom_fields] if hash[:custom_fields]
-    settings[setting][:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash.has_key?(:enabled)
-    keys.each { |key| settings[setting][key] = hash[key] if hash.has_key?(key) }
+  def self.global_navigation_tools(root_account, visibility)
+    tools = root_account.context_external_tools.active.having_setting(:global_navigation)
+    if visibility == 'members'
+      # reject the admin only tools
+      tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+    end
+    tools
+  end
 
-    # if the type needs to do some validations for specific keys
-    yield settings[setting] if block_given?
-
-    settings[setting]
+  def self.global_navigation_menu_cache_key(root_account, visibility)
+    # only reload the menu if one of the global nav tools has changed
+    key = "external_tools/global_navigation/#{root_account.asset_string}/#{visibility}"
+    Rails.cache.fetch(key) do
+      tools = global_navigation_tools(root_account, visibility)
+      Digest::MD5.hexdigest(tools.map(&:cache_key).join('/'))
+    end
   end
 end

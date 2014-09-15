@@ -47,7 +47,6 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
         return if @isDestroying
 
         @tooltip = @createTooltip()
-        @$progressBar = @tooltip.options.content().find('.bar')
     ).observes('controller.file')
 
     removeTooltip: (->
@@ -69,7 +68,8 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
         return if @isDestroying
 
         @repositionTooltip()
-        @$progressBar.css {
+        $progressBar = @tooltip.options.content().find('.bar')
+        $progressBar.css {
           width: "#{@get('controller.progress.completion')}%"
         }
     ).observes('controller.progress.completion')

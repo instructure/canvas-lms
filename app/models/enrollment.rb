@@ -849,7 +849,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
+    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users, :read_roster)}
     can :read
 
     given { |user| self.user == user }
@@ -912,7 +912,7 @@ class Enrollment < ActiveRecord::Base
     scope = self.order(clause)
     if scope.select_values.present?
       scope = scope.select(clause)
-    elsif !CANVAS_RAILS2
+    else
       scope = scope.select(self.arel_table[Arel.star])
     end
     scope

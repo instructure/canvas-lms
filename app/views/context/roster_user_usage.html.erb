@@ -8,7 +8,7 @@
     <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
   </div>
 <% end %>
-<h2><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h2>
+<h1><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h1>
 <% content_for :stylesheets do %>
 <style>
 #usage_report table {

@@ -1,0 +1,214 @@
+// Shared between:
+// - course_settings/compiler-course_settings.scss
+// - account-settings/account-settings.scss
+
+$app_width: 260px;
+$app_height: 145px;
+
+.star-sprite {
+  display: block;
+  width: 46px;
+  height: 8px;
+  margin-top: 5px;
+  overflow: hidden;
+  background-image: url(/images/star-sprite.png);
+  background-position: 0px 0px;
+  &.star-sprite-1 {
+    background-position: 0 -8px;
+  }
+  &.star-sprite-2 {
+    background-position: 0 -16px;
+  }
+  &.star-sprite-3 {
+    background-position: 0 -24px;
+  }
+  &.star-sprite-4 {
+    background-position: 0 -32px;
+  }
+  &.star-sprite-5 {
+    background-position: 0 -40px;
+  }
+}
+
+#wrapper-container {
+  min-width: 1280px;
+}
+
+#external_tools {
+  h2 {
+    margin: 10px 0;
+  }
+  p.description {
+    margin-bottom: 15px;
+  }
+  .well {
+    border: none;
+  }
+  .text-right {
+    text-align: right;
+  }
+  .lm {
+    margin-left: 5px;
+  }
+  table {
+    table-layout: fixed;
+  }
+  .external_tool_item {
+    .external_tool {
+      width: 500px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .app-full-view {
+    td {
+      border: none;
+    }
+    td.app-full-view-left {
+      width: 255px;
+    }
+    h2 {
+      margin: 0;
+    }
+    .add_app {
+      margin: 10px 0 5px;
+    }
+    .app_cancel {
+      font-size: 12px;
+    }
+  }
+  .reviews {
+    margin-top: 5px;
+    .avatar {
+      padding-left: 65px;
+      min-height: 65px;
+    }
+    .review-item {
+      border-top: thin solid #eeeeee;
+      padding-top: 10px;
+    }
+    .review-item-header {
+      margin-top: 0px;
+      font-size: 12px;
+      color: #a1a3a2;
+      span {
+        color: #666666;
+      }
+    }
+  }
+  .app_center {
+    .app_list {
+      .app {
+        cursor: pointer;
+        width: $app_width;
+        height: $app_height;
+        position: relative;
+        float: left;
+        border: thin solid #eeeeee;
+        margin: 0 2px 2px 0;
+        .banner_image {
+          width: $app_width - 40;
+          height: $app_height - 40;
+          position: relative;
+          top: 20px;
+          left: 20px;
+        }
+        .details {
+          position: absolute;
+          top: 0px;
+          width: $app_width;
+          height: $app_height;
+          background-color: black;
+          color: white;
+          display: none;
+          .content {
+            padding: 15px;
+            .name {
+              font-weight: bold;
+              font-size: 14px;
+              color: #d6ecfc;
+            }
+            .desc {
+              margin-top: 5px;
+              font-size: 11px;
+              line-height: 17px;
+            }
+          }
+        }
+      }
+    }
+  }
+  .individual-app {
+    .gray-box-centered {
+      text-align: center;
+      color: #666666;
+      background-color: #efefef;
+      padding: 10px;
+    }
+    .individual-app-left {
+      width: 250px;
+      padding-right: 20px;
+      text-align: center;
+      .add_app {
+        margin-top: 10px;
+      }
+      .app_cancel {
+        display: block;
+        margin-top: 5px;
+      }
+    }
+    .individual-app-right {
+      h2 {
+        margin: 0px;
+      }
+      .data-label {
+        color: #888888;
+        text-align: right;
+        padding-right: 10px;
+      }
+      .data-value {
+        ul {
+          margin: 0px;
+          padding: 0px;
+          list-style: none;
+        }
+      }
+      .star-table {
+        margin-bottom: 10px;
+        td {
+          padding: 0px;
+        }
+      }
+    }
+  }
+  .add-review {
+    margin-top: 20px;
+    padding-top: 5px;
+    border-top: thin solid #eeeeee;
+    .rate_app {
+      font-weight: bold;
+    }
+  }
+  .review-item {
+    margin: 0 0 10px 0;
+    td {
+      &.image-and-stars {
+        padding: 10px 0 0 10px;
+        width: 58px;
+        img {
+          max-width: 50px;
+        }
+      }
+      &.review-content {
+        .review-item-header {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+fieldset.rate_app_wrapper {
+  margin: 0px;
+}

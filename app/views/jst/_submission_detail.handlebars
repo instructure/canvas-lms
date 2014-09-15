@@ -1,7 +1,7 @@
 <div class="submission_detail">
   {{#if submission_type}}
     {{#if url}}
-      Submission URL: <a href="{{url}}" title="{{#t "go_to_submission_url"}}Go to submission URL{{/t}}" target="_blank">{{url}}</a>
+      Submission URL: <a class="url-submission" href="{{url}}" title="{{#t "go_to_submission_url"}}Go to submission URL{{/t}}" target="_blank">{{url}}</a>
     {{/if}}
     {{#if attachments}}
       <label>{{#t "submitted_files"}}Submitted files:{{/t}}</label>
@@ -24,7 +24,6 @@
           <span class="turnitin_score_container">{{> turnitinScore}}</span>
         {{/with}}
       {{/if}}
-      {{#t "online_text_entry_see_details_in_the_speedgrader."}}Online Text Entry, <a href="{{speedGraderUrl}}">see details in the SpeedGrader</a>.{{/t}}
     {{/ifEqual}}
   {{else}}
     {{#t "no_submission"}}No submission{{/t}}

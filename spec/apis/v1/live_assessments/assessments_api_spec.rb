@@ -19,17 +19,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe LiveAssessments::AssessmentsController, type: :request do
-  let(:assessment_course) { course(active_all: true) }
-  let(:teacher) { assessment_course.teachers.first }
-  let(:student) { course_with_student(course: assessment_course).user }
-  let(:outcome) do
+  let_once(:assessment_course) { course(active_all: true) }
+  let_once(:teacher) { assessment_course.teachers.first }
+  let_once(:student) { course_with_student(course: assessment_course).user }
+  let_once(:outcome) do
     outcome = assessment_course.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_course.root_outcome_group.add_outcome(outcome)
     assessment_course.root_outcome_group.save!
     assessment_course.reload
     outcome
   end
-  let(:unrelated_outcome) {course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome')}
+  let_once(:unrelated_outcome) {course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome')}
   let(:assessment_hash) {{key: '2014-05-28-Outcome-52', title: 'a test assessment'}}
 
   describe 'POST create' do

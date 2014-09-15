@@ -19,13 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Polling::PollSessionsController, type: :request do
-  before :each do
-    course_with_teacher_logged_in active_all: true
+  before :once do
+    course_with_teacher active_all: true
     @section = @course.course_sections.first
   end
 
   describe 'GET index' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: "Example Poll")
       3.times do |n|
         @poll.poll_sessions.create!(course: @course, course_section: @section)
@@ -81,14 +81,10 @@ describe Polling::PollSessionsController, type: :request do
       )
     end
 
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
       @poll_session = @poll.poll_sessions.new(course: @course, course_section: @section)
       @poll_session.publish!
-    end
-
-    after(:each) do
-      @user = @teacher
     end
 
     def get_show(raw = false, data = {})
@@ -249,7 +245,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'POST create' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
     end
 
@@ -288,7 +284,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'PUT update' do
-    before :each do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
     end
@@ -346,7 +342,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'GET open' do
-    before :each do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
     end
@@ -406,7 +402,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'GET close' do
-    before :each do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
       @poll_session.publish!
@@ -460,7 +456,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'GET opened' do
-    before :each do
+    before :once do
       @course1 = course_model
       @course2 = course_model
       @teacher1 = teacher_in_course(course: @course1).user
@@ -531,7 +527,7 @@ describe Polling::PollSessionsController, type: :request do
   end
 
   describe 'GET closed' do
-    before :each do
+    before :once do
       @course1 = course_model
       @course2 = course_model
       @teacher1 = teacher_in_course(course: @course1).user

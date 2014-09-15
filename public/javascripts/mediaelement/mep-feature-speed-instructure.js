@@ -59,6 +59,10 @@
 
       player.playbackspeed = t.options.defaultSpeed;
 
+      player.$media.on('loadedmetadata', function() {
+        media.playbackRate = parseFloat(player.playbackspeed);
+      });
+
       player.speedButton.on('click', 'input[type=radio]', function() {
         player.playbackspeed = $(this).attr('value');
         media.playbackRate = parseFloat(player.playbackspeed);

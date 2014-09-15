@@ -62,11 +62,7 @@ require 'folio/page'
 require 'paginated_collection'
 require 'json_token'
 
-if CANVAS_RAILS3
-  require 'will_paginate/active_record'
-else
-  require 'fake_arel'
-end
+require 'will_paginate/active_record'
 
 module BookmarkedCollection
   require 'bookmarked_collection/collection'
