@@ -598,4 +598,11 @@ describe ActiveRecord::Base do
       a.user_account_associations.loaded?.should be_false
     end
   end
+
+  describe "callbacks" do
+    it "should use default scope" do
+      Account.before_save { Account.scoped.to_sql.should_not =~ /callbacks something/; true }
+      Account.where(name: 'callbacks something').create!
+    end
+  end
 end

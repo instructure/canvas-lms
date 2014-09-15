@@ -1625,3 +1625,13 @@ if Rails.version < '4'
     end
   end
 end
+
+module UnscopeCallbacks
+  def run_callbacks(kind)
+    scope = self.class.unscoped
+    scope.default_scoped = true
+    scope.scoping { super }
+  end
+end
+
+ActiveRecord::Base.send(:include, UnscopeCallbacks)
