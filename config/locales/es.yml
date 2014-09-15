@@ -288,7 +288,17 @@ es:
     report_header_assignment_id: "ID de la tarea"
     report_header_assignment_title: "Título de la tarea"
     report_header_assignment_url: "URL de la tarea"
+    report_header_associated_user_id: ID_usuario_asociado
     report_header_attempt: intento
+    report_header_canvas_account_id: ID_cuenta_Canvas
+    report_header_canvas_associated_user_id: ID_usuario_asociado_Canvas
+    report_header_canvas_course_id: ID_curso_Canvas
+    report_header_canvas_group_id: ID_grupo_Canvas
+    report_header_canvas_parent_id: ID_primaria_Canvas
+    report_header_canvas_section_id: ID_sección_Canvas
+    report_header_canvas_term_id: ID_período_Canvas
+    report_header_canvas_user_id: ID_usuario_Canvas
+    report_header_canvas_xlist_course_id: ID_curso_xlist_Canvas
     report_header_course: curso
     report_header_course__id: "ID del curso"
     report_header_course_id: "ID del curso"
@@ -315,6 +325,7 @@ es:
     report_header_long_name: "Nombre largo"
     report_header_name: nombre
     report_header_outcome_score: "puntuación del resultado"
+    report_header_parent_account_id: ID_cuenta_primaria
     report_header_role: función
     report_header_section: sección
     report_header_section__id: "ID de la sección"
@@ -342,6 +353,7 @@ es:
     report_header_user_id: "ID del usuario"
     report_header_user_name: "nombre del usuario"
     report_header_user_sis_id: "ID SIS del usuario"
+    report_header_xlist_course_id: ID_curso_xlist
     sis_exporter: 
       reports: "Informes: %{files}"
     student: 
@@ -1161,6 +1173,8 @@ es:
       ta: "Inscripciones de ta"
       teachers: "Inscripciones de profesores"
     user_add_failed_message: "La adición del usuario falló, intente de nuevo"
+    user_added_message: "*%{user}* corectamente agregado"
+    user_added_message_sent_message: "Se ha agregado a *%{user}*. En breve recibirán una confirmación por correo electrónico."
     user_deleted_message: "%{username} borrado con éxito"
     user_inactivity_csv_parameters: 
       account_reports: 
@@ -11821,6 +11835,7 @@ es:
         new_discussion: "Nuevo debate"
         one_question_at_a_time: "Mostrar una pregunta cada vez"
         one_time_results: "Solo una vez después de cada intento"
+        only_visible_to_overrides_note: "Nota: Esta evaluación **solo** se puede ver en las secciones que aparecen a contunaución:"
         points_possible: "Puntos %{n} "
         quiz_title: "Título de la evaluación"
         quiz_type: "Tipo de cuestionario"
