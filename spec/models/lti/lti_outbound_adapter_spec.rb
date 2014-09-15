@@ -172,7 +172,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect { adapter.launch_url }.to raise_error(RuntimeError, 'Called launch_url before calling prepared_tool_launch')
+      expect { adapter.launch_url }.to raise_error(RuntimeError, 'Called launch_url before calling prepare_tool_launch')
     end
   end
 
@@ -186,7 +186,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect { adapter.generate_post_payload }.to raise_error(RuntimeError, 'Called generate_post_payload before calling prepared_tool_launch')
+      expect { adapter.generate_post_payload }.to raise_error(RuntimeError, 'Called generate_post_payload before calling prepare_tool_launch')
     end
   end
 
@@ -224,7 +224,7 @@ describe Lti::LtiOutboundAdapter do
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect {
         adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
-      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling generate_post_payload_for_assignment')
+      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
     end
 
   end
@@ -243,7 +243,7 @@ describe Lti::LtiOutboundAdapter do
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect {
         adapter.generate_post_payload_for_homework_submission(assignment)
-      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling generate_post_payload_for_assignment')
+      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling prepare_tool_launch')
     end
   end
 

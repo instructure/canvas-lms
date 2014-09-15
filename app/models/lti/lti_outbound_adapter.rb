@@ -84,26 +84,26 @@ module Lti
     end
 
     def generate_post_payload
-      raise('Called generate_post_payload before calling prepared_tool_launch') unless @tool_launch
+      raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
       @tool_launch.generate(@overrides)
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
-      raise('Called generate_post_payload_for_assignment before calling generate_post_payload_for_assignment') unless @tool_launch
+      raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url)
       generate_post_payload
     end
 
     def generate_post_payload_for_homework_submission(assignment)
-      raise('Called generate_post_payload_for_homework_submission before calling generate_post_payload_for_assignment') unless @tool_launch
+      raise('Called generate_post_payload_for_homework_submission before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       @tool_launch.for_homework_submission!(lti_assignment)
       generate_post_payload
     end
 
     def launch_url
-      raise('Called launch_url before calling prepared_tool_launch') unless @tool_launch
+      raise('Called launch_url before calling prepare_tool_launch') unless @tool_launch
       @tool_launch.url
     end
 
