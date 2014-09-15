@@ -20,6 +20,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizGroupsController, type: :request do
+  before :once do
+    teacher_in_course(:active_all => true)
+    @quiz = @course.quizzes.create! :title => 'title'
+    @bank = @course.assessment_question_banks.create! :title => 'Test Bank'
+  end
+
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/groups (create)" do
 
     def api_create_quiz_group(quiz_group_params, opts={})
@@ -27,12 +33,6 @@ describe Quizzes::QuizGroupsController, type: :request do
               {:controller=>"quizzes/quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}"},
               {:quiz_groups => [quiz_group_params]},
               {'Accept' => 'application/vnd.api+json'}, opts)
-    end
-
-    before do
-      teacher_in_course(:active_all => true)
-      @quiz = @course.quizzes.create! :title => 'title'
-      @bank = @course.assessment_question_banks.create! :title => 'Test Bank'
     end
 
     let (:new_quiz_group) { @quiz.quiz_groups.all[0] }
@@ -94,12 +94,8 @@ describe Quizzes::QuizGroupsController, type: :request do
               {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
-    before do
-      teacher_in_course(:active_all => true)
-
-      @quiz  = @course.quizzes.create! :title => 'title'
+    before :once do
       @group = @quiz.quiz_groups.create :name => 'Test Group'
-      @bank  = @course.assessment_question_banks.create! :title => 'Test Bank'
     end
 
     it "updates group attributes" do
@@ -141,8 +137,6 @@ describe Quizzes::QuizGroupsController, type: :request do
 
   describe "DELETE /courses/:course_id/quizzes/:quiz_id/groups/:id (destroy)" do
     before do
-      teacher_in_course(:active_all => true)
-      @quiz  = @course.quizzes.create! :title => 'title'
       @group = @quiz.quiz_groups.create :name => 'Test Group'
     end
 
@@ -156,8 +150,6 @@ describe Quizzes::QuizGroupsController, type: :request do
 
   describe "POST /courses/:course_id/quizzes/:quiz_id/groups/:id/reorder" do
     before do
-      teacher_in_course(:active_all => true)
-      @quiz  = @course.quizzes.create! :title => 'title'
       @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
       @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}], :position => 2})
       @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}], :position => 3})

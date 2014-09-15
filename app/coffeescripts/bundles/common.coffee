@@ -3,7 +3,6 @@ require [
 
   # true modules that we manage in this file
   'Backbone'
-  'compiled/widget/courseList'
   'compiled/helpDialog'
   'compiled/tours'
 
@@ -47,8 +46,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, Backbone, courseList, helpDialog, tours) ->
-  courseList.init()
+], ($, Backbone, helpDialog, tours) ->
   helpDialog.initTriggers()
   tours.init()
 

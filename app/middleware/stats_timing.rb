@@ -6,8 +6,7 @@ class StatsTiming
   def call(env)
     result = nil
     ms = Benchmark.ms { result = @app.call(env) }
-    namespace = CANVAS_RAILS2 ? "action_controller" : "action_dispatch"
-    path_parameters = env["#{namespace}.request.path_parameters"]
+    path_parameters = env["action_dispatch.request.path_parameters"]
     controller = path_parameters.try(:[], :controller)
     action = path_parameters.try(:[], :action)
 

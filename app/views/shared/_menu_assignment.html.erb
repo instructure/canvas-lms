@@ -21,6 +21,14 @@
       </span>
       <span class="name ellipsis" <%= "title='#{menu_assignment.title}'" if menu_assignment.title && menu_assignment.title.length > 35 %>><%= menu_assignment.title %></span>
     </span>
-    <span class="subtitle"><%= menu_assignment.context_name %></span>
+    <%
+       context_name = case menu_assignment
+                      when Assignment
+                        menu_assignment.context.name
+                      when Submission
+                        menu_assignment.context_name
+                      end
+    %>
+    <span class="subtitle"><%= context_name %></span>
   </a>  
 </li>

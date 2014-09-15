@@ -256,15 +256,20 @@ describe GradebookImporter do
 
   it "should parse new and existing users" do
     course_with_student
+    @student1 = @student
+    e = student_in_course
+    e.update_attribute :workflow_state, 'completed'
+    concluded_student = @student
     @student2 = user
     @course.enroll_student(@student2)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
-        ",#{@student.id},,10",
-        "New Student,,,12"
+        ",#{@student1.id},,10",
+        "New Student,,,12",
+        ",#{concluded_student.id},,10"
     )
-    @gi.students.length.should == 2
-    @gi.students.first.should == @student
+    @gi.students.length.should == 2  # doesn't include concluded_student
+    @gi.students.first.should == @student1
     @gi.students.last.should be_new_record
     @gi.students.last.id.should < 0
     @gi.missing_students.should == [@student2]

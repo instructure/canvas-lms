@@ -19,10 +19,13 @@
 define [
   'compiled/collections/PaginatedCollection'
   'underscore'
-], (PaginatedCollection, _) ->
+  'compiled/models/File'
+], (PaginatedCollection, _, File) ->
 
   class FilesCollection extends PaginatedCollection
     @optionProperty 'parentFolder'
+
+    model: File
 
     initialize: ->
       @on 'change:sort change:order', @setQueryStringParams

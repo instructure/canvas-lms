@@ -25,8 +25,7 @@ class AppointmentGroup < ActiveRecord::Base
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./,
-      CANVAS_RAILS2 ? 'calendar_events_join.' : '_appointments_appointments_participants_join.'))
+  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, '_appointments_appointments_participants_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, :include => :sub_context

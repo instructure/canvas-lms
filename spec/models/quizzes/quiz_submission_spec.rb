@@ -1322,4 +1322,26 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#points_possible_at_submission_time' do
+    it 'should work' do
+      quiz_with_graded_submission([
+        {
+          question_data: {
+            name: 'question 1',
+            points_possible: 0.23,
+            question_type: 'essay_question'
+          }
+        },
+        {
+          question_data: {
+            name: 'question 2',
+            points_possible: 0.42,
+            question_type: 'essay_question'
+          }
+        }
+      ])
+
+      @quiz_submission.points_possible_at_submission_time.should == 0.65
+    end
+  end
 end

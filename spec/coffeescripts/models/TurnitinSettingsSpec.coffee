@@ -70,6 +70,7 @@ define  [
       internet_check: true
       originality_report_visibility: 'after_grading'
       s_paper_check: true
+      submit_papers_to: false
     ts = new TurnitinSettings options
     deepEqual ts.toJSON(), options
 

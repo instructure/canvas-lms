@@ -400,7 +400,6 @@ class CustomDataController < ApplicationController
 
   def get_scope
     @scope = params[:scope]
-    @scope = @scope.join('/') if CANVAS_RAILS2
   end
 
   def require_custom_data

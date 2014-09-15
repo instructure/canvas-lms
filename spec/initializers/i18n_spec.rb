@@ -8,9 +8,10 @@ describe I18n do
     end
 
     it 'should return en-US for a locale without a qualified locale' do
-      I18n.backend.store_translations :lolz, key: "text"
-      I18n.locale = :lolz
-      I18n.qualified_locale.should == 'en-US'
+      I18n.backend.stub lolz: {key: "text"} do
+        I18n.locale = :lolz
+        I18n.qualified_locale.should == 'en-US'
+      end
     end
   end
 end

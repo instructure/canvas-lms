@@ -14,8 +14,8 @@ describe Quizzes::QuizStatisticsController, type: :request do
       }, params, { 'Accept' => 'application/vnd.api+json' })
   end
 
-  before :each do
-    course_with_teacher_logged_in :active_all => true
+  before :once do
+    course_with_teacher :active_all => true
 
     teacher = @user
 

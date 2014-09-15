@@ -30,7 +30,7 @@ describe UsersController, type: :request do
   end
 
   context "with current_user" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
       @me = @user
       # course_with_student(:active_all => true)

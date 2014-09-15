@@ -9,4 +9,4 @@ define [
       style = {}
       style.display = 'none' unless @props.isLoading
       React.DOM.div style: style, className:'paginatedView-loading', role: 'status', 'aria-live':'polite',
-        I18n.t 'loading_more_results', 'Loading more results'
+        I18n.t 'loading_more_results', 'Loading more results...'

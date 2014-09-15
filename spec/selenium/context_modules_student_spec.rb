@@ -71,6 +71,24 @@ describe "context_modules" do
       context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
     end
 
+    it "should not lock modules for observers" do
+      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      user_session(@user)
+
+      go_to_modules
+
+      # shouldn't show the teacher's "show student progression" button
+      ff('.module_progressions_link').should_not be_present
+
+      context_modules = ff('.context_module')
+      #initial check to make sure everything was setup correctly
+      ff('.context_module .progression_container').each do |item|
+        item.text.strip.should be_blank
+      end
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      f('#content').should_not include_text("hasn't been unlocked yet")
+    end
+
     it "should show overridden due dates for assignments" do
       override = assignment_override_model(:assignment => @assignment_2)
       override.override_due_at(4.days.from_now)

@@ -37,31 +37,12 @@ if RUBY_VERSION == "2.0.0"
   warn "Ruby 2.0 support is untested"
   ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
 elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
-  warn "Ruby 2.1 support is untested"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 elsif RUBY_VERSION >= "2.2"
   warn "Ruby newer than 2.1 is very UNSUPPORTED"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
-end
-
-# force a different lockfile for rails 2
-if CANVAS_RAILS2
-  Bundler::SharedHelpers.class_eval do
-    class << self
-      def default_lockfile
-        Pathname.new("#{Bundler.default_gemfile}.lock2")
-      end
-    end
-  end
-
-  Bundler::Dsl.class_eval do
-    def to_definition(lockfile, unlock)
-      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
-      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
-    end
-  end
 end
 
 # patch bundler to do github over https

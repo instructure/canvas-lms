@@ -5,6 +5,16 @@
   font-size: 28px;
 }
 
+/* wider and more opaque source chooser */
+.mejs-sourcechooser-selector {
+  width: 150px !important;
+  background: rgba(50, 50, 50, 0.9);
+
+  label {
+    width: inherit !important;
+  }
+}
+
 //
 // Playback speed control is based on code from an as-yet-unmerged pull request to mediaelement.js
 // See: https://github.com/matthillman/mediaelement/commit/e9efc9473ca38c240b712a11ba4c035651c204d4

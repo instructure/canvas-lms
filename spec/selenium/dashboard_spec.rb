@@ -42,7 +42,7 @@ describe "dashboard" do
       items.first.reload.hidden.should == true
     end
 
-    it "should allow hiding a stream item on the dashboard" do
+    it "should allow hiding a stream item on the dashboard", :non_parallel do
       test_hiding("/")
     end
 
@@ -396,7 +396,7 @@ describe "dashboard" do
       c1.reload
 
       get "/courses"
-      f('.past_enrollments').should include_text(c1.name)
+      fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list and assignments menu for a teacher" do
@@ -406,18 +406,27 @@ describe "dashboard" do
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       assignment.reload
-      get "/"
+      enable_cache do
+        get "/"
 
-      #verify assignment is in to do list
-      f('.to-do-list > li').should include_text('Grade ' + assignment.title)
+        #verify assignment is in to do list
+        f('.to-do-list > li').should include_text('Grade ' + assignment.title)
 
-      #verify assignment is in drop down
-      driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
+        #verify assignment is in drop down
+        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
 
-      wait_for_ajaximations
+        wait_for_ajaximations
 
-      f('#assignments_menu_item').should include_text("To Grade")
-      f('#assignments_menu_item').should include_text(assignment.title)
+        f('#assignments_menu_item').should include_text("To Grade")
+        f('#assignments_menu_item').should include_text(assignment.title)
+
+        # should update the to-do list when the grader grades
+        assignment.grade_student(student, :grade => 1)
+        get "/"
+        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
+
+        f('#assignments_menu_item').should_not include_text("To Grade")
+      end
     end
 
     it "should show submitted essay quizzes in the todo list" do
@@ -442,7 +451,7 @@ describe "dashboard" do
 
     context "course menu customization" do
 
-      it "should allow customization if there are sufficient courses" do
+      it "should always have a link to the courses page (with customizations)" do
         20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
 
         get "/"
@@ -451,101 +460,7 @@ describe "dashboard" do
         wait_for_ajaximations
 
         fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('Customize')
-        fj('#courses_menu_item').should include_text('View all courses')
-      end
-
-
-      it "should allow customization if there are sufficient course invitations" do
-        20.times { course_with_teacher({:user => user_with_communication_channel(:user_state => :creation_pending), :active_course => true}) }
-        get "/"
-
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('Customize')
-        fj('#courses_menu_item').should include_text('View all courses')
-      end
-
-      it "should allow customization if all courses are already favorited" do
-        @user.favorites.create(:context => @course)
-        20.times {
-          course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
-          @user.favorites.create(:context => @course)
-        }
-
-        get "/"
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('Customize')
-      end
-
-      it "should allow customization even before the course ajax request comes back" do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
-
-        get "/"
-
-        # Now artificially make the next ajax request slower. We want to make sure that we click the
-        # customize button before the ajax request returns. Delaying the request by 1s should
-        # be enough.
-        UsersController.before_filter { sleep 1; true }
-
-        course_menu = f('#courses_menu_item')
-        driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
-        sleep 0.4 # there's a fixed 300ms delay before the menu will display
-
-        # For some reason, a normal webdriver click here causes strangeness on FF in XP with
-        # firebug installed.
-        driver.execute_script("$('#menu .customListOpen:first').click()")
-        wait_for_ajaximations
-
-        if CANVAS_RAILS2
-          UsersController.filter_chain.pop
-        else
-          UsersController._process_action_callbacks.pop
-        end
-
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('View all courses')
-        course_menu.find_element(:css, '.customListWrapper').should be_displayed
-      end
-
-      it "should perform customization actions" do
-        def favoriteElsSize
-          ff('#menu_enrollments > .menu-item-drop-column-list li.customListItem').size
-        end
-
-        def checkedEls
-          ffj('#menu_enrollments .customListContent li.customListItem.on')
-        end
-
-        @courses = []
-        20.times { @courses << course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}).course }
-
-        @user.favorites.by('Course').destroy_all
-        @courses[0...10].each do |course|
-          @user.favorites.build(:context => course)
-        end
-        @user.save
-
-        get "/"
-        driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
-        sleep 0.4 # there's a fixed 300ms delay before the menu will display
-        wait_for_ajaximations
-        favoriteElsSize.should == 10
-        driver.execute_script("$('#menu .customListOpen:first').click()")
-        wait_for_ajaximations
-
-        checkedEls.size.should == 10
-        checkedEls[0].click
-        wait_for_ajaximations
-        checkedEls.size.should == 9
-        favoriteElsSize.should == 9
-        @user.reload
-        @user.favorites.size.should == 9
+        fj('#courses_menu_item').should include_text('View All or Customize')
       end
     end
   end

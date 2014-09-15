@@ -41,8 +41,13 @@ class EmberBundle
   end
 
   def build
-    main_path = "app/coffeescripts/ember/#{@app_name}/main.coffee"
     bundle_path = "public/javascripts/compiled/bundles/#{@app_name}.js"
+
+    # if there is nothing in our app besides auto-generated
+    # .gitignor'ed stuff, clean up and continue
+    return FileUtils::rm_rf([@root, bundle_path], verbose: true) if @assigns.empty?
+
+    main_path = "#{@root}/main.coffee"
     File.open(main_path, 'w') { |f| f.write build_output }
     FileUtils.mkdir_p 'public/javascripts/compiled/bundles'
     File.open(bundle_path, 'w') do |f|

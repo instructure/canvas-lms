@@ -137,7 +137,24 @@
         </div>
       </div>
     </div>
+  </fieldset>
 
+  <fieldset>
+    <h5>
+      {{#t "turnitin_settings.labels.turnitin_repository"}}
+        Turnitin Repository
+      {{/t}}
+    </h5>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox" for="submit_papers_to">
+          {{checkbox "submit_papers_to" checked=submitPapersTo}}
+          {{#t "turnitin_settings.labels.submit_papers_to"}}
+            Include in Repository
+          {{/t}}
+        </label>
+      </div>
+    </div>
   </fieldset>
 
   <div class="button-container">

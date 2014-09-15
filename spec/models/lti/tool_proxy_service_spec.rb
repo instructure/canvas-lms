@@ -51,10 +51,9 @@ module Lti
         tool_proxy.product_family.id.should == pf.id
       end
 
-      it "creates the resource handler" do
+      it "creates the resource handlers" do
         tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
-        rh = tool_proxy.resources.first
-        rh.resource_type_code.should == 'asmt'
+        rh = tool_proxy.resources.find{|r| r.resource_type_code == 'asmt'}
         rh.name.should == 'Acme Assessment'
         rh.description.should == 'An interactive assessment using the Acme scale.'
         rh.icon_info.should == [
@@ -77,7 +76,21 @@ module Lti
 
       it "creates the message_handlers" do
         tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
-        mh = tool_proxy.resources.first.message_handlers.first
+        resource_handler = tool_proxy.resources.find{|r| r.resource_type_code == 'asmt'}
+        mh = resource_handler.message_handlers.first
+        mh.message_type.should == 'basic-lti-launch-request'
+        mh.launch_path.should == 'https://acme.example.com/handler/launchRequest'
+        mh.capabilities.should == [ "Result.autocreate" ]
+        mh.parameters.should == [{'name' => 'result_url', 'variable' => 'Result.url'}, {'name' => 'discipline', 'fixed' => 'chemistry'}]
+      end
+
+      it "creates default message handlers" do
+        tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
+        resource_handler = tool_proxy.resources.find{|r| r.resource_type_code == 'instructure.com:default'}
+
+        resource_handler.name.should == 'Default'
+        resource_handler.message_handlers.size.should == 1
+        mh = resource_handler.message_handlers.first
         mh.message_type.should == 'basic-lti-launch-request'
         mh.launch_path.should == 'https://acme.example.com/handler/launchRequest'
         mh.capabilities.should == [ "Result.autocreate" ]
@@ -98,7 +111,7 @@ module Lti
         tool_proxy.guid.should == tool_proxy_guid
         tool_proxy.product_version.should == '10.3'
         tool_proxy.lti_version.should == 'LTI-2p0'
-        tool_proxy.root_account.should == account
+        tool_proxy.context.should == account
         tool_proxy.workflow_state.should == 'disabled'
       end
 

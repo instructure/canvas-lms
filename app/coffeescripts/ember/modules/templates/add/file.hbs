@@ -1,0 +1,24 @@
+{{#ic-modal-title}}{{title}}{{/ic-modal-title}}
+
+<ul>
+  {{#each file in files}}
+    <li>
+      <label>
+        <input type="checkbox" {{action "toggleSelected" file on="change"}}/>
+        {{file.display_name}}
+      </label>
+    </li>
+  {{/each}}
+</ul>
+
+<div class="form-controls">
+  <button type="submit" class="btn btn-primary">{{#t "add_files"}}Add files{{/t}}</button>
+  <ul>
+    {{#each model.selected}}
+      <li>{{display_name}}</li>
+    {{/each}}
+  </ul>
+</div>
+
+
+

@@ -37,7 +37,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
       ce.save!
       cm.content_export = ce
 
-      ce.export_course_without_send_later
+      ce.export_without_send_later
 
       if ce.workflow_state == 'exported_for_course_copy'
         # use the exported attachment as the import archive

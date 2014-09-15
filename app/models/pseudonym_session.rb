@@ -43,50 +43,29 @@ class PseudonymSession < Authlogic::Session::Base
     @valid_basic_auth
   end
 
-  unless CANVAS_RAILS2
-    # In authlogic 3.2.0, it tries to parse the last part of the cookie (delimited by '::')
-    # as a timestamp to verify whether the cookie is stale.
-    # This conflicts with the uuid that we use instead in that place,
-    # so skip that check for now, to keep behavior similar between Rails 2 and 3.
-    def remember_me_expired?
-      false
-    end
+  # In authlogic 3.2.0, it tries to parse the last part of the cookie (delimited by '::')
+  # as a timestamp to verify whether the cookie is stale.
+  # This conflicts with the uuid that we use instead in that place,
+  # so skip that check for now, to keep behavior similar between Rails 2 and 3.
+  def remember_me_expired?
+    false
   end
 
-  if CANVAS_RAILS2
-    # modifications to authlogic's cookie persistence (used for the "remember me" token)
-    # see the SessionPersistenceToken class for details
-    #
-    # also, the version of authlogic canvas is on doesn't support httponly (or
-    # secure-only) for the "remember me" cookie yet, so we add that support here.
-    def save_cookie
-      return unless remember_me?
-      token = SessionPersistenceToken.generate(record)
-      controller.cookies[cookie_key] = {
-        :value => token.pseudonym_credentials,
-        :expires => remember_me_until,
-        :domain => controller.cookie_domain,
-        :httponly => true,
-        :secure => controller.request.session_options[:secure],
-      }
-    end
-  else
-    secure CanvasRails::Application.config.session_options[:secure]
-    httponly true
+  secure CanvasRails::Application.config.session_options[:secure]
+  httponly true
 
-    # modifications to authlogic's cookie persistence (used for the "remember me" token)
-    # see the SessionPersistenceToken class for details
-    def save_cookie
-      return unless remember_me?
-      token = SessionPersistenceToken.generate(record)
-      controller.cookies[cookie_key] = {
-        :value => token.pseudonym_credentials,
-        :expires => remember_me_until,
-        :domain => controller.cookie_domain,
-        :httponly => httponly,
-        :secure => secure,
-      }
-    end
+  # modifications to authlogic's cookie persistence (used for the "remember me" token)
+  # see the SessionPersistenceToken class for details
+  def save_cookie
+    return unless remember_me?
+    token = SessionPersistenceToken.generate(record)
+    controller.cookies[cookie_key] = {
+      :value => token.pseudonym_credentials,
+      :expires => remember_me_until,
+      :domain => controller.cookie_domain,
+      :httponly => httponly,
+      :secure => secure,
+    }
   end
 
   def persist_by_cookie

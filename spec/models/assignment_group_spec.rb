@@ -59,6 +59,7 @@ describe AssignmentGroup do
         @ag.active_assignments.count.should == 3
         # one with override, one with grade
         @ag.visible_assignments(@u).count.should == 2
+        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 2
       end
     end
 
@@ -68,6 +69,7 @@ describe AssignmentGroup do
         @c.enable_feature! :draft_state
         @ag.active_assignments.count.should == 3
         @ag.visible_assignments(@u).count.should == 3
+        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
       end
     end
 
@@ -77,6 +79,7 @@ describe AssignmentGroup do
         @c.disable_feature! :draft_state
         @ag.active_assignments.count.should == 3
         @ag.visible_assignments(@u).count.should == 3
+        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
       end
     end
   end

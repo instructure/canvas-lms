@@ -29,21 +29,25 @@ describe AssignmentGroupsController do
     @assignment = @group.assignments.create(:name => "some group assignment")
   end
 
+  before :once do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       get 'index', :course_id => @course.id, :format => :json
       assigns[:groups].should_not be_nil
     end
 
     it "should retrieve course groups if they exist" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       course_group
       @group = course_group
 
@@ -57,19 +61,18 @@ describe AssignmentGroupsController do
 
   describe "POST 'reorder'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'reorder', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should not allowe students to reorder" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       post 'reorder', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should reorder assignment groups" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       groups = 3.times.map { course_group }
       groups.map(&:position).should == [1, 2, 3]
       g1, g2, _ = groups
@@ -82,16 +85,15 @@ describe AssignmentGroupsController do
   end
 
   describe "GET 'show'" do
+    before(:once) { course_group }
+
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_group
       get 'show', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      course_group
+      user_session(@student)
       get 'show', :course_id => @course.id, :id => @group.id, :format => :json
       # response.should be_success
       assigns[:assignment_group].should_not be_nil
@@ -101,19 +103,18 @@ describe AssignmentGroupsController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should not allow students to create" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should create a new group" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :assignment_group => {:name => "some test group"}
       response.should be_redirect
       assigns[:assignment_group].should_not be_nil
@@ -124,23 +125,21 @@ describe AssignmentGroupsController do
   end
 
   describe "PUT 'update'" do
+    before(:once) { course_group }
+
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_group
       put 'update', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should not allow students to update" do
-      course_with_student_logged_in(:active_all => true)
-      course_group
+      user_session(@student)
       put 'update', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should update group" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_group
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @group.id, :assignment_group => {:name => "new group name"}
       assigns[:assignment_group].should_not be_nil
       assigns[:assignment_group].should eql(@group)
@@ -149,23 +148,21 @@ describe AssignmentGroupsController do
   end
 
   describe "DELETE 'destroy'" do
+    before(:once) { course_group }
+
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_group
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should not allow students to delete" do
-      course_with_student_logged_in(:active_all => true)
-      course_group
+      user_session(@student)
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
 
     it "should delete group" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_group
+      user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assigns[:assignment_group].should_not be_nil
       assigns[:assignment_group].should eql(@group)
@@ -174,7 +171,7 @@ describe AssignmentGroupsController do
     end
 
     it "should delete assignments in the group" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group1 = @course.assignment_groups.create!(:name => "group 1")
       @assignment1 = @course.assignments.create!(:title => "assignment 1", :assignment_group => @group1)
       delete 'destroy', :course_id => @course.id, :id => @group1.id
@@ -186,7 +183,7 @@ describe AssignmentGroupsController do
     end
 
     it "should move assignments to a different group if specified" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @group1 = @course.assignment_groups.create!(:name => "group 1")
       @assignment1 = @course.assignments.create!(:title => "assignment 1", :assignment_group => @group1)
       @group2 = @course.assignment_groups.create!(:name => "group 2")
@@ -211,7 +208,7 @@ describe AssignmentGroupsController do
 
     it "does not allow users to delete assignment groups with frozen assignments" do
       PluginSetting.stubs(:settings_for_plugin).returns(title: 'yes')
-      course_with_teacher_logged_in(active_all: true)
+      user_session(@teacher)
       group = @course.assignment_groups.create!(name: "group 1")
       assignment = @course.assignments.create!(title: "assignment",
                                                assignment_group: group,
@@ -224,8 +221,7 @@ describe AssignmentGroupsController do
     end
 
     it "should return JSON if requested" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_group
+      user_session(@teacher)
       delete 'destroy', :format => "json", :course_id => @course.id, :id => @group.id
       response.should be_success
     end

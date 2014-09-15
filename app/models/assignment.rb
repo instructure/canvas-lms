@@ -91,11 +91,7 @@ class Assignment < ActiveRecord::Base
       assignment.external_tool_tag.context = assignment
       assignment.external_tool_tag.content_type = "ContextExternalTool"
     else
-      if CANVAS_RAILS2
-        assignment.external_tool_tag = nil
-      else
-        assignment.association(:external_tool_tag).reset
-      end
+      assignment.association(:external_tool_tag).reset
     end
     true
   end
@@ -555,7 +551,7 @@ class Assignment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
-    self.save
+    self.save!
 
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
     self.quiz.destroy if self.quiz && !self.quiz.deleted?
@@ -601,6 +597,31 @@ class Assignment < ActiveRecord::Base
     else
       context.students
     end
+  end
+
+  def visible_to_user?(user)
+    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
+    visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
+  end
+
+  def visible_to_observer?(user)
+    return false unless context.user_has_been_observer?(user)
+    return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
+
+    visible_student_ids = students_with_visibility.pluck(:id)
+    observed_students = ObserverEnrollment.observed_students(context, user)
+
+    has_visible_students = observed_students.any?{ |student, enrollments|
+      visible_student_ids.include?(student.id)
+    }
+
+    # if the observer has any students, don't make decision based on section enrollments
+    return has_visible_students if observed_students.any?
+
+    enrollment_section_ids = context.observer_enrollments.for_user(user).pluck(:course_section_id)
+    has_visible_sections = self.active_assignment_overrides.where(:set_type => 'CourseSection').map(&:set_id).any?{ |ao_section_id|
+      enrollment_section_ids.include?(ao_section_id)
+    }
   end
 
   attr_accessor :saved_by
@@ -1105,11 +1126,16 @@ class Assignment < ActiveRecord::Base
     res
   end
 
+  SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
+                             media_comment_id media_comment_type]
+  ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
+                                    %w[comment group_comment]).to_set
+
   def submit_homework(original_student, opts={})
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
-      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
+      opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
     }
     raise "Student Required" unless original_student
     comment = opts.delete(:comment)
@@ -1130,6 +1156,11 @@ class Assignment < ActiveRecord::Base
                 end
     transaction do
       find_or_create_submissions(students) do |homework|
+        # clear out attributes from prior submissions
+        if opts[:submission_type].present?
+          SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }
+        end
+
         student = homework.user
         homework.grade_matches_current_submission = homework.score ? false : true
         homework.attributes = opts.merge({
@@ -1613,11 +1644,7 @@ class Assignment < ActiveRecord::Base
     # select doesn't work with include() in rails3, and include(:context)
     # doesn't work because of the polymorphic association. So we'll preload
     # context for the assignments in a single query.
-    if CANVAS_RAILS2
-      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
-    else
-      chain.preload(:context)
-    end
+    chain.preload(:context)
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
@@ -1626,11 +1653,8 @@ class Assignment < ActiveRecord::Base
         where("assignments.needs_grading_count>0").
         limit(limit).
         order("assignments.due_at")
-    if CANVAS_RAILS2
-      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
-    else
-      chain.preload(:context)
-    end
+
+    chain.preload(:context)
   }
 
   scope :expecting_submission, -> { where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL") }
@@ -1652,12 +1676,6 @@ class Assignment < ActiveRecord::Base
 
   def overdue?
     due_at && due_at <= Time.now
-  end
-
-  # We can replace context_name with context.name in _menu_assignment.html.erb
-  # and remove this once the rails3 switch is complete
-  def context_name
-    CANVAS_RAILS2 ? read_attribute('context_name') : context.name
   end
 
   def readable_submission_types

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-(CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers).define :have_answer do |expected|
+RSpec::Matchers.define :have_answer do |expected|
   match do |actual|
     expected = Regexp.new(expected, "i") if expected.is_a? String
     actual.detect { |a| a[:text] =~ expected || a[:html] =~ expected || a[:comments] =~ expected || a[:answer] =~ expected }

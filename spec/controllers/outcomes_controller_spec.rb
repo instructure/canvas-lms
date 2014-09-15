@@ -33,15 +33,21 @@ describe OutcomesController do
     context_outcome(@account)
   end
 
+  before :once do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    @account = Account.default
+    account_admin_user
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>15,'hidden'=>true}])
       get 'index', :course_id => @course.id
       response.should be_redirect
@@ -49,23 +55,19 @@ describe OutcomesController do
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       get 'index', :course_id => @course.id
       response.should be_success
     end
     
     it "should work in accounts" do
-      @account = Account.default
-      account_admin_user
-      user_session(@user)
+      user_session(@admin)
       account_outcome
       get 'index', :account_id => @account.id
     end
 
     it "should find a common core group from settings" do
-      @account = Account.default
-      account_admin_user
-      user_session(@user)
+      user_session(@admin)
       account_outcome
       Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
       get 'index', :account_id => @account.id
@@ -75,54 +77,46 @@ describe OutcomesController do
 
   describe "GET 'show'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
       assert_unauthorized
     end
     
     it "should not allow students to view outcomes" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
       assert_unauthorized
     end
     
     it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
       response.should be_success
     end
     
     it "should work in accounts" do
-      @account = Account.default
-      account_admin_user
-      user_session(@user)
+      user_session(@admin)
       account_outcome
       get 'show', :account_id => @account.id, :id => @outcome.id
       response.should be_success
     end
     
     it "should include tags from courses when viewed in the account" do
-      course
-      @account = @course.account
-
       account_outcome
       @outcome
 
       quiz = @course.quizzes.create!
       alignment = @outcome.align(quiz, @course)
 
-      account_admin_user(:account => @account)
-      user_session(@user)
+      user_session(@admin)
       get 'show', :account_id => @account.id, :id => @outcome.id
 
       assigns[:alignments].any?{ |a| a.id == alignment.id }.should be_true
     end
 
     it "should not allow access to individual outcomes for large_roster courses" do
-      course
       course_outcome
 
       @course.large_roster = true
@@ -135,23 +129,20 @@ describe OutcomesController do
 
   describe "GET 'detail'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
       assert_unauthorized
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
       response.should be_success
     end
     
     it "should work in accounts" do
-      @account = Account.default
-      account_admin_user
-      user_session(@user)
+      user_session(@admin)
       account_outcome
       get 'details', :account_id => @account.id, :outcome_id => @outcome.id
     end
@@ -159,11 +150,9 @@ describe OutcomesController do
 
   describe "GET 'list'" do
     it "should list account outcomes for an account context" do
-      @account = Account.default
-      account_admin_user
       account_outcome
 
-      user_session(@user)
+      user_session(@admin)
       get 'list', :account_id => @account.id
       response.should be_success
       data = json_parse
@@ -171,12 +160,10 @@ describe OutcomesController do
     end
 
     it "should list account outcomes for a subaccount context" do
-      @account = Account.default
-      account_admin_user
       account_outcome
       sub_account_1 = @account.sub_accounts.create!
 
-      user_session(@user)
+      user_session(@admin)
       get 'list', :account_id => sub_account_1.id
       response.should be_success
       data = json_parse
@@ -184,11 +171,9 @@ describe OutcomesController do
     end
 
     it "should list account outcomes for a course context" do
-      @account = Account.default
-      account_admin_user
       account_outcome
 
-      course_with_teacher_logged_in
+      user_session(@teacher)
       get 'list', :course_id => @course.id
       response.should be_success
       data = json_parse

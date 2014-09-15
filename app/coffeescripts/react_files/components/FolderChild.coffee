@@ -1,38 +1,73 @@
 define [
+  'i18n!react_files'
   'react'
+  'react-router'
   '../mixins/BackboneMixin'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'
+  './ItemCog'
   'compiled/util/friendlyBytes'
-], (React, BackboneMixin, withGlobalDom, FriendlyDatetime, friendlyBytes) ->
-
-  EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+/
+  'compiled/models/Folder'
+  'compiled/fn/preventDefault'
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
 
 
   FolderChild = React.createClass
 
     mixins: [BackboneMixin('model')],
 
-    folderHref: ->
-      @props.baseUrl + 'folder' + @props.model.get('full_name').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
+    getInitialState: ->
+      editing: false
 
-    render: withGlobalDom ->
+    componentWillMount: ->
+      if @props.model.isNew()
+        @startEditingName()
 
+    startEditingName: preventDefault ->
+      @setState editing: true
+      setTimeout =>
+        @refs.newName.getDOMNode().focus()
+
+
+    saveNameEdit: preventDefault ->
+      @props.model.save(name: @refs.newName.getDOMNode().value)
+      @setState(editing: false)
+
+
+    cancelEditingName: ->
+      @props.model.collection.remove(@props.model) if @props.model.isNew()
+      @setState(editing: false)
+
+
+    render: withReactDOM ->
       div className:'ef-item-row',
         div className:'ef-name-col',
-          (if @props.model.get('display_name')
+          if @state.editing
+            form className: 'ef-edit-name-form', onSubmit: @saveNameEdit,
+              input({
+                type:'text',
+                ref:'newName',
+                className: 'input-block-level',
+                placeholder: I18n.t('name', 'Name'),
+                defaultValue: @props.model.get('name') || @props.model.get('display_name')
+                onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
+              }),
+              button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,
+                i className: 'icon-x'
+          else if @props.model instanceof Folder
+            Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
+              i className:'icon-folder',
+              @props.model.get('name')
+          else
             a href: @props.model.get('url'),
-              (if @props.model.get('thumbnail_url')
+              if @props.model.get('thumbnail_url')
                 img src: @props.model.get('thumbnail_url'), className:'ef-thumbnail', alt:''
               else
                 i className:'icon-document'
-              ),
               @props.model.get('display_name')
-          else
-            a href: @folderHref(),
-              i className:'icon-folder'
-              @props.model.get('name')
-          )
+
+        div className:'ef-date-created-col', onClick: @startEditing,
+          FriendlyDatetime datetime: @props.model.get('created_at'),
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
         div className:'ef-modified-by-col',
@@ -48,24 +83,5 @@ define [
             span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.')
           ),
 
-          div( {className:'ef-hover-options'},
-            a( {herf:'#', style: {'color': 'black', 'margin-right': '10px'}}, i( {className:'icon-download'})),
-            div( {className:'ef-admin-gear'},
-              div(null,
-                a( {className:'al-trigger al-trigger-gray', role:'button', 'aria-haspopup':'true', 'aria-owns':'content-1', 'aria-label':'Settings', href:'#'},
-                  i( {className:'icon-settings'}),
-                  i( {className:'icon-mini-arrow-down'})
-                ),
-
-                ul( {id:'content-1', className:'al-options', role:'menu', tabIndex:'0', 'aria-hidden':'true', 'aria-expanded':'false', 'aria-activedescendant':'content-2'},
-                  li( {role:'presentation'},
-                  a( {href:'#', className:'icon-edit', id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit'}, 'Edit')
-                  ),
-                  li( {role:'presentation'},
-                  a( {href:'#', className:'icon-trash', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete this module'}, 'Delete')
-                  )
-                )
-              )
-            )
-          )
+          ItemCog(model: @props.model, startEditingName: @startEditingName)
         )

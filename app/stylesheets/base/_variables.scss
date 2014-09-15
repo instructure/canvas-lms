@@ -1,0 +1,167 @@
+/// TOC
+//============================================================================================
+// 
+// - Brand Variants
+// - Color Variables
+// - Layout Variables
+//
+//============================================================================================
+
+// Canvas Brand Variants
+//=======================
+// This imports the variables needed to support new styles {$use_new_styles}
+// accessibility ($use_high_contrast) and k12 ($is-k12). 
+// You can also use the sass function that helps ensure color contrast ratio. 
+// Look in /sass-functions/ for more information on how that is used
+
+@import "variant_variables";
+
+/// Canvas LMS Color Sheet
+//=======================
+// Our color variables in Canvas are simple and easy to integrate
+// We use a two-tiered variable process with Canvas color variables.
+// When you need to use a color, please create a functional variable name
+// and use the color variable name of your choosing. See examples below.
+
+// New Canvas Theme Color Variables
+//=======================
+// These are the new colors that we would like to start rebranding
+// all the canvas pages in. All of the app variables that denote a
+// color should use or be based off of one of these variables
+
+$canvas-primary:                  #05a6ee; // light blue
+@if $use_high_contrast { $canvas-primary: #0576A3 }
+
+$canvas-secondary:                #05a6ee; // dark blue
+@if $use_high_contrast { $canvas-secondary: #5F707B }
+
+$canvas-success:                  #05a6ee; // green
+@if $use_high_contrast { $canvas-success: #14881E }
+
+$canvas-neutral:                  #F7F7F7; // gray
+
+$canvas-action:                   #ba3fa5; // magenta
+
+$canvas-danger:                   #ad393a; // red
+
+$canvas-alert:                    #d89919; // gold
+@if $use_high_contrast { $canvas-alert: #926711 }
+
+$canvas-light:                    #ffffff; // white
+
+$canvas-dark:                     #7D8F9A; // gray/blue
+@if $use_high_contrast { $canvas-alert: #5F707B }
+
+// Bootstrap Color Variable Overwrites
+//=======================
+// These overwrite the variables used by bootstrap using our 
+// custom colors above
+
+// When the new_style feature flag is available to use, we
+// can uncomment these out. Right now they would overwrite
+// current canvas styles prematurely
+
+// $brand-primary:         $canvas-primary;
+// $brand-success:         $canvas-success;
+// $brand-info:            $canvas-light;
+// $brand-warning:         $canvas-alert;
+// $brand-danger:          $canvas-danger;
+// $brand-inverse:         $canvas-neutral;
+
+// $gray-darker:            lighten(#000, 13.5%);  // #222
+// $gray-dark:              lighten(#000, 20%);   // #333
+// $gray:                   lighten(#000, 33.5%); // #555
+// $gray-light:             lighten(#000, 60%);   // #999
+// $gray-lighter:           lighten(#000, 93.5%); // #eee
+
+// Functional Variable Colors
+//=======================
+// For variables throughout canvas we should be using custom names
+// and setting their colors using our two-tiered process
+
+// Examples of functional variable use:
+//
+//    $link-color: $canvas-primary;
+//    $submit_button--on: $canvas-secondary;
+
+
+// Legacy Variables
+//=======================
+// These are variables used throughout Canvas that need to be restructured and organized
+// Eventually we'd like to have these put into one of the two categories: Colors or Layout
+
+$iconSpritePath:      "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
+$iconWhiteSpritePath: $iconSpritePath !default;
+
+@import 'vendor/bootstrap/variables';
+@import 'vendor/jqueryui/variables';
+
+
+$right_side_width: 286px;
+$left_side_width: 175px;
+$min_main_width: 510px;
+$max_main_width: 1100px;
+
+$identity-link-color: #fff;
+$menu-border-color: #ccc;
+
+$menu-background-color: #f3f4f5;
+$menu-text-color: ensure-contrast(#444, $menu-background-color);
+
+$menu-link-color: #456787;
+
+$right_side_text_color: #595959;
+$right_side_margin: 13px;
+
+// section tabs
+$section_tabs_bg_color: #f2f5f7;
+$section_tabs_color: #4b7092;
+$section_tabs_hover_background_color: darken(#e4e7e9, 2%);
+$section_tabs_border_top_color: #C6C6C6;
+$section_tabs_border_bottom_color: lighten($section_tabs_border_top_color, 4%);
+$section_tabs_to_be_hidden_color: #888;
+$hintTextColor: #888;
+
+$button-text-color: #525252;
+
+$ui-state-default-gradient-top: #ededed;
+$ui-state-default-gradient-bottom: #c4c4c4;
+
+
+// this is the blue color that we use all over the place when not in a gradiants
+$highlight-color: #06a9ee;
+// light blue hover color
+$hover-color: #E5F3FF;
+// this is the grey color for when things are disabled, or meant to contrast with $highlight-color
+$diminutive-color: #acacac;
+
+$masquerade-link-color: #ffa500;
+
+// canvas stuff
+$lightBackground:               rgb(248, 250, 251);
+$altBG:                         #dfe9f0;
+$borderColor:                   #a8adb3;
+$borderRadius:                  4px;
+$toolbarBackground:             #D7E7F5;
+$toolbarBackgroundLight:        #E8F1F9;
+$listViewHeaderBackground:      rgb(225, 230, 235);
+$listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%);
+$contentBoxPadding:             8px;
+$listBorderColor:               lighten($borderColor, 5%);
+$activeBG:                      #d6ecfc;
+$dimmedOpacity:                 0.4;
+
+$masquerade-link-color: #ffa500;
+
+// Font Sizes
+$h1-font-size: 23px;
+$h2-font-size: 14px;
+$h3-font-size: 19px;
+
+$spacing-width: 20px;
+
+$wellBackground: #e8ecef;
+
+// override bootstrap green buttons
+$green: #34832b !default;
+

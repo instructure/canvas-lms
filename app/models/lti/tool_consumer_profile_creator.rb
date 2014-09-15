@@ -1,13 +1,15 @@
 module Lti
   class ToolConsumerProfileCreator
 
-    def initialize(account, tp_registration_url)
+    def initialize(account, tcp_url, tp_registration_url)
       @root_account = account.root_account
+      @tcp_url = tcp_url
       @tp_registration_url = tp_registration_url
     end
 
     def create
       profile = IMS::LTI::Models::ToolConsumerProfile.new
+      profile.id = @tcp_url
       profile.lti_version = IMS::LTI::Models::ToolConsumerProfile::LTI_VERSION_2P0
       profile.product_instance = create_product_instance
       profile.service_offered  = [create_tp_registration_service]
@@ -50,7 +52,7 @@ module Lti
 
     def create_tp_registration_service
       reg_srv = IMS::LTI::Models::RestService.new
-      reg_srv.id = 'tcp:ToolProxy.collection'
+      reg_srv.id = "#{@tcp_url}#ToolProxy.collection"
       reg_srv.endpoint = @tp_registration_url
       reg_srv.type = 'RestService'
       reg_srv.format = ['application/vnd.ims.lti.v2.toolproxy+json']

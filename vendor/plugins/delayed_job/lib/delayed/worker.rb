@@ -48,17 +48,15 @@ class Worker
     @max_memory_usage = options[:worker_max_memory_usage].to_i
     @job_count = 0
 
-    if CANVAS_RAILS3
-      app = Rails.application
-      unless app.config.cache_classes
-        Delayed::Worker.lifecycle.around(:perform) do |&block|
-          reload = app.config.reload_classes_only_on_change != true || app.reloaders.map(&:updated?).any?
-          ActionDispatch::Reloader.prepare! if reload
-          begin
-            block.call
-          ensure
-            ActionDispatch::Reloader.cleanup! if reload
-          end
+    app = Rails.application
+    unless app.config.cache_classes
+      Delayed::Worker.lifecycle.around(:perform) do |&block|
+        reload = app.config.reload_classes_only_on_change != true || app.reloaders.map(&:updated?).any?
+        ActionDispatch::Reloader.prepare! if reload
+        begin
+          block.call
+        ensure
+          ActionDispatch::Reloader.cleanup! if reload
         end
       end
     end
@@ -119,7 +117,6 @@ class Worker
 
     if job
       configure_for_job(job) do
-        ensure_db_connection
         @job_count += perform(job)
 
         if @max_job_count > 0 && @job_count >= @max_job_count
@@ -138,7 +135,7 @@ class Worker
         end
       end
     else
-      set_process_name("wait:#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
+      set_process_name("wait:#{Shard.current(:delayed_jobs).id}~#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
       sleep(sleep_delay + (rand * sleep_delay_stagger))
     end
   end
@@ -146,7 +143,7 @@ class Worker
   def perform(job)
     count = 1
     self.class.lifecycle.run_callbacks(:perform, self, job) do
-      set_process_name("run:#{job.id}:#{job.name}")
+      set_process_name("run:#{Shard.current(:delayed_jobs).id}~#{job.id}:#{job.name}")
       say("Processing #{log_job(job, :long)}", :info)
       runtime = Benchmark.realtime do
         if job.batch?
@@ -176,7 +173,6 @@ class Worker
         job.source = parent_job.source
         job.create_and_lock!(name)
         configure_for_job(job) do
-          ensure_db_connection
           perform(job)
         end
       end
@@ -201,7 +197,7 @@ class Worker
   def log_job(job, format = :short)
     case format
     when :long
-      "#{job.full_name} #{ job.to_json(:include_root => false, :only => %w(strand priority attempts created_at max_attempts)) }"
+      "#{job.full_name} #{ job.to_json(:include_root => false, :only => %w(tag strand priority attempts created_at max_attempts source)) }"
     else
       job.full_name
     end
@@ -229,16 +225,6 @@ class Worker
   ensure
     ENV['TMPDIR'] = previous_tmpdir if @make_tmpdir
     Thread.current[:context] = nil
-  end
-
-  def ensure_db_connection
-    begin
-      ActiveRecord::Base.connection.execute("select 1")
-    rescue ActiveRecord::StatementInvalid
-      ActiveRecord::Base.connection.reconnect!
-      # if this fails again, it'll raise the error up
-      ActiveRecord::Base.connection.execute("select 1")
-    end
   end
 
   def self.current_job

@@ -213,14 +213,16 @@ describe ApplicationController do
   end
 
   describe "safe_domain_file_user" do
-    before :each do
-      # safe_domain_file_url wants to use request.protocol
-      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
-
+    before :once do
       @user = User.create!
       @attachment = @user.attachments.new(:filename => 'foo.png')
       @attachment.content_type = 'image/png'
       @attachment.save!
+    end
+
+    before :each do
+      # safe_domain_file_url wants to use request.protocol
+      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
 
       @common_params = {
         :user_id => nil,
@@ -315,15 +317,6 @@ describe ApplicationController do
       controller.instance_variable_get(:@context).should == @course
       I18n.set_locale_with_localizer # this is what t() triggers
       I18n.locale.to_s.should == "ru"
-    end
-  end
-
-  if CANVAS_RAILS2
-    describe "#complete_request_uri" do
-      it "should filter sensitive parameters from the query string" do
-        controller.stubs(:request).returns(mock(:protocol => "https://", :host => "example.com", :fullpath => "/api/v1/courses?password=abcd&test=5&Xaccess_token=13&access_token=sekrit"))
-        controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
-      end
     end
   end
 end

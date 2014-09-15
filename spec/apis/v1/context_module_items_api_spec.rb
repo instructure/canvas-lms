@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Module Items API", type: :request do
-  before do
+  before :once do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
@@ -57,7 +57,7 @@ describe "Module Items API", type: :request do
   end
 
   context "as a teacher" do
-    before :each do
+    before :once do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
@@ -163,6 +163,45 @@ describe "Module Items API", type: :request do
         item.should include('url')
         uri = URI(item['url'])
         uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include('url=')
+      end
+    end
+
+    it 'should return the url for external tool manually entered urls' do
+      @module1.add_item(:type => 'external_tool', :title => 'Tool', :url => 'http://www.google.com', :new_tab => false, :indent => 0)
+      @module1.save!
+      @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items.length.should == 1
+      items.each do |item|
+        item.should include('url')
+        uri = URI(item['url'])
+        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include('url=')
+      end
+    end
+
+    it "should return the url for external tool with tool_id" do
+      tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :tool_id => 'ewet00b')
+      @module1.add_item(:type => 'external_tool', :title => 'Tool', :id => tool.id, :url => 'http://www.google.com', :new_tab => false, :indent => 0)
+      @module1.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items.length.should == 1
+      items.each do |item|
+        item.should include('url')
+        uri = URI(item['url'])
+        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include("id=#{tool.id}")
         uri.query.should include('url=')
       end
     end
@@ -781,8 +820,18 @@ describe "Module Items API", type: :request do
         json['items'][0]['next']['id'].should eql @topic_tag.id
       end
 
+      it "should treat a nil position as sort-last" do
+        @external_url_tag.update_attribute(:position, nil)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=discussion&asset_id=#{@topic.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'discussion', :asset_id => @topic.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['prev']['id'].should eql @quiz_tag.id
+        json['items'][0]['next']['id'].should eql @external_url_tag.id
+      end
+
       context "with duplicate items" do
-        before do
+        before :once do
           @other_quiz_tag = @module3.add_item(:id => @quiz.id, :type => 'quiz')
         end
 
@@ -826,8 +875,8 @@ describe "Module Items API", type: :request do
   end
 
   context "as a student" do
-    before :each do
-      course_with_student_logged_in(:course => @course, :active_all => true)
+    before :once do
+      course_with_student(:course => @course, :active_all => true)
     end
 
     def override_assignment
@@ -873,7 +922,7 @@ describe "Module Items API", type: :request do
       end
       let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id}['content_details'] }
 
-      before do
+      before :once do
         override_assignment
       end
 
@@ -906,7 +955,7 @@ describe "Module Items API", type: :request do
       end
       let(:assignment_details) { json['content_details'] }
 
-      before do
+      before :once do
         override_assignment
       end
 
@@ -1011,7 +1060,7 @@ describe "Module Items API", type: :request do
 
     describe "GET 'module_item_sequence'" do
       context "unpublished item" do
-        before do
+        before :once do
           @quiz_tag.unpublish
         end
 
@@ -1036,7 +1085,7 @@ describe "Module Items API", type: :request do
       end
 
       context "unpublished module" do
-        before do
+        before :once do
           @new_assignment_1 = @course.assignments.create!
           @new_assignment_1_tag = @module3.add_item :type => 'assignment', :id => @new_assignment_1.id
           @module4 = @course.context_modules.create!
@@ -1069,7 +1118,7 @@ describe "Module Items API", type: :request do
   end
 
   context "unauthorized user" do
-    before do
+    before :once do
       user
     end
 

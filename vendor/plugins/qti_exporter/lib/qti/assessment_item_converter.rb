@@ -249,8 +249,20 @@ class AssessmentItemConverter
   def clear_html(text)
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
-  
+
+  # try to escape unmatched '<' and '>' characters because some people don't format their QTI correctly...
+  def escape_unmatched_brackets(string)
+    string.split(/(\<[^\<\>]*\>)/).map do |sub|
+      if sub.start_with?("<") && sub.end_with?(">")
+        sub
+      else
+        sub.gsub("<", "&lt;").gsub(">", "&gt;")
+      end
+    end.join
+  end
+
   def sanitize_html_string(string, remove_extraneous_nodes=false)
+    string = escape_unmatched_brackets(string)
     sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(string), remove_extraneous_nodes)
   end
 

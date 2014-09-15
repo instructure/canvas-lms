@@ -36,6 +36,8 @@ define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
       svg = d3.select(@$('svg')[0])
         .attr('width', width + MARGIN_L + MARGIN_R)
         .attr('height', height + MARGIN_T + MARGIN_B)
+        .attr('viewBox', "0 0 #{width + MARGIN_L + MARGIN_R} #{height + MARGIN_T + MARGIN_B}")
+        .attr('preserveAspectRatio', 'xMinYMax')
         .append('g')
           .attr("transform", "translate(#{MARGIN_L},#{MARGIN_T})")
 

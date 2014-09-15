@@ -107,13 +107,7 @@ class NotificationPolicy < ActiveRecord::Base
         notifications.each do |notification_id|
           scope = user.notification_policies.
               where(communication_channel_id: params[:channel_id], notification_id: notification_id)
-          if CANVAS_RAILS2
-            # can't use find_or_initialize, cause Rails 2 gets confused
-            p = scope.first
-            p ||= user.notification_policies.build(communication_channel_id: params[:channel_id], notification_id: notification_id)
-          else
-            p = scope.first_or_initialize
-          end
+          p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
           p.save!

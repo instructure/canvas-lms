@@ -27,24 +27,20 @@ describe EportfoliosController do
     @entry = @category.eportfolio_entries.create!(:name => "some entry", :eportfolio => @portfolio)
   end
   
-  # describe "GET 'index'" do
-    # it "should assign variables" do
-      # eportfolio_with_user
-      # get 'index'
-      # response.should be_success
-      # assigns[:portfolios].should_not be_nil
-    # end
-  # end
+
+  before :once do
+    user(:active_all => true)
+  end
   
   describe "GET 'user_index'" do
+    before(:once){ eportfolio }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       get 'user_index'
       response.should be_redirect
     end
     
     it "should assign variables" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       get 'user_index'
       assigns[:portfolios].should_not be_nil
       assigns[:portfolios].should_not be_empty
@@ -55,8 +51,7 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
-      course_with_student_logged_in(:active_all => true)
-      @user.eportfolios.create!
+      course_with_student_logged_in(:active_all => true, :user => @user)
       get 'user_index'
       response.should be_redirect
     end
@@ -69,7 +64,6 @@ describe EportfoliosController do
     end
     
     it "should create portfolio" do
-      user(:active_all => true)
       user_session(@user)
       post 'create', :eportfolio => {:name => "some portfolio"}
       response.should be_redirect
@@ -79,8 +73,8 @@ describe EportfoliosController do
   end
   
   describe "GET 'show'" do
+    before(:once){ eportfolio }
     it "should require authorization if the eportfolio is not public" do
-      eportfolio_with_user(:active_all => true)
       get 'show', :id => @portfolio.id
       assert_unauthorized
     end
@@ -89,29 +83,43 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
-      course_with_student_logged_in(:active_all => true)
-      @portfolio = @user.eportfolios.create!
+      course_with_student_logged_in(:active_all => true, :user => @user)
       get 'show', :id => @portfolio.id
       assert_unauthorized
     end
     
     it "should show portfolio" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       get 'show', :id => @portfolio.id
       response.should be_success
       assigns[:portfolio].should_not be_nil
     end
+
+    it "should create a category if one doesn't exist" do
+      user_session(@user)
+      get 'show', :id => @portfolio.id
+      response.should be_success
+      assigns[:category].should_not be_nil
+    end
+
+    it "should create an entry in the first category if one doesn't exist" do
+      @portfolio.eportfolio_categories.create!(:name => "Home")
+      user_session(@user)
+      get 'show', :id => @portfolio.id
+      response.should be_success
+      assigns[:page].should_not be_nil
+    end
   end
   
   describe "PUT 'update'" do
+    before(:once){ eportfolio }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       put 'update', :id => @portfolio.id, :eportfolio => {:name => "new title"}
       assert_unauthorized
     end
     
     it "should update portfolio" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       put 'update', :id => @portfolio.id, :eportfolio => {:name => "new title"}
       response.should be_redirect
       assigns[:portfolio].should_not be_nil
@@ -120,14 +128,14 @@ describe EportfoliosController do
   end
   
   describe "DELETE 'destroy'" do
+    before(:once){ eportfolio }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       delete 'destroy', :id => @portfolio.id
       assert_unauthorized
     end
     
     it "should delete portfolio" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       delete 'destroy', :id => @portfolio.id
       assigns[:portfolio].should_not be_nil
       assigns[:portfolio].should_not be_frozen
@@ -139,14 +147,14 @@ describe EportfoliosController do
   end
   
   describe "POST 'reorder_categories'" do
+    before(:once){ eportfolio }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       post 'reorder_categories', :eportfolio_id => @portfolio.id, :order => ''
       assert_unauthorized
     end
     
     it "should reorder categories" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       c1 = eportfolio_category
       c2 = eportfolio_category
       c3 = eportfolio_category
@@ -165,14 +173,14 @@ describe EportfoliosController do
   end
   
   describe "POST 'reorder_entries'" do
+    before(:once){ eportfolio }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       post 'reorder_entries', :eportfolio_id => @portfolio.id, :order => '', :eportfolio_category_id => 1
       assert_unauthorized
     end
     
     it "should reorder entries" do
-      eportfolio_with_user_logged_in(:active_all => true)
+      user_session(@user)
       eportfolio_category
       e1 = category_entry
       e2 = category_entry
@@ -191,14 +199,16 @@ describe EportfoliosController do
   end
 
   describe "GET 'public_feed.atom'" do
-    before(:each) do
-      eportfolio_model
-      @eportfolio.public = true
-      @eportfolio.save!
+    before(:once) do
+      eportfolio
+      @portfolio.public = true
+      @portfolio.save!
+      eportfolio_category
+      category_entry
     end
 
     it "should include absolute path for rel='self' link" do
-      get 'public_feed', :eportfolio_id => @eportfolio.id, :format => 'atom'
+      get 'public_feed', :eportfolio_id => @portfolio.id, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.links.first.rel.should match(/self/)
@@ -206,7 +216,7 @@ describe EportfoliosController do
     end
 
     it "should include an author for each entry" do
-      get 'public_feed', :eportfolio_id => @eportfolio.id, :format => 'atom'
+      get 'public_feed', :eportfolio_id => @portfolio.id, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.entries.should_not be_empty

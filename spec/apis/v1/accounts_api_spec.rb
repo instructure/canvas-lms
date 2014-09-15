@@ -19,8 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Accounts API", type: :request do
-  before do
-    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+  before :once do
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45, :default_group_storage_quota_mb => 42)
     @a1.account_users.create!(user: @user)
@@ -31,6 +30,10 @@ describe "Accounts API", type: :request do
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
     @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
+  end
+
+  before :each do
+    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
   end
 
   describe 'index' do
@@ -68,7 +71,7 @@ describe "Accounts API", type: :request do
   end
 
   describe 'sub_accounts' do
-    before do
+    before :once do
       root = @a1
       a1 = root.sub_accounts.create! :name => "Account 1"
       a2 = root.sub_accounts.create! :name => "Account 2"
@@ -244,7 +247,7 @@ describe "Accounts API", type: :request do
     end
 
     context 'with :manage_storage_quotas' do
-      before(:each) do
+      before(:once) do
         # remove the user from being an Admin
         @a1.account_users.where(user_id: @user).delete_all
 
@@ -294,7 +297,7 @@ describe "Accounts API", type: :request do
     end
 
     context 'without :manage_storage_quotas' do
-      before(:each) do
+      before(:once) do
         # remove the user from being an Admin
         @a1.account_users.where(user_id: @user).delete_all
 
@@ -387,7 +390,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "courses filtered by state[]" do
-      before do
+      before :once do
         @me = @user
         [:c1, :c2, :c3, :c4].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
@@ -433,7 +436,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "?with_enrollments" do
-      before do
+      before :once do
         @me = @user
         c1 = course_model(:account => @a1, :name => 'c1')    # has a teacher
         c2 = Course.create!(:account => @a1, :name => 'c2')  # has no enrollments
@@ -460,7 +463,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "?published" do
-      before do
+      before :once do
         @me = @user
         [:c1, :c2].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
@@ -489,7 +492,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "?completed" do
-      before do
+      before :once do
         @me = @user
         [:c1, :c2, :c3, :c4].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
@@ -526,7 +529,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "?by_teachers" do
-      before do
+      before :once do
         @me = @user
         course_with_teacher(:account => @a1, :course_name => 'c1a', :user => user_with_pseudonym(:account => @a1))
         @pseudonym.sis_user_id = 'a_sis_id'
@@ -563,7 +566,7 @@ describe "Accounts API", type: :request do
     end
 
     describe "?by_subaccounts" do
-      before do
+      before :once do
         @me = @user
         @sub1 = account_model(:name => 'sub1', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sub1')
         @sub1a = account_model(:name => 'sub1a', :parent_account => @sub1, :root_account => @a1, :sis_source_id => 'sub1a')
@@ -615,16 +618,16 @@ describe "Accounts API", type: :request do
     end
 
     it "should limit the maximum per-page returned" do
-      @me = @user
-      15.times { |i| course_model(:name => "c#{i}", :account => @a1, :root_account => @a1) }
-      @user = @me
+      create_courses(15, account: @a1, account_associations: true)
       api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 12
       Setting.set('api_max_per_page', '5')
       api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 5
     end
 
     it "should return courses filtered search term" do
-      @user, @courses = @user, (5..12).map { |i| course_model(:name => "name#{i}", :course_code => "code#{i}", :account => @a1, :root_account => @a1) }
+      data = (5..12).map{ |i| {name: "name#{i}", course_code: "code#{i}" }}
+      @courses = create_courses(data, account: @a1, account_associations: true, return_type: :record)
+      @course = @courses.last
 
       search_term = "name"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",

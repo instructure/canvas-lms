@@ -19,9 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CommunicationChannelsController do
+  before :once do
+    user_with_pseudonym(:active_user => true)
+  end
+
   describe "POST 'create'" do
+    before(:once) { user_model }
+
     it "should create a new CC unconfirmed" do
-      user_model
       user_session(@user)
       post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email'  }
       response.should be_success
@@ -33,7 +38,6 @@ describe CommunicationChannelsController do
     it "should create a new CC regardless of conflicts" do
       u = User.create!
       cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
-      user_model
       user_session(@user)
       post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
       response.should be_success
@@ -44,7 +48,6 @@ describe CommunicationChannelsController do
     end
 
     it "should resurrect retired CCs" do
-      user_model
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc|
         cc.workflow_state = 'retired'
         cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
@@ -59,7 +62,6 @@ describe CommunicationChannelsController do
     end
 
     it "should not allow duplicate active CCs for a single user" do
-      user_model
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
@@ -69,8 +71,9 @@ describe CommunicationChannelsController do
 
   describe "GET 'confirm'" do
     context "add CC to existing user" do
+      before(:once) { user_with_pseudonym(active_user: 1) }
+
       it "should confirm an unconfirmed CC" do
-        user_with_pseudonym(:active_user => 1)
         user_session(@user, @pseudonym)
         get 'confirm', :nonce => @cc.confirmation_code
         response.should be_redirect
@@ -80,14 +83,12 @@ describe CommunicationChannelsController do
       end
 
       it "should redirect to login when trying to confirm" do
-        user_with_pseudonym(:active_user => 1)
         get 'confirm', :nonce => @cc.confirmation_code
         response.should be_redirect
         response.should redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
       it "should require the correct user to confirm a cc" do
-        user_with_pseudonym(:active_all => 1)
         @user1 = @user
         @pseudonym1 = @pseudonym
         user_with_pseudonym(:active_user => 1, :username => 'jt@instructure.com')
@@ -112,6 +113,12 @@ describe CommunicationChannelsController do
     end
 
     describe "open registration" do
+      before :once do
+        @account = Account.create!
+        course(:active_all => 1, :account => @account)
+        user
+      end
+
       it "should show a pre-registered user the confirmation form" do
         user_with_pseudonym(:password => :autogenerate)
         @user.accept_terms
@@ -153,7 +160,6 @@ describe CommunicationChannelsController do
       end
 
       it "should not forget the account when registering for a non-default account" do
-        @account = Account.create!
         @course = Course.create!(:account => @account) { |c| c.workflow_state = 'available' }
         user_with_pseudonym(:account => @account, :password => :autogenerate)
         @user.accept_terms
@@ -171,7 +177,6 @@ describe CommunicationChannelsController do
       end
 
       it "should figure out the correct domain when registering" do
-        @account = Account.create!
         user_with_pseudonym(:account => @account, :password => :autogenerate)
         @pseudonym.account.should == @account
         @user.should be_pre_registered
@@ -194,8 +199,6 @@ describe CommunicationChannelsController do
       end
 
       it "should show the confirm form for a creation_pending user" do
-        course(:active_all => 1)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -210,8 +213,6 @@ describe CommunicationChannelsController do
       end
 
       it "should register creation_pending user" do
-        course(:active_all => 1)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -237,7 +238,6 @@ describe CommunicationChannelsController do
       end
 
       it "should show the confirm form for a creation_pending user that's logged in (masquerading)" do
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -251,7 +251,6 @@ describe CommunicationChannelsController do
       end
 
       it "should register creation_pending user that's logged in (masquerading)" do
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -274,9 +273,6 @@ describe CommunicationChannelsController do
       end
 
       it "should prepare to register a creation_pending user in the correct account" do
-        @account = Account.create!
-        course(:active_all => 1, :account => @account)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -293,9 +289,6 @@ describe CommunicationChannelsController do
       end
 
       it "should register creation_pending user in the correct account" do
-        @account = Account.create!
-        course(:active_all => 1, :account => @account)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -321,8 +314,6 @@ describe CommunicationChannelsController do
       end
 
       it "should prepare to register a creation_pending user in the correct account (admin)" do
-        @account = Account.create!
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.account_users.create!(user: @user)
@@ -338,8 +329,6 @@ describe CommunicationChannelsController do
       end
 
       it "should register creation_pending user in the correct account (admin)" do
-        @account = Account.create!
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.account_users.create!(user: @user)
@@ -363,7 +352,6 @@ describe CommunicationChannelsController do
 
       it "should show the confirm form for old creation_pending users that have a pseudonym" do
         course(:active_all => 1)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -378,7 +366,6 @@ describe CommunicationChannelsController do
 
       it "should work for old creation_pending users that have a pseudonym" do
         course(:active_all => 1)
-        user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -437,6 +424,11 @@ describe CommunicationChannelsController do
     end
 
     describe "merging" do
+      before :once do
+        @account1 = Account.create!(:name => 'A')
+        @account2 = Account.create!(:name => 'B')
+      end
+
       it "should prepare to merge with an already-logged-in user" do
         user_with_pseudonym(:username => 'jt+1@instructure.com')
         @not_logged_user = @user
@@ -491,11 +483,9 @@ describe CommunicationChannelsController do
 
       it "should not show users that can't have a pseudonym created for the correct account" do
         Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-        @account1 = Account.create!
         @account1.account_authorization_configs.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
 
-        @account2 = Account.create!
         course(:active_all => 1, :account => @account2)
         user
         @user.update_attribute(:workflow_state, 'creation_pending')
@@ -512,7 +502,6 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         @old_user = @user
 
-        @account2 = Account.create!
         course(:active_all => 1, :account => @account2)
         user
         @user.update_attribute(:workflow_state, 'creation_pending')
@@ -533,8 +522,6 @@ describe CommunicationChannelsController do
 
       it "should include all pseudonyms if there are multiple" do
         Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-        @account1 = Account.create!(:name => 'A')
-        @account2 = Account.create!(:name => 'B')
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
         @pseudonym1 = @pseudonym
         @user1 = @user
@@ -566,8 +553,9 @@ describe CommunicationChannelsController do
     end
 
     describe "invitations" do
+      before(:once) { course_with_student(:active_course => 1) }
+
       it "should prepare to accept an invitation when creating a new user" do
-        course_with_student(:active_course => 1)
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
@@ -579,7 +567,6 @@ describe CommunicationChannelsController do
       end
 
       it "should accept an invitation when creating a new user" do
-        course_with_student(:active_course => 1)
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -597,7 +584,6 @@ describe CommunicationChannelsController do
       end
 
       it "should accept an invitation when merging with the current user" do
-        course_with_student(:active_course => 1)
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user
@@ -614,7 +600,6 @@ describe CommunicationChannelsController do
       end
 
       it "should accept an invitation when merging with the current user" do
-        course_with_student(:active_course => 1)
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user
@@ -680,7 +665,6 @@ describe CommunicationChannelsController do
   end
 
   it "should re-send communication channel invitation for an invited channel" do
-    user_with_pseudonym(:active_user => true)
     Notification.create(:name => 'Confirm Email Communication Channel')
     get 're_send_confirmation', :user_id => @pseudonym.user_id, :id => @cc.id
     response.should be_success
@@ -690,7 +674,6 @@ describe CommunicationChannelsController do
   end
 
   it "should re-send enrollment invitation for an invited user" do
-    user_with_pseudonym(:active_user => true)
     course(:active_all => true)
     @enrollment = @course.enroll_user(@user)
     @enrollment.context.should eql(@course)
@@ -703,7 +686,6 @@ describe CommunicationChannelsController do
   end
 
   it "should uncache user's cc's when retiring a CC" do
-    user_with_pseudonym(:active_user => true)
     user_session(@user, @pseudonym)
     User.record_timestamps = false
     begin
@@ -725,7 +707,6 @@ describe CommunicationChannelsController do
   end
 
   it "should not delete a required institutional channel" do
-    user_with_pseudonym(:active_user => true)
     user_session(@user, @pseudonym)
     Account.default.settings[:edit_institution_email] = false
     Account.default.save!

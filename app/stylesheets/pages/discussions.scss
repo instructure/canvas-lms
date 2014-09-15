@@ -123,6 +123,24 @@ body.with-right-side.with-left-side {
   }
 }
 
+.peer-review-alert {
+  .peer-review-title {
+    line-height: 21px;
+    margin: 0;
+    a {
+      display: inline-block;
+      margin-left: 3px
+    }
+  }
+  .icon-peer-review {
+    position: relative;
+    top: 4px;
+    &:before {
+      top: 0;
+    }
+  }
+}
+
 .reply-textarea {
   border-radius: 5px 5px 0 0;
   box-sizing: border-box;
@@ -179,9 +197,15 @@ body.with-right-side.with-left-side {
   line-height: 23px;
 }
 
-.discussion-assignment-section .discussion-title {
-  font-size: 14px !important;
+.discussion-assignment-section {
+  .row-fluid [class*="span"] {
+    min-height: 0;
+  }  
+  .discussion-title {
+    font-size: 14px !important;
+  }
 }
+
 
 .discussion-fyi {
   font-style: italic;

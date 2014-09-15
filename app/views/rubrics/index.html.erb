@@ -46,7 +46,7 @@
 </style>
 <% end %>
 <% js_bundle 'legacy/rubrics_index' %>
-<h2>
+<h1>
   <% case @context.class.to_s %>
     <% when 'Course' %>
       <%= t 'course_rubrics', "Course Rubrics" %>
@@ -55,7 +55,7 @@
     <% when 'Account' %>
       <%= t 'account_rubrics', "Account Rubrics" %>
   <% end %>
-</h2>
+</h1>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
 <div id="rubrics" class="raw_listing">
   <ul>

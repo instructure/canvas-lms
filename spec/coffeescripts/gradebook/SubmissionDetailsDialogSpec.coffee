@@ -36,3 +36,26 @@ define [
     dialog.open()
 
     ok dialog.dialog.find('.submission-details').text().match('LATE')
+
+  module '_submission_detail',
+
+    setup: ->
+      @assignment = new Assignment(id: 1)
+      @options    = { speed_grader_enabled: true, change_grade_url: 'magic'}
+
+    teardown: ->
+      $('.submission_details_dialog').remove()
+
+  test 'partial correctly makes url field if submission type is url', ->
+    @user       = { assignment_1: { submission_history: [{ submission_type: "online_url", url: "www.cnn.com" }] }, id: 1, name: 'Test student' }
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: true, change_grade_url: ':assignment/:student')
+    dialog.open()
+
+    equal dialog.dialog.find('.url-submission').length, 1
+
+  test 'partial correctly makes attachment fields if submission included attachments', ->
+    @user       = { assignment_1: { submission_history: [{ submission_type: "online_url", attachments: [{},{},{}] }] }, id: 1, name: 'Test student' }
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: true, change_grade_url: ':assignment/:student')
+    dialog.open()
+
+    equal dialog.dialog.find('.submisison-attachment').length, 3

@@ -19,12 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Polling::PollsController, type: :request do
-  before(:each) do
-    course_with_teacher_logged_in active_all: true
+  before :once do
+    course_with_teacher active_all: true
   end
 
   describe 'GET index' do
-    before(:each) do
+    before :once do
       5.times do |n|
         @teacher.polls.create!(question: "Example Poll #{n+1}")
       end
@@ -79,7 +79,7 @@ describe Polling::PollsController, type: :request do
   end
 
   describe 'GET show' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
     end
 
@@ -181,7 +181,7 @@ describe Polling::PollsController, type: :request do
   end
 
   describe 'PUT update' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
     end
 
@@ -214,7 +214,7 @@ describe Polling::PollsController, type: :request do
   end
 
   describe 'DELETE destroy' do
-    before(:each) do
+    before :once do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @choice = @poll.poll_choices.create!(text: 'Blah')
       @session = @poll.poll_sessions.create!(course: @course)

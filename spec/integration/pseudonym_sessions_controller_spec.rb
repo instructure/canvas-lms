@@ -98,9 +98,24 @@ describe PseudonymSessionsController do
       redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
 
       get cas_login_url :ticket => 'ST-abcd'
-      response.should redirect_to(@cas_client.logout_url(cas_login_url :no_auto => true))
+      response.should redirect_to(cas_login_url(:no_auto => true))
       get cas_login_url :no_auto => true
       flash[:delegated_message].should match(/Canvas doesn't have an account for user/)
+    end
+
+    it "should redirect to a custom url if the user CAS account doesn't exist" do
+      redirect_url = login_url(:no_auto => 'true')
+      aac = Account.default.account_authorization_config
+      aac.unknown_user_url = redirect_url
+      aac.save
+
+      stubby("yes\nnonexistentuser\n")
+
+      get login_url
+      redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+
+      get cas_login_url :ticket => 'ST-abcd'
+      response.should redirect_to(redirect_url)
     end
 
     it "should login case insensitively" do

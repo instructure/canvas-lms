@@ -36,13 +36,13 @@ describe "Group Categories API", type: :request do
     }
   end
 
-  before do
+  before :once do
     @account = Account.default
     @category_path_options = {:controller => "group_categories", :format => "json"}
   end
 
   describe "course group categories" do
-    before do
+    before :once do
       @course = course(:course_name => 'Math 101', :account => @account, :active_course => true)
       @category = GroupCategory.student_organized_for(@course)
     end
@@ -58,7 +58,7 @@ describe "Group Categories API", type: :request do
         }
       end
 
-      before do
+      before :once do
         @user = user(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
 
@@ -67,8 +67,11 @@ describe "Group Categories API", type: :request do
 
 
         6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
 
+        @user = @course.teacher_enrollments.first.user
+      end
+
+      before :each do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -140,7 +143,7 @@ describe "Group Categories API", type: :request do
     end
 
     describe "teacher actions with no group" do
-      before do
+      before :once do
         @name = 'some group name'
         @user = user(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
@@ -158,8 +161,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "should allow a teacher to update a category and distribute students to new groups" do
-        6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
+        create_users_in_course(@course, 6)
         json = api_call :put, "/api/v1/group_categories/#{@category.id}",
                         @category_path_options.merge(:action => 'update',
                                                      :group_category_id => @category.to_param),
@@ -173,8 +175,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "should create group category/groups and split students between groups" do
-        6.times { course_with_student({:course => @course}) }
-        @user = @course.teacher_enrollments.first.user
+        create_users_in_course(@course, 6)
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -244,7 +245,7 @@ describe "Group Categories API", type: :request do
       end
 
       describe "teacher actions with a group" do
-        before do
+        before :once do
           @study_group = group_model(:name => @name, :group_category => @category,
                                      :context => @course)
         end
@@ -332,7 +333,7 @@ describe "Group Categories API", type: :request do
     end
 
     describe "student actions" do
-      before do
+      before :once do
         @user = user(:name => "derrik hans")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
       end
@@ -393,7 +394,6 @@ describe "Group Categories API", type: :request do
         student = @course.enroll_student(user_model).user
         category = @course.group_categories.create(:name => "Group Category")
 
-        user_session(student)
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
@@ -486,12 +486,12 @@ describe "Group Categories API", type: :request do
   end
 
   describe "account group categories" do
-    before do
+    before :once do
       @communities = GroupCategory.communities_for(@account)
     end
 
     describe "admin actions" do
-      before do
+      before :once do
         @user = account_admin_user(:account => @account)
       end
 

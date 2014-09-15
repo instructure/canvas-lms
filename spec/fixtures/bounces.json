@@ -1,0 +1,90 @@
+[
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Permanent\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 550-5.7.1 PERM_FAIL_POLICY Your email has been rejected because it violates\\n550 5.7.1 school policy. h9si40237239qgf.115 - gsmtp\",\"emailAddress\":\"hard@example.edu\"}],\"timestamp\":\"2014-08-22T12:25:46.786Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"source\":\"notifications@instructure.com\",\"timestamp\":\"2014-08-22T12:25:45.000Z\",\"messageId\":\"example-id\",\"destination\":[\"hard@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:25:46.854Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Permanent\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 550-5.7.1 PERM_FAIL_POLICY Your email has been rejected because it violates\\n550 5.7.1 school policy. h9si40237239qgf.115 - gsmtp\",\"emailAddress\":\"hard@example.edu\"}],\"timestamp\":\"2014-08-22T12:25:46.786Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"source\":\"notifications@instructure.com\",\"timestamp\":\"2014-08-22T12:25:45.000Z\",\"messageId\":\"example-id\",\"destination\":[\"hard@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:25:46.854Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Permanent\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 550-5.7.1 PERM_FAIL_POLICY Your email has been rejected because it violates\\n550 5.7.1 school policy. h9si40237239qgf.115 - gsmtp\",\"emailAddress\":\"hard@example.edu\"}],\"timestamp\":\"2014-08-22T12:25:46.786Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"source\":\"notifications@instructure.com\",\"timestamp\":\"2014-08-22T12:25:45.000Z\",\"messageId\":\"example-id\",\"destination\":[\"hard@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:25:46.854Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Permanent\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 550-5.7.1 PERM_FAIL_POLICY Your email has been rejected because it violates\\n550 5.7.1 school policy. h9si40237239qgf.115 - gsmtp\",\"emailAddress\":\"hard@example.edu\"}],\"timestamp\":\"2014-08-22T12:25:46.786Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"source\":\"notifications@instructure.com\",\"timestamp\":\"2014-08-22T12:25:45.000Z\",\"messageId\":\"example-id\",\"destination\":[\"hard@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:25:46.854Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"Suppressed\",\"bounceType\":\"Permanent\",\"bouncedRecipients\":[{\"status\":\"5.1.1\",\"action\":\"failed\",\"diagnosticCode\":\"Amazon SES has suppressed sending to this address because it has a recent history of bouncing as an invalid address. For more information about how to remove an address from the suppression list, see the Amazon SES Developer Guide: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/remove-from-suppressionlist.html \",\"emailAddress\":\"hard@example.edu\"}],\"reportingMTA\":\"dns; amazonses.com\",\"timestamp\":\"2014-08-22T12:18:57.314Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-22T12:18:57.000Z\",\"destination\":[\"hard@example.edu\"],\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\"}}",
+        "Timestamp" : "2014-08-22T12:18:57.429Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Transient\",\"reportingMTA\":\"dns;SCN-EX13MB03.scn.internal\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp;550 5.7.1 RESOLVER.RST.AuthRequired; authentication required\",\"emailAddress\":\"soft@example.edu\"}],\"timestamp\":\"2014-08-22T13:24:31.000Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-22T13:24:23.000Z\",\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\",\"destination\":[\"soft@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T13:24:36.599Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"Suppressed\",\"bounceType\":\"Permanent\",\"reportingMTA\":\"dns; amazonses.com\",\"bouncedRecipients\":[{\"status\":\"5.1.1\",\"action\":\"failed\",\"diagnosticCode\":\"Amazon SES has suppressed sending to this address because it has a recent history of bouncing as an invalid address. For more information about how to remove an address from the suppression list, see the Amazon SES Developer Guide: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/remove-from-suppressionlist.html \",\"emailAddress\":\"suppressed@example.edu\"}],\"timestamp\":\"2014-08-22T12:18:58.044Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-22T12:18:57.000Z\",\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\",\"destination\":[\"suppressed@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:18:58.143Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    },
+    {
+        "Type" : "Notification",
+        "MessageId" : "example-id",
+        "TopicArn" : "example-arn",
+        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Transient\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"emailAddress\":\"soft@example.edu\",\"status\":\"4.4.7\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 554 4.4.7 Message expired: unable to deliver in 840 minutes.<421 4.4.0 Unable to lookup DNS for ms-wasatch-edu.mail.protection.outlook.com>\"}],\"timestamp\":\"2014-08-22T12:18:58.226Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-21T20:51:56.000Z\",\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\",\"destination\":[\"soft@example.edu\"]}}",
+        "Timestamp" : "2014-08-22T12:18:58.393Z",
+        "SignatureVersion" : "1",
+        "Signature" : "example==",
+        "SigningCertURL" : "https://example.com/example.pem",
+        "UnsubscribeURL" : "https://example.com/unsubscribe"
+    }
+]

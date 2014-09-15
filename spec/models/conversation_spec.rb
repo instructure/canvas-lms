@@ -19,19 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Conversation do
+  let_once(:sender) { user }
+  let_once(:recipient) { user }
+
   context "initiation" do
     it "should set private_hash for private conversations" do
-      users = 2.times.map{ user }
+      users = create_users(2, return_type: :record)
       Conversation.initiate(users, true).private_hash.should_not be_nil
     end
 
     it "should not set private_hash for group conversations" do
-      users = 3.times.map{ user }
+      users = create_users(3, return_type: :record)
       Conversation.initiate(users, false).private_hash.should be_nil
     end
 
     it "should reuse private conversations" do
-      users = 2.times.map{ user }
+      users = create_users(2, return_type: :record)
       c1 = Conversation.initiate(users, true)
       c2 = Conversation.initiate(users, true)
       c1.should == c2
@@ -39,13 +42,13 @@ describe Conversation do
     end
 
     it "should not reuse group conversations" do
-      users = 2.times.map{ user }
+      users = create_users(2, return_type: :record)
       Conversation.initiate(users, false).should_not ==
       Conversation.initiate(users, false)
     end
 
     it "should populate subject if provided" do
-      users = 2.times.map{ user }
+      users = create_users(2, return_type: :record)
       Conversation.initiate(users, nil, :subject => 'lunch').subject.should == 'lunch'
     end
 
@@ -103,14 +106,12 @@ describe Conversation do
 
   context "adding participants" do
     it "should not add participants to private conversations" do
-      sender = user
-      root_convo = Conversation.initiate([sender, user], true)
+      root_convo = Conversation.initiate([sender, recipient], true)
       lambda{ root_convo.add_participants(sender, [user]) }.should raise_error
     end
 
     it "should add new participants to group conversations and give them all messages" do
-      sender = user
-      root_convo = Conversation.initiate([sender, user], false)
+      root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
       new_guy = user
@@ -124,8 +125,6 @@ describe Conversation do
     end
 
     it "should only add participants to messages the existing user has participants on" do
-      sender = user
-      recipient = user
       root_convo = Conversation.initiate([sender, recipient], false)
       msgs = []
       msgs << root_convo.add_message(sender, "first message body")  <<
@@ -143,16 +142,13 @@ describe Conversation do
 
 
     it "should not re-add existing participants to group conversations" do
-      sender = user
-      recipient = user
       root_convo = Conversation.initiate([sender, recipient], false)
       lambda{ root_convo.add_participants(sender, [recipient]) }.should_not raise_error
       root_convo.participants.size.should == 2
     end
 
     it "should update the updated_at timestamp and clear the identity header cache of new participants" do
-      sender = user
-      root_convo = Conversation.initiate([sender, user], false)
+      root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
       new_guy = user
@@ -341,7 +337,6 @@ describe Conversation do
 
   context "subscription" do
     it "should mark-as-read when unsubscribing iff it was unread" do
-      sender = user
       subscription_guy = user
       archive_guy = user
       root_convo = Conversation.initiate([sender, archive_guy, subscription_guy], false)
@@ -359,7 +354,6 @@ describe Conversation do
     end
 
     it "should mark-as-unread when re-subscribing iff there are newer messages" do
-      sender = user
       flip_flopper_guy = user
       subscription_guy = user
       archive_guy = user
@@ -394,7 +388,6 @@ describe Conversation do
     end
 
     it "should not toggle read/unread until the subscription change is saved" do
-      sender = user
       subscription_guy = user
       root_convo = Conversation.initiate([sender, user, subscription_guy], false)
       root_convo.add_message(sender, 'test')
@@ -414,8 +407,7 @@ describe Conversation do
 
   context "adding messages" do
     it "should deliver the message to all participants" do
-      sender = user
-      recipients = 5.times.map{ user }
+      recipients = create_users(5, return_type: :record)
       Conversation.initiate([sender] + recipients, false).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.reload.read?.should be_true # only for the sender, and then only on the first message
@@ -430,8 +422,7 @@ describe Conversation do
     end
 
     it "should only ever change the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
-      sender = user
-      Conversation.initiate([sender, user], true).add_message(sender, 'test')
+      Conversation.initiate([sender, recipient], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.update_attribute(:workflow_state, "unread")
       convo.add_message('another test', :update_for_sender => false) # as if it were a bulk private message
@@ -452,8 +443,7 @@ describe Conversation do
     end
 
     it "should not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
-      sender = user
-      rconvo = Conversation.initiate([sender, user], true)
+      rconvo = Conversation.initiate([sender, recipient], true)
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_message_at.should_not be_nil
@@ -470,8 +460,7 @@ describe Conversation do
       expected_times = [Time.now.utc - 1.hours, Time.now.utc].map{ |t| Time.parse(t.to_s) }
       ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).twice.returns(*expected_times)
 
-      sender = user
-      rconvo = Conversation.initiate([sender, user], true)
+      rconvo = Conversation.initiate([sender, recipient], true)
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_authored_at.should eql expected_times.first
@@ -488,8 +477,7 @@ describe Conversation do
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do
-      sender = user
-      recipients = 5.times.map{ user }
+      recipients = create_users(5, return_type: :record)
       Conversation.initiate([sender] + recipients, false).add_message(sender, 'test')
 
       recipient = recipients.last
@@ -508,8 +496,7 @@ describe Conversation do
     end
 
     it "should only alert message participants" do
-      sender = user
-      recipients = 5.times.map{ user }
+      recipients = create_users(5, return_type: :record)
       convo = Conversation.initiate([sender] + recipients, false)
       convo.add_message(sender, 'test')
 
@@ -659,15 +646,19 @@ describe Conversation do
     end
 
     context "subsequent tags" do
-      it "should add new tags to the conversation" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
+      let_once(:course1) { @course1 = course(active_all: true) }
+      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:u1) { student_in_course(active_all: true, course: course1).user }
+      let_once(:u2) { student_in_course(active_all: true, course: course1).user }
+      let_once(:u3) { student_in_course(active_all: true, course: course2).user }
+      let_once(:conversation) do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation
+      end
+
+      it "should add new tags to the conversation" do
         conversation.tags.should eql [@course1.asset_string]
 
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string])
@@ -675,14 +666,6 @@ describe Conversation do
       end
 
       it "should add new visible tags to the conversation_participant" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
-        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
-        conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         u1.conversations.first.tags.should == [@course1.asset_string]
         u2.conversations.first.tags.should == [@course1.asset_string]
         u3.conversations.first.tags.should == [@course2.asset_string]
@@ -694,14 +677,6 @@ describe Conversation do
       end
 
       it "should ignore conversation_participants without a valid user" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
-        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
-        conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         u1.conversations.first.tags.should == [@course1.asset_string]
         u2.conversations.first.tags.should == [@course1.asset_string]
         u3.conversations.first.tags.should == [@course2.asset_string]
@@ -717,11 +692,12 @@ describe Conversation do
     end
 
     context "private conversations" do
+      let_once(:course1) { @course1 = course(active_all: true) }
+      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:u1) { student_in_course(active_all: true, course: course1).user }
+      let_once(:u2) { student_in_course(active_all: true, course: course1).user }
+
       it "should save new visible tags on the conversation_message_participant" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
@@ -734,22 +710,16 @@ describe Conversation do
       end
 
       it "should save the previous message tags on the conversation_message_participant if there are no new visible ones" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
         conversation = Conversation.initiate([u1, u2], true)
-        conversation.add_message(u1, 'test', :tags => [@course.asset_string])
+        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         cp = u2.conversations.first
-        cp.messages.human.first.tags.should eql [@course.asset_string]
+        cp.messages.human.first.tags.should eql [@course1.asset_string]
 
         conversation.add_message(u1, 'another', :tags => ["course_0"])
-        cp.messages.human.first.tags.should eql [@course.asset_string]
+        cp.messages.human.first.tags.should eql [@course1.asset_string]
       end
 
       it "should recompute the conversation_participant's tags when removing messages" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
@@ -768,23 +738,21 @@ describe Conversation do
     end
 
     context "group conversations" do
+      let_once(:course1) { @course1 = course(active_all: true) }
+      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:u1) { student_in_course(active_all: true, course: course1).user }
+      let_once(:u2) { student_in_course(active_all: true, course: course1).user }
+
       it "should not save tags on the conversation_message_participant" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        u3 = student_in_course(:active_all => true, :course => @course).user
-        @course = @course
+        u3 = student_in_course(:active_all => true, :course => @course1).user
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course.asset_string])
+        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         u1.conversations.first.messages.human.first.tags.should eql []
         u2.conversations.first.messages.human.first.tags.should eql []
         u3.conversations.first.messages.human.first.tags.should eql []
       end
 
       it "should not recompute the conversation_participant's tags when removing messages" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -800,10 +768,6 @@ describe Conversation do
       end
 
       it "should add tags specified along with new recipients" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         u4 = student_in_course(:active_all => true, :course => @course2).user
@@ -872,6 +836,9 @@ describe Conversation do
         @student    = student_in_course(:active_all => true, :course => @course).user
         @old_course = @course
       end
+
+      let_once(:student1) { student_in_course(:active_all => true, :course => @old_course).user }
+      let_once(:student2) { student_in_course(:active_all => true, :course => @old_course).user }
 
       it "should remove old tags and add new ones" do
         conversation = Conversation.initiate([@teacher, @student], true)
@@ -948,9 +915,6 @@ describe Conversation do
       end
 
       it "should include concluded group contexts when no active ones exist" do
-        student1 = student_in_course(:active_all => true, :course => @old_course).user
-        student2 = student_in_course(:active_all => true, :course => @old_course).user
-
         group      = Group.create!(:context => @old_course)
         [student1, student2].each { |s| group.users << s }
 
@@ -969,9 +933,6 @@ describe Conversation do
       end
 
       it "should replace concluded group contexts with active ones" do
-        student1 = student_in_course(:active_all => true, :course => @old_course).user
-        student2 = student_in_course(:active_all => true, :course => @old_course).user
-
         old_group = Group.create!(:context => @old_course)
         [student1, student2].each { |s| old_group.users << s }
 

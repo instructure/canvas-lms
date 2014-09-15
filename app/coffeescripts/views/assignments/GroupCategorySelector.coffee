@@ -12,7 +12,7 @@ define [
     template: template
 
     GROUP_CATEGORY_ID = '#assignment_group_category_id'
-    HAS_GROUP_CATEGORY = '#assignment_has_group_category'
+    HAS_GROUP_CATEGORY = '#has_group_category'
     GROUP_CATEGORY_OPTIONS = '#group_category_options'
 
     els: do ->
@@ -39,7 +39,7 @@ define [
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
         # TODO: Yikes, we need to pull the javascript out of manage_groups.js
-        # and get rid of this global thing 
+        # and get rid of this global thing
         window.addGroupCategory (data) =>
           group = data[0].group_category
           $newCategory = $('<option>')
@@ -73,6 +73,7 @@ define [
       sectionLabel: @sectionLabel
       fieldLabel: @fieldLabel
       lockedMessage: @lockedMessage
+      ariaChecked: if @parentModel.groupCategoryId() then 'true' else 'false'
 
       nested: @nested
       prefix: 'assignment' if @nested

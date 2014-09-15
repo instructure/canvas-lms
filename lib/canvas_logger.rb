@@ -1,11 +1,5 @@
 require 'active_support'
 
-if CANVAS_RAILS2
-  ActiveSupport::BufferedLogger.class_eval do
-    alias :quietly :silence
-  end
-end
-
 class CanvasLogger < ActiveSupport::BufferedLogger
   attr_reader :log_path
 

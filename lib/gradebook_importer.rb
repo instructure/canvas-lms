@@ -49,7 +49,7 @@ class GradebookImporter
     @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
     @all_assignments = @context.assignments.active.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
-    @all_students = @context.students.select(['users.id', :name, :sortable_name]).index_by(&:id)
+    @all_students = @context.all_students.select(['users.id', :name, :sortable_name]).index_by(&:id)
 
     csv = CSV.new(self.contents, :converters => :nil)
     header = csv.shift
@@ -122,9 +122,15 @@ class GradebookImporter
       @students = [] if @assignments.empty?
     end
 
+    # remove concluded enrollments
+    prior_enrollment_ids = (
+      @all_students.keys - @context.students.pluck(:user_id).map(&:to_i)
+    ).to_set
+    @students.delete_if { |s| prior_enrollment_ids.include? s.id }
+
     @original_submissions = [] unless @missing_student || @missing_assignment
   end
-  
+
   def process_header(row)
     if row.length < 3 || row[0] !~ /Student/ || row[1] !~ /ID/
       raise "Couldn't find header row"

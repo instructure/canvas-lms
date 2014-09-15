@@ -1,0 +1,27 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+  {{c-icon type="quiz"}}
+
+  {{input
+    autofocus="true"
+    type="text"
+    class="span4"
+    value=model.title
+    placeholder=text.quizName
+    aria-label=text.quizName
+  }}
+
+  {{fast-select value=model.quiz_type items=types}}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "create_quiz"}}Create Quiz{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

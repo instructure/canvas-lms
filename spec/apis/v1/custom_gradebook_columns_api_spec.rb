@@ -22,14 +22,14 @@ describe CustomGradebookColumnsApiController, type: :request do
   include Api
   include Api::V1::CustomGradebookColumn
 
-  before do
+  before :once do
     course_with_teacher active_all: true
     student_in_course active_all: true
     @user = @teacher
   end
 
   describe 'index' do
-    before do
+    before :once do
       @cols = 2.times.map { |i|
         @course.custom_gradebook_columns.create! title: "Col #{i+1}",
                                                  position: i
@@ -103,7 +103,7 @@ describe CustomGradebookColumnsApiController, type: :request do
   end
 
   describe 'update' do
-    before { @col = @course.custom_gradebook_columns.create! title: "Foo" }
+    before(:once) { @col = @course.custom_gradebook_columns.create! title: "Foo" }
 
     it 'checks permissions' do
       @user = @student
@@ -129,7 +129,7 @@ describe CustomGradebookColumnsApiController, type: :request do
   end
 
   describe 'delete' do
-    before do
+    before :once do
       @col = @course.custom_gradebook_columns.create! title: "Foo"
     end
 

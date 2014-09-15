@@ -19,10 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizSubmissionsController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+    @teacher_enrollment = @enrollment
+  end
 
   describe "POST 'create'" do
-    before do
-      course_with_teacher(:active_all => true)
+    before :once do
       @quiz = @course.quizzes.create!
       @quiz.workflow_state = "available"
       @quiz.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
@@ -36,7 +40,6 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "should not break trying to sanitize parameters of an already submitted quiz" do
-      student_in_course(:active_all => true)
       user_session(@student)
       @quiz.one_question_at_a_time = true
       @quiz.cant_go_back = true
@@ -48,7 +51,6 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "clears the access code key in user's session" do
-      student_in_course(:active_all => true)
       user_session(@student)
       @quiz.access_code = "Testing Testing 123"
       @quiz.save!
@@ -60,7 +62,6 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "should reject a submission when the validation token does not match" do
-      student_in_course(:active_all => true)
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => "xxx"
@@ -70,16 +71,13 @@ describe Quizzes::QuizSubmissionsController do
   end
   
   describe "PUT 'update'" do
+    before(:once) { quiz_with_submission }
     it "should require authentication" do
-    course_with_teacher(:active_all => true)
-      quiz_with_submission
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id
       assert_unauthorized
     end
     
     it "should allow updating scores if the teacher is logged in" do
-      course_with_teacher(:active_all => true)
-      quiz_with_submission
       user_session(@teacher)
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"
       response.should be_redirect
@@ -88,19 +86,19 @@ describe Quizzes::QuizSubmissionsController do
     end
     
     it "should not allow updating if the course is concluded" do
-      course_with_teacher(:active_all => true)
-      quiz_with_submission
-      @enrollment.conclude
+      @teacher_enrollment.conclude
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id
       assert_unauthorized
     end
   end
 
   describe "PUT 'backup'" do
-    it "should require authentication" do
-      course_with_student(:active_all => true)
+    before :once do
       quiz_model(:course => @course)
       @qs = @quiz.generate_submission(@student, false)
+    end
+
+    it "should require authentication" do
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
@@ -110,9 +108,7 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "should backup to the user's quiz submission" do
-      course_with_student_logged_in(:active_all => true)
-      quiz_model(:course => @course)
-      @qs = @quiz.generate_submission(@student, false)
+      user_session(@student)
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
@@ -122,9 +118,8 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "should return the time left to finish a quiz" do
-      course_with_student_logged_in(:active_all => true)
-      quiz_model(:course => @course)
-      submission = @quiz.generate_submission(@student, false)
+      user_session(@student)
+      submission = @qs
       submission.update_attribute(:end_at, Time.now + 1.hour)
       Quizzes::QuizSubmission.where(:id => submission).update_all(:updated_at => 1.hour.ago)
 
@@ -138,7 +133,9 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   describe "POST 'record_answer'" do
-    before do
+    before :once do
+      @course = nil
+      @student = nil
       quiz_with_submission(!:complete_quiz)
       @quiz.update_attribute(:one_question_at_a_time, true)
     end
@@ -151,6 +148,7 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "should record the user's submission" do
+      # TODO: FIXME, this test doesn't appear to match its description
       user_session(@student)
 
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
@@ -171,7 +169,7 @@ describe Quizzes::QuizSubmissionsController do
 
     context "with a zip parameter present" do
       it "queues a job to get all attachments for all submissions of a quiz" do
-        course_with_teacher_logged_in
+        user_session(@teacher)
         quiz = course_quiz !!:active
         ContentZipper.expects(:send_later_enqueue_args).with {|first_arg,second_arg|
           first_arg.should == :process_attachment
@@ -184,9 +182,9 @@ describe Quizzes::QuizSubmissionsController do
 
   describe "POST / (#extension)" do
     context "as a teacher in course" do
+      let_once(:quiz) { course_quiz !!:active }
       it "should be able to extend own extra attempts" do
-        course_with_teacher_logged_in
-        quiz = course_quiz !!:active
+        user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1
         response.should be_success
@@ -196,8 +194,7 @@ describe Quizzes::QuizSubmissionsController do
       end
 
       it "should be able to reset the result lockdown flag" do
-        course_with_teacher_logged_in
-        quiz = course_quiz !!:active
+        user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1
         response.should be_success

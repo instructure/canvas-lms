@@ -40,17 +40,19 @@ describe Quizzes::QuizQuestionsController do
     @quiz.quiz_groups.create
   end
 
+  before :once do
+    course_with_teacher(active_all: true)
+    course_quiz
+  end
+
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_quiz
       post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {}
       assert_unauthorized
     end
 
     it "should create a quiz question" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
         :answers => {
@@ -70,8 +72,7 @@ describe Quizzes::QuizQuestionsController do
       assigns[:quiz].should eql(@quiz)
     end
     it "should preserve ids, if provided, on create" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
         :answers => [
@@ -104,17 +105,13 @@ describe Quizzes::QuizQuestionsController do
   end
 
   describe "PUT 'update'" do
+    before(:once) { quiz_question }
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_quiz
-      quiz_question
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {}
       assert_unauthorized
     end
     it "should update a quiz question" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
-      quiz_question
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
         :answers => {
@@ -138,9 +135,7 @@ describe Quizzes::QuizQuestionsController do
       assigns[:quiz].should eql(@quiz)
     end
     it "should preserve ids, if provided, on update" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
-      quiz_question
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
         :answers => {

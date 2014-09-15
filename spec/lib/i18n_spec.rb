@@ -100,7 +100,6 @@ describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
       pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      pending('cannot pass in both rails 2 and rails 3') if CANVAS_RAILS2
       translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...
@@ -116,11 +115,12 @@ describe I18n do
 
     it "should fall back to en if the current locale's interpolation is broken" do
       I18n.locale = :es
-      I18n.backend.store_translations :es, __interpolation_test: "Hola %{mundo}"
-      I18n.t(:__interpolation_test, "Hello %{mundo}", {mundo: "WORLD"}).
-        should == "Hola WORLD"
-      I18n.t(:__interpolation_test, "Hello %{world}", {world: "WORLD"}).
-        should == "Hello WORLD"
+      I18n.backend.stub es: {__interpolation_test: "Hola %{mundo}"} do
+        I18n.t(:__interpolation_test, "Hello %{mundo}", {mundo: "WORLD"}).
+          should == "Hola WORLD"
+        I18n.t(:__interpolation_test, "Hello %{world}", {world: "WORLD"}).
+          should == "Hello WORLD"
+      end
     end
 
     it "should raise an error if the the en interpolation is broken" do

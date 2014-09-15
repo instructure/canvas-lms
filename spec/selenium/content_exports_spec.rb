@@ -14,7 +14,7 @@ describe "content exports" do
       yield if block_given?
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
-      @export.export_course_without_send_later
+      @export.export_without_send_later
       new_download_link = keep_trying_until { f("#export_files a") }
       url = new_download_link.attribute 'href'
       url.should match(%r{/files/\d+/download\?verifier=})

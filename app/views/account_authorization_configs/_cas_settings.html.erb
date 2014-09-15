@@ -35,6 +35,16 @@
         </td>
       </tr>
       <tr>
+        <td style="vertical-align: top; width: 200px;"><%= f.blabel :unknown_user_url, :en => "Unknown User Url" %></td>
+        <td style="vertical-align: top;" class="nobr">
+          <%= f.text_field :unknown_user_url, :class => "auth_form", :style => "width: 450px;", :placeholder => cas_login_url(:no_auto=>'true') %>
+          <span class="auth_info auth_unknown_user_url"><%= @account_config.unknown_user_url %></span>
+          <span class="auth_form" style="font-size: smaller;">
+            <br><%= t(:unknown_user_url_description, "The url to redirect to when an authenticated user is not found in Canvas.") %>
+          </span>
+        </td>
+      </tr>
+      <tr>
         <td colspan="4">
           <div class="form-actions">
             <span class="auth_form">

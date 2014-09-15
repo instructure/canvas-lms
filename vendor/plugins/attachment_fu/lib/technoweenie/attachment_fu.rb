@@ -169,12 +169,8 @@ module Technoweenie # :nodoc:
         base.after_save :after_process_attachment
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
-        if CANVAS_RAILS2
-          base.define_callbacks :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
-        else
-          base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
-          base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
-        end
+        base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
+        base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
       end
 
       unless defined?(::ActiveSupport::Callbacks)
@@ -232,10 +228,6 @@ module Technoweenie # :nodoc:
 
     module InstanceMethods
       require 'rack'
-
-      def self.included(base)
-        base.define_callbacks *[:after_attachment_saved, :before_thumbnail_saved] if CANVAS_RAILS2 && base.respond_to?(:define_callbacks)
-      end
 
       # Checks whether the attachment's content type is an image content type
       def image?
@@ -557,24 +549,22 @@ module Technoweenie # :nodoc:
           end
         end
 
-        unless CANVAS_RAILS2
-          # callback is not defined in Rails 3
-          def callback(method)
-            runner_method = "_run_#{method}_callbacks"
-            unless self.respond_to?(runner_method, true)
-              chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
+        # callback is not defined in Rails 3
+        def callback(method)
+          runner_method = "_run_#{method}_callbacks"
+          unless self.respond_to?(runner_method, true)
+            chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
 
-              kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
-              chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
+            kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
+            chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
 
-              str = chain.compile
-              class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
-                def #{runner_method}() #{str} end
-                protected :#{runner_method}
-              RUBY_EVAL
-            end
-            self.send(runner_method)
+            str = chain.compile
+            class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
+              def #{runner_method}() #{str} end
+              protected :#{runner_method}
+            RUBY_EVAL
           end
+          self.send(runner_method)
         end
 
         # Removes the thumbnails for the attachment, if it has any

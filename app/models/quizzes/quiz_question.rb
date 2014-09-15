@@ -17,7 +17,7 @@
 #
 
 class Quizzes::QuizQuestion < ActiveRecord::Base
-  self.table_name = 'quiz_questions' unless CANVAS_RAILS2
+  self.table_name = 'quiz_questions'
 
   include Workflow
 

@@ -1,21 +1,11 @@
-if CANVAS_RAILS2
-  # Even on Rails 2.3, we're using Rails 3 style routes.
-  #
-  # You should have plenty of examples in here for anything you're trying to do,
-  # but if you want a full primer this is a good one:
-  # http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
-  #
-  # Don't try anything too fancy, FakeRails3Routes doesn't support some of the
-  # more advanced Rails 3 routing features, since in the background it's just
-  # calling into the Rails 2 routing system.
-  routes = FakeRails3Routes
-else
-  routes = CanvasRails::Application.routes
-end
+full_path_glob = '(/*full_path)'
 
-full_path_glob = CANVAS_RAILS2 ? '/*full_path' : '(/*full_path)'
+# allow plugins to prepend routes
+Dir["vendor/plugins/*/config/pre_routes.rb"].each { |pre_routes|
+  load pre_routes
+}
 
-routes.draw do
+CanvasRails::Application.routes.draw do
   resources :submission_comments, :only => :destroy
 
   match 'inbox' => 'context#inbox', :as => :inbox
@@ -290,11 +280,14 @@ routes.draw do
       match 'homework_submission' => 'external_tools#homework_submission', :as => :homework_submission
       match 'finished' => 'external_tools#finished', :as => :finished
       collection do
-        get :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
         get :retrieve
         get :homework_submissions
       end
     end
+
+    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
+
 
     resources :submissions
     resources :calendar_events
@@ -534,6 +527,7 @@ routes.draw do
     match 'users' => 'users#create', :as => :add_user, :via => :post
     match 'users/:user_id/delete' => 'accounts#confirm_delete_user', :as => :confirm_delete_user
     match 'users/:user_id' => 'accounts#remove_user', :as => :delete_user, :via => :delete
+
     resources :users
     resources :account_notifications, :only => [:create, :destroy]
     concerns :announcements
@@ -553,10 +547,12 @@ routes.draw do
     resources :external_tools do
       match 'finished' => 'external_tools#finished', :as => :finished
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
-      collection do
-        get  :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
-      end
     end
+
+
+    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
+
 
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
     resources :outcomes do
@@ -716,6 +712,7 @@ routes.draw do
       end
     end
 
+    resources :content_exports, :path => :data_exports
     resources :rubrics, :path => :assessments
   end
 
@@ -844,8 +841,6 @@ routes.draw do
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
       post 'courses/:course_id/ping', :action => :ping, :path_name => 'course_ping'
-
-      get "courses/:course_id/content_list", :controller => :content_exports_api, :action => :content_list, :path_name => "course_content_list"
     end
 
     scope(:controller => :account_notifications) do
@@ -1080,7 +1075,7 @@ routes.draw do
     end
 
     scope(:controller => :custom_data) do
-      glob = CANVAS_RAILS2 ? '/*scope' : '(/*scope)'
+      glob = '(/*scope)'
       get "users/:user_id/custom_data#{glob}", action: 'get_data'
       put "users/:user_id/custom_data#{glob}", action: 'set_data'
       delete "users/:user_id/custom_data#{glob}", action: 'delete_data'
@@ -1282,8 +1277,8 @@ routes.draw do
 
     scope(:controller => :favorites) do
       get "users/self/favorites/courses", :action => :list_favorite_courses, :path_name => :list_favorite_courses
-      post "users/self/favorites/courses/:id", :action => :add_favorite_course
-      delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
+      post "users/self/favorites/courses/:id", :action => :add_favorite_course, :path_name => :add_favorite_course
+      delete "users/self/favorites/courses/:id", :action => :remove_favorite_course, :path_name => :remove_favorite_course
       delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
 
@@ -1549,10 +1544,14 @@ routes.draw do
     end
 
     scope(:controller => :content_exports_api) do
-      prefix = "courses/:course_id/content_exports"
-      get prefix, :action => :index, :path_name => "course_content_exports"
-      post prefix, :action => :create
-      get "#{prefix}/:id", :action => :show
+      %w(course group user).each do |context|
+        context_prefix = "#{context.pluralize}/:#{context}_id"
+        prefix = "#{context_prefix}/content_exports"
+        get prefix, :action => :index, :path_name => "#{context}_content_exports"
+        post prefix, :action => :create
+        get "#{prefix}/:id", :action => :show
+      end
+      get "courses/:course_id/content_list", :action => :content_list, :path_name => "course_content_list"
     end
 
     scope(:controller => :grading_standards_api) do
@@ -1577,6 +1576,7 @@ routes.draw do
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
+    post "tools/:tool_id/xapi", :controller => :lti_api, :action => :xapi, :path_name => "lti_xapi"
   end
 
   ApiRouteSet.draw(self, "/api/lti") do

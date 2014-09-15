@@ -167,11 +167,14 @@ describe ConversationMessage do
   end
 
   context "stream_items" do
+    before :once do
+      course_with_teacher
+      student_in_course
+    end
+
     it "should create a stream item based on the conversation" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       message = conversation.add_message("initial message")
 
@@ -183,8 +186,6 @@ describe ConversationMessage do
     it "should not create a conversation stream item for a submission comment" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course.user
       assignment_model(:course => @course)
       @assignment.workflow_state = 'published'
       @assignment.save
@@ -197,8 +198,6 @@ describe ConversationMessage do
     it "should not create additional stream_items for additional messages in the same conversation" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("first message")
       stream_item = StreamItem.last
@@ -212,8 +211,6 @@ describe ConversationMessage do
     it "should not delete the stream_item if a message is deleted, just regenerate" do
       old_count = StreamItem.count
 
-      course_with_teacher
-      student_in_course
       conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("initial message")
       message = conversation.add_message("second message")
@@ -277,8 +274,11 @@ describe ConversationMessage do
   end
 
   describe "reply_from" do
-    it "should ignore replies on deleted accounts" do
+    before :once do
       course_with_teacher
+    end
+
+    it "should ignore replies on deleted accounts" do
       student_in_course
       conversation = @teacher.initiate_conversation([@user])
       cm = conversation.add_message("initial message", :root_account_id => Account.default.id)
@@ -296,7 +296,6 @@ describe ConversationMessage do
     end
 
     it "should reply only to the message author on conversations2 conversations" do
-      course_with_teacher
       users = 3.times.map{ course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
@@ -314,7 +313,6 @@ describe ConversationMessage do
     end
 
     it "should mark conversations as read for the replying author" do
-      course_with_teacher
       student_in_course
       cp = @teacher.initiate_conversation([@user])
       cm = cp.add_message("initial message", :root_account_id => Account.default.id)

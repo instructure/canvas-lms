@@ -21,8 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe "API Authentication", type: :request do
 
-  before do
+  before :once do
     @key = DeveloperKey.create!
+  end
+
+  before :each do
     @client_id = @key.id
     @client_secret = @key.api_key
     consider_all_requests_local(false)
@@ -72,9 +75,12 @@ describe "API Authentication", type: :request do
 
     describe "should continue to allow developer key + basic auth access" do
       # this will continue to be supported until we notify api users and explicitly phase it out
-      before do
+      before :once do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
         course_with_teacher(:user => @user)
+      end
+
+      before :each do
         post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
       end
 
@@ -469,7 +475,7 @@ describe "API Authentication", type: :request do
   end
 
   describe "access token" do
-    before do
+    before :once do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
       course_with_teacher(:user => @user)
       @token = @user.access_tokens.create!
@@ -566,7 +572,7 @@ describe "API Authentication", type: :request do
   end
 
   describe "as_user_id" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @course1 = @course
       course_with_student(:user => @user, :active_all => true)
@@ -722,7 +728,7 @@ describe "API Authentication", type: :request do
   end
 
   describe "CSRF protection" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @course1 = @course
       course_with_student(:user => @user, :active_all => true)

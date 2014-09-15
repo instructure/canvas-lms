@@ -19,8 +19,6 @@
 # @API Assignments
 # @subtopic Assignment Overrides
 #
-# API for accessing assignment information.
-#
 # @model AssignmentOverride
 #     {
 #       "id": "AssignmentOverride",

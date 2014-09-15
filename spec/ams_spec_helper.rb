@@ -12,15 +12,9 @@ require_dependency 'text_helper'
 
 module ActiveModel
   class FakeController
-    if CANVAS_RAILS2
-      include ActionController::PolymorphicRoutes
-      include ActionController::UrlWriter
-      self.default_url_options[:host] = 'example.com'
-    else
-      include Rails.application.routes.url_helpers
-      def default_url_options
-        { host: 'example.com' }
-      end
+    include Rails.application.routes.url_helpers
+    def default_url_options
+      { host: 'example.com' }
     end
 
     attr_accessor :accepts_jsonapi, :stringify_json_ids, :session, :context

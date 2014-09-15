@@ -14,6 +14,10 @@ define [
     tagName: 'li'
     
     @optionProperty 'nestingLevel'
+    @optionProperty 'onlyShowFolders'
+    @optionProperty 'onClick'
+    @optionProperty 'href'
+
     
     defaults:
       nestingLevel: 1
@@ -32,8 +36,9 @@ define [
       @model.on         'all', @render, this
       @model.files.on   'all', @render, this
       @model.folders.on 'all', @render, this
+      res = super
       @render()
-      super
+      res
 
     render: ->
       @renderSelf()
@@ -44,7 +49,7 @@ define [
       event.preventDefault()
       event.stopPropagation()
 
-      @model.toggle()
+      @model.toggle({onlyShowFolders: @onlyShowFolders})
       @$el.attr(@attributes())
 
     title_text: ->
@@ -52,9 +57,14 @@ define [
       
     renderSelf: ->
       @$el.attr @attributes()
-      @$label ||= $("<a class='folderLabel' role='presentation' tabindex='-1' href='#' title='#{@title_text()}'/>").prependTo(@$el)
+      @$label ||= $("<a class='folderLabel' role='presentation' tabindex='-1' title='#{@title_text()}'/>").prependTo(@$el)
+      $text = $('<span>', {
+        text: @title_text(),
+        click: (event) => @onClick?(event, @model)
+      })
       @$label
-        .text(@title_text())
+        .attr('href', @href?(@model) || '#')
+        .html($text)
         .toggleClass('expanded', !!@model.isExpanded)
         .toggleClass('loading after', !!@model.isExpanding)
 
@@ -65,23 +75,28 @@ define [
           foldersView = new PaginatedCollectionView(
             collection: @model.folders
             itemView: FolderTreeView
-            itemViewOptions: {nestingLevel: @nestingLevel+1 }
+            itemViewOptions:
+              nestingLevel: @nestingLevel+1
+              onlyShowFolders: @onlyShowFolders
+              onClick: @onClick
+              href: @href
             tagName: 'li'
             className: 'folders'
             template: collectionTemplate
             scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
           )
           @$folderContents.append(foldersView.render().el)
-          filesView = new PaginatedCollectionView(
-            collection: @model.files
-            itemView: FileItemView
-            itemViewOptions: {nestingLevel: @nestingLevel+1}
-            tagName: 'li'
-            className: 'files'
-            template: collectionTemplate
-            scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
-          )
-          @$folderContents.append(filesView.render().el)
+          unless @onlyShowFolders
+            filesView = new PaginatedCollectionView(
+              collection: @model.files
+              itemView: FileItemView
+              itemViewOptions: {nestingLevel: @nestingLevel+1}
+              tagName: 'li'
+              className: 'files'
+              template: collectionTemplate
+              scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
+            )
+            @$folderContents.append(filesView.render().el)
         @$('> .folderContents').removeClass('hidden')
       else
         @$('> .folderContents').addClass('hidden')

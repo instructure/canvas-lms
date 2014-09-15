@@ -21,6 +21,7 @@ class ContentMigration < ActiveRecord::Base
   include TextHelper
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
+  validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, :class_name => 'Attachment'
@@ -471,13 +472,19 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_date_shift_options(opts)
-    if opts && Canvas::Plugin.value_to_boolean(opts[:shift_dates])
-      self.migration_settings[:date_shift_options] = opts.slice(:shift_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
+    if opts && (Canvas::Plugin.value_to_boolean(opts[:shift_dates]) || Canvas::Plugin.value_to_boolean(opts[:remove_dates]))
+      self.migration_settings[:date_shift_options] = opts.slice(:shift_dates, :remove_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
     end
   end
 
   def date_shift_options
     self.migration_settings[:date_shift_options]
+  end
+
+  def valid_date_shift_options
+    if date_shift_options && Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates]) && Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
+      errors.add(:date_shift_options, t('errors.cannot_shift_and_remove', "cannot specify shift_dates and remove_dates simultaneously"))
+    end
   end
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
@@ -600,8 +607,13 @@ class ContentMigration < ActiveRecord::Base
 
   # strips out the "id_" prepending the migration ids in the form
   # also converts arrays of migration ids (or real ids for course exports) into the old hash format
-  def self.process_copy_params(hash, for_content_export=false)
+  def self.process_copy_params(hash, for_content_export=false, return_asset_strings=false)
     return {} if hash.blank?
+    process_key = if return_asset_strings
+      ->(asset_string) { asset_string }
+    else
+      ->(asset_string) { CC::CCHelper.create_key(asset_string) }
+    end
     new_hash = {}
 
     hash.each do |key, value|
@@ -611,7 +623,7 @@ class ContentMigration < ActiveRecord::Base
 
         value.each do |sub_key, sub_value|
           if for_content_export
-            new_sub_hash[CC::CCHelper.create_key(sub_key)] = sub_value
+            new_sub_hash[process_key.call(sub_key)] = sub_value
           elsif sub_key.is_a?(String) && sub_key.start_with?("id_")
             new_sub_hash[sub_key.sub("id_", "")] = sub_value
           else
@@ -627,7 +639,7 @@ class ContentMigration < ActiveRecord::Base
         if for_content_export
           asset_type = key.to_s.singularize
           value.each do |id|
-            sub_hash[CC::CCHelper.create_key("#{asset_type}_#{id}")] = '1'
+            sub_hash[process_key.call("#{asset_type}_#{id}")] = '1'
           end
         else
           value.each do |id|

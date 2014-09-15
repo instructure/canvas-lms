@@ -1,6 +1,6 @@
 {
   "name": "ic-lazy-list",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "description": "Lazily loads records from an href as the user scrolls down the page, all in your template",
   "main": "main.js",
   "scripts": {

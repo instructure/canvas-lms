@@ -8,12 +8,15 @@
 
     <div class="discussion-type">
       {{#if assignment}}
+        {{#if assignment.peer_reviews}}
+          <i class="icon-peer-review" aria-hidden="true"></i>
+        {{/if}}
         <i class="icon-assignment" aria-hidden="true"></i>
       {{/if}}
     </div>
 
     <div class="discussion-title">
-      <div role="heading">
+      <div role="heading" aria-level="3">
         {{#if assignment}}
           <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
         {{/if}}

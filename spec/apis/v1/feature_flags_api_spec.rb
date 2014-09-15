@@ -18,12 +18,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Feature Flags API", type: :request do
-  let(:t_site_admin) { Account.site_admin }
-  let(:t_root_account) { account_model }
-  let(:t_teacher) { user_with_pseudonym account: t_root_account }
-  let(:t_sub_account) { account_model parent_account: t_root_account }
-  let(:t_course) { course_with_teacher(user: t_teacher, account: t_sub_account, active_all: true).course }
-  let(:t_root_admin) { account_admin_user account: t_root_account }
+  let_once(:t_site_admin) { Account.site_admin }
+  let_once(:t_root_account) { account_model }
+  let_once(:t_teacher) { user_with_pseudonym account: t_root_account }
+  let_once(:t_sub_account) { account_model parent_account: t_root_account }
+  let_once(:t_course) { course_with_teacher(user: t_teacher, account: t_sub_account, active_all: true).course }
+  let_once(:t_root_admin) { account_admin_user account: t_root_account }
 
   before do
     Feature.stubs(:definitions).returns({
@@ -354,7 +354,7 @@ describe "Feature Flags API", type: :request do
       end
 
       context "AccountManager" do
-        before do
+        before :once do
           t_site_admin.role_overrides.create!(permission: 'manage_feature_flags',
                                               enrollment_type: 'AccountManager',
                                               enabled: true,

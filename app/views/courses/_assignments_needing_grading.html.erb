@@ -12,10 +12,11 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
  visible_limit = 5
  needs_grading = @current_user ? @current_user.assignments_needing_grading(:contexts => contexts, :limit => 100) : []
  needs_submitting = @current_user ? @current_user.assignments_needing_submitting(:contexts => contexts, :limit => 100) : []
+ needs_reviewing = @current_user ? @current_user.submissions_needing_peer_review(:contexts => contexts, :limit => 100) : []
  hidden_todos = 0
 %>
 
-<% if @current_user && needs_grading.present? || needs_submitting.present? %>
+<% if @current_user && needs_grading.present? || needs_submitting.present? || needs_reviewing.present? %>
   <h2><%= t('headings.to_do', %{To Do}) %></h2>
   <ul class="right-side-list to-do-list">
     <% needs_grading.each_with_index do |assignment, i| %>
@@ -74,7 +75,32 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
         <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
       </li>
     <% end %>
-    <% hidden_items = [needs_grading.length - visible_limit, 0].max + [needs_submitting.length - visible_limit, 0].max %>
+    <% needs_reviewing.each_with_index do |assessment_request, i| %>
+      <% if assessment_request.asset.assignment.published? %>
+        <li style="<%= hidden if i >= visible_limit %>">
+        <% assignment = assessment_request.asset.assignment %>
+          <a
+            class="item icon-peer-review tooltip"
+            href="<%= course_assignment_submission_path( assignment.context_id, assignment.id, assessment_request.user_id) %>"
+            data-track-category="dashboard"
+            data-track-label="todo needs reviewing"
+            data-tooltip
+            title="User: <%= assessment_request.user.name %>"
+          >
+            <b>Peer Review for <%= assignment.title %></b>
+            <em>
+              <% if assignment.peer_reviews_due_at %>
+                <%= t('peer_review_due_date', 'due: %{peer_review_due_at}', {:peer_review_due_at => datetime_string(force_zone(assignment.peer_reviews_due_at))}) %>
+              <% else %>
+                <%= t('no_peer_review_due_date', 'due: No Due Date') %>
+              <% end %>
+            </em>
+          <a class='disable_item_link submitting' title="<%= t('links.title.ignore_review', %{Ignore this review}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assessment_request.asset_string, 'reviewing') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+          </a>
+        </li>
+      <% end %>
+    <% end %>
+    <% hidden_items = [needs_grading.length - visible_limit, 0].max + [needs_submitting.length - visible_limit, 0].max + [needs_reviewing.length - visible_limit, 0].max %>
     <% if hidden_items > 0 %>
       <li>
       <a href="#" class="more_link">

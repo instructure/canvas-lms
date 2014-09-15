@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
     context "an admin user" do
-      before do
+      before :once do
         account_admin_user(:active_all => true)
         course(:active_course => true)
         @unenrolled_user = user_with_pseudonym
@@ -254,7 +254,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "custom course-level roles" do
-        before :each do
+        before :once do
           @course_role = @course.root_account.roles.build(:name => 'newrole')
           @course_role.base_role_type = 'TeacherEnrollment'
           @course_role.save!
@@ -374,7 +374,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "a teacher" do
-      before do
+      before :once do
         course_with_teacher(:active_all => true)
         @course_with_teacher    = @course
         @course_wo_teacher      = course
@@ -449,7 +449,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "a student" do
-      before do
+      before :once do
         course_with_student(:active_all => true)
         @unenrolled_user        = user_with_pseudonym
         @path                   = "/api/v1/courses/#{@course.id}/enrollments"
@@ -470,7 +470,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "self enrollment" do
-      before do
+      before :once do
         course(active_all: true)
         @course.update_attribute(:self_enrollment, true)
         @unenrolled_user = user_with_pseudonym
@@ -522,7 +522,7 @@ describe EnrollmentsApiController, type: :request do
   end
 
   describe "enrollment listing" do
-    before do
+    before :once do
       course_with_student(:active_all => true, :user => user_with_pseudonym)
       @teacher = User.create(:name => 'Señor Chang')
       @teacher.pseudonyms.create(:unique_id => 'chang@example.com')
@@ -538,7 +538,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "an account admin" do
-      before do
+      before :once do
         @user = user_with_pseudonym(:username => 'admin@example.com')
         Account.default.account_users.create!(user: @user)
       end
@@ -717,7 +717,7 @@ describe EnrollmentsApiController, type: :request do
 
       describe "custom roles" do
         context "user context" do
-          before do
+          before :once do
             @original_course = @course
             course.offer!
             role = @course.account.roles.build :name => 'CustomStudent'
@@ -750,7 +750,7 @@ describe EnrollmentsApiController, type: :request do
         end
 
         context "course context" do
-          before do
+          before :once do
             role = @course.account.roles.build :name => 'CustomStudent'
             role.base_role_type = 'StudentEnrollment'
             role.save!
@@ -1022,7 +1022,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "a user without permissions" do
-      before do
+      before :once do
         @user = user_with_pseudonym(:name => 'Don Draper', :username => 'ddraper@sterling-cooper.com')
       end
 
@@ -1100,7 +1100,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     describe "enrollment deletion and conclusion" do
-      before do
+      before :once do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
         @enrollment = @student.enrollments.first
 
@@ -1112,7 +1112,9 @@ describe EnrollmentsApiController, type: :request do
         @path = "/api/v1/courses/#{@course.id}/enrollments/#{@enrollment.id}"
         @params = { :controller => 'enrollments_api', :action => 'destroy', :course_id => @course.id.to_param,
           :id => @enrollment.id.to_param, :format => 'json' }
+      end
 
+      before :each do
         time = Time.now
         Time.stubs(:now).returns(time)
       end
