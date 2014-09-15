@@ -20,7 +20,7 @@ group :test do
   gem 'once-ler', '0.0.13'
 
   gem 'sequel', '4.5.0', :require => false
-  gem 'selenium-webdriver', '2.42.0'
+  gem 'selenium-webdriver', '2.43.0'
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
   gem 'webmock', '1.16.1', :require => false
