@@ -28,23 +28,6 @@ define [
       if confirm message
         @props.model.destroy()
 
-    # Function Summary
-    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
-    # dialog window. This allows us to do react things inside of this all ready rendered
-    # jQueryUI widget
-    openRestrictedDialog: ->
-      $dialog = $('<div>').dialog
-        title: I18n.t("title.limit_student_access", "Limit student access")
-        width: 400
-        close: ->
-          React.unmountComponentAtNode this
-          $(this).remove()
-
-      React.renderComponent(RestrictedDialogForm({
-        model: @props.model
-        closeDialog: -> $dialog.dialog('close')
-      }), $dialog[0])
-
 
     render: withReactDOM ->
       wrap = (fn) =>
@@ -80,9 +63,6 @@ define [
               li {},
                 a href:'#', onClick: preventDefault(@props.startEditingName), ref: 'editName',
                   I18n.t('edit_name', 'Edit Name')
-              li {},
-                a href:'#', onClick: preventDefault(@openRestrictedDialog), ref: 'restrictedDialog',
-                  I18n.t('restrict_access', 'Restrict Access')
               li {},
                 a href:'#', onClick: wrap(openMoveDialog), ref: 'move',
                   I18n.t('move', 'Move')

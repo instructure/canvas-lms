@@ -44,7 +44,6 @@ define [
     teardown: ->
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
 
-
   test 'deletes model when delete link is pressed', ->
     sinon.stub($, 'ajax')
     sinon.stub(window, 'confirm').returns(true)
@@ -57,20 +56,9 @@ define [
     window.confirm.restore()
     $.ajax.restore()
 
-  test 'clicking restricted dialog opens a dialog', ->
-    sinon.stub(React, 'renderComponent')
-    sinon.spy($.fn, 'dialog')
-    Simulate.click(@itemCog.refs.restrictedDialog.getDOMNode())
-
-    ok $.fn.dialog.calledOnce, 'opens a restricted dialog window'
-    ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
-    $.fn.dialog.restore()
-    React.renderComponent.restore()
-
   test 'only shows download button for limited users', ->
     readOnlyItemCog = React.renderComponent(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
     ok @buttonsEnabled(readOnlyItemCog, @readOnlyConfig), 'only download button is shown'
 
   test 'shows all buttons for users with manage_files permissions', ->
     ok @buttonsEnabled(@itemCog, @manageConfig), 'all buttons are shown'
-

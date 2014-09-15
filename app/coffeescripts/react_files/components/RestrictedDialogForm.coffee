@@ -14,20 +14,52 @@ define [
     displayName: 'RestrictedDialogForm'
 
     propTypes:
-      closeDialog: React.PropTypes.func.isRequired
-      model: customPropTypes.filesystemObject
+      closeDialog: React.PropTypes.func.isRequired,
+      models: React.PropTypes.arrayOf(customPropTypes.filesystemObject)
 
     getInitialState: ->
-      calendarOption: @initialCalendarOption()
+      permissionAttributes = ['hidden', 'locked', 'lock_at', 'unlock_at']
+      initialState = {}
 
-    componentDidUpdate: ->
-      @dateInputFields()
-      @focusOnFirst()
+      allAreEqual = @props.models.every (model) =>
+        permissionAttributes.every (attribute) =>
+          @props.models[0].get(attribute) is model.get(attribute) || ( !@props.models[0].get(attribute) && !model.get(attribute) )
+
+      if allAreEqual
+        initialState = @props.models[0].pick(permissionAttributes)
+        initialState.selectedOption = if initialState.locked
+          'unpublished'
+        else if initialState.hidden
+          'link_only'
+        else if initialState.lock_at
+          'date_range'
+        else
+          'published'
+
+      initialState
 
     componentDidMount: ->
-      @dateInputFields()
+      $([@refs.unlock_at.getDOMNode(), @refs.lock_at.getDOMNode()]).datetime_field()
+      $(@getDOMNode()).find(':tabbable:first').focus()
 
     # === Custom Functions === #
+
+    # Function Summary
+    #
+    # Extracts data from the form and converts it into an object.
+    #
+    # Refactoring Notes:
+    #   This function should be refactored so no refs are used. This could
+    #   be accomplished by storing form values to send in state and binding
+    #   from the inputs themselves when things change.
+    #
+    # Returns an object representing data the api expects.
+
+    extractFormValues: ->
+      hidden   : @state.selectedOption is 'link_only'
+      unlock_at: @state.selectedOption is 'date_range' && @refs.unlock_at.getDOMNode().value or ''
+      lock_at  : @state.selectedOption is 'date_range' && @refs.lock_at.getDOMNode().value or ''
+      locked: @state.selectedOption is 'unpublished'
 
     # Function Summary
     #
@@ -38,86 +70,131 @@ define [
     handleSubmit: (event) ->
       event.preventDefault()
 
-      data = 
-        'hidden': @refs.hiddenInput.getDOMNode().checked
-        'unlock_at': @refs.availableFromInput.getDOMNode().value if @state.calendarOption
-        'lock_at': @refs.availableUntilInput.getDOMNode().value if @state.calendarOption
-        'locked' : false # both restricted and hidden states require locked to be false to work
+      attributes = @extractFormValues()
+      promises = @props.models.map (item) ->
+        # Calling .save like this (passing data as the 'attrs' property on
+        # the 'options' argument instead of as the first argument) is so that we just send
+        # the 3 attributes we care about (hidden, lock_at, unlock_at) in the PUT
+        # request (like you would for a PATCH request, execept our api doesn't support PATCH).
+        # We do this so if some other user changes the name while we are looking at the page,
+        # when we submit this form, we don't blow away their change and change the name back
+        # to what it was. we just update the things we intended.
+        item.save({}, {attrs: attributes})
 
-      # Calling .save like this (passing data as the 'attrs' property on
-      # the 'options' argument instead of as the first argument) is so that we just send
-      # the 3 attributes we care about (hidden, lock_at, unlock_at) in the PUT
-      # request (like you would for a PATCH request, execept our api doesn't support PATCH).
-      # We do this so if some other user changes the name while we are looking at the page,
-      # when we submit this form, we don't blow away their change and change the name back
-      # to what it was. we just update the things we intended.
-      dfd = @props.model.save({}, {attrs: data})
-
-      $(@refs.dialogForm.getDOMNode()).disableWhileLoading dfd
+      dfd = $.when(promises...)
       dfd.done => @props.closeDialog()
+      $(@refs.dialogForm.getDOMNode()).disableWhileLoading dfd
 
-    # Function Summary
-    #
-    # Because hidden and calendar options might be nil or '' we need some
-    # logic to determine if the dialog should show the calendar or hide without
-    # url option. The !! are making sure we are working with boolean values
-    #
-    # @returns boolean
-
-    initialCalendarOption: ->
-      hiddenIsFalse = !@props.model.get('hidden')
-      lockAtIsTrue = !!@props.model.get('lock_at')
-      unlockAtIsTrue = !!@props.model.get('unlock_at')
-
-      hiddenIsFalse && lockAtIsTrue && unlockAtIsTrue
-
-    # Function Summary
-    # This function was written for this one case. If more radio buttons are added
-    # it might need to be changed.
-
-    radioSelected: (event) ->
-      selectedShowCalendar = @refs.showCalendarInput.getDOMNode() == event.target
-      @setState calendarOption: selectedShowCalendar
-
-    # Function Summary
-    # If possible, focus on the first input element for accessiblity
-
-    focusOnFirst: ->
-      $(@refs.availableFromInput?.getDOMNode())?.focus()
-
-    dateInputFields: ->
-      if @refs.availableFromInput && @refs.availableUntilInput
-        $(@refs.availableFromInput.getDOMNode()).date_field()
-        $(@refs.availableUntilInput.getDOMNode()).date_field()
-
-    # === Render Logic === #
     render: withReactDOM ->
-      form ref: 'dialogForm', onSubmit: @handleSubmit, className: 'form-horizontal form-dialog', title: I18n.t("title.limit_student_access", "Limit student access"),
+      form {
+        ref: 'dialogForm', 
+        onSubmit: @handleSubmit, 
+        className: 'form-horizontal form-dialog permissions-dialog-form', 
+        title: I18n.t("title.limit_student_access", "Permissions")
+      },
         div className: "radio",
           label {},
-            input ref: 'hiddenInput', type: 'radio', name: 'restrict_access', value: 'true', onChange: @radioSelected, defaultChecked: !@state.calendarOption
-            I18n.t("options_1.description", "Only allow students to view or download files in this folder when I link to them")
+            input {
+              ref: 'publishInput'
+              type: 'radio'
+              name: 'permissions'
+              checked: @state.selectedOption is 'published'
+              onChange: (event) =>
+                @setState { selectedOption: 'published'}
+            },
+            I18n.t("options.publish.description", "Publish")
 
         div className: "radio",
           label {},
-            input ref: 'showCalendarInput', type: 'radio', name: 'restrict_access', onChange: @radioSelected, defaultChecked: @state.calendarOption
-            I18n.t("options_2.description", "Schedule student availability")
+            input {
+              ref: 'unpublishInput'
+              type: 'radio'
+              name: 'permissions'
+              checked: @state.selectedOption is 'unpublished'
+              onChange: (event) =>
+                @setState { selectedOption: 'unpublished'}
+            },
+            I18n.t("options.unpublish.description", "Unpublish")
 
-        @displayOption()
+        div className: "radio",
+          label {},
+            input {
+              ref: 'permissionsInput'
+              type: 'radio'
+              name: 'permissions'
+              checked: @state.selectedOption in ['link_only', 'date_range'] 
+              onChange: (event) =>
+                  @setState selectedOption: if @state.unlock_at
+                                              'date_range'
+                                            else
+                                              'link_only'
+            },
+            I18n.t("options.restrictedAccess.description", "Restricted Access")
+
+ 
+        div {
+          style: 
+            'margin-left': '20px', 
+            display: (if  @state.selectedOption in ['link_only', 'date_range'] then 'block' else 'none')
+        },
+          div className: "radio",
+            label {},
+              input {
+                ref: 'link_only'
+                type: 'radio'
+                name: 'restrict_options'
+                checked: @state.selectedOption is 'link_only'
+                onChange: (event) =>
+                    @setState selectedOption: 'link_only'
+              },
+              I18n.t("options.hiddenInput.description", "Only available to students with link. Not visible in student files.")
+          div className: "radio",
+            label {},
+               input {
+                 ref: 'dateRange'
+                 type: 'radio',
+                 name: 'restrict_options',
+                 checked: @state.selectedOption is 'date_range',
+                 onChange: (event) => 
+                   @setState({selectedOption: 'date_range'})
+               }
+               I18n.t("options_2.description", "Schedule student availability")
+     
+          div {
+            className: 'control-group'
+            style: 
+              display: (if @state.selectedOption is 'date_range' then 'block' else 'none')
+          },
+            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableFrom', 'From')
+              div className: 'controls dateSelectInputContainer',
+                input
+                  ref: 'unlock_at'
+                  defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at,
+                  className: 'form-control dateSelectInput',
+                  type: 'text',
+                  'aria-label': I18n.t('aria_label.availableFrom', 'From')
+            div className: 'control-group',
+              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableUntil', 'Until')
+                div className: 'controls dateSelectInputContainer',
+                input
+                  ref: 'lock_at'
+                  defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
+                  className: 'form-control dateSelectInput',
+                  type: 'text'
+                  'aria-label': I18n.t('aria_label.availableUntil', 'Until')
 
         div className:"form-controls",
-          input type: 'button', onClick: @props.closeDialog, className: "btn", style: {'margin-right': '10px'}, value: I18n.t("button_text.cancel", "Cancel")
-          input ref: 'updateBtn', type: "submit", className: "btn btn-primary", value: I18n.t("button_text.update", "Update")
-    displayOption: ->
-      if @state.calendarOption
-        [
-          div className: 'control-group',
-            label className: 'control-label dialog-adapter-form-calendar-label', for: 'availableFromInput', I18n.t('label.availableFrom', 'Available From')
-            div className: 'controls dateSelectInputContainer',
-              input ref: 'availableFromInput', defaultValue: $.datetimeString(@props.model.get('unlock_at')), id: 'availableFromInput', className: 'form-control dateSelectInput', type: 'text', 'aria-label': I18n.t('aria_label.availableFrom', 'Available From')
-         ,
-          div className: 'control-group',
-            label className: 'control-label dialog-adapter-form-calendar-label', for: 'availableUntil', I18n.t('label.availableUntil', 'Until')
-            div className: 'controls dateSelectInputContainer',
-              input ref: 'availableUntilInput', id: 'availableUntil', defaultValue: $.datetimeString(@props.model.get('lock_at')), className: 'form-control dateSelectInput', type: 'text', 'aria-label': I18n.t('aria_label.availableUntil', 'Until')
-        ]
+          button { 
+            type: 'button',
+            onClick: @props.closeDialog,
+            className: "btn",
+          },
+            I18n.t("button_text.cancel", "Cancel")
+
+          button {
+            ref: 'updateBtn'
+            type: "submit",
+            className: "btn btn-primary",
+            disabled: !(@state.selectedOption)
+          },
+            I18n.t("button_text.update", "Update")

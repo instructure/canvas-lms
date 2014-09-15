@@ -6,7 +6,6 @@ define [
 ], (React, $, PublishCloud, FilesystemObject) ->
 
   Simulate = React.addons.TestUtils.Simulate
-  RenderIntoDocument = React.addons.TestUtils.renderIntoDocument
 
   # Integration Tests
   module 'PublishCloud',
@@ -25,43 +24,12 @@ define [
     @model.set('locked', false)
     equal @publishCloud.state.published, true, "changing models locked changes it to true"
 
-  test "clicking a published cloud sets its state to unpublished", ->
-    dfdStub = $.Deferred()
-    sinon.stub(@publishCloud.props.model, 'save').returns(dfdStub)
+  test "clicking a published cloud opens restricted dialog", ->
+    sinon.stub(React, 'renderComponent')
+    Simulate.click(@publishCloud.refs.publishCloud.getDOMNode())
 
-    Simulate.click @publishCloud.refs.publishCloud.getDOMNode()
-    ok @publishCloud.props.model.save.calledWithMatch({}, {attrs: {locked: false, hidden: false, lock_at: null, unlock_at: null}}), 'Called save with hidden true attribute and lock/unlock_at null'
-
-    @publishCloud.props.model.save.restore()
-
-  test "network error when pressing cloud calles an error", ->
-    sinon.spy($, 'flashError')
-
-    dfdStub = $.Deferred()
-    sinon.stub(@publishCloud.props.model, 'save').returns(dfdStub)
-
-    Simulate.click @publishCloud.refs.publishCloud.getDOMNode()
-    dfdStub.reject()
-
-    ok $.flashError.calledOnce, "Shows an error to the user"
-    #ok @publishCloud.props.model.save.calledWithMatch({}, {attrs: {hidden: true, lock_at: null, unlock_at: null}}), 'Called save with hidden true attribute and lock/unlock_at null'
-
-    @publishCloud.props.model.save.restore()
-    $.flashError.restore()
-
-  test "network error when pressing cloud reverts back to original state", ->
-    sinon.spy(@publishCloud, 'setState')
-
-    dfdStub = $.Deferred()
-    sinon.stub(@publishCloud.props.model, 'save').returns(dfdStub)
-
-    Simulate.click @publishCloud.refs.publishCloud.getDOMNode()
-    dfdStub.reject()
-
-    ok @publishCloud.setState.calledWith(@publishCloud.extractStateFromModel(@model)), "set state with original model attributes"
-
-    @publishCloud.props.model.save.restore()
-    @publishCloud.setState.restore()
+    ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
+    React.renderComponent.restore()
 
   # Unit Tests
 

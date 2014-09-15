@@ -3,10 +3,11 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!broccoli_cloud'
+  'compiled/models/FilesystemObject'
+  './RestrictedDialogForm'
   '../modules/customPropTypes'
   'compiled/jquery.rails_flash_notifications'
-], ($, React, withReactDOM, I18n, customPropTypes) ->
-
+], ($, React, withReactDOM, I18n, FilesystemObject, RestrictedDialogForm, customPropTypes) ->
   PublishCloud = React.createClass
     displayName: 'PublishCloud'
 
@@ -47,61 +48,64 @@ define [
       @setState published: !@state.published, restricted: false, hidden: false
 
     # Function Summary
-    # When hidden is true, the FilesystemObject is unpublished.
-    # When we publish, we blow away other restricted access dates.
-    # We also revert to the previous state if a successful save can't
-    # be had.
+    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
+    # dialog window. This allows us to do react things inside of this all ready rendered
+    # jQueryUI widget
+
+    openRestrictedDialog: ->
+      $dialog = $('<div>').dialog
+        title: I18n.t("title.permissions", "Editing permissions for: %{name}", {name: @props.model.displayName()})
+        width: 400
+        close: ->
+          React.unmountComponentAtNode this
+          $(this).remove()
+
+      React.renderComponent(RestrictedDialogForm({
+        models: [@props.model]
+        closeDialog: -> $dialog.dialog('close')
+      }), $dialog[0])
+
+    # Function Summary
+    # Opens the restricted dialog window
 
     handleClick: (event) ->
       event.preventDefault()
-
-      @togglePublishedState()
-
-      dataToSave = locked: @state.published, hidden: false, lock_at: null, unlock_at: null
-      dfd = @props.model.save({}, {attrs: dataToSave})
-
-      dfd.fail =>
-        if @state.published
-          $.flashError I18n.t('publish_error', 'An error occurred while trying to publish %{name}. Changes have been reverted!', {name: @props.model.displayName()})
-        else
-          $.flashError I18n.t('unpublish_error', 'An error occurred while trying to unpublish %{name} . Changes have been reverted!', {name: @props.model.displayName()})
-
-        @setState @getInitialState()
+      @openRestrictedDialog()
 
     render: withReactDOM ->
       if @state.published && @state.restricted
-        button
-          'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
+        button 
+          'data-tooltip': 'left'
           onClick: @handleClick
           ref: "publishCloud"
           className:'btn-link published-status restricted'
-          title: I18n.t('restricted_title', 'Restricted. Click to unpublish')
-          'aria-label': I18n.t('label.restricted', 'Restricted. Click to unpublish.'),
+          title: I18n.t('restricted_title', "Available from %{from_date} until %{until_date}",from_date: $.datetimeString(@props.model.get('unlock_at')), until_date: $.datetimeString(@props.model.get('lock_at')) )
+          'aria-label': I18n.t('restricted_title', "Available from %{from_date} until %{until_date}",from_date: $.datetimeString(@props.model.get('unlock_at')), until_date: $.datetimeString(@props.model.get('lock_at')) ),
             i className:'icon-calendar-day'
       else if @state.published && @state.hidden
-        button
-          'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
+        button 
+          'data-tooltip': 'left'
           onClick: @handleClick
           ref: "publishCloud"
           className:'btn-link published-status hiddenState'
-          title: I18n.t('hidden_title', 'Hidden. Click to unpublish')
-          'aria-label': I18n.t('label.hidden', 'Hidden. Click to unpublish.'),
+          title: I18n.t('hidden_title', 'Hidden. Available with a link')
+          'aria-label': I18n.t('label.hidden', 'Hidden. Available with a link'),
             i className:'icon-paperclip'
       else if @state.published
-        button
-          'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
+        button 
+          'data-tooltip': 'left'
           onClick: @handleClick,
           ref: "publishCloud",
           className:'btn-link published-status published'
-          title: I18n.t('published_title', 'Published. Click to unpublish')
-          'aria-label': I18n.t('label.published', 'Published. Click to unpublish.'),
+          title: I18n.t('published_title', 'Published')
+          'aria-label': I18n.t('label.published', 'Published'),
             i className:'icon-publish'
       else
-        button
-          'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
+        button 
+          'data-tooltip': 'left'
           onClick: @handleClick
           ref: "publishCloud"
           className:'btn-link published-status unpublished'
-          title: I18n.t('unpublished_title', 'Unpublished. Click to publish')
-          'aria-label': I18n.t('label.unpublished', 'Unpublished. Click to publish.'),
+          title: I18n.t('unpublished_title', 'Unpublished')
+          'aria-label': I18n.t('label.unpublished', 'Unpublished'),
             i className:'icon-unpublish'

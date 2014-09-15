@@ -7,7 +7,8 @@ define [
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
   '../modules/customPropTypes'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes) ->
+  './RestrictedDialogForm'
+], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -40,6 +41,24 @@ define [
       $.when(promises...).then ->
         $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
       @props.clearSelectedItems()
+
+    # Function Summary
+    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
+    # dialog window. This allows us to do react things inside of this all ready rendered
+    # jQueryUI widget
+
+    openRestrictedDialog: ->
+      $dialog = $('<div>').dialog
+        title: I18n.t("title.permissions", "Editing permissions for %{count} items", {count: @props.selectedItems.length})
+        width: 400
+        close: ->
+          React.unmountComponentAtNode this
+          $(this).remove()
+
+      React.renderComponent(RestrictedDialogForm({
+        models: @props.selectedItems
+        closeDialog: -> $dialog.dialog('close')
+      }), $dialog[0])
 
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
@@ -83,7 +102,7 @@ define [
             button {
               disabled: !showingButtons
               className: 'ui-button btn-restrict',
-              onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
+              onClick: @openRestrictedDialog
               title: I18n.t('restrict_access', 'Restrict Access')
               'aria-label': I18n.t('restrict_access', 'Restrict Access')
               'data-tooltip': ''
