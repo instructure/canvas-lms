@@ -1,4 +1,8 @@
-set :stage, :testing
+require 'capistrano-scm-copy'
+set :scm, :copy
+set :copy_local_tar, "/usr/local/bin/gtar" if `uname` =~ /Darwin/
+
+set :stage, :testing_buildbox
 set :app_node_prefix, "canvas-at"
 set :canvas_url, 'https://canvas-test.sfu.ca'
 
