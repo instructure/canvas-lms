@@ -4050,6 +4050,7 @@ pt:
       done_sending_message: "Enviou *%{message_preview}* para *%{num_people}*"
       error_sending_message: "Erro ao enviar a mensagem:"
       sending_message: "A enviar *%{message_preview}* para *%{num_people}*"
+    more_participants: "+%{total} pessoas"
     no_message: 
       batch_selected: "Várias conversas selecionadas"
       no_conversations_selected: "Não existem conversas selecionadas"
@@ -5256,6 +5257,7 @@ pt:
     cannot_unpublish_with_replies: "Não é possível anular a publicação se existirem respostas"
     confirm_delete_announcement: 
       one: "Tem a certeza de que pretende eliminar este anúncio?"
+      other: "Tem a certeza de que pretende eliminar estes %{count} anúncios?"
     confirm_delete_discussion_topic: 
       one: "Tem a certeza de que pretende eliminar este tópico de discussão?"
       other: "Tem a certeza de que pretende eliminar estes %{count} tópicos de discussão?"
