@@ -374,6 +374,7 @@ class DiscussionTopic < ActiveRecord::Base
   #  - this is a root level graded group discussion and you aren't in any of the groups
   #  - this is group level discussion and you aren't in the group
   def subscription_hold(user, context_enrollment, session)
+    return nil unless user
     case
     when initial_post_required?(user, context_enrollment, session)
       :initial_post_required
