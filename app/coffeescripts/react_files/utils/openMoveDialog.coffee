@@ -18,3 +18,6 @@ define [
       closeDialog: -> $dialog.dialog('close')
       setTitle: (title) -> $dialog.dialog('option', 'title', title)
     }), $dialog[0])
+
+    $dialog.find(':tabbable:first').focus()
+

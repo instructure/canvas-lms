@@ -43,12 +43,19 @@ define [
       div {
         onClick: @props.toggleSelected
         className: "ef-item-row #{'ef-item-selected' if @props.isSelected}"
+        role: 'row'
+        'aria-selected': @props.isSelected
       },
-        label className: 'screenreader-only',
-          input type: 'checkbox', defaultChecked: @props.isSelected, onChange: @props.toggleSelected,
+        label className: 'screenreader-only', role: 'gridcell',
+          input {
+            type: 'checkbox'
+            checked: @props.isSelected
+            className: 'multiselectable-not-ignored'
+            onChange: @props.toggleSelected
+          },
           I18n.t('labels.select', 'Select This Item')
 
-        div className:'ef-name-col ellipsis',
+        div className:'ef-name-col ellipsis', role: 'rowheader',
           if @state.editing
             form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),
               input({
@@ -59,7 +66,12 @@ define [
                 defaultValue: @props.model.displayName()
                 onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
               }),
-              button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,
+              button {
+                type: 'button'
+                className: 'btn btn-link ef-edit-name-cancel'
+                'aria-label': I18n.t('cancel', 'Cancel')
+                onClick: @cancelEditingName
+              },
                 i className: 'icon-x'
           else if @props.model instanceof Folder
             Link {
@@ -86,19 +98,26 @@ define [
               span className: 'media-body',
                 @props.model.displayName()
 
-        div className:'ef-date-created-col',
+        div className: 'screenreader-only', role: 'gridcell',
+          if @props.model instanceof Folder
+            I18n.t('folder', 'Folder')
+          else
+            @props.model.get('content-type')
+
+
+        div className:'ef-date-created-col', role: 'gridcell',
           FriendlyDatetime datetime: @props.model.get('created_at'),
 
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
 
-        div className:'ef-modified-by-col ellipsis',
+        div className:'ef-modified-by-col ellipsis', role: 'gridcell',
           a href: @props.model.get('user')?.html_url, className: 'ef-plain-link',
             @props.model.get('user')?.display_name
 
-        div className:'ef-size-col',
+        div className:'ef-size-col', role: 'gridcell',
           friendlyBytes(@props.model.get('size'))
 
-        div className: 'ef-links-col',
+        div className: 'ef-links-col', role: 'gridcell',
           PublishCloud(model: @props.model),
           ItemCog(model: @props.model, startEditingName: @startEditingName)

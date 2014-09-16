@@ -45,7 +45,11 @@ define [
         })
 
         div className: 'ef-main',
-          aside className: 'visible-desktop ef-folder-content',
+          aside {
+            className: 'visible-desktop ef-folder-content'
+            role: 'region'
+            'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
+          },
             if @state.rootTillCurrentFolder
               FolderTree({
                 rootTillCurrentFolder: @state.rootTillCurrentFolder,
@@ -57,6 +61,8 @@ define [
             currentFolder: @state.currentFolder
             selectedItems: @state.selectedItems
             toggleItemSelected: @toggleItemSelected
+            toggleAllSelected: @toggleAllSelected
+            areAllItemsSelected: @areAllItemsSelected
         div className: 'ef-footer grid-row',
           FilesUsage({
             className: 'col-xs-3'

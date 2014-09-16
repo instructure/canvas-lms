@@ -12,6 +12,7 @@ define [
       params: {}
       query: {}
       onResolvePath: ->
+      areAllItemsSelected: -> false
     @searchResults = React.renderComponent(SearchResults(props), $('#fixtures')[0])
 
     ok @searchResults.refs.noResultsFound, 'Displays the no results text'

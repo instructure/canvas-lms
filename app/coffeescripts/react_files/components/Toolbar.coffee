@@ -41,8 +41,11 @@ define [
 
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
-      header className:'ef-header grid-row between-xs',
-
+      header {
+        className:'ef-header grid-row between-xs'
+        role: 'region'
+        'aria-label': I18n.t('files_toolbar', 'Files Toolbar')
+      },
         form {
           className: "col-lg-3 #{ if showingButtons
                                     'col-xs-4 col-sm-3 col-md-4'
@@ -50,61 +53,75 @@ define [
                                     'col-xs-7 col-sm-5 col-md-4'}"
           onSubmit: @onSubmitSearch
         },
-          input placeholder: I18n.t('search', 'Search for files'), type:'search', ref:'searchTerm', defaultValue: @props.query.search_term
+          input
+            placeholder:  I18n.t('search_for_files', 'Search for files')
+            'aria-label': I18n.t('search_for_files', 'Search for files')
+            type: 'search'
+            ref: 'searchTerm'
+            defaultValue: @props.query.search_term
 
-        if showingButtons
-          div className: 'ui-buttonset col-xs',
-            span className: 'hidden-tablet hidden-phone', style: {paddingRight: 10},
-              I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+        div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
+          span className: 'hidden-tablet hidden-phone', style: {paddingRight: 10},
+            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
 
-            button {
-              className: 'ui-button'
-              onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
-              title: I18n.t('view', 'View')
-              'data-tooltip': ''
-            },
-              i className: 'icon-search'
+          button {
+            disabled: !showingButtons
+            className: 'ui-button'
+            onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
+            title: I18n.t('view', 'View')
+            'data-tooltip': ''
+          },
+            i className: 'icon-search'
 
-            button {
-              className: 'ui-button',
-              onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
-              title: I18n.t('restrict_access', 'Restrict Access')
-              'data-tooltip': ''
-            },
-              i className: 'icon-unpublished'
+          button {
+            disabled: !showingButtons
+            className: 'ui-button',
+            onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
+            title: I18n.t('restrict_access', 'Restrict Access')
+            'data-tooltip': ''
+          },
+            i className: 'icon-unpublished'
 
-            button {
-              className: 'ui-button'
-              onClick: @downloadSelecteAsZip
-              title:  if @props.selectedItems.length is 1
-                        I18n.t('download', 'Download')
-                      else
-                        I18n.t('download_as_zip', 'Downlod as Zip')
-              'data-tooltip': ''
-            },
-              i className: 'icon-download'
+          button {
+            disabled: !showingButtons
+            className: 'ui-button'
+            onClick: @downloadSelecteAsZip
+            title:  if @props.selectedItems.length is 1
+                      I18n.t('download', 'Download')
+                    else
+                      I18n.t('download_as_zip', 'Downlod as Zip')
+            'data-tooltip': ''
+          },
+            i className: 'icon-download'
 
-            button {
-              className: 'ui-button'
-              onClick: openMoveDialog.bind(null, @props.selectedItems)
-              title: I18n.t('move', 'Move')
-              'data-tooltip': ''
-            },
-              i className: 'icon-copy-course'
+          button {
+            disabled: !showingButtons
+            className: 'ui-button'
+            onClick: openMoveDialog.bind(null, @props.selectedItems)
+            title: I18n.t('move', 'Move')
+            'data-tooltip': ''
+          },
+            i className: 'icon-copy-course'
 
-            button {
-              className: 'ui-button'
-              onClick: @deleteSelectedItems
-              title: I18n.t('delete', 'Delete')
-              'data-tooltip': ''
-            },
-              i className: 'icon-trash'
+          button {
+            disabled: !showingButtons
+            className: 'ui-button'
+            onClick: @deleteSelectedItems
+            title: I18n.t('delete', 'Delete')
+            'data-tooltip': ''
+          },
+            i className: 'icon-trash'
+
         div className: 'text-right',
           span className: 'ui-buttonset',
-            button onClick: @addFolder, className:'btn',
-              i className:'icon-plus'
+            button {
+              onClick: @addFolder
+              className:'btn'
+              'aria-label': I18n.t('add_folder', 'Add Folder')
+            },
+              i(className:'icon-plus'),
               span className: ('hidden-phone' if showingButtons),
-                  I18n.t('folder', 'Folder')
+                I18n.t('folder', 'Folder')
 
           span className: 'ui-buttonset',
             UploadButton

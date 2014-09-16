@@ -12,6 +12,10 @@ define [
     property: 'name'
     className: 'ef-name-col'
   ,
+    displayName: I18n.t('kind', 'Kind')
+    property: 'content-type'
+    className: 'screenreader-only'
+  ,
     displayNameShort: I18n.t('created_at_short', 'Created')
     displayName: I18n.t('created_at', 'Date Created')
     property: 'created_at'
@@ -44,10 +48,23 @@ define [
       sort = @props.query.sort or 'name'
       order = @props.query.order or 'asc'
 
-      header className:'ef-directory-header',
+      header className:'ef-directory-header', role: 'row',
+        label className: 'screenreader-only', role: 'columnheader',
+          input {
+            type: 'checkbox'
+            checked: @props.areAllItemsSelected()
+            onChange: (event) => @props.toggleAllSelected(event.target.checked)
+          },
+          I18n.t('select_all', 'Select All')
         columns.map (column) =>
           isSortedCol = sort is column.property
-          div key: column.property, className: "#{column.className} #{'current-filter' if isSortedCol}",
+          div {
+            key: column.property
+            className: "#{column.className} #{'current-filter' if isSortedCol}"
+            role: 'columnheader'
+            'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
+            'aria-live': 'polite'
+          },
             ReactRouter.Link _.defaults({to: @props.to, query: @queryParamsFor(column.property), className: 'ef-plain-link'}, @props.params),
 
               span className: ('visible-desktop' if column.displayNameShort),
@@ -56,6 +73,15 @@ define [
                 span className: 'hidden-desktop',
                   column.displayNameShort
 
-              i className:'icon-mini-arrow-up'   if isSortedCol and order is 'asc'
-              i className:'icon-mini-arrow-down' if isSortedCol and order is 'desc'
-        div className:'ef-links-col'
+
+              if isSortedCol and order is 'asc'
+                i className:'icon-mini-arrow-up',
+                  span className: 'screenreader-only',
+                    I18n.t('sorted_ascending', "Sorted Ascending")
+              if isSortedCol and order is 'desc'
+                i className:'icon-mini-arrow-down',
+                  span className: 'screenreader-only',
+                    I18n.t('sorted_desending', "Sorted Descending")
+
+              span className: 'screenreader-only', I18n.t('click_to_sort_by_this_column', 'Click to sort by this column')
+        div className:'ef-links-col', role: 'columnheader'

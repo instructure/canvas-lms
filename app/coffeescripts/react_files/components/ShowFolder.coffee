@@ -64,9 +64,16 @@ define [
 
     render: withReactDOM ->
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div className:'ef-directory',
+      div className:'ef-directory', role: 'grid',
         CurrentUploads({})
-        ColumnHeaders(to: (if @props.params.splat then 'folder' else 'rootFolder'), subject: @props.currentFolder, params: @props.params, query: @props.query),
+        ColumnHeaders {
+          to: (if @props.params.splat then 'folder' else 'rootFolder')
+          subject: @props.currentFolder
+          params: @props.params
+          query: @props.query
+          toggleAllSelected: @props.toggleAllSelected
+          areAllItemsSelected: @props.areAllItemsSelected
+        }
         if @props.currentFolder.isEmpty()
           div ref: 'folderEmpty', className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
         else

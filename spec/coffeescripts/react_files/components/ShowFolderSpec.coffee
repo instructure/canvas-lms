@@ -24,6 +24,7 @@ define [
     props =
       params: {}
       onResolvePath: ->
+      areAllItemsSelected: -> false
 
     showFolderTest props, ->
       ok @showFolder.refs.emptyDiv, "empty div displayed"
@@ -38,6 +39,7 @@ define [
       onResolvePath: ->
       currentFolder: folder
       query: ''
+      areAllItemsSelected: -> false
 
     showFolderTest props, ->
       equal @showFolder.refs.folderEmpty.getDOMNode().textContent, 'This folder is empty', 'displays the empty message'
@@ -54,6 +56,7 @@ define [
       query: ''
       toggleItemSelected: ->
       selectedItems: []
+      areAllItemsSelected: -> false
 
     showFolderTest props, ->
       ok $('.ef-item-row').length, 'generates an item row'
@@ -71,6 +74,7 @@ define [
       query: ''
       toggleItemSelected: ->
       selectedItems: []
+      areAllItemsSelected: -> false
 
     showFolderTest props, ->
       @showFolder.registerListeners(mockProps)
@@ -89,6 +93,7 @@ define [
       query: ''
       toggleItemSelected: ->
       selectedItems: []
+      areAllItemsSelected: -> false
 
     showFolderTest props, ->
       @showFolder.registerListeners(mockProps)

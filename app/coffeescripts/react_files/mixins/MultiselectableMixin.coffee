@@ -25,10 +25,16 @@ define [
       return if e.target.nodeName.toLowerCase() in ['input', 'textarea']
       if e.which == 65 && (e.ctrlKey || e.metaKey)
         e.preventDefault()
-        if e.shiftKey #ctrl-shift-a
-          @setState selectedItems: []
-        else # ctrl-a
-          @setState selectedItems: @selectables()
+        @toggleAllSelected(!e.shiftKey) #ctrl-shift-a
+
+    toggleAllSelected: (shouldSelect) ->
+      if shouldSelect
+        @setState selectedItems: @selectables()
+      else
+        @setState selectedItems: []
+
+    areAllItemsSelected: ->
+      @state.selectedItems.length && (@state.selectedItems.length is @selectables().length)
 
     selectRange: (item) ->
       selectables = @selectables()
@@ -43,8 +49,9 @@ define [
       @setState selectedItems: []
 
     toggleItemSelected: (item, event={}) ->
-      return if $(event.target).closest(@multiselectIgnoredElements).length
+      return if $(event.target).closest(@multiselectIgnoredElements).not('.multiselectable-not-ignored').length
       event.preventDefault()
+
       return @selectRange(item) if event.shiftKey
 
       itemIsSelected = item in @state.selectedItems

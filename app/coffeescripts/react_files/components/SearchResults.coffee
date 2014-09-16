@@ -45,8 +45,15 @@ define [
       @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null})
 
     render: withReactDOM ->
-      div className:'ef-directory',
-        ColumnHeaders to: 'search', subject: @state.collection, params: @props.params, query: @props.query
+      div className:'ef-directory', role: 'grid',
+        ColumnHeaders {
+          to: 'search'
+          subject: @state.collection
+          params: @props.params
+          query: @props.query
+          toggleAllSelected: @props.toggleAllSelected
+          areAllItemsSelected: @props.areAllItemsSelected
+        }
         @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
           FolderChild key:child.cid, model: child, params: @props.params
         LoadingIndicator isLoading: !@state.collection.loadedAll
