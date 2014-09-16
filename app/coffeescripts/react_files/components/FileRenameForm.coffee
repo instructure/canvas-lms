@@ -8,6 +8,7 @@ define [
 ], (I18n, React, withReactDOM, DialogAdapter, DialogContent, DialogButtons) ->
 
   FileRenameForm = React.createClass
+    displayName: 'FileRenameForm'
 
     # dialog for renaming
 

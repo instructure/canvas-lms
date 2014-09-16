@@ -36,6 +36,14 @@ define [
   ]
 
   ColumnHeaders = React.createClass
+    displayName: 'ColumnHeaders'
+
+    propTypes:
+      to: React.PropTypes.string.isRequired
+      query: React.PropTypes.object.isRequired
+      toggleAllSelected: React.PropTypes.func.isRequired
+      areAllItemsSelected: React.PropTypes.func.isRequired
+      splat: React.PropTypes.string #optional
 
     queryParamsFor: (property) ->
       order = if ((@props.query.sort || 'name') is property) and (@props.query.order is 'desc')
@@ -65,7 +73,10 @@ define [
             'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
             'aria-live': 'polite'
           },
-            ReactRouter.Link _.defaults({to: @props.to, query: @queryParamsFor(column.property), className: 'ef-plain-link'}, @props.params),
+            ReactRouter.Link _.defaults({
+              query: @queryParamsFor(column.property)
+              className: 'ef-plain-link'
+            }, @props),
 
               span className: ('visible-desktop' if column.displayNameShort),
                 column.displayName

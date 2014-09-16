@@ -6,6 +6,7 @@ define [
 ], ($, React, {Link}, withReactDOM) ->
 
   BreadcrumbCollapsedContainer = React.createClass
+    displayName: 'BreadcrumbCollapsedContainer'
 
 
     propTypes:
@@ -42,8 +43,6 @@ define [
                 li {},
                   Link {
                     to: (if folder.urlPath() then 'folder' else 'rootFolder')
-                    contextType: @props.contextType
-                    contextId: @props.contextId
                     splat: folder.urlPath()
                     activeClassName: 'active'
                     className: 'ellipsis'

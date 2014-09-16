@@ -5,7 +5,8 @@ define [
   './ProgressBar'
 ], (React, withReactDOM, FileUploader, ProgressBar) ->
 
-  UploadProgressView = React.createClass
+  UploadProgress = React.createClass
+    displayName: 'UploadProgress'
 
     propTypes:
       uploader: React.PropTypes.instanceOf(FileUploader).isRequired

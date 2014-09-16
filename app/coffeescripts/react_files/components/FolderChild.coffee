@@ -14,6 +14,7 @@ define [
 
 
   FolderChild = React.createClass
+    displayName: 'FolderChild'
 
     mixins: [BackboneMixin('model')],
 
@@ -76,8 +77,6 @@ define [
           else if @props.model instanceof Folder
             Link {
               to: 'folder'
-              contextType: @props.params.contextType
-              contextId: @props.params.contextId
               splat: @props.model.urlPath()
               className: 'media'
             },

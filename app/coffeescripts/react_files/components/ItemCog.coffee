@@ -13,8 +13,9 @@ define [
 ], (I18n, React, withReactDOM, preventDefault, FilesystemObject, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, $) ->
 
   ItemCog = React.createClass
-
     # === React Functions === #
+    displayName: 'ItemCog'
+
     propTypes:
       model: React.PropTypes.instanceOf(FilesystemObject)
 
@@ -46,6 +47,13 @@ define [
 
 
     render: withReactDOM ->
+      wrap = (fn) =>
+        preventDefault =>
+          fn([@props.model], {
+            contextType: @props.model.collection.parentFolder.get('context_type').toLowerCase() + 's'
+            contextId: @props.model.collection.parentFolder.get('context_id')
+          })
+
       span {},
 
         button {
@@ -60,11 +68,7 @@ define [
           li {},
             a (if @props.model instanceof Folder
               href: '#'
-              onClick: preventDefault =>
-                downloadStuffAsAZip([@props.model], {
-                  contextType: @props.params.contextType
-                  contextId: @props.params.contextId
-                })
+              onClick: wrap(downloadStuffAsAZip)
             else
               href: @props.model.get('url')
             ),
@@ -76,7 +80,7 @@ define [
             a href:'#', onClick: preventDefault(@openRestrictedDialog), ref: 'restrictedDialog',
               I18n.t('restrict_access', 'Restrict Access')
           li {},
-            a href:'#', onClick: preventDefault(openMoveDialog.bind(null, [@props.model])),
+            a href:'#', onClick: wrap(openMoveDialog),
               I18n.t('move', 'Move')
           li {},
             a href:'#', onClick: preventDefault(@deleteItem), ref: 'deleteLink',

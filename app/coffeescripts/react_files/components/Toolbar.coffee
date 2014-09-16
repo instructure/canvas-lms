@@ -9,9 +9,12 @@ define [
 ], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip) ->
 
   Toolbar = React.createClass
+    displayName: 'Toolbar'
 
     propTypes:
       currentFolder: React.PropTypes.object # not required as we don't have it on the first render
+      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
+      contextId: React.PropTypes.string.isRequired
 
     onSubmitSearch: (event) ->
       event.preventDefault()
@@ -24,8 +27,8 @@ define [
 
     downloadSelecteAsZip: ->
       downloadStuffAsAZip(@props.selectedItems, {
-        contextType: @props.params.contextType,
-        contextId: @props.params.contextId
+        contextType: @props.contextType,
+        contextId: @props.contextId
       })
 
     deleteSelectedItems: ->
@@ -97,7 +100,9 @@ define [
           button {
             disabled: !showingButtons
             className: 'ui-button'
-            onClick: openMoveDialog.bind(null, @props.selectedItems)
+            onClick: openMoveDialog.bind null, @props.selectedItems,
+              contextType: @props.contextType
+              contextId: @props.contextId
             title: I18n.t('move', 'Move')
             'data-tooltip': ''
           },

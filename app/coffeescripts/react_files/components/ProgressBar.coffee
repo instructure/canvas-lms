@@ -4,6 +4,7 @@ define [
 ], (React, withReactDOM) ->
 
   ProgressBar = React.createClass
+    displayName: 'ProgressBar'
 
     propTypes:
       progress: React.PropTypes.number

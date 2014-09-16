@@ -7,6 +7,7 @@ define [
 ], (I18n, React, friendlyBytes, withReactDOM, ProgressBar) ->
 
   FilesUsage = React.createClass
+    displayName: 'FilesUsage'
 
     propTypes:
       contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
@@ -18,7 +19,10 @@ define [
 
     componentDidMount: ->
       @update()
-      setInterval @update, 1000*60*5 #refresh every 5 minutes
+      @interval = setInterval @update, 1000*60*5 #refresh every 5 minutes
+
+    componentWillUnmount: ->
+      clearInterval @interval
 
     render: withReactDOM ->
       @transferPropsTo div {},

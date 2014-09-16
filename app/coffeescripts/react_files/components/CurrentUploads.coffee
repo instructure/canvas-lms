@@ -8,6 +8,7 @@ define [
 ], (I18n, React, withReactDOM, UploadQueue, UploadProgress) ->
 
   CurrentUploads = React.createClass
+    displayName: 'CurrentUploads'
 
     getInitialState: ->
       currentUploads: []

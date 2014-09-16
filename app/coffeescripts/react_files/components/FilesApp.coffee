@@ -8,9 +8,11 @@ define [
   './FolderTree'
   './FilesUsage'
   '../mixins/MultiselectableMixin'
-], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin) ->
+  '../modules/filesEnv'
+], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, filesEnv) ->
 
   FilesApp = React.createClass
+    displayName: 'FilesApp'
 
     onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults}) ->
       @setState
@@ -33,20 +35,29 @@ define [
     selectables: -> @state.currentFolder.children(@props.query)
 
     render: withReactDOM ->
+
+
+      if @state.currentFolder # when showing a folder
+        contextType = @state.currentFolder.get('context_type').toLowerCase() + 's'
+        contextId = @state.currentFolder.get('context_id')
+      else # when showing search results
+        contextType = filesEnv.contextType
+        contextId = filesEnv.contextId
+
+
       div null,
         Breadcrumbs({
           rootTillCurrentFolder: @state.rootTillCurrentFolder
-          contextType: @props.params.contextType
-          contextId: @props.params.contextId
           query: @props.query
           showingSearchResults: @state.showingSearchResults
         })
         Toolbar({
           currentFolder: @state.currentFolder
           query: @props.query
-          params: @props.params
           selectedItems: @state.selectedItems
           clearSelectedItems: @clearSelectedItems
+          contextType: contextType
+          contextId: contextId
         })
 
         div className: 'ef-main',
@@ -55,15 +66,15 @@ define [
             role: 'region'
             'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
           },
-            if @state.rootTillCurrentFolder
-              FolderTree({
-                rootTillCurrentFolder: @state.rootTillCurrentFolder,
-                contextType: @props.params.contextType,
-                contextId: @props.params.contextId
-              })
+            FolderTree({
+              rootTillCurrentFolder: @state.rootTillCurrentFolder
+              rootFoldersToShow: filesEnv.rootFolders
+            })
           @props.activeRouteHandler
             onResolvePath: @onResolvePath
             currentFolder: @state.currentFolder
+            contextType: contextType
+            contextId: contextId
             selectedItems: @state.selectedItems
             toggleItemSelected: @toggleItemSelected
             toggleAllSelected: @toggleAllSelected
@@ -71,10 +82,11 @@ define [
         div className: 'ef-footer grid-row',
           FilesUsage({
             className: 'col-xs-3'
-            contextType: @props.params.contextType
-            contextId: @props.params.contextId
+            contextType: contextType
+            contextId: contextId
           }),
-          div className: 'col-xs',
-            div {},
-              a className: 'pull-right', href: '/files?show_all_contexts=1',
-                I18n.t('all_my_files', 'All My Files')
+          unless filesEnv.showingAllContexts
+            div className: 'col-xs',
+              div {},
+                a className: 'pull-right', href: '/files?show_all_contexts=1',
+                  I18n.t('all_my_files', 'All My Files')

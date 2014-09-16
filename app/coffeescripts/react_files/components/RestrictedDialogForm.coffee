@@ -11,6 +11,8 @@ define [
   RestrictedDialogForm = React.createClass
 
     # === React Functions === #
+    displayName: 'RestrictedDialogForm'
+
     propTypes:
       closeDialog: React.PropTypes.func.isRequired,
       model: React.PropTypes.instanceOf(FilesystemObject)

@@ -28,6 +28,7 @@ define [
 
 
   FriendlyDatetime = React.createClass
+    displayName: 'FriendlyDatetime'
 
     propTypes:
       datetime: React.PropTypes.oneOfType([

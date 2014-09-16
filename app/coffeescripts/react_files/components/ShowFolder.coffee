@@ -3,6 +3,7 @@ define [
   'react'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
+  '../modules/filesEnv'
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
@@ -10,9 +11,12 @@ define [
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
   './CurrentUploads'
-], (_, React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads) ->
+], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads) ->
+
+  LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
   ShowFolder = React.createClass
+    displayName: 'ShowFolder'
 
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
@@ -33,12 +37,20 @@ define [
 
 
     buildFolderPath: (splat) ->
-      path = '/' + (splat || '')
-      encodeURI(path)
+      encodeURI('/' + (splat || ''))
 
     getCurrentFolder: ->
       path = @buildFolderPath(@props.params.splat)
-      Folder.resolvePath(@props.params.contextType, @props.params.contextId, path).then (rootTillCurrentFolder) =>
+
+      if filesEnv.showingAllContexts
+        pluralAssetString = path.split('/')[1]
+        context = filesEnv.contextsDictionary[pluralAssetString] or filesEnv.contexts[0]
+        {contextType, contextId} = context
+        path = path.replace(LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH, '')
+      else
+        {contextType, contextId} = filesEnv
+
+      Folder.resolvePath(contextType, contextId, path).then (rootTillCurrentFolder) =>
         currentFolder = rootTillCurrentFolder[rootTillCurrentFolder.length - 1]
         @props.onResolvePath({currentFolder, rootTillCurrentFolder, showingSearchResults:false})
 
@@ -68,11 +80,10 @@ define [
         CurrentUploads({})
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')
-          subject: @props.currentFolder
-          params: @props.params
           query: @props.query
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
+          splat: @props.params.splat
         }
         if @props.currentFolder.isEmpty()
           div ref: 'folderEmpty', className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
@@ -81,7 +92,6 @@ define [
             FolderChild
               key:child.cid
               model: child
-              params: @props.params
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
 

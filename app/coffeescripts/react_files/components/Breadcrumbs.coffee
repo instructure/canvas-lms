@@ -9,11 +9,10 @@ define [
 ], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM ) ->
 
   Breadcrumbs = React.createClass
+    displayName: 'Breadcrumbs'
 
     propTypes:
       rootTillCurrentFolder: React.PropTypes.array.isRequired
-      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
-      contextId: React.PropTypes.string.isRequired
 
     getInitialState: ->
       {
@@ -71,8 +70,6 @@ define [
       li {},
         Link {
           to: (if isRootCrumb then 'rootFolder' else 'folder')
-          contextType: @props.contextType
-          contextId: @props.contextId
           splat: (folder.urlPath() unless isRootCrumb)
           # only add title tooltips if there's a chance they could be ellipsized
           title: (name if @state.maxCrumbWidth < 500)
@@ -91,8 +88,6 @@ define [
           li {},
             Link {
               to: 'search'
-              contextType: @props.contextType
-              contextId: @props.contextId
               query: @props.query
             },
               span {
@@ -109,11 +104,7 @@ define [
             @renderSingleCrumb(folder, folder isnt lastFolder, i is 0)
         else
           [
-            BreadcrumbCollapsedContainer({
-              foldersToContain: foldersInMiddle
-              contextType: @props.contextType,
-              contextId: @props.contextId
-            }),
+            BreadcrumbCollapsedContainer({foldersToContain: foldersInMiddle}),
             @renderSingleCrumb(lastFolder, false)
           ]
 

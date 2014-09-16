@@ -7,6 +7,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], ($, React, withReactDOM, I18n, FilesystemObject) ->
   PublishCloud = React.createClass
+    displayName: 'PublishCloud'
     propTypes:
       model: React.PropTypes.instanceOf(FilesystemObject)
 

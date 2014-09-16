@@ -14,6 +14,11 @@ define [
 
 
   SearchResults = React.createClass
+    displayName: 'SearchResults'
+
+    propTypes:
+      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
+      contextId: React.PropTypes.string.isRequired
 
     getInitialState: ->
       return {
@@ -22,7 +27,7 @@ define [
 
     updateResults: (props) ->
       oldUrl = @state.collection.url
-      @state.collection.url = "#{location.origin}/api/v1/#{@props.params.contextType}/#{@props.params.contextId}/files"
+      @state.collection.url = "#{window.location.origin}/api/v1/#{@props.contextType}/#{@props.contextId}/files"
       updateAPIQuerySortParams(@state.collection, @props.query)
 
       return if @state.collection.url is oldUrl # if you doesn't search for the same thing twice
@@ -51,13 +56,12 @@ define [
         ColumnHeaders {
           to: 'search'
           subject: @state.collection
-          params: @props.params
           query: @props.query
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
         }
         @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
-          FolderChild key:child.cid, model: child, params: @props.params
+          FolderChild key:child.cid, model: child
         LoadingIndicator isLoading: !@state.collection.loadedAll
         if @state.collection.loadedAll and (@state.collection.length is 0)
           div ref: 'noResultsFound',

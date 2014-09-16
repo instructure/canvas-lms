@@ -9,6 +9,7 @@ define [
 ], (I18n, React, withReactDOM, UploadQueue, _, FileRenameForm, DialogAdapter) ->
 
   UploadButton = React.createClass
+    displayName: 'UploadButton'
 
     ###
     FileOption:

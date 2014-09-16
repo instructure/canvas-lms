@@ -166,7 +166,8 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
-    return ember_app if (@context.feature_enabled?(:better_file_browsing))
+    # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
+    return ember_app if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
 
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
@@ -318,10 +319,31 @@ class FilesController < ApplicationController
   end
 
   def ember_app
-    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && @context.feature_enabled?(:better_file_browsing)
+    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
     @body_classes << 'full-width padless-content'
     js_bundle :react_files
     jammit_css :ember_files
+
+    @contexts = [@context]
+    get_all_pertinent_contexts(include_groups: true) if @context == @current_user
+    files_contexts = @contexts.map { |context|
+      # TODO: it would be a LOT better if we didn't have to go fetch all these root folders just so
+      # we can go fetch them again in ajax API requests. if we can figure out :read_contents permissions
+      # I can get by without the root_folder_id prop as well.
+      root_folder = Folder.root_folders(context).first
+      {
+        asset_string: context.asset_string,
+        name: context == @current_user ? t('my_files', 'My Files') : context.name,
+        root_folder_id: root_folder.id,
+        permissions: {
+          # TODO: make sure these permision checks are sufficient and fast
+          manage_files: context.grants_right?(@current_user, session, :manage_files),
+          read_contents: root_folder.grants_right?(@current_user, session, :read_contents)
+        }
+      }
+    }
+    js_env :FILES_CONTEXTS => files_contexts
+
     render :text => "".html_safe, :layout => true
   end
 
