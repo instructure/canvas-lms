@@ -1276,7 +1276,7 @@ pl:
       recipients_required: "Wymagany jest co najmniej jeden odbiorca"
       threshold_should_be_numeric: "Powinna to być liczba dodatnia"
   allow_lor_tools: "Zezwól użytkownikom na przeglądanie i korzystanie z zewnętrznych narzędzi skonfigurowanych z LOR."
-  allow_opt_out_of_inbox: "Pozwól uczestnikom wypisać się ze skrzynki konwersacyjnej — spowoduje to wysłanie wszystkich komunikatów dyskusyjnych i powiadomień w trybie Tak szybko jak to możliwe do głównej skrzynki użytkownika, ukrycie identyfikatorów o nieprzeczytanych wiadomościach dyskusyjnych w skrzynce oraz ukrycie preferencji o powiadomieniach dyskusyjnych."
+  allow_opt_out_of_inbox: "Pozwól uczestnikom wypisać się ze skrzynki konwersacyjnej — spowoduje to niezwłoczne wysłanie wszystkich komunikatów dyskusyjnych i powiadomień do głównej skrzynki użytkownika, ukrycie identyfikatorów o nieprzeczytanych wiadomościach dyskusyjnych w skrzynce oraz ukrycie preferencji o powiadomieniach dyskusyjnych."
   analytics: 
     course: 
       analytics: Analityka
@@ -9907,14 +9907,14 @@ pl:
       show_progressions_for_student: "Pokaż postęp dla %{name}"
     progressions_index: 
       back_to_modules: "Powrót do strony modułów"
-      no_students_found: "Nie znaleziono studentów"
+      no_students_found: "Nie znaleziono uczestników"
       student_progress: "Postęp uczestnika"
   modules_item_controller: 
-    max_score_complete: "zdobyto nie więcej niż *wynik*"
-    max_score_incomplete: "trzeba zdobyć nie więcej niż *wynik*"
-    min_score_complete: "zdobyto co najmniej *wynik*"
-    min_score_incomplete: "trzeba zdobyć co najmniej *wynik*"
-    must_contribute_complete: "brało udział w dyskusji na stronie"
+    max_score_complete: "zdobył nie więcej niż *wynik*"
+    max_score_incomplete: "musi zdobyć nie więcej niż *wynik*"
+    min_score_complete: "zdobył co najmniej *wynik*"
+    min_score_incomplete: "musi zdobyć co najmniej *wynik*"
+    must_contribute_complete: "brał udział w dyskusji na stronie"
     must_contribute_incomplete: "muszą brać udział w dyskusji na stronie"
     must_submit_complete: "przesłali zadanie"
     must_submit_incomplete: "muszą przesłać zadanie"
