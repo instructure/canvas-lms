@@ -417,7 +417,7 @@ describe ExternalToolsController do
       assigns[:tool].url.should == "http://example.com/other_url"
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].not_selectable.should == "true"
+      assigns[:tool].not_selectable.should be_truthy
       assigns[:tool].has_placement?(:editor_button).should be_true
     end
 
