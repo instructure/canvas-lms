@@ -267,12 +267,12 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:text]
   end
 
-  def not_selectable=(bool)
-    settings[:not_selectable] = Canvas::Plugin.value_to_boolean(bool)
+  def not_selectable
+    !!read_attribute(:not_selectable)
   end
 
-  def not_selectable
-    settings[:not_selectable]
+  def not_selectable=(bool)
+    write_attribute(:not_selectable, Canvas::Plugin.value_to_boolean(bool))
   end
 
   def selectable
