@@ -15,7 +15,7 @@ namespace :canvas do
       execute :chown, '-R', "#{user}:{user}", "#{release_path}"
     end
   end
-  
+
   desc "Set application nodes from config file"
   task :set_app_nodes do
     on primary :db do
@@ -63,12 +63,4 @@ namespace :canvas do
     end
   end
 
-end
-
-namespace :wtf do
-  task :hostname do
-    on roles(:all) do
-      execute :hostname
-    end
-  end
 end
