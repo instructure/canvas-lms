@@ -36,7 +36,7 @@ end
 
 namespace :deploy do
 
-  before :started,  'canvas:meta_tasks:before_started'
+  # before :started,  'canvas:meta_tasks:before_started'
   before :updated,  'canvas:meta_tasks:before_updated'
   after :updated,   'canvas:meta_tasks:after_updated'
   after :published, 'canvas:meta_tasks:after_published'
