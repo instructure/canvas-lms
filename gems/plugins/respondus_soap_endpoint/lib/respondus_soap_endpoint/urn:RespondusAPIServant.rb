@@ -348,7 +348,7 @@ Implemented for: Canvas LMS}]
   #
   def replaceServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
     scope = get_scope(session, itemType)
-    item = scope.find_by_id(itemID)
+    item = scope.where(id: itemID).first
     raise(CantReplaceError) unless item
     do_import(item, itemType, uploadType, fileName, fileData)
   end
@@ -477,7 +477,7 @@ Implemented for: Canvas LMS}]
 
     raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
     # selection_state comes from the session, which is safe from user modification
-    course = Course.find_by_id(selection_state.first)
+    course = Course.where(id: selection_state.first).first
     raise(OtherError, 'Item type incompatible with selection state') unless course
 
     case itemType
@@ -506,7 +506,7 @@ Implemented for: Canvas LMS}]
     end
 
     selection_state = session['selection_state'] || []
-    course = Course.find_by_id(selection_state.first)
+    course = Course.where(id: selection_state.first).first
     raise(OtherError, 'Item type incompatible with selection state') unless course
 
     # Make sure that the image import folder is hidden by default

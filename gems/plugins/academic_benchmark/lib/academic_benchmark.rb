@@ -25,7 +25,7 @@ module AcademicBenchmark
       return
     end
 
-    if permissionful_user = User.find_by_id(user_id)
+    if permissionful_user = User.where(id: user_id).first
       guids.each do |guid|
         AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user)
       end
@@ -55,7 +55,7 @@ module AcademicBenchmark
 
   def self.set_common_core_setting!
     if guid = self.config[:common_core_guid]
-      if group = LearningOutcomeGroup.find_by_migration_id(guid)
+      if group = LearningOutcomeGroup.where(migration_id: guid).first
         Setting.set(common_core_setting_key, group.id)
       end
     end

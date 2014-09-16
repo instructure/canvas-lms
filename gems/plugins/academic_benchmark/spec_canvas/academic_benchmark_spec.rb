@@ -40,7 +40,7 @@ describe AcademicBenchmark::Converter do
     c = b.child_outcome_groups.first
     c.migration_id.should == "cccccccccc"
     c.title.should == "College- and Career-Readiness Standards and K-12 Mathematics"
-    d = c.child_outcome_groups.find_by_migration_id("ddddddddd")
+    d = c.child_outcome_groups.where(migration_id: "ddddddddd").first
     d.migration_id.should == "ddddddddd"
     d.title.should == "Kindergarten"
     d.low_grade.should == "K"
@@ -59,17 +59,17 @@ describe AcademicBenchmark::Converter do
     f.high_grade.should == "K"
     f.child_outcome_links.count.should == 3
 
-    g = LearningOutcome.global.find_by_migration_id("ggggggggggggggggg")
+    g = LearningOutcome.global.where(migration_id: "ggggggggggggggggg").first
     g.short_description.should == "K.CC.1"
     g.description.should == "Count to 100 by ones and by tens."
-    g = LearningOutcome.global.find_by_migration_id("hhhhhhhhhhhhhhhh")
+    g = LearningOutcome.global.where(migration_id: "hhhhhhhhhhhhhhhh").first
     g.short_description.should == "K.CC.2"
     g.description.should == "Count forward beginning from a given number within the known sequence (instead of having to begin at 1)."
-    g = LearningOutcome.global.find_by_migration_id("iiiiiiiiiiiiiiiii")
+    g = LearningOutcome.global.where(migration_id: "iiiiiiiiiiiiiiiii").first
     g.short_description.should == "K.CC.3"
     g.description.should == "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
 
-    j = c.child_outcome_groups.find_by_migration_id("jjjjjjjjjjj")
+    j = c.child_outcome_groups.where(migration_id: "jjjjjjjjjjj").first
     j.migration_id.should == "jjjjjjjjjjj"
     j.title.should == "First Grade"
     j.low_grade.should == "1"
@@ -88,7 +88,7 @@ describe AcademicBenchmark::Converter do
     l.high_grade.should == "1"
     l.child_outcome_links.count.should == 1
 
-    m = LearningOutcome.global.find_by_migration_id("mmmmmmmmmmm")
+    m = LearningOutcome.global.where(migration_id: "mmmmmmmmmmm").first
     m.short_description.should == "1.DD.1"
     m.description.should == "And something else"
     m.title.should == "1.DD.1"
