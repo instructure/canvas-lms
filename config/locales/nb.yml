@@ -104,6 +104,7 @@ nb:
         auth_base: CAS-URL
         auth_type: Type
         login_handle_name: Innloggingstekst
+        unknown_user_url: "Ukjent Bruker URL"
       login_handle_name_description: "Teksten som brukes for unike innnloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Student ID, etc."
       save_button: "Lagre innstillinger for autentisering"
     index: 
@@ -143,6 +144,7 @@ nb:
       identifer_format_description: "LDAP-attributtet som brukes til å sjekke Canvas-innloggingen. La den være blank for å bruke brukernavnet som angis av brukeren."
       labels: 
         auth_base: Grunnlag
+        auth_filter: Filtrer
         auth_host: Vert
         auth_over_tls: "Over TLS?"
         auth_over_tls_false: "Ingen TLS"
@@ -210,6 +212,7 @@ nb:
         login_handle_name: Innloggingstekst
         position: Posisjon
         requested_authn_context: Autentiseringskontekst
+        unkown_user_url: "Ukjent Bruker URL"
       log_in_url: Påloggings-URL
       log_out_url: Avloggings-URL
       login_attribute: Innloggingsattributt
@@ -266,6 +269,8 @@ nb:
       extra_text_term: "Semester: %{term_name};"
       message: "%{type}-rapport generert med følgende innstillinger. Konto: %{account}; %{options}"
       section_text: "For klasse: %{section};"
+      start_text: "Start På: %{start_at};"
+      term_text: "Begrep: %{term_name};"
     grades: 
       deleted: "Inkluder slettede objekter: sant;"
       limited: "slettet objekter er begrenset av dager som er spesifisert;"
@@ -427,9 +432,11 @@ nb:
     admin_tools: 
       admin_tools: 
         tab_labels: 
+          admin_tools_logging: Logging
           restore_course: "Gjenopprett kurs"
         view_messages: "Vis varsler"
       admin_tools_cumb: Administratorverktøy
+      admin_tools_title: Administrasjonsverktøy
       auth_logging_content_pane: 
         auth_logging: "Inn- og utloggingsaktivitet for brukeren"
       auth_logging_search_results: 
@@ -482,6 +489,7 @@ nb:
         time: Tid
         user: Bruker
       course_search_form: 
+        course_id: "Kurs ID"
         select_default: "Velg et kurs"
         select_label: "Velg et kurs"
       course_search_results: 
@@ -770,6 +778,8 @@ nb:
             field: Prøve-ID
           section_id: 
             field: Klasse-ID
+    screenreader_heading: 
+      page_title: Kontoinnstillinger
     settings: 
       about_google_docs: |-
           Google Docs forhåndsvisning tillater brukere å vise dokumenter fra
@@ -874,6 +884,7 @@ nb:
         help_link_subtext: Undertekst
         help_link_text: "Tekst som vises for lenke"
         help_link_url: URL
+        login_handle_name: "Logg inn Etikett"
         membership_type: "Legg til flere"
         message: Beskjed
         mfa_settings: "Flerfaktors autentisering"
@@ -907,6 +918,7 @@ nb:
         add_admins: "Legg til kontoadministratorer"
         configure_report: Konfigurer…
         run_report: "Kjør rapport"
+      login_handle_name_placeholder: "ex: Logg inn, Brukernavn, eller Student ID"
       manual_quotas: 
         find_button: Finn
         manual_quotas_title: "Manuelt justerbare kvoter"
@@ -1197,6 +1209,12 @@ nb:
         header: 
           one: "1 feil forhindret denne %{model} fra å bli lagret"
           other: "%{count} feil forhindret denne %{model} fra å bli lagret"
+  add_module_item: 
+    add_assignment_to: "Legge et oppdrag til %{module}"
+    add_file_to: "Legg filer til  %{module}"
+    add_page_to: "Legge sider til %{module}"
+    add_quiz_to: "Legg spørrekonkurranser til %{module}"
+    add_topic_to: "Legg diskusjonsemner til %{module}"
   ajax_errors: 
     error_heading: "Ajax Error: %{status_code}"
     errors: 
@@ -1937,6 +1955,7 @@ nb:
         add_rubric: "Legg til vurdringsveiledning"
         assign_rubric: "Tildel vurderingsveiledning"
         edit: Rediger
+      manage: Behandle
       messages: 
         locked: "Denne oppgave er for tiden låst."
       new_assignment: "Ny oppgave"
@@ -3196,6 +3215,7 @@ nb:
         beginning_change_to: "endre til"
         beginning_date: Startdato
         checkbox_label: "Juster hendelser og innleveringsfrister"
+        date_adjustment: "Dato justering"
         ending_change_to: "endre til"
         ending_date: "Endrer dato"
         new_end_date_label: "Endre sluttdato til"
@@ -3206,6 +3226,8 @@ nb:
         old_end_date_title: "Endrer dato"
         old_start_date_label: Startdato
         old_start_date_title: Startdato
+        remove_dates: "Fjern datoer"
+        shift_dates: "Skift datoer"
         substitution: Erstatning
       day_substitution: 
         move_from: "Flytt fra"
@@ -3654,6 +3676,15 @@ nb:
       module: modul
       module_details: "Moduler vises i sekvensiell rekkefølge, så kun moduler som er over %{name} kan settes som forhåndskrav."
       module_name: Modulnavn
+      move_module: 
+        after: "Etter at"
+        before: Før
+        or: ELLER
+        place: Sted
+      move_module_item: 
+        into: "inn i"
+        or: ELLER
+        place: Sted
       must_complete_prerequisites: "De må fullføre"
       no_preprequisites: "Ingen forhåndskrav definert"
       no_requirements: "Ingen krav definert"
@@ -3727,9 +3758,11 @@ nb:
         text: 
           delete_module: Slett
           edit_module: Rediger
+          move_module: "Flytte til..."
         title: 
           delete_module: "Slett denne modulen"
           edit_module: Rediger
+          move_module: "Flytt denne modul"
           student_progress: "Se studentfremdrift for denne Modulen"
       manager_module: "Behandle modul"
       module_will_unlock_at: "Låses opp *%{unlock_date}*"
@@ -3810,6 +3843,8 @@ nb:
         edit_item_details: "Rediger elementets detaljer"
         indent: "Øk innrykk"
         indent_item: "Øk innrykk"
+        move_item: "Flytt dette element"
+        move_item_label: "Flytt dette element"
         outdent: "Reduser innrykk"
         outdent_item: "Reduser innrykk"
         remove_item: Fjern
@@ -3820,6 +3855,7 @@ nb:
       min_score: 
         fulfilled: "fikk et resultat på minst en %{score}"
         unfulfilled: "må ha et resultat på minst en %{score}"
+      modules_item_move_to: "Flytte til..."
       must_contribute: 
         fulfilled: "bidro til innholdet på siden"
         unfulfilled: "må bidra til innholdet på siden"
@@ -4464,6 +4500,9 @@ nb:
     group_list: 
       headings: 
         groups: Kursgrupper
+    import_in_progress_notice: 
+      course_import_notice: 
+        status_link: "Importere Status"
     index: 
       headings: 
         future_enrollments: "Framtidige påmeldinger"
@@ -4592,6 +4631,7 @@ nb:
       alerts_title: Varsler
       buttons: 
         add_section: "Legg til klasse"
+        edit_section_name: "Endre seksjon navn"
         move_course: "Flytt kurs"
         update_course: "Oppdater kursets detaljer"
       course_conclude_at_warning_message: "Kurset er for tiden satt til å slutte ved midnatt, noe som betyr at den foregående dagen vil være siste dag kurset er aktivt."
@@ -4673,6 +4713,12 @@ nb:
           delete_section: "Slett klasse"
           edit_section: "Rediger klasse"
       megabytes: megabytes
+      move_module: 
+        place: Sted
+      move_nav_item: 
+        after: "Etter At"
+        before: Før
+        or: ELLER
       no_date: "Ingen dato satt"
       no_language_preference: "Ikke angitt (brukerinnstilt, standard er %{language})"
       none: Ingen
@@ -4826,6 +4872,8 @@ nb:
       new: Ny
       new_discussion_entries: "Nye diskusjonsinnlegg"
       new_discussions: "Nye diskusjoner"
+      num_of_assignments: "# Overdragelse"
+      num_of_submissions: "# Innleveringer"
       page_title: Kursstatistikk
       quiz: Prøve
       quiz_questions: Prøvespørsmål
@@ -4854,8 +4902,12 @@ nb:
   create_module_item: 
     assignment_name: Oppgavenavn
   create_module_item_quiz: 
+    discussion_name: "Diskusjons Navn"
+    file_to_upload: "Filen for å laste opp"
     graded_quiz: "Rettet prøve"
     graded_survey: "Rettet undersøkelse"
+    header_name: "Topptekst Navn"
+    link_title: "Lenken Tittel"
     page_name: Sidenavn
     practice_quiz: "Øv på prøve"
     quiz_name: Prøvenavn
@@ -6133,6 +6185,13 @@ nb:
     student_outcome_gradebook: "Karakterbok for studentens mestringsbaserte læring"
   file_browser_view: 
     folder_tree_instructions: "Bruk opp- og nedoverpilene for å navigere gjennom treet. Trykk høyre for å utvide mapper venstre for å lukke dem, og enter for å velge et bilde."
+  file_rename_form: 
+    back: Tilbake
+    change: Endre
+    change_name: "Endre Navn"
+    name: Navn
+    rename_title: Kopi
+    replace: Erstatt
   filebrowserview: 
     course_files: Kursfiler
     group_files: Gruppefiler
@@ -6327,6 +6386,7 @@ nb:
     no_deleting_folders_with_content: "Kan ikke slette en mappe med innhold"
     no_deleting_root: "Kan ikke slette rotmappen"
     only_one_folder: "Kan ikke sette mappesti og mappe-ID"
+  for: før
   global_message_icons: 
     announcement: kunngjøring
     calendar: kalender
