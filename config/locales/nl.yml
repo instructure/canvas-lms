@@ -104,8 +104,10 @@ nl:
         auth_base: CAS-URL
         auth_type: Type
         login_handle_name: Aanmeldingslabel
+        unknown_user_url: "Onbekende gebruiker url"
       login_handle_name_description: "Het label dat gebruikt wordt voor  unieke aanmeldingsID's. Bijvoorbeeld: Login, Gebruikersnaam, cursist-ID, enzovoort."
       save_button: "Verificatie-instellingen opslaan"
+      unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiken niet in canvas te vinden is."
     index: 
       add_auth_desc: "Een identiteit van provider aan dit account toevoegen:"
       canvas_login_tip: |-
@@ -211,6 +213,7 @@ nl:
         login_handle_name: Aanmeldings-label
         position: Positie
         requested_authn_context: Verificatiecontext
+        unkown_user_url: "Onbekende gebruiker url"
       log_in_url: "Inloggen op URL"
       log_out_url: "Uitloggen op URL"
       login_attribute: Aanmeldings-kenmerk
@@ -225,6 +228,7 @@ nl:
       save_button: "Verificatie-instellingen opslaan"
       start_debugging: "Foutopsporing starten"
       stop_debugging: "Foutopsporing stoppen"
+      unkown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiken niet in canvas te vinden is."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest verzonden naar IdP"
       auth_response_from_idp: "AuthnResponse van IdP"
@@ -440,6 +444,7 @@ nl:
           restore_course: "Cursussen herstellen"
         view_messages: "Meldingen bekijken"
       admin_tools_cumb: Beheertools
+      admin_tools_title: "Admin Tools"
       auth_logging_content_pane: 
         auth_logging: "Gebruikerslogin / afmelden activiteit"
       auth_logging_search_results: 
@@ -492,6 +497,9 @@ nl:
         time: Tijd
         user: Gebruiker
       course_search_form: 
+        course_id: Cursus-id
+        labels: 
+          find_deleted_course: "Naar verwijderde cursus per ID zoeken"
         select_default: "Een cursus selecteren"
         select_label: "Een cursus selecteren"
       course_search_results: 
@@ -549,6 +557,7 @@ nl:
         generate_activity_username: "Activiteit genereren voor *%{user}*"
         message_date_from: Van-datum
         message_date_to: Tot-datum
+        search: "Naar personen per ID of naam zoeken"
         search_people: "Personen zoeken"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -591,9 +600,9 @@ nl:
         zero: Gerapporteerd
       saving: "Bezig met opslaan..."
       submitted_link: 
-        one: "Ingediend %{count}"
-        other: "Ingediend %{count}"
-        zero: Ingediend
+        one: "Ingeleverd %{count}"
+        other: "Ingelevered %{count}"
+        zero: Ingeleverd
       title: Profielfoto
       unlock_link: ontgrendelen
     cannot_manage_account: "Je bent niet gemachtigd om accountinstellingen te beheren"
@@ -780,6 +789,8 @@ nl:
             field: Toets-ID
           section_id: 
             field: Sectie-ID
+    screenreader_heading: 
+      page_title: accountinstellingen
     settings: 
       about_google_docs: |-
           Google Docs voorbeeldweergaven maken het voor gebruikers mogelijk om documenten
@@ -884,6 +895,7 @@ nl:
         help_link_subtext: Subtekst
         help_link_text: "Tekst om bij link weer te geven "
         help_link_url: URL
+        login_handle_name: Aanmeldingslabel
         membership_type: "Meer toevoegen"
         message: Bericht
         mfa_settings: Multi-Factor-verificatie
@@ -917,6 +929,7 @@ nl:
         add_admins: "Accountbeheerders toevoegen"
         configure_report: Configureren...
         run_report: "Rapport uitvoeren"
+      login_handle_name_placeholder: "bijv.: Aanmelden, Gebruikersnaam of Cursist-ID"
       manual_quotas: 
         find_button: Zoeken
         manual_quotas_title: "Handmatig instelbare quota's"
@@ -983,7 +996,7 @@ nl:
       tab_reports: Rapporten
       tab_settings: Instellingen
       transifex_message: "Lid worden van de [Canvas-vertaalcommunity](%{transifex_url})"
-      turnitin_comments_help: "deze opmerkingen zullen aan cursisten getoond worden als ze een Turnitin- geauthoriseerde opdracht insturen."
+      turnitin_comments_help: "deze opmerkingen zullen aan cursisten getoond worden als ze een Turnitin- geauthoriseerde opdracht inleveren."
       turnitin_pledge_help: "cursisten moeten een selectievakje inschakelen om aan te geven dat ze met deze belofte accoord gaan"
       turnitin_settings_title: Turnitin-instellingen
       update_settings_button: "Instellingen bijwerken"
@@ -1204,6 +1217,12 @@ nl:
         header: 
           one: "Dit %{model} is niet opgeslagen door een fout"
           other: "Dit %{model} is niet opgeslagen door %{count} fouten"
+  add_module_item: 
+    add_assignment_to: "Opdracht toevoegen aan %{module}"
+    add_file_to: "Bestand toevoegen aan %{module}"
+    add_page_to: "Pagina toevoegen aan %{module}"
+    add_quiz_to: "Toets toevoegen aan %{module}"
+    add_topic_to: "Discussieonderwerp toevoegen aan %{module}"
   ajax_errors: 
     error_heading: "Ajax-fout: %{status_code}"
     errors: 
@@ -1255,6 +1274,8 @@ nl:
       criteria_required: "Er is minimaal een trigger nodig"
       recipients_required: "Er is minimaal een ontvanger nodig"
       threshold_should_be_numeric: "Dit moet een positief getal zijn"
+  allow_lor_tools: "Gebruikers toelaten om externe tools voor LOR geconfigureerd te zien en te gebruiken."
+  allow_opt_out_of_inbox: "Gebruikers toelaten om Gepreskken Inbox af te wijzen. Hierdoor zullen alle gesprek berichten en meldingen als zo snel mogelijke meldingen naar het primaire email van de gebruiker te sturen, de ongelezen berichten XX en de meldingsvoorkeuren van de Gesprekken te verbergen."
   analytics: 
     course: 
       analytics: Analytics
@@ -1404,6 +1425,7 @@ nl:
     labels: 
       due: Inleverdatum
     name_is_required: "Naam is verplicht!"
+    points_possible_not_zero: "Mogelijke punten moeten meer dan 0 zijn voor het gekozen beoordelingstype"
     points_possible_number: "Mogelijke punten moeten een getal zijn"
     select_external_tool_dialog_title: "Externe tool configureren"
     submission_action_take_quiz: "%{title} afnemen"
@@ -1520,6 +1542,7 @@ nl:
       group_weight: "%{groupWeight}% van totaal"
       manage: Beheren
       move: "Verplaatsen naar..."
+      move_to_accessibility_warning: "Waarschuwing: voor betere toegang tot of opnieuw ordenen van opdrachten en groepen, de optie Naar Dialog Verplaatsen in menu te vinden gebruiken. "
     assignment_group_selector: 
       assignment_group: Opdrachtgroep
       assignment_group_options: 
@@ -1713,7 +1736,7 @@ nl:
       reminder_failed: "Versturen van herinnering mislukt"
     everyone_else: "Alle anderen"
     external_content_homework_file_submission_view: 
-      additional_comments: "Extra opmerkingen"
+      additional_comments: "Verdere opmerkingen"
       buttons: 
         submit_assignment: "Opdracht inleveren"
       group_assignment_header: Reacties...
@@ -1763,6 +1786,7 @@ nl:
         pass_fail: Compleet/incompleet
         percent: Percentage
         points: Punten
+      view_grading_scheme: "Beoordelingsschema bekijken"
     group_category_selector: 
       grade_group_students_individually: "Cijfer toekennen aan iedere cursist afzonderlijk"
       group_assignment_header: Groepsopdracht
@@ -1837,13 +1861,13 @@ nl:
       label_place_before: "Ervoor plaatsen"
     messages: 
       adding_group: "Bezig met het toevoegen van groep..."
-      agree_to_pledge: "je moet akkoord te gaan met de inzendingsvoorwaarde voordat deze opdracht ingezonden kan worden."
+      agree_to_pledge: "je moet akkoord te gaan met de inzendingsvoorwaarde voordat deze opdracht ingeleverd kan worden."
       not_submitted_yet: "Je hebt het inleveren van jouw opdracht nog niet afgerond. Je moet nog  op \"Inleveren\" klikken om de opdracht daadwerkelijk in te zenden. Weet je zeker dat je deze pagina hoe dan ook wil verlaten?"
       now_overdue: "De inleverdatum voor deze opdracht is verstreken. Nieuwe inzendingen zullen gemarkeerd  worden als \"te laat\". Toch doorgaan?"
       overdue: "De inleverdatum voor deze opdracht is verstreken. Wil je de opdracht toch inleveren?"
-      record_before_submitting: "Registreren voor inzending"
-      submit_failed: "Insturen mislukt. Probeer het opnieuw"
-      submitting: "Bezig met insturen..."
+      record_before_submitting: "Registreren voor inleveren"
+      submit_failed: "Inleveren mislukt. Probeer het opnieuw"
+      submitting: "Bezig met inleveren..."
     multiple_due_dates: "Meerdere inleverdata"
     name_is_required: "Naam is vereist!"
     name_too_long: "Naam is te lang"
@@ -1865,6 +1889,7 @@ nl:
     non_number: "Je moet een nummer gebruiken"
     notices: 
       assignment_delete: "Deze opdracht is verwijderd"
+      assignment_not_availible: "De opdracht die je aangevraagd hebt is niet beschikbaar in jouw cursus gedeelte."
       created: "Opdracht is succesvol aangemaakt."
       updated: "Opdracht is bijgewerkt."
     number_of_assignments: 
@@ -1881,7 +1906,7 @@ nl:
         add: Toevoegen
         assign_peer_reviews: "Peer reviews toewijzen"
       descriptions: 
-        automatically_assign_reviews: "Door op onderstaande knop te klikken kun je peer reviews toewijzen aan die gebruikers die al een opdracht hebben ingestuurd maar an wie nog geen reviews zijn toegewezen."
+        automatically_assign_reviews: "Door op onderstaande knop te klikken kun je peer reviews toewijzen aan die gebruikers die al een opdracht hebben ingeleverd maar an wie nog geen reviews zijn toegewezen."
       details: "Aan de linkerkant kun je  een lijst met cursisten voor deze opdracht zien. Je kunt hier ook zien welke inzendingen (indien van toepassing) ter nakijken aan hen zijn toegewezen."
       links: 
         assign_peer_review: "%{student} nog een inzending laten beoordelen"
@@ -1938,6 +1963,7 @@ nl:
         add_rubric: "Commentaar toevoegen"
         assign_rubric: "Commentaar toewijzen"
         edit: Bewerken
+      manage: Beheren
       messages: 
         locked: "Deze opdracht is momenteel vergrendeld."
       new_assignment: "Nieuwe opdracht"
@@ -2015,17 +2041,17 @@ nl:
       additional_comments: "Extra opmerkingen"
       buttons: 
         record_media: "Media opnemen/uploaden"
-        submit_assignment: "Opdracht insturen"
+        submit_assignment: "Opdracht inleveren"
       comments_placeholder: Reacties...
       errors: 
         unacceptable_file_type: "Dit bestandstype is niet toegestaan. Toegestane bestandstypen: %{allowed_extensions_list}"
-      gmail_restriction_description: "Jouw account heeft Google Doc inzendingen naar Google accounts op het %{domain} domein beperkt. Om deze opdracht met een Google Doc in te sturen, zul je de Google doc integratie op jouw gebruikers pagina instelling opnieuw moeten configureren."
+      gmail_restriction_description: "Jouw account heeft Google Doc inzendingen naar Google accounts op het %{domain} domein beperkt. Om deze opdracht met een Google Doc in te leveren, zul je de Google doc integratie op jouw gebruikers pagina instelling opnieuw moeten configureren."
       instructions: 
-        from_external_tool: "Een hulpprogramma uit de onderstaande lijst selecteren om een bron vanuit deze tool te laden en in te sturen."
+        from_external_tool: "Een hulpprogramma uit de onderstaande lijst selecteren om een bron vanuit deze tool te laden en in te leveren."
         google_docs: "Het bestand uit de onderstaande lijst selecteren."
-        media_recording: "De onderstaande link gebruiken om jouw inzending vast te leggen. Klikken op \"Opslaan\" wanneer je klaar bent en wilt insturen."
+        media_recording: "De onderstaande link gebruiken om jouw inzending vast te leggen. Klikken op \"Opslaan\" wanneer je klaar bent en wilt inleveren."
         online_text_entry: "Jouw inzending kopieëren en plakken of hier rechts typen."
-        online_url: "De link naar de door jouw gewenste website kopieëren en plakken om deze opdracht in te sturen."
+        online_url: "De link naar de door jouw gewenste website kopieëren en plakken om deze opdracht in te leveren."
       invalid_google_docs_domain: "Ongeldig domein"
       labels: 
         uploaded_data: Bestand
@@ -2043,10 +2069,10 @@ nl:
           website: Website-URL
       loading_tools: "Bezig met het laden van hulprogramma's..."
       messages: 
-        google_docs_auth_required: "Voordat je opdrachten direct vanuit Google Docs kunt insturen, moet je aan Canvas toegang verlenen tot jouw Google Docs-account:"
-        media_recording_ready: "Klaar om in te sturen! Klikken op de knop 'Opdracht insturen' om de procedure te voltooien."
-        media_recordings_disabled: "Mediaopnames zijn niet ingeschakeld voor deze Canvas-site en je kunt deze typen opdrachten niet insturen. Neem contact op met jouw docent om de instellingen voor deze opdracht te wijzigen, of neem contact op met jouw systeembeheerder om mediaopnames in te schakelen."
-        submitting: "Bezig met insturen..."
+        google_docs_auth_required: "Voordat je opdrachten direct vanuit Google Docs kunt inleveren, moet je aan Canvas toegang verlenen tot jouw Google Docs-account:"
+        media_recording_ready: "Klaar om in te leveren! Klikken op de knop 'Opdracht insturen' om de procedure te voltooien."
+        media_recordings_disabled: "Mediaopnames zijn niet ingeschakeld voor deze Canvas-site en je kunt deze typen opdrachten niet inleveren. Neem contact op met jouw docent om de instellingen voor deze opdracht te wijzigen, of neem contact op met jouw systeembeheerder om mediaopnames in te schakelen."
+        submitting: "Bezig met inleveren..."
         uploading: "Er wordt een kopie van jouw Google Doc opgehaald om in te sturen voor deze opdracht. Dit kan eventjes duren, afhankelijk van de bestandsgrootte..."
       no_files: "Geen bestanden"
       no_submission: "Geen inzending geselecteerd"
@@ -2101,6 +2127,8 @@ nl:
           internet_check: "Internet database"
           journal_check: "Kranten, tijdschriften en publicaties"
           student_paper_check: "Papers van andere cursisten"
+          submit_papers_to: "In opslagplaats toevoegen"
+          turnitin_repository: "Turnitin opslagplaats"
         originality_report_never: Nooit
         originality_report_visibility: "Cursisten kunnen het originele rapport zien"
         originality_report_visible_after_due_date: "Na de inleverdatum"
@@ -2144,6 +2172,7 @@ nl:
         wizard_box: "Ik zou graag:"
   assignments_api: 
     invalid_date_time: "Ongeldige datum voor %{attribute}"
+    invalid_submission_types: "Ongeldige verzend-type"
   attachment: 
     default_filename: Bestand
     errors: 
@@ -2194,6 +2223,18 @@ nl:
     no_manifest: "Dit Blackboard-zipbestand heeft geen imsmanifest.xml in de hoofd directory."
   bookmark_service: 
     default_title: "Geen titel"
+  broccoli_cloud: 
+    hidden_title: "Verborgen. Klik om publicatie ongedaan te maken"
+    label: 
+      hidden: "Verborgen. Klik om publicatie ongedaan te maken."
+      published: "Geplubliceerd. Klik om publicatie ongedaan te maken."
+      restricted: "Beperkt. Klik om publicatie ongedaan te maken."
+      unpublished: "Niet gepubliceerd. Klik om te publiceren."
+    publish_error: "Er is een fout opgetreden bij het proberen om te publiceren %{name}. Verandering zijn hersteld!"
+    published_title: "Gepubliceerd. Klik om publicatie ongedaan te maken."
+    restricted_title: "Beperkt. Klik om publicatie ongedaan te maken."
+    unpublish_error: "Er is een fout opgetreden bij het proberen om te publiceren %{name}. Verandering zijn hersteld!"
+    unpublished_title: "Nit gepubliceerd. Klik om te publiceren."
   bulk_course_migration: 
     export_failed: "Er is een fout opgetreden bij het exporteren van de cursus met bb_lcid %{id} vanuit Blackboard"
     export_failed_no_id: "Er is een fout opgetreden bij het importeren van een cursus"
@@ -2418,6 +2459,7 @@ nl:
         calendar_month: Maand
         calendar_scheduler: Planner
         calendar_week: Week
+        improved_accessibility_recommend_agenda: "Waarschuwing: Voor betere toegang, de \"Agendaweergave\" gebruiken voor de Kalender."
       loading: "Bezig met laden"
       my_appointment_groups: "Mijn afspraakgroepen"
     calendar_navigator: 
@@ -2754,8 +2796,8 @@ nl:
         delete2: "Nu op \"Verwijderen\" (*waar?*) klikken en jouw gebeurtenis zal verwijderd worden."
         delete_done: "Over en uit. Dat is eventjes een belangrijke vaardigheid om iets te verwijderen\""
         done: "Schattig! De gebeurtenis is nu gemaakt! Door erop te klikken, kun je de details zien en de gebeurtenis bewerken of verwijderen. Je kunt ook de gebeurtenis naar een andere dag slepen en daar neerzetten om de datum te wijzigen."
-        edit: "Geweldig! Nu een naam invoeren voor de gebeurtenis (*waar?*). Je kunt als je wilt ook een start- en eindtijd  of alleen een starttijd of helemaal geen tijd instellen. Vervolgens op \"Inzenden\" klikken om de procedure te voltooien."
-        edit_assignment: "Nu gewoon een naam  voor de opdracht (*waar?*) en voor de bijbehorende taakgroep invoeren. Je kunt, als je wilt, ook  een inleverdatum opgeven. Op \"Inzenden\" klikken om de procedure te voltooien."
+        edit: "Geweldig! Nu een naam invoeren voor de gebeurtenis (*waar?*). Je kunt als je wilt ook een start- en eindtijd  of alleen een starttijd of helemaal geen tijd instellen. Vervolgens op \"Inleveren\" klikken om de procedure te voltooien."
+        edit_assignment: "Nu gewoon een naam  voor de opdracht (*waar?*) en voor de bijbehorende taakgroep invoeren. Je kunt, als je wilt, ook  een inleverdatum opgeven. Op \"Inleveren\" klikken om de procedure te voltooien."
       labels: 
         i_would_like_to: Actie
       links: 
@@ -2981,7 +3023,7 @@ nl:
       new_conferences: "Nieuwe vergaderingen"
       page_title: Webvergaderingen
     loading_urls_message: "Bezig met laden, een ogenblik geduld..."
-    multiple_urls_message: "Er zijn meerdere %{type} paginas beschikbaar voor deze vergadering. Selecteer een pagina:"
+    multiple_urls_message: "Er zijn meerdere %{type} pagina's beschikbaar voor deze vergadering. Selecteer een pagina:"
     new_conference: 
       delete: Verwijderen
       edit: Bewerken
@@ -2996,7 +3038,7 @@ nl:
     no_concluded_conferences: "Er zijn geen afgeronde vergaderingen"
     no_new_conferences: "Er zijn geen nieuwe vergaderingen"
     no_settings_error: "De vergadering heeft geen geavanceerde instellingspagina"
-    no_urls_error: "Sorry, er schijnen nog geen %{type} paginas voor deze vergadering te zijn."
+    no_urls_error: "Sorry, er schijnen nog geen %{type} pagina's voor deze vergadering te zijn."
     notifications: 
       inaccessible: "Waarschuwing: deze pagina bevat inhoud van derden die niet toegankelijk is voor schermlezers."
     show: 
@@ -3016,7 +3058,7 @@ nl:
   confirm_dialog: 
     cancel: Annuleren
     ok: Oké
-    submit: Inzenden
+    submit: Inleveren
   confirm_dialog_component: 
     ok: Oké
   content_exports: 
@@ -3036,9 +3078,12 @@ nl:
         quiz: Toets
       links: 
         download: "Cursusexport vanaf %{date}: *Hier klikken om te downloaden*"
+        download_file_export: "Bestand export voor %{date}: *Klik hier om te downloaden*"
         download_qti: "QTI-export vanaf %{date}: *Hier klikken om te downloaden*"
+        download_user_export: "Gebruiker data export voor %{date}: *Klik hier om te downloaden*"
       message: 
         export_started: "Het exporteren is gestart. Dit kan voor grote cursussen even duren. *Je kunt de pagina verlaten* en je ontvangt een e-mail wanneer het exportproces  voltooid is."
+      no_submissions: "Je hebt momenteel geen verzendingen te exporteren."
     labels: 
       new_export: "Nieuwe export:"
     links: 
@@ -3458,7 +3503,7 @@ nl:
         students_unlocked: "Cursisten die de module ontgrendeld hebben (maar niet gestart zijn)"
       help: 
         create: |-
-            Cursusmodules kunnen jow opdrachten, paginas, bestanden, etc.  in kleinere secties of eenheden opsplitsen. Modules kunnen rond een thema  gecentreerd worden, kunnen op een specificiek onderwerp gericht worden, of  kunnen alleen maar chronologisch gegroepeerd worden. 
+            Cursusmodules kunnen jow opdrachten, pagina's, bestanden, etc.  in kleinere secties of eenheden opsplitsen. Modules kunnen rond een thema  gecentreerd worden, kunnen op een specificiek onderwerp gericht worden, of  kunnen alleen maar chronologisch gegroepeerd worden. 
             
              Je kunt modules in een volgorde plaatsen door criteria en vereisten voor iedere module op te stellen. Cursisten kunnen de module dan pas openen als ze aan alle primaire vereisten voldoen. Hierdoor kunnen cursisten bijvoorbeeld een bepaalde inhoud of bestanden pas bekijken als ze , laten we zeggen, minstens 75% behaald hebben in een review toets. 
             
@@ -3773,8 +3818,8 @@ nl:
         fulfilled: "heeft bijgedragen aan de inhoud van de pagina"
         unfulfilled: "moet aan de inhoud van de pagina bijdragen"
       must_submit: 
-        fulfilled: "de opdracht ingezonden"
-        unfulfilled: "moet de opdracht inzenden"
+        fulfilled: "de opdracht ingeleverd"
+        unfulfilled: "moet de opdracht inleveren"
       must_view: 
         fulfilled: "heeft de pagina bekeken"
         unfulfilled: "moet de pagina bekijken"
@@ -3812,8 +3857,8 @@ nl:
         fulfilled: "aan de inhoud van de pagina bijgedragen"
         unfulfilled: "moet aan de inhoud van de pagina bijdragen"
       must_submit: 
-        fulfilled: "de opdracht ingezonden"
-        unfulfilled: "moet de opdracht inzenden"
+        fulfilled: "de opdracht ingeleverd"
+        unfulfilled: "moet de opdracht inleveren"
       must_view: 
         fulfilled: "de pagina bekeken"
         unfulfilled: "moet de pagina bekijken"
@@ -3829,7 +3874,7 @@ nl:
       external_urls: "Externe URL's"
       files: Bestanden
       quizzes: Toetsen
-      wiki_pages: "Wiki-paginas "
+      wiki_pages: "Wiki-pagina's "
     points_possible_short: "%{points} punten"
     prerequisits_footer: 
       default_module_name: module
@@ -4142,7 +4187,7 @@ nl:
       topics: "Exporteren van sommige onderwerpen mislukt"
       web_links: "Exporteren van sommige weblinks mislukt"
       wiki_page: "De wiki-pagina \"%{title}\" kan niet geëxporteed worden"
-      wiki_pages: "Exporteren van wiki-paginas mislukt"
+      wiki_pages: "Exporteren van wiki-pagina's mislukt"
     errors_list_message: "Fouten tijdens export %{export_id}:"
     unknown_titles: 
       assignment: "Onbekende opdracht"
@@ -4591,7 +4636,7 @@ nl:
       date_restricted: "Gebruikers kunnen alleen tussen deze datums deelnemen aan deze cursus"
       deatils: 
         move_course: "Een nieuwe hoofdaccount voor deze cursus selecteren. Na het verplaatsen van de cursus kun je ook een nieuwe afdeling voor de cursus opgeven."
-      drag_details: "Het deactiveren van de meeste paginas zorgt ervoor dat cursisten die deze paginas bezoeken doorgestuurd worden naar de homepage van de cursus."
+      drag_details: "Het deactiveren van de meeste pagina's zorgt ervoor dat cursisten die deze paginas bezoeken doorgestuurd worden naar de homepage van de cursus."
       drag_to_hide: "Items hierheen slepen om ze  voor cursisten te verbergen."
       enrollment_count: 
         one: "1 gebruiker"
@@ -4691,8 +4736,8 @@ nl:
       transifex_message: "Lid worden van de [Canvas-vertaalcommunity](%{transifex_url})"
       turnitin: "deze opmerkingen zullen aan cursisten getoond worden als ze een ingeschakelde Turnitin opdracht inleveren"
       view_grading_scheme: "Beoordelingsschema bekijken"
-      wiki_editing_roles: "kan standaard wiki-paginas voor cursus maken, de naam hiervan wijzigen en bewerken"
-      wiki_editing_roles_change_existing: "Paginas wijzigen die momenteel bewerkbaar zijn via \"%{current_setting}\" naar \"%{new_setting}\"."
+      wiki_editing_roles: "kan standaard wiki-pagina's voor cursus maken, de naam hiervan wijzigen en bewerken"
+      wiki_editing_roles_change_existing: "Pagina's wijzigen die momenteel bewerkbaar zijn via \"%{current_setting}\" naar \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
         reset: "Cursusinhoud resetten"
@@ -4700,7 +4745,7 @@ nl:
       headings: 
         current_users: "Huidige gebruikers"
       help: 
-        reset_course_content: "Het herstellen van de cursusinhoud houdt in dat alle hieraan gekoppelde opdrachten, discussies, toetsen, modules, rubrieken, paginas, bestanden, leerdoelen, vragenbanken, samenwerkingen, vergaderingen en iedere andere inhoud permanent verwijderd zullen worden. Deze actie is onomkeerbaar en de gegevens kunnen *niet*  hersteld worden. Weet je zeker dat je door wilt gaan?"
+        reset_course_content: "Het herstellen van de cursusinhoud houdt in dat alle hieraan gekoppelde opdrachten, discussies, toetsen, modules, rubrieken, pagina's, bestanden, leerdoelen, vragenbanken, samenwerkingen, vergaderingen en iedere andere inhoud permanent verwijderd zullen worden. Deze actie is onomkeerbaar en de gegevens kunnen *niet*  hersteld worden. Weet je zeker dat je door wilt gaan?"
       links: 
         calendar: Cursuskalender
         conclude: "Deze cursus sluiten"
@@ -4884,7 +4929,7 @@ nl:
     syllabus: Syllabus
     users: Gebruikers
     wiki_page_revisions: Revisies
-    wiki_pages: Paginas
+    wiki_pages: Pagina's
   csv: 
     alpha: Alpha
     answered: 
@@ -4938,7 +4983,7 @@ nl:
     curve_average: "Een gemiddeld cijfer invoeren voor de verdeling voor *%{assignment.name}*. De grafiek toont een beste poging voor het bijstellen van de cijfers op basis van de huidige scores van cursisten."
     curve_grade_for_assignment: "Cijfers bijstellen voor %{assignment.name}"
     labels: 
-      assign_blanks: "Nullen toewijzen aan cursisten die geen opdracht ingediend hebben"
+      assign_blanks: "Nullen toewijzen aan cursisten die geen opdracht ingeleverd hebben"
     out_of_points_possible: "vanuit %{assignment.points_possible}"
     this_is_permanent: "Gewijzigde cijferverdeling kan niet ongedaan gemaakt worden. De cijfers van vóór de cijferverdeling zijn nog wel beschikbaar, maar de gewijzigde verdeling kan niet teruggedraaid worden."
   d2l_display: Desire2Learn
@@ -5615,7 +5660,7 @@ nl:
       manage_sections: "Secties beheren"
     confirm_delete_message: "Weet je zeker dat je dit bericht wilt verwijderen?"
     confirm_delete_page: "Deze pagina inclusief inhoud verwijderen?"
-    confirm_delete_section: "Deze sectie inclusief alle paginas verwijderen?"
+    confirm_delete_section: "Deze sectie inclusief alle pagina's verwijderen?"
     default_description: "Dit is mijn %{assignment} inzending voor %{course}"
     eportfolio_settings: ePortfolio-instellingen
     errors: 
@@ -5667,7 +5712,7 @@ nl:
         other: "*%{count}* pagina's"
       updated_at: "laatst bijgewerkt %{updated_at}"
     help_link_text: "%{help_icon} Hoe kan ik...?"
-    manage_pages_link_text: "Paginas indelen/beheren"
+    manage_pages_link_text: "Pagina's indelen/beheren"
     manage_sections_link_text: "Secties indelen"
     notices: 
       created: "Portfolio succesvol gemaakt"
@@ -5680,12 +5725,12 @@ nl:
       default_page_name: "Naam van de pagina"
       edit_instructions: "Klikken om de naam van welke pagina dan ook te wijzigen, klikken en slepen om volgorde te wijzigen."
       headers: 
-        page_list: "Paginas voor deze sectie"
+        page_list: "Pagina's voor deze sectie"
       links: 
         add_page: "Nog een pagina toevoegen"
       titles: 
         delete_page: "Deze pagina verwijderen"
-        manage_pages: "Paginas in deze sectie toevoegen, verwijderen of herschikken"
+        manage_pages: "Pagina's in deze sectie toevoegen, verwijderen of herschikken"
         rename_page: "Naam van pagina wijzigen"
     page_section: 
       links: 
@@ -5736,10 +5781,10 @@ nl:
         select_submission: "Inzending selecteren"
         update_eportfolio: "ePortfolio bijwerken"
         upload_file: "Bestand selecteren/uploaden"
-      current_pages: "Huidige paginas"
+      current_pages: "Huidige pagina's"
       delete_confirm: 
         one: "Je hebt 1 pagina in deze ePortfolio. Weet je zeker dat je de hele ePortfolio wilt verwijderen?"
-        other: "Je hebt momenteel  %{count} paginas in deze ePortfolio. Weet je zeker dat je deze hele ePortfolio wilt verwijderen?"
+        other: "Je hebt momenteel  %{count} pagina's in deze ePortfolio. Weet je zeker dat je deze hele ePortfolio wilt verwijderen?"
       headers: 
         add_content: "Inhoud toevoegen"
         export_progress: "Bezig met het verzamelen van alle ePortfolio-bronnen . Dit kan een tijdje duren als je een grote portfolio hebt."
@@ -5840,12 +5885,12 @@ nl:
         instructions: "Een ePortfolio gebruiken"
         introduction: Introductie
         page_content: Pagina-inhoud
-        pages: Sectiepaginas
+        pages: Sectiepagina's
         sections: Portfoliosecties
         settings: ePortfolio-instellingen
         submissions: "Inzendingen toevoegen"
       introduction: 
-        body: "Met een ePortfolio kun je jouw werk tonen. Een portfolio bestaat uit secties en paginas. De lijst met secties staat aan de linkerkant  van het venster (%{showme1}). Elke sectie kan meerdere paginas hebben. Deze vind je aan de rechterkant van het venster (%{showme2})."
+        body: "Met een ePortfolio kun je jouw werk tonen. Een portfolio bestaat uit secties en pagina's. De lijst met secties staat aan de linkerkant  van het venster (%{showme1}). Elke sectie kan meerdere pagina's hebben. Deze vind je aan de rechterkant van het venster (%{showme2})."
       links: 
         portfolio: "De portfolio bekijken"
       page_content: 
@@ -5854,15 +5899,15 @@ nl:
         body3: "Inhoud is verdeeld in verschillende subsecties,voorzien van een gestippelde rand. Je kunt de inhoud van een subsectie verwijderen of bewerken door op de icoontjes %{edit_icon} of %{delete_icon} te klikken in de rechterbovenhoek van iedere subsectie."
         body4: "Om nieuwe subsecties toe te voegen, moet je het type inhoud zoeken dat je wilt toevoegen aan de lijst met opties aan de rechterkant van deze pagina (%{showme}) en er dan op klikken."
       pages: 
-        body1: "Secties bestaan uit meerdere paginas. Je kunt een lijst  met paginas voor de huidige sectie aan de rechterkant van het venster (%{showme1}) zien. Klikken op \"%{manage_pages}\" koppeling (%{showme2}) om paginas in te delen of toe te voegen"
-        body2: "Je kunt de naam  van elke pagina wijzigen door op de pictogram %{edit_icon} dat verschijnt te klikken. Je kunt een pagina verwijderen door op de pictogram %{delete_icon} te klikken en je kunt paginas heschikken door te klikken en ze te gaan (ver)slepen."
+        body1: "Secties bestaan uit meerdere pagina's. Je kunt een lijst  met pagina's voor de huidige sectie aan de rechterkant van het venster (%{showme1}) zien. Klikken op \"%{manage_pages}\" koppeling (%{showme2}) om pagina's in te delen of toe te voegen"
+        body2: "Je kunt de naam  van elke pagina wijzigen door op de pictogram %{edit_icon} dat verschijnt te klikken. Je kunt een pagina verwijderen door op de pictogram %{delete_icon} te klikken en je kunt pagina's heschikken door te klikken en ze te gaan (ver)slepen."
       sections: 
-        body1: "Secties worden aan de linkerkant van het venster getoond (%{showme1}). Elke sectie kan uit meerdere paginas bestaan.  Op link klikken \"%{manage_sections}\" (%{showme2}) om secties in te delen of toe te voegen,."
+        body1: "Secties worden aan de linkerkant van het venster getoond (%{showme1}). Elke sectie kan uit meerdere pagina's bestaan.  Op link klikken \"%{manage_sections}\" (%{showme2}) om secties in te delen of toe te voegen,."
         body2: "Je kunt de naam van iedere sectie wijzigen door op de pictogram %{edit_icon} dat verschijnt te klikken. Herschikken van secties kan door middel van een klik en de secties te verslepen of verwijderen  kan met behulp van de pictogram %{delete_icon}."
       settings: 
         body: " Klikken op \"ePortfolio-instellingen\" de link (%{showme}) om instellingen voor jouw ePortfolio te wijzigen. Je kunt niet alleen de naam van de portfolio wijzigen maar ook wijzigen of de portfolio openbaar of privé is. Privéportfolios zijn alleen zichtbaar voor gebruikers met toegang."
       submissions: 
-        body1: "Het is je misschien opgevallen dat aan het einde van deze pagina een lijst met recente inzendingenvan jouw groepen te vinden is (%{showme}). Je kunt vanaf deze pagina snel inzendingen toevoegen aan nieuwe paginas in jouw portfolio. Je hoeft hiervoor alleen maar te klikken op de inzending die je wilt toevoegen en een eenvoudig dialoogvenster zal geopend worden."
+        body1: "Het is je misschien opgevallen dat aan het einde van deze pagina een lijst met recente inzendingenvan jouw groepen te vinden is (%{showme}). Je kunt vanaf deze pagina snel inzendingen toevoegen aan nieuwe pagina's in jouw portfolio. Je hoeft hiervoor alleen maar te klikken op de inzending die je wilt toevoegen en een eenvoudig dialoogvenster zal geopend worden."
         body2: "Mooi! Om het toevoegen aan jouw inzending te voltooien, moet je kiezen aan welke sectie je jouw inzending wilt toevoegen en de pagina een naam geven. Als je op \"Pagina toevoegen\" klikt, word je naar de nieuwe pagina gebracht, zodat je meer details kunt bewerken als je dat zou willen."
   errors: 
     bad_navigation_config: "Ongeldige configuratie van cursustabbladen"
@@ -6324,7 +6369,7 @@ nl:
     invitation: uitnodiging
     question: vraag
     warning: waarschuwing
-  google_docs_domain_restriction_description: "Beperking van Google Docs Domein staat toe dat inzendingen en amenwerkingen in Google Docs beperkt worden tot een enkel domein. Cursisten die proberen opdrachten of samenwerkingen in een niet goedgekeurd domein in te zenden zullen een foutbericht ontvangen om ze te waarschuwen dat ze hun Google Docs integratie moeten bijwerken. "
+  google_docs_domain_restriction_description: "Beperking van Google Docs Domein staat toe dat inzendingen en amenwerkingen in Google Docs beperkt worden tot een enkel domein. Cursisten die proberen opdrachten of samenwerkingen in een niet goedgekeurd domein in te leveren zullen een foutbericht ontvangen om ze te waarschuwen dat ze hun Google Docs integratie moeten bijwerken. "
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Deze cursus nog niet een keer tonen."
@@ -6358,7 +6403,7 @@ nl:
       select_an_option: "Selecteer een optie"
     graded: beoordeeld
     graded_by_me: "%{graded_time} door mij"
-    graded_then_resubmitted: "beoordeeld, daarna opnieuw ingezonden (%{when})"
+    graded_then_resubmitted: "beoordeeld, daarna opnieuw ingelevered (%{when})"
     gradee_index_of_total: "%{gradee} %{x} van %{y}"
     group: Groep
     hide_all_details_button: "Alle details verbergen"
@@ -6377,9 +6422,9 @@ nl:
       dropped_assignment_no_total: "Deze opdracht telt niet mee voor het totaal cijfer"
       hypothetical_score: "Dit is een wat-als-score"
     turnitin: 
-      error_message: "Er is een fout opgetreden tijdens het inzenden naar turnitin. Probeer het bestand opnieuw in te zenden voordat je contact gaat opnemen met de ondersteuning"
+      error_message: "Er is een fout opgetreden tijdens het inleveren naar turnitin. Probeer het bestand opnieuw in te zenden voordat je contact gaat opnemen met de ondersteuning"
       info_message: "Het bestand wordt nog steeds verwerkt door turnitin. Controleer later om de score te zien"
-      resubmitting: "Bezig met opnieuw inzenden..."
+      resubmitting: "Bezig met opnieuw inleveren..."
       tooltip: 
         error: "Turnitin-vergelijkbaarheidsscore - Details van fout bij inzending zien"
         pending: "Turnitin-vergelijkbaarheidsscore - Inzending in behandeling"
@@ -6458,7 +6503,7 @@ nl:
     percent_of_grade: "%{percentage} van cijfer"
     points_out_of: "van %{points_possible}"
     remedial: verbetering
-    resubmitted: "Opnieuw ingezonden sinds laatste beoordeling"
+    resubmitted: "Opnieuw ingeleverd sinds laatste beoordeling"
     row_student_name: 
       student_placeholder: Cursist
     secondary_id: "Secundaire ID"
@@ -6714,7 +6759,7 @@ nl:
       buttons: 
         save: Opslaan
         save_settings: "Instellingen opslaan"
-        submit_comment: "Opmerking insturen"
+        submit_comment: "Opmerking verzenden"
       gradebook: 
         mute_assignment: "Opdracht verbergen"
         unmute_assignment: "Opheffen opdracht verbergen"
@@ -6725,7 +6770,7 @@ nl:
         grading: Beoordeling
         no_group_submission: "Deze groep heeft geen inzending voor deze opdracht"
         no_submission: "Deze cursist heeft  voor deze opdracht niets ingezonden"
-        submission: "Deze cursist heeft de opdracht ingezonden"
+        submission: "Deze cursist heeft de opdracht ingeleverd"
       icons: 
         delete_comment: "Opmerking verwijderen"
         file_attachment: Bestandsbijlage
@@ -6771,10 +6816,10 @@ nl:
       not_newest_notice: "Opmerking: dit is niet de meest recente inzending"
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
-        status: "op inzendingsstatus (nog beoordelen, niet ingezonden, etc.)"
+        status: "op inleveringsstatus (nog beoordelen, niet ingeleverd, etc.)"
         student_name: "op naam van cursist (alfabetische volgorde)"
-        submitted_at: "de datum waarop de opdrachten zijn ingeleverd"
-      submitted_files: "Ingezonden bestanden: (klik om te laden)"
+        submitted_at: "de datum waarop zij de opdrachten hebben ingeleverd"
+      submitted_files: "Ingeleverde bestanden: (klik om te laden)"
       titles: 
         download_file: "Dit bestand downloaden"
         not_newest: " De keuzelijst hierboven gebruiken om een andere inzending te bekijken"
@@ -6866,7 +6911,7 @@ nl:
       discussions: Discussies
       files: Bestanden
       home: Startpagina
-      pages: Paginas
+      pages: Pagina's
       people: Personen
   group_categories: 
     notices: 
@@ -6993,7 +7038,7 @@ nl:
       drag_and_drop_instructions: "Klikken en slepen om een cursist naar een andere groep te verplaatsen ."
       get_started_info: "Om aan de slag te gaan, aan de rechterkant klikken op \"Een nieuwe groepsreeks maken\"."
       group_assignment_instructions: "Je kunt cursisten willekeurig toewijzen aan groepen van een specifieke grootte of je kunt handmatig groepen maken en indelen. Eens jouw groepen gemaakt zijn, kun je opdrachten instellen als \"groepsinzending\" opdrachten, wat inhoudt dat iedere groep een opdracht zal inzenden namens alle leden van die groep."
-      group_pages: Groepspaginas
+      group_pages: Groepspagina's
       headings: 
         account_groups: "Groepen cursisten op accountniveau"
         course_groups: "Groepen cursisten"
@@ -7229,7 +7274,7 @@ nl:
   help_dialog: 
     Back: Terug
     Help: Help
-    Submitting_Ticket: "Bezig met inzenden van ticket..."
+    Submitting_Ticket: "Bezig met verzenden van ticket..."
     canvas_help_sub: "Antwoorden op veelgestelde vragen zoeken"
     description: Beschrijving
     extreme_critical_emergency: "EXTREEM NOODGEVAL!!"
@@ -7240,7 +7285,7 @@ nl:
     i_need_some_help_but_its_not_urgent: "Ik heb wat hulp nodig, maar het is niet urgent"
     include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "Een koppeling naar een screencast/screenshot inschakelen met behulp van bijvoorbeeld *Jing*."
     instructor_question: "Jouw cursusleider een vraag stellen"
-    instructor_question_sub: "Vragen worden bij  jouw cursusleider ingediend"
+    instructor_question_sub: "Vragen worden bij  jouw cursusleider ingeleverd"
     just_a_casual_question_comment_idea_suggestion: "Gewoon een informele vraag, opmerking, idee of suggestie"
     message: Bericht
     message_will_be_sent_to_all_the_teachers_tas_in_the_course: "Bericht zal naar alle docenten/onderwijsassistenten van de cursus verzonden worden."
@@ -7253,7 +7298,7 @@ nl:
     sending: "Bezig met verzenden..."
     somethings_broken_but_i_can_work_around_it_for_now: "Er is iets kapot, maar ik kan er omheen werken"
     subject: Onderwerp
-    submit_this_support_request: "Ticket inzenden"
+    submit_this_support_request: "Ticket verzenden"
     which_course_is_this_question_about: "Over welke cursus gaat de vraag?"
     your_email_address: "Jouw e-mailadres"
   helpers: 
@@ -7550,7 +7595,7 @@ nl:
         quizzes: Toetsen
         rubrics: Rubrics
         syllabus_body: "Hoofdbestanddeel van syllabus"
-        wikis: "Wiki-paginas "
+        wikis: "Wiki-pagina's "
     cc: 
       standard: 
         failed_to_convert_qti: "Het importeren van beoordeling %{file_identifier} mislukt"
@@ -7643,7 +7688,7 @@ nl:
     alerts: 
       kaltura_disabled: "Kaltura is voor deze Canvas-site niet ingeschakeld"
     buttons: 
-      submit: "Mediabestand inzenden"
+      submit: "Mediabestand verzonden"
     cancel: Annuleren
     click_to_view: "Klikken om te bekijken"
     errors: 
@@ -7667,7 +7712,7 @@ nl:
       flash_required_upload_audio: "je hebt Flash nodig om geluid te uploaden."
       flash_required_upload_video: "Je hebt Flash nodig om video te uploaden."
       loading: "Bezig met laden..."
-      submitted: "Mediabestand is ingezonden!"
+      submitted: "Mediabestand is verzonden!"
       submitting: "Bezig met mediabestand in te zenden..."
     titles: 
       media_contribution: Mediabijdrage
@@ -9288,7 +9333,7 @@ nl:
         body: "Je hebt een herinnering ontvangen om %{rubric}, %{context} te beoordelen:"
         html: 
           body: "Je hebt een herinnering ontvangen om %{rubric}, %{context} te beoordelen:"
-          link_message: "Hier klikken om de opdracht na te kijken en jouw invoer in te zenden"
+          link_message: "Hier klikken om de evaluatie na te kijken en jouw invoer in te zenden"
           subject: "Herinnering om te beoordelen: %{rubric}, %{context}"
         link_message: "Je kunt de evaluatie hier nakijken en jouw invoer inzenden:"
         subject: "Herinnering om %{rubric}, %{context} te beoordelen"
@@ -9307,9 +9352,9 @@ nl:
         body: "Er is een nieuwe beoordeling gemaakt voor %{context}:"
         html: 
           body: "Er is een nieuwe beoordeling gemaakt voor %{context}:"
-          link_message: "Hier klikken om de evaluatie na te kijken jouw invoer in te zenden"
+          link_message: "Hier klikken om de evaluatie na te kijken en jouw invoer in te zenden"
           subject: "Nieuwe beoordeling: %{title}, %{context}"
-        link_message: "Je kunt de evaluatie nakijken en jouw invoer hier inzenden:"
+        link_message: "Je kunt de evaluatie nakijken en jouw invoer hier verzenden:"
         subject: "Nieuwe beoordeling: %{title}, %{context}"
       facebook: 
         body: "Er is een nieuwe beoordeling gemaakt voor %{context}:"
@@ -9493,14 +9538,14 @@ nl:
         html: 
           body: "%{user_name} heeft de toets %{quiz_title} voltooid en deze moet handmatig  beoordeeld worden."
           link_message: "Je kunt de inzending hier nakijken"
-          subject: "Toets ingezonden: %{quiz}, %{context}"
-          submitted_date: "ingezonden op: %{date}"
+          subject: "Toets ingeleverd: %{quiz}, %{context}"
+          submitted_date: "ingeleverd op: %{date}"
         link_message: "Je kunt de inzending hier nakijken:"
-        subject: "Toets ingezonden: %{quiz}, %{context}"
-        submitted_date: "ingezonden op: %{date}"
+        subject: "Toets ingeleverd: %{quiz}, %{context}"
+        submitted_date: "ingeleverd op: %{date}"
       facebook: 
         body: "%{user_name} heeft de toets %{quiz_title} voltooid en deze moet handmatig beoordeeld worden ."
-        submitted_date: "ingezonden op: %{date}"
+        submitted_date: "ingeleverd op: %{date}"
       sms: 
         body_sms: "Jouw cijfer voor %{title}, %{context} is zojuist gewijzigd."
         more_info: "Meer info op %{url}"
@@ -9511,10 +9556,10 @@ nl:
         score_pending: "de docent moet score nakijken"
       summary: 
         body: "Er is  voor jouw toets (*%{title}*) een inzending ingestuurd en deze moet handmatig beoordeeld worden."
-        subject: "Toets ingezonden: %{quiz}, %{context}"
-        submitted_date: "ingezonden op: %{date}"
+        subject: "Toets ingeleverd: %{quiz}, %{context}"
+        submitted_date: "ingeleverd op: %{date}"
       twitter: 
-        body: "Canvas melding - Toets ingezonden: %{quiz}, %{user_name}"
+        body: "Canvas melding - Toets ingeleverd: %{quiz}, %{user_name}"
     summaries: 
       email: 
         daily_body: "Je bent aangemeld voor een dagelijks rapport over enkele belangrijke meldingen van jouw Canvas-account. Hieronder vind je het rapport voor %{date}:"
@@ -10477,7 +10522,7 @@ nl:
       validations: 
         poll_choice_belongs_to_poll: "Die peiling keuze behoort niet tot de bestaande peiling."
         poll_is_published: "Deze peilingsessie is niet open voor inzendingen."
-        user_and_poll_session_uniqueness: "kan slechts een keuze per peilingsessie invoeren."
+        user_and_poll_session_uniqueness: "kan slechts een keuze per peilingsessie insturen."
   post_grades_description: "Cijfers posten laat aan docenten toe cijfers op een ingeschakelde SIS-systeem terug te plaatsen: Powerschool,\n\
       Aspire (SIS2000), JMC, en enig ander SIF-ingeschakelde SIS die de SIF CategorieBeoordeling, \n\
       OpdrachtBeoordeling, OpdrachtBeoordelingsCijfer accepteert.  "
@@ -10574,7 +10619,7 @@ nl:
       feature_options: " Functieopties"
       full_token_warning: "**Dit/deze token nu kopieëren**. Eens je deze pagina hebt verlaten, kun je de volledige token nooit meer opvragen. Je zult het opnieuw moeten genereren om een nieuwe waarde te krijgen."
       generate_access_token_description: "Met behulp van toegangstokens kun je aan externe toepassingen namens jou toegang tot Canvas geven. Deze tokens worden normaal automatisch gemaakt voor benodigde toepassingen, maar als [je zelf een nieuw of een beperkt project aan het ontwikkelen bent](%{documentation_url}) kun je gewoon vanuit hier de token genereren."
-      google_docs_description: "Eens je ons toegang tot Google Docs geeft , zul je jouw opdrachten direct vanuit Google Docs kunnen inzenden en documenten kunnen maken en kunnen delen met klasgenoten."
+      google_docs_description: "Eens je ons toegang tot Google Docs geeft , zul je jouw opdrachten direct vanuit Google Docs kunnen inleveren en documenten kunnen maken en kunnen delen met klasgenoten."
       headers: 
         application_abbrev: App
         dates: Datums
@@ -11214,7 +11259,7 @@ nl:
       item_analysis_not_available: "Analyse van item is niet voor enquêtes beschikbaar"
   quiz_results_protected: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten. "
   quiz_results_protected_after_first_glimpse: "Toetsresultaten zijn voor deze toets beveiligd en kunnen meteen na inzending eenmalig bekeken worden."
-  quiz_results_protected_until_last_attempt: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingezonden."
+  quiz_results_protected_until_last_attempt: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingeleverd."
   quiz_route: 
     that_quiz_doesnt_exist: "Die toets bestaat niet"
     that_quiz_has_been_deleted: "Deze toets is verwijderd"
@@ -11306,8 +11351,8 @@ nl:
     default_quesiton_name: Vraag
     default_question_name: Vraag
     default_quiz_title: Toets
-    default_response_to_essay: "Antwoord aan cursist tonen als hij/zij een antwoord heeft ingezonden"
-    default_response_to_file_upload: "Antwoord aan cursist tonen als zij/hij een antwoord heeft ingezonden"
+    default_response_to_essay: "Antwoord aan cursist tonen als hij/zij een antwoord heeft ingeleverd"
+    default_response_to_file_upload: "Antwoord aan cursist tonen als zij/hij een antwoord heeft ingeleverd"
     download_all_quiz_file_upload_submissions: "Alle toetsbestanden downloaden die zijn ingezonden door ze te uploaden"
     editor: 
       keyboard_shortcuts: 
@@ -11511,15 +11556,15 @@ nl:
         student_analysis: "Cursist analyse"
     quiz_submission: 
       titles: 
-        this_is_an_external_element: "Dit is geen tekst maar een extern element dat gewijzigd kan zijn sinds de cursist het ingezonden heeft"
-        this_is_an_external_frame: "Dit is geen tekst maar een extern frame dat gewijzigd kan zijn sinds de cursist het ingezonden heeft"
-        this_is_an_image: "Dit is geen tekst maar een afbeelding die gewijzigd kan zijn sinds de cursist deze ingezonden heeft"
+        this_is_an_external_element: "Dit is geen tekst maar een extern element dat gewijzigd kan zijn sinds de cursist het ingeleverd heeft"
+        this_is_an_external_frame: "Dit is geen tekst maar een extern frame dat gewijzigd kan zijn sinds de cursist het ingeleverd heeft"
+        this_is_an_image: "Dit is geen tekst maar een afbeelding die gewijzigd kan zijn sinds de cursist deze ingeleverd heeft"
     quiz_submission_users: 
       created: aangemaakt
     quiz_submissions: 
       errors: 
         invalid_submissions: "Deze toetsinzending kan niet  geverifieerd worden als die van jou. Probeer opnieuw."
-        late_quiz: "Je hebt deze toets te laat ingezonden. Hierdoor zijn jouw antwoorden misschien niet opgenomen."
+        late_quiz: "Je hebt deze toets te laat ingeleverd. Hierdoor zijn jouw antwoorden misschien niet opgenomen."
         protected_quiz: "Deze toets is beveiligd en is alleen toegankelijk vanaf bepaalde locaties. De computer die je op dit moment gebruikt, schijnt geen geldige toegang te hebben om deze toets te maken."
       show: 
         score_out_of: "Je hebt %{score} van de %{points_possible} punten"
@@ -12024,7 +12069,7 @@ nl:
         quiz_not_yet_taken: "Deze toets is nog niet gemaakt."
         quiz_submission_needs_review: "Deze toets is significant gewijzigd sinds het maken van deze inzending. De inzending moet opnieuw beoordeeld worden."
         requires_lockdown: "Respondus LockDown Browser is vereist om jouw toetsresultaten te bekijken."
-        submitted_at: "Ingezonden %{when}"
+        submitted_at: "Ingeleverd %{when}"
         survey_fudged_negative: "Deze enquêtescore is handmatig aangepast met %{fudge} punten."
         survey_fudged_positive: "Deze enquêtescore is handmatig aangepast met +%{fudge} punten."
         survey_not_yet_taken: "Deze enquête is nog niet ingevuld."
@@ -12153,12 +12198,12 @@ nl:
           next: Volgende
           out_of_time_submit: "Oké, prima"
           previous: Vorige
-          submit_quiz: "Toest inleveren"
+          submit_quiz: "Toets inleveren"
         headers: 
           draft_preview: "Dit is een voorbeeld van de concept-versie van de toets"
         labels: 
           started: Gestart
-          times_up: "Tijd is om! Resultaten inzenden in"
+          times_up: "Tijd is om! Resultaten verzenden in"
         logged_out_of_canvas: "*Je bent afgemeld bij Canvas*. Meld je aan om verder te gaan"
         login_required: "Aanmelden vereist"
         not_saved: "Niet opgeslagen"
@@ -12217,7 +12262,7 @@ nl:
         one: "1 poging"
         other: "%{count} pogingen"
       titles: 
-        submitted_users_for_quesiton: "Gebruikers met inzending voor %{user}"
+        submitted_users_for_quesiton: "Ingestuurde gebruikers voor %{user}"
       uncounted_submissions: 
         one: "1 andere inzending"
         other: "%{count} andere inzendingen"
@@ -12229,11 +12274,11 @@ nl:
         navigate_away: "Je probeert deze pagina te verlaten. Toch Doorgaan?"
         unanswered_questions: 
           one: "Je hebt 1 niet beantwoorde vraag (zie de rechterzijbalk voor details). Toch inzenden?"
-          other: "Je hebt %{count} niet beantwoorde vragen (zie de rechterbalk voor details). Toch inzenden?"
+          other: "Je hebt %{count} niet beantwoorde vragen (zie de rechterbalk voor details). Toch verzenden?"
         unfinished_quiz: "Je staat op het punt om de toets onafgerond te verlaten. Toch doorgaan?"
         unseen_questions: 
           one: "Je hebt 1 vraag nog niet bekeken. Toch inzenden?"
-          other: "Je hebt %{count} vragen nog niet bekeken. Toch inzenden?"
+          other: "Je hebt %{count} vragen nog niet bekeken. Toch verzenden?"
       days_count: 
         one: "1 dag"
         other: "%{count} dagen"
@@ -12424,7 +12469,7 @@ nl:
       manage_user_logins: "Aanmeldinggegevens voor gebruikers wijzigen"
       manage_user_notes: "Faculteitsnieuws beheren"
       manage_user_observers: "Waarnemers voor de gebruikers beheren"
-      manage_wiki: "Wiki beheren (paginas toevoegen/bewerken/verwijderen)"
+      manage_wiki: "Wiki beheren (pagina's toevoegen/bewerken/verwijderen)"
       managed_jobs: "Achtergrondprocessen beheren"
       moderate_form: "Discussies overzien (berichten van anderen verwijderen/bewerken, onderwerpen vergrendelen)"
       post_to_forum: "Bericht naar discussies"
@@ -12444,7 +12489,7 @@ nl:
       view_course_changes: "Logboeken over cursuswijzigingen bekijken"
       view_error_reports: "Foutrapporten bekijken"
       view_grade_changes: "Logboeken over cijferwijzigingen bekijken"
-      view_group_pages: "De groepspaginas van alle groepen cursisten bekijken"
+      view_group_pages: "De groepspagina's van alle groepen cursisten bekijken"
       view_jobs: "Achtergrondprocessen bekijken"
       view_notifications: "Meldingen bekijken"
       view_statistics: "Statistieken bekijken"
@@ -13353,7 +13398,7 @@ nl:
           course: Cursusnavigatie
           group: Groepsnavigatie
         quizzes: Toetsen
-        wiki_pages: Wiki-paginas
+        wiki_pages: Wiki-pagina's
       messages: 
         loading: "Bezig met laden..."
       new_page_name: "Hoe wil je de nieuwe pagina noemen?"
@@ -13496,7 +13541,7 @@ nl:
       section_id: sectie_id
       section_sis_id: sectie_sis_id
       sis_id: sis_id
-      submitted: ingezonden
+      submitted: ingeleverd
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} tot %{upper_bound}"
     no_answer: "Geen antwoord"
@@ -13568,7 +13613,7 @@ nl:
   submission_detail: 
     go_to_submission_url: "Via URL naar Inzending gaan"
     no_submission: "Geen inzending"
-    submitted_files: "Ingezonden bestanden:"
+    submitted_files: "Ingeleverde bestanden:"
   submission_details_dialog: 
     add_a_comment: "Een opmerking toevoegen"
     comments: Opmerkingen
@@ -13581,7 +13626,7 @@ nl:
     loading_comments: "Bezig met laden van opmerkingen..."
     more_details_in_the_speedgrader: "Meer details in SpeedGrader"
     post_comment: "Opmerking plaatsen"
-    submitted: "Ingezonden:"
+    submitted: "Ingeleverd:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Meerdere keren ingeleverd, kies welke je wilt bekijken:"
     update_grade: "Cijfer bijwerken"
     view_rubric_assessment_in_the_speedgrader: "Beoordeling van rubric bekijken in SpeedGrader"
@@ -13593,7 +13638,7 @@ nl:
     download_submissions: "Ingezonden opdrachten downloaden"
     download_submissions_title: "Download opdrachtinzendingen"
     errors: 
-      assignment_submit_fail: "Fout bij inzenden van opdracht"
+      assignment_submit_fail: "Fout bij inleveren van opdracht"
       can_not_submit_locked_assignment: "Je  kunt geen opdracht inleveren wanneer deze vergrendeld is"
       invalid_file_type: "Ongeldig bestandstype"
       invalid_google_docs_domain: "Je kunt vanuit deze google_docs domein geen opdrachten inleveren"
@@ -13606,7 +13651,7 @@ nl:
     finished_redirecting: "Klaar! Bezig met doorsturen naar bestand..."
     gathering_files: "Bestanden worden verzameld (%{progress})..."
     gathering_files_progress: "Bezig met het verzamelen van bestanden (%{progress})..."
-    resubmitted_to_turnitin: "Opdracht opnieuw ingezonden bij Turnitin."
+    resubmitted_to_turnitin: "Opdracht succesvol opnieuw ingeleverd bij Turnitin."
     see_attached_files: "Bijgevoegde bestanden zien"
     show: 
       attach_file: "Bestand toevoegen"
@@ -13640,12 +13685,12 @@ nl:
       speedgrader: "SpeedGrader[äó"
       student_mute_notification: "Cijfers zijn niet beschikbaar omdat de cursusleider ermee bezig is."
       submission_details: "Details van de inzendingen"
-      submitted_at: "ingezonden op %{submit_date}"
-      teachers_notified_of_comments: "Docenten en inzender worden over alle opmerkingen gewaarschuwd."
+      submitted_at: "ingeleverd op %{submit_date}"
+      teachers_notified_of_comments: "Docenten en verzender worden over alle opmerkingen gewaarschuwd."
     show_preview: 
       discussion_submission_description: "De inzendingen voor deze opdracht zijn berichten in het discussieforum van de opdracht. Hieronder vind je de discussieberichten voor %{user} of je kunt de *volledige discussie bekijken*."
       entry_no_image: "Houd in gedachten dat deze pagina  gewijzigd kan zijn sinds de inzending oorspronkelijk heeft plaatsgevonden."
-      entry_with_image: "We hebben een snapshot van de pagina op het moment van inzending bijgevoegd. Je kunt ook klikken om de oorspronkelijke inzending te bekijken."
+      entry_with_image: "We hebben een snapshot van de pagina op het moment van verzending bijgevoegd. Je kunt ook klikken om de oorspronkelijke inzending te bekijken."
       external_url_submission: "Deze inzending was een URL naar een externe pagina."
       file_uploads_for_user: "Bestandsuploads voor **%{user}**"
       group_discussion_submission_description: "De inzendingen voor deze opdracht zijn berichten in het discussieforum van de opdracht van deze groep. Hieronder vind je de discussieberichten voor %{user}. Je kunt ook de *volledige groepsdiscussie bekijken*."
@@ -13706,7 +13751,7 @@ nl:
     modules: Modules
     observees: "Bezig met waarnemen"
     outcomes: Leerresultaten
-    pages: Paginas
+    pages: Pagina's
     people: Personen
     profile: Profiel
     quizzes: Toetsen
@@ -13721,12 +13766,12 @@ nl:
         term_start: "start van periode"
         unspecified: "wanneer dan ook"
       errors: 
-        submit: "Fout bij inzenden"
+        submit: "Fout bij verzenden"
       links: 
         add_new_term: "Nieuwe periode toevoegen"
       messages: 
         classes_in_term: "Je kunt een periode waarin nog curcussen worden gegeven niet verwijderen."
-        submitting: "Bezig met inzenden..."
+        submitting: "Bezig met inleveren..."
       page_title: "%{account}-periodes"
       prompts: 
         delete: "Weet je zeker dat je deze periode wilt verwijderen?"
@@ -13853,7 +13898,7 @@ nl:
     error_217: "Het Turnitin-product voor dit account is verlopen. Neem contact op met jouw verkoper om het product te verlengen."
     error_414: "Het originaliteit rapport voor deze inzending is nog niet beschikbaar."
     error_415: "De originaliteit score voor deze inzending is nog niet beschikbaar."
-    error_default: "Er is een fout opgetreden tijdens het inzenden naar turtin. Probeer het bestand opnieuw in te zenden voordat je contact opneemt voor hulp."
+    error_default: "Er is een fout opgetreden tijdens het verzenden naar turtin. Probeer het bestand opnieuw in te zenden voordat je contact opneemt voor hulp."
     tooltip: 
       score: "Turnitin-vergelijkbaarheidsscore - Zie gedetailleerd rapport"
   turnitin_info: 
@@ -14245,9 +14290,9 @@ nl:
       message_student: "Aan deze cusist een bericht sturen"
       no_students: "Er zijn geen leerlingen om over te rapporteren."
       submitted_time: 
-        one: "1 dag geleden ingezonden"
-        other: "%{count} dagen geleden ingezonden"
-        zero: "minder dan 1 dag geleden ingezonden"
+        one: "1 dag geleden ingeleverd"
+        other: "%{count} dagen geleden ingeleverd"
+        zero: "minder dan 1 dag geleden ingeleverd"
       title: "Rapport over activiteiten van docent"
     twitter_added: "Toegang tot Twitter geautoriseerd!"
     twitter_fail_whale: "Twitter-autorisatie mislukt. Probeer opnieuw."
@@ -14326,7 +14371,7 @@ nl:
     wiki_page: 
       buttons: 
         edit: Bewerken
-        view_all_pages: "Alle paginas bekijken"
+        view_all_pages: "Alle pagina's bekijken"
       delete_wiki: Verwijderen
       labels: 
         front_page: Voorpagina
@@ -14370,8 +14415,8 @@ nl:
         page_title: Paginatitel
       loading: "Bezig met laden..."
       loading_more: "Bezig meer te laden..."
-      no_pages: "Nog geen paginas gemaakt."
-      pages_title: Paginas
+      no_pages: "Nog geen pagina's gemaakt."
+      pages_title: Pagina's
     wiki_page_index_edit_dialog: 
       page_title: Titel
     wiki_page_index_item: 
@@ -14435,8 +14480,8 @@ nl:
         only_teachers: "Alleen docenten"
         teachers_and_students: "Docent en cursisten"
       course_home_wiki_page_description: "Je kunt deze pagina gebruiken om jouw cursus te organiseren of te introduceren zoal je wilt. Je kunt hier gemakkelijk koppelen naar opdrachten, bestanden, etc. door gebruik te maken van de sectie \"Paginahulpmiddelen\" die na het starten van de bewerking aan de rechterkant te zien zal zijn."
-      course_wiki_page_description: "Je kunt gebruikmaken van deze wiki om aanvullende paginas of beschrijvingen voor jouw cursusmateriaal te maken. Je kunt eenvoudig koppelingen maken tussen wiki-paginas en opdrachten of vanuit elke wiki-pagina koppelingen maken naar ander cursusmateriaal en bestanden. Dit maakt het een ideale plek om moeilijke concepten uit te leggen,voor groepsprojecten, of gewoon iedere andere soort pagina te maken die je ook in jouw cursus nodig kunt hebben."
-      default_wiki_page_description: "Deze pagina is de standaard wikipagina. Cursisten zullen deze zien wanneer zij in deze cursus op het tabblad \"Paginas\" klikken."
+      course_wiki_page_description: "Je kunt gebruikmaken van deze wiki om aanvullende pagina's of beschrijvingen voor jouw cursusmateriaal te maken. Je kunt eenvoudig koppelingen maken tussen wiki-pagina's en opdrachten of vanuit elke wiki-pagina koppelingen maken naar ander cursusmateriaal en bestanden. Dit maakt het een ideale plek om moeilijke concepten uit te leggen,voor groepsprojecten, of gewoon iedere andere soort pagina te maken die je ook in jouw cursus nodig kunt hebben."
+      default_wiki_page_description: "Deze pagina is de standaard wikipagina. Cursisten zullen deze zien wanneer zij in deze cursus op het tabblad \"Pagina's\" klikken."
       default_wiki_page_is_course_home_page_warning: |-
           Op dit moment is deze pagina ook ingesteld als standaard cursuspagina, waardoor bezoekers
           aan jouw cursus deze pagina als eerste zullen zien. Je kunt dat wijzigen op [de startpagina van de cursus](%{link}).
@@ -14474,15 +14519,15 @@ nl:
       page_revisions_title: "%{title} revisies: %{context_name}"
     pages_index: 
       titles: 
-        pages: Paginas
+        pages: Pagina's
     wiki_right_side: 
       buttons: 
         create: Maken
         rename: "Naam wijzigen"
       delete_page_confirmation: "Weet je zeker dat je deze pagina wilt verwijderen? Dit kan niet ongedaan gemaakt worden!"
       headers: 
-        all_pages: "Alle paginas"
-        common_pages: "Gemeenschappelijke paginas"
+        all_pages: "Alle pagina's"
+        common_pages: "Gemeenschappelijke pagina's"
         page_tools: "Hulpprogramma voor pagina"
         recent_changes: "Recente wijzigingen"
       links: 
