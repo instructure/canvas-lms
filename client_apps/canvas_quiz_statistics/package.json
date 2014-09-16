@@ -21,9 +21,9 @@
     "url": "https://github.com/amireh/canvas_quiz_statistics/issues"
   },
   "scripts": {
-    "start": "./node_modules/.bin/grunt",
-    "test": "./node_modules/.bin/grunt test",
-    "build": "./node_modules/.bin/grunt compile_js"
+    "start": "./node_modules/grunt-cli/bin/grunt",
+    "test": "./node_modules/grunt-cli/bin/grunt test",
+    "build": "./node_modules/grunt-cli/bin/grunt compile_js"
   },
   "devDependencies": {
     "node-sass": "^0.9.3",
