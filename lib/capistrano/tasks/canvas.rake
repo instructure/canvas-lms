@@ -9,6 +9,13 @@ end
 
 namespace :canvas do
 
+  desc "Fix ownership on canvas install directory"
+  task :fix_owner do
+    on roles(:all) do
+      execute :chown, '-R', "#{user}:{user}", "#{release_path}"
+    end
+  end
+  
   desc "Set application nodes from config file"
   task :set_app_nodes do
     on primary :db do
