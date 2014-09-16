@@ -143,9 +143,18 @@ define [
         data.spanWidth      = 'span4'
         data.alignTextClass = 'align-right'
 
-      data.assignment_menu_tools = ENV.assignment_menu_tools
-      _.each data.assignment_menu_tools, (tool) =>
-        tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
+      if @model.isQuiz()
+        data.menu_tools = ENV.quiz_menu_tools
+        _.each data.menu_tools, (tool) =>
+          tool.url = tool.base_url + "&quizzes[]=#{@model.get("quiz_id")}"
+      else if @model.isDiscussionTopic()
+        data.menu_tools = ENV.discussion_topic_menu_tools
+        _.each data.menu_tools, (tool) =>
+          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic_id")}"
+      else
+        data.menu_tools = ENV.assignment_menu_tools
+        _.each data.menu_tools, (tool) =>
+          tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
 
       if modules = @model.get('modules')
         moduleName = modules[0]
