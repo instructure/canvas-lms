@@ -12,6 +12,7 @@ namespace :canvas do
   desc "Fix ownership on canvas install directory"
   task :fix_owner do
     on roles(:all) do
+      user = fetch :user
       execute :chown, '-R', "#{user}:{user}", "#{release_path}"
     end
   end
