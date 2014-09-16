@@ -33,7 +33,6 @@ namespace :canvas do
 
   desc "Run the copy_config script"
   task :copy_config do
-    puts "original"
     on roles(:all) do
       execute "sudo CANVASDIR=#{release_path} /etc/init.d/canvasconfig start"
     end
