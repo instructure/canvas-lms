@@ -269,6 +269,33 @@ describe "dashboard" do
       end
     end
 
+    it "should only open the courses menu when clicking the courses nav item" do
+      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+      Enrollment.update_all(:created_at => 1.minute.ago)
+
+      get '/'
+
+      f('#courses_menu_item a').click
+      path = driver.execute_script %{ return window.location.pathname;}
+      path.should_not == '/courses'
+    end
+
+    it "should go to a course when clicking a course link from the menu" do
+      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+      Enrollment.update_all(:created_at => 1.minute.ago)
+
+      get '/'
+
+      driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+      wait_for_ajaximations
+
+      fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
+      path = driver.execute_script %{ return window.location.pathname;}
+      path.should == "/courses/#{@course.id}"
+
+    end
+
+
     it "should display scheduled web conference in stream" do
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 

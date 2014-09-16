@@ -88,7 +88,7 @@ define([
         menuItemHoverTimeoutId;
 
     // Makes sure that the courses/groups menu is openable by clicking
-    $coursesItem = $menu.find('#courses_menu_item')
+    $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
     $coursesItem.click(function (e) {
       if (e.metaKey || e.ctrlKey) return;
       e.preventDefault();
