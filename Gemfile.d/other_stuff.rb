@@ -5,14 +5,14 @@ if CANVAS_RAILS3
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'
   gem 'encrypted_cookie_store-instructure', '1.1.6', :require => 'encrypted_cookie_store'
+  gem 'routing_concerns', '0.1.0'
 else
-  gem 'rails', '4.1.5'
+  gem 'rails', '4.0.10'
   gem 'rack', '1.5.2'
   gem 'builder', '3.1.4'
-  gem 'tzinfo', '1.1.0'
+  gem 'tzinfo', '0.3.39'
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
-  gem 'activesupport-json_encoder', '1.1.0'
 end
 gem 'active_model_serializers', '0.9.0alpha1',
   :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
@@ -20,7 +20,6 @@ gem 'authlogic', '3.3.0'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'routing_concerns', '0.1.0'
 gem 'switchman', '1.2.18'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
