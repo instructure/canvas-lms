@@ -444,6 +444,7 @@ pt-BR:
           restore_course: "Restaurar cursos"
         view_messages: "Exibir notificações"
       admin_tools_cumb: "Ferramentas do administrador"
+      admin_tools_title: "Ferramentas administrativas "
       auth_logging_content_pane: 
         auth_logging: "Atividade de login/logout do usuário"
       auth_logging_search_results: 
@@ -496,6 +497,9 @@ pt-BR:
         time: Hora
         user: Usuário
       course_search_form: 
+        course_id: "ID do curso"
+        labels: 
+          find_deleted_course: "Pesquisar um curso excluído por ID"
         select_default: "Selecionar um curso"
         select_label: "Selecionar um curso"
       course_search_results: 
@@ -553,6 +557,7 @@ pt-BR:
         generate_activity_username: "Gerar atividade para *%{user}*"
         message_date_from: "Da data"
         message_date_to: "Até data"
+        search: "Pesquisar pessoas por ID ou nome"
         search_people: "Pesquisar pessoas"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -784,6 +789,8 @@ pt-BR:
             field: "ID do teste"
           section_id: 
             field: "ID da seção"
+    screenreader_heading: 
+      page_title: "Configurações de conta"
     settings: 
       about_google_docs: |-
           Google Docs Previews permite que os usuários visualizem documentos de 
@@ -888,6 +895,7 @@ pt-BR:
         help_link_subtext: Sub-Texto
         help_link_text: "Texto disponibilizado para o Link"
         help_link_url: URL
+        login_handle_name: "Rótulo de login"
         membership_type: "Adicionar mais"
         message: Mensagem
         mfa_settings: "Autenticação Multifator"
@@ -921,6 +929,7 @@ pt-BR:
         add_admins: "Adicionar administradores de conta"
         configure_report: Configurar...
         run_report: "Executar relatório"
+      login_handle_name_placeholder: "ex: login, nome do usuário ou ID do aluno"
       manual_quotas: 
         find_button: Localizar
         manual_quotas_title: "Cotas manualmente configuráveis"
@@ -1419,6 +1428,7 @@ pt-BR:
     labels: 
       due: Vencimento
     name_is_required: "Nome é obrigatório!"
+    points_possible_not_zero: "Pontos possíveis devem ser acima de 0 para o tipo de classificação selecionado"
     points_possible_number: "Pontos possíveis devem ser um número"
     select_external_tool_dialog_title: "Configurar ferramenta externa"
     submission_action_take_quiz: "Pegar %{title}"
@@ -1535,6 +1545,7 @@ pt-BR:
       group_weight: "%{groupWeight}% do total"
       manage: Gerenciar
       move: "Mover para..."
+      move_to_accessibility_warning: "Aviso: para acessibilidade avançada de atribuições de grupos reordenados, use a opção Mover para localizada no menu."
     assignment_group_selector: 
       assignment_group: "Grupo de tarefa"
       assignment_group_options: 
@@ -1783,6 +1794,7 @@ pt-BR:
         pass_fail: Completo/Incompleto
         percent: Porcentagem
         points: Pontos
+      view_grading_scheme: "Exibir esquema de classificação"
     group_category_selector: 
       grade_group_students_individually: "Atribuir notas para cada aluno individualmente"
       group_assignment_header: "Tarefa em grupo"
@@ -1959,6 +1971,7 @@ pt-BR:
         add_rubric: "Adicionar protocolo"
         assign_rubric: "Atribuir protocolo"
         edit: Editar
+      manage: Gerenciar
       messages: 
         locked: "Esta tarefa está bloqueada no momento."
       new_assignment: "Nova tarefa"
@@ -2123,6 +2136,8 @@ pt-BR:
           internet_check: "Banco de dados da internet"
           journal_check: "Revistas, periódicos e publicações"
           student_paper_check: "Outros artigos do aluno"
+          submit_papers_to: "Incluir em repositório"
+          turnitin_repository: "Entregar repositório"
         originality_report_never: Nunca
         originality_report_visibility: "Os alunos podem ver o relatório de originalidade"
         originality_report_visible_after_due_date: "Após a data de entrega"
@@ -2217,6 +2232,18 @@ pt-BR:
     no_manifest: "Este Blackboard.zip não tem arquivo imsmanifest.xml no diretório raiz."
   bookmark_service: 
     default_title: "Sem título"
+  broccoli_cloud: 
+    hidden_title: "Secreto. Clique para não publicar"
+    label: 
+      hidden: "Secreto. Clique para não publicar"
+      published: "Publicado, Clique para não publicar."
+      restricted: "Restrito. Clique para não publicar."
+      unpublished: "Não publicado. Clique para publicar."
+    publish_error: "Ocorreu um erro ao tentar publicar %{nome}. As alterações foram revertidas!"
+    published_title: "Publicado. Clique para não publicar."
+    restricted_title: "Restrito. Clique para não publicar"
+    unpublish_error: "Ocorreu um erro ao tentar anular a publicação de %{nome} . As alterações foram revertidas!"
+    unpublished_title: "Não publicado. Clique para publicar"
   bulk_course_migration: 
     export_failed: "Ocorreu um erro ao exportar o curso com bb_lcid %{id} do Blackboard"
     export_failed_no_id: "Ocorreu um erro ao importar um curso"
@@ -2441,6 +2468,7 @@ pt-BR:
         calendar_month: Mês
         calendar_scheduler: Agendador
         calendar_week: Semana
+        improved_accessibility_recommend_agenda: "Aviso: para acessibilidade avançada, use o calendário \"Exibição de agenda\"."
       loading: Carregando
       my_appointment_groups: "Meus grupos de compromissos"
     calendar_navigator: 
@@ -3688,6 +3716,16 @@ pt-BR:
       module: módulo
       module_details: "Os módulos são exibidos em ordem sequencial; assim, somente os módulos acima de %{name} podem ser definidos como prerrequisitos."
       module_name: "Nome de módulo"
+      modules_keyboard_hint_updated: "Aviso: para acessibilidade avançada, use a opção Mover para localizada no menu."
+      move_module: 
+        after: Depois
+        before: Antes
+        or: OU
+        place: Lugar
+      move_module_item: 
+        into: em
+        or: OU
+        place: Lugar
       must_complete_prerequisites: "Eles devem concluir"
       no_preprequisites: "Nenhum prerrequisito definido"
       no_requirements: "Nenhum requisito definido"
@@ -3761,12 +3799,15 @@ pt-BR:
         text: 
           delete_module: Excluir
           edit_module: Editar
+          move_module: "Mover para..."
         title: 
           delete_module: "Excluir este módulo"
           edit_module: Editar
+          move_module: "Mover esse módulo"
           student_progress: "Ver o progresso do aluno neste módulo"
       manager_module: "Gerenciar módulo"
       module_will_unlock_at: "Será desbloqueado em *%{unlock_date}*"
+      modules_keyboard_drag_and_drop: "Aviso: para acessibilidade avançada, use a opção do Mover para diálogo localizada no menu."
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em andamento"
       reorder_modules: "Arrastar para reordenar os módulos"
@@ -3844,6 +3885,8 @@ pt-BR:
         edit_item_details: "Editar detalhes do item"
         indent: "Aumentar recuo"
         indent_item: "Aumentar recuo"
+        move_item: "Mover esse item"
+        move_item_label: "Mover esse item"
         outdent: "Diminuir recuo"
         outdent_item: "Diminuir recuo"
         remove_item: Remover
@@ -3854,6 +3897,7 @@ pt-BR:
       min_score: 
         fulfilled: "pontuou pelo menos %{score}"
         unfulfilled: "deve pontuar ao menos %{score}"
+      modules_item_move_to: "Mover para..."
       must_contribute: 
         fulfilled: "contribuiu com o conteúdo da página"
         unfulfilled: "deve contribuir com o conteúdo da página"
@@ -4196,6 +4240,8 @@ pt-BR:
       topic: "Tópico desconhecido"
       wiki_page: "Página wiki desconhecida"
   course_list: 
+    favorited_tooltip: "Clique para remover do menu de cursos."
+    nonfavorited_tooltip: "Clique para adicionar o menu de cursos."
     wrapper: 
       close_course_menu_title: fechar
       reset_course_menu: Redefinir
@@ -4499,6 +4545,10 @@ pt-BR:
     group_list: 
       headings: 
         groups: "Grupos do curso"
+    import_in_progress_notice: 
+      course_import_notice: 
+        status_link: "Importar status"
+        text: "Um ou mais itens estão atualmente sendo importados. Eles serão mostrados no curso abaixo assim que estiverem disponíveis."
     index: 
       headings: 
         future_enrollments: "Inscrições futuras"
@@ -4567,6 +4617,7 @@ pt-BR:
         name: Nome
         next: Avançar
         section: Seção
+        user_might_not_exist: "Se seu formato estiver correto, entre em contato com a Administração do Canvas para assegurar que o usuário tenha uma conta do Canvas."
         user_role: "Função:"
         validating: Validando...
         will_not_be_added: "Esses usuários tiveram erros e não serão adicionados. Verifique se foram formatados corretamente."
@@ -4710,6 +4761,13 @@ pt-BR:
           delete_section: "Excluir turma"
           edit_section: "Editar turma"
       megabytes: megabytes
+      move_module: 
+        place: Lugar
+      move_nav_item: 
+        after: Depois
+        before: Antes
+        or: OU
+      nav_items_keyboard_drag_and_drop: "Aviso: para acessibilidade avançada, use a opção Mover para localizada no menu."
       no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo usuário, padrão em %{language})"
       none: Nenhum
@@ -4863,6 +4921,8 @@ pt-BR:
       new: Nova
       new_discussion_entries: "Nova entrada de discussão"
       new_discussions: "Nova discussão"
+      num_of_assignments: "# Tarefas"
+      num_of_submissions: "# Envios"
       page_title: "Estatísticas do curso"
       quiz: Teste
       quiz_questions: "Questões do teste"
@@ -5406,6 +5466,8 @@ pt-BR:
         one: "1 resposta não lida."
         other: "%{count} respostas não lidas."
         zero: "Nenhuma resposta não lida."
+    notices: 
+      discussion_not_availible: "Você não tem acesso à discussão selecionada."
     page_nav: 
       Page: Página
       current_page: Atual
@@ -5569,6 +5631,9 @@ pt-BR:
     buttons: 
       create_rubric: "Criar protocolo"
       update_rubric: "Atualizar protocolo"
+    discussion_points_possible: 
+      one: "%{count} pontos possíveis"
+      other: "%{count} pontos possíveis"
     errors: 
       load_rubrics_failed: "Falha ao carregar protocolos, tente novamente"
     messages: 
@@ -5608,6 +5673,8 @@ pt-BR:
     screen_reader_tip: "Usuários de leitores de tela: a forma mais acessível para utilizar este editor é alternar para a visualização avançada e depois inserir LaTeX diretamente ou utilizar a barra de ferramentas para ajudar você a fazer isso. O link para alternar para a visualização avançada pode ser encontrado perto do fim deste diálogo, diretamente antes do campo de edição."
     search_flickr: "Pesquisar no Flickr: Creative Commons"
     switch_editor_html: "Editor de HTML"
+    switch_editor_rich_text: "Editor de conteúdo de rich text"
+    switch_editor_visual: "Editor de conteúdo de rich text"
     switch_to_mathjax: "Alternar exibição para Básica"
     switch_to_mathquill: "Alternar exibição para Avançada"
     tabs: 
@@ -5632,6 +5699,7 @@ pt-BR:
       rte_help: "Área de rich text. Pressione ALT+F10 para barra de tarefas. Pressione ALT+F8 para ajuda."
   email: 
     default_from_name: "Instructure Canvas"
+  ember_modules_description: "Módulos regravados em Ember. Usa a API nativa de arrastar e soltar para permitir arrastar de locais externos."
   enrollment: 
     default_course_name: Curso
     default_email: "Sem email"
@@ -5999,6 +6067,7 @@ pt-BR:
         truncated: Truncado
       phrase_to_look_for: "Frase a ser procurada"
       posts_added: "Publicações adicionadas"
+      remove_feed: "Remover %{display_name}"
   external_tools: 
     account_navigation_configured: "Navegação de conta configurada"
     app_full_view: 
@@ -6013,6 +6082,7 @@ pt-BR:
     app_review_view: 
       posted_by_on: "Publicado por *%{user.name}* em *%{created_at}*"
     app_saved_message: "%{app} salvo com sucesso!"
+    assignment_menu_configured: "Menu de tarefas configurado"
     buttons: 
       cancel: Cancelar
       delete: Excluir
@@ -6026,6 +6096,7 @@ pt-BR:
     dialog_title_add_tool: "Adicionar novo aplicativo"
     dialog_title_edit_tool: "Editar ferramenta externa"
     dialog_title_rate_tool: "Como você classifica esta ferramenta?"
+    discussion_topic_menu_configured: "Menu do Tópico de discussão configurado"
     edit_view: 
       anonymous: Anônimo
       by_url: "Por URL"
@@ -6076,12 +6147,14 @@ pt-BR:
       load_success_message: "Você pode navegar livremente e sair desta página."
       load_success_title: "Uso da ferramenta finalizado"
     generic_error: "Ocorreu um erro ao processar seu pedido"
+    global_navigation_configured: "Navegação global configurada"
     homework_submission_configured: "Envio de dever de casa configurado"
     index_view: 
       add_new_tool: "Adicionar novo aplicativo"
       all: Todos
       app_headder: "Aplicativos externos"
       external_tools_note: "Os aplicativos são uma maneira fácil de adicionar novos recursos ao Canvas. Eles podem ser adicionados aos cursos individuais ou a todos os cursos de uma conta. Uma vez configurado, você pode conectar-se a eles através dos módulos dos cursos e criar tarefas para as ferramentas de avaliação."
+      external_tools_references: "*Veja algumas ferramentas LTI* que funcionam muito bem com o Canvas. Você também pode examinar os tópicos da  **Comunidade Canvas sobre as ferramentas LTI**"
       installed: Instalado
       not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
@@ -6089,6 +6162,8 @@ pt-BR:
       view_installed_tools: "Exibir Configurações do aplicativo"
     migration_selection_configured: "Seleção de migração configurada"
     missing_stars: "Você deve selecionar uma classificação por estrelas"
+    module_menu_configured: "Menu de módulo configurado"
+    quiz_menu_configured: "Menu de teste configurado"
     rate_tool_view: 
       rate_tool: "Como você classifica esta ferramenta?"
     remove_tool: "Tem certeza que deseja remover esta ferramenta?"
@@ -6098,6 +6173,7 @@ pt-BR:
     shared_secret: "Segredo compartilhado"
     submit: Enviar
     user_navigation_configured: "Navegação de usuário configurada"
+    wiki_page_menu_configured: "Menu da página Wiki configurado"
   facebook: 
     authorization_required: "Apenas usuários autorizados podem acessar esta página"
     authorization_success: "Autorização bem-sucedida!  Canvas e Facebook são agora amigos."
@@ -6157,10 +6233,12 @@ pt-BR:
       ? "on"
       : Ligada
       release_notes: "liberar notas"
+      toggle_feature_details_screenreader_info: "Alterar detalhes do recurso para %{title}"
     feature_flag_admin_view: 
       feature_options: "Opções de recurso"
       no_features_available: "Nenhum recurso está disponível no momento."
   features: 
+    allow_opt_out_of_inbox: "Permitir que os usuários optem pela caixa de entrada "
     better_file_browsing: "Melhor navegação de arquivo"
     differentiated_assignments: "Tarefas diferenciadas"
     draft_state: "Estado de rascunho"
@@ -6170,11 +6248,13 @@ pt-BR:
     draft_state_course_disable_warning: |-
         O desligamento deste recurso publicará TODOS os objetos existentes neste curso. Tenha certeza de que todo conteúdo de rascunho
         esteja pronto para ser publicado e disponibilizado a todos os usuários no curso antes de continuar.
+    ember_modules: "Módulos do Ember"
     google_docs_domain_restriction: "Restrição de domínio do Google Docs"
     high_contrast: "Usar estilos de alto contraste"
     html5_first_videos: "Prefira o HTML5 para a reprodução de vídeos"
     k12: "Recursos específicos do K-12"
     learning_mastery_gradebook: "Livro de Notas de Domínio do Aprendizado"
+    lor: "Ferramentas externas LOR"
     new_quiz_moderate: "Nova página moderada do teste"
     new_quiz_statistics: "Página de novas estatísticas do teste"
     new_styles: "Use novos estilos"
@@ -6183,6 +6263,15 @@ pt-BR:
     student_outcome_gradebook: "Livro de notas de domínio da aprendizagem do aluno"
   file_browser_view: 
     folder_tree_instructions: "Utilize as setas para cima e para baixo para navegar pela árvore. Pressione para direita para expandir as pastas, esquerda para recolher, e entre para escolher uma imagem."
+  file_rename_form: 
+    back: Voltar
+    change: Alterar
+    change_name: "Alterar nome"
+    message: "Um item denominado \"%{name}\" já existe nesse local. Deseja substituir o arquivo existente?"
+    name: Nome
+    prompt: "Alterar \"%{name}\" para"
+    rename_title: Copiar
+    replace: Substituir
   filebrowserview: 
     course_files: "Arquivos do curso"
     group_files: "Arquivos de grupo"
@@ -6368,6 +6457,7 @@ pt-BR:
     default_folder_name: pasta
     errors: 
       invalid_recursion: "Uma pasta não pode ser principal de si mesma"
+      invalid_root_folder_name: "O nome da pasta raiz não pode ser alterado"
     folder_created: "Pasta \"%{name}\" criada"
   folders: 
     event_updated: "O evento foi atualizado com sucesso."
@@ -6377,6 +6467,7 @@ pt-BR:
     no_deleting_folders_with_content: "Não é possível excluir uma pasta com conteúdo"
     no_deleting_root: "Não é possível excluir um diretório raiz"
     only_one_folder: "Não é possível definir um caminho de pasta e uma ID de pasta"
+  for: para
   global_message_icons: 
     announcement: anúncio
     calendar: calendário
@@ -6557,6 +6648,8 @@ pt-BR:
       url: "Envio de URL"
     total: Total
     total_column_header: 
+      move_to_end: "Mover para final"
+      move_to_front: "Mover para frente"
       options: Opções
       switch_to_percent: "Alternar para porcentagem"
       switch_to_points: "Alternar para pontos"
@@ -6668,6 +6761,7 @@ pt-BR:
       close_rubric: "Fechar protocolo"
       close_score: Fechar
       close_score_screenreader: "Fechar detalhes da pontuação"
+      collapse: "Recolher todos os grupos de resultados de domínio de aprendizado"
       collapse_title: Colapso
       comment_count: 
         one: "1 comentário"
@@ -6675,6 +6769,7 @@ pt-BR:
       comment_count_screenreader: "Ler comentários"
       comments: Comentários
       disabled_for_student_view: "As pontuações do aluno teste não são incluídas nas estatísticas de notas"
+      expand: "Expandir todos os grupos de resultado de aprendizado."
       expand_title: Expandir
       faculty_journal: "Diário da Faculdade para %{user}"
       for_course: "Para o curso,"
@@ -6723,6 +6818,7 @@ pt-BR:
         view_scoring_details: "Exibir detalhes da pontuação"
       total: Total
     gradebook2: 
+      accessibility_warning: "Aviso: a exibição da Grade do livro de notas não está acessível. Clique aqui para usar a Exibição individual em seu lugar."
       arrange_columns_by_due_date: "Organizar colunas por data de entrega"
       arrange_columns_by_group: "Organizar colunas por grupo de tarefa"
       download_scores: "Baixar pontuação (.csv)"
@@ -6752,6 +6848,7 @@ pt-BR:
         current: Atual
         student: Aluno
       page_title: "Histórico do livro de notas"
+      regraded: Reavaliado
       revert: "Reverter para esta nota"
       submission_count: 
         one: "1 alteração"
@@ -7335,6 +7432,7 @@ pt-BR:
       assignment_details: "Detalhes da tarefa"
       conversation_details: "Detalhes da conversa"
       discussion_details: "Detalhes da discussão"
+      peer_review_details: "Detalhes da Revisão por colegas"
       x_more: "%{x} mais..."
       x_new_in_announcements: 
         one: "*1* anúncio"
@@ -7348,6 +7446,9 @@ pt-BR:
       x_new_in_discussions: 
         one: "*1* discussão"
         other: "*%{count}* discussões"
+      x_new_in_peer_reviews: 
+        one: "*1* Revisão por colegas"
+        other: "*%{count}* Peer Reviews"
     local: Local
     select: 
       prompt: Selecione
@@ -7355,6 +7456,9 @@ pt-BR:
       create: "Criar %{model}"
       submit: "Salvar %{model}"
       update: "Atualizar %{model}"
+  high_contrast_description: |-
+      Se preferir uma versão de maior contraste da interface do usuário Canvas, habilite essa.
+      Isso pode ser útil para pessoas com deficiência visual ou dificuldade de leitura.
   html5_first_videos_description: |-
       Por padrão, o Canvas tentará usar primeiro o Flash para reproduzir vídeos. Ative-o para tentar usar primeiro o HTML5,
       em seguida, volte ao Flash.
@@ -7542,7 +7646,9 @@ pt-BR:
   last_user_access_title: "Último acesso do usuário"
   layouts: 
     application: 
+      by_instructure: "Por Instructure"
       group_switch: Alterar
+      javascript_required: "É necessário ter JavaScript habilitado para acessar esse site."
       keyboard_navigation: 
         close: "Pressione vírgula para fechar este diálogo."
       links: 
@@ -7566,6 +7672,7 @@ pt-BR:
     menu: 
       view_all_accounts: "Exibir todas as contas"
       view_all_groups: "Exibir todos os grupos"
+      view_all_or_customize: "Exibir tudo ou Personalizar"
     mobile_auth: 
       log_in_to_canvas: "Fazer login no Canvas"
   learning_mastery_gradebook_description: "O Livro de Notas de Domínio do Aprendizado fornece uma maneira de os professores visualizarem rapidamente o progresso dos alunos e do curso nos resultados de aprendizado do curso. Os resultados são apresentados em um formato semelhante ao livro de notas e o progresso do aluno é exibido como uma pontuação numérica e como dominado/quase dominado/recuperação."
@@ -8507,10 +8614,13 @@ pt-BR:
         audio_comment: "Esta mensagem inclui comentários em mídia. Para ouvir ou responder, clique no link abaixo:"
         html: 
           attached_files: "Arquivos anexados:"
+          audio_comment: "Essa mensagem inclui comentários de mídia. Para ouvir ou responder, clique no link abaixo:"
           download: baixar
+          reply_to_conversation_message: "Você pode responder a essa mensagem no Canvas respondendo diretamente nesse email."
           subject: "%{user_name} acabou de enviá-lo uma mensagem no Canvas."
           unknown_user: "Usuário desconhecido"
           view_message: "Visualizar essa mensagem nas Conversas"
+        reply_to_conversation_message: "Você pode responder a essa mensagem no Canvas respondendo diretamente nesse email."
         subject: "%{user_name} acabou de enviá-lo uma mensagem no Canvas."
         unknown_user: "Usuário desconhecido"
         view_message: "Visualizar essa mensagem nas Conversas"
@@ -9137,6 +9247,7 @@ pt-BR:
         discussion_entry_reply_message: "Participe da conversa usando o link abaixo ou comentário respondendo a esta mensagem."
         html: 
           body: "%{user} postou um novo comentário na discussão %{discussion_topic} de %{course}:"
+          discussion_entry_reply_message: "Junte-se à conversa usando o link abaixo, ou comente respondendo a essa mensagem."
           link: "Clique aqui para participar da conversa"
           subject: "Novo comentário para %{discussion_topic}: %{course}"
         subject: "Novo comentário para %{discussion_topic}: %{course}"
@@ -9720,6 +9831,7 @@ pt-BR:
       no_students_found: "Nenhum aluno foi encontrado"
       student_progress: "Progresso do aluno"
   modules_item_controller: 
+    max_score_complete: "pontuado com não mais de uma *pontuação*"
     must_contribute_complete: "contribuiu com o conteúdo da página"
     must_contribute_incomplete: "deve contribuir com o conteúdo da página"
     must_submit_complete: "enviou a tarefa"
@@ -9751,6 +9863,10 @@ pt-BR:
   new_facebook_message: "Você tem uma nova mensagem do Canvas"
   new_quiz_moderate_desc: "Quando o Estado de rascunho e as Estatísticas de teste são permitidas/ativados, isso permite a nova página moderada de teste para uma conta."
   new_quiz_statistics_desc: "Quando o Estado de rascunho é permitido/ativado, isso permite a nova página moderada de teste para uma conta."
+  new_styles_description: |-
+      Estamos trabalhando em uma melhoria da IU do Canvas. Ative isso para optar por ver
+      a aparência atualizada e simplificada da interface do Canvas. Esse é um recurso de "Trabalho em andamento"
+      e não deve ser usado em produção por usuários reais ainda.
   no_migration_file: "Arquivo necessário para migração de conteúdo."
   not_a_number: "deve ser um número positivo"
   notification: 
@@ -9920,6 +10036,15 @@ pt-BR:
       updated_wiki_page: "Atualizar página do wiki"
       web_conference_invitation: "Convite da webconferência"
     no_subject: "Sem assunto"
+    other_description: |-
+        *Instrutor e Administradores apenas*.
+        
+        * Inscrição no curso
+        * Report gerado
+        * Exportação de conteúdo
+        * Relatório de migração
+        * Novo usuário de conta
+        * Novo grupo de alunos
     other_display: "Notificações administrativas"
     reminder_display: Lembrete
     student_appointment_description: |-
@@ -10664,6 +10789,7 @@ pt-BR:
         facebook_access: "Acesso ao Facebook"
         generate_access_token: "Gerar um token de acesso"
         google_docs_access: "Acesso do Google Docs"
+        inbox_opt_out: "Opção de caixa de entrada de conversas"
         linkedin_access: "Acesso do LinkedIn"
         loading_images: "Carregando imagens..."
         login: Login
@@ -10686,6 +10812,7 @@ pt-BR:
         change_password: "Alterar senha"
         confirm_password: "Confirmar senha"
         default_email: "Email padrão"
+        disable_inbox: "Desativar os emblemas de mensagens não lidas da caixa de entrada de Conversas e enviar todas as mensagens e conversa e notificações via email, O mais rápido possível."
         expires_at: "Expira em"
         headers: 
           approved_integrations: "Integrações aprovadas"
@@ -11260,6 +11387,12 @@ pt-BR:
       delete_quiz: "Tem certeza que deseja excluir este teste?"
     delete_quiz: "Excluir teste"
     edit_quiz: "Editar teste"
+    points: 
+      one: "1 ponto"
+      other: "%{count} pts"
+    questions: 
+      one: "1 Pergunta"
+      other: "%{count} Questions"
   quiz_message_students: 
     and_num_more_students: "e mais %{num} estudantes"
     message_not_sent_because_empty: "A mensagem não pode ser enviada pois foi deixada vazia"
@@ -11390,6 +11523,9 @@ pt-BR:
     editor: 
       keyboard_shortcuts: 
         dialog_title: "Atalhos de teclado"
+        keybindings: 
+          open_dialog: "Abrir esse diálogo de ajuda"
+          open_toolbar: "Abrir a barra de ferramentas do editor"
     enter_answer_variable_above: "[ Inserir variáveis de resposta acima ]"
     errors: 
       adding_questions_failed: "Falha ao adicionar perguntas, tente novamente"
@@ -11706,6 +11842,7 @@ pt-BR:
         hints: 
           group_pick_count: "%{pick_count} selecionadas até o momento"
         labels: 
+          add_questions_to_group: "Adicionar perguntas ao grupo de perguntas"
           group_name: "Nome de grupo"
           group_pick_count: Escolher
           group_points: Pontos
@@ -11858,6 +11995,26 @@ pt-BR:
         unnamed_survey_results: "Resultados de questionário de %{user}"
       index: 
         page_titles: Testes
+      index_legacy: 
+        buttons: 
+          publish_quizzes: "Publicar testes"
+        headers: 
+          assignment_quizzes: "Testes de tarefas"
+          course_quizzes: "Testes do curso"
+          practice_quizzes: "Testes práticos"
+          publish_multiple_quizzes: "Publicar vários testes"
+          surveys: Questionários
+          unpublished_quizzes: "Testes não publicados"
+        labels: 
+          publish_multiple_quizzes: "Selecione os testes que desejaria publicar neste momento"
+        links: 
+          create_new_quiz: "Criar um novo teste"
+          manage_question_banks: "Gerenciar os bancos de perguntas"
+          publish_multiple_quizzes: "Publicar vários testes"
+        no_quizzes: "Nenhum teste disponível"
+        page_titles: Testes
+        titles: 
+          this_quiz_is_locked: "Este teste está bloqueado atualmente. Clique para obter mais detalhes."
       invalid_ip: 
         quiz_protected: "Este teste está protegido e está disponível somente para certos locais. O computador que você está usando no momento não está em um local válido para fazer este teste."
         survey_protected: "Este questionário está protegido e está disponível somente para certos locais. O computador que você está usando no momento não está em um local válido para fazer este questionário."
@@ -12235,6 +12392,9 @@ pt-BR:
         student_n: "Aluno %{student_counter}"
         survey_all_version_disclaimer: "Este relatório está mostrando as estatísticas do questionário baseando-se em todas as tentativas de todos os usuários."
         survey_latest_version_disclaimer: "Este relatório está mostrando as estatísticas do questionário baseando-se na tentativa mais recente de cada usuário."
+      statistics_cqs: 
+        page_title: " Estatísticas CQS"
+      statistics_cqs_crumb: "Estatísticas CQS"
       statistics_crumb: Estatísticas
       submission_version: 
         attempt_number: "Tentativa %{att_no}"
@@ -12414,10 +12574,42 @@ pt-BR:
     upload_info: "Se forem feitas alterações nos arquivos enviados pelo aluno que você baixou anteriormente, é só fazer novamente o zip e enviar este zip com o formulário abaixo. Os alunos verão os arquivos modificados em seus comentários para o envio."
     upload_warning: "Certifique-se de não alterar os nomes dos arquivos enviados, para que possamos reconhecê-los."
   react_files: 
+    cancel: Cancelar
+    confirm_delete: "Tem certeza que deseja excluir  %{name}?"
+    confirm_delete_selected: "Tem certeza que deseja excluir esses %{count} itens?"
+    count_items_selected: "%{count} itens selecionados"
+    delete: Excluir
+    deleted_items_successfully: "%{count} itens excluídos com sucesso"
+    download_zip: "Downlod Zip"
+    edit_name: "Editar nome"
     errors: 
       no_match: 
+        keywords: "Tentar palavras-chaves diferentes"
+        spelled: "Verifique se todas as palavras estão escritas corretamente."
         suggestions: "Sugestões:"
+        three_chars: "Insira pelos menos três letras na caixa de pesquisa."
+        your_search: "Sua pesquisa - \"%{search_term}\" - não correspondeu a nenhum arquivo."
+    folder: Pasta
+    labels: 
+      select: "Selecionar um item"
+    loading_more_results: "Carregando mais resultados..."
+    move: Mover
+    move_question: 
+      one: "Where would you like to move %{item}?"
+      other: "Para onde deseja mover esses %{count} itens?"
+    move_success: 
+      one: "%{item} movido para %{destinationFolder}"
+      other: "%{count} items moved to %{destinationFolder}"
+    moving: Movendo...
     name: Nome
+    progress_error: "Ocorreu um erro ao tentar preparar o download, tente novamente."
+    progress_message: "Preparando o download: %{percent}% concluído"
+    restrict_access: "Restringir acesso"
+    search: "Pesquisar arquivos"
+    settings: Configurações
+    this_folder_is_empty: "Esta pasta está vazia"
+    title: 
+      limit_student_access: "Limitar o acesso dos alunos"
     usage_details: "%{quota_used} de %{quota}"
   recent_student: 
     last_logged_in: "última conexão em %{last_login}"
@@ -12472,6 +12664,10 @@ pt-BR:
         name: Nome
     welcome_to_canvas: "Bem-vindo ao Canvas!"
   reply_from_name: "%{name} por meio de Notificações do Canvas"
+  respondus_soap_endpoint: 
+    plugin_settings: 
+      labels: 
+        enabled: "Ativado (deve ativar o Conversor QTI também)"
   restrict_student_access: 
     aria_label: 
       availableFrom: "Disponível de"
@@ -12482,6 +12678,13 @@ pt-BR:
     label: 
       availableFrom: "Disponível de"
       availableUntil: Até
+    options_1: 
+      description: "Somente permitir que os alunos exibam ou façam download dos  arquivos nessa pasta quando houver link para eles"
+    options_2: 
+      description: "Agendar disponibilidade do aluno"
+    title: 
+      default_title: Diálogo
+      limit_student_access: "Limitar acesso do aluno"
   retrieve_timeout: "Não foi possível recuperar a configuração. O tempo de resposta do servidor expirou."
   role_override: 
     permission: 
@@ -12904,6 +13107,11 @@ pt-BR:
       enrolled_as_student: "Inscrito como aluno"
       enrolled_as_ta: "Inscrito como assistente"
       enrolled_as_teacher: "Inscrito como professor"
+      favorited_tooltip: "Clique para remover do menu cursos."
+      nonfavorited_tooltip: "Clique para adicionar ao menu cursos."
+      not_favoritable_tooltip: "Este curso não pode ser adicionado ao menu cursos neste momento."
+      unpublished_course: "não publicado"
+      unpublished_course_tooltip: "Este curso não pode ser publicado. Os alunos devem entrar em contato com o instrutor do curso para obterem acesso."
     custom_search_results: 
       links: 
         search_for_resources: "Procurar recursos abertos relacionados a esta página"
@@ -13147,6 +13355,12 @@ pt-BR:
       ta_title: "convidado como assistente, clique para ver o curso"
       teacher: "%{course} como professor."
       teacher_title: "convidado como professor, clique para ver o curso"
+    primary_header_navigation: 
+      menu: 
+        calendar: Calendário
+        grades: Notas
+      navigation: 
+        main: "Navegação principal"
     profile: 
       add_link_field: "Adicionar outro link"
       bio: Biografia
@@ -13367,6 +13581,9 @@ pt-BR:
       links: 
         feedback: "Diga-nos o que está procurando"
       title: "Feed inválido"
+    user_header_navigation: 
+      navigation: 
+        user_menu: "Menu do usuário"
     user_lists: 
       copy_and_paste_notice_just_email: "Copie e cole uma lista de endereços de email para adicionar usuários."
       copy_and_paste_notice_with_login_handle: "Copie e cole uma lista de usuários. Você pode usar o endereço de email deles ou %{login_handle_name}."
@@ -13619,6 +13836,9 @@ pt-BR:
     group_name: "%{group_name} em %{group_category}"
     search_groups_placeholder: "Pesquisar Grupos ou Pessoas"
     student_groups_filter_description: "Conforme você digitou nesse campo, a lista de grupos que serão automaticamente filtrados para apenas incluir àqueles cujos nomes correspondem a sua entrada."
+    students_count: 
+      one: "1 aluno"
+      other: "%{count} students"
   student_groups_desc: "Isso permite uma nova página de grupo do aluno para uma conta. A nova página foi criada para fornecer uma experiência de inscrição de grupo mais dinâmica"
   student_id: "ID de aluno"
   student_name: "Nome do aluno"
@@ -13708,6 +13928,8 @@ pt-BR:
     finished_redirecting: "finalizado  Redirecionando para o arquivo..."
     gathering_files: "Reunindo arquivos (%{progress})..."
     gathering_files_progress: "Reunindo arquivos (%{progress})..."
+    notices: 
+      submission_not_availible: "A tarefa que você solicitou não está mais disponível para sua seção do curso. Os envios anteriores não contarão para sua nota."
     resubmitted_to_turnitin: "Reenviado com sucesso para o Turnitin."
     see_attached_files: "Consultar arquivos anexos"
     show: 
@@ -13896,6 +14118,151 @@ pt-BR:
       times: "%{start_time} para %{end_time}"
     unknown_date: "Data desconhecida"
     with_ago: "%{time} atrás"
+  time_zones: 
+    abu_dhabi: "Abu Dhabi"
+    adelaide: Adelaide
+    alaska: Alasca
+    almaty: Almaty
+    american_samoa: "Samoa Americana"
+    amsterdam: Amsterdã
+    arizona: Arizona
+    astana: Astana
+    athens: Atenas
+    atlantic_time_canada: "Horário do Atlântico (Canadá)"
+    auckland: Auckland
+    azores: Azores
+    baghdad: Bagdá
+    baku: Baku
+    bangkok: Bangkok
+    beijing: Pequim
+    belgrade: Belgrade
+    berlin: Berlin
+    bern: Bern
+    bogota: Bogotá
+    brasilia: Brasília
+    bratislava: Bratislava
+    brisbane: Brisbane
+    brussels: Bruxelas
+    bucharest: Bucarest
+    budapest: Budapeste
+    buenos_aires: "Buenos Aires"
+    cairo: Cairo
+    canberra: Canberra
+    cape_verde_is: "Ilha do Cabo Verde"
+    caracas: Caracas
+    casablanca: Casablanca
+    central_america: "América Central"
+    central_time_us_canada: "Horário Central (EUA e Canadá)"
+    chennai: Chennai
+    chihuahua: Chihuahua
+    chongqing: Chongqing
+    copenhagen: Copenhagen
+    darwin: Darwin
+    dhaka: Dhaka
+    dublin: Dublin
+    eastern_time_us_canada: "Horário do Leste (EUA e Canadá)"
+    edinburgh: Edinburgh
+    ekaterinburg: Ekaterinburg
+    fiji: Fiji
+    georgetown: Georgetown
+    greenland: Greenland
+    guadalajara: Guadalajara
+    guam: Guam
+    hanoi: Hanoi
+    harare: Harare
+    hawaii: Hawaii
+    helsinki: Helsinki
+    hobart: Hobart
+    hong_kong: "Hong Kong"
+    indiana_east: "Indiana (Leste)"
+    international_date_line_west: "Linha Internacional de Datas"
+    irkutsk: Irkutsk
+    islamabad: Islamabad
+    istanbul: Istanbul
+    jakarta: Jakarta
+    jerusalem: Jerusalém
+    kabul: Kabul
+    kamchatka: Kamchatka
+    karachi: Karachi
+    kathmandu: Kathmandu
+    kolkata: Calcutá
+    krasnoyarsk: Krasnoyarsk
+    kuala_lumpur: "Kuala Lumpur"
+    kuwait: Kuwait
+    kyiv: Kyiv
+    la_paz: "La Paz"
+    lima: Lima
+    lisbon: Lisboa
+    ljubljana: Ljubljana
+    london: Londres
+    madrid: Madrid
+    magadan: Magadan
+    marshall_is: "Ilha Marshall."
+    mazatlan: Mazatlan
+    melbourne: Melbourne
+    mexico_city: "Cidade do México"
+    mid_atlantic: "Médio Atlântico"
+    midway_island: "Ilhas Midway"
+    minsk: Minsk
+    monrovia: Monrovia
+    monterrey: Monterrey
+    moscow: Moscou
+    mountain_time_us_canada: "Mountain Time (EUA e Canadá)"
+    mumbai: Mumbai
+    muscat: Muscat
+    nairobi: Nairobi
+    new_caledonia: "Nova Caledónia"
+    new_delhi: "New Delhi"
+    newfoundland: "Terra Nova"
+    novosibirsk: Novosibirsk
+    nukualofa: Nuku'alofa
+    osaka: Osaka
+    pacific_time_us_canada: "Horário do Pacífico (EUA e Canadá)"
+    paris: Paris
+    perth: Perth
+    port_moresby: "Port Moresby"
+    prague: Praga
+    pretoria: Pretoria
+    quito: Quito
+    rangoon: Rangoon
+    riga: Riga
+    riyadh: Riyadh
+    rome: Roma
+    samoa: Samoa
+    santiago: Santiago
+    sapporo: Sapporo
+    sarajevo: Sarajevo
+    saskatchewan: Saskatchewan
+    seoul: Seul
+    singapore: Cingapura
+    skopje: Skopje
+    sofia: Sofia
+    solomon_is: "Ilha Salomão."
+    sri_jayawardenepura: "Sri Jayawardenepura"
+    st_petersburg: "St. Petersburg"
+    stockholm: Estocolmo
+    sydney: Sydney
+    taipei: Taipei
+    tallinn: Tallinn
+    tashkent: Tashkent
+    tbilisi: Tbilisi
+    tehran: Teerã
+    tijuana: Tijuana
+    tokelau_is: "Ilha Toquelau"
+    tokyo: Tóquio
+    ulaan_bataar: "Ulaan Bataar"
+    urumqi: Urumqi
+    utc: UTC
+    vienna: Vienna
+    vilnius: Vilnius
+    vladivostok: Vladivostok
+    volgograd: Volgograd
+    warsaw: Warsaw
+    wellington: Wellington
+    west_central_africa: "África Ocidental Central"
+    yakutsk: Yakutsk
+    yerevan: Yerevan
+    zagreb: Zagreb
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Descreva a imagem para melhorar a acessibilidade"
@@ -13967,6 +14334,10 @@ pt-BR:
   unpublished_courses_title: "Cursos não publicados"
   unsupported_package: "Pacote de conteúdo não suportado"
   unused_courses_title: "Cursos não utilizados"
+  upload_button: 
+    upload: Upload
+  upload_progress_view: 
+    processing: processando
   user: 
     default_user_name: Usuário
     errors: 
@@ -13982,6 +14353,7 @@ pt-BR:
   user_date_range_search: 
     cant_be_blank: "A ID de Usuário Canvas não pode estar em branco"
     cant_come_before_from: "\"Até data\" não pode vir antes de \"De data\""
+    results_found: "%{length} resultados encontrados"
   user_lists: 
     add_n_users: 
       one: "Parece estar tudo certo, adicione este usuário"
