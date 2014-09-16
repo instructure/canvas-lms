@@ -13,7 +13,7 @@ namespace :canvas do
   task :fix_owner do
     on roles(:all) do
       user = fetch :user
-      execute :chown, '-R', "#{user}:{user}", "#{release_path}"
+      execute :chown, '-R', "#{user}:#{user}", "#{release_path}"
     end
   end
 
