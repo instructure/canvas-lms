@@ -583,21 +583,47 @@ describe "assignments" do
 
         @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
         @tool.assignment_menu = {:url => "http://www.example.com", :text => "Export Assignment"}
+        @tool.quiz_menu = {:url => "http://www.example.com", :text => "Export Quiz"}
+        @tool.discussion_topic_menu = {:url => "http://www.example.com", :text => "Export DiscussionTopic"}
         @tool.save!
 
         @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
       end
 
       it "should show tool launch links in the gear for items on the index" do
+        plain_assignment = @assignment
+
+        quiz_assignment = assignment_model(:submission_types => "online_quiz", :course => @course)
+        quiz_assignment.reload
+        quiz = quiz_assignment.quiz
+
+        topic_assignment = assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)
+        topic_assignment.reload
+        topic = topic_assignment.discussion_topic
+
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
 
-        gear = f("#assignment_#{@assignment.id} .al-trigger")
+        gear = f("#assignment_#{plain_assignment.id} .al-trigger")
         gear.click
-        link = f("#assignment_#{@assignment.id} li a.menu_tool_link")
+        link = f("#assignment_#{plain_assignment.id} li a.menu_tool_link")
         link.should be_displayed
         link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{plain_assignment.id}"
+
+        gear = f("#assignment_#{topic_assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{topic_assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{topic.id}"
+
+        gear = f("#assignment_#{quiz_assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{quiz_assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
       end
 
       it "should show tool launch links in the gear for items on the show page" do
