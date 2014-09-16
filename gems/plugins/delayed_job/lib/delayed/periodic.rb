@@ -1,3 +1,5 @@
+require 'rufus-scheduler'
+
 module Delayed
 class Periodic
   attr_reader :name, :cron

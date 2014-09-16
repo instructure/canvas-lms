@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
 ENV['RUNNING_AS_DAEMON'] = 'true'
-require(File.expand_path("../../vendor/plugins/delayed_job/lib/delayed/pool", __FILE__))
+require(File.expand_path("../../gems/plugins/delayed_job/lib/delayed/pool", __FILE__))
 Delayed::Pool.new.run()

@@ -130,7 +130,7 @@ shared_examples_for 'Delayed::Worker' do
       @job = Delayed::Job.list_jobs(:failed, 1).first
       @job.original_job_id.should == old_id
       @job.last_error.should =~ /did not work/
-      @job.last_error.should =~ /worker_spec.rb/
+      @job.last_error.should =~ /shared\/worker.rb/
       @job.attempts.should == 1
       @job.failed_at.should_not be_nil
       @job.run_at.should > Delayed::Job.db_time_now - 10.minutes

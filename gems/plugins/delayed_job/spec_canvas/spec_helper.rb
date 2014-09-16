@@ -27,4 +27,4 @@ module MyReverser
 end
 
 require File.expand_path('../sample_jobs', __FILE__)
-require File.expand_path('../shared_jobs_spec', __FILE__)
+require File.expand_path('../shared_jobs_specs', __FILE__)

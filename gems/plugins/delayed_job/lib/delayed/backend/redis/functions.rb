@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'redis/scripting'
+
 # This module handles loading the Lua functions into Redis and running them
 module Delayed::Backend::Redis
-class Functions < Redis::Scripting::Module
+class Functions < ::Redis::Scripting::Module
   def initialize(redis)
     super(redis, File.dirname(__FILE__))
   end

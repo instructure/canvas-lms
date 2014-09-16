@@ -41,9 +41,9 @@ shared_examples_for 'random ruby objects' do
         obj = TestObject.new
         lambda { obj.test_method }.should change { Delayed::Job.jobs_count(:current) }.by(1)
         lambda { obj.test_method_with_send_later }.should change { Delayed::Job.jobs_count(:current) }.by(1)
-        obj.ran.should be_false
+        obj.ran.should be_falsey
         lambda { obj.test_method_without_send_later }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
       end
 
       it "should work without default_async" do
@@ -54,13 +54,13 @@ shared_examples_for 'random ruby objects' do
         end
         obj = TestObject.new
         lambda { obj.test_method_with_send_later }.should change { Delayed::Job.jobs_count(:current) }.by(1)
-        obj.ran.should be_false
+        obj.ran.should be_falsey
         lambda { obj.test_method }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
         obj.ran = false
-        obj.ran.should be_false
+        obj.ran.should be false
         lambda { obj.test_method_without_send_later }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
       end
 
       it "should send along enqueue args and args default async" do
@@ -132,9 +132,9 @@ shared_examples_for 'random ruby objects' do
         obj = TestObject.new
         lambda { obj.test_method? }.should change { Delayed::Job.jobs_count(:current) }.by(1)
         lambda { obj.test_method_with_send_later? }.should change { Delayed::Job.jobs_count(:current) }.by(1)
-        obj.ran.should be_false
+        obj.ran.should be_falsey
         lambda { obj.test_method_without_send_later? }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
       end
 
       it "should handle punctuation correctly without default_async" do
@@ -145,13 +145,13 @@ shared_examples_for 'random ruby objects' do
         end
         obj = TestObject.new
         lambda { obj.test_method_with_send_later? }.should change { Delayed::Job.jobs_count(:current) }.by(1)
-        obj.ran.should be_false
+        obj.ran.should be_falsey
         lambda { obj.test_method? }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
         obj.ran = false
-        obj.ran.should be_false
+        obj.ran.should be false
         lambda { obj.test_method_without_send_later? }.should_not change { Delayed::Job.jobs_count(:current) }
-        obj.ran.should be_true
+        obj.ran.should be true
       end
 
       it "should handle assignment punctuation correctly with default_async" do
@@ -198,12 +198,12 @@ shared_examples_for 'random ruby objects' do
           def test_method; end
           add_send_later_methods :test_method, {}, true
         end
-        TestObject1.public_method_defined?(:test_method).should be_true
-        TestObject2.public_method_defined?(:test_method).should be_false
-        TestObject3.public_method_defined?(:test_method).should be_false
-        TestObject2.protected_method_defined?(:test_method).should be_true
-        TestObject3.protected_method_defined?(:test_method).should be_false
-        TestObject3.private_method_defined?(:test_method).should be_true
+        TestObject1.public_method_defined?(:test_method).should be true
+        TestObject2.public_method_defined?(:test_method).should be false
+        TestObject3.public_method_defined?(:test_method).should be false
+        TestObject2.protected_method_defined?(:test_method).should be true
+        TestObject3.protected_method_defined?(:test_method).should be false
+        TestObject3.private_method_defined?(:test_method).should be true
       end
     end
 

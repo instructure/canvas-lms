@@ -28,6 +28,7 @@
 #     * have a master auditor that fails jobs if a whole pool dies
 #     * audit strands ocasionally, look for any stuck strands where the strand queue isn't empty but there's no strand job running or queued
 module Delayed::Backend::Redis
+require 'delayed/backend/redis/functions'
 
 class Job
   extend ActiveModel::Callbacks

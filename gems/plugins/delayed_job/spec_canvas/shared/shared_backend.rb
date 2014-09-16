@@ -13,7 +13,7 @@ shared_examples_for 'a backend' do
 
   it "should not set run_at automatically if already set" do
     later = Delayed::Job.db_time_now + 5.minutes
-    Delayed::Job.create(:payload_object => ErrorJob.new, :run_at => later).run_at.should be_close(later, 1)
+    Delayed::Job.create(:payload_object => ErrorJob.new, :run_at => later).run_at.should be_within(1).of(later)
   end
 
   it "should raise ArgumentError when handler doesn't respond_to :perform" do
@@ -43,7 +43,7 @@ shared_examples_for 'a backend' do
   it "should be able to set run_at when enqueuing items" do
     later = Delayed::Job.db_time_now + 5.minutes
     @job = Delayed::Job.enqueue SimpleJob.new, :priority => 5, :run_at => later
-    @job.run_at.should be_close(later, 1)
+    @job.run_at.should be_within(1).of(later)
   end
 
   it "should work with jobs in modules" do
@@ -617,20 +617,20 @@ shared_examples_for 'a backend' do
       end
 
       it "should hold a scope of jobs" do
-        @affected_jobs.all? { |j| j.on_hold? }.should be_false
-        @ignored_jobs.any? { |j| j.on_hold? }.should be_false
+        @affected_jobs.all? { |j| j.on_hold? }.should be false
+        @ignored_jobs.any? { |j| j.on_hold? }.should be false
         Delayed::Job.bulk_update('hold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
-        @affected_jobs.all? { |j| Delayed::Job.find(j.id).on_hold? }.should be_true
-        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
+        @affected_jobs.all? { |j| Delayed::Job.find(j.id).on_hold? }.should be true
+        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
       end
 
       it "should un-hold a scope of jobs" do
         pending "fragile on mysql for unknown reasons" if Delayed::Job == Delayed::Backend::ActiveRecord::Job && %w{MySQL Mysql2}.include?(Delayed::Job.connection.adapter_name)
         Delayed::Job.bulk_update('unhold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
-        @affected_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
-        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
+        @affected_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
+        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
       end
 
       it "should delete a scope of jobs" do
@@ -699,14 +699,14 @@ shared_examples_for 'a backend' do
       j2 = create_job(:run_at => 2.hours.from_now)
       j3 = "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
       Delayed::Job.bulk_update('hold', :ids => [j1.id, j2.id]).should == 2
-      Delayed::Job.find(j1.id).on_hold?.should be_true
-      Delayed::Job.find(j2.id).on_hold?.should be_true
-      Delayed::Job.find(j3.id).on_hold?.should be_false
+      Delayed::Job.find(j1.id).on_hold?.should be true
+      Delayed::Job.find(j2.id).on_hold?.should be true
+      Delayed::Job.find(j3.id).on_hold?.should be false
 
       Delayed::Job.bulk_update('unhold', :ids => [j2.id]).should == 1
-      Delayed::Job.find(j1.id).on_hold?.should be_true
-      Delayed::Job.find(j2.id).on_hold?.should be_false
-      Delayed::Job.find(j3.id).on_hold?.should be_false
+      Delayed::Job.find(j1.id).on_hold?.should be true
+      Delayed::Job.find(j2.id).on_hold?.should be false
+      Delayed::Job.find(j3.id).on_hold?.should be false
     end
 
     it "should delete given job ids" do
