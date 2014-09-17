@@ -65,6 +65,7 @@ describe "Features::QuizStatFeatureFlag" do
       Rails.env.stubs(:test?).returns(false)
       Rails.env.stubs(:development?).returns(false)
       Rails.env.stubs(:production?).returns(true)
+      ApplicationController.stubs(:test_cluster?).returns(false)
 
       flag.register!
 
