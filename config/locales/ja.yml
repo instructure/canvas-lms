@@ -1277,7 +1277,7 @@ ja:
       recipients_required: "受信者は最低1 名必要です"
       threshold_should_be_numeric: 正数である必要があります。
   allow_lor_tools: "LOR 用に設定された外部ツールの表示および使用をユーザに許可します。"
-  allow_opt_out_of_inbox: "ユーザは、会話の受信箱の受信を拒否 (オプトアウト) することができます。オプトアウトすると、会話のすべてのメッセージおよびお知らせが ASAP のお知らせとしてユーザのメインの電子メール アドレスに送信されます。また、会話の受信箱の未読メッセージ バッジが受信箱で非表示になり、会話のお知らせの基本設定が非表示になります。"
+  allow_opt_out_of_inbox: "ユーザは、会話の受信箱の受信を拒否 (オプトアウト) できます。オプトアウトすると、すべての会話メッセージとお知らせが ASAP のお知らせとしてユーザのメインの電子メール アドレスに送信されます。また、受信箱では会話の受信箱の未読メッセージ バッジが非表示になり、会話のお知らせの基本設定が非表示になります。"
   analytics: 
     course: 
       analytics: 分析
@@ -1544,7 +1544,7 @@ ja:
       group_weight: "合計の %{groupWeight}%"
       manage: 管理
       move: 移動先...
-      move_to_accessibility_warning: "警告: 課題およびグループの並べ替えでのアクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
+      move_to_accessibility_warning: "警告: 課題およびグループの並べ替えのアクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
@@ -2235,13 +2235,13 @@ ja:
     hidden_title: 非表示です。未公開にするにはクリックします
     label: 
       hidden: 非表示です。未公開にするにはクリックします。
-      published: 公開です。未公開にするにはクリックします。
+      published: 公開されています。未公開にするにはクリックします。
       restricted: 制限されています。未公開にするにはクリックします。
       unpublished: 未公開です。公開するにはクリックします。
     publish_error: "%{name} を公開するときにエラーが発生しました。変更内容は元に戻されました。"
-    published_title: 公開です。未公開にするにはクリックします
+    published_title: 公開されています。未公開にするにはクリックします
     restricted_title: 制限されています。未公開にするにはクリックします
-    unpublish_error: "%{name} を未公開するときにエラーが発生しました。変更内容は元に戻されました。"
+    unpublish_error: "%{name} を未公開にするときにエラーが発生しました。変更内容は元に戻されました。"
     unpublished_title: 未公開です。公開するにはクリックします
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
@@ -3093,7 +3093,7 @@ ja:
     index: 
       buttons: 
         create: コースのエクスポートの作成
-      content_exports: コースのエクスポート
+      content_exports: コンテンツのエクスポート
       export_type: エクスポートのタイプ
       labels: 
         course: コース
@@ -3169,6 +3169,7 @@ ja:
   content_migration: 
     bad_attachment: ファイルは正常にアップロードされませんでした。
     errors: 
+      cannot_shift_and_remove: "shift_dates と remove_dates を同時に指定することはできません"
       import_error: "インポートのエラー:"
     missing_content_links_message: "次の参照を解決できません:"
     missing_content_links_title: インポートしたコンテンツにリンク切れがあります
@@ -3721,7 +3722,7 @@ ja:
         or: または
         place: 場所
       move_module_item: 
-        into: 内部
+        into: 内へ
         or: または
         place: 場所
       must_complete_prerequisites: "次のことを完了する必要があります:"
@@ -4624,7 +4625,7 @@ ja:
         edit_sections_desc: "セクションはユーザの編成手段の 1 つです。セクションを利用するとで、1 つのコースで複数のクラスを教えることができ、コースの内容を 1 箇所にまとめることができます。以下では、ユーザを別のセクションに移動したり、セクションの登録を追加/削除できます。ユーザは常に 1 つ以上のセクションに含まれる必要があります。"
       index: 
         cannot_add_users: このコースは完了しているため、新しいユーザを追加できません
-        filter_field_description: メンバーの検索。フィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力内容に一致するメンバーのみが表示されます。
+        filter_field_description: メンバーの検索。フィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力内容に一致する名前のメンバーのみが表示されます。
         group_set: "グループ セット"
         people: メンバー
         role_to_search: 制限付きの役割検索
@@ -4920,6 +4921,8 @@ ja:
       new: 新規作成
       new_discussion_entries: "新しいディスカッション エントリ"
       new_discussions: 新しいディスカッション
+      num_of_assignments: 課題数
+      num_of_submissions: 提出数
       page_title: コースの統計情報
       quiz: クイズ
       quiz_questions: クイズ問題
@@ -5464,7 +5467,7 @@ ja:
         other: "%{count} 件の未読の返信があります。"
         zero: 未読の返信はありません。
     notices: 
-      discussion_not_availible: 要求したディスカッションに対するアクセス権がありません。
+      discussion_not_availible: 要求したディスカッションへのアクセス権がありません。
     page_nav: 
       Page: ページ
       current_page: 現在
@@ -5696,7 +5699,7 @@ ja:
       rte_help: "リッチ テキスト領域。ツールバーの場合は ALT + F10 を押してください。ヘルプの場合は ALT + F8 を押してください。"
   email: 
     default_from_name: "Instructure Canvas"
-  ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するために、ネイティブのドラッグ アンド ドロップ API を使用します。"
+  ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
   enrollment: 
     default_course_name: コース
     default_email: 電子メールなし
@@ -6266,7 +6269,7 @@ ja:
     change_name: 名前の変更
     message: "「%{name}」という名前のアイテムは既にこの場所に存在しています。既存のファイルを置き換えますか?"
     name: 名前
-    prompt: "「%{name}」の変更"
+    prompt: "「%{name}」を次に変更"
     rename_title: コピー
     replace: 置換
   filebrowserview: 
@@ -6464,7 +6467,7 @@ ja:
     no_deleting_folders_with_content: 内容のあるフォルダは削除できません
     no_deleting_root: "ルート フォルダは削除できません"
     only_one_folder: "フォルダ パスおよびフォルダ ID を設定できません"
-  for: ":"
+  for: ための
   global_message_icons: 
     announcement: アナウンス
     calendar: カレンダー
@@ -7639,7 +7642,7 @@ ja:
   last_user_access_title: "最終ユーザ アクセス"
   layouts: 
     application: 
-      by_instructure: Instructure
+      by_instructure: "By Instructure"
       group_switch: 切り替え
       javascript_required: "このサイトにアクセスするには、JavaScript を有効にする必要があります。"
       keyboard_navigation: 
@@ -9852,9 +9855,9 @@ ja:
   new_quiz_moderate_desc: ドラフト状態およびクイズの統計情報が許可/オンの場合、この設定によって、アカウントの新しいクイズ管理ページが有効になります。
   new_quiz_statistics_desc: ドラフト状態が許可/オンの場合、この設定によって、アカウントの新しいクイズの統計情報ページが有効になります。
   new_styles_description: |-
-      現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイスが
-      リリースされたときに通知をご希望の場合は、これをオンにします。新しいインターフェイスはまだ開発中の機能であり、
-      運用環境で実際のユーザに対してオンにしないでください。
+      現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイス
+      をご覧になりたい場合は、これをオンにしてください。新しいインターフェイスはまだ開発中であるため、
+      実際のユーザが使用する運用環境ではオンにしないでください。
   no_migration_file: コンテンツ移行にはファイルが必要です。
   not_a_number: 正の数字を使用する必要があります
   notification: 
@@ -11958,7 +11961,7 @@ ja:
           surveys: サーベイ
           unpublished_quizzes: 未公開のクイズ
         labels: 
-          publish_multiple_quizzes: ここで公開するクイズを選択します
+          publish_multiple_quizzes: 今回公開するクイズを選択します
         links: 
           create_new_quiz: 新しいクイズの作成
           manage_question_banks: 問題バンクの管理
@@ -11966,7 +11969,7 @@ ja:
         no_quizzes: 利用できるクイズがありません
         page_titles: クイズ
         titles: 
-          this_quiz_is_locked: このクイズは現在ロックされています。詳細についてはクリックしてください。
+          this_quiz_is_locked: このクイズは現在ロックされています。詳細を見るにはクリックしてください。
       invalid_ip: 
         quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
         survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
@@ -12537,7 +12540,7 @@ ja:
     errors: 
       no_match: 
         keywords: 別のキーワードを試してください。
-        spelled: すべての単語について誤入力がないことを確認してください。
+        spelled: すべての単語が正しく入力されていることを確認してください。
         suggestions: "提案:"
         three_chars: "検索ボックスには 3 文字以上を入力してください。"
         your_search: "「%{search_term}」での検索に一致するファイルはありませんでした。"
@@ -12631,9 +12634,9 @@ ja:
       availableFrom: 次から使用可能
       availableUntil: 次の日時まで
     options_1: 
-      description: このフォルダのファイルにリンクしたときに、受講生に対して表示およびダウンロードのみを許可
+      description: リンクしたときにのみ、受講生にこのフォルダ内のファイルの表示およびダウンロードを許可
     options_2: 
-      description: 受講生の利用可能状態をスケジュール
+      description: 受講生の利用可能状況をスケジュール
     title: 
       default_title: ダイアログ
       limit_student_access: 受講生のアクセスを制限
@@ -13882,7 +13885,7 @@ ja:
     gathering_files: "ファイルを収集しています (%{progress})..."
     gathering_files_progress: "ファイルを収集しています (%{progress})..."
     notices: 
-      submission_not_availible: "要求した課題は、コース セクションで利用できません。過去に提出された提出物は、成績に反映されません。"
+      submission_not_availible: "要求した課題は、現在のコース セクションでは利用できません。過去に提出された提出物は、成績に反映されません。"
     resubmitted_to_turnitin: "turnitin に正常に再提出されました。"
     see_attached_files: 添付ファイルを参照してください
     show: 
@@ -14115,7 +14118,7 @@ ja:
     dublin: ダブリン
     eastern_time_us_canada: "東部標準時 (アメリカおよびカナダ)"
     edinburgh: エディンバラ
-    ekaterinburg: エカチェリンブルグ
+    ekaterinburg: エカテリンブルグ
     fiji: フィジー
     georgetown: ジョージタウン
     greenland: グリーンランド
@@ -14134,7 +14137,7 @@ ja:
     istanbul: イスタンブル
     jakarta: ジャカルタ
     jerusalem: エルサレム
-    kabul: カーブル
+    kabul: カブール
     kamchatka: カムチャツカ
     karachi: カラチ
     kathmandu: カトマンズ
@@ -14197,7 +14200,7 @@ ja:
     sydney: シドニー
     taipei: 台北
     tallinn: タリン
-    tashkent: タシュケント
+    tashkent: タシケント
     tbilisi: トビリシ
     tehran: テヘラン
     tijuana: ティフアナ
