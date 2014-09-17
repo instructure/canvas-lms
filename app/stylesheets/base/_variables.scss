@@ -139,6 +139,21 @@ $announcements_disscussion-summary-color: $canvas-dark;
 
 $gradebook_letter-grade-font: lighten($canvas-dark, 8%);
 
+// These variables control the active and hover
+// states we have on the global left-hand sidenav in Canvas
+
+$course-sidenav_list-item--bg-color: #fff;
+@if $use_high_contrast {$course-sidenav_list-item--bg-color: #333;}
+
+$course-sidenav_list-item--active-font-color: #0099e0;
+@if $use_high_contrast {$course-sidenav_list-item--active-font-color: #fff;}
+
+$course-sidenav_list-item--inactive-font-color: #ccc;
+
+$course-sidenav_list-item--hover-bg-color: #0099e0;
+@if $use_high_contrast {$course-sidenav_list-item--hover-bg-color: #333;}
+
+
 
 // Legacy Variables
 //=======================

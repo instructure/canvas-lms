@@ -13,8 +13,9 @@
 
 #section-tabs .section-tab-hidden a
   @if $use_high_contrast
-    color: #555
-    background-color: #fff
+    color: darken($course-sidenav_list-item--inactive-font-color, 45%)
+    background: lighten($course-sidenav_list-item--inactive-font-color, 15%)
   @else
-    color: #bbb
+    color: $course-sidenav_list-item--inactive-font-color
+
 

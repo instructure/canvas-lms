@@ -86,7 +86,7 @@
         }
         
         @else {
-          padding: 4px 12px;
+          padding: 4px 8px;
           &:hover {
             @if $use_high_contrast {
               background: #333;
@@ -94,12 +94,17 @@
             } 
             @else { background: $white; }
           }
+          &:hover {
+            text-decoration: none;
+            background: $course-sidenav_list-item--bg-color;  
+            color: $course-sidenav_list-item--active-font-color;        
+          }
         }
 
         & > span {
           white-space: nowrap;
         }
- 
+
       }
 
       &:last-child > a {
@@ -107,7 +112,7 @@
       }
     }
   }
-
+  
   // lists w/o headers still need a strong border
   & > ul + ul {
     border-top: 1px solid $listBorderColor;
@@ -129,21 +134,13 @@
     }
     
     @else {
-      
-      @if $use_high_contrast {
-        background: #333;
-        color: #fff;
-      } 
-      @else { background: $white; } 
-      
+      /// active state colors and backgrounds on left sidenav            
+      background: $course-sidenav_list-item--bg-color;
+      color: $course-sidenav_list-item--active-font-color;
       &:hover {      
-        @if $use_high_contrast {
-          background: #333;
-          color: #fff;
-        } 
-        @else { background: $white; } 
+        background: $course-sidenav_list-item--bg-color;  
+        color: $course-sidenav_list-item--active-font-color;
       }
-
     }
   }
 }

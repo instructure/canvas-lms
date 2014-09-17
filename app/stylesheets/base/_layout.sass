@@ -5,13 +5,15 @@ body, html
 body
   min-width: $min_main_width
 
-  @if not $use_high_contrast
+  @if $use_high_contrast
+    background: white
+  @else
     @if $is-k12
       background: white
     @else
-      background-color: #f7f7f7
-  @else
-    background: white
+      background-color: #efefef
+  
+    
   
   &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
