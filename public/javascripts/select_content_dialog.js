@@ -112,7 +112,12 @@ $(document).ready(function() {
     $("#select_context_content_dialog").dialog({
       title: dialog_title,
       width: options.width || 400,
-      height: options.height || 400
+      height: options.height || 400,
+      close: function() {
+        if (options.close) {
+          options.close();
+        }
+      }
     }).fixDialogButtons();
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }

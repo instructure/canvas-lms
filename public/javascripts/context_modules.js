@@ -1018,7 +1018,8 @@ define([
 
     $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
-      $(event.currentTarget).blur();
+      var $trigger = $(event.currentTarget);
+      $trigger.blur();
       var $module = $(this).closest(".context_module");
       if($module.hasClass('collapsed_module')) {
         $module.find(".expand_module_link").triggerHandler('click', function() {
@@ -1034,6 +1035,9 @@ define([
         options.height = 550;
         options.width = 770;
         options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': module.name});
+        options.close = function () {
+          $trigger.focus();
+        };
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
