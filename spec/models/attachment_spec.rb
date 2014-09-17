@@ -393,6 +393,16 @@ describe Attachment do
     end
   end
 
+  context "restore" do
+    it "should restore to 'available' state" do
+      a = attachment_model(:uploaded_data => default_uploaded_data)
+      a.destroy
+      a.should be_deleted
+      a.restore
+      a.should be_available
+    end
+  end
+
   context "destroy!" do
     it "should not delete the s3 object, even here" do
       s3_storage!

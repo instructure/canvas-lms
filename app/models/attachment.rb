@@ -1156,7 +1156,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def restore
-    self.file_state = 'active'
+    self.file_state = 'available'
     self.save
   end
 
