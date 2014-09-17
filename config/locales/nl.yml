@@ -104,10 +104,10 @@ nl:
         auth_base: CAS-URL
         auth_type: Type
         login_handle_name: Aanmeldingslabel
-        unknown_user_url: "Onbekende gebruiker url"
+        unknown_user_url: "Onbekende url gebruiker"
       login_handle_name_description: "Het label dat gebruikt wordt voor  unieke aanmeldingsID's. Bijvoorbeeld: Login, Gebruikersnaam, cursist-ID, enzovoort."
       save_button: "Verificatie-instellingen opslaan"
-      unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiken niet in canvas te vinden is."
+      unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiker niet in canvas te vinden is."
     index: 
       add_auth_desc: "Een identiteit van provider aan dit account toevoegen:"
       canvas_login_tip: |-
@@ -213,7 +213,7 @@ nl:
         login_handle_name: Aanmeldings-label
         position: Positie
         requested_authn_context: Verificatiecontext
-        unkown_user_url: "Onbekende gebruiker url"
+        unkown_user_url: "Onbekende url gebruiker"
       log_in_url: "Inloggen op URL"
       log_out_url: "Uitloggen op URL"
       login_attribute: Aanmeldings-kenmerk
@@ -228,7 +228,7 @@ nl:
       save_button: "Verificatie-instellingen opslaan"
       start_debugging: "Foutopsporing starten"
       stop_debugging: "Foutopsporing stoppen"
-      unkown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiken niet in canvas te vinden is."
+      unkown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiker niet in canvas te vinden is."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest verzonden naar IdP"
       auth_response_from_idp: "AuthnResponse van IdP"
@@ -499,7 +499,7 @@ nl:
       course_search_form: 
         course_id: Cursus-id
         labels: 
-          find_deleted_course: "Naar verwijderde cursus per ID zoeken"
+          find_deleted_course: "Met ID naar verwijderde cursus zoeken"
         select_default: "Een cursus selecteren"
         select_label: "Een cursus selecteren"
       course_search_results: 
@@ -557,7 +557,7 @@ nl:
         generate_activity_username: "Activiteit genereren voor *%{user}*"
         message_date_from: Van-datum
         message_date_to: Tot-datum
-        search: "Naar personen per ID of naam zoeken"
+        search: "Met ID naar personen of naam zoeken"
         search_people: "Personen zoeken"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1218,11 +1218,11 @@ nl:
           one: "Dit %{model} is niet opgeslagen door een fout"
           other: "Dit %{model} is niet opgeslagen door %{count} fouten"
   add_module_item: 
-    add_assignment_to: "Opdracht toevoegen aan %{module}"
-    add_file_to: "Bestand toevoegen aan %{module}"
-    add_page_to: "Pagina toevoegen aan %{module}"
-    add_quiz_to: "Toets toevoegen aan %{module}"
-    add_topic_to: "Discussieonderwerp toevoegen aan %{module}"
+    add_assignment_to: "Een opdracht toevoegen aan %{module}"
+    add_file_to: "Een bestand toevoegen aan %{module}"
+    add_page_to: "Een pagina toevoegen aan %{module}"
+    add_quiz_to: "Een toets toevoegen aan %{module}"
+    add_topic_to: "Discussieonderwerpen toevoegen aan %{module}"
   ajax_errors: 
     error_heading: "Ajax-fout: %{status_code}"
     errors: 
@@ -1274,8 +1274,8 @@ nl:
       criteria_required: "Er is minimaal een trigger nodig"
       recipients_required: "Er is minimaal een ontvanger nodig"
       threshold_should_be_numeric: "Dit moet een positief getal zijn"
-  allow_lor_tools: "Gebruikers toelaten om externe tools voor LOR geconfigureerd te zien en te gebruiken."
-  allow_opt_out_of_inbox: "Gebruikers toelaten om Gepreskken Inbox af te wijzen. Hierdoor zullen alle gesprek berichten en meldingen als zo snel mogelijke meldingen naar het primaire email van de gebruiker te sturen, de ongelezen berichten XX en de meldingsvoorkeuren van de Gesprekken te verbergen."
+  allow_lor_tools: "Gebruikers toelaten om externe tools, die voor LOR geconfigureerd zijn, te bekijken en te gebruiken."
+  allow_opt_out_of_inbox: "Gebruikers toelaten om Gesprekken Inbox af te wijzen. Hierdoor zullen alle gespreksberichten en meldingen als zo snel mogelijke meldingen naar de primaire email van de gebruiker gestuurd worden, zal de ongelezen berichtenbadge uit de gesprekken inbox XX verborgen worden en zullen de meldingsvoorkeuren van de Gesprekken verborgen worden."
   analytics: 
     course: 
       analytics: Analytics
@@ -1425,7 +1425,7 @@ nl:
     labels: 
       due: Inleverdatum
     name_is_required: "Naam is verplicht!"
-    points_possible_not_zero: "Mogelijke punten moeten meer dan 0 zijn voor het gekozen beoordelingstype"
+    points_possible_not_zero: "Mogelijke punten moeten voor het gekozen beoordelingstype meer dan 0 zijn"
     points_possible_number: "Mogelijke punten moeten een getal zijn"
     select_external_tool_dialog_title: "Externe tool configureren"
     submission_action_take_quiz: "%{title} afnemen"
@@ -1542,7 +1542,7 @@ nl:
       group_weight: "%{groupWeight}% van totaal"
       manage: Beheren
       move: "Verplaatsen naar..."
-      move_to_accessibility_warning: "Waarschuwing: voor betere toegang tot of opnieuw ordenen van opdrachten en groepen, de optie Naar Dialog Verplaatsen in menu te vinden gebruiken. "
+      move_to_accessibility_warning: "Waarschuwing: voor betere toegang tot of opnieuw ordenen van opdrachten en groepen, de optie Naar Dialoog Verplaatsen gebruiken die in het menu te vinden is. "
     assignment_group_selector: 
       assignment_group: Opdrachtgroep
       assignment_group_options: 
@@ -1889,7 +1889,7 @@ nl:
     non_number: "Je moet een nummer gebruiken"
     notices: 
       assignment_delete: "Deze opdracht is verwijderd"
-      assignment_not_availible: "De opdracht die je aangevraagd hebt is niet beschikbaar in jouw cursus gedeelte."
+      assignment_not_availible: "De opdracht die je aangevraagd hebt is niet beschikbaar in jouw cursus deel."
       created: "Opdracht is succesvol aangemaakt."
       updated: "Opdracht is bijgewerkt."
     number_of_assignments: 
@@ -2128,7 +2128,7 @@ nl:
           journal_check: "Kranten, tijdschriften en publicaties"
           student_paper_check: "Papers van andere cursisten"
           submit_papers_to: "In opslagplaats toevoegen"
-          turnitin_repository: "Turnitin opslagplaats"
+          turnitin_repository: "Turnitin opslagplaats/opslagplaats van/voor Turnitin"
         originality_report_never: Nooit
         originality_report_visibility: "Cursisten kunnen het originele rapport zien"
         originality_report_visible_after_due_date: "Na de inleverdatum"
@@ -2172,7 +2172,7 @@ nl:
         wizard_box: "Ik zou graag:"
   assignments_api: 
     invalid_date_time: "Ongeldige datum voor %{attribute}"
-    invalid_submission_types: "Ongeldige verzend-type"
+    invalid_submission_types: "Ongeldige indieningstypen"
   attachment: 
     default_filename: Bestand
     errors: 
@@ -2224,17 +2224,17 @@ nl:
   bookmark_service: 
     default_title: "Geen titel"
   broccoli_cloud: 
-    hidden_title: "Verborgen. Klik om publicatie ongedaan te maken"
+    hidden_title: "Verborgen. Klikken om publicatie ongedaan te maken"
     label: 
-      hidden: "Verborgen. Klik om publicatie ongedaan te maken."
-      published: "Geplubliceerd. Klik om publicatie ongedaan te maken."
-      restricted: "Beperkt. Klik om publicatie ongedaan te maken."
-      unpublished: "Niet gepubliceerd. Klik om te publiceren."
-    publish_error: "Er is een fout opgetreden bij het proberen om te publiceren %{name}. Verandering zijn hersteld!"
-    published_title: "Gepubliceerd. Klik om publicatie ongedaan te maken."
-    restricted_title: "Beperkt. Klik om publicatie ongedaan te maken."
-    unpublish_error: "Er is een fout opgetreden bij het proberen om te publiceren %{name}. Verandering zijn hersteld!"
-    unpublished_title: "Nit gepubliceerd. Klik om te publiceren."
+      hidden: "Verborgen. Klikken om publicatie ongedaan te maken."
+      published: "Geplubliceerd. Klikken om publicatie ongedaan te maken."
+      restricted: "Beperkt. Klikken om publicatie ongedaan te maken."
+      unpublished: "Niet gepubliceerd. Klikken om te publiceren."
+    publish_error: "Er is een fout opgetreden bij een poging om %{name} te publiceren. Veranderingen zijn hersteld!"
+    published_title: "Gepubliceerd. Klikken om publicatie ongedaan te maken."
+    restricted_title: "Beperkt. Klikken om publicatie ongedaan te maken."
+    unpublish_error: "Er is een fout opgetreden bij de poging om %{name} te publiceren . Veranderingen zijn hersteld!"
+    unpublished_title: "Niet gepubliceerd. Klikken om te publiceren."
   bulk_course_migration: 
     export_failed: "Er is een fout opgetreden bij het exporteren van de cursus met bb_lcid %{id} vanuit Blackboard"
     export_failed_no_id: "Er is een fout opgetreden bij het importeren van een cursus"
@@ -2459,7 +2459,7 @@ nl:
         calendar_month: Maand
         calendar_scheduler: Planner
         calendar_week: Week
-        improved_accessibility_recommend_agenda: "Waarschuwing: Voor betere toegang, de \"Agendaweergave\" gebruiken voor de Kalender."
+        improved_accessibility_recommend_agenda: "Waarschuwing: Voor betere toegang, de \"Agendaweergave\"  voor de Kalender gebruiken."
       loading: "Bezig met laden"
       my_appointment_groups: "Mijn afspraakgroepen"
     calendar_navigator: 
@@ -3078,12 +3078,12 @@ nl:
         quiz: Toets
       links: 
         download: "Cursusexport vanaf %{date}: *Hier klikken om te downloaden*"
-        download_file_export: "Bestand export voor %{date}: *Klik hier om te downloaden*"
+        download_file_export: "Bestand export voor %{date}: *Hier klikken om te downloaden*"
         download_qti: "QTI-export vanaf %{date}: *Hier klikken om te downloaden*"
-        download_user_export: "Gebruiker data export voor %{date}: *Klik hier om te downloaden*"
+        download_user_export: "Data export gebruiker voor %{date}: *Hier klikken om te downloaden*"
       message: 
         export_started: "Het exporteren is gestart. Dit kan voor grote cursussen even duren. *Je kunt de pagina verlaten* en je ontvangt een e-mail wanneer het exportproces  voltooid is."
-      no_submissions: "Je hebt momenteel geen verzendingen te exporteren."
+      no_submissions: "Je hebt momenteel geen enkele indiening om te exporteren."
     labels: 
       new_export: "Nieuwe export:"
     links: 
