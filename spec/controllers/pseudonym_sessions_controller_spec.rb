@@ -250,7 +250,7 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
 
-    it "should redirect when a user is authenticted but is not found in canvas" do
+    it "should redirect when a user is authenticated but is not found in canvas" do
       ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
@@ -264,7 +264,12 @@ describe PseudonymSessionsController do
       controller.expects(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = account
 
-      # Default to Login url
+      # Default to Login url if set to nil or blank
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(login_url(:no_auto => 'true'))
+      session[:saml_unique_id].should be_nil
+
+      account.account_authorization_config.unknown_user_url = ''
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(login_url(:no_auto => 'true'))
       session[:saml_unique_id].should be_nil

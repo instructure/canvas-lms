@@ -406,7 +406,7 @@ class PseudonymSessionsController < ApplicationController
 
             successful_login(@user, @pseudonym)
           else
-            unknown_user_url = aac.unknown_user_url || login_url(:no_auto => 'true')
+            unknown_user_url = aac.unknown_user_url.presence || login_url(:no_auto => 'true')
             increment_saml_stat("errors.unknown_user")
             message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
             logger.warn message
