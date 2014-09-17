@@ -330,6 +330,10 @@
     outline: none;
   }
 
+  .subject {
+    float: left;
+  }
+
   .no-messages {
     color: #bbbbbb;
     display: block;
@@ -359,6 +363,12 @@
 
     .label {
       margin-top: 12px;
+    }
+  }
+
+  .message-detail-actions {
+    li {
+      display: inline;
     }
   }
 
@@ -411,7 +421,7 @@
   .date {
     color: #7f7f7f;
     position: absolute;
-    right: 0;
+    right: 10px;
     top: 0;
   }
 
@@ -419,15 +429,17 @@
     right: 9999em;
     position: relative;
     top: 0;
+    margin: 20px 10px 0 8px;
   }
 
   .actions li {
     border: none;
     float: left;
-    margin: 0 0 0 8px;
+    margin:0 0 0 8px;
     padding: 0;
   }
 
+  .message-detail-actions li a,
   .actions li a {
     color: #7f7f7f;
 
@@ -451,9 +463,6 @@
 }
 
 .message-item-view:hover, .message-metadata.hover {
-  .date {
-    right: 9999em;
-  }
 
   .actions {
     display: block;

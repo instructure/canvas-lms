@@ -51,12 +51,17 @@ define [
         menuselect: @select
         popupopen: @onOpen
         popupclose: @onClose
+        keydown: @onKeyDown
 
     onOpen: (event) =>
       @$ariaMenuWrapper.attr 'role', 'application'
       @adjustCarat event
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
+
+
+    onKeyDown: (event) =>
+      @$trigger.focus() unless event.keyCode != 9
 
     open: ->
       @$menu.popup 'open'
