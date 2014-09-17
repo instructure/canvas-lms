@@ -28,5 +28,12 @@ module Lti
 
     validates_presence_of :message_type, :resource_handler, :launch_path
 
+    scope :by_message_types, lambda { |*message_types| where('lti_message_handlers.message_type IN (?)', message_types) }
+
+    scope :for_context, lambda { |context|
+      tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      joins(:resource_handler).where('lti_resource_handlers.tool_proxy_id' => tool_proxies)
+    }
+
   end
 end
