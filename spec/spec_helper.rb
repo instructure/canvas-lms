@@ -1121,7 +1121,7 @@ RSpec.configure do |config|
 
   # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
   module AttachmentStorageSwitcher
-    BACKENDS = %w{FileSystem S3}.map { |backend| Technoweenie::AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+    BACKENDS = %w{FileSystem S3}.map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As #:nodoc:
       private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$)/ }
@@ -1178,7 +1178,7 @@ RSpec.configure do |config|
   def s3_storage!(opts = {:stubs => true})
     [Attachment, Thumbnail].each do |model|
       model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      model.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+      model.stubs(:current_backend).returns(AttachmentFu::Backends::S3Backend)
 
       model.stubs(:s3_storage?).returns(true)
       model.stubs(:local_storage?).returns(false)
@@ -1206,7 +1206,7 @@ RSpec.configure do |config|
   def local_storage!
     [Attachment, Thumbnail].each do |model|
       model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      model.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+      model.stubs(:current_backend).returns(AttachmentFu::Backends::FileSystemBackend)
 
       model.stubs(:s3_storage?).returns(false)
       model.stubs(:local_storage?).returns(true)
