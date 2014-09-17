@@ -13,10 +13,6 @@
 # class with those attributes.
 #
 class Version < ActiveRecord::Base #:nodoc:
-  # INSTRUCTURE: shims for quizzes namespacing
-  include PolymorphicTypeOverride
-  override_polymorphic_types versionable_type: {'Quiz' => 'Quizzes::Quiz', 'QuizSubmission' => 'Quizzes::QuizSubmission'}
-
   belongs_to :versionable, :polymorphic => true
 
   before_create :initialize_number
