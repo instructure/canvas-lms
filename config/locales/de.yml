@@ -104,8 +104,10 @@ de:
         auth_base: CAS-URL
         auth_type: Typ
         login_handle_name: Login-label
+        unknown_user_url: "URL für unbekannte Benutzer"
       login_handle_name_description: "Dieses Label wird für eindeutige Login-identifier verwendet. Beispiele: Anmeldung, Benutzername, Studenten-ID, usw."
       save_button: "Authentifizierungseinstellungen speichern"
+      unknown_user_url_description: "Die URL für die Weiterleitung, wenn ein autorisierter Benutzer in Canvas nicht gefunden wird."
     index: 
       add_auth_desc: "Fügen Sie diesem Konto einen Identitätsanbieter hinzu:"
       canvas_login_tip: "Wenn Sie Einstellungen vornehmen, die dazu führen, dass eine Anmeldung nicht länger möglich ist, können Sie   *%{url1}* ans Ende Ihrer Anmelde-URL hinzufügen. Auf diese Weise können Sie den normalen Canvas-anmeldeprozess verwenden. Für dieses Konto wäre die URL dann %{url2}"
@@ -208,6 +210,7 @@ de:
         login_handle_name: Login-label
         position: Position
         requested_authn_context: Authentifizierungskontext
+        unkown_user_url: "URL für unbekannte Benutzer"
       log_in_url: "Anmelde-URL "
       log_out_url: "Abmelde-URL "
       login_attribute: Zugangskennungs-Attribut
@@ -222,6 +225,7 @@ de:
       save_button: "Authentifizierungseinstellungen speichern"
       start_debugging: "Fehlerbeseitigung starten"
       stop_debugging: "Fehlerbeseitigung anhalten"
+      unkown_user_url_description: "Die URL für die Weiterleitung, wenn ein autorisierter Benutzer in Canvas nicht gefunden wird."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest sent to IdP"
       auth_response_from_idp: "AuthnResponse from IdP"
@@ -437,6 +441,7 @@ de:
           restore_course: "Kurse wiederherstellen"
         view_messages: "Benachrichtigungen anzeigen"
       admin_tools_cumb: Verwaltungs-Tools
+      admin_tools_title: Admin-Tools
       auth_logging_content_pane: 
         auth_logging: Benutzeranmeldungs-/Abmeldungsaktivität
       auth_logging_search_results: 
@@ -489,6 +494,9 @@ de:
         time: Uhrzeit
         user: Benutzer
       course_search_form: 
+        course_id: Kurs-ID
+        labels: 
+          find_deleted_course: "Anhand der ID nach einem gelöschten Kurs suchen"
         select_default: "Kurs auswählen"
         select_label: "Kurs auswählen"
       course_search_results: 
@@ -546,6 +554,7 @@ de:
         generate_activity_username: "Aktivität generieren für *%{user}*"
         message_date_from: "Von Datum"
         message_date_to: "Bis Datum"
+        search: "Anhand der ID oder des Namens nach Personen suchen"
         search_people: "Personen durchsuchen"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -777,6 +786,8 @@ de:
             field: Quiz-ID
           section_id: 
             field: Abschnitts-ID
+    screenreader_heading: 
+      page_title: Kontoeinstellungen
     settings: 
       about_google_docs: |-
           Mit Google Docs Previews können Benutzer Dokumente
@@ -881,6 +892,7 @@ de:
         help_link_subtext: Subtext
         help_link_text: "Text, der statt des Links angezeigt wird"
         help_link_url: URL
+        login_handle_name: Anmelde-Label
         membership_type: "Weitere hinzufügen"
         message: Nachricht
         mfa_settings: "Mehrstufige Authentifizierung"
@@ -914,6 +926,7 @@ de:
         add_admins: "Kontoadministratoren hinzufügen"
         configure_report: Konfigurieren...
         run_report: "Bericht erstellen"
+      login_handle_name_placeholder: "Beispiel: Zugangskennung, Benutzername oder Studenten-ID"
       manual_quotas: 
         find_button: Suchen
         manual_quotas_title: "Manuell festlegbare Kontingente"
@@ -1197,6 +1210,12 @@ de:
         header: 
           one: "1 Fehler hat das Speichern von %{model} verhindert"
           other: "%{count} Fehler haben das Speichern von %{model} verhindert"
+  add_module_item: 
+    add_assignment_to: "Aufgabe zu %{module} hinzufügen"
+    add_file_to: "Dateien zu %{module} hinzufügen"
+    add_page_to: "Seiten zu %{module} hinzufügen"
+    add_quiz_to: "Quiz zu %{module} hinzufügen"
+    add_topic_to: "Diskussionsthemen zu %{module} hinzufügen"
   ajax_errors: 
     error_heading: "Ajax-fehler: %{status_code}"
     errors: 
@@ -1248,6 +1267,8 @@ de:
       criteria_required: "Mindestens ein Trigger ist erforderlich"
       recipients_required: "Mindestens ein Empfänger ist erforderlich"
       threshold_should_be_numeric: "Diese Zahl muss positiv sein"
+  allow_lor_tools: "Benutzern die Anzeige und Verwendung externer für LOR konfigurierter Tools ermöglichen."
+  allow_opt_out_of_inbox: "Benutzern ermöglichen, den Konversations-Posteingang zu deaktivieren. Dadurch werden alle Konversationsnachrichten und -benachrichtigungen als ASAP-Benachrichtigungen an die primäre E-Mail des Benutzers gesendet, und das Kennzeichen für ungelesene Nachrichten des Konversations-Posteingangs sowie die Benachrichtigungseinstellungen für die Konversation werden ausgeblendet."
   analytics: 
     course: 
       analytics: Analysen
@@ -1397,6 +1418,7 @@ de:
     labels: 
       due: Abgabetermin
     name_is_required: "Name erforderlich!"
+    points_possible_not_zero: "Die möglichen Punkte für die ausgewählte Benotungsart müssen über 0 liegen"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     select_external_tool_dialog_title: "Externes Tool konfigurieren"
     submission_action_take_quiz: "Akzeptieren %{title}"
@@ -1513,6 +1535,7 @@ de:
       group_weight: "%{groupWeight}% der Gesamtzahl"
       manage: Verwalten
       move: "Verschieben nach ..."
+      move_to_accessibility_warning: "Warnung: Um die Neuzuordnung von Aufgaben und Gruppen zu verbessern, verwenden Sie die Dialogoption \"Verschieben in\" des Menüs."
     assignment_group_selector: 
       assignment_group: Aufgabengruppe
       assignment_group_options: 
@@ -1760,6 +1783,7 @@ de:
         pass_fail: Abgeschlossen/Unvollständig
         percent: Prozentsatz
         points: Punkte
+      view_grading_scheme: "Benotungssystem anzeigen"
     group_category_selector: 
       grade_group_students_individually: "Noten für alle Studenten einzeln vergeben"
       group_assignment_header: Gruppenaufgabe
@@ -1862,6 +1886,7 @@ de:
     non_number: "Sie müssen eine Zahl verwenden"
     notices: 
       assignment_delete: "Diese Aufgabe wurde gelöscht"
+      assignment_not_availible: "Die angeforderte Aufgabe steht für Ihren Kursabschnitt nicht zur Verfügung."
       created: "Die Aufgabe wurde erfolgreich erstellt."
       updated: "Die Aufgabe wurde erfolgreich aktualisiert."
     number_of_assignments: 
@@ -1935,6 +1960,7 @@ de:
         add_rubric: "Rubrik hinzufügen"
         assign_rubric: "Rubrik zuweisen"
         edit: Bearbeiten
+      manage: Verwalten
       messages: 
         locked: "Diese Aufgabe ist derzeit gesperrt."
       new_assignment: "Neue Aufgabe"
@@ -2096,6 +2122,8 @@ de:
           internet_check: Internet-Datenbank
           journal_check: "Magazine, Fachzeitschriften und Publikationen"
           student_paper_check: "Sonstige studentische Arbeiten"
+          submit_papers_to: "In Repository aufnehmen"
+          turnitin_repository: Turnitin-Repository
         originality_report_never: Nie
         originality_report_visibility: "Studenten können den Echtheitsbericht einsehen"
         originality_report_visible_after_due_date: "Nach dem Abgabetermin"
@@ -2139,6 +2167,7 @@ de:
         wizard_box: "Ich möchte folgendes tun:"
   assignments_api: 
     invalid_date_time: "Ungültige/s Datum/Uhrzeit für %{attribute}"
+    invalid_submission_types: "Ungültige Einsendungsarten"
   attachment: 
     default_filename: Datei
     errors: 
@@ -2189,6 +2218,13 @@ de:
     no_manifest: "Diese Blackboard ZIP-Datei enthält keine Datei \"imsmanifest.xml\" im Stammverzeichnis."
   bookmark_service: 
     default_title: "Ohne Titel"
+  broccoli_cloud: 
+    hidden_title: "Ausgeblendet. Klicken, um die Veröffentlichung rückgängig zu machen"
+    label: 
+      hidden: "Ausgeblendet. Klicken, um die Veröffentlichung rückgängig zu machen"
+      published: "Veröffentlicht. Klicken, um die Veröffentlichung rückgängig zu machen"
+      restricted: "Beschränkt. Klicken, um die Veröffentlichung rückgängig zu machen"
+      unpublished: "Veröffentlichung rückgängig gemacht. Zum Veröffentlichen klicken"
   bulk_course_migration: 
     export_failed: "Beim Exportieren des Kurses mit der ID bb_lcid %{id} aus Blackboard ist ein Fehler aufgetreten"
     export_failed_no_id: "Beim Importieren eines Kurses ist ein Fehler aufgetreten"
@@ -3024,7 +3060,7 @@ de:
     index: 
       buttons: 
         create: "Kursexport erstellen"
-      content_exports: Kursexporte
+      content_exports: Inhaltsexporte
       export_type: Exporttyp
       labels: 
         course: Kurs
@@ -4294,7 +4330,7 @@ de:
       need_grading_count: 
         one: "1 muss benotet werden"
         other: "%{count} müssen benotet werden"
-      no_peer_review_due_date: "fällig: Kein Abgabetermin "
+      no_peer_review_due_date: "Fällig am: kein Abgabetermin "
       points_possible: "von insgesamt %{points_possible}"
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4839,7 +4875,7 @@ de:
     graded_survey: "Benotete Befragung"
     page_name: "Name der Seite"
     practice_quiz: Übungs-Quiz
-    quiz_name: "Name des Quizzes"
+    quiz_name: "Name des Quiz"
     ungrded_survey: "Unbenotete Befragung"
     url: URL
   create_users_view: 
@@ -5348,7 +5384,7 @@ de:
       first_page: Erste
       last_page: Letzte
     peer_reviews: 
-      due_date: "fällig am %{date}"
+      due_date: "Fällig am %{date}"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     reply_count_tooltip: 
       one: "1 Antwort."
