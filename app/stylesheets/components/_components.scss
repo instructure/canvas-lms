@@ -55,20 +55,40 @@
         display: block;
         padding: 4px 12px;
         color: ensure-contrast($gray, $lightBackground);
+        &:hover { text-decoration: none; }
+        &:focus { text-decoration: underline; }
+        
+        @if $is-k12 { 
+          padding: ($k12-sp - 4) $k12-sp;
+          border-radius: $k12-sp/2;
+          
+          @if $use_high_contrast {
+            &:hover, &:focus {
+              background: darken($brand-k12-dark, 30%);
+              color: white;
+            }
+          }
+          @else { &:hover, &:focus { background: #f2f2f2; } }
+        }
+        
+        @else {
+          padding: 4px 8px;
+          &:hover {
+            @if $use_high_contrast {
+              background: #333;
+              color: #fff;
+            } 
+            @else { background: $white; }
+          }
+          &:hover {
+            text-decoration: none;
+            background: $course-sidenav_list-item--bg-color;  
+            color: $course-sidenav_list-item--active-font-color;        
+          }
+        }
 
         & > span {
           white-space: nowrap;
-        }
-
-        &:hover {
-          text-decoration: none;
-          @if $use_high_contrast {
-            background: #333;
-            color: #fff;
-          } @else {
-          background: $white;  
-          }
-          
         }
       }
 
@@ -77,26 +97,35 @@
       }
     }
   }
-
+  
   // lists w/o headers still need a strong border
   & > ul + ul {
     border-top: 1px solid $listBorderColor;
   }
 
   a.active {
-    @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-    } @else {
-    background: $white;  
-    } 
-    &:hover {      
+
+    @if $is-k12 {
+      background-color: $brand-k12;
+      color: white;
       @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-      } @else {
-      background: $white;  
-      } 
+        background-color: darken($brand-k12, 35%);
+        &:hover, &:focus { background-color: darken($brand-k12, 35%); }
+      }
+      @else {
+        background-color: $brand-k12;
+        &:hover, &:focus { background-color: $brand-k12; }
+      }
+    }
+    
+    @else {
+      /// active state colors and backgrounds on left sidenav            
+      background: $course-sidenav_list-item--bg-color;
+      color: $course-sidenav_list-item--active-font-color;
+      &:hover {      
+        background: $course-sidenav_list-item--bg-color;  
+        color: $course-sidenav_list-item--active-font-color;
+      }
     }
   }
 }
@@ -139,5 +168,4 @@
     }
   }
 }
-
 
