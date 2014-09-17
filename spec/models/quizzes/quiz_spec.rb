@@ -841,6 +841,17 @@ describe Quizzes::Quiz do
         each { |s| q2.send(s).should be_true }
   end
 
+  it 'should not report LDB to be required for viewing results if LDB is not required to take the quiz' do
+    Quizzes::Quiz.expects(:lockdown_browser_plugin_enabled?).twice.returns(true)
+
+    q = @course.quizzes.build
+    q.require_lockdown_browser_for_results = true
+    q.require_lockdown_browser_for_results.should be_false
+    q.require_lockdown_browser = true
+    q.require_lockdown_browser_for_results = true
+    q.require_lockdown_browser_for_results.should be_true
+  end
+
   describe "non_shuffled_questions" do
     subject { Quizzes::Quiz.non_shuffled_questions }
 
