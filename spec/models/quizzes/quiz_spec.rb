@@ -887,6 +887,24 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "prepare_matches" do
+    let(:quiz) { Quizzes::Quiz.new }
+    let(:question) { { :matches => matches } }
+    let(:matches) { ['a', 'b', 'c'] }
+
+    it "shuffles matches for a matching question" do
+      quiz.stubs(:shuffle_answers).returns(true)
+      matches.expects(:sort_by)
+      quiz.prepare_matches(question)
+    end
+
+    it "still shuffles even if shuffle_answers option is off" do
+      quiz.stubs(:shuffle_answers).returns(false)
+      matches.expects(:sort_by)
+      quiz.prepare_matches(question)
+    end
+  end
+
   describe "shuffleable_question_type?" do
     specify { Quizzes::Quiz.shuffleable_question_type?("true_false_question").should be_false }
     specify { Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question").should be_true }

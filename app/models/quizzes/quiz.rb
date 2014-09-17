@@ -569,7 +569,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       if val[:answers]
         val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if val[:matches]
+        val[:matches] = prepare_matches(val) if val[:matches]
       elsif val[:questions] # It's a Quizzes::QuizGroup
         if val[:assessment_question_bank_id]
           # It points to a question bank
@@ -579,7 +579,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           val[:questions].each do |question|
             if question[:answers]
               question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
+              question[:matches] = prepare_matches(question) if question[:matches]
             end
             questions << question
           end
@@ -674,7 +674,7 @@ class Quizzes::Quiz < ActiveRecord::Base
             questions.each do |question|
               if question[:answers]
                 question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
+                question[:matches] = prepare_matches(question) if question[:matches]
               end
               question[:points_possible] = q[:question_points]
               question[:published_at] = q[:published_at]
@@ -749,6 +749,14 @@ class Quizzes::Quiz < ActiveRecord::Base
       else
         answers
       end
+    end
+  end
+
+  def prepare_matches(question)
+    if matches = question[:matches]
+      # question matches should always be shuffled, regardless of the
+      # shuffle_answers option
+      matches.sort_by { |m| rand }
     end
   end
 
