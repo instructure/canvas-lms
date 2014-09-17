@@ -196,7 +196,10 @@ $ef-thumbnail-size: 36px;
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
 }
 
-.ef-edit-name-form { position: relative }
+.ef-edit-name-form {
+  position: relative;
+  margin-bottom: 0;
+}
 .ef-edit-name-cancel {
   position: absolute;
   top: 0;
