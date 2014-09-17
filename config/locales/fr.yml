@@ -4908,6 +4908,8 @@ fr:
       new: Nouveau
       new_discussion_entries: "Entrées d’une nouvelle discussion"
       new_discussions: "Nouvelles discussions"
+      num_of_assignments: "Nbre de travaux"
+      num_of_submissions: "Nbre d’envois"
       page_title: "Statistiques du cours"
       quiz: Questionnaire
       quiz_questions: "Questions du questionnaire"
