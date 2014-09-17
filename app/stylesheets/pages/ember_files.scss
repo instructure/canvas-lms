@@ -291,6 +291,30 @@ i[class*=current_uploads__instructions__icon-upload] {
   font-weight: bold;
 }
 
+.ef-breadcrumb-popover {
+  display: block;
+  left: -9999px;
+  top: 15px;
+  opacity: 0;
+  transition: opacity .2s;
+  width: auto;
+  &.open {
+    left: -23px;
+    opacity: 1;
+  }
+  &.popover > .arrow {
+    left: 53px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+}
+
+
+
+
 
 // Hack, Hack, Hack!
 // to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files

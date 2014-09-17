@@ -3,38 +3,28 @@ define [
   'jquery'
   'compiled/react_files/components/Breadcrumbs'
   'compiled/models/Folder'
-  'react-router'
-], (React, $, Breadcrumbs, Folder, ReactRouter) ->
+  'compiled/react_files/routes'
+], (React, $, Breadcrumbs, Folder, routes) ->
+
   Simulate = React.addons.TestUtils.Simulate
 
+  module 'FolderChild',
+    setup: ->
+      React.addons.TestUtils.renderIntoDocument(routes)
 
-  # Need to pass in setup objects but doing the same test
-  breadcrumbTest = (routerObject, test) =>
-    sinon.stub(ReactRouter, 'Link').returns("/some_url")
-    @breadcrumbs = React.renderComponent(Breadcrumbs(rootTillCurrentFolder: routerObject), $('<div>').appendTo('body')[0])
+      sampleProps =
+        rootTillCurrentFolder: [new Folder(), new Folder({name: 'test_folder_name', full_name: 'course_files/test_folder_name'})]
+        contextId: 'sample_course_id'
+        contextType: 'courses'
 
-    test()
+      @component = React.renderComponent(Breadcrumbs(sampleProps), $('<div>').appendTo('body')[0])
 
-    ReactRouter.Link.restore()
-    React.unmountComponentAtNode(@breadcrumbs.getDOMNode().parentNode)
+    teardown: ->
+      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
-  module 'Breadcrumbs#render',
-  test 'generates the rootFolder link', ->
-    routerObject =
-      [
-        new Folder(name: 'folder')
-      ]
-
-    breadcrumbTest routerObject, ->
-      ok ReactRouter.Link.calledWith(to: 'rootFolder', contextType: undefined, contextId: undefined, splat: "", activeClassName: 'active'), 'called with correct parameters for rootFolder' 
-  test 'generates a folder link', ->
-    folder = new Folder(name: 'folder')
-    folder.urlPath = -> "somePath"
-    routerObject =
-      [
-        folder
-      ]
-
-    breadcrumbTest routerObject, ->
-      ok ReactRouter.Link.calledWith(to: 'folder', contextType: undefined, contextId: undefined, splat: "somePath", activeClassName: 'active'), 'called with correct parameters for a folder link' 
-  
+  test 'generates the home, rootFolder, and other links', ->
+    $breadcrumbs = $(this.component.getDOMNode())
+    equal $breadcrumbs.find('.home a').attr('href'), '/', 'correct home url'
+    equal $breadcrumbs.find('li:nth-child(3) a').attr('href'), '/courses/sample_course_id/files', 'rootFolder link has correct url'
+    equal $breadcrumbs.find('li:nth-child(4) a').attr('href'), '/courses/sample_course_id/files/folder/test_folder_name', 'correct url for child'
+    equal $breadcrumbs.find('li:nth-child(4) a').text(), 'test_folder_name', 'shows folder names'

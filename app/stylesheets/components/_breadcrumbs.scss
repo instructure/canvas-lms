@@ -6,11 +6,12 @@
     list-style: none;
     > li {
       display: inline-block;
+      white-space: nowrap;
       + li {
         &:before {
           @extend i[class*=icon-]:before;
           @extend .icon-arrow-open-right:before;
-          font-size: 10px;
+          font-size: 10px !important;
           color: hsl(0,0,61%);
           padding: 0 5px;
         }
@@ -19,6 +20,16 @@
         }
       }
     }
+  }
+  // This is kinda hacky, but the label for the crumbs is in a
+  // <span class="ellipsis"> so we have to give it a display other than inline
+  // for it to actually do ellipsis. but when we do that, it is positioned weird;
+  // hence the position, top and margin-top, to get it back to where it should be.
+  .ellipsis {
+    display: inline-block;
+    position: relative;
+    top: 6px;
+    margin-top: -6px;
   }
   .icon-home:before {
     font-size: 10px;

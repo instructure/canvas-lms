@@ -28,18 +28,18 @@ define [
 
     render: withReactDOM ->
       div null,
+        Breadcrumbs({
+          rootTillCurrentFolder: @state.rootTillCurrentFolder,
+          contextType: @props.params.contextType,
+          contextId: @props.params.contextId
+        })
         Toolbar({
           currentFolder: @state.currentFolder,
           query: @props.query,
           params: @props.params
           selectedItems: @state.selectedItems
         })
-        if @state.rootTillCurrentFolder
-          Breadcrumbs({
-            rootTillCurrentFolder: @state.rootTillCurrentFolder,
-            contextType: @props.params.contextType,
-            contextId: @props.params.contextId
-          })
+
         div className: 'ef-main',
           aside className: 'visible-desktop ef-folder-content',
             if @state.rootTillCurrentFolder
