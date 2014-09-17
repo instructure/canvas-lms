@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_page_view
   before_filter :refresh_cas_ticket
   before_filter :require_reacceptance_of_terms
+  before_filter :clear_policy_cache
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -801,6 +802,10 @@ class ApplicationController < ActionController::Base
       render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
       false
     end
+  end
+
+  def clear_policy_cache
+    AdheresToPolicy::Cache.clear
   end
 
   def generate_page_view

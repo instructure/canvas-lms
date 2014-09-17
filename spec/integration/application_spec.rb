@@ -113,4 +113,11 @@ describe "site-wide" do
       response.body.to_s.should_not match(%r{id="breadcrumbs"})
     end
   end
+
+  context "policy cache" do
+    it "should clear the in-process policy cache between requests" do
+      AdheresToPolicy::Cache.expects(:clear).with(nil).once
+      get '/'
+    end
+  end
 end

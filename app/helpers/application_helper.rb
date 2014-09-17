@@ -281,7 +281,7 @@ module ApplicationHelper
     @section_tabs ||= begin
       if @context
         html = []
-        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key) do
+        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key, expires_in: 1.hour) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
