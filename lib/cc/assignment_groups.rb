@@ -57,7 +57,7 @@ module CC
                 rules.each do |rule|
                   a = nil
                   if rule.first == 'never_drop'
-                    a = @course.assignments.find_by_id(rule.last)
+                    a = @course.assignments.where(id: rule.last).first
                     next unless a
                   end
                   rules_node.rule do |rule_node|

@@ -77,7 +77,7 @@ module Canvas::MessageHelper
       using[:name] ||= split_txt[0]
     end
     raise 'Name is required' unless using[:name]
-    n = Notification.find_or_initialize_by_name(using[:name])
+    n = Notification.where(name: using[:name]).first_or_initialize
     begin
       n.update_attributes(:delay_for => using[:delay_for], :category => using[:category])
     rescue => e

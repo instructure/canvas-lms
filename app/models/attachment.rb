@@ -131,14 +131,16 @@ class Attachment < ActiveRecord::Base
   # by id is deleted but an active attachment in the same context has the same
   # path, it'll return that attachment.
   module FindInContextAssociation
-    def find(*a, &b)
-      return super if a.first.is_a?(Symbol)
+    def find(*a)
       find_with_possibly_replaced(super)
     end
 
-    def method_missing(method, *a, &b)
-      return super unless method.to_s =~ /^find(?:_all)?_by_id$/
-      find_with_possibly_replaced(super)
+    def find_by_id(id)
+      find_with_possibly_replaced(where(id: id).first)
+    end
+
+    def find_all_by_id(ids)
+      find_with_possibly_replaced(where(id: ids).to_a)
     end
 
     def find_with_possibly_replaced(a_or_as)

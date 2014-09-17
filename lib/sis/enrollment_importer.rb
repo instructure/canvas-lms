@@ -127,7 +127,7 @@ module SIS
             else
               root_account = @root_account
             end
-            pseudo = root_account.pseudonyms.find_by_sis_user_id(user_id)
+            pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
 
             unless pseudo
               @messages << "User #{user_id} didn't exist for user enrollment"
@@ -142,8 +142,8 @@ module SIS
               end
             end
 
-            @course ||= Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id) unless course_id.blank?
-            @section ||= CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, section_id) unless section_id.blank?
+            @course ||= @root_account.all_courses.where(sis_source_id: course_id).first unless course_id.blank?
+            @section ||= @root_account.course_sections.where(sis_source_id: section_id).first unless section_id.blank?
             unless (@course || @section)
               @messages << "Neither course #{course_id} nor section #{section_id} existed for user enrollment"
               next
@@ -190,12 +190,12 @@ module SIS
                 'TaEnrollment'
               elsif role =~ /\Aobserver\z/i
                 if associated_user_id
-                  pseudo = root_account.pseudonyms.find_by_sis_user_id(associated_user_id)
+                  pseudo = root_account.pseudonyms.where(sis_user_id: associated_user_id).first
                   if status =~ /\Aactive/i
-                    associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
+                    associated_enrollment = pseudo && @course.student_enrollments.where(user_id: pseudo.user_id).first
                   else
                     # the observed user may have already been concluded
-                    associated_enrollment = pseudo && @course.all_student_enrollments.find_by_user_id(pseudo.user_id)
+                    associated_enrollment = pseudo && @course.all_student_enrollments.where(user_id: pseudo.user_id).first
                   end
                 end
                 'ObserverEnrollment'

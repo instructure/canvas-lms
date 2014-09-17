@@ -42,7 +42,7 @@ module CC
       def add_ref_or_question(node, question)
         aq = nil
         unless question[:assessment_question_id].blank?
-          if aq = AssessmentQuestion.find_by_id(question[:assessment_question_id])
+          if aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first
             if aq.deleted? || 
                     !aq.assessment_question_bank || 
                     aq.assessment_question_bank.deleted? || 

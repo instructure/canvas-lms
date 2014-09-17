@@ -147,9 +147,9 @@ module Canvas::Migration::Helpers
         hash[:title] = item['file_name']
       elsif type == 'assessment_question_banks'
         if hash[:title].blank? && @migration && @migration.context.respond_to?(:assessment_question_banks)
-          if hash[:migration_id] && bank = @migration.context.assessment_question_banks.find_by_migration_id(hash[:migration_id])
+          if hash[:migration_id] && bank = @migration.context.assessment_question_banks.where(migration_id: hash[:migration_id]).first
             hash[:title] = bank.title
-          elsif @migration.question_bank_id && default_bank = @migration.context.assessment_question_banks.find_by_id(@migration.question_bank_id)
+          elsif @migration.question_bank_id && default_bank = @migration.context.assessment_question_banks.where(id: @migration.question_bank_id).first
             hash[:title] = default_bank.title
           end
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title

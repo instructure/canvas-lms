@@ -397,7 +397,7 @@ module Api
       if match.obj_id
         obj   = preloaded_attachments[match.obj_id]
         obj ||= if context.is_a?(User) || context.nil?
-                  Attachment.find_by_id(match.obj_id)
+                  Attachment.where(id: match.obj_id).first
                 else
                   context.attachments.find_by_id(match.obj_id)
                 end

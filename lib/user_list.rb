@@ -70,7 +70,7 @@ class UserList
   def users
     existing = @addresses.select { |a| a[:user_id] }
     existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] } ) do |shard_existing|
-      User.find_all_by_id(shard_existing.map { |a| a[:user_id] })
+      User.where(id: shard_existing.map { |a| a[:user_id] })
     end
 
     non_existing = @addresses.select { |a| !a[:user_id] }

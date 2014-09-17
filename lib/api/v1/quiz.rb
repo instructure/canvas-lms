@@ -109,7 +109,7 @@ module Api::V1::Quiz
     # make sure assignment_group_id belongs to context
     if update_params.has_key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
-      ag = quiz.context.assignment_groups.find_by_id(ag_id)
+      ag = quiz.context.assignment_groups.where(id: ag_id).first
       update_params["assignment_group_id"] = ag.try(:id)
     end
 

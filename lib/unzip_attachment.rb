@@ -204,7 +204,7 @@ class UnzipAttachment
     # For every directory in the path...
     # (-2 means all entries but the last, which should be a filename)
     list[0..-2].each do |dir|
-      if new_dir = current.sub_folders.find_by_name(dir)
+      if new_dir = current.sub_folders.where(name: dir).first
         current = new_dir
       else
         current = assert_folder(current, dir)
