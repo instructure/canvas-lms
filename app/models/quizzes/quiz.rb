@@ -146,6 +146,11 @@ class Quizzes::Quiz < ActiveRecord::Base
       @assignment_to_set = self.assignment
       self.assignment_id = nil
     end
+
+    if !self.require_lockdown_browser
+      self.require_lockdown_browser_for_results = false
+    end
+
     self.assignment_group_id ||= self.assignment.assignment_group_id if self.assignment
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
@@ -1131,7 +1136,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias :require_lockdown_browser? :require_lockdown_browser
 
   def require_lockdown_browser_for_results
-    self[:require_lockdown_browser_for_results] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
+    self.require_lockdown_browser &&
+    self[:require_lockdown_browser_for_results] &&
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
