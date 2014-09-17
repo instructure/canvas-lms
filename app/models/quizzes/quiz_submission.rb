@@ -27,6 +27,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
 
+  GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
     :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview,
@@ -46,6 +48,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     allow_nil: true
 
   before_validation :update_quiz_points_possible
+  before_validation :rectify_finished_at_drift, :if => :end_at?
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
   belongs_to :submission, :touch => true
@@ -316,6 +319,31 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def update_quiz_points_possible
     self.quiz_points_possible = self.quiz && self.quiz.points_possible
+  end
+
+  # This callback attempts to handle a somewhat edge-case reported in CNVS-8463
+  # where the quiz auto-submits while the browser tab is inactive, but that
+  # time at which the submission is turned in may have happened *after* the
+  # timer had elapsed (and is never consistent).. When that happened,
+  # admins/teachers were confused that those students had gained extra time when
+  # in fact they didn't, it's just that the JS stalled with submitting at the
+  # right time.
+  #
+  # This will reduce such "drift" only if it appears to be incidental by testing
+  # if it happened within a relatively small window of time; the reason for that
+  # is that if #finished_at was set to something like 5 hours after time-out
+  # then there may be something more sinister going on and we don't want the
+  # callback to shadow it.
+  #
+  # Of course, this is purely guess-work and is not bullet-proof.
+  def rectify_finished_at_drift
+    if self.finished_at && self.end_at
+      drift = self.finished_at - self.end_at
+
+      if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD
+        self.finished_at = self.end_at
+      end
+    end
   end
 
   def update_kept_score

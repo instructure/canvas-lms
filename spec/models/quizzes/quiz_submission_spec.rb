@@ -63,6 +63,19 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#finished_at' do
+    it 'should rectify small amounts of drift (could be caused by JS stalling)' do
+      anchor = Time.now
+
+      # subject.stubs(:end_at?).returns(true)
+      subject.started_at = anchor
+      subject.end_at = anchor + 5.minutes
+      subject.finished_at = anchor + 6.minutes
+      subject.save
+      subject.finished_at.should == subject.end_at
+    end
+  end
+
   it "should copy the quiz's points_possible whenever it's saved" do
     Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!

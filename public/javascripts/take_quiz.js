@@ -24,6 +24,7 @@ define([
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'compiled/views/quizzes/LDBLoginPopup',
+  'worker!compiled/workers/quizzes/quiz_taking_police',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
@@ -35,7 +36,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView, File, I18n, $, timing, autoBlurActiveInput, _, LDBLoginPopup) {
+], function(FileUploadQuestionView, File, I18n, $, timing, autoBlurActiveInput, _, LDBLoginPopup, QuizTakingPolice) {
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
@@ -651,7 +652,23 @@ define([
       });
     }, 2000);
 
-    setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
+    if (QuizTakingPolice) {
+      var quizTakingPolice = new QuizTakingPolice();
+
+      quizTakingPolice.addEventListener('message', function(e) {
+        if (e.data === 'stopwatchTick') {
+          quizSubmission.updateTime();
+        }
+      });
+
+      quizTakingPolice.postMessage({
+        code: 'startStopwatch',
+        frequency: quizSubmission.clockInterval
+      });
+    }
+    else {
+      setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
+    }
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
 
