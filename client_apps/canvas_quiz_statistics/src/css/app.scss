@@ -20,6 +20,10 @@
 
   .inline {
     display: inline-block;
+
+    &.sighted-user-content[hidden] {
+      display: inline-block;
+    }
   }
 
   .section-title {
@@ -66,5 +70,9 @@
       line-height: 22px;
       font-size: 14.5px;
     }
+  }
+
+  .sighted-user-content[hidden] {
+    display: inherit;
   }
 }

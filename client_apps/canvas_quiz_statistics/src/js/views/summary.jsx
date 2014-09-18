@@ -14,7 +14,7 @@ define(function(require) {
     render: function() {
       return (
         <th scope="col">
-          <SightedUserContent tagName="i" className={this.props.icon} />
+          <SightedUserContent tagName="i" className={this.props.icon + ' inline'} />
           {' '}
           {this.props.label}
         </th>
@@ -61,7 +61,7 @@ define(function(require) {
           </header>
 
           <table className="text-left">
-            <ScreenReaderContent tagName="caption">
+            <ScreenReaderContent tagName="caption" forceSentenceDelimiter>
               {I18n.t('table_description',
                 'Summary statistics for all turned in submissions')
               }
@@ -96,7 +96,7 @@ define(function(require) {
                 <td>{this.ratioFor(this.props.scoreLow)}%</td>
                 <td>{formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
                 <td>
-                  <ScreenReaderContent>
+                  <ScreenReaderContent forceSentenceDelimiter>
                     {secondsToTime.toReadableString(this.props.durationAverage)}
                   </ScreenReaderContent>
                   {/*
