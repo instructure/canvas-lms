@@ -158,9 +158,8 @@ class ContextController < ApplicationController
     end
 
     @snippet = params[:object_data] || ""
-    hmac = Canvas::Security.hmac_sha1(@snippet)
 
-    if hmac != params[:s]
+    unless Canvas::Security.verify_hmac_sha1(params[:s], @snippet)
       return render :nothing => true, :status => 400
     end
 

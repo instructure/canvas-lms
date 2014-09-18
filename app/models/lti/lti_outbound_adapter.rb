@@ -124,7 +124,7 @@ module Lti
     def encode_source_id(assignment)
       @tool.shard.activate do
         payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
+        "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
       end
     end
   end

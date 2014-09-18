@@ -59,12 +59,11 @@ module Api::V1::Avatar
   end
 
   def construct_token(user, type, url)
-    uid = user.is_a?(User) ? user.id : user
-    token = "#{uid}::#{type}::#{url}"
+    token = "#{user.id}::#{type}::#{url}"
     Canvas::Security.hmac_sha1(token)
   end
 
   def avatar_for_token(user, token)
-    avatars_json_for_user(user).select{ |j| j['token'] == token }.first
+    avatars_json_for_user(user).detect { |j| Canvas::Security.verify_hmac_sha1(token, "#{user.id}::#{j['type']}::#{j['url']}") }
   end
 end

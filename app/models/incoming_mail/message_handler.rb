@@ -115,7 +115,7 @@ module IncomingMail
     end
 
     def valid_secure_id?(original_message, secure_id)
-      secure_id == IncomingMail::ReplyToAddress.new(original_message).secure_id
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message.global_id.to_s)
     end
 
     def valid_user_and_context?(context, user)

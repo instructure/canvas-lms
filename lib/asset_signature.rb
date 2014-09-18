@@ -8,7 +8,7 @@ module AssetSignature
 
   def self.find_by_signature(klass, signature)
     id, hmac = signature.split(DELIMITER, 2)
-    return nil unless hmac == generate_hmac(klass, id)
+    return nil unless Canvas::Security.verify_hmac_sha1(hmac, "#{klass}#{id}", truncate: 8)
     klass.where(id: id.to_i).first
   end
 

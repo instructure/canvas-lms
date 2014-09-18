@@ -561,6 +561,10 @@ class Attachment < ActiveRecord::Base
     Canvas::Security.hmac_sha1(uuid + "quota_exempt")[0,10]
   end
 
+  def verify_quota_exemption_key(hmac)
+    Canvas::Security.verify_hmac_sha1(hmac, uuid + "quota_exempt", truncate: 10)
+  end
+
   def self.minimum_size_for_quota
     Setting.get('attachment_minimum_size_for_quota', '512').to_i
   end
