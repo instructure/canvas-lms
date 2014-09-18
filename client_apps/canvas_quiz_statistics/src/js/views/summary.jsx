@@ -112,7 +112,11 @@ define(function(require) {
             </tbody>
           </table>
 
-          <ScorePercentileChart key="chart" scores={this.props.scores} />
+          <ScorePercentileChart
+            key="chart"
+            scores={this.props.scores}
+            scoreAverage={this.props.scoreAverage}
+            pointsPossible={this.props.pointsPossible} />
         </div>
       );
     },

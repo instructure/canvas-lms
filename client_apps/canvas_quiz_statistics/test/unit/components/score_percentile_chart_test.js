@@ -79,5 +79,13 @@ define(function(require) {
         { i: 100, x: 952, y: -2, h: 182 },
       ]);
     });
+
+    describe('#calculateStudentStatistics', function() {
+      it('should work', function() {
+        var output = subject.calculateStudentStatistics(3, [ 0, 1, 1, 1, 2 ]);
+        expect(output.aboveAverage).toBe(3); // includes the average
+        expect(output.belowAverage).toBe(2);
+      });
+    });
   });
 });
