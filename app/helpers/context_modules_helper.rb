@@ -19,7 +19,7 @@
 module ContextModulesHelper
   def cache_if_module(context_module, editable, draft_state, &block)
     if context_module
-      cache_key = ['context_module_render_11_', context_module.cache_key, editable, draft_state].join('/')
+      cache_key = ['context_module_render_11_', context_module.cache_key, editable, draft_state, Time.zone].join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache(cache_key, nil, &block)
     else
