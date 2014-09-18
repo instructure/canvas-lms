@@ -816,7 +816,6 @@ define([
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
       } else if (type == "float_long") {
-        console.log(val);
         val = Math.round(parseFloat(val) * 10000.0) / 10000.0;
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
@@ -1121,7 +1120,7 @@ define([
     data.answer_match_left = data.left || data.answer_match_left;
     data.answer_match_left_html = data.left_html || data.answer_match_left_html;
     data.answer_match_right = data.right || data.answer_match_right;
-    data.answer_exact = data.exact || data.answer_exact;
+    data.answer_exact = data.exact === undefined ? data.answer_exact : data.exact;
     data.answer_error_margin = data.answer_error_margin || data.margin;
     data.answer_range_start = data.start || data.answer_range_start;
     data.answer_range_end = data.end || data.answer_range_end;
