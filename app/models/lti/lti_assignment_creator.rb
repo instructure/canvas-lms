@@ -19,6 +19,11 @@ module Lti
       lti_assignment.points_possible = @assignment.points_possible
       lti_assignment.return_types = -> { @assignment.submission_types_array.map { |type| SUBMISSION_TYPES_MAP[type] }.flatten.compact }
       lti_assignment.allowed_extensions = @assignment.allowed_extensions
+
+      lti_assignment.due_at = @assignment.due_at
+      lti_assignment.lock_at = @assignment.lock_at
+      lti_assignment.unlock_at = @assignment.unlock_at
+
       lti_assignment
     end
   end

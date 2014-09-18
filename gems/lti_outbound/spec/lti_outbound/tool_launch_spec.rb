@@ -68,6 +68,9 @@ describe LtiOutbound::ToolLaunch do
       assignment.points_possible = 100
       assignment.return_types = ['url', 'text']
       assignment.allowed_extensions = ['jpg', 'pdf']
+      assignment.unlock_at = DateTime.parse("2011-04-13 00:00:00")
+      assignment.due_at = DateTime.parse("2011-05-13 00:00:00")
+      assignment.lock_at = DateTime.parse("2011-06-13 00:00:00")
     end
 
     @variable_substitutor = LtiOutbound::VariableSubstitutor.new()#user:@user)
@@ -330,6 +333,9 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['custom_canvas_assignment_title']).to eq 'assignment1'
       expect(hash['custom_canvas_assignment_points_possible']).to eq '100'
       expect(hash['custom_canvas_assignment_id']).to eq 'assignment_id'
+      expect(hash['custom_canvas_assignment_unlock_at']).to eq DateTime.parse("2011-04-13 00:00:00").iso8601
+      expect(hash['custom_canvas_assignment_due_at']).to eq DateTime.parse("2011-05-13 00:00:00").iso8601
+      expect(hash['custom_canvas_assignment_lock_at']).to eq DateTime.parse("2011-06-13 00:00:00").iso8601
     end
 
     it 'includes assignment outcome service params for teacher' do
