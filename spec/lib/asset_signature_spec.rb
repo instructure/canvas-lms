@@ -37,14 +37,6 @@ describe AssetSignature do
       SomeModel.expects(:where).never
       AssetSignature.find_by_signature(SomeModel, '24-not-the-sig').should be_nil
     end
-
-    #TODO: Remove this after the next release cycle
-    # its just here for temporary backwards compatibility
-    it 'will also find the model by the old id method' do
-      SomeModel.expects(:where).with(id: '24').once.returns(stub(first: nil))
-      AssetSignature.find_by_signature(SomeModel, '24')
-    end
-    ################################################
   end
 end
 
