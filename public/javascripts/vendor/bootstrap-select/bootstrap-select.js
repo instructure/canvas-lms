@@ -87,7 +87,7 @@ define(['jquery'],function($) {
                         "<div class='filter-option pull-left'></div>&nbsp;" +
                         "<div class='caret'></div>" +
                     "</button>" +
-                    "<div class='dropdown-menu open'>" +
+                    "<div class='dropdown-menu open' tabindex='0'>" +
                         "<ul class='dropdown-menu inner' role='menu'>" +
                         "</ul>" +
                     "</div>" +
@@ -161,8 +161,8 @@ define(['jquery'],function($) {
                         if (_this.options.useSubmenus) {
                           _liA.push(
                             '<div class="div-contain"><div class="divider"></div></div>'+
-                            '<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
-                            '<div class="dropdown-menu open"><ul class="dropdown-menu inner" role="group">'
+                            '<a role="button" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
+                            '<div class="dropdown-menu open" tabindex="0"><ul class="dropdown-menu inner" role="group">'
                             );
                           _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
                         } else if ($this[0].index != 0) {
@@ -192,7 +192,7 @@ define(['jquery'],function($) {
                 if (_subLiA.length && !$this.next().length) {
                   var group = _liA.pop();
                   $.each(_subLiA, function(i, item) {
-                      group += "<li rel='" + i + "'>" + item + "</li>";
+                      group += "<li rel='" + i + "' tabindex='0'>" + item + "</li>";
                   });
                   group += '</ul></div>'; 
                   _liA.push(group);
@@ -203,7 +203,7 @@ define(['jquery'],function($) {
             $.each(_liA, function(i, item) {
                 // INSTRUCTURE
                 var isMenu = item.indexOf('<ul') != -1;
-                _liHtml += "<li rel='" + i + "'" + (isMenu ? " class='dropdown-submenu'" : "") + ">" + item + "</li>";
+                _liHtml += "<li rel='" + i + "'" + (isMenu ? " class='dropdown-submenu'" : "") + " tabindex='0'>" + item + " </li>";
             });
 
             //If we are not multiple, and we dont have a selected item, and we dont have a title, select the first element so something is set in the button

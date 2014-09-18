@@ -26,6 +26,7 @@ define [
       @options.courses.all.on('add', @render)
       @options.courses.groups.on('reset', @render)
       @options.courses.groups.on('add', @render)
+      @$picker = @$el.next()
       @render()
 
     render: () =>
@@ -50,7 +51,6 @@ define [
       @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')
-      @$picker = @$el.next()
       @$picker.find('.paginatedLoadingIndicator').remove()
       @createSearchViews()
       if !@renderValue() then @loadAll()
