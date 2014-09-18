@@ -12,16 +12,19 @@ define [
 
   FilesApp = React.createClass
 
-    onResolvePath: ({currentFolder, rootTillCurrentFolder}) ->
+    onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults}) ->
       @setState
         currentFolder: currentFolder
         rootTillCurrentFolder: rootTillCurrentFolder
+        showingSearchResults: showingSearchResults
         selectedItems: []
 
     getInitialState: ->
       {
         currentFolder: undefined
         rootTillCurrentFolder: undefined
+        showingSearchResults: false
+        selectedItems: undefined
       }
 
     mixins: [MultiselectableMixin]
@@ -32,13 +35,15 @@ define [
     render: withReactDOM ->
       div null,
         Breadcrumbs({
-          rootTillCurrentFolder: @state.rootTillCurrentFolder,
-          contextType: @props.params.contextType,
+          rootTillCurrentFolder: @state.rootTillCurrentFolder
+          contextType: @props.params.contextType
           contextId: @props.params.contextId
+          query: @props.query
+          showingSearchResults: @state.showingSearchResults
         })
         Toolbar({
-          currentFolder: @state.currentFolder,
-          query: @props.query,
+          currentFolder: @state.currentFolder
+          query: @props.query
           params: @props.params
           selectedItems: @state.selectedItems
           clearSelectedItems: @clearSelectedItems

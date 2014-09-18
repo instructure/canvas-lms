@@ -42,7 +42,9 @@ define [
       @updateResults(@props)
 
     componentDidMount: ->
-      @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null})
+      # this setTimeout is to handle a race condition with the setTimeout in the componentWillUnmount method of ShowFolder
+      setTimeout =>
+        @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true})
 
     render: withReactDOM ->
       div className:'ef-directory', role: 'grid',

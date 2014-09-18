@@ -40,7 +40,7 @@ define [
       path = @buildFolderPath(@props.params.splat)
       Folder.resolvePath(@props.params.contextType, @props.params.contextId, path).then (rootTillCurrentFolder) =>
         currentFolder = rootTillCurrentFolder[rootTillCurrentFolder.length - 1]
-        @props.onResolvePath({currentFolder, rootTillCurrentFolder})
+        @props.onResolvePath({currentFolder, rootTillCurrentFolder, showingSearchResults:false})
 
         [currentFolder.folders, currentFolder.files].forEach (collection) =>
           updateAPIQuerySortParams(collection, @props.query)

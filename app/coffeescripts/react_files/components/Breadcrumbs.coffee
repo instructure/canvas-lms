@@ -1,11 +1,12 @@
 define [
+  'i18n!react_files'
   'jquery'
   'underscore'
   'react'
   'react-router'
   './BreadcrumbCollapsedContainer'
   'compiled/react/shared/utils/withReactDOM'
-], ($, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM ) ->
+], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM ) ->
 
   Breadcrumbs = React.createClass
 
@@ -64,37 +65,57 @@ define [
         maxCrumbWidth = Math.max(@state.minCrumbWidth, @state.maxCrumbWidth - 20)
         @setState({maxCrumbWidth}, @checkIfCrumbsFit)
 
-    renderSingleCrumb: (folder, isLastCrumb) ->
+    renderSingleCrumb: (folder, isLastCrumb, isRootCrumb) ->
+      name = if isRootCrumb then I18n.t('files', 'Files') else folder.get('name')
+
       li {},
         Link {
-          to: (if folder.urlPath() then 'folder' else 'rootFolder')
+          to: (if isRootCrumb then 'rootFolder' else 'folder')
           contextType: @props.contextType
           contextId: @props.contextId
-          splat: folder.urlPath()
-          activeClassName: 'active'
-          title: folder.get('name')
+          splat: (folder.urlPath() unless isRootCrumb)
+          # only add title tooltips if there's a chance they could be ellipsized
+          title: (name if @state.maxCrumbWidth < 500)
         },
           span {
             className: 'ellipsis'
             style:
-              maxWidth: (@state.maxCrumbWidth if isLastCrumb)
+              maxWidth: (@state.maxCrumbWidth unless isLastCrumb)
           },
-            folder.get('name')
+            name
 
     renderDynamicCrumbs: ->
-      return [] unless @props.rootTillCurrentFolder?.length
-      [foldersInMiddle..., lastFolder] = @props.rootTillCurrentFolder
-      if @state.maxCrumbWidth > @state.minCrumbWidth
-        @props.rootTillCurrentFolder.map (folder) => @renderSingleCrumb(folder, folder isnt lastFolder)
-      else
+      if @props.showingSearchResults
         [
-          BreadcrumbCollapsedContainer({
-            foldersToContain: foldersInMiddle
-            contextType: @props.contextType,
-            contextId: @props.contextId
-          }),
-          @renderSingleCrumb(lastFolder, false)
+          @renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
+          li {},
+            Link {
+              to: 'search'
+              contextType: @props.contextType
+              contextId: @props.contextId
+              query: @props.query
+            },
+              span {
+                className: 'ellipsis'
+              },
+                if @props.query.search_term
+                  I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: @props.query.search_term})
         ]
+      else
+        return [] unless @props.rootTillCurrentFolder?.length
+        [foldersInMiddle..., lastFolder] = @props.rootTillCurrentFolder
+        if @state.maxCrumbWidth > @state.minCrumbWidth
+          @props.rootTillCurrentFolder.map (folder, i) =>
+            @renderSingleCrumb(folder, folder isnt lastFolder, i is 0)
+        else
+          [
+            BreadcrumbCollapsedContainer({
+              foldersToContain: foldersInMiddle
+              contextType: @props.contextType,
+              contextId: @props.contextId
+            }),
+            @renderSingleCrumb(lastFolder, false)
+          ]
 
     render: withReactDOM ->
       nav {
