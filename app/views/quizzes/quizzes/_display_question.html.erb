@@ -24,12 +24,15 @@
     right_answers = (hash_get(question, :matches) || hash_get(question, :answers).sort_by{|a| rand }) if question_type.entry_type == "matching" rescue {}
   end
 %>
-<div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
+<div class="quiz_sortable question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
   <% marked = assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %>
   <div class="display_question question <%= question_type.question_type %> <%= "marked" if marked %> <%= "correct" if correct && display_correct_answers %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
-    <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
+    <div class="move">
+      <%= image_tag "move.png", :class => "move_icon", "aria-hidden" => true %>
+      <a href="#" role="button" class="screenreader-only move_to"><%= t('move_to', 'Move To...') %></a>
+    </div>
     <% if assessing && @quiz_presenter.can_go_back? %>
       <div class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
         <span class="screenreader-only"><%= t(:flag_this_question, "Flag this Question") %></span>

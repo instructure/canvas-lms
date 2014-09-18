@@ -4,10 +4,11 @@
      question_bank = @banks_hash[hash_get(group, :assessment_question_bank_id)]
    end
 %>
-<div class="group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>">
+<div class="quiz_sortable group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>">
   <%= form_for :quiz_group, :url => context_url(@context, :context_quiz_quiz_groups_url, @quiz.id), :html => {:class => "quiz_group_form"} do |f| %>
   <div style="float: left;" class="move">
-    <%= image_tag "move.png", :class => "move_icon" %>
+    <%= image_tag "move.png", :class => "move_icon", "aria-hidden" => true %>
+    <a href="#" role="button" class="screenreader-only move_to"><%= t('move_to', 'Move To...') %></a>
   </div>
   <div style="float: left;">
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>

@@ -1,7 +1,10 @@
 <% data = question_teaser %>
-<div class="question_holder question_teaser" id="question_teaser_<%= question_teaser ? question_teaser[:id] : "blank" %>" style="<%= hidden unless question_teaser %>">
+<div class="quiz_sortable question_holder question_teaser" id="question_teaser_<%= question_teaser ? question_teaser[:id] : "blank" %>" style="<%= hidden unless question_teaser %>">
   <div class="display_question question">
-    <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
+    <div class="move">
+      <%= image_tag "move.png", :class => "move_icon", "aria-hidden" => true %>
+      <a href="#" role="button" class="screenreader-only move_to"><%= t('move_to', 'Move To...') %></a>
+    </div>
     <div class="header">
       <a href="#" class="question_name question_teaser_link" title="<%= t('titles.click_to_show_details', "Click to show full question details") %>"><%= hash_get(data, :question_name) %></a>
     </div>
