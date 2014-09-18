@@ -217,6 +217,7 @@ class ExternalToolsController < ApplicationController
       }
 
       if assignment
+        assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
         launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
       else
         launch_settings['tool_settings'] = adapter.generate_post_payload
