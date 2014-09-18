@@ -3,13 +3,12 @@ define [
   'compiled/str/splitAssetString'
 ], (Folder, splitAssetString) ->
 
-
+  fileContexts = ENV.FILES_CONTEXTS or []
 
   filesEnv =
+    contexts: fileContexts
 
-    contexts: ENV.FILES_CONTEXTS
-
-    contextsDictionary: ENV.FILES_CONTEXTS.reduce (dict, context)  ->
+    contextsDictionary: fileContexts.reduce (dict, context)  ->
       [contextType, contextId] = splitAssetString(context.asset_string)
       context.contextType = contextType
       context.contextId = contextId
@@ -19,10 +18,10 @@ define [
 
     showingAllContexts: window.location.pathname.match(/^\/files/) # does the url start with '/files' ?
 
-    contextType: ENV.FILES_CONTEXTS[0].contextType
-    contextId: ENV.FILES_CONTEXTS[0].contextId
+    contextType: fileContexts[0]?.contextType
+    contextId: fileContexts[0]?.contextId
 
-    rootFolders: ENV.FILES_CONTEXTS.map (contextData) ->
+    rootFolders: fileContexts.map (contextData) ->
       folder = new Folder({
         'custom_name': contextData.name
         'context_type': contextData.contextType.replace(/s$/, '') #singularize it
@@ -32,21 +31,20 @@ define [
       folder.url = "/api/v1/#{contextData.contextType}/#{contextData.contextId}/folders/root"
       folder
 
-    userHasPermission: (folderOrFile, action) ->
-      folder = if folderOrFile instanceof Folder
-        folderOrFile
-      else
-        folderOrFile.collection.parentFolder
+  filesEnv.userHasPermission = (folderOrFile, action) ->
+    return false unless folderOrFile
+    folder = if folderOrFile instanceof Folder
+      folderOrFile
+    else
+      folderOrFile.collection?.parentFolder
 
-      assetString = (folder.get('context_type') + 's_' + folder.get('context_id')).toLowerCase()
-      filesEnv.contextsDictionary[assetString]?.permissions?[action]
+    assetString = (folder?.get('context_type') + 's_' + folder?.get('context_id')).toLowerCase()
+    filesEnv.contextsDictionary?[assetString]?.permissions?[action]
+
+  filesEnv.baseUrl =  if filesEnv.showingAllContexts
+                        '/files'
+                      else
+                        "/#{filesEnv.contextType}/#{filesEnv.contextId}/files"
 
 
-
-  filesEnv.baseUrl = if filesEnv.showingAllContexts
-    '/files'
-  else
-    "/#{filesEnv.contextType}/#{filesEnv.contextId}/files"
-
-
-  return filesEnv
+  filesEnv

@@ -72,17 +72,21 @@ define [
               onClick: wrap(downloadStuffAsAZip)
             else
               href: @props.model.get('url')
+            ref: 'download'
             ),
               I18n.t('download', 'Download')
-          li {},
-            a href:'#', onClick: preventDefault(@props.startEditingName),
-              I18n.t('edit_name', 'Edit Name')
-          li {},
-            a href:'#', onClick: preventDefault(@openRestrictedDialog), ref: 'restrictedDialog',
-              I18n.t('restrict_access', 'Restrict Access')
-          li {},
-            a href:'#', onClick: wrap(openMoveDialog),
-              I18n.t('move', 'Move')
-          li {},
-            a href:'#', onClick: preventDefault(@deleteItem), ref: 'deleteLink',
-              I18n.t('delete', 'Delete')
+          if @props.userCanManageFilesForContext
+            [
+              li {},
+                a href:'#', onClick: preventDefault(@props.startEditingName), ref: 'editName',
+                  I18n.t('edit_name', 'Edit Name')
+              li {},
+                a href:'#', onClick: preventDefault(@openRestrictedDialog), ref: 'restrictedDialog',
+                  I18n.t('restrict_access', 'Restrict Access')
+              li {},
+                a href:'#', onClick: wrap(openMoveDialog), ref: 'move',
+                  I18n.t('move', 'Move')
+              li {},
+                a href:'#', onClick: preventDefault(@deleteItem), ref: 'deleteLink',
+                  I18n.t('delete', 'Delete')
+            ]

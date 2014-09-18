@@ -6,13 +6,14 @@ define [
   './UploadButton'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip) ->
+  'compiled/models/Folder'
+], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, Folder) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
 
     propTypes:
-      currentFolder: React.PropTypes.object # not required as we don't have it on the first render
+      currentFolder: React.PropTypes.instanceOf(Folder) # not required as we don't have it on the first render
       contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
       contextId: React.PropTypes.string.isRequired
 
@@ -25,7 +26,7 @@ define [
       event.preventDefault()
       @props.currentFolder.folders.add({})
 
-    downloadSelecteAsZip: ->
+    downloadSelectedAsZip: ->
       downloadStuffAsAZip(@props.selectedItems, {
         contextType: @props.contextType,
         contextId: @props.contextId
@@ -39,8 +40,6 @@ define [
       $.when(promises...).then ->
         $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
       @props.clearSelectedItems()
-
-
 
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
@@ -72,7 +71,7 @@ define [
 
           button {
             disabled: !showingButtons
-            className: 'ui-button'
+            className: 'ui-button btn-view'
             onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
             title: I18n.t('view', 'View')
             'aria-label': I18n.t('view', 'View')
@@ -80,67 +79,70 @@ define [
           },
             i className: 'icon-search'
 
-          button {
-            disabled: !showingButtons
-            className: 'ui-button',
-            onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
-            title: I18n.t('restrict_access', 'Restrict Access')
-            'data-tooltip': ''
-          },
-            i className: 'icon-unpublished'
+          if @props.userCanManageFilesForContext
+            button {
+              disabled: !showingButtons
+              className: 'ui-button btn-restrict',
+              onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
+              title: I18n.t('restrict_access', 'Restrict Access')
+              'data-tooltip': ''
+            },
+              i className: 'icon-unpublished'
 
           button {
             disabled: !showingButtons
-            className: 'ui-button'
-            onClick: @downloadSelecteAsZip
+            className: 'ui-button btn-download'
+            onClick: @downloadSelectedAsZip
             title: downloadTitle
             'aria-label': downloadTitle
             'data-tooltip': ''
           },
             i className: 'icon-download'
 
-          button {
-            disabled: !showingButtons
-            className: 'ui-button'
-            onClick: (event) =>
-              openMoveDialog(@props.selectedItems, {
-                contextType: @props.contextType
-                contextId: @props.contextId
-                returnFocusTo: event.target
-              })
-            title: I18n.t('move', 'Move')
-            'aria-label': I18n.t('move', 'Move')
-            'data-tooltip': ''
-          },
-            i className: 'icon-copy-course'
+          if @props.userCanManageFilesForContext
+            [
+              button {
+                disabled: !showingButtons
+                className: 'ui-button btn-move'
+                onClick: (event) =>
+                  openMoveDialog(@props.selectedItems, {
+                    contextType: @props.contextType
+                    contextId: @props.contextId
+                    returnFocusTo: event.target
+                  })
+                title: I18n.t('move', 'Move')
+                'aria-label': I18n.t('move', 'Move')
+                'data-tooltip': ''
+              },
+                i className: 'icon-copy-course'
 
-          button {
-            disabled: !showingButtons
-            className: 'ui-button'
-            onClick: @deleteSelectedItems
-            title: I18n.t('delete', 'Delete')
-            'aria-label': I18n.t('delete', 'Delete')
-            'data-tooltip': ''
-          },
-            i className: 'icon-trash'
+              button {
+                disabled: !showingButtons
+                className: 'ui-button btn-delete'
+                onClick: @deleteSelectedItems
+                title: I18n.t('delete', 'Delete')
+                'aria-label': I18n.t('delete', 'Delete')
+                'data-tooltip': ''
+              },
+                i className: 'icon-trash'
 
-          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
-            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+              span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
+                I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+            ]
 
+        if @props.userCanManageFilesForContext
+          div className: 'text-right',
+            span className: 'ui-buttonset',
+              button {
+                onClick: @addFolder
+                className:'btn btn-add-folder'
+                'aria-label': I18n.t('add_folder', 'Add Folder')
+              },
+                i(className:'icon-plus'),
+                span className: ('hidden-phone' if showingButtons),
+                  I18n.t('folder', 'Folder')
 
-        div className: 'text-right',
-          span className: 'ui-buttonset',
-            button {
-              onClick: @addFolder
-              className:'btn'
-              'aria-label': I18n.t('add_folder', 'Add Folder')
-            },
-              i(className:'icon-plus'),
-              span className: ('hidden-phone' if showingButtons),
-                I18n.t('folder', 'Folder')
-
-          span className: 'ui-buttonset',
-            UploadButton
-              currentFolder: @props.currentFolder
-              showingButtons: showingButtons
-
+            span className: 'ui-buttonset',
+              UploadButton
+                currentFolder: @props.currentFolder
+                showingButtons: showingButtons

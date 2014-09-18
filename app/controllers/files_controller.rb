@@ -343,7 +343,6 @@ class FilesController < ApplicationController
       }
     }
     js_env :FILES_CONTEXTS => files_contexts
-
     render :text => "".html_safe, :layout => true
   end
 

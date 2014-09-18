@@ -27,7 +27,7 @@ define [
     # extractStateFromModel expects a backbone model wtih the follow attributes
     # * hidden, lock_at, unlock_at
     #
-    # It takes those attributes and returns an object that can be used to set the 
+    # It takes those attributes and returns an object that can be used to set the
     # components internal state
     #
     # returns object
@@ -68,7 +68,7 @@ define [
 
     render: withReactDOM ->
       if @state.published && @state.restricted
-        button 
+        button
           'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
           onClick: @handleClick
           ref: "publishCloud"
@@ -77,7 +77,7 @@ define [
           'aria-label': I18n.t('label.restricted', 'Restricted. Click to unpublish.'),
             i className:'icon-calendar-day'
       else if @state.published && @state.hidden
-        button 
+        button
           'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
           onClick: @handleClick
           ref: "publishCloud"
@@ -86,7 +86,7 @@ define [
           'aria-label': I18n.t('label.hidden', 'Hidden. Click to unpublish.'),
             i className:'icon-paperclip'
       else if @state.published
-        button 
+        button
           'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
           onClick: @handleClick,
           ref: "publishCloud",
@@ -95,7 +95,7 @@ define [
           'aria-label': I18n.t('label.published', 'Published. Click to unpublish.'),
             i className:'icon-publish'
       else
-        button 
+        button
           'data-tooltip':'{"tooltipClass":"popover popover-padded", "position":"left"}'
           onClick: @handleClick
           ref: "publishCloud"

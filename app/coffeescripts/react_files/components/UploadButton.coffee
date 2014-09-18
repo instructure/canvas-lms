@@ -94,7 +94,7 @@ define [
             ref:'addFileInput'
             onChange: @handleFilesInputChange
             multiple: true
-        button className:'btn btn-primary', onClick: @handleAddFilesClick,
+        button className:'btn btn-primary btn-upload', onClick: @handleAddFilesClick,
           i className: 'icon-upload'
           span className: ('hidden-phone' if @props.showingButtons),
             I18n.t('upload', 'Upload')

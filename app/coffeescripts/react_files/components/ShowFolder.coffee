@@ -32,10 +32,6 @@ define [
       # Ensure that we clean up any dangling references when the component is destroyed.
       @props.currentFolder?.off(null, null, this)
 
-    componentWillUnmount: ->
-      @unregisterListeners()
-
-
     buildFolderPath: (splat) ->
       encodeURI('/' + (splat || ''))
 
@@ -64,6 +60,8 @@ define [
       @getCurrentFolder()
 
     componentWillUnmount: ->
+      @unregisterListeners()
+
       setTimeout =>
         @props.onResolvePath({currentFolder:undefined, rootTillCurrentFolder:undefined})
 
@@ -98,6 +96,7 @@ define [
               model: child
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 

@@ -35,7 +35,7 @@ define [
     selectables: -> @state.currentFolder.children(@props.query)
 
     render: withReactDOM ->
-
+      userCanManageFilesForContext = filesEnv.userHasPermission(@state.currentFolder, 'manage_files')
 
       if @state.currentFolder # when showing a folder
         contextType = @state.currentFolder.get('context_type').toLowerCase() + 's'
@@ -58,6 +58,7 @@ define [
           clearSelectedItems: @clearSelectedItems
           contextType: contextType
           contextId: contextId
+          userCanManageFilesForContext: userCanManageFilesForContext
         })
 
         div className: 'ef-main',
@@ -79,12 +80,14 @@ define [
             toggleItemSelected: @toggleItemSelected
             toggleAllSelected: @toggleAllSelected
             areAllItemsSelected: @areAllItemsSelected
+            userCanManageFilesForContext: userCanManageFilesForContext
         div className: 'ef-footer grid-row',
-          FilesUsage({
-            className: 'col-xs-3'
-            contextType: contextType
-            contextId: contextId
-          }),
+          if userCanManageFilesForContext
+            FilesUsage({
+              className: 'col-xs-3'
+              contextType: contextType
+              contextId: contextId
+            })
           unless filesEnv.showingAllContexts
             div className: 'col-xs',
               div {},
