@@ -5698,6 +5698,7 @@ zh:
       rte_help: "富文本区域。按 ALT F10 显示工具栏。按 ALT F8 显示帮助。"
   email: 
     default_from_name: "Instructure Canvas"
+  ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   enrollment: 
     default_course_name: 课程
     default_email: 无电子邮件
@@ -6065,6 +6066,7 @@ zh:
         truncated: 已省略
       phrase_to_look_for: 要查找的短语
       posts_added: 帖子已添加
+      remove_feed: "删除 %{display_name}"
   external_tools: 
     account_navigation_configured: 帐户导航已配置
     app_full_view: 
@@ -12565,8 +12567,32 @@ zh:
     edit_name: 编辑名称
     errors: 
       no_match: 
+        keywords: 尝试不同的关键字。
+        spelled: 确保所有字词拼写正确。
         suggestions: 建议：
+        three_chars: "在搜索框中输入至少 3 个字母。"
+        your_search: "您搜索的 - \"%{search_term}\" - 不匹配任何文件。"
+    folder: 文件夹
+    labels: 
+      select: 选择此项目
+    loading_more_results: 正在加载更多结果...
+    move: 移动
+    move_question: 
+      one: "您希望将这 %{count} 个项目移到何处？"
+      other: "您希望将这 %{count} 个项目移到何处？"
+    move_success: 
+      one: "%{count} 个项目已移到 %{destinationFolder}"
+      other: "%{count} 个项目已移到 %{destinationFolder}"
+    moving: 正在移动...
     name: 姓名
+    progress_error: 尝试准备下载时出错，请重试
+    progress_message: "正在准备下载：%{percent}% 已完成"
+    restrict_access: 限制访问
+    search: 搜索文件
+    settings: 设置
+    this_folder_is_empty: 此文件夹为空
+    title: 
+      limit_student_access: 限制学生访问
     usage_details: "%{quota_used} / %{quota}"
   recent_student: 
     last_logged_in: "上次登录时间 %{last_login}"
@@ -12621,6 +12647,10 @@ zh:
         name: 姓名
     welcome_to_canvas: "欢迎使用 Canvas！"
   reply_from_name: "%{name}，借助 Canvas 通知"
+  respondus_soap_endpoint: 
+    plugin_settings: 
+      labels: 
+        enabled: "已启用（还必须启用 QTI 转换器）"
   restrict_student_access: 
     aria_label: 
       availableFrom: 开始时间
@@ -12631,6 +12661,13 @@ zh:
     label: 
       availableFrom: 开始时间
       availableUntil: 截止时间
+    options_1: 
+      description: 当我链接到此文件夹中的文件时只允许学生查看或下载这些文件
+    options_2: 
+      description: 计划学生可用性
+    title: 
+      default_title: 对话框
+      limit_student_access: 限制学生访问
   retrieve_timeout: 无法检索配置，服务器响应超时
   role_override: 
     permission: 
@@ -13055,6 +13092,9 @@ zh:
       enrolled_as_teacher: 注册为教师
       favorited_tooltip: 单击可从课程菜单中删除。
       nonfavorited_tooltip: 单击可添加到课程菜单。
+      not_favoritable_tooltip: 此时该课程无法添加到课程菜单。
+      unpublished_course: 已取消发布
+      unpublished_course_tooltip: 此课程尚未发布。学生应联系课程导师进行访问。
     custom_search_results: 
       links: 
         search_for_resources: 搜索与此页面有关的开放资源
@@ -13298,6 +13338,12 @@ zh:
       ta_title: 邀请作为助教，单击以查看"课程"
       teacher: "%{course}（作为教师）。"
       teacher_title: 邀请作为教师，单击以查看"课程"
+    primary_header_navigation: 
+      menu: 
+        calendar: 日历
+        grades: 评分
+      navigation: 
+        main: 主导航
     profile: 
       add_link_field: 添加其它链接
       bio: 个人简介
@@ -13518,6 +13564,9 @@ zh:
       links: 
         feedback: 告诉我们您在找什么
       title: 无效的源
+    user_header_navigation: 
+      navigation: 
+        user_menu: 用户菜单
     user_lists: 
       copy_and_paste_notice_just_email: 复制并粘贴电子邮件地址列表以添加用户。
       copy_and_paste_notice_with_login_handle: "复制并粘贴用户列表。您可以使用其电子邮件地址或 %{login_handle_name}。"
@@ -13864,6 +13913,8 @@ zh:
     finished_redirecting: 已完成！正在重定向至文件...
     gathering_files: "正在收集文件 (%{progress})..."
     gathering_files_progress: "正在收集文件 (%{progress})..."
+    notices: 
+      submission_not_availible: 您请求的作业不再可用于您的课程章节。之前的提交项将不会计入您的评分。
     resubmitted_to_turnitin: "已成功重新提交到 Turnitin。"
     see_attached_files: 查看附件文件
     show: 
@@ -14054,6 +14105,24 @@ zh:
       times: "%{start_time} 至 %{end_time}"
     unknown_date: 未知日期
     with_ago: "%{time} 前"
+  time_zones: 
+    abu_dhabi: 阿布扎比
+    adelaide: 阿德莱德
+    alaska: 阿拉斯加
+    almaty: 阿拉木图
+    american_samoa: 美属萨摩亚
+    amsterdam: 阿姆斯特丹
+    arizona: 亚利桑那
+    astana: 阿斯塔纳
+    athens: 雅典
+    atlantic_time_canada: 大西洋时间（加拿大）
+    auckland: 奥克兰
+    azores: 亚速尔群岛
+    baghdad: 巴格达
+    baku: 巴库
+    bangkok: 曼谷
+    beijing: 北京
+    belgrade: 贝尔格莱德
   tinymce: 
     insert_update_image_view: 
       alt_help_text: 说明要改进辅助功能的图像
