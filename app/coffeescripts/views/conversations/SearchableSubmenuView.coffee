@@ -17,7 +17,6 @@ define [
         .keydown(@handleDownArrow)
       label = @getMenuRoot().text()
       $labelledField = $('<label>')
-        .append($('<span />').addClass('screenreader-only').text(I18n.t('search_category', 'Search %{category}', category: label)))
         .append(@$field)
       @$submenu = @$el.children('.dropdown-menu')
         .prepend($labelledField)
