@@ -39,6 +39,7 @@ describe IncomingMail::MessageHandler do
         :shard => shard,
         :context => context,
         :user => user,
+        :global_id => 1
     }
   }
 
@@ -56,7 +57,7 @@ describe IncomingMail::MessageHandler do
   let(:original_message) { stub("original message", original_message_attributes) }
 
   before do
-    IncomingMail::ReplyToAddress.any_instance.stubs(:secure_id).returns(secure_id)
+    Canvas::Security.stubs(:verify_hmac_sha1).returns(true)
   end
 
   describe "#route" do
@@ -88,7 +89,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silently fails on invalid secure id" do
-          IncomingMail::ReplyToAddress.any_instance.stubs(:secure_id).returns("deadbeef") # non-matching secure-id
+          Canvas::Security.stubs(:verify_hmac_sha1).returns(false)
 
           Mailer.expects(:create_message).never
           original_message.context.expects(:reply_from).never
