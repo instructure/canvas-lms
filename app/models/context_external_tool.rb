@@ -456,12 +456,9 @@ class ContextExternalTool < ActiveRecord::Base
     contexts.concat contexts_to_search(context)
     return nil if contexts.empty?
 
-    tools = contexts.each_with_object([]) do |context, tools|
-      scope = context.context_external_tools.active
-      scope = scope.having_setting(options[:type]) if options[:type]
-      tools.concat scope
-    end
-    Canvas::ICU.collate_by(tools, &:name)
+    scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+    scope = scope.having_setting(options[:type]) if options[:type]
+    scope.order(ContextExternalTool.best_unicode_collation_key('name'))
   end
 
   # Order of precedence: Basic LTI defines precedence as first

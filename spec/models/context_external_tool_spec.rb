@@ -382,7 +382,7 @@ describe ContextExternalTool do
       @tools << @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tools << @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tools << @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      ContextExternalTool.all_tools_for(@course).should eql(@tools.sort_by(&:name))
+      ContextExternalTool.all_tools_for(@course).to_a.should eql(@tools.sort_by(&:name))
     end
   end
 
