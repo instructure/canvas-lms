@@ -37,7 +37,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :require_lockdown_browser_for_results, :context, :notify_of_update,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
     :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :one_time_results, :only_visible_to_overrides
+    :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -378,7 +378,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     return true if self.grants_right?(user, :grade) &&
       (submission && submission.user && submission.user != user)
 
-    return false if !self.show_correct_answers
+    return false unless self.show_correct_answers
+
+    if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
+      return quiz_submission.attempts_left == 0
+    end
 
     # If we're showing the results only one time, and are letting students
     # see their correct answers, don't take the showAt/hideAt dates into

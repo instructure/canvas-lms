@@ -1082,7 +1082,7 @@ define([
     // Keep the pickers visible, but enable or disable them
     enableDatePickers: function(isEnabled) {
       correctAnswerVisibility.$options
-        .find('input, button')
+        .find('input.date_field, button.date_field')
         .prop('disabled', !isEnabled);
     }
   };
@@ -3874,8 +3874,17 @@ define([
         correctAnswerVisibility.disable();
         $('#quiz_one_time_results').prop('checked', false)
         $('#hide_results_only_after_last').prop('checked', false);
+        $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
         $('.show_quiz_results_options').hide();
       }
+
+      // Only allow students to see answers on last attempt if the quiz has more than one attempt
+      showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
+      $('#quiz_show_correct_answers_last_attempt_container').toggle(showCorrectAnswersLastAttempt);
+      if(!showCorrectAnswersLastAttempt) {
+        $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
+      }
+
     }).triggerHandler('change');
   });
 });

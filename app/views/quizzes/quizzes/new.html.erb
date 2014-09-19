@@ -295,6 +295,14 @@
 
                     <div id="quiz_show_correct_answers_options" class="options">
                       <div>
+
+                        <div id="quiz_show_correct_answers_last_attempt_container">
+                          <label class="checkbox" for="quiz_show_correct_answers_last_attempt">
+                            <%= check_box :quiz, :show_correct_answers_last_attempt %>
+                            <%= t(:show_correct_answers_last_attempt, "Only After Their Last Attempt") %>
+                          </label>
+                        </div>
+
                         <label for="quiz_show_correct_answers_at" class="inline">
                           <%= t(:show_correct_answers_at, 'Show Correct Answers at') %>
                         </label>

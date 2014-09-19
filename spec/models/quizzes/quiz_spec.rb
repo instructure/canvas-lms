@@ -1517,6 +1517,40 @@ describe Quizzes::Quiz do
       quiz.update_attributes({ one_time_results: true })
       expect(quiz.show_correct_answers?(@user, submission)).to be_truthy
     end
+
+    context "show_correct_answers_last_attempt is true" do
+      let(:user) { User.create! }
+
+      it "shows the correct answers on last attempt" do
+        quiz = @course.quizzes.create!({
+          title: 'test quiz',
+          show_correct_answers: true,
+          show_correct_answers_last_attempt: true,
+          allowed_attempts: 1
+        })
+
+        quiz.publish!
+
+        submission = quiz.generate_submission(user)
+
+        expect(quiz.show_correct_answers?(user, submission)).to be_truthy
+      end
+
+      it "hides the correct answers on last attempt" do
+        quiz = @course.quizzes.create!({
+          title: 'test quiz',
+          show_correct_answers: true,
+          show_correct_answers_last_attempt: true,
+          allowed_attempts: 2
+        })
+
+        quiz.publish!
+
+        submission = quiz.generate_submission(user)
+
+        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+      end
+    end
   end
 
   context "permissions" do
