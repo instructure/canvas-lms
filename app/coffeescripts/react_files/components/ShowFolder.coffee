@@ -76,7 +76,11 @@ define [
 
     render: withReactDOM ->
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div className:'ef-directory', role: 'grid',
+      div {
+        className:'ef-directory'
+        role: 'grid'
+        'aria-label': I18n.t('main_file_browser_pane', 'Main file browser pane')
+      },
         CurrentUploads({})
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')

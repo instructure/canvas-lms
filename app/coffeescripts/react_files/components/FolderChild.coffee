@@ -50,20 +50,21 @@ define [
         label className: 'screenreader-only', role: 'gridcell',
           input {
             type: 'checkbox'
+            className: 'multiselectable-toggler'
             checked: @props.isSelected
-            className: 'multiselectable-not-ignored'
-            onChange: @props.toggleSelected
-          },
+            onChange: ->
+          }
           I18n.t('labels.select', 'Select This Item')
 
         div className:'ef-name-col ellipsis', role: 'rowheader',
           if @state.editing
             form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),
               input({
-                type:'text',
-                ref:'newName',
-                className: 'input-block-level',
-                placeholder: I18n.t('name', 'Name'),
+                type:'text'
+                ref:'newName'
+                className: 'input-block-level'
+                placeholder: I18n.t('name', 'Name')
+                'aria-label': I18n.t('folder_name', 'Folder Name')
                 defaultValue: @props.model.displayName()
                 onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
               }),
@@ -105,10 +106,10 @@ define [
 
 
         div className:'ef-date-created-col', role: 'gridcell',
-          FriendlyDatetime datetime: @props.model.get('created_at'),
+          FriendlyDatetime datetime: @props.model.get('created_at')
 
-        div className:'ef-date-modified-col',
-          FriendlyDatetime datetime: @props.model.get('updated_at'),
+        div className:'ef-date-modified-col', role: 'gridcell',
+          FriendlyDatetime datetime: @props.model.get('updated_at')
 
         div className:'ef-modified-by-col ellipsis', role: 'gridcell',
           a href: @props.model.get('user')?.html_url, className: 'ef-plain-link',

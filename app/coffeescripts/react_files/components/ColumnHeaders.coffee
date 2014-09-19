@@ -71,7 +71,6 @@ define [
             className: "#{column.className} #{'current-filter' if isSortedCol}"
             role: 'columnheader'
             'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
-            'aria-live': 'polite'
           },
             ReactRouter.Link _.defaults({
               query: @queryParamsFor(column.property)
@@ -94,5 +93,4 @@ define [
                   span className: 'screenreader-only',
                     I18n.t('sorted_desending', "Sorted Descending")
 
-              span className: 'screenreader-only', I18n.t('click_to_sort_by_this_column', 'Click to sort by this column')
         div className:'ef-links-col', role: 'columnheader'

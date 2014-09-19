@@ -44,6 +44,11 @@ define [
 
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
+      downloadTitle = if @props.selectedItems.length is 1
+        I18n.t('download', 'Download')
+      else
+        I18n.t('download_as_zip', 'Downlod as Zip')
+
       header {
         className:'ef-header grid-row between-xs'
         role: 'region'
@@ -64,14 +69,13 @@ define [
             defaultValue: @props.query.search_term
 
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
-          span className: 'hidden-tablet hidden-phone', style: {paddingRight: 10},
-            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
 
           button {
             disabled: !showingButtons
             className: 'ui-button'
             onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
             title: I18n.t('view', 'View')
+            'aria-label': I18n.t('view', 'View')
             'data-tooltip': ''
           },
             i className: 'icon-search'
@@ -89,10 +93,8 @@ define [
             disabled: !showingButtons
             className: 'ui-button'
             onClick: @downloadSelecteAsZip
-            title:  if @props.selectedItems.length is 1
-                      I18n.t('download', 'Download')
-                    else
-                      I18n.t('download_as_zip', 'Downlod as Zip')
+            title: downloadTitle
+            'aria-label': downloadTitle
             'data-tooltip': ''
           },
             i className: 'icon-download'
@@ -100,10 +102,14 @@ define [
           button {
             disabled: !showingButtons
             className: 'ui-button'
-            onClick: openMoveDialog.bind null, @props.selectedItems,
-              contextType: @props.contextType
-              contextId: @props.contextId
+            onClick: (event) =>
+              openMoveDialog(@props.selectedItems, {
+                contextType: @props.contextType
+                contextId: @props.contextId
+                returnFocusTo: event.target
+              })
             title: I18n.t('move', 'Move')
+            'aria-label': I18n.t('move', 'Move')
             'data-tooltip': ''
           },
             i className: 'icon-copy-course'
@@ -113,9 +119,14 @@ define [
             className: 'ui-button'
             onClick: @deleteSelectedItems
             title: I18n.t('delete', 'Delete')
+            'aria-label': I18n.t('delete', 'Delete')
             'data-tooltip': ''
           },
             i className: 'icon-trash'
+
+          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
+            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+
 
         div className: 'text-right',
           span className: 'ui-buttonset',

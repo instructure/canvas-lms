@@ -52,7 +52,11 @@ define [
         @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true})
 
     render: withReactDOM ->
-      div className:'ef-directory', role: 'grid',
+      div {
+        className:'ef-directory'
+        role: 'grid'
+        'aria-label': I18n.t('search_results', 'Search results')
+      },
         ColumnHeaders {
           to: 'search'
           subject: @state.collection

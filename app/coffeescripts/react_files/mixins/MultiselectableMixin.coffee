@@ -19,7 +19,7 @@ define [
 
     # overwrite this in your component if you want to suppress the multi-select
     # behavior on different elements. Should be something you can pass to $.fn.is
-    multiselectIgnoredElements: ':input, a'
+    multiselectIgnoredElements: ':input:not(.multiselectable-toggler), a'
 
     handleCtrlPlusA: (e) ->
       return if e.target.nodeName.toLowerCase() in ['input', 'textarea']
@@ -49,7 +49,7 @@ define [
       @setState selectedItems: []
 
     toggleItemSelected: (item, event={}) ->
-      return if $(event.target).closest(@multiselectIgnoredElements).not('.multiselectable-not-ignored').length
+      return if $(event.target).closest(@multiselectIgnoredElements).length
       event.preventDefault()
 
       return @selectRange(item) if event.shiftKey

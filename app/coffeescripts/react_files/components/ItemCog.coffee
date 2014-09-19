@@ -48,10 +48,11 @@ define [
 
     render: withReactDOM ->
       wrap = (fn) =>
-        preventDefault =>
+        preventDefault (event)=>
           fn([@props.model], {
             contextType: @props.model.collection.parentFolder.get('context_type').toLowerCase() + 's'
             contextId: @props.model.collection.parentFolder.get('context_id')
+            returnFocusTo: event.target
           })
 
       span {},
