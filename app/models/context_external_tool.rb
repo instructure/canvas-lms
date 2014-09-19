@@ -64,7 +64,7 @@ class ContextExternalTool < ActiveRecord::Base
   def extension_setting(type, property = nil)
     type = type.to_sym
     return settings[type] unless property && settings[type]
-    settings[type][property] || settings[property] || extension_default_value(property)
+    settings[type][property] || settings[property] || extension_default_value(type, property)
   end
 
   def set_extension_setting(type, hash)
@@ -287,7 +287,7 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || 'in_context'
   end
 
-  def extension_default_value(property)
+  def extension_default_value(type, property)
     case property
       when :url
         url
@@ -295,6 +295,12 @@ class ContextExternalTool < ActiveRecord::Base
         800
       when :selection_height
         400
+      when :message_type
+        if type == :resource_selection
+          'resource_selection'
+        else
+          'basic-lti-launch-request'
+        end
       else
         nil
     end
@@ -448,7 +454,6 @@ class ContextExternalTool < ActiveRecord::Base
       return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
           (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
     end
-
     contexts = []
     if options[:user]
       contexts << options[:user]
@@ -458,6 +463,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
     scope = scope.having_setting(options[:type]) if options[:type]
+    scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
     scope.order(ContextExternalTool.best_unicode_collation_key('name'))
   end
 
@@ -525,6 +531,8 @@ class ContextExternalTool < ActiveRecord::Base
       scoped
     end
   }
+
+  scope :selectable, lambda { where("context_external_tools.not_selectable IS NOT TRUE") }
 
   def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)

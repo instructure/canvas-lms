@@ -1013,6 +1013,14 @@ CanvasRails::Application.routes.draw do
       et_routes("account")
     end
 
+    scope(controller: 'lti/lti_apps') do
+      def et_routes(context)
+        get "#{context}s/:#{context}_id/lti_apps/launch_definitions", action: :launch_definitions, path_name: "#{context}_launch_definitions"
+      end
+      et_routes("course")
+      et_routes("account")
+    end
+
     scope(:controller => :external_feeds) do
       def ef_routes(context)
         get "#{context}s/:#{context}_id/external_feeds", :action => :index, :path_name => "#{context}_external_feeds"

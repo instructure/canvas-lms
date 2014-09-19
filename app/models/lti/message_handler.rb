@@ -19,6 +19,7 @@
 module Lti
   class MessageHandler< ActiveRecord::Base
     attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource_handler, :links
+    attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
     has_many :links, :class_name => 'Lti::LtiLink'

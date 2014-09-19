@@ -384,6 +384,16 @@ describe ContextExternalTool do
       @tools << @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       ContextExternalTool.all_tools_for(@course).to_a.should eql(@tools.sort_by(&:name))
     end
+
+    it "returns all tools that are selectable" do
+      @tools = []
+      @tools << @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tools << @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', not_selectable: true)
+      @tools << @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tools << @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', not_selectable: true)
+      tools = ContextExternalTool.all_tools_for(@course, selectable: true)
+      tools.count.should == 2
+    end
   end
 
   describe "placements" do
@@ -623,7 +633,16 @@ describe ContextExternalTool do
         tool.save!
         tool.display_type(:course_navigation).should == 'other_display_type'
       end
+
     end
+  end
+
+  describe "#extension_default_value" do
+
+    it "returns resource_selection when the type is 'resource_slection'" do
+      subject.extension_default_value(:resource_selection, :message_type).should == 'resource_selection'
+    end
+
   end
 
   describe "change_domain" do

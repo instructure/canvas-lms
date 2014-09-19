@@ -20,6 +20,7 @@ module Lti
   class ResourceHandler < ActiveRecord::Base
 
     attr_accessible :resource_type_code, :placements, :name, :description, :icon_info, :tool_proxy
+    attr_readonly :created_at
 
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
     has_many :message_handlers, class_name: 'Lti::MessageHandler', :foreign_key => :resource_handler_id
