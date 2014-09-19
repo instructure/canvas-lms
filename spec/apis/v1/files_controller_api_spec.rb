@@ -292,6 +292,34 @@ describe "Files API", type: :request do
         }
       ]
     end
+
+    it "should include user even for user files" do
+      my_root_folder = Folder.root_folders(@user).first
+      my_file = Attachment.create! :filename => 'ztest.txt',
+                                   :display_name => "ztest.txt",
+                                   :position => 1,
+                                   :uploaded_data => StringIO.new('file'),
+                                   :folder => my_root_folder,
+                                   :context => @user,
+                                   :user => @user
+
+      json = api_call(:get, "/api/v1/folders/#{my_root_folder.id}/files?include[]=user", {
+        :controller => "files",
+        :action => "api_index",
+        :format => "json",
+        :id => my_root_folder.id.to_param,
+        :include => ['user']
+      })
+      json.map{|f|f['user']}.should eql [
+        {
+          "id" => @user.id,
+          "display_name" => @user.short_name,
+          "avatar_image_url" => User.avatar_fallback_url,
+          "html_url" => "http://www.example.com/about/#{@user.id}"
+        }
+      ]
+    end
+
   end
 
   describe "#index for courses" do

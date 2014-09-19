@@ -85,7 +85,9 @@ module Api::V1::Attachment
     locked_json(hash, attachment, user, 'file')
 
     if includes.include? 'user'
-      hash['user'] = user_display_json(attachment.user, attachment.context)
+      context = attachment.context
+      context = :profile if context == user
+      hash['user'] = user_display_json(attachment.user, context)
     end
     if includes.include? 'preview_url'
       hash['preview_url'] = attachment.crocodoc_url(user) ||
