@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require 'account_reports/report_helper'
 
-module Canvas::AccountReports
+module AccountReports
   class SisExporter
-    include Api
-    include Canvas::AccountReports::ReportHelper
+    include ReportHelper
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 
@@ -66,7 +65,7 @@ module Canvas::AccountReports
     end
 
     def users
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -124,7 +123,7 @@ module Canvas::AccountReports
     end
 
     def accounts
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -176,7 +175,7 @@ module Canvas::AccountReports
     end
 
     def terms
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -220,7 +219,7 @@ module Canvas::AccountReports
     end
 
     def courses
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -296,7 +295,7 @@ module Canvas::AccountReports
     end
 
     def sections
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -384,7 +383,7 @@ module Canvas::AccountReports
     end
 
     def enrollments
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -472,7 +471,7 @@ module Canvas::AccountReports
     end
 
     def groups
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -523,7 +522,7 @@ module Canvas::AccountReports
     end
 
     def group_membership
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
@@ -582,7 +581,7 @@ module Canvas::AccountReports
     end
 
     def xlist
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility

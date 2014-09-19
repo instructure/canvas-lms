@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require 'account_reports/report_helper'
 
-module Canvas::AccountReports
+module AccountReports
 
   class StudentReports
-    include Api
-    include Canvas::AccountReports::ReportHelper
+    include ReportHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -90,7 +89,7 @@ module Canvas::AccountReports
       start_and_end_times
       report_extra_text
 
-      file = Canvas::AccountReports.generate_file(@account_report)
+      file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
         condition = [""]
@@ -170,7 +169,7 @@ module Canvas::AccountReports
 
     def zero_activity
       report_extra_text
-      file = Canvas::AccountReports.generate_file(@account_report)
+      file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
         data = root_account.enrollments.active.
@@ -245,7 +244,7 @@ module Canvas::AccountReports
 
     def last_user_access
       report_extra_text
-      file = Canvas::AccountReports.generate_file(@account_report)
+      file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
         students = root_account.pseudonyms.active.

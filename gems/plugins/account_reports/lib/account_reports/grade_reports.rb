@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require 'account_reports/report_helper'
 
-module Canvas::AccountReports
+module AccountReports
 
   class GradeReports
-    include Api
-    include Canvas::AccountReports::ReportHelper
+    include ReportHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -100,7 +99,7 @@ module Canvas::AccountReports
       students = add_course_sub_account_scope(students, 'c')
       students = add_term_scope(students, 'c')
 
-      file = Canvas::AccountReports.generate_file(@account_report)
+      file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
         headers = []
 

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::AccountReports
+module AccountReports
   module Default
 
     def self.student_assignment_outcome_map_csv(account_report)

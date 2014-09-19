@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require 'account_reports/report_helper'
 
-module Canvas::AccountReports
+
+module AccountReports
 
   class OutcomeReports
-    include Api
-    include Canvas::AccountReports::ReportHelper
+    include ReportHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -147,7 +147,7 @@ module Canvas::AccountReports
       t_headers << I18n.t('#account_reports.report_header_assignment_url', 'assignment url')
 
         # Generate the CSV report
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         csv << t_headers
         Shackles.activate(:slave) do
@@ -271,7 +271,7 @@ module Canvas::AccountReports
       t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
 
       # Generate the CSV report
-      filename = Canvas::AccountReports.generate_file(@account_report)
+      filename = AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         csv << t_headers
         Shackles.activate(:slave) do

@@ -18,7 +18,8 @@
 
 require 'csv'
 
-module Canvas::AccountReports::ReportHelper
+module AccountReports::ReportHelper
+  include ::Api
 
   def parse_utc_string(datetime)
     if datetime.is_a? String
@@ -149,7 +150,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def check_report_key(key)
-    Canvas::AccountReports.available_reports[@account_report.report_type][:parameters].keys.include? key
+    AccountReports.available_reports[@account_report.report_type][:parameters].keys.include? key
   end
 
   def report_extra_text
@@ -180,7 +181,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def report_title(account_report )
-    Canvas::AccountReports.available_reports[account_report.report_type].title
+    AccountReports.available_reports[account_report.report_type].title
   end
 
   def send_report(file = nil, account_report = @account_report)
@@ -188,7 +189,7 @@ module Canvas::AccountReports::ReportHelper
     if account_report.has_parameter? "extra_text"
       options = account_report.parameters["extra_text"]
     end
-    Canvas::AccountReports.message_recipient(
+    AccountReports.message_recipient(
       account_report,
       I18n.t(
         'account_reports.default.message',
@@ -198,7 +199,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def write_report(headers)
-    file = Canvas::AccountReports.generate_file(@account_report)
+    file = AccountReports.generate_file(@account_report)
     CSV.open(file, "w") do |csv|
       csv << headers
       yield csv

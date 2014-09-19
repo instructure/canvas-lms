@@ -1,6 +1,6 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
     <table style="width: 500px;" class="formtable">
-      <% Canvas::AccountReports::REPORTS.map.sort_by { |(report, details)| [details[:module], report] }.each do |(report, details)| %>
+      <% AccountReports::REPORTS.map.sort_by { |(report, details)| [details[:module], report] }.each do |(report, details)| %>
         <tr>
           <td><%= f.blabel report, "#{details.title} (#{details[:module]})" %></td>
           <td><%= f.check_box report, :enabled => settings[report] %></td>

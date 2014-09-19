@@ -18,9 +18,9 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
-module Canvas::AccountReports
+module AccountReports
   class TestReport
-    include Canvas::AccountReports::ReportHelper
+    include ReportHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -31,16 +31,16 @@ end
 describe "report helper" do
   let(:account) { Account.default }
   let(:account_report) { AccountReport.new(:report_type => 'test_report', :account => account) }
-  let(:report) { Canvas::AccountReports::TestReport.new(account_report) }
+  let(:report) { AccountReports::TestReport.new(account_report) }
 
   describe "#send_report" do
     before do
-      Canvas::AccountReports.stubs(available_reports: {account_report.report_type => {title: 'test_report'}})
+      AccountReports.stubs(available_reports: {account_report.report_type => {title: 'test_report'}})
       report.stubs(:report_title).returns('TitleReport')
     end
 
     it "Should not break for nil parameters" do
-      Canvas::AccountReports.expects(:message_recipient)
+      AccountReports.expects(:message_recipient)
       report.send_report
     end
   end

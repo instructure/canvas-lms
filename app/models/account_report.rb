@@ -54,7 +54,7 @@ class AccountReport < ActiveRecord::Base
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
-        Canvas::AccountReports.generate_report(self)
+        AccountReports.generate_report(self)
       rescue
         self.workflow_state = :error
         self.save
@@ -72,7 +72,7 @@ class AccountReport < ActiveRecord::Base
 
   def self.available_reports
     # check if there is a reports plugin for this account
-    Canvas::AccountReports.available_reports
+    AccountReports.available_reports
   end
 
 end

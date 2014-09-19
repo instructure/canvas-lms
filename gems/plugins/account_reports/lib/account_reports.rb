@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'account_reports/engine'
 require 'zip'
-require 'action_controller_test_process'
 
-module Canvas::AccountReports
+module AccountReports
 
   REPORTS = {}
 
@@ -34,7 +34,8 @@ module Canvas::AccountReports
   def self.configure_account_report(module_name, reports)
     reports.each do |report_type, details|
       details[:module] ||= module_name
-      details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
+      module_name = "AccountReports::#{module_name}" unless module_name.include?("::")
+      details[:proc] ||= module_name.constantize.method(report_type)
       report = Report.new(details[:title], details[:description_partial], details[:parameters_partial], details[:parameters], details[:module], details[:proc])
       REPORTS[report_type] = report
     end

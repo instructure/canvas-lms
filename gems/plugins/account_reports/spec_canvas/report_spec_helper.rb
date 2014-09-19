@@ -34,7 +34,7 @@ module ReportSpecHelper
                                        :report_type => type)
     account_report.parameters = parameters
     account_report.save
-    Canvas::AccountReports.available_reports[type].proc.call(account_report)
+    AccountReports.available_reports[type].proc.call(account_report)
     account_report
   end
 
