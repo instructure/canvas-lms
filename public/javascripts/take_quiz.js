@@ -392,10 +392,15 @@ define([
     autoBlurActiveInput();
 
     if($("#preview_mode_link").length == 0) {
-      window.onbeforeunload = function() {
+
+      var unloadWarned = false;
+
+      window.onbeforeunload = function(e) {
         if (!quizSubmission.navigatingToRelogin) {
           quizSubmission.updateSubmission(false, true);
-          if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway) {
+          if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway && !unloadWarned) {
+            setTimeout(function() { unloadWarned = false; }, 0);
+            unloadWarned = true;
             return I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
           }
         }
