@@ -238,20 +238,15 @@ class SubmissionsController < ApplicationController
 
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first rescue nil
     if authorized_action(@submission, @current_user, :read)
-
-      if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
-        respond_to do |format|
-          flash[:error] = t 'notices.submission_not_availible', "The assignment you requested is no longer availible to your course section. Prior submissions will not count towards your grade."
-          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-        end
-        return
-      end
-
       respond_to do |format|
         json_handled = false
         if params[:preview]
           if params[:version] && !@assignment.quiz
             @submission = @submission.submission_history[params[:version].to_i]
+          end
+
+          if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
+            flash[:notice] = t 'notices.submission_doesnt_count', "This assignment will no longer count towards your grade."
           end
 
           @headers = false
