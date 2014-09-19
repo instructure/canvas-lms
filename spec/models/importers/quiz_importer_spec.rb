@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importers::QuizImporter" do
   before(:once) do
-    course_model.root_account.disable_feature!(:draft_state)
+    course_model
   end
 
   it "should get the quiz properties" do
@@ -85,40 +85,26 @@ describe "Importers::QuizImporter" do
     quiz.assignment.should be_nil
   end
 
-  it "should create an assignment if it is an assessment when enable_drafts is not on" do
+  it "should not build an assignment, instead set to unpublished" do
     context = get_import_context
-    question_data = import_example_questions context
-    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Importers::QuizImporter.import_from_migration(data, context, nil, question_data)
-    Importers::QuizImporter.import_from_migration(data, context, nil, question_data)
+    context.enable_feature!(:draft_state)
+
+    quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    data = {'assessments' => {'assessments' => [quiz_hash]}}
+    migration = context.content_migrations.create!
+    Importers::CourseContentImporter.import_content(context, data, nil, migration)
 
     Assignment.count.should == 0
     Quizzes::Quiz.count.should == 1
 
-    quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
+    quiz = Quizzes::Quiz.find_by_migration_id quiz_hash[:migration_id]
+    quiz.unpublished?.should == true
     quiz.assignment.should be_nil
-    quiz.quiz_type.should == 'assignment'
   end
 
-  it "should create an assignment if it is an assessment when enable_drafts is on" do
+  it "should not create an extra assignment if it already references one (but not set unpublished)" do
     context = get_import_context
-    context.root_account.enable_feature!(:draft_state)
-    question_data = import_example_questions context
-    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Importers::QuizImporter.import_from_migration(data, context, nil, question_data)
-    Importers::QuizImporter.import_from_migration(data, context, nil, question_data)
-
-    Assignment.count.should == 1
-    Quizzes::Quiz.count.should == 1
-
-    quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
-    quiz.assignment.should_not be_nil
-    quiz.quiz_type.should == 'assignment'
-  end
-
-  it "should not create an extra assignment if it already references one and enable_drafts is on" do
-    context = get_import_context
-    context.root_account.enable_feature!(:draft_state)
+    context.enable_feature!(:draft_state)
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     assignment_hash = get_import_data 'vista', 'assignment'
@@ -133,6 +119,7 @@ describe "Importers::QuizImporter" do
     Quizzes::Quiz.count.should == 1
 
     quiz = Quizzes::Quiz.find_by_migration_id quiz_hash[:migration_id]
+    quiz.available?.should == true
     quiz.assignment.should_not be_nil
     quiz.quiz_type.should == 'assignment'
   end

@@ -188,6 +188,7 @@ module Importers
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
             event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
+            event.saved_by = :migration
             event.save!
           end
 

@@ -188,8 +188,7 @@ module Api::V1::Assignment
                         when "discussion_topic" then assignment.discussion_topic
                         else assignment
                         end
-      module_ids = thing_in_module.context_module_tags.map &:context_module_id
-      hash['module_ids'] = module_ids
+      hash['module_ids'] = thing_in_module.context_module_tags.map(&:context_module_id) if thing_in_module
     end
 
     if assignment.context.feature_enabled?(:draft_state)

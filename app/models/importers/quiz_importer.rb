@@ -151,6 +151,7 @@ module Importers
       if item && !allow_update
         if item.deleted?
           item.workflow_state = hash[:available] ? 'available' : 'created'
+          item.saved_by = :migration
           item.save
         end
       end
@@ -197,7 +198,7 @@ module Importers
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)
       end
 
-      item.saved_by = :migration if item.new_record?
+      item.saved_by = :migration
       item.save!
 
       if migration
@@ -267,6 +268,8 @@ module Importers
           item.assignment_group_id = g.id
         end
       end
+
+      item.workflow_state = 'unpublished' if context.feature_enabled?(:draft_state) && !item.assignment
 
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
