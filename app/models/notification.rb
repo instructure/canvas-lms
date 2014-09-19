@@ -80,7 +80,7 @@ class Notification < ActiveRecord::Base
   end
 
   def self.find(id, options = {})
-    (@all_by_id ||= all.index_by(&:id))[id] or raise ActiveRecord::RecordNotFound
+    (@all_by_id ||= all.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 
   def self.by_name(name)
