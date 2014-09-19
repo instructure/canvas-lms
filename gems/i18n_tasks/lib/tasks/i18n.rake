@@ -180,7 +180,7 @@ namespace :i18n do
     MultiJson.dump_options = {:escape_mode => :xss_safe}
 
     # set up rails i18n paths ... normally rails env does this for us :-/
-    require 'action_controller' 
+    require 'action_controller'
     require 'active_record'
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
@@ -542,7 +542,11 @@ HEADER
 
   def transifex_languages(languages)
     if languages.present?
-      languages.split(/\s*,\s*/)
+      if languages.include?('>')
+        Hash[languages.split(',').map { |lang| lang.split('>') }]
+      else
+        languages.split(',')
+      end
     else
       %w(ar zh fr ja pt es ru)
     end
@@ -554,12 +558,18 @@ HEADER
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
     userpass = "#{user}:#{password}"
-    for lang in languages
+    languages.each do |lang|
+      if lang.is_a?(Array)
+        lang, transifex_lang = *lang
+      else
+        lang, transifex_lang = lang, lang.sub('-', '_')
+      end
+
       puts "Downloading tmp/#{lang}.yml"
-      json = `curl --user #{userpass} #{translation_url}/#{lang.sub('-', '_')}/`
+      json = `curl --user #{userpass} #{translation_url}/#{transifex_lang}/`
       parsed = YAML.load(JSON.parse(json)['content'])
       File.open("tmp/#{lang}.yml", "w") do |file|
-        file.write({ lang => parsed[lang.sub('-', '_')] }.to_yaml)
+        file.write({ lang => parsed[transifex_lang] }.to_yaml)
       end
     end
   end
@@ -580,7 +590,8 @@ HEADER
 
     transifex_download(args[:user], args[:password], languages)
 
-    for lang in languages
+    languages.each do |lang|
+      lang = lang.first if lang.is_a?(Array)
       translated_file = "tmp/#{lang}.yml"
       puts "Importing #{translated_file}"
       new_translations = YAML.safe_load(open(translated_file))
