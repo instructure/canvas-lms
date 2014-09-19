@@ -137,7 +137,7 @@
         <div id="not_right_side">
           <div id="content-wrapper">
             <%= render_crumbs %>
-            <%= render :partial => 'shared/content_notices' if @context && @context.respond_to?(:content_notices) %>
+            <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
             <div id="content" role="main" class="container-fluid">
               <%= yield %>
             </div>
