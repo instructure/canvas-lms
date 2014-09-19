@@ -2235,7 +2235,7 @@ zh:
     hidden_title: 已隐藏。单击可取消发布
     label: 
       hidden: 已隐藏。单击可取消发布。
-      published: 已隐藏。单击可取消发布。
+      published: 已发布。单击可取消发布。
       restricted: 已限制。单击可取消发布。
       unpublished: 已取消发布。单击可发布。
     publish_error: "尝试发布 %{name} 时发生错误。已恢复所做的更改！"
@@ -3099,9 +3099,9 @@ zh:
         quiz: 测验
       links: 
         download: "课程导出从 %{date}:*单击此处下载*"
-        download_file_export: "%{date} 的文件导出：*单击此处下载*"
+        download_file_export: "自 %{date} 的文件导出：*单击此处下载*"
         download_qti: "%{date} 导出的 QTI: *点此下载*"
-        download_user_export: "%{date} 的用户数据导出：*单击此处下载*"
+        download_user_export: "自 %{date} 的用户数据导出：*单击此处下载*"
       message: 
         export_started: 导出过程已开始。大型课程可能需要一段时间。*您可以离开页面*，在导出完成时您会收到电子邮件。
       no_submissions: 您当前没有可导出的提交项。
@@ -4920,8 +4920,8 @@ zh:
       new: 新建
       new_discussion_entries: 新建讨论条目
       new_discussions: 新建讨论
-      num_of_assignments: "# 作业"
-      num_of_submissions: "# 提交项"
+      num_of_assignments: 作业数
+      num_of_submissions: 提交项数
       page_title: 课程统计信息
       quiz: 测验
       quiz_questions: 测验题
@@ -12559,7 +12559,7 @@ zh:
   react_files: 
     cancel: 取消
     confirm_delete: "是否确定要删除 %{name}？"
-    confirm_delete_selected: "是否确定要删除这些 %{count} 项目？"
+    confirm_delete_selected: "是否确定要删除这 %{count} 个项目？"
     count_items_selected: "已选择 %{count} 个项目"
     delete: 删除
     deleted_items_successfully: "已成功删除 %{count} 个项目"
@@ -12585,7 +12585,7 @@ zh:
       other: "%{count} 个项目已移到 %{destinationFolder}"
     moving: 正在移动...
     name: 姓名
-    progress_error: 尝试准备下载时出错，请重试
+    progress_error: 尝试准备下载时出错，请重试。
     progress_message: "正在准备下载：%{percent}% 已完成"
     restrict_access: 限制访问
     search: 搜索文件
@@ -14123,6 +14123,133 @@ zh:
     bangkok: 曼谷
     beijing: 北京
     belgrade: 贝尔格莱德
+    berlin: 柏林
+    bern: 伯尔尼
+    bogota: 波哥大
+    brasilia: 巴西利亚
+    bratislava: 布拉迪斯拉发
+    brisbane: 布里斯班
+    brussels: 布鲁塞尔
+    bucharest: 布加勒斯特
+    budapest: 布达佩斯
+    buenos_aires: 布宜诺斯艾利斯
+    cairo: 开罗
+    canberra: 堪培拉
+    cape_verde_is: 佛得角
+    caracas: 加拉加斯
+    casablanca: 卡萨布兰卡
+    central_america: 中美洲
+    central_time_us_canada: 中部时间（美国和加拿大）
+    chennai: 钦奈
+    chihuahua: 奇瓦瓦州
+    chongqing: 重庆
+    copenhagen: 哥本哈根
+    darwin: 达尔文市
+    dhaka: 达卡
+    dublin: 都柏林
+    eastern_time_us_canada: "东部时间（美国和加拿大） "
+    edinburgh: 爱丁堡
+    ekaterinburg: 叶卡捷琳堡
+    fiji: 斐济
+    georgetown: 乔治敦
+    greenland: 格陵兰岛
+    guadalajara: 瓜达拉哈拉
+    guam: 关岛
+    hanoi: 河内
+    harare: 哈拉雷
+    hawaii: 夏威夷
+    helsinki: 赫尔辛基
+    hobart: 霍巴特
+    hong_kong: 香港
+    indiana_east: 印第安纳（东部）
+    international_date_line_west: 国际日期变更线西边
+    irkutsk: 伊尔库次克
+    islamabad: 伊斯兰堡
+    istanbul: 伊斯坦布尔
+    jakarta: 雅加达
+    jerusalem: 耶路撒冷
+    kabul: 喀布尔
+    kamchatka: 堪察加半岛
+    karachi: 卡拉奇
+    kathmandu: 加德满都
+    kolkata: 加尔各答
+    krasnoyarsk: 克拉斯诺亚尔斯克
+    kuala_lumpur: 吉隆坡
+    kuwait: 科威特市
+    kyiv: 基辅
+    la_paz: 拉巴斯
+    lima: 利马
+    lisbon: 里斯本
+    ljubljana: 卢布尔雅那
+    london: 伦敦
+    madrid: 马德里
+    magadan: 马加丹
+    marshall_is: 马绍尔群岛
+    mazatlan: 马萨特兰
+    melbourne: 墨尔本
+    mexico_city: 墨西哥城
+    mid_atlantic: 中大西洋
+    midway_island: 中途岛
+    minsk: 明斯克
+    monrovia: 蒙罗维亚
+    monterrey: 蒙特雷
+    moscow: 莫斯科
+    mountain_time_us_canada: 山地标准时间（美国和加拿大）
+    mumbai: 孟买
+    muscat: 马斯喀特
+    nairobi: 内罗毕
+    new_caledonia: 新喀里多尼亚
+    new_delhi: 新德里
+    newfoundland: 纽芬兰
+    novosibirsk: 诺沃西比尔斯克
+    nukualofa: 努库阿洛法
+    osaka: 大坂
+    pacific_time_us_canada: 太平洋时间（美国和加拿大）
+    paris: 巴黎
+    perth: 珀斯
+    port_moresby: 莫尔兹比港
+    prague: 布拉格
+    pretoria: 比勒陀利亚
+    quito: 基多
+    rangoon: 仰光
+    riga: 里加
+    riyadh: 利雅得
+    rome: 罗马
+    samoa: 萨摩亚群岛
+    santiago: 圣地亚哥
+    sapporo: 札幌
+    sarajevo: 萨拉热窝
+    saskatchewan: 萨斯喀彻温省
+    seoul: 首尔
+    singapore: 新加坡
+    skopje: 斯科普里
+    sofia: 索非亚
+    solomon_is: 所罗门群岛
+    sri_jayawardenepura: 斯里贾亚瓦德纳普拉
+    st_petersburg: 圣彼得堡
+    stockholm: 斯德哥尔摩
+    sydney: 悉尼
+    taipei: 台北
+    tallinn: 塔林
+    tashkent: 塔什干
+    tbilisi: 第比利斯
+    tehran: 德黑兰
+    tijuana: 提华纳
+    tokelau_is: 托克劳群岛
+    tokyo: 东京
+    ulaan_bataar: 乌兰巴托
+    urumqi: 乌鲁木齐
+    utc: UTC
+    vienna: 维也纳
+    vilnius: 维尔纽斯
+    vladivostok: 符拉迪沃斯托克
+    volgograd: 伏尔加格勒
+    warsaw: 华沙
+    wellington: 惠灵顿
+    west_central_africa: 中西非洲
+    yakutsk: 雅库茨克
+    yerevan: 埃里温
+    zagreb: 萨格勒布
   tinymce: 
     insert_update_image_view: 
       alt_help_text: 说明要改进辅助功能的图像
@@ -14194,6 +14321,10 @@ zh:
   unpublished_courses_title: 未发布的课程
   unsupported_package: 不受支持的内容包
   unused_courses_title: 未使用的课程
+  upload_button: 
+    upload: 上传
+  upload_progress_view: 
+    processing: 正在处理
   user: 
     default_user_name: 用户
     errors: 
@@ -14209,6 +14340,7 @@ zh:
   user_date_range_search: 
     cant_be_blank: "Canvas 用户 ID 不能为空"
     cant_come_before_from: “结束日期”不能早于“开始日期”
+    results_found: "找到 %{length} 结果"
   user_lists: 
     add_n_users: 
       one: "看起来不错，添加 %{count} 个用户"
