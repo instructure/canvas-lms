@@ -148,8 +148,8 @@ describe 'simply_versioned' do
     it 'returns the correct representation of a quiz submission' do
       submission = quiz_model.quiz_submissions.create
       submission.with_versioning(explicit: true, &:save!)
-      version = Version.find_by_versionable_id(submission.id)
-      version.versionable_type.should == 'Quizzes::QuizSubmission'
+      version = Version.where(:versionable_id => submission.id, :versionable_type => 'Quizzes::QuizSubmission').first
+      version.should_not be_nil
 
       Version.where(id: version).update_all(versionable_type: 'QuizSubmission')
       Version.find(version.id).versionable_type.should == 'Quizzes::QuizSubmission'
@@ -158,8 +158,7 @@ describe 'simply_versioned' do
     it 'returns the correct representation of a quiz' do
       quiz = quiz_model
       quiz.with_versioning(explicit: true, &:save!)
-      version = Version.find_by_versionable_id(quiz.id)
-      version.versionable_type.should == 'Quizzes::Quiz'
+      version = Version.where(:versionable_id => quiz.id, :versionable_type => 'Quizzes::Quiz').first
 
       version.versionable_type = 'Quiz'
       version.send(:save_without_callbacks)
