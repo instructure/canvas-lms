@@ -1808,40 +1808,11 @@ class User < ActiveRecord::Base
         visible_instances = visible_stream_item_instances(opts).
             includes(:stream_item => :context).
             limit(Setting.get('recent_stream_item_limit', 100))
-
-        is_course = opts[:context].try(:is_a?, Course)
-        visible_assignments, courses_with_da, courses_with_rights = [],[],[]
-        if is_course
-          course = opts[:context]
-          courses_with_da << course.id if course.feature_enabled?(:differentiated_assignments)
-          courses_with_rights << course.id if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
-        else
-          courses.each do |c|
-            courses_with_da << id if c.feature_enabled?(:differentiated_assignments)
-            courses_with_rights << id if c.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
-          end
-        end
-
-        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_for_user(id, courses_with_da) unless (courses_with_da.empty? || courses.length == courses_with_rights.length)
-
         visible_instances.map do |sii|
           si = sii.stream_item
           next unless si.present?
           next if si.asset_type == 'Submission'
-          si_context_is_course = si.context_type == "Course"
-          next if si_context_is_course && si.context.concluded?
-
-          is_da_course = si_context_is_course && courses_with_da.include?(si.context.id)
-          has_rights = courses_with_rights.include?(si.context.id)
-
-          if is_da_course && !has_rights
-            correct_id = si.data["context_id"] # assignment
-            if si.data["type"] == "DiscussionTopic"
-              correct_id = si.data["assignment_id"] || DiscussionTopic.find(si.asset_id).assignment_id
-            end
-            next if !visible_assignments.include? correct_id
-          end
-
+          next if si.context_type == "Course" && si.context.concluded?
           si.data.write_attribute(:unread, sii.unread?)
           si
         end.compact

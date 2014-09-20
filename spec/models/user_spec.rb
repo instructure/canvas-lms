@@ -19,21 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe User do
-  def setup_DA
-    @course = course(draft_state: true, active_all: true, differentiated_assignments: true)
-    @section_one = @course.course_sections.create!(name: 'Section One')
-    @section_two = @course.course_sections.create!(name: 'Section Two')
-
-    @student_one, @student_two = create_users(2, return_type: :record)
-    student_in_section(@section_one, user: @student_one)
-    student_in_section(@section_two, user: @student_two)
-
-    @assignment_one = assignment_model(course: @course)
-    @assignment_two = assignment_model(course: @course)
-
-    differentiated_assignment(assignment: @assignment_one, course_section: @section_one)
-    differentiated_assignment(assignment: @assignment_two, course_section: @section_two)
-  end
 
   context "validation" do
     it "should create a new instance given valid attributes" do
@@ -191,39 +176,6 @@ describe User do
       item.asset.should == sub
       @student.visible_stream_item_instances.map(&:stream_item).should include item
       @student.recent_stream_items.should_not include item
-    end
-
-    context "differentiated assignments" do
-      before :once do
-        Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
-        setup_DA
-      end
-
-      it "should hide stream items for assignments that are not visible to the student" do
-        StreamItem.delete_all
-        Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
-        @assignment_one.update_attribute(:due_at, 1.week.from_now)
-        @assignment_two.update_attribute(:due_at, 1.week.from_now)
-
-        stream = @student_one.recent_stream_items
-        stream.length.should == 1
-        stream.first.data.asset_context_id.should == @assignment_one.id
-        @student_one.recent_stream_items({context: @course}).length.should == 1
-        stream = @student_two.recent_stream_items
-        stream.length.should == 1
-        stream.first.data.asset_context_id.should == @assignment_two.id
-        @student_two.recent_stream_items({context: @course}).length.should == 1
-      end
-
-      it "should hide stream items for discussions that are not visible to the student" do
-        StreamItem.delete_all
-        assignment_three = assignment_model(course: @course)
-        differentiated_assignment(assignment: assignment_three, course_section: @section_one)
-        topic = @course.discussion_topics.create!(:assignment => assignment_three)
-        stream = @student_one.recent_stream_items
-        stream.length.should == 1
-        stream.first.asset_id.should == topic.id
-      end
     end
   end
 
