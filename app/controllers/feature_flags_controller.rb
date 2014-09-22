@@ -63,13 +63,13 @@
 #           "type": "boolean"
 #         },
 #         "beta": {
-#           "description": "Whether the feature is a beta feature",
-#           "example": false,
+#           "description": "Whether the feature is a beta feature. If true, the feature may not be fully polished and may be subject to change in the future.",
+#           "example": true,
 #           "type": "boolean"
 #         },
 #         "development": {
-#           "description": "Whether the feature is in development",
-#           "example": true,
+#           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
+#           "example": false,
 #           "type": "boolean"
 #         },
 #         "release_notes_url": {

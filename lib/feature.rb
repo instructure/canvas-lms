@@ -51,6 +51,10 @@ class Feature
     @state == 'hidden'
   end
 
+  def self.production_environment?
+    Rails.env.production? && !(ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?)
+  end
+
   # Register one or more features.  Must be done during application initialization.
   # The feature_hash is as follows:
 =begin
@@ -63,7 +67,7 @@ class Feature
                           # will be inherited in "off" state by root accounts
     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
     beta: false,          # 'beta' tag shown in UI
-    development: false,   # 'development' tag shown in UI
+    development: false,   # whether the feature is restricted to development / test / beta instances
     release_notes_url: 'http://example.com/',
 
     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
@@ -83,9 +87,10 @@ class Feature
 
   def self.register(feature_hash)
     @features ||= {}
-    feature_hash.each do |k, v|
-      feature = k.to_s
-      @features[feature] = Feature.new({feature: feature}.merge(v))
+    feature_hash.each do |feature_name, attrs|
+      next if attrs[:development] && production_environment?
+      feature = feature_name.to_s
+      @features[feature] = Feature.new({feature: feature}.merge(attrs))
     end
   end
 
@@ -116,8 +121,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true,
-      beta: true,
-      development: true
+      beta: true
     },
     'html5_first_videos' =>
     {
@@ -128,8 +132,7 @@ then fall back to Flash.
 END
       applies_to: 'RootAccount',
       state: 'allowed',
-      beta: true,
-      development: true
+      beta: true
     },
     'high_contrast' =>
     {
@@ -140,8 +143,7 @@ This might be useful for people with impaired vision or difficulty reading.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true,
-      development: true
+      beta: true
     },
     'outcome_gradebook' =>
     {
@@ -154,8 +156,7 @@ mastery/remedial.
 END
       applies_to: 'Course',
       state: 'allowed',
-      root_opt_in: false,
-      development: false
+      root_opt_in: false
     },
     'student_outcome_gradebook' =>
     {
@@ -168,22 +169,21 @@ mastery/remedial.
 END
       applies_to: 'Course',
       state: 'allowed',
-      root_opt_in: false,
-      development: false
+      root_opt_in: false
     },
-  'post_grades' =>
-      {
-          display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
-          description:  -> { I18n.t('post_grades_description', <<-END) },
+    'post_grades' =>
+    {
+      display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
+      description:  -> { I18n.t('post_grades_description', <<-END) },
 Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
 Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
- GradingAssignment, GradingAssignmentScore.
-          END
-          applies_to: 'Course',
-          state: 'hidden',
-          root_opt_in: true,
-          development: true
-      },
+GradingAssignment, GradingAssignmentScore.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'k12' =>
     {
       display_name: -> { I18n.t('features.k12', 'K-12 specific features') },
@@ -194,8 +194,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true,
-      beta: true,
-      development: true
+      beta: true
     },
     'quiz_moderate' =>
     {
@@ -205,7 +204,7 @@ When Draft State and Quiz Statistics is allowed/on, this enables the new quiz mo
 END
       applies_to: 'Course',
       state: 'hidden',
-      development: true
+      beta: true
     },
     'student_groups_next' =>
     {
@@ -217,7 +216,7 @@ END
       applies_to: 'RootAccount',
       state: 'allowed',
       root_opt_in: true,
-      development: true
+      beta: true
     },
     'better_file_browsing' =>
     {
@@ -230,7 +229,7 @@ END
 
       applies_to: 'Course',
       state: 'hidden',
-      development: true
+      beta: true
     },
     'modules_next' =>
     {
@@ -260,7 +259,7 @@ Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'User',
       state: 'hidden',
-      development: true
+      beta: true
     },
     'lor_for_account' =>
     {
@@ -270,8 +269,18 @@ Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'RootAccount',
       state: 'hidden',
-      development: true
+      beta: true
     },
+    'quiz_stats' =>
+    {
+      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
+      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
+Enable the new quiz statistics page for an account.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true
+    }
   )
 
   def self.definitions

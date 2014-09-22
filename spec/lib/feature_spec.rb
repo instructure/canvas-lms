@@ -150,3 +150,58 @@ describe Feature do
   end
 
 end
+
+describe "Feature.register" do
+  before do
+    # unregister the default features
+    Feature.instance_variable_set(:@features, nil)
+  end
+
+  let(:t_feature_hash) do
+    {
+      display_name: -> { "some feature or other" },
+      description: -> { "this does something" },
+      applies_to: 'RootAccount',
+      state: 'allowed'
+    }
+  end
+
+  let(:t_dev_feature_hash) do
+    t_feature_hash.merge(development: true)
+  end
+
+  it "should register a feature" do
+    Feature.register({some_feature: t_feature_hash})
+    Feature.definitions.should be_frozen
+    Feature.definitions['some_feature'].display_name.call.should eql('some feature or other')
+  end
+
+  describe "development" do
+    it "should register in a test environment" do
+      Feature.register({dev_feature: t_dev_feature_hash})
+      Feature.definitions['dev_feature'].should_not be_nil
+    end
+
+    it "should register in a dev environment" do
+      Rails.env.stubs(:test?).returns(false)
+      Rails.env.stubs(:development?).returns(true)
+      Feature.register({dev_feature: t_dev_feature_hash})
+      Feature.definitions['dev_feature'].should_not be_nil
+    end
+
+    it "should register in a production test cluster" do
+      Rails.env.stubs(:test?).returns(false)
+      Rails.env.stubs(:production?).returns(true)
+      ApplicationController.stubs(:test_cluster?).returns(true)
+      Feature.register({dev_feature: t_dev_feature_hash})
+      Feature.definitions['dev_feature'].should_not be_nil
+    end
+
+    it "should not register in production" do
+      Rails.env.stubs(:test?).returns(false)
+      Rails.env.stubs(:production?).returns(true)
+      Feature.register({dev_feature: t_dev_feature_hash})
+      Feature.definitions['dev_feature'].should be_nil
+    end
+  end
+end

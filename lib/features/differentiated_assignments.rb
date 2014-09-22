@@ -41,7 +41,7 @@ END
     applies_to: 'Course',
     state: 'hidden',
     root_opt_in: true,
-    development: true,
+    beta: true,
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'
         transitions['off']['message'] = I18n.t('features.differentiated_assignments_course_disable_warning', <<END)
