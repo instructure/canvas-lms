@@ -11,8 +11,6 @@ define [
       @$ariaMenuWrapper = @$trigger.parent()
       @opts = $.extend(true, {}, KyleMenu.defaults, options)
 
-      @$trigger.click => @$ariaMenuWrapper.attr 'role', 'application'
-
       unless @opts.noButton
         @$trigger.append('<i class="icon-mini-arrow-down"></i>') if @opts.buttonOpts.addDropArrow
         @$trigger.button(@opts.buttonOpts)
@@ -55,6 +53,7 @@ define [
         popupclose: @onClose
 
     onOpen: (event) =>
+      @$ariaMenuWrapper.attr 'role', 'application'
       @adjustCarat event
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
@@ -79,7 +78,7 @@ define [
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
 
     close: =>
-      @$menu.popup('close').removeClass('ui-state-open')
+      @$menu.hasClass('ui-state-open') && @$menu.popup('close').removeClass('ui-state-open')
 
     keepButtonActive: =>
       @$trigger.addClass('ui-state-active') if @$menu.is('.ui-state-open') && @$trigger.is('.btn, .ui-button')
