@@ -520,6 +520,46 @@ describe Quizzes::QuizzesController do
       assigns[:submissions_from_logged_out].should be_empty
       assigns[:submitted_students].should be_empty
     end
+
+    context "differentiated_assignments" do
+      it "only returns submissions and users when there is visibility" do
+        user_session(@teacher)
+
+        @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @course.enroll_student(@user1)
+        @course.enable_feature!(:differentiated_assignments)
+
+        questions = [{:question_data => { :name => "test 1" }}]
+
+        @assignment = @course.assignments.create(:title => "Test Assignment")
+        @assignment.workflow_state = "available"
+        @assignment.submission_types = "online_quiz"
+        @assignment.save
+        @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+        @quiz.anonymous_submissions = true
+        @quiz.quiz_type = "survey"
+
+        @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+        @quiz.generate_quiz_data
+        @quiz.only_visible_to_overrides = true
+        @quiz.save!
+
+        @quiz_submission = @quiz.generate_submission(@user1)
+        @quiz_submission.mark_completed
+
+        get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
+
+        assigns[:submissions_from_users][@quiz_submission.user_id].should == nil
+        assigns[:submitted_students].should == []
+
+        create_section_override_for_quiz(@quiz, {course_section: @user1.enrollments.first.course_section})
+
+        get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
+
+        assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
+        assigns[:submitted_students].should == [@user1]
+      end
+    end
   end
 
   describe "GET 'moderate'" do

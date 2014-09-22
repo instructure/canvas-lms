@@ -564,7 +564,12 @@ class Quizzes::QuizzesController < ApplicationController
   def managed_quiz_data
     extend Api::V1::User
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
-      students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
+      student_scope = @context.students_visible_to(@current_user)
+      if @quiz.differentiated_assignments_applies?
+        student_scope = student_scope.able_to_see_quiz_in_course_with_da(@quiz.id, @context.id)
+      end
+      students = student_scope.order_by_sortable_name.to_a.uniq
+
       @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.all
 
       @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id,s] }]

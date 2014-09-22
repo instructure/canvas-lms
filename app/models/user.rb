@@ -110,6 +110,7 @@ class User < ActiveRecord::Base
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
+  has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
@@ -208,6 +209,12 @@ class User < ActiveRecord::Base
   scope :able_to_see_assignment_in_course_with_da, lambda {|assignment_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :assignment_id => assignment_id, :course_id => course_id })
+  }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :able_to_see_quiz_in_course_with_da, lambda {|quiz_id, course_id|
+    joins(:quiz_student_visibilities).
+    where(:quiz_student_visibilities => { :quiz_id => quiz_id, :course_id => course_id })
   }
 
   def assignment_and_quiz_visibilities(opts = {})

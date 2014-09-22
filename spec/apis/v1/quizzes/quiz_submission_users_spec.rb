@@ -123,5 +123,25 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       json['quiz_submissions'].first.with_indifferent_access[:id].should == @quiz_submission.id.to_s
       json['quiz_submissions'].length.should == 1
     end
+
+    context "differentiated_assignments" do
+      it "only returns submissions of students with visibility" do
+        @quiz.only_visible_to_overrides = true
+        @quiz.save!
+        @course.enable_feature!(:differentiated_assignments)
+
+        json = get_submitted_users(submitted: false)
+        response.should be_success
+        user_ids = json['users'].map { |h| h['id'] }
+        user_ids.should_not include @student2.id.to_s
+
+        create_section_override_for_quiz(@quiz, {course_section: @student2.current_enrollments.first.course_section})
+
+        json = get_submitted_users(submitted: false)
+        response.should be_success
+        user_ids = json['users'].map { |h| h['id'] }
+        user_ids.should include @student2.id.to_s
+      end
+    end
   end
 end
