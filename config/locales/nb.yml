@@ -14018,6 +14018,43 @@ nb:
       times: "%{start_time} til %{end_time}"
     unknown_date: "Ukjent dato"
     with_ago: "%{time} siden"
+  time_zones: 
+    adelaide: Adelaide
+    alaska: Alaska
+    almaty: Almaty
+    american_samoa: "Amerikansk Samoa"
+    amsterdam: Amsterdam
+    arizona: Arizona
+    astana: Astana
+    athens: Aten
+    atlantic_time_canada: "Atlantiske Tid (Kanada)"
+    auckland: Auckland
+    azores: Azorene
+    baghdad: Baghdad
+    baku: Baku
+    bangkok: Bangkok
+    beijing: Beijing
+    belgrade: Beograd
+    berlin: Berlin
+    bern: Bern
+    bogota: Bogota
+    brasilia: Brasilia
+    bratislava: Bratislava
+    brisbane: Brisbane
+    brussels: Brussel
+    bucharest: Bucuresti
+    budapest: Budapest
+    buenos_aires: "Buenos Aires"
+    cairo: Kairo
+    canberra: Canberra
+    cape_verde_is: "Kapp Verde er."
+    caracas: Caracas
+    casablanca: Casablanca
+    central_america: "Sentral Amerika"
+    central_time_us_canada: "Sentral tid (US & Kanada)"
+    chennai: Chennai
+    chihuahua: Chihuahua
+    chongqing: Chongqing
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Beskriv bildet for å forbedre tilgjengeligheten"
