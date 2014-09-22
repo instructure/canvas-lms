@@ -45,7 +45,7 @@ define [
       @refs.form.getDOMNode().reset()
 
     componentDidUpdate: (prevState) ->
-      if @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0
+      if @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
         @queueUploads()
 
     render: withReactDOM ->

@@ -88,7 +88,6 @@ define [
       one = createFileOption('other.zip')
       one.file.type = 'application/zip'
       one.expandZip = true
-      debugger
       {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
       equal resolved.length, 1
       equal collisions.length, 0

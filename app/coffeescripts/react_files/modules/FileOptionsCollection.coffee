@@ -23,11 +23,13 @@ define [
         resolvedNames: []
         nameCollisions: []
         zipOptions: []
+        newOptions: false
       }
 
     queueUploads: (contextId, contextType) ->
       @state.resolvedNames.forEach (f) =>
         UploadQueue.enqueue(f, @folder, contextId, contextType)
+      @setState({newOptions: false})
 
     toFilesOptionArray: (fList) ->
       files = []
@@ -102,7 +104,10 @@ define [
     setOptionsFromFiles: (files) ->
       allOptions = @toFilesOptionArray(files)
       {resolved, collisions, zips} = @segregateOptionBuckets(allOptions)
-      @setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})
+      @setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips, newOptions: true})
+
+    hasNewOptions: ->
+      return @state.newOptions
 
     setFolder: (folder) ->
       @folder = folder
