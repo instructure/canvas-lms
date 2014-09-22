@@ -6140,6 +6140,7 @@ fr:
       all: Tous
       app_headder: "Applications externes"
       external_tools_note: "Les applications permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Elles peuvent être ajoutées à des cours individuels ou à tous les cours d’un compte. Une fois qu’elles sont configurées, vous pouvez créer un lien vers elles via les modules des cours et créer des activités pour les outils d‘évaluation."
+      external_tools_references: "*Découvrez quelques outils LTI* qui fonctionnent très bien avec Canvas. Vous pouvez également consulter les **sujets abordés au sein de la communauté Canvas au sujet des outils LTI**."
       installed: Installés
       not_installed: "Non installés"
       search_filter: "Filtrer par nom"
@@ -6218,6 +6219,7 @@ fr:
       ? "on"
       : Activer
       release_notes: "notes de publication"
+      toggle_feature_details_screenreader_info: "Activer/désactiver les détails de la fonctionnalité pour %{title}"
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
@@ -6251,6 +6253,7 @@ fr:
     back: Retour
     change: Changer
     change_name: "Changer le nom"
+    message: "Il existe déjà un élément appelé « %{name} » à cet emplacement. Voulez-vous remplacer le fichier existant ?"
     name: Nom
     prompt: "Remplacer \"%{name}\" par"
     rename_title: Copier
@@ -7432,6 +7435,9 @@ fr:
       create: "Créer %{model}"
       submit: "Enregistrer %{model}"
       update: "Actualiser %{model}"
+  high_contrast_description: |-
+      Si vous préférez une version de l’interface Canvas avec un contraste plus élevé, activez cette option.
+      Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
   html5_first_videos_description: "Par défaut, Canvas essaiera d’utiliser Flash en premier pour lire les vidéos. Activez cette option pour essayer d’utiliser HTML5 d’abord, avant de revenir à Flash."
   ic_actions: 
     manage: gérer
@@ -9791,6 +9797,10 @@ fr:
       no_students_found: "Aucun étudiant trouvé"
       student_progress: "Progrès des étudiants"
   modules_item_controller: 
+    max_score_complete: "le résultat ne dépassait pas une *note*"
+    max_score_incomplete: "ne doit pas dépasser une *note*"
+    min_score_complete: "le résultat était au moins égal à une *note*"
+    min_score_incomplete: "doit être au moins égal à une *note*"
     must_contribute_complete: "a participé au contenu de la page"
     must_contribute_incomplete: "doit participer au contenu de la page"
     must_submit_complete: "a envoyé le travail"
@@ -9822,6 +9832,10 @@ fr:
   new_facebook_message: "Vous avez un nouveau message de Canvas"
   new_quiz_moderate_desc: "Lorsque le mode Brouillon et les statistiques des questionnaires sont autorisés/activés, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
   new_quiz_statistics_desc: "Lorsque le mode Brouillon est autorisé/activé, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
+  new_styles_description: |-
+      Nous sommes en train de revoir l’interface utilisateur de Canvas. Activez cette option
+      pour afficher la nouvelle interface, offrant un aspect et un fonctionnement simplifiés.
+      Il s’agit d’une fonctionnalité en plein développement qui ne doit pas encore être activée dans un environnement de production.
   no_migration_file: "Fichier requis pour la migration de ce contenu."
   not_a_number: "doit être un nombre positif"
   notification: 
@@ -9991,6 +10005,15 @@ fr:
       updated_wiki_page: "Page Wiki mise à jour"
       web_conference_invitation: "Invitation à la conférence Web"
     no_subject: "Aucun sujet"
+    other_description: |-
+        *Instructeur et administrateur uniquement :*
+        
+        * Inscription aux cours
+        * Rapport généré
+        * Contenu exporté
+        * Rapport de migration
+        * Nouveau compte d’utilisateur
+        * Nouveau groupe d’étudiants
     other_display: "Notifications administratives"
     reminder_display: Rappel
     student_appointment_description: |-
@@ -10760,6 +10783,7 @@ fr:
         change_password: "Modifier le mot de passe"
         confirm_password: "Confirmer le mot de passe"
         default_email: "E-mail par défaut"
+        disable_inbox: "Désactive le symbole des messages non lus dans la boîte de réception des conversations et envoie tous les messages des conversations et toutes les notifications par e-mail, dans les plus brefs délais."
         expires_at: Expiration
         headers: 
           approved_integrations: "Intégrations approuvées"
@@ -12525,12 +12549,22 @@ fr:
         spelled: "Assurez-vous que tous les mots sont correctement orthographiés."
         suggestions: "Suggestions :"
         three_chars: "Fournissez au moins 3 lettres dans la case de recherche."
+        your_search: "Votre recherche, « %{search_term} », ne correspond à aucun fichier."
     folder: Dossier
     labels: 
       select: "Sélectionner cet élément"
+    loading_more_results: "Chargement de résultats supplémentaires..."
     move: Déplacer
+    move_question: 
+      one: "Où voulez-vous déplacer %{item} ?"
+      other: "Où voulez-vous déplacer ces %{count} éléments ?"
+    move_success: 
+      one: "%{item} déplacé vers %{destinationFolder}"
+      other: "%{count} éléments déplacés vers %{destinationFolder}"
     moving: Déplacement...
     name: Nom
+    progress_error: "Une erreur s’est produite lors de la préparation du téléchargement. Veuillez réessayer."
+    progress_message: "Préparation du téléchargement : %{percent}% effectués"
     restrict_access: "Limiter l’accès "
     search: "Rechercher des fichiers"
     settings: Paramètres
@@ -12601,6 +12635,10 @@ fr:
     label: 
       availableFrom: "Disponible depuis"
       availableUntil: Jusqu’au
+    options_1: 
+      description: "Autoriser les étudiants à voir ou télécharger les fichiers de ce dossier uniquement lorsqu’ils reçoivent un lien les y invitant"
+    options_2: 
+      description: "Planifier la disponibilité des étudiants"
     title: 
       limit_student_access: "Limiter l’accès des étudiants"
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
@@ -13027,7 +13065,9 @@ fr:
       enrolled_as_teacher: "Inscrit comme enseignant"
       favorited_tooltip: "Cliquez pour retirer cet élément du menu des cours."
       nonfavorited_tooltip: "Cliquez pour ajouter cet élément dans le menu des cours."
+      not_favoritable_tooltip: "Actuellement, ce cours ne peut pas être ajouté au menu des cours."
       unpublished_course: "non publié"
+      unpublished_course_tooltip: "Ce cours n’a pas été publié. Les étudiants doivent contacter l’instructeur concerné pour y accéder."
     custom_search_results: 
       links: 
         search_for_resources: "Chercher les ressources ouvertes associées à cette page"
@@ -13274,6 +13314,8 @@ fr:
       menu: 
         calendar: Calendrier
         grades: Notes
+      navigation: 
+        main: "Navigation principale"
     profile: 
       add_link_field: "Ajouter un lien"
       bio: Biographie
@@ -13494,6 +13536,9 @@ fr:
       links: 
         feedback: "Que cherchez-vous ?"
       title: "Flux non valide"
+    user_header_navigation: 
+      navigation: 
+        user_menu: "Menu utilisateur"
     user_lists: 
       copy_and_paste_notice_just_email: "Copier et coller une liste d’adresses de messagerie pour ajouter des utilisateurs."
       copy_and_paste_notice_with_login_handle: "Copier et coller une liste d’utilisateurs. Vous pouvez utiliser leur adresse de messagerie ou %{login_handle_name}."
@@ -13840,6 +13885,8 @@ fr:
     finished_redirecting: "Terminé. Redirection vers le fichier..."
     gathering_files: "Collecte des fichiers (%{progress})..."
     gathering_files_progress: "Collecte des fichiers (%{progress})..."
+    notices: 
+      submission_not_availible: "Le travail que vous avez demandé n’est plus disponible pour votre section de cours. Les envois précédents ne compteront pas dans votre note."
     resubmitted_to_turnitin: "Renvoi réussi à turnitin."
     see_attached_files: "Voir les fichiers joints"
     show: 
@@ -14029,38 +14076,85 @@ fr:
     unknown_date: "Date inconnue"
     with_ago: "il y a %{time}"
   time_zones: 
+    abu_dhabi: "Abou Dhabi"
+    adelaide: Adélaïde
     alaska: Alaska
+    almaty: Almaty
+    american_samoa: "Samoa américaines"
     amsterdam: Amsterdam
     arizona: Arizona
+    astana: Astana
+    athens: Athènes
+    atlantic_time_canada: "Heure de l’Atlantique (Canada)"
+    auckland: Auckland
+    azores: Açores
+    baghdad: Bagdad
+    baku: Bakou
     bangkok: Bangkok
+    beijing: Beijing
     belgrade: Belgrade
     berlin: Berlin
     bern: Berne
     bogota: Bogota
+    brasilia: Brasilia
     bratislava: Bratislava
     brisbane: Brisbane
     brussels: Bruxelles
+    bucharest: Bucarest
     budapest: Budapest
+    buenos_aires: "Buenos Aires"
+    cairo: "Le Caire"
+    canberra: Canberra
+    cape_verde_is: "Île du Cap-Vert"
+    caracas: Caracas
     casablanca: Casablanca
+    central_america: "Amérique centrale"
+    central_time_us_canada: "Heure du Centre (États-Unis et Canada)"
+    chennai: Chennai
+    chihuahua: Chihuahua
+    chongqing: Chongqing
+    copenhagen: Copenhague
+    darwin: Darwin
+    dhaka: Dhaka
     dublin: Dublin
+    eastern_time_us_canada: "Heure de l’Est (États-Unis et Canada)"
     edinburgh: Édimbourg
+    ekaterinburg: Ekaterinbourg
+    fiji: Fidji
+    georgetown: Georgetown
+    greenland: Greenland
+    guadalajara: Guadalajara
     guam: Guam
     hanoi: Hanoï
     harare: Harare
     hawaii: Hawaï
     helsinki: Helsinki
+    hobart: Hobart
     hong_kong: "Hong Kong"
+    indiana_east: "Indiana (Est)"
+    international_date_line_west: "Ligne de changement de date"
+    irkutsk: Irkoutsk
     islamabad: Islamabad
     istanbul: Istanbul
     jakarta: Jakarta
     jerusalem: Jérusalem
+    kabul: Kaboul
+    kamchatka: Kamtchatka
+    karachi: Karachi
+    kathmandu: Katmandou
+    kolkata: Kolkata
+    krasnoyarsk: Krasnoïarsk
     kuala_lumpur: "Kuala Lumpur"
     kuwait: Koweït
+    kyiv: Kiev
     la_paz: "La Paz"
     lima: Lima
     lisbon: Lisbonne
+    ljubljana: Ljubljana
     london: Londres
     madrid: Madrid
+    magadan: Magadan
+    marshall_is: "Îles Marshall"
     melbourne: Melbourne
     minsk: Minsk
     monterrey: Monterrey
