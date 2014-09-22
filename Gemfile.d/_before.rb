@@ -57,7 +57,7 @@ unless CANVAS_RAILS3
 
   Bundler::Dsl.class_eval do
     def to_definition(lockfile, unlock)
-      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      @sources << @rubygems_source if @sources.respond_to?(:include?) && !@sources.include?(@rubygems_source)
       Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
   end
