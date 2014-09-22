@@ -868,7 +868,6 @@ class Assignment < ActiveRecord::Base
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
       context.grants_right?(user, session, :participate_as_student) &&
-      student_has_group?(user) &&
       !locked_for?(user)
     }
     can :submit and can :attach_submission_comment_files
@@ -879,13 +878,6 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
-
-  def student_has_group?(student)
-    group_category_id ?
-      group_category.group_for(student) :
-      true
-  end
-  private :student_has_group?
 
   def filter_attributes_for_user(hash, user, session)
     if lock_info = self.locked_for?(user, :check_policies => true)
