@@ -4,7 +4,6 @@ if CANVAS_RAILS3
   gem 'rack', '1.4.5'
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'
-  gem 'encrypted_cookie_store-instructure', '1.1.6', :require => 'encrypted_cookie_store'
   gem 'routing_concerns', '0.1.0'
 else
   gem 'rails', '4.0.10'
@@ -14,6 +13,7 @@ else
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
 end
+gem 'encrypted_cookie_store-instructure', '1.1.7', :require => 'encrypted_cookie_store'
 gem 'active_model_serializers', '0.9.0alpha1',
   :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.3.0'
