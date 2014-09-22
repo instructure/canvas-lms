@@ -692,14 +692,6 @@ describe User do
     end
   end
 
-  context "permissions" do
-    it "should not allow account admin to modify admin privileges of other account admins" do
-      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, admin_role)).to be_truthy
-    end
-  end
-
   context "check_courses_right?" do
     before :once do
       course_with_teacher(:active_all => true)
@@ -2510,53 +2502,11 @@ describe User do
     end
   end
 
-  describe '#grants_right?' do
-    let_once(:subaccount) do
-      account = Account.create!
-      account.root_account_id = Account.default.id
-      account.save!
-      account
-    end
-
-    let_once(:site_admin) do
-      user = User.create!
-      Account.site_admin.account_users.create!(user: user)
-      Account.default.account_users.create!(user: user)
-      user
-    end
-
-    let_once(:local_admin) do
-      user = User.create!
-      Account.default.account_users.create!(user: user)
-      subaccount.account_users.create!(user: user)
-      user
-    end
-
-    let_once(:sub_admin) do
-      user = User.create!
-      subaccount.account_users.create!(user: user)
-      user
-    end
-
-
-    it 'allows site admins to manage their own logins' do
-      expect(site_admin.grants_right?(site_admin, :manage_logins)).to be_truthy
-    end
-
-    it 'allows local admins to manage their own logins' do
-      expect(local_admin.grants_right?(local_admin, :manage_logins)).to be_truthy
-    end
-
-    it 'allows site admins to manage local admins logins' do
-      expect(local_admin.grants_right?(site_admin, :manage_logins)).to be_truthy
-    end
-
-    it 'forbids local admins from managing site admins logins' do
-      expect(site_admin.grants_right?(local_admin, :manage_logins)).to be_falsey
-    end
-
-    it 'only considers root accounts when checking subset permissions' do
-      expect(sub_admin.grants_right?(local_admin, :manage_logins)).to be_truthy
+  describe 'permissions' do
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, admin_role)).to be_truthy
     end
 
     describe ":reset_mfa" do

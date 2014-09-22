@@ -558,36 +558,48 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    @root_account = @account.root_account
-    if authorized_action(@root_account, @current_user, :manage_user_logins)
-      @context = @root_account
-      @user = @root_account.all_users.where(id: params[:user_id]).first if params[:user_id].present?
-      if !@user
-        flash[:error] = t(:no_user_message, "No user found with that id")
-        redirect_to account_url(@account)
-      end
+    raise ActiveRecord::RecordNotFound unless @account.root_account?
+    @user = api_find(User, params[:user_id])
+
+    unless @account.user_account_associations.where(user_id: @user).exists?
+      flash[:error] = t(:no_user_message, "No user found with that id")
+      redirect_to account_url(@account)
+      return
     end
+
+    @context = @account
+    render_unauthorized_action unless @user.allows_user_to_remove_from_account?(@account, @current_user)
   end
 
+  # @API Delete a user from the root account
+  #
+  # Delete a user record from a Canvas root account. If a user is associated
+  # with multiple root accounts (in a multi-tenant instance of Canvas), this
+  # action will NOT remove them from the other accounts.
+  #
+  # WARNING: This API will allow a user to remove themselves from the account.
+  # If they do this, they won't be able to make API calls or log into Canvas at
+  # that account.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/3/users/5 \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  #       -X DELETE
+  #
+  # @returns User
   def remove_user
-    @root_account = @account.root_account
-    if authorized_action(@root_account, @current_user, :manage_user_logins)
-      @user = UserAccountAssociation.where(account_id: @root_account.id, user_id: params[:user_id]).first.user rescue nil
-      # if the user is in any account other then the
-      # current one, remove them from the current account
-      # instead of deleting them completely
-      if @user
-        if !(@user.associated_root_accounts.map(&:id).compact.uniq - [@root_account.id]).empty?
-          @user.remove_from_root_account(@root_account)
-        else
-          @user.destroy
-        end
-        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
-      end
+    raise ActiveRecord::RecordNotFound unless @account.root_account?
+    @user = api_find(User, params[:user_id])
+    raise ActiveRecord::RecordNotFound unless @account.user_account_associations.where(user_id: @user).exists?
+    if @user.allows_user_to_remove_from_account?(@account, @current_user)
+      @user.remove_from_root_account(@account)
+      flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       respond_to do |format|
         format.html { redirect_to account_users_url(@account) }
         format.json { render :json => @user || {} }
       end
+    else
+      render_unauthorized_action
     end
   end
 

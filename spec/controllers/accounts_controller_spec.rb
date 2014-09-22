@@ -55,8 +55,7 @@ describe AccountsController do
 
     it "should not confirm deletion of non-existent users" do
       get 'confirm_delete_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1)
-      expect(response).to redirect_to(account_url(@account))
-      expect(flash[:error]).to match /No user found with that id/
+      expect(response).to be_not_found
     end
 
     it "should confirm deletion of managed password users" do
@@ -70,63 +69,74 @@ describe AccountsController do
     before(:once) { account_with_admin }
     before(:each) { user_session(@admin) }
 
-    it "should delete canvas-authenticated users" do
+    it "should remove user from the account" do
       user_with_pseudonym :account => @account
-      expect(@user.workflow_state).to eq "pre_registered"
       post 'remove_user', :account_id => @account.id, :user_id => @user.id
       expect(flash[:notice]).to match /successfully deleted/
       expect(response).to redirect_to(account_users_url(@account))
-      @user.reload
-      expect(@user.workflow_state).to eq "deleted"
+      expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
 
-    it "should do nothing for non-existent users as html" do
+    it "should 404 for non-existent users as html" do
       post 'remove_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1)
       expect(flash[:notice]).to be_nil
-      expect(response).to redirect_to(account_users_url(@account))
+      expect(response).to be_not_found
     end
 
-    it "should do nothing for non-existent users as json" do
+    it "should 404 for non-existent users as json" do
       post 'remove_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1), :format => "json"
       expect(flash[:notice]).to be_nil
-      expect(json_parse(response.body)).to eq({})
+      expect(response).to be_not_found
     end
 
-    it "should only remove users from the current account if the user exists in multiple accounts" do
+    it "should only remove user from the account, but not delete them" do
+      user_with_pseudonym :account => @account
+      workflow_state_was = @user.workflow_state
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      expect(@user.reload.workflow_state).to eql workflow_state_was
+    end
+
+    it "should only remove users from the specified account" do
       @other_account = account_model
       account_with_admin_logged_in
       user_with_pseudonym :account => @account, :username => "nobody@example.com"
       pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
-      expect(@user.workflow_state).to eq "pre_registered"
-      expect(@user.associated_accounts.map(&:id).include?(@account.id)).to be_truthy
-      expect(@user.associated_accounts.map(&:id).include?(@other_account.id)).to be_truthy
       post 'remove_user', :account_id => @account.id, :user_id => @user.id
       expect(flash[:notice]).to match /successfully deleted/
       expect(response).to redirect_to(account_users_url(@account))
-      @user.reload
-      expect(@user.workflow_state).to eq "pre_registered"
-      expect(@user.associated_accounts.map(&:id).include?(@account.id)).to be_falsey
-      expect(@user.associated_accounts.map(&:id).include?(@other_account.id)).to be_truthy
+      expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
+      expect(@user.associated_accounts.map(&:id)).to include(@other_account.id)
     end
 
-    it "should delete users who have managed passwords with html" do
+    it "should delete the user's CCs when removed from their last account" do
+      user_with_pseudonym :account => @account
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      expect(@user.communication_channels.unretired).to be_empty
+    end
+
+    it "should not delete the user's CCs when other accounts remain" do
+      @other_account = account_model
+      account_with_admin_logged_in
+      user_with_pseudonym :account => @account, :username => "nobody@example.com"
+      pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      expect(@user.communication_channels.unretired).not_to be_empty
+    end
+
+    it "should remove users with managed passwords with html" do
       user_with_managed_pseudonym :account => @account
-      expect(@user.workflow_state).to eq "pre_registered"
       post 'remove_user', :account_id => @account.id, :user_id => @user.id
       expect(flash[:notice]).to match /successfully deleted/
       expect(response).to redirect_to(account_users_url(@account))
-      @user.reload
-      expect(@user.workflow_state).to eq "deleted"
+      expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
 
-    it "should delete users who have managed passwords with json" do
-      user_with_managed_pseudonym :account => @account
-      expect(@user.workflow_state).to eq "pre_registered"
+    it "should remove users with managed passwords with json" do
+      user_with_managed_pseudonym :account => @account, :name => "John Doe"
       post 'remove_user', :account_id => @account.id, :user_id => @user.id, :format => "json"
       expect(flash[:notice]).to match /successfully deleted/
-      @user = json_parse(@user.reload.to_json)
-      expect(json_parse(response.body)).to eq @user
-      expect(@user["user"]["workflow_state"]).to eq "deleted"
+      expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
+      expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
     end
   end
 

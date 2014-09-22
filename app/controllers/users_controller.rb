@@ -1461,31 +1461,13 @@ class UsersController < ApplicationController
 
   def delete
     @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      unless @user.grants_right?(@current_user, :delete)
-        flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-        redirect_to user_profile_url(@current_user)
-      end
-    end
+    render_unauthorized_action unless @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
   end
 
-  # @API Delete a user
-  #
-  # Delete a user record from Canvas.
-  #
-  # WARNING: This API will allow a user to delete themselves. If you do this,
-  # you won't be able to make API calls or log into Canvas.
-  #
-  # @example_request
-  #     curl https://<canvas>/api/v1/users/5 \
-  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
-  #       -X DELETE
-  #
-  # @returns User
   def destroy
     @user = api_find(User, params[:id])
-    if authorized_action(@user, @current_user, :delete)
-      @user.destroy
+    if @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
+      @user.remove_from_root_account(@domain_root_account)
       if @user == @current_user
         logout_current_user
       end
@@ -1501,6 +1483,8 @@ class UsersController < ApplicationController
           render :json => user_json(@user, @current_user, session)
         end
       end
+    else
+      render_unauthorized_action
     end
   end
 

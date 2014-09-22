@@ -139,24 +139,37 @@ describe UsersController do
     end
 
     it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
-      course_with_student_logged_in
+      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
+      user_session(@user)
+      course_with_student
       get 'delete', :user_id => @student.id
       expect(response).to be_success
     end
 
     it "should fail when the current user won't be able to delete managed pseudonyms" do
-      course_with_student_logged_in
-      managed_pseudonym @student
+      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
+      user_session(@admin)
+      course_with_student
+      managed_pseudonym @student, account: @course.account
       get 'delete', :user_id => @student.id
-      expect(flash[:error]).to match /cannot delete a system-generated user/
-      expect(response).to redirect_to(user_profile_url(@student))
+      assert_unauthorized
+    end
+
+    it "should not fail when the only managed pseudonyms are in another account" do
+      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
+      user_session(@user)
+      course_with_student
+      pseudonym @student, account: @course.account
+      managed_pseudonym @student, account: account_model
+      get 'delete', :user_id => @student.id
+      expect(response).to be_success
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
       account_admin_user
       user_session(@admin)
       course_with_student
-      managed_pseudonym @student
+      managed_pseudonym @student, account: @course.account
       get 'delete', :user_id => @student.id
       expect(flash[:error]).to be_nil
       expect(response).to be_success
@@ -179,24 +192,28 @@ describe UsersController do
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
       assert_status(401)
-      expect(@student.reload.workflow_state).not_to eq 'deleted'
+      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
     end
 
     it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
-      course_with_student_logged_in
+      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
+      user_session(@admin)
+      course_with_student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      expect(response).to redirect_to(root_url)
-      expect(@student.reload.workflow_state).to eq 'deleted'
+      expect(response).to redirect_to(users_url)
+      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
     end
 
     it "should fail when the current user won't be able to delete managed pseudonyms" do
-      course_with_student_logged_in
-      managed_pseudonym @student
+      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
+      user_session(@admin)
+      course_with_student
+      managed_pseudonym @student, account: @course.account
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      assert_status(401)
-      expect(@student.reload.workflow_state).not_to eq 'deleted'
+      assert_unauthorized
+      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
     end
 
     it "should fail when the user has a SIS ID and uses canvas authentication" do
@@ -205,18 +222,29 @@ describe UsersController do
       @student.pseudonym.update_attribute :sis_user_id, 'kzarn'
       post 'destroy', id: @student.id
       assert_status(401)
-      expect(@student.reload.workflow_state).not_to eq 'deleted'
+      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
       account_admin_user
       user_session(@admin)
       course_with_student
-      managed_pseudonym @student
+      managed_pseudonym @student, account: @course.account
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
       expect(response).to redirect_to(users_url)
-      expect(@student.reload.workflow_state).to eq 'deleted'
+      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
+    end
+
+    it "should succeed when the system-generated pseudonyms are on another account" do
+      account_admin_user_with_role_changes(role_changes: {managed_sis: false})
+      user_session(@admin)
+      course_with_student
+      managed_pseudonym @student, account: account_model
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      post 'destroy', :id => @student.id
+      expect(response).to redirect_to(users_url)
+      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
     end
 
     it "should clear the session and log the user out when the current user deletes himself, with managed pseudonyms and :manage_login permissions" do
@@ -226,15 +254,29 @@ describe UsersController do
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @admin.id
       expect(response).to redirect_to(root_url)
-      expect(@admin.reload.workflow_state).to eq 'deleted'
+      expect(@admin.associated_accounts.map(&:id)).to_not include(Account.default.id)
     end
 
     it "should clear the session and log the user out when the current user deletes himself, without managed pseudonyms and :manage_login permissions" do
-      course_with_student_logged_in
+      account_admin_user(user: @user)
+      pseudonym(@admin, account: Account.default)
+      user_session(@admin, @pseudonym)
       PseudonymSession.find(1).expects(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
+      post 'destroy', :id => @admin.id
       expect(response).to redirect_to(root_url)
-      expect(@student.reload.workflow_state).to eq 'deleted'
+      expect(@admin.associated_accounts(true).map(&:id)).to_not include(Account.default.id)
+    end
+
+    it "should not remove the user from their other root accounts, if any" do
+      other_account = account_model
+      account_admin_user
+      user_session(@admin)
+      course_with_student account: Account.default
+      course_with_student account: other_account, user: @student
+      post 'destroy', :id => @student.id
+      expect(response).to redirect_to(users_url)
+      expect(@student.associated_accounts.map(&:id)).to_not include(Account.default.id)
+      expect(@student.associated_accounts.map(&:id)).to include(other_account.id)
     end
   end
 

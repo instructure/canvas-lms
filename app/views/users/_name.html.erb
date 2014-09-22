@@ -60,7 +60,7 @@
             | 
             <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
           <% end %>
-          <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.grants_right?(@current_user, session, :manage_logins) %>
+          <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
             |
             <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
           <% end %>

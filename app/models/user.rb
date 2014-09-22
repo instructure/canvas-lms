@@ -810,33 +810,54 @@ class User < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
   def destroy
-    ActiveRecord::Base.transaction do
-      self.workflow_state = 'deleted'
-      self.deleted_at = Time.now.utc
-      self.save
-      self.pseudonyms.each{|p| p.destroy }
-      self.communication_channels.each{|cc| cc.destroy }
-      self.delete_enrollments
-    end
+    self.remove_from_root_account(:all)
+    self.workflow_state = 'deleted'
+    self.deleted_at = Time.now.utc
+    self.save
   end
 
   # avoid extraneous callbacks when enrolled in multiple sections
-  def delete_enrollments
-    courses_to_update = self.enrollments.active.select(:course_id).uniq.map(&:course_id)
+  def delete_enrollments(enrollment_scope=self.enrollments)
+    courses_to_update = enrollment_scope.active.uniq.pluck(:course_id)
     Enrollment.suspend_callbacks(:update_cached_due_dates) do
-      self.enrollments.each { |e| e.destroy }
+      enrollment_scope.each{ |e| e.destroy }
     end
     courses_to_update.each do |course|
       DueDateCacher.recompute_course(course)
     end
   end
 
-  def remove_from_root_account(account)
-    self.enrollments.where(root_account_id: account).each(&:destroy)
-    self.pseudonyms.active.where(account_id: account).each(&:destroy)
-    self.account_users.where(account_id: account).each(&:destroy)
-    self.save
-    self.update_account_associations
+  def remove_from_root_account(root_account)
+    ActiveRecord::Base.transaction do
+      if root_account == :all
+        # make sure to hit all shards
+        enrollment_scope = self.enrollments.shard(self)
+        pseudonym_scope = self.pseudonyms.active.shard(self)
+        account_user_scope = self.account_users.shard(self)
+        has_other_root_accounts = false
+      else
+        # make sure to do things on the root account's shard. but note,
+        # root_account.enrollments won't include the student view user's
+        # enrollments, so we need to fetch them off the user instead; the
+        # student view user won't be cross shard, so that will still be the
+        # right shard
+        enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
+        pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
+        account_user_scope = root_account.account_users.where(user_id: self)
+        has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
+      end
+
+      self.delete_enrollments(enrollment_scope)
+      pseudonym_scope.each(&:destroy)
+      account_user_scope.each(&:destroy)
+
+      # only delete the user's communication channels when the last account is
+      # removed (they don't belong to any particular account). they will always
+      # be on the user's shard
+      self.communication_channels.each(&:destroy) unless has_other_root_accounts
+
+      self.update_account_associations
+    end
   end
 
   def associate_with_shard(shard, strength = :strong)
@@ -1005,15 +1026,7 @@ class User < ActiveRecord::Base
          self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename
-
-    given do |user|
-      user && (
-        self.grants_right?(user, :manage_logins) ||
-          (self.grants_right?(user, :manage) && self.pseudonyms.none? {|p| p.system_created?})
-      )
-    end
-    can :delete
+    can :manage_user_details and can :rename
 
     given{ |user| self.pseudonyms.with_each_shard.any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1046,6 +1059,12 @@ class User < ActiveRecord::Base
     account_users.all? do |account_user|
       account_user.is_subset_of?(user)
     end
+  end
+
+  def allows_user_to_remove_from_account?(account, other_user)
+    Pseudonym.new(account: account, user: self).grants_right?(other_user, :delete) &&
+    (Pseudonym.new(account: account, user: self).grants_right?(other_user, :manage_sis) ||
+     !account.pseudonyms.active.where(user_id: self).where('sis_user_id IS NOT NULL').exists?)
   end
 
   def self.infer_id(obj)

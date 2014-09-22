@@ -522,7 +522,8 @@ CanvasRails::Application.routes.draw do
     get 'users/:user_id/delete' => 'accounts#confirm_delete_user', as: :confirm_delete_user
     delete 'users/:user_id' => 'accounts#remove_user', as: :delete_user
 
-    resources :users
+    # create/delete are handled by specific routes just above
+    resources :users, only: [:index, :new, :edit, :show, :update]
     resources :account_notifications, only: [:create, :destroy]
     concerns :announcements
     resources :assignments
@@ -1035,7 +1036,6 @@ CanvasRails::Application.routes.draw do
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
-      delete 'accounts/:account_id/users/:id', action: :destroy
 
       put 'users/:id', action: :update
       post 'users/:user_id/files', action: :create_file
@@ -1084,6 +1084,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
+      delete 'accounts/:account_id/users/:user_id', action: :remove_user
     end
 
     scope(controller: :sub_accounts) do

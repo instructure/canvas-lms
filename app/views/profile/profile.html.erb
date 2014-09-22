@@ -141,7 +141,7 @@
 
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
-      <% if @user.grants_right?(@current_user, :delete) %>
+      <% if @user == @current_user && @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user) %>
         <p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p>
       <% end %>
       <div class="form-actions">
