@@ -17,10 +17,6 @@ describe "dashboard" do
       })
     end
 
-    def click_recent_activity_header
-      f('.stream-announcement .stream_header').click
-    end
-
     def test_hiding(url)
       create_announcement
       items = @user.stream_item_instances
@@ -168,71 +164,6 @@ describe "dashboard" do
       ffj(".communication_message.message_group_#{@group.id}").size.should == 1
     end
 
-    it "should display assignment in to do list" do
-      due_date = Time.now.utc + 2.days
-      @assignment = assignment_model({:due_at => due_date, :course => @course})
-      get "/"
-      f('.events_list .event a').should include_text(@assignment.title)
-      # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
-      driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
-    end
-
-    it "should put locked graded discussions / quizzes in the coming up list only" do
-      def check_list_text(list_element, text, should_have_text = true)
-        if should_have_text
-          list_element.should include_text(text)
-        else
-          list_element.should_not include_text(text)
-        end
-      end
-
-      due_date = Time.now.utc + 2.days
-      names = ['locked discussion assignment', 'locked quiz']
-      @course.assignments.create(:name => names[0], :submission_types => 'discussion', :due_at => due_date, :lock_at => Time.now, :unlock_at => due_date)
-      q = @course.quizzes.create!(:title => names[1], :due_at => due_date, :lock_at => Time.now, :unlock_at => due_date)
-      q.workflow_state = 'available'
-      q.save
-      q.reload
-      get "/"
-
-      # No "To Do" list shown
-      f('.right-side-list.to-do-list').should be_nil
-      coming_up_list = f('.right-side-list.events')
-
-      2.times { |i| check_list_text(coming_up_list, names[i]) }
-    end
-
-    it "should limit the number of visible items in the to do list" do
-      due_date = Time.now.utc + 2.days
-      20.times do
-        assignment_model :due_at => due_date, :course => @course, :submission_types => 'online_text_entry'
-      end
-
-      get "/"
-
-      keep_trying_until { ffj(".to-do-list li:visible").size.should == 5 + 1 } # +1 is the see more link
-      f(".more_link").click
-      wait_for_ajaximations
-      ffj(".to-do-list li:visible").size.should == 20
-    end
-
-    it "should display assignments to do in to do list for a student" do
-      notification_model(:name => 'Assignment Due Date Changed')
-      notification_policy_model(:notification_id => @notification.id)
-      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      assignment.due_at = Time.now + 60
-      assignment.created_at = 1.month.ago
-      assignment.save!
-
-      get "/"
-
-      #verify assignment changed notice is in messages
-      f('.stream-assignment .stream_header').click
-      f('#assignment-details').should include_text('Assignment Due Date Changed')
-      #verify assignment is in to do list
-      f('.to-do-list > li').should include_text(assignment.submission_action_string)
-    end
-
     it "should display course name in course menu" do
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
       Enrollment.update_all(:created_at => 1.minute.ago)
@@ -292,9 +223,7 @@ describe "dashboard" do
       fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
       path = driver.execute_script %{ return window.location.pathname;}
       path.should == "/courses/#{@course.id}"
-
     end
-
 
     it "should display scheduled web conference in stream" do
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
@@ -311,39 +240,6 @@ describe "dashboard" do
 
       get "/courses/#{@course.to_param}"
       f('.conference .message').should include_text(@conference.title)
-    end
-
-    it "should display calendar events in the coming up list" do
-      calendar_event_model({
-                               :title => "super fun party",
-                               :description => 'celebrating stuff',
-                               :start_at => 5.minutes.from_now,
-                               :end_at => 10.minutes.from_now
-                           })
-      get "/"
-      f('.events_list .event a').should include_text(@event.title)
-    end
-
-    it "should display quiz submissions with essay questions as submitted in coming up list" do
-      quiz_with_graded_submission([:question_data => {:id => 31,
-                                                      :name => "Quiz Essay Question 1",
-                                                      :question_type => 'essay_question',
-                                                      :question_text => 'qq1',
-                                                      :points_possible => 10}],
-                                  {:user => @student, :course => @course}) do
-        {
-            "question_31" => "<p>abeawebawebae</p>",
-            "question_text" => "qq1"
-        }
-      end
-
-      @assignment.due_at = Time.now.utc + 1.week
-      @assignment.save!
-
-      get "/"
-      keep_trying_until { ffj(".events_list .event .tooltip_wrap").size.should > 0 }
-      driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
-      f('.events_list .event .tooltip_wrap').should include_text 'submitted'
     end
 
     it "should create an announcement for the first course that is not visible in the second course" do
@@ -398,76 +294,6 @@ describe "dashboard" do
 
       # submission page should load
       f('h2').text.should == "Submission Details"
-    end
-  end
-
-  context "as a teacher" do
-
-    before (:each) do
-      course_with_teacher_logged_in(:active_cc => true)
-    end
-
-    it "should validate the functionality of soft concluded courses on courses page" do
-      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
-      term.root_account_id = @course.root_account_id
-      term.save!
-      c1 = @course
-      c1.name = 'a_soft_concluded_course'
-      c1.update_attributes!(:enrollment_term => term)
-      c1.reload
-
-      get "/courses"
-      fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
-    end
-
-    it "should display assignment to grade in to do list for a teacher" do
-      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-      assignment.reload
-      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
-      assignment.reload
-      enable_cache do
-        get "/"
-
-        #verify assignment is in to do list
-        f('.to-do-list > li').should include_text('Grade ' + assignment.title)
-      end
-    end
-
-    it "should show submitted essay quizzes in the todo list" do
-      quiz_title = 'new quiz'
-      student_in_course(:active_all => true)
-      q = @course.quizzes.create!(:title => quiz_title)
-      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
-      q.generate_quiz_data
-      q.workflow_state = 'available'
-      q.save
-      q.reload
-      qs = q.generate_submission(@user)
-      qs.mark_completed
-      qs.submission_data = {"question_31" => "<p>abeawebawebae</p>", "question_text" => "qq1"}
-      Quizzes::SubmissionGrader.new(qs).grade_submission
-      get "/"
-
-      todo_list = f('.to-do-list')
-      todo_list.should_not be_nil
-      todo_list.should include_text(quiz_title)
-    end
-
-    context "course menu customization" do
-
-      it "should always have a link to the courses page (with customizations)" do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
-
-        get "/"
-
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('View All or Customize')
-      end
     end
   end
 end
