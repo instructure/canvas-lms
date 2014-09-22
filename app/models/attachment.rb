@@ -426,7 +426,7 @@ class Attachment < ActiveRecord::Base
     ns ||= self.context.account.file_namespace rescue nil
     if Rails.env.development? && Attachment.local_storage?
       ns ||= ""
-      ns = "_localstorage_/#{ns}"
+      ns = "_localstorage_/#{ns}" unless ns.start_with?('_localstorage_/')
     end
     ns = nil if ns && ns.empty?
     ns

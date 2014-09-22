@@ -1325,4 +1325,16 @@ describe Attachment do
     end
   end
 
+  describe "infer_namespace" do
+    it "should infer the correct namespace from the root attachment" do
+      local_storage!
+      Rails.env.stubs(:development?).returns(true)
+      course
+      a1 = attachment_model(context: @course, uploaded_data: default_uploaded_data)
+      a2 = attachment_model(context: @course, uploaded_data: default_uploaded_data)
+      a2.root_attachment.should eql(a1)
+      a2.namespace.should eql(a1.namespace)
+    end
+  end
+
 end
