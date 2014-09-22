@@ -2501,6 +2501,7 @@ describe Assignment do
 
     context "group assignments" do
       before :once do
+        course_with_teacher(active_all: true)
         gc = @course.group_categories.create! name: "Assignment Groups"
         @groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
         students = create_users_in_course(@course, 4, return_type: :record)
@@ -2550,6 +2551,11 @@ describe Assignment do
         s = @assignment.submission_for_student(g1rep)
         s.update_attribute :submission_type, 'online_upload'
         @assignment.representatives(@teacher).should include g1rep
+      end
+
+      it "includes users who aren't in a group" do
+        student_in_course active_all: true
+        @assignment.representatives(@teacher).last.should == @student
       end
     end
 
