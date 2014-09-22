@@ -1395,9 +1395,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
-      group_category.groups.includes(:group_memberships => :user).map { |g|
-        [g.name, g.users]
-      }.map { |group_name, group_students|
+      groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
@@ -1418,6 +1416,17 @@ class Assignment < ActiveRecord::Base
       visible_students_for_speed_grader(user)
     end
   end
+
+  def groups_and_ungrouped(user)
+    groups_and_users = group_category.
+      groups.includes(:group_memberships => :user).
+      map { |g| [g.name, g.users] }
+    users_in_group = groups_and_users.flat_map { |_,users| users }
+    groupless_users = visible_students_for_speed_grader(user) - users_in_group
+    phony_groups = groupless_users.map { |u| [u.name, [u]] }
+    groups_and_users + phony_groups
+  end
+  private :groups_and_ungrouped
 
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes
