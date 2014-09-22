@@ -210,26 +210,6 @@ describe SubmissionsController do
         response.should be_redirect
       end
     end
-
-    it "requires a group to submit to a group assignment" do
-      course_with_student_logged_in active_all: true
-      gc = GroupCategory.create! context: @course, name: "homework"
-      a = @course.assignments.create! group_category: gc,
-        submission_types: "online_text_entry"
-      submit = lambda {
-        post(:create, course_id: @course.id, assignment_id: a.id,
-             submission: {body: "hello"})
-      }
-
-      submit.call
-      assert_unauthorized
-
-      g = gc.groups.create! name: "group 1", context: @course
-      g.add_user(@student)
-      submit.call
-      response.should be_redirect
-      a.submissions.count == 1
-    end
   end
   
   describe "PUT update" do
