@@ -1,5 +1,5 @@
 group :test do
-  gem 'testbot', :github => 'smeredith0506/testbot'
+  gem 'testbot', :github => 'smeredith0506/testbot', :branch => 'master', :ref => '47fbf057ab40f8a6e24b1ae780c3f1a176621892'
   gem 'simplecov', '0.8.2', :require => false
     gem 'docile', '1.1.3'
   gem 'simplecov-rcov', '0.2.3', :require => false
