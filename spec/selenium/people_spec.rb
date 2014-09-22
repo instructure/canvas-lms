@@ -286,4 +286,49 @@ describe "people" do
       end
     end
   end
+
+  def add_a_section
+    section_name = 'section2'
+    get "/courses/#{@course.id}/settings#tab-sections"
+
+    section_input = f('#course_section_name')
+    keep_trying_until { section_input.should be_displayed }
+    replace_content(section_input, section_name)
+    submit_form('#add_section_form')
+    wait_for_ajaximations
+    ff('#sections > .section')[1].should include_text(section_name)
+  end
+
+  context "course with multiple sections", :priority => "2" do
+    before (:each) do
+      course_with_admin_logged_in
+      add_a_section
+    end
+
+    it "should save add people form data" do
+      get "/courses/#{@course.id}/users"
+
+      f('#addUsers').click
+      wait_for_ajaximations
+
+      f('#create-users-step-1').should be_displayed
+      replace_content(f('#user_list_textarea'), 'student@example.com')
+      click_option('#enrollment_type', 'TaEnrollment', :value)
+      click_option('#course_section_id', 'Unnamed Course', :text)
+      f('#limit_privileges_to_course_section').click
+      f('#next-step').click
+      wait_for_ajaximations
+
+      f('#create-users-step-2').should be_displayed
+      f('.btn.createUsersStartOver').click
+      wait_for_ajaximations
+
+      #verify form and options have not changed
+      f('#create-users-step-1').should be_displayed
+      f('#user_list_textarea').text.should == 'student@example.com'
+      first_selected_option(f('#enrollment_type')).text.should == 'TA'
+      first_selected_option(f('#course_section_id')).text.should == 'Unnamed Course'
+      is_checked('#limit_privileges_to_course_section') == true
+    end
+  end
 end

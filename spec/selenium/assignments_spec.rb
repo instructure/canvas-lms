@@ -37,7 +37,7 @@ describe "assignments" do
 
     def stub_freezer_plugin(frozen_atts = nil)
       frozen_atts ||= {
-        "assignment_group_id" => "true"
+          "assignment_group_id" => "true"
       }
       PluginSetting.stubs(:settings_for_plugin).returns(frozen_atts)
     end
@@ -280,9 +280,9 @@ describe "assignments" do
     it "should validate that a group category is selected" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-         :name => assignment_name,
-         :assignment_group => @course.assignment_groups.create!(:name => "default")
-      })
+                                                   :name => assignment_name,
+                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
+                                               })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#has_group_category').click
@@ -332,63 +332,82 @@ describe "assignments" do
     end
 
     it "should validate points for percentage grading (> 0)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Percentage')
       }
     end
 
     it "should validate points for percentage grading (!= '')" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Percentage')
         replace_content f('#assignment_points_possible'), ('')
       }
     end
 
     it "should validate points for percentage grading (digits only)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Percentage')
         replace_content f('#assignment_points_possible'), ('taco')
       }
     end
 
     it "should validate points for letter grading (> 0)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Letter Grade')
       }
     end
 
     it "should validate points for letter grading (!= '')" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Letter Grade')
         replace_content f('#assignment_points_possible'), ('')
       }
     end
 
     it "should validate points for letter grading (digits only)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'Letter Grade')
         replace_content f('#assignment_points_possible'), ('taco')
       }
     end
 
     it "should validate points for GPA scale grading (> 0)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'GPA Scale')
       }
     end
 
     it "should validate points for GPA scale grading (!= '')" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'GPA Scale')
         replace_content f('#assignment_points_possible'), ('')
       }
     end
 
     it "should validate points for GPA scale grading (digits only)" do
-      point_validation{
+      point_validation {
         click_option('#assignment_grading_type', 'GPA Scale')
         replace_content f('#assignment_points_possible'), ('taco')
       }
+    end
+
+    context "frozen assignment", :priority => "2" do
+      before do
+        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
+        default_group = @course.assignment_groups.create!(:name => "default")
+        @frozen_assign = frozen_assignment(default_group)
+      end
+
+      it "should allow editing the due date even if completely frozen" do
+        old_due_at = @frozen_assign.due_at
+        run_assignment_edit(@frozen_assign) do
+          replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
+        end
+
+        f('.assignment_dates').text.should match /Sep 20, 2012/
+        #some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
+        @frozen_assign.reload.due_at.to_i.should_not == old_due_at.to_i
+      end
     end
 
     context "frozen assignment_group_id" do
@@ -396,6 +415,31 @@ describe "assignments" do
         stub_freezer_plugin
         default_group = @course.assignment_groups.create!(:name => "default")
         @frozen_assign = frozen_assignment(default_group)
+      end
+
+      it "should not allow assignment group to be deleted by teacher if assignment group id frozen", :priority => "2" do
+        get "/courses/#{@course.id}/assignments"
+        fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link").should be_nil
+        fj("#assignment_#{@frozen_assign.id} .delete_assignment_link").should be_nil
+      end
+
+      it "should not be locked for admin", :priority => "2" do
+        @course.assignment_groups.create!(:name => "other")
+        course_with_admin_logged_in(:course => @course, :name => "admin user")
+        orig_title = @frozen_assign.title
+
+        run_assignment_edit(@frozen_assign) do
+          # title isn't locked, should allow editing
+          f('#assignment_name').send_keys(' edit')
+
+          f('#assignment_group_id').attribute('disabled').should be_nil
+          f('#assignment_peer_reviews').attribute('disabled').should be_nil
+          f('#assignment_description').attribute('disabled').should be_nil
+          click_option('#assignment_group_id', "other")
+        end
+
+        f('h2.title').should include_text(orig_title + ' edit')
+        @frozen_assign.reload.assignment_group.name.should == "other"
       end
 
       it "should not allow assignment group to be deleted by teacher if assignment group id frozen" do
@@ -442,6 +486,66 @@ describe "assignments" do
         wait_for_ajaximations
 
         ff('.assignment_group .ig-header h2').map(&:text).should include("Second AG")
+      end    
+ 
+      it "should go to the new assignment page from 'Add Assignment'", :priority => "2" do
+        get "/courses/#{@course.id}/assignments"
+        expect_new_page_load { f('.new_assignment').click }
+        wait_for_ajaximations
+
+        f('#edit_assignment_form').should be_present
+      end
+
+      it "should allow quick-adding an assignment to a group", :priority => "2" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        a = ag.reload.assignments.first
+        a.name.should == "Do this"
+        a.points_possible.should == 13
+
+        f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
+      end
+
+      it "should allow quick-adding two assignments to a group (dealing with form re-render)", :priority => "2" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        keep_trying_until do
+          fj("#assignment_group_#{ag.id} .add_assignment").click
+          wait_for_ajaximations
+          fj("#ag_#{ag.id}_assignment_name").displayed?
+        end
+
+        get_value("#ag_#{ag.id}_assignment_name").should == ""
+        get_value("#ag_#{ag.id}_assignment_points").should == "0"
+
+        replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
+        replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        ag.reload.assignments.count.should == 2
       end
 
       #Per selenium guidelines, we should not test buttons navigating to a page
@@ -520,13 +624,25 @@ describe "assignments" do
         end
       end
 
-      context "frozen assignment_group_id" do
+      context "frozen assignment_group_id", :priority => "2" do
         before do
           stub_freezer_plugin
           default_group = @course.assignment_groups.create!(:name => "default")
           @frozen_assign = frozen_assignment(default_group)
         end
+        it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
+          get "/courses/#{@course.id}/assignments"
+          fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
+          wait_for_ajaximations
+          element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group").should be_false
+        end
 
+        it "should not allow deleting a frozen assignment from index page" do
+          get "/courses/#{@course.id}/assignments"
+          fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
+          wait_for_ajaximations
+          element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible").should be_false
+        end
       end
 
       context 'publishing' do
@@ -536,15 +652,24 @@ describe "assignments" do
           @assignment.unpublish
         end
 
+        it "should allow publishing from the index page", :priority => "2" do
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+          f("#assignment_#{@assignment.id} .publish-icon").click
+          wait_for_ajaximations
+          @assignment.reload.should be_published
+          keep_trying_until { f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label').should include_text("Published") }
+        end
+
         it "shows submission scores for students on index page" do
           @assignment.update_attributes(points_possible: 15)
           @assignment.publish
           course_with_student_logged_in(active_all: true, course: @course)
-          @assignment.grade_student(@student,grade: 14)
+          @assignment.grade_student(@student, grade: 14)
           get "/courses/#{@course.id}/assignments"
           wait_for_ajaximations
           f("#assignment_#{@assignment.id} .js-score .non-screenreader").
-            text.should match "14/15 pts"
+              text.should match "14/15 pts"
         end
 
         it "should allow publishing from the show page" do
@@ -585,7 +710,7 @@ describe "assignments" do
           end
 
           it "should not overwrite overrides if published twice from the index page" do
-            get("/courses/#{@course.id}/assignments",false)
+            get("/courses/#{@course.id}/assignments", false)
             wait_for_ajaximations
 
             f("#assignment_#{@assignment.id} .publish-icon").click

@@ -233,6 +233,89 @@ describe "context_modules" do
       validate_context_module_status_text(2, @completed_text)
     end
 
+    context "next and previous buttons", :priority => "2" do
+
+      def verify_next_and_previous_buttons_display
+        f('#sequence_footer a.prev').should be_displayed
+        f('#sequence_footer a.next').should be_displayed
+      end
+
+      def module_setup
+        course_with_teacher_logged_in(:active_all => true)
+        @module = @course.context_modules.create!(:name => "module")
+
+        #create module items
+        #add first and last module items to get previous and next displayed
+        @assignment1 = @course.assignments.create!(:title => 'first item in module')
+        @assignment2 = @course.assignments.create!(:title => 'assignment')
+        @assignment3 = @course.assignments.create!(:title => 'last item in module')
+        @quiz = @course.quizzes.create!(:title => 'quiz assignment')
+        @quiz.publish!
+        @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
+        @discussion = @course.discussion_topics.create!(:title => 'discussion')
+
+        #add items to module
+        @module.add_item :type => 'assignment', :id => @assignment1.id
+        @module.add_item :type => 'assignment', :id => @assignment2.id
+        @module.add_item :type => 'quiz', :id => @quiz.id
+        @module.add_item :type => 'wiki_page', :id => @wiki.id
+        @module.add_item :type => 'discussion_topic', :id => @discussion.id
+        @module.add_item :type => 'assignment', :id => @assignment3.id
+
+        #add external tool
+        @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @external_tool_tag = @module.add_item({
+                                                  :type => 'context_external_tool',
+                                                  :title => 'Example',
+                                                  :url => 'http://www.example.com',
+                                                  :new_tab => '0'
+                                              })
+        #add external url
+        @external_url_tag = @module.add_item({
+                                                 :type => 'external_url',
+                                                 :title => 'pls view',
+                                                 :url => 'http://example.com/lolcats'
+                                             })
+
+        #add another assignment at the end to create a bookend, provides next and previous for external url
+        @module.add_item :type => 'assignment', :id => @assignment3.id
+      end
+
+      before (:each) do
+        module_setup
+      end
+
+      it "should show previous and next buttons for quizzes" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for assignments" do
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for wiki pages" do
+        get "/courses/#{@course.id}/pages/#{@wiki.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for discussions" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for external tools" do
+        get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for external urls" do
+        get "/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
+        verify_next_and_previous_buttons_display
+      end
+    end
+
     describe "sequence footer" do
       it "should show the right nav when an item is in modules multiple times" do
         @assignment = @course.assignments.create!(:title => "some assignment")

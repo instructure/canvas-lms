@@ -1080,8 +1080,8 @@ describe "context_modules" do
                                             :title => 'pls view', :indent => 1)
       @external_url_tag.publish
       @module1.completion_requirements = {
-          @assignment_tag.id => { :type => 'must_submit' },
-          @external_url_tag.id => { :type => 'must_view' } }
+          @assignment_tag.id => {:type => 'must_submit'},
+          @external_url_tag.id => {:type => 'must_view'}}
       @module1.save!
 
       @christmas = Time.zone.local(Time.now.year + 1, 12, 25, 7, 0)
@@ -1244,9 +1244,9 @@ describe "context_modules" do
       wait_for_ajaximations
 
       type_to_tag = {
-        :assignment_menu => @assignment_tag,
-        :quiz_menu => @quiz_tag,
-        :wiki_page_menu => @wiki_page_tag
+          :assignment_menu => @assignment_tag,
+          :quiz_menu => @quiz_tag,
+          :wiki_page_menu => @wiki_page_tag
       }
       type_to_tag.each do |type, tag|
         gear = f("#context_module_item_#{tag.id} .al-trigger")
@@ -1343,6 +1343,34 @@ describe "context_modules" do
       gear.click
       link = f("#context_module_item_#{new_tag.id} li.ui-menu-item a.menu_tool_link")
       link.should_not be_displayed
+    end
+  end
+
+  context "new module items", :priority => "2" do
+
+    def verify_persistence(title)
+      refresh_page
+      f('#context_modules').should include_text(title)
+    end
+
+    before (:each) do
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/modules"
+    end
+
+    it "new discussion item should persist after refresh " do
+      add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
+      verify_persistence('New Discussion Title')
+    end
+
+    it "new quiz item should persist after refresh " do
+      add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', 'New Quiz Title')
+      verify_persistence('New Quiz Title')
+    end
+
+    it "new wiki page item should persist after refresh " do
+      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
+      verify_persistence('New Page Title')
     end
   end
 end
