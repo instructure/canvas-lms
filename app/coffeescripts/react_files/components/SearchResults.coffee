@@ -8,17 +8,18 @@ define [
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
+  '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, updateAPIQuerySortParams, getAllPages) ->
+], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
 
 
   SearchResults = React.createClass
     displayName: 'SearchResults'
 
     propTypes:
-      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
-      contextId: React.PropTypes.string.isRequired
+      contextType: customPropTypes.contextType
+      contextId: customPropTypes.contextId
 
     getInitialState: ->
       return {

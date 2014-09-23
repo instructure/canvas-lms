@@ -3,13 +3,15 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!broccoli_cloud'
-  'compiled/models/FilesystemObject'
+  '../modules/customPropTypes'
   'compiled/jquery.rails_flash_notifications'
-], ($, React, withReactDOM, I18n, FilesystemObject) ->
+], ($, React, withReactDOM, I18n, customPropTypes) ->
+
   PublishCloud = React.createClass
     displayName: 'PublishCloud'
+
     propTypes:
-      model: React.PropTypes.instanceOf(FilesystemObject)
+      model: customPropTypes.filesystemObject
 
     # == React Functions == #
     getInitialState: -> @extractStateFromModel( @props.model )

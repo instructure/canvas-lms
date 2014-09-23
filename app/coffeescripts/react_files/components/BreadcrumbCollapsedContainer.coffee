@@ -2,15 +2,16 @@ define [
   'jquery'
   'react'
   'react-router'
-  'compiled/react/shared/utils/withReactDOM',
-], ($, React, {Link}, withReactDOM) ->
+  'compiled/react/shared/utils/withReactDOM'
+  '../modules/customPropTypes'
+], ($, React, {Link}, withReactDOM, customPropTypes) ->
 
   BreadcrumbCollapsedContainer = React.createClass
     displayName: 'BreadcrumbCollapsedContainer'
 
 
     propTypes:
-      foldersToContain: React.PropTypes.array.isRequired
+      foldersToContain: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
 
     getInitialState: ->
       open: false

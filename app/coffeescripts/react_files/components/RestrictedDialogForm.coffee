@@ -3,10 +3,10 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!restrict_student_access'
-  'compiled/models/FilesystemObject'
+  '../modules/customPropTypes'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, withReactDOM, I18n, FilesystemObject) ->
+], ($, React, withReactDOM, I18n, customPropTypes) ->
 
   RestrictedDialogForm = React.createClass
 
@@ -14,8 +14,8 @@ define [
     displayName: 'RestrictedDialogForm'
 
     propTypes:
-      closeDialog: React.PropTypes.func.isRequired,
-      model: React.PropTypes.instanceOf(FilesystemObject)
+      closeDialog: React.PropTypes.func.isRequired
+      model: customPropTypes.filesystemObject
 
     getInitialState: ->
       calendarOption: @initialCalendarOption()

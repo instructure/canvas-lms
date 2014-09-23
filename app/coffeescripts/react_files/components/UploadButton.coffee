@@ -6,7 +6,8 @@ define [
   'underscore'
   './FileRenameForm'
   './DialogAdapter'
-], (I18n, React, withReactDOM, UploadQueue, _, FileRenameForm, DialogAdapter) ->
+  '../modules/customPropTypes'
+], (I18n, React, withReactDOM, UploadQueue, _, FileRenameForm, DialogAdapter, customPropTypes) ->
 
   UploadButton = React.createClass
     displayName: 'UploadButton'
@@ -19,7 +20,7 @@ define [
     ###
 
     propTypes:
-      currentFolder: React.PropTypes.object # not required as we don't have it on the first render
+      currentFolder: customPropTypes.folder # not required as we don't have it on the first render
 
     getInitialState: ->
       return {

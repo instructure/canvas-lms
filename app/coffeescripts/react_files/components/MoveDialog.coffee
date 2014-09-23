@@ -4,17 +4,16 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/models/Folder'
-  'compiled/models/FilesystemObject'
   'compiled/views/FileBrowserView'
-], (I18n, $, React, withReactDOM, preventDefault, Folder,FilesystemObject, FileBrowserView) ->
+  '../modules/customPropTypes'
+], (I18n, $, React, withReactDOM, preventDefault, FileBrowserView, customPropTypes) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
 
     propTypes:
-      rootFoldersToShow: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Folder)).isRequired
-      thingsToMove: React.PropTypes.arrayOf(React.PropTypes.instanceOf(FilesystemObject)).isRequired
+      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
+      thingsToMove: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
       closeDialog: React.PropTypes.func.isRequired
 
     getInitialState: ->

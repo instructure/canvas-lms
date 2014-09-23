@@ -6,16 +6,16 @@ define [
   './UploadButton'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
-  'compiled/models/Folder'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, Folder) ->
+  '../modules/customPropTypes'
+], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
 
     propTypes:
-      currentFolder: React.PropTypes.instanceOf(Folder) # not required as we don't have it on the first render
-      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
-      contextId: React.PropTypes.string.isRequired
+      currentFolder: customPropTypes.folder # not required as we don't have it on the first render
+      contextType: customPropTypes.contextType.isRequired
+      contextId: customPropTypes.contextId.isRequired
 
     onSubmitSearch: (event) ->
       event.preventDefault()

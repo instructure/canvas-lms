@@ -6,13 +6,14 @@ define [
   'react-router'
   './BreadcrumbCollapsedContainer'
   'compiled/react/shared/utils/withReactDOM'
-], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM ) ->
+  '../modules/customPropTypes'
+], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM, customPropTypes) ->
 
   Breadcrumbs = React.createClass
     displayName: 'Breadcrumbs'
 
     propTypes:
-      rootTillCurrentFolder: React.PropTypes.array.isRequired
+      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
 
     getInitialState: ->
       {

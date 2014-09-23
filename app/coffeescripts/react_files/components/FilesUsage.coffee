@@ -4,14 +4,15 @@ define [
   'compiled/util/friendlyBytes'
   'compiled/react/shared/utils/withReactDOM'
   './ProgressBar'
-], (I18n, React, friendlyBytes, withReactDOM, ProgressBar) ->
+  '../modules/customPropTypes'
+], (I18n, React, friendlyBytes, withReactDOM, ProgressBar, customPropTypes) ->
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
 
     propTypes:
-      contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']).isRequired
-      contextId: React.PropTypes.string.isRequired
+      contextType: customPropTypes.contextType.isRequired
+      contextId: customPropTypes.contextId.isRequired
 
     update: ->
       $.get "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota", (data) =>

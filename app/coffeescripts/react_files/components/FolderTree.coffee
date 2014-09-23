@@ -2,14 +2,15 @@ define [
   'react'
   'react-router'
   'compiled/views/FileBrowserView'
-], (React, Router, FileBrowserView) ->
+  '../modules/customPropTypes'
+], (React, Router, FileBrowserView, customPropTypes) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
 
     propTypes:
-      rootFoldersToShow: React.PropTypes.array.isRequired
-      rootTillCurrentFolder: React.PropTypes.array
+      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
+      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
 
     componentDidMount: ->
       new FileBrowserView({

@@ -43,7 +43,7 @@ define [
       query: React.PropTypes.object.isRequired
       toggleAllSelected: React.PropTypes.func.isRequired
       areAllItemsSelected: React.PropTypes.func.isRequired
-      splat: React.PropTypes.string #optional
+      splat: React.PropTypes.string
 
     queryParamsFor: (property) ->
       order = if ((@props.query.sort || 'name') is property) and (@props.query.order is 'desc')

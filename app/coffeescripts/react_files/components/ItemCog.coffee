@@ -3,21 +3,21 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/models/FilesystemObject'
+  '../modules/customPropTypes'
   'compiled/models/Folder'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, FilesystemObject, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, $) ->
 
   ItemCog = React.createClass
     # === React Functions === #
     displayName: 'ItemCog'
 
     propTypes:
-      model: React.PropTypes.instanceOf(FilesystemObject)
+      model: customPropTypes.filesystemObject
 
     # === Custom Functions === #
 

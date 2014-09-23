@@ -7,7 +7,7 @@ define [
     displayName: 'ProgressBar'
 
     propTypes:
-      progress: React.PropTypes.number
+      progress: React.PropTypes.number.isRequired
 
     createWidthStyle: ->
       width: @props.progress + '%'
