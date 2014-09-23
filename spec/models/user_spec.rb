@@ -2350,6 +2350,31 @@ describe User do
         @teacher.assignments_needing_grading(:limit => 1).length.should == 1
       end
     end
+
+    context "differentiated assignments" do
+      before :once do
+        @a2 = @course1.assignments.create!(:title => "some assignment 2", :submission_types => ['online_text_entry'])
+        [@studentA, @studentB].each do |student|
+          @a2.submit_homework student, body: "submission for #{student.name}"
+        end
+
+        @section1a = @course1.course_sections.create!(name: 'Section One')
+        student_in_section(@section1a, user: @studentB)
+
+        assignments = @course1.assignments
+        differentiated_assignment(assignment: assignments[0], course_section: @section1b)
+        differentiated_assignment(assignment: assignments[1], course_section: @section1a)
+      end
+
+      it "should not include submissions from students without visibility" do
+        @course1.enable_feature!(:differentiated_assignments)
+        @teacher.assignments_needing_grading.length.should == 2
+      end
+
+      it "should show all submissions with the feature flag off" do
+        @teacher.assignments_needing_grading.length.should == 3
+      end
+    end
   end
 
   describe ".initial_enrollment_type_from_type" do

@@ -144,6 +144,11 @@ class Submission < ActiveRecord::Base
       AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
       SQL
 
+    # TODO: add this to the SQL above when DA is on for everybody
+    # and don't forget to run `rake db:generate_trigger_migration`
+    # and remove NeedsGradingCountQuery#manual_count
+    # AND EXISTS(SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
+
     { :default    => default_sql.gsub("{{now}}", "now()"),
       :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
       :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
