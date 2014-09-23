@@ -527,7 +527,7 @@ describe Submission do
           if s.id == submission.id
             s.turnitin_data[:last_processed_attempt].should > 0
           else
-            s.turnitin_data.should == nil
+            s.turnitin_data.should == {}
           end
         end
       end

@@ -300,9 +300,8 @@ class Assignment < ActiveRecord::Base
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
 
-    unless read_attribute(:turnitin_settings)
-      self.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
-    end
+    # make sure the defaults get serialized
+    self.turnitin_settings = turnitin_settings
 
     if res[:assignment_id]
       self.turnitin_settings[:created] = true
@@ -316,7 +315,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings
-    read_attribute(:turnitin_settings) || Turnitin::Client.default_assignment_turnitin_settings
+    super.empty? ? Turnitin::Client.default_assignment_turnitin_settings : super
   end
 
   def turnitin_settings=(settings)

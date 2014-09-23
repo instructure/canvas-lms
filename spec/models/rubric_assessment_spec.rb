@@ -47,7 +47,8 @@ describe RubricAssessment do
     @assessment.data.first[:comments].should == comment
     t = Class.new
     t.extend HtmlTextHelper
-    @assessment.data.first[:comments_html].should == t.format_message(comment).first
+    # data has been round-tripped through YAML, and syck doesn't preserve carriage returns
+    @assessment.data.first[:comments_html].should == t.format_message(comment).first.gsub("\r", '')
   end
 
   context "grading" do

@@ -1582,27 +1582,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
-ActiveRecord::AttributeMethods::Serialization::Attribute.class_eval do
-  def unserialize
-    self.state = :unserialized
-    if value.nil?
-      nil
-    else
-      self.value = coder.load(value)
-    end
-  end
-
-  def serialized_value
-    return nil if value.nil?
-    unserialize if state == :serialized
-    coder.dump(value)
-  end
-
-  def serialize
-    serialized_value
-  end
-end
-
 ActiveRecord::Associations::CollectionAssociation.class_eval do
   # CollectionAssociation implements uniq for :uniq option, in its
   # own special way. re-implement, but as a relation if it's not an

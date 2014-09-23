@@ -31,7 +31,7 @@ describe 'DataFixup::ResanitizeAssignmentsAllowedExtensions' do
 
     DataFixup::ResanitizeAssignmentsAllowedExtensions.run
 
-    a1.reload.allowed_extensions.should be_nil
+    a1.reload.allowed_extensions.should == []
     a2.reload.allowed_extensions.should == ['doc', 'xsl']
     a3.reload.allowed_extensions.should == ['doc', 'xsl']
   end

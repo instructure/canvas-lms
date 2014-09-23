@@ -2115,7 +2115,7 @@ describe AssignmentsApiController, type: :request do
       params = {"integration_data" => json}
 
       update_from_params(@assignment, params, @user)
-      @assignment.integration_data.should == nil
+      @assignment.integration_data.should == {}
     end
 
     it "updates integration_data with permission" do
