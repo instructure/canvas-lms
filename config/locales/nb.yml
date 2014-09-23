@@ -6838,6 +6838,7 @@ nb:
         current: Gjeldende
         student: Student
       page_title: "Historisk karakteroversikt"
+      regraded: "Karakter Endret"
       revert: "Gå tilbake til denne karakteren"
       submission_count: 
         one: "1 endring"
@@ -8593,10 +8594,13 @@ nb:
         audio_comment: "Denne meldingen inneholder mediekommentarer. For å lytte eller svare, klikk lenken nedenfor:"
         html: 
           attached_files: "Vedlagte filer:"
+          audio_comment: "Meldingen inneholder medie kommentarer. For å lytte eller svar, Klikk på linken nedenfor:"
           download: "last ned"
+          reply_to_conversation_message: "Du kan svare på denne meldingen i Canvas ved å svare direkte på denne e-posten."
           subject: "%{user_name} sendte deg nettopp en melding i Canvas:"
           unknown_user: "Ukjent bruker"
           view_message: "Vis denne beskjeden i samtaler"
+        reply_to_conversation_message: "Du kan svare på denne meldingen i Canvas ved å svare direkte på denne e-posten."
         subject: "%{user_name} sendte deg nettopp en beskjed i Canvas:"
         unknown_user: "Ukjent bruker"
         view_message: "Vis denne beskjeden i samtaler"
@@ -9223,6 +9227,7 @@ nb:
         discussion_entry_reply_message: "Bli med på samtalen ved å benytte lenken nedenfor, eller kommenter ved å svare på denne meldingen."
         html: 
           body: "%{user} postet en ny kommentar i tråden %{discussion_topic} i %{course}:"
+          discussion_entry_reply_message: "Delta i samtalen ved å benytte lenken under eller kommentar ved å svare på denne meldingen."
           link: "Klikk her for å bli med i samtalen"
           subject: "Ny kommentar i %{discussion_topic}: %{course}"
         subject: "Ny kommentar i %{discussion_topic}: %{course}"
@@ -12502,18 +12507,29 @@ nb:
     upload_warning: "Ikke endre navn på innleveringsfiler slik at vi kan gjenkjenne de."
   react_files: 
     cancel: Avbryt
+    confirm_delete: "Er du sikker på at du vil slette %{name}?"
+    confirm_delete_selected: "Er du sikker på at du vil slette disse %{count} elementer?"
+    count_items_selected: "%{count} elementer valgt"
     delete: Slette
+    deleted_items_successfully: "%{count} Elementer slettet uten problemer"
     download_zip: "Last ned Zip"
     edit_name: "Endre navn"
     errors: 
       no_match: 
+        keywords: "Prøv forskjellig søkeord."
+        spelled: "Sørge for at alle ordene er stavet riktig."
         suggestions: "Forslag:"
+        three_chars: "Angi minst 3 bokstaver i søkeboksen."
+        your_search: "Søket ditt - \"%{search_term}\" - stemte ikke med noen filer."
     folder: Mappe
     labels: 
       select: "Velg denne varen"
+    loading_more_results: "Laster inn flere resultater..."
     move: Flytt
     moving: Flytting...
     name: Navn
+    progress_error: "Har oppstått en feil forsøker å forberede nedlasting, vennligst prøve igjen."
+    progress_message: "Forbereder nedlasting: %{percent}% fullført"
     restrict_access: "Begrens tilgang"
     search: "Søk etter filer"
     settings: Innstillinger
@@ -12588,6 +12604,10 @@ nb:
     label: 
       availableFrom: "Tilgjengelig fra"
       availableUntil: Til
+    options_1: 
+      description: "Tillate elevene kun å vise eller laste ned filer i denne mappen når jeg lenker til dem"
+    options_2: 
+      description: "Planlegg student tilgjengelighet"
     title: 
       default_title: Dialogen
       limit_student_access: "Begrens student tilgang"
@@ -13015,7 +13035,9 @@ nb:
       enrolled_as_teacher: "Påmeldt som faglærer"
       favorited_tooltip: "Klikk for å fjerne fra kurs menyen."
       nonfavorited_tooltip: "Klikk for å legge til kurs menyen."
+      not_favoritable_tooltip: "Kurset kan ikke legge til kurs-menyen for et øyeblikks"
       unpublished_course: upublisert
+      unpublished_course_tooltip: "Kurset har ikke blitt publisert. Studenter bør ta kontakt med faglærer for tilgang."
     custom_search_results: 
       links: 
         search_for_resources: "Søk etter åpne ressurser som er relatert til denne siden"
@@ -13261,6 +13283,8 @@ nb:
       menu: 
         calendar: Kalender
         grades: Karakterer
+      navigation: 
+        main: Hovednavigasjon
     profile: 
       add_link_field: "Legg til nok en lenke"
       bio: Biografi
@@ -13830,6 +13854,8 @@ nb:
     finished_redirecting: "Ferdig! Omdirigerer til filen..."
     gathering_files: "Samler filer (%{progress})…"
     gathering_files_progress: "Samler filer (%{progress})…"
+    notices: 
+      submission_not_availible: "Oppdraget du har bedt om er ikke lenger tilgjengelig for kurset delen. Tidligere henvendelser vil ikke telle mot din klasse."
     resubmitted_to_turnitin: "Levert til Turnitin på nytt."
     see_attached_files: "Se vedlagte filer"
     show: 
@@ -14019,6 +14045,7 @@ nb:
     unknown_date: "Ukjent dato"
     with_ago: "%{time} siden"
   time_zones: 
+    abu_dhabi: "Abu Dhabi"
     adelaide: Adelaide
     alaska: Alaska
     almaty: Almaty
@@ -14055,6 +14082,113 @@ nb:
     chennai: Chennai
     chihuahua: Chihuahua
     chongqing: Chongqing
+    copenhagen: København
+    darwin: Darwin
+    dhaka: Dhaka
+    dublin: Dublin
+    eastern_time_us_canada: "Austleg tid (US & Kanada)"
+    edinburgh: Edinburgh
+    ekaterinburg: Ekaterinburg
+    fiji: Fiji
+    georgetown: Georgetown
+    greenland: Grønland
+    guadalajara: Guadalajara
+    guam: Guam
+    hanoi: Hanoi
+    harare: Harare
+    hawaii: Hawaii
+    helsinki: Helsinki
+    hobart: Hobart
+    hong_kong: "Hong Kong"
+    indiana_east: "Indiana (East)"
+    international_date_line_west: "Internasjonal datolinje Vest"
+    irkutsk: Irkutsk
+    islamabad: Islamabad
+    istanbul: Istanbul
+    jakarta: Jakarta
+    jerusalem: Jerusalem
+    kabul: Kabul
+    kamchatka: Kamtsjatka
+    karachi: Karachi
+    kathmandu: Kathmandu
+    kolkata: Kolkata
+    krasnoyarsk: Krasnoyarsk
+    kuala_lumpur: "Kuala Lumpur"
+    kuwait: Kuwait
+    kyiv: Kyiv
+    la_paz: "La Paz"
+    lima: Lima
+    lisbon: Lisboa
+    ljubljana: Ljubljana
+    london: London
+    madrid: Madrid
+    magadan: Magadan
+    marshall_is: "Marshall Is."
+    mazatlan: Mazatlan
+    melbourne: Melbourne
+    mexico_city: "Mexico by"
+    mid_atlantic: Midt-Atlantiske
+    midway_island: Midtveisøyene
+    minsk: Minsk
+    monrovia: Monrovia
+    monterrey: Monterrey
+    moscow: Moskva
+    mountain_time_us_canada: "Fjell tiden (US & Kanada)"
+    mumbai: Mumbai
+    muscat: Muscat
+    nairobi: Nairobi
+    new_caledonia: "Ny Caledonia"
+    new_delhi: "Ny Delhi"
+    newfoundland: Newfoundland
+    novosibirsk: Novosibirsk
+    nukualofa: Nuku'alofa
+    osaka: Osaka
+    pacific_time_us_canada: "Stillehavstid (US & Kanada)"
+    paris: Paris
+    perth: Perth
+    port_moresby: "Port Moresby"
+    prague: Praha
+    pretoria: Pretoria
+    quito: Quito
+    rangoon: Rangoon
+    riga: Riga
+    riyadh: Riyadh
+    rome: Roma
+    samoa: Samoa
+    santiago: Santiago
+    sapporo: Sapporo
+    sarajevo: Sarajevo
+    saskatchewan: Saskatchewan
+    seoul: Seoul
+    singapore: Singapore
+    skopje: Skopje
+    sofia: Sofia
+    solomon_is: Salomonøyene.
+    sri_jayawardenepura: "Sri Jayawardenepura"
+    st_petersburg: "St. Petersburg"
+    stockholm: Stockholm
+    sydney: Sydney
+    taipei: Taipei
+    tallinn: Tallinn
+    tashkent: Tasjkent
+    tbilisi: Tbilisi
+    tehran: Teheran
+    tijuana: Tijuana
+    tokelau_is: "Tokelau Is."
+    tokyo: Tokyo
+    ulaan_bataar: "Ulaan Bator"
+    urumqi: Urumqi
+    utc: UTC
+    vienna: Wien
+    vilnius: Vilnius
+    vladivostok: Vladivostok
+    volgograd: Volgograd
+    warsaw: Warszawa
+    wellington: Wellington
+    west_central_africa: "Vest Sentral Afrika"
+    yakutsk: Yakutsk
+    yerevan: Yerevan
+    zagreb: Zagreb
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Beskriv bildet for å forbedre tilgjengeligheten"
@@ -14126,6 +14260,10 @@ nb:
   unpublished_courses_title: "Ikke publiserte kurs"
   unsupported_package: "Ustøttet innholdspakke"
   unused_courses_title: "Ikke benyttede kurs"
+  upload_button: 
+    upload: "Last opp"
+  upload_progress_view: 
+    processing: behandling
   user: 
     default_user_name: Bruker
     errors: 
@@ -14141,6 +14279,7 @@ nb:
   user_date_range_search: 
     cant_be_blank: "Canvas-bruker-ID kan ikke være tom"
     cant_come_before_from: "Til-datoen kan ikke være før fra-datoen"
+    results_found: "%{length} resultat funnet"
   user_lists: 
     add_n_users: 
       one: "OK, det ser bra ut, legg til denne 1 brukeren"
