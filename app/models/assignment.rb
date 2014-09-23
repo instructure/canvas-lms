@@ -584,37 +584,9 @@ class Assignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility
-    if self.differentiated_assignments_applies?
-      context.all_students.able_to_see_assignment_in_course_with_da(self.id, context.id)
-    else
-      context.all_students
-    end
-  end
-
-  def visible_to_user?(user)
-    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
-    visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
-  end
-
-  def visible_to_observer?(user)
-    return false unless context.user_has_been_observer?(user)
-    return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
-
-    visible_student_ids = students_with_visibility.pluck(:id)
-
-    observed_students_ids = ObserverEnrollment.observed_student_ids(context, user)
-
-    # observers can be students as well, so their own assignments must be included
-    if user.student_enrollments.where(course_id: self.context_id).any?
-      observed_student_ids << user.id
-    end
-
-    # if the observer doesn't have students, show them published assignments
-    has_visible_students = (observed_students_ids & visible_student_ids).any?
-    return has_visible_students if observed_students_ids.any?
-
-    self.published?
+  def students_with_visibility(scope=context.all_students)
+    return scope unless self.differentiated_assignments_applies?
+    scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
   end
 
   attr_accessor :saved_by
@@ -1432,10 +1404,7 @@ class Assignment < ActiveRecord::Base
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[user.global_id] ||= (
       student_scope = user ? context.students_visible_to(user) : context.participating_students
-      if self.differentiated_assignments_applies?
-        student_scope = student_scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
-      end
-      student_scope
+      students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end
 
@@ -1502,12 +1471,7 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-
-    student_ids = if self.differentiated_assignments_applies?
-                    context.students.able_to_see_assignment_in_course_with_da(self.id, self.context.id).pluck(:id)
-                  else
-                    context.student_ids
-                  end
+    student_ids = students_with_visibility(context.students).pluck(:id)
 
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }

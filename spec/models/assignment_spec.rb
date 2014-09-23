@@ -277,18 +277,12 @@ describe Assignment do
       end
     end
 
-    describe "visible_to_observer?" do
+    describe "observers" do
       before :once do
         setup_DA
         @course.enable_feature!(:draft_state)
         @course.enable_feature!(:differentiated_assignments)
         @observer = User.create
-      end
-
-      context "user_is_not_an_observer" do
-        it "should not be visible" do
-          @assignment.visible_to_observer?(@student1).should be_false
-        end
       end
 
       context "differentiated_assignment on" do
@@ -297,7 +291,7 @@ describe Assignment do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           end
           it "should be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
 
@@ -307,7 +301,7 @@ describe Assignment do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
           end
           it "should be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
 
@@ -317,7 +311,7 @@ describe Assignment do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
           end
           it "should not be visible" do
-            @assignment.visible_to_observer?(@observer).should be_false
+            @assignment.visible_to_user?(@observer).should be_false
           end
         end
 
@@ -327,7 +321,7 @@ describe Assignment do
             @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
           end
           it "should not be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
 
@@ -337,7 +331,7 @@ describe Assignment do
             @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
           end
           it "should not be visible" do
-            @assignment.visible_to_observer?(@observer).should be_false
+            @assignment.visible_to_user?(@observer).should be_false
           end
         end
       end
@@ -349,7 +343,7 @@ describe Assignment do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
           end
           it "should be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
 
@@ -359,7 +353,7 @@ describe Assignment do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
           end
           it "should be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
 
@@ -369,7 +363,7 @@ describe Assignment do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
           end
           it "should be visible" do
-            @assignment.visible_to_observer?(@observer).should be_true
+            @assignment.visible_to_user?(@observer).should be_true
           end
         end
       end

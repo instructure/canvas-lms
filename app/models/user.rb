@@ -1351,27 +1351,13 @@ class User < ActiveRecord::Base
 
   def assignments_visibile_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
+    published_visible_assignments = course.active_assignments.published
     if course.feature_enabled?(:differentiated_assignments)
-      return assignments_visible_as_observer(course) if course.user_has_been_observer?(self)
-      course.active_assignments.published.visible_to_student_in_course_with_da(self.id, course.id)
-    else
-      course.active_assignments.published
+      published_visible_assignments = DifferentiableAssignment.filter(published_visible_assignments,self,course, is_teacher: false) do |assignment_scope,user_ids|
+        assignment_scope.visible_to_student_in_course_with_da(user_ids, course.id)
+      end
     end
-  end
-
-  def assignments_visible_as_observer(course)
-    return [] unless course.user_has_been_observer?(self)
-
-    observed_student_ids = ObserverEnrollment.observed_student_ids(course, self)
-    if self.student_enrollments.any?
-      observed_student_ids.concat self.student_enrollments.pluck(:user_id)
-    end
-
-    if course.feature_enabled?(:differentiated_assignments) && observed_student_ids.any?
-      course.active_assignments.visible_to_student_in_course_with_da(observed_student_ids, course.id)
-    else
-      course.active_assignments
-    end
+    published_visible_assignments
   end
 
   def assignments_needing_submitting(opts={})

@@ -1306,15 +1306,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
   end
 
-  def visible_to_user?(user)
-    return true unless self.context.feature_enabled?(:differentiated_assignments)
-    visible_quizzes = AssignmentStudentVisibility.filter_for_differentiated_assignments([self],user,self.context) do |quiz_id, user_ids|
-      # note: quiz_id is an array
-      Quizzes::QuizStudentVisibility.where(user_id: user_ids, quiz_id: quiz_id)
-    end
-    visible_quizzes.any?
-  end
-
   delegate :feature_enabled?, to: :context
 
   # The IP filters available for this Quiz, which is an aggregate of the Quiz's

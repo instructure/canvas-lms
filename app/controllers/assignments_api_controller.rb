@@ -527,7 +527,7 @@ class AssignmentsApiController < ApplicationController
       end
 
       if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-        scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+        scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
           scope.visible_to_student_in_course_with_da(user_ids, @context.id)
         end
       end

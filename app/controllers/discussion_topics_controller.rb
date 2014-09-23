@@ -276,7 +276,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+      scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
         scope.visible_to_students_with_da_enabled(user_ids)
       end
     end

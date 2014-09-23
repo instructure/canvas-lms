@@ -57,7 +57,7 @@ class Quizzes::QuizzesController < ApplicationController
     scope = scope.available unless can_manage
 
     if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
-      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+      scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
         scope.visible_to_students_in_course_with_da(user_ids,@context.id)
       end
     end

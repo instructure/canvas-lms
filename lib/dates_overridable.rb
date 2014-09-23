@@ -2,6 +2,7 @@ module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden,
     :has_no_overrides
   attr_writer :without_overrides
+  include DifferentiableAssignment
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -68,18 +69,6 @@ module DatesOverridable
     all_dates = assignment_overrides.active.overriding_due_at.map(&:as_hash)
     all_dates << base_due_date_hash unless differentiated_assignments_applies?
     all_dates
-  end
-
-  def differentiated_assignments_applies?
-    return false if !context.feature_enabled?(:differentiated_assignments)
-
-    if self.is_a?(Assignment) || Quizzes::Quiz.class_names.include?(self.class_name)
-      self.only_visible_to_overrides
-    elsif self.assignment
-      self.assignment.only_visible_to_overrides
-    else
-      false
-    end
   end
 
   def all_dates_visible_to(user)

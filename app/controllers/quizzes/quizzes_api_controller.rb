@@ -292,8 +292,8 @@ class Quizzes::QuizzesApiController < ApplicationController
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
 
-        if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
-          scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+        if @context.feature_enabled?(:differentiated_assignments)
+          scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
             scope.visible_to_students_in_course_with_da(user_ids, @context.id)
           end
         end
@@ -520,7 +520,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   def check_differentiated_assignments
-    return true unless @context.feature_enabled?(:differentiated_assignments)
-    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user)
+    return true unless da_on = @context.feature_enabled?(:differentiated_assignments)
+    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user, differentiated_assignments: da_on)
   end
 end

@@ -306,14 +306,14 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if self.grants_right?(user, :manage_content)
+    if user_is_teacher = self.grants_right?(user, :manage_content)
       tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
     if self.feature_enabled?(:differentiated_assignments)
-      tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self) do |tags, user_ids|
+      tags = DifferentiableAssignment.filter(tags, user, self, is_teacher: user_is_teacher) do |tags, user_ids|
         tags.visible_to_students_with_da_enabled(user_ids)
       end
     end

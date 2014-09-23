@@ -260,9 +260,9 @@ class SubmissionsApiController < ApplicationController
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
-      if !@context.feature_enabled?(:differentiated_assignments) ||
+      if !(da_on = @context.feature_enabled?(:differentiated_assignments)) ||
            @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
-           @submission.assignment_visible_to_user?(@current_user)
+           @submission.assignment_visible_to_user?(@current_user, differentiated_assignments: da_on)
         includes = Array(params[:include])
         render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
       else

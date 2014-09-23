@@ -303,6 +303,7 @@ class ContextModule < ActiveRecord::Base
     end
 
     if !self.grants_right?(user, :update) && self.context.feature_enabled?(:differentiated_assignments) && user
+      opts[:is_teacher]= false
       tags = filter_tags_for_da(tags, user, opts)
     end
 
@@ -330,7 +331,7 @@ class ContextModule < ActiveRecord::Base
 
     filter = opts[:tags_loaded] ? array_filter : scope_filter
 
-    tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self.context, opts) do |tags, user_ids|
+    tags = DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
       filter.call(tags, user_ids, self.context_id, opts)
     end
 
