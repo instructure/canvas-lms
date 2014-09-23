@@ -11,7 +11,7 @@ class RespondusAPIPort
   def request
     # we want an actual rails request because it has logic to determine the
     # remote_ip through proxies and such
-    @request ||= ActionController::Request.new(rack_env)
+    @request ||= ActionDispatch::Request.new(rack_env)
   end
 
   # sweet little authlogic adapter so we can play nice with authlogic

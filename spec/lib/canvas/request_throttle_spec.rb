@@ -37,7 +37,7 @@ describe 'Canvas::RequestThrottle' do
 
   describe "#client_identifier" do
     def req(hash)
-      ActionController::Request.new(hash).tap { |req| req.fullpath }
+      ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
     end
 
     it "should use access token" do

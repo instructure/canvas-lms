@@ -1090,7 +1090,7 @@ describe PseudonymSessionsController do
 
       it "should add the current ip to existing ips" do
         cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
-        ActionController::Request.any_instance.stubs(:remote_ip).returns('ip2')
+        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns('ip2')
         post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should_not be_nil
