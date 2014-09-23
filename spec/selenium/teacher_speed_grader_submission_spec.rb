@@ -248,22 +248,6 @@ describe "speed grader submissions" do
     end
   end
 
-  it "should successfully download attachments" do
-    filename, fullpath, data = get_file("testfile1.txt")
-    create_and_enroll_students(1)
-    @assignment.submission_types ='online_upload'
-    @assignment.save!
-
-    add_attachment_student_assignment(filename, @students[0], fullpath)
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    keep_trying_until { f('#speedgrader_iframe').should be_displayed }
-    f(".submission-file-download").click
-
-    #this assertion verifies the attachment was opened since its a .txt it just renders in the browser
-    keep_trying_until { f("body pre").should include_text("63f46f1c") }
-  end
-
   context "turnitin" do
     before(:each) do
       @assignment.turnitin_enabled = true
