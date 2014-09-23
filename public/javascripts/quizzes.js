@@ -33,6 +33,7 @@ define([
   'compiled/editor/MultipleChoiceToggle',
   'compiled/str/TextHelper',
   'compiled/views/quizzes/editor/KeyboardShortcuts',
+  'INST', // safari sniffing for VO workarounds
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -54,7 +55,7 @@ define([
             wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper,
-            RCEKeyboardShortcuts){
+            RCEKeyboardShortcuts, INST){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -1933,9 +1934,42 @@ define([
     });
 
     $(document).delegate("a.comment_focus", 'focus click', function(event) {
+      var $commentEditor;
+      var $focusProxy = $(this);
+      var focusEditor = function() {
+        $commentEditor.focus().select();
+      };
+
       event.preventDefault();
-      $(this).parents(".question_comment,.answer_comments").removeClass('empty')
-        .find("textarea.comments").focus().select();
+
+      $commentEditor = $focusProxy
+        .closest('.question_comment, .answer_comments')
+          .removeClass('empty')
+          .find('textarea.comments');
+
+      // Hack to fix focusing the editor on Safari using keyboard arrows under
+      // VoiceOver (tab worked just fine, just not VO+arrow cursor navigation)
+      // by waiting a while before we focus the comment editor.
+      //
+      // Read below for a "guess" on why this is happening.
+      //
+      // It seems VO/Safari ignores manual focus calls past a certain threshold,
+      // so the fact that we're focusing the a.comment_focus then moving focus
+      // to the textarea does not work with arrows. This is the closest thing I
+      // found to the issue: http://bit.ly/1rkdSUh
+      //
+      // @since CNVS-15099
+      if (INST.browser.safari && event.type === 'focusin') {
+        setTimeout(function() {
+          // don't focus the editor if the user has tabbed/moved away from the
+          // proxy anchor
+          if ($focusProxy.is(':focus')) {
+            focusEditor();
+          }
+        }, 500 /* the magic started working at 350ms but it wasn't reliable */);
+      } else {
+        focusEditor();
+      }
     });
 
     $(document).delegate("textarea.comments", 'focus', function() {
