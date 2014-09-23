@@ -43,7 +43,7 @@ define [
       nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
       if !@state.isEditing
         div {},
-          p {}, I18n.t('message','An item named "%{name}" already existings in this location. Do you want to replace the existing file?', {name: nameToUse})
+          p {}, I18n.t('message','An item named "%{name}" already exists in this location. Do you want to replace the existing file?', {name: nameToUse})
       else
         div {},
           p {}, I18n.t('prompt', 'Change "%{name}" to', {name: nameToUse})
