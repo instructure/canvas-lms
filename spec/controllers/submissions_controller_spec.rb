@@ -413,6 +413,25 @@ describe SubmissionsController do
 
       assigns[:visible_rubric_assessments].should == [@assessment]
     end
+
+    it "should redirect download requests with the download_frd parameter" do
+      # This is because the files controller looks for download_frd to indicate a forced download
+      course_with_teacher_logged_in
+      assignment = assignment_model(course: @course)
+      student_in_course
+      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
+      submission = submission_model(
+        course: @course,
+        assignment: assignment,
+        submission_type: "online_upload",
+        attachment_ids: att.id,
+        attachments: [att],
+        user: @student)
+      get 'show', assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id
+
+      response.should be_redirect
+      response.headers["Location"].should match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
+    end
   end
 
   describe 'GET turnitin_report' do
