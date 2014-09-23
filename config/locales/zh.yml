@@ -7775,7 +7775,7 @@ zh:
     help: 帮助
     show_me_where: 显示我的位置
   locales: 
-    zh: 中文
+    zh: 简体中文
   logged_out_user: "注销的用户 %{user_counter}"
   lti: 
     lti_message: 
