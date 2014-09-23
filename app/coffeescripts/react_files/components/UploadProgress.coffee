@@ -9,7 +9,10 @@ define [
     displayName: 'UploadProgress'
 
     propTypes:
-      uploader: React.PropTypes.instanceOf(FileUploader).isRequired
+      uploader: React.PropTypes.shape({
+        getFileName: React.PropTypes.func.isRequired
+        roundProgress: React.PropTypes.func.inRequired
+      })
 
     getLabel: withReactDOM ->
       span {},

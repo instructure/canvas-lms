@@ -93,6 +93,7 @@ $ef-thumbnail-size: 36px;
   }
 }
 .ef-directory{
+  position: relative;
   margin: 10px;
   flex: 3 3 0;
   display: flex;
@@ -246,27 +247,6 @@ $ef-thumbnail-size: 36px;
   padding-left: 20px;
   padding-right: 20px;
 }
-.current_uploads__instructions {
-  text-align: center;
-}
-.current_uploads__instructions__close {
-  float: right;
-  color: $canvas-neutral;
-  font-size: -1.8em;
-  pointer: cursor;
-}
-i[class*=current_uploads__instructions__icon-upload]:before {
-  font-size: 100px;
-}
-i[class*=current_uploads__instructions__icon-upload] {
-  color: $canvas-primary;
-  width: 100px;
-  height: 100px;
-}
-.current_uploads__instructions__drag {
-  font-size: 1.8em;
-  font-weight: bold;
-}
 
 .ef-breadcrumb-popover {
   display: block;
@@ -289,7 +269,44 @@ i[class*=current_uploads__instructions__icon-upload] {
   }
 }
 
+.UploadDropZone {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background: rgba(254, 254, 254, 0);
+  z-index: -1;
+}
 
+.UploadDropZone__active {
+  background: rgba(254, 254, 254, 0.9);
+  z-index: 1;
+}
+
+.UploadDropZone__instructions {
+  margin-top: 70px;
+  text-align: center;
+  pointer-events: none;
+}
+.UploadDropZone__instructions__close {
+  float: right;
+  color: $canvas-neutral;
+  font-size: -1.8em;
+  pointer: cursor;
+}
+i[class*=UploadDropZone__instructions--icon-upload]:before {
+  font-size: 100px;
+}
+i[class*=UploadDropZone__instructions--icon-upload] {
+  color: $canvas-primary;
+  width: 100px;
+  height: 100px;
+}
+.UploadDropZone__instructions--drag {
+  font-size: 1.3em;
+  font-weight: bold;
+}
 
 
 

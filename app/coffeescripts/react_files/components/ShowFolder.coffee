@@ -11,7 +11,8 @@ define [
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
   './CurrentUploads'
-], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads) ->
+  './UploadDropZone'
+], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, UploadDropZone) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
@@ -79,6 +80,7 @@ define [
         role: 'grid'
         'aria-label': I18n.t('main_file_browser_pane', 'Main file browser pane')
       },
+        UploadDropZone(currentFolder: @props.currentFolder)
         CurrentUploads({})
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')

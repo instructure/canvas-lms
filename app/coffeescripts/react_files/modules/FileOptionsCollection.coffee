@@ -55,11 +55,11 @@ define [
       while i < selectedFiles.length
         fileOptions = selectedFiles[i]
         nameToTest = fileOptions.name || fileOptions.file.name
-        # only mark as collision if it is a collision that hasn't been resolved, or is is a zip that will be expanded
-        if @fileNameExists(nameToTest) && (fileOptions.dup != 'overwrite' && (!fileOptions.expandZip? || fileOptions.expandZip == false))
-          collisions.push fileOptions
-        else if (@isZipFile(fileOptions.file) && fileOptions.expandZip == undefined)
+        if (@isZipFile(fileOptions.file) && fileOptions.expandZip == undefined)
           zips.push fileOptions
+        # only mark as collision if it is a collision that hasn't been resolved, or is is a zip that will be expanded
+        else if @fileNameExists(nameToTest) && (fileOptions.dup != 'overwrite' && (!fileOptions.expandZip? || fileOptions.expandZip == false))
+          collisions.push fileOptions
         else
           resolved.push fileOptions
         i++
@@ -101,10 +101,12 @@ define [
       {resolved, collisions, zips} = @segregateOptionBuckets(allOptions)
       @setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})
 
-    setOptionsFromFiles: (files) ->
+    setOptionsFromFiles: (files, notifyChange) ->
       allOptions = @toFilesOptionArray(files)
       {resolved, collisions, zips} = @segregateOptionBuckets(allOptions)
       @setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips, newOptions: true})
+      if notifyChange && @onChange
+        @onChange()
 
     hasNewOptions: ->
       return @state.newOptions
@@ -123,5 +125,8 @@ define [
 
     resetState: ->
       @state = @buildDefaultState()
+
+    onChange: ->
+      #noop
 
   new FileOptionsCollection()
