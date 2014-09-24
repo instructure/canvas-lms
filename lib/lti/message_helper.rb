@@ -68,16 +68,22 @@ module Lti
                 '$Person.address.timezone' => Time.zone.tzinfo.name,
                 '$User.image' => -> { @current_user.avatar_url },
                 '$User.id' => @current_user.id,
-                '$User.username' => pseudonym ? pseudonym.unique_id : nil,
                 '$Canvas.user.id' => @current_user.id,
-                '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
-                '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
                 '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
             }
         )
         if pseudonym
-          substitutions.merge!({'$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) }})
+          substitutions.merge!(
+              {
+                  '$User.username' => pseudonym.unique_id,
+                  '$Canvas.user.loginId' => pseudonym.unique_id,
+                  '$Canvas.user.sisSourceId' => pseudonym.sis_user_id,
+                  '$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) },
+              }
+          )
         end
+
+        substitutions.merge!( '$Canvas.masqueradingUser.id' => logged_in_user.id ) if logged_in_user != @current_user
       end
 
       substitutions

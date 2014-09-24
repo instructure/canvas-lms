@@ -22,6 +22,10 @@ module Lti
   class DummyClass
     include MessageHelper
 
+    def logged_in_user
+      @current_user
+    end
+
     attr_accessor :domain_root_account, :context, :current_user
   end
 
@@ -205,6 +209,13 @@ module Lti
             pseudonym.unique_id = 'username'
             subject.common_variable_substitutions['$User.username'].should == 'username'
           end
+        end
+
+        it 'has substitution for $Canvas.masqueradingUser.id' do
+          logged_in_user = User.new
+          logged_in_user.stubs(:id).returns(7878)
+          subject.stubs(:logged_in_user).returns(logged_in_user)
+          subject.common_variable_substitutions['$Canvas.masqueradingUser.id'].should == 7878
         end
       end
     end
