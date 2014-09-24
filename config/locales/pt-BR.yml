@@ -9818,7 +9818,6 @@ pt-BR:
         published: Publicado
     post_grades_dialog_title: "Postar notas no SIS"
     progression_module_collection: 
-      module_progress_for: "Progresso de módulo para %h{student_link}"
       module_progress_for_student: "Progresso de módulo para %{student.name}"
       no_modules_found: "Nenhum módulo foi encontrado"
     progression_module_view: 
