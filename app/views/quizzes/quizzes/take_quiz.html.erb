@@ -29,6 +29,19 @@
   <div id="quiz-instructions" class="user_content">
     <%= user_content(@quiz.description) %>
   </div>
+
+  <% if @quiz.time_limit %>
+    <div class="screenreader-only" role="note">
+      <%= t 'audible_quiz_timer_shortcut_description', <<-DESCRIPTION
+        Note: this is a timed quiz. You may check the remaining time you have
+        at any point while taking the quiz by pressing the keyboard combination
+        SHIFT, ALT, and T...
+
+        Again: SHIFT, ALT, and T...
+        DESCRIPTION
+      %>
+    </div>
+  <% end %>
 </header>
 
 <% js_bundle :take_quiz %>
