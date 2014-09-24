@@ -111,6 +111,10 @@ $kyle-menu-border-radius: 8px;
     color: white;
     font-weight: bold !important;
     text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+    .ui-icon-radio-on {
+      background: url(/images/icon-checkmark-rev.svg) 0 50% no-repeat !important;
+      background-size: 14px;
+    }
   }
 }
 
