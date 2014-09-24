@@ -75,16 +75,21 @@ define [
               rootTillCurrentFolder: @state.rootTillCurrentFolder
               rootFoldersToShow: filesEnv.rootFolders
             })
-          @props.activeRouteHandler
-            onResolvePath: @onResolvePath
-            currentFolder: @state.currentFolder
-            contextType: contextType
-            contextId: contextId
-            selectedItems: @state.selectedItems
-            toggleItemSelected: @toggleItemSelected
-            toggleAllSelected: @toggleAllSelected
-            areAllItemsSelected: @areAllItemsSelected
-            userCanManageFilesForContext: userCanManageFilesForContext
+          div {
+            className:'ef-directory'
+            role: 'region'
+            'aria-label' : I18n.t('file_list', 'File List')
+          },
+            @props.activeRouteHandler
+              onResolvePath: @onResolvePath
+              currentFolder: @state.currentFolder
+              contextType: contextType
+              contextId: contextId
+              selectedItems: @state.selectedItems
+              toggleItemSelected: @toggleItemSelected
+              toggleAllSelected: @toggleAllSelected
+              areAllItemsSelected: @areAllItemsSelected
+              userCanManageFilesForContext: userCanManageFilesForContext
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext
             FilesUsage({

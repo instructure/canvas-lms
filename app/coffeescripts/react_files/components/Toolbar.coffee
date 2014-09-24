@@ -8,7 +8,9 @@ define [
   '../utils/downloadStuffAsAZip'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm) ->
+  'jquery'
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -32,6 +34,12 @@ define [
         contextType: @props.contextType,
         contextId: @props.contextId
       })
+
+    componentDidUpdate: (prevProps) ->
+      if prevProps.selectedItems.length isnt @props.selectedItems.length
+        $.screenReaderFlashMessage(I18n.t('count_items_selected', '%{count} items selected', {
+          count: @props.selectedItems.length
+        }))
 
     deleteSelectedItems: ->
       count = @props.selectedItems.length
@@ -146,7 +154,7 @@ define [
             },
               i className: 'icon-trash'
 
-          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
+          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13},
             I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
 
         if @props.userCanManageFilesForContext

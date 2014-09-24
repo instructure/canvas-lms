@@ -75,11 +75,7 @@ define [
 
     render: withReactDOM ->
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div {
-        className:'ef-directory'
-        role: 'grid'
-        'aria-label': I18n.t('main_file_browser_pane', 'Main file browser pane')
-      },
+      div role: 'grid',
         UploadDropZone(currentFolder: @props.currentFolder)
         CurrentUploads({})
         ColumnHeaders {
