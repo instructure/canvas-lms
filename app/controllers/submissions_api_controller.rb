@@ -506,7 +506,7 @@ class SubmissionsApiController < ApplicationController
   def bulk_load_attachments_and_previews(submissions)
     Submission.bulk_load_versioned_attachments(submissions)
     attachments = submissions.flat_map &:versioned_attachments
-    Attachment.send :preload_associations, attachments,
-      [:canvadoc, :crocodoc_document]
+    ActiveRecord::Associations::Preloader.new(attachments,
+      [:canvadoc, :crocodoc_document]).run
   end
 end

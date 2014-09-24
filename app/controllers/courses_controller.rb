@@ -701,9 +701,10 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
+        ActiveRecord::Associations::Preloader.new(users,
+                                                  { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard)
+                  :shard => @context.shard).run
       end
       render :json => users.map { |u|
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
@@ -751,9 +752,10 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        User.send(:preload_associations, users, {:not_ended_enrollments => :course},
+        ActiveRecord::Associations::Preloader.new(users,
+                                                  {:not_ended_enrollments => :course},
                   :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard)
+                  :shard => @context.shard).run
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
@@ -1522,7 +1524,7 @@ class CoursesController < ApplicationController
                           :search_method => @context.user_list_search_mode_for(@current_user),
                           :initial_type => params[:enrollment_type])
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
-        Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
+        ActiveRecord::Associations::Preloader.new(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}]).run
         json = @enrollments.map { |e|
           { 'enrollment' =>
             { 'associated_user_id' => e.associated_user_id,

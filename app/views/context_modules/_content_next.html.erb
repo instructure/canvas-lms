@@ -232,7 +232,7 @@ TEXT
     <% cache_key = cache_key_items.join('/') %>
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
     <% cache(cache_key) do %>
-      <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
+      <% ActiveRecord::Associations::Preloader.new(@modules, :content_tags => :content).run %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable } %>
       <% end %>

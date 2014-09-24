@@ -1421,7 +1421,7 @@ class User < ActiveRecord::Base
               expecting_submission.
               not_ignored_by(self, 'grading').
               need_grading_info(limit)
-            Assignment.send :preload_associations, as, :context
+            ActiveRecord::Associations::Preloader.new(as, :context).run
             as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
           end
           # outer limit, since there could be limit * n_shards results
@@ -1614,7 +1614,7 @@ class User < ActiveRecord::Base
         end
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
-          Enrollment.send(:preload_associations, pending_enrollments, :course)
+          ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
           res.concat(pending_enrollments.map { |e| c = e.course; c.write_attribute(:primary_enrollment, e.type); c.write_attribute(:primary_enrollment_rank, e.rank_sortable.to_s); c.write_attribute(:primary_enrollment_state, e.workflow_state); c.write_attribute(:invitation, e.uuid); c })
           res.uniq!
         end
@@ -1653,7 +1653,7 @@ class User < ActiveRecord::Base
       end
     end + temporary_invitations
     if opts[:preload_courses]
-      Enrollment.send(:preload_associations, enrollments, [:course])
+      ActiveRecord::Associations::Preloader.new(enrollments, :course).run
     end
     enrollments
   end
@@ -1727,7 +1727,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          Submission.send(:preload_associations, submissions, [:assignment, :user, :submission_comments])
+          ActiveRecord::Associations::Preloader.new(submissions, [:assignment, :user, :submission_comments]).run
           submissions
         end
       end

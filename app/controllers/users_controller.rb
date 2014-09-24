@@ -132,7 +132,7 @@ class UsersController < ApplicationController
         return
       end
 
-      Enrollment.send(:preload_associations, @observed_enrollments, :course)
+      ActiveRecord::Associations::Preloader.new(@observed_enrollments, :course).run
     end
   end
 

@@ -223,7 +223,7 @@ class ContextModuleItemsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:module_id])
-      ContextModule.send(:preload_associations, mod, {:content_tags => :content})
+      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])

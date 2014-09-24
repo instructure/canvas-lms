@@ -358,7 +358,7 @@ class ContextModulesApiController < ApplicationController
       scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
       modules = Api.paginate(scope, self, route)
 
-      ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new(modules, content_tags: :content) if includes.include?('items')
 
       if @student
         modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
@@ -418,7 +418,7 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
-      ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run if includes.include?('items')
       prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end

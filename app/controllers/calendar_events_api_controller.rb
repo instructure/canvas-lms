@@ -304,7 +304,7 @@ class CalendarEventsApiController < ApplicationController
 
     scope = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
-    CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
+    ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
     events = apply_assignment_overrides(events) if @type == :assignment
 
     if @errors.empty?

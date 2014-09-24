@@ -118,7 +118,7 @@ class AssignmentGroupsController < ApplicationController
         # aliased table names the conditons on has_many :context_module_tags will break
         if params[:include].include? "module_ids"
           module_includes = [:context_module_tags,{:discussion_topic => :context_module_tags},{:quiz => :context_module_tags}]
-          Assignment.send(:preload_associations, all_visible_assignments, module_includes)
+          ActiveRecord::Associations::Preloader.new(all_visible_assignments, module_includes).run
         end
 
         assignment_descriptions = all_visible_assignments.map(&:description)

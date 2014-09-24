@@ -905,7 +905,7 @@ describe ContextModule do
       # if tags are preloaded we shouldn't filter by a scope (as that requires re-fetching the tags)
       it "should not reload the tags if already loaded" do
         ContentTag.expects(:visible_to_students_with_da_enabled).never
-        ContextModule.send(:preload_associations, [@module], {:content_tags => :content})
+        ActiveRecord::Associations::Preloader.new(@module, content_tags: :content).run
         @module.content_tags_visible_to(@student_1)
       end
       # if tags are not preloaded we should filter by a scope (as will be quicker than filtering an array)

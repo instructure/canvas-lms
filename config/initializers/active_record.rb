@@ -1,14 +1,6 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  # XXX: Rails3 There are lots of issues with these patches in Rails3 still
-
-  class << self
-    def preload_associations(records, associations, preload_options={})
-      ActiveRecord::Associations::Preloader.new(records, associations, preload_options).run
-    end
-  end
-
   def write_attribute(*args)
     value = super
     value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
