@@ -85,6 +85,7 @@ define [
               className: 'ui-button btn-restrict',
               onClick: alert.bind(null, 'TODO: handle CNVS-15382 Multi select restricted access')
               title: I18n.t('restrict_access', 'Restrict Access')
+              'aria-label': I18n.t('restrict_access', 'Restrict Access')
               'data-tooltip': ''
             },
               i className: 'icon-unpublished'
@@ -100,35 +101,34 @@ define [
             i className: 'icon-download'
 
           if @props.userCanManageFilesForContext
-            [
-              button {
-                disabled: !showingButtons
-                className: 'ui-button btn-move'
-                onClick: (event) =>
-                  openMoveDialog(@props.selectedItems, {
-                    contextType: @props.contextType
-                    contextId: @props.contextId
-                    returnFocusTo: event.target
-                  })
-                title: I18n.t('move', 'Move')
-                'aria-label': I18n.t('move', 'Move')
-                'data-tooltip': ''
-              },
-                i className: 'icon-copy-course'
+            button {
+              disabled: !showingButtons
+              className: 'ui-button btn-move'
+              onClick: (event) =>
+                openMoveDialog(@props.selectedItems, {
+                  contextType: @props.contextType
+                  contextId: @props.contextId
+                  returnFocusTo: event.target
+                })
+              title: I18n.t('move', 'Move')
+              'aria-label': I18n.t('move', 'Move')
+              'data-tooltip': ''
+            },
+              i className: 'icon-copy-course'
 
-              button {
-                disabled: !showingButtons
-                className: 'ui-button btn-delete'
-                onClick: @deleteSelectedItems
-                title: I18n.t('delete', 'Delete')
-                'aria-label': I18n.t('delete', 'Delete')
-                'data-tooltip': ''
-              },
-                i className: 'icon-trash'
+          if @props.userCanManageFilesForContext
+            button {
+              disabled: !showingButtons
+              className: 'ui-button btn-delete'
+              onClick: @deleteSelectedItems
+              title: I18n.t('delete', 'Delete')
+              'aria-label': I18n.t('delete', 'Delete')
+              'data-tooltip': ''
+            },
+              i className: 'icon-trash'
 
-              span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
-                I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
-            ]
+          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
+            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
 
         if @props.userCanManageFilesForContext
           div className: 'text-right',
