@@ -29,10 +29,8 @@
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
   <% marked = assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %>
   <div class="display_question question <%= question_type.question_type %> <%= "marked" if marked %> <%= "correct" if correct && display_correct_answers %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
-    <div class="move">
-      <%= image_tag "move.png", :class => "move_icon", "aria-hidden" => true %>
-      <a href="#" role="button" class="screenreader-only move_to"><%= t('move_to', 'Move To...') %></a>
-    </div>
+    <%= render partial: "quizzes/quizzes/move_handle" %>
+
     <% if assessing && @quiz_presenter.can_go_back? %>
       <div class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
         <span class="screenreader-only"><%= t(:flag_this_question, "Flag this Question") %></span>

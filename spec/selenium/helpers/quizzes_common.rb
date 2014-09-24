@@ -368,7 +368,7 @@ shared_examples_for "quizzes selenium tests" do
   # ActiveRecord id `group_id`
   def drag_question_into_group(question_id, group_id)
     move_to_question question_id
-    source = "#question_#{question_id} .move_icon"
+    source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id}"
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -391,7 +391,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a question with ActiveRecord id of `id` to the top of the list
   def drag_question_to_top(id)
     move_to_question id
-    source = "#question_#{id} .move_icon"
+    source = "#question_#{id} .draggable-handle"
     target = '#questions > *'
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -401,7 +401,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a group with ActiveRecord id of `id` to the top of the question list
   def drag_group_to_top(id)
     move_to_group id
-    source = "#group_top_#{id} .move_icon"
+    source = "#group_top_#{id} .draggable-handle"
     target = '#questions > *'
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -411,7 +411,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a question to the top of the group
   def drag_question_to_top_of_group(question_id, group_id)
     move_to_question question_id
-    source = "#question_#{question_id} .move_icon"
+    source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end

@@ -93,7 +93,7 @@ describe "quizzes questions" do
 
       # drag the second question up 100px (next slot)
       driver.execute_script <<-JS
-      $('.move_icon:eq(1)').show().simulate('drag', {dx: 0, dy: -100});
+      $('.draggable-handle:eq(1)').show().simulate('drag', {dx: 0, dy: -100});
       JS
 
       # verify they were swapped

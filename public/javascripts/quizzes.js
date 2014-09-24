@@ -3079,7 +3079,6 @@ define([
       },
 
       focusDialog: function() {
-        console.log(this.$form.find("h2"))
         this.$form.find("h2").focus();
       },
 
@@ -3195,16 +3194,21 @@ define([
         return params;
       }
     }
-    $(document).on('click', ".move_to", function(event) {
+    $(document).on('click keypress', ".draggable-handle", function(event) {
       event.preventDefault();
+      if (event.type == "keypress" && event.keyCode != 13) { return; }
+
       accessibleSortables.init(
         $(event.target), $("#questions"), $("#move_quiz_item_form")
       );
     });
-
+    $(document).on('focus blur', ".draggable-handle", function(e) {
+      var warning = $(e.target).find('.accessibility-warning');
+      warning[e.type == 'focusin' ? 'removeClass' : 'addClass']('screenreader-only');
+    });
 
     $("#questions").sortable({
-      handle: '.move_icon',
+      handle: '.draggable-handle',
       helper: function(event, ui) {
         return ui.clone().removeClass('group');
       },
