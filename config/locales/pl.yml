@@ -9897,7 +9897,6 @@ pl:
         published: Opublikowane
     post_grades_dialog_title: "Wyślij oceny do SIS"
     progression_module_collection: 
-      module_progress_for: "Postęp uczestnika w module dla %h{student_link}"
       module_progress_for_student: "Postęp uczestnika w module dla %{student.name}"
       no_modules_found: "Nie znaleziono modułów"
     progression_module_view: 
