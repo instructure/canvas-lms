@@ -1492,11 +1492,18 @@ describe Quizzes::QuizzesController do
         get 'show', :course_id => @course.id, :id => @quiz.id
         expect(response).not_to be_redirect
       end
-      it 'redirect for students without visibility' do
+      it 'redirect for students without visibility or a submission' do
         user_session(@student2)
         get 'show', :course_id => @course.id, :id => @quiz.id
         expect(response).to be_redirect
         expect(flash[:error]).to match(/You do not have access to the requested quiz/)
+      end
+      it 'shows a message to students without visibility with a submission' do
+        Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student2)
+        user_session(@student2)
+        get 'show', :course_id => @course.id, :id => @quiz.id
+        expect(response).not_to be_redirect
+        expect(flash[:notice]).to match(/This quiz will no longer count towards your grade/)
       end
     end
   end

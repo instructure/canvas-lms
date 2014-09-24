@@ -195,11 +195,15 @@ class Quizzes::QuizzesController < ApplicationController
       return if value_to_boolean(params[:force_user]) && !force_user
 
       if @current_user && !@quiz.visible_to_user?(@current_user)
-        respond_to do |format|
-          flash[:error] = t 'notices.quiz_not_availible', "You do not have access to the requested quiz."
-          format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        if @current_user.quiz_submissions.where(quiz_id: @quiz).any?
+          flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."
+        else
+          respond_to do |format|
+            flash[:error] = t 'notices.quiz_not_availible', "You do not have access to the requested quiz."
+            format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+          end
+          return
         end
-        return
       end
 
       @quiz = @quiz.overridden_for(@current_user)
@@ -648,6 +652,9 @@ class Quizzes::QuizzesController < ApplicationController
       end
       js_env :GRADE_BY_QUESTION => @current_user.preferences[:enable_speedgrader_grade_by_question]
       if authorized_action(@submission, @current_user, :read)
+        if @current_user && !@quiz.visible_to_user?(@current_user)
+          flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."
+        end
         dont_show_user_name = @submission.quiz.anonymous_submissions || (!@submission.user || @submission.user == @current_user)
         add_crumb((dont_show_user_name ? t(:default_history_crumb, "History") : @submission.user.name))
         @headers = !params[:headless]

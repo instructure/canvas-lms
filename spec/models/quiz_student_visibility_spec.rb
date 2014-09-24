@@ -140,8 +140,10 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
 
-        it "should not keep the quiz visible if there is no grade" do
-          @quiz.assignment.grade_student(@user, {grade: nil})
+        it "should not keep the quiz visible if there is no score, even if it has a grade" do
+          @quiz.assignment.grade_student(@user, {grade: 10})
+          @quiz.assignment.submissions.last.update_attribute("score", nil)
+          @quiz.assignment.submissions.last.update_attribute("grade", 10)
           @user.enrollments.each(&:destroy!)
           enroller_user_in_section(@section_bar, {user: @user})
           ensure_user_does_not_see_quiz

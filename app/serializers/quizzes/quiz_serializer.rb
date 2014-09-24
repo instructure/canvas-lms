@@ -298,7 +298,7 @@ module Quizzes
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
       !serializer_option(:skip_date_overrides) &&
-      context.user_has_been_student?(current_user) ?
+      context.user_has_been_student?(current_user) && due_dates.any? ?
         due_dates[0][domain] :
         quiz.send(domain)
     end
