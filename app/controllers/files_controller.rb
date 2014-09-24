@@ -326,22 +326,15 @@ class FilesController < ApplicationController
 
     @contexts = [@context]
     get_all_pertinent_contexts(include_groups: true) if @context == @current_user
-    files_contexts = @contexts.map { |context|
-      # TODO: it would be a LOT better if we didn't have to go fetch all these root folders just so
-      # we can go fetch them again in ajax API requests. if we can figure out :read_contents permissions
-      # I can get by without the root_folder_id prop as well.
-      root_folder = Folder.root_folders(context).first
+    files_contexts = @contexts.map do |context|
       {
         asset_string: context.asset_string,
         name: context == @current_user ? t('my_files', 'My Files') : context.name,
-        root_folder_id: root_folder.id,
         permissions: {
-          # TODO: make sure these permision checks are sufficient and fast
           manage_files: context.grants_right?(@current_user, session, :manage_files),
-          read_contents: root_folder.grants_right?(@current_user, session, :read_contents)
         }
       }
-    }
+    end
     js_env :FILES_CONTEXTS => files_contexts
     render :text => "".html_safe, :layout => true
   end

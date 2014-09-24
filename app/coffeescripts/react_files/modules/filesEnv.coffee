@@ -26,9 +26,9 @@ define [
         'custom_name': contextData.name
         'context_type': contextData.contextType.replace(/s$/, '') #singularize it
         'context_id': contextData.contextId
-        'id': contextData.root_folder_id
       })
       folder.url = "/api/v1/#{contextData.contextType}/#{contextData.contextId}/folders/root"
+      folder.fetch()
       folder
 
   filesEnv.userHasPermission = (folderOrFile, action) ->
