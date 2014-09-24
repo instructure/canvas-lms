@@ -9745,7 +9745,6 @@ de:
         published: Veröffentlicht
     post_grades_dialog_title: "Noten in SIS veröffentlichen"
     progression_module_collection: 
-      module_progress_for: "Modul-Fortschritt für %h{student_link}"
       module_progress_for_student: "Modul-Fortschritt für %{student.name}"
       no_modules_found: "Es wurden keine Module gefunden"
     progression_module_view: 
