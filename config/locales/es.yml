@@ -5668,6 +5668,7 @@ es:
       rte_help: "Area de texto enriquecido. Pulse ALT F10 para acceder a la barra de herramientas. Pulse ALT F8 para acceder a la ayuda. "
   email: 
     default_from_name: "Instructure Canvas"
+  ember_modules_description: "Módulos reescritos en Ember. Utiliza la API de arrastrar y soltar nativa para permitir arrastrar desde ubicaciones externas."
   enrollment: 
     default_course_name: Curso
     default_email: "Sin Correo Electrónico"
@@ -6033,6 +6034,7 @@ es:
         truncated: Truncado
       phrase_to_look_for: "Frase que se quiere buscar"
       posts_added: "Publicaciones añadidas"
+      remove_feed: "Eliminar %{display_name}"
   external_tools: 
     account_navigation_configured: "Se ha configurado la navegación de la cuenta "
     app_full_view: 
@@ -6047,6 +6049,7 @@ es:
     app_review_view: 
       posted_by_on: "Publicado por *%{user.name}* el *%{created_at}*"
     app_saved_message: "%{app} guardada correctamente"
+    assignment_menu_configured: "Menú de tareas configurado"
     buttons: 
       cancel: Cancelar
       delete: Borrar
@@ -6060,6 +6063,7 @@ es:
     dialog_title_add_tool: "Añadir nueva aplicación"
     dialog_title_edit_tool: "Editar la herramienta externa"
     dialog_title_rate_tool: "¿Cómo califica esta herramienta?"
+    discussion_topic_menu_configured: "Menú de temas de debate configurado"
     edit_view: 
       anonymous: Anónimo
       by_url: "Por URL"
@@ -6110,12 +6114,14 @@ es:
       load_success_message: "Puede navegar a otra página."
       load_success_title: "Uso de la herramienta se completo"
     generic_error: "Se ha producido un error al procesar su petición"
+    global_navigation_configured: "Navegación global configurada"
     homework_submission_configured: "Envío de deberes configurado"
     index_view: 
       add_new_tool: "Añadir nueva aplicación"
       all: Todo
       app_headder: "Aplicaciones externas"
       external_tools_note: "Las aplicaciones permiten añadir nuevas funciones a Canvas de manera sencilla.  Se pueden incorporar a cursos individuales o a todos los cursos de una cuenta. Una vez que se ha configurado, puede enlazarlas a través de los módulos del curso y crear tareas para las herramientas de evaluación."
+      external_tools_references: "*Ver algunas de las herramientas LTI* que funcionan bien con Canvas. También puede consultar los **Temas de la comunidad Canvas sobre herramientas LTI**"
       installed: Instalada
       not_installed: "No instalada"
       search_filter: "Filtrar por nombre"
@@ -6123,6 +6129,8 @@ es:
       view_installed_tools: "Ver las configuraciones de las aplicaciones"
     migration_selection_configured: "Selección de la migración configurada"
     missing_stars: "Debe elegir una calificación por estrellas."
+    module_menu_configured: "Menú de módulos configurado"
+    quiz_menu_configured: "Menú de evaluaciones configurado"
     rate_tool_view: 
       rate_tool: "¿Cómo califica esta herramienta?"
     remove_tool: "¿Está seguro de que desea eliminar esta herramienta?"
@@ -6132,6 +6140,7 @@ es:
     shared_secret: "Secreto compartido"
     submit: Enviar
     user_navigation_configured: "Navegación del usuario configurada"
+    wiki_page_menu_configured: "Menú de páginas Wiki configurado"
   facebook: 
     authorization_required: "Solo usuarios autorizados pueden tener acceso a esa página"
     authorization_success: "¡Autorización completa! Canvas y Facebook ahora son amigos."
@@ -6191,20 +6200,24 @@ es:
       ? "on"
       : Activado
       release_notes: "notas de la versión"
+      toggle_feature_details_screenreader_info: "Detalles de la función Alternar para %{title}"
     feature_flag_admin_view: 
       feature_options: "Opciones de características"
       no_features_available: "No hay funciones disponibles actualmente"
   features: 
+    allow_opt_out_of_inbox: "Permitir a los usuarios prescindir de la bandeja de entrada"
     better_file_browsing: "Exploración de archivos mejorada"
     differentiated_assignments: "Tareas diferenciadas"
     draft_state: "Estado borrador"
     draft_state_account_disable_warning: "Deshabilitar esta función afectará a los cursos existentes. Para obtener asistencia para deshabilitar esta función, póngase en contacto con su Canvas Success Manager."
     draft_state_course_disable_warning: "Desactivar esta función hará que se publiquen TODOS los objetos existentes en su curso. Por favor, asegúrese de que todo el contenido del borrador está listo para ser publicado y disponible para todos los usuarios del curso antes de continuar."
+    ember_modules: "Módulos Ember"
     google_docs_domain_restriction: "Restricción de dominio de Google Docs"
     high_contrast: "Utilizar estilos de gran contraste"
     html5_first_videos: "Se prefiere HTML5 para la reproducción de video"
     k12: "Funciones específicas de K-12"
     learning_mastery_gradebook: "Libro de calificaciones de dominio de aprendizaje"
+    lor: "Herramientas externas LOR"
     new_quiz_moderate: "Nueva página para moderar evaluaciones"
     new_quiz_statistics: "Nueva página de estadísticas de evaluaciones"
     new_styles: "Utilizar nuevos estilos"
@@ -6213,6 +6226,15 @@ es:
     student_outcome_gradebook: "Libro de calificaciones de dominio del aprendizaje del alumno"
   file_browser_view: 
     folder_tree_instructions: "Utilice la tecla de dirección hacia arriba o hacia abajo para navegar a través del árbol. Presione la flecha derecha para expandir las carpetas, la izquierda para contraerlas y la tecla Intro para elegir una imagen."
+  file_rename_form: 
+    back: Atrás
+    change: Cambiar
+    change_name: "Cambiar nombre"
+    message: "Un elemento llamado \"%{name}\" ya existe en esta ublicación. ¿Desea reemplazar el archivo actual?"
+    name: Nombre
+    prompt: "Cambiar \"%{name}\" a"
+    rename_title: Copiar
+    replace: Reemplazar
   filebrowserview: 
     course_files: "Archivos del curso"
     group_files: "Archivos del grupo"
@@ -6396,6 +6418,7 @@ es:
     default_folder_name: carpeta
     errors: 
       invalid_recursion: "Una carpeta no puede ser una carpeta de sí misma"
+      invalid_root_folder_name: "No se puede cambiar el nombre de la carpeta raíz"
     folder_created: "Carpeta \"%{name}\" creada"
   folders: 
     event_updated: "Evento actualizado."
@@ -6405,6 +6428,7 @@ es:
     no_deleting_folders_with_content: "No puede borrar una carpeta con contenido"
     no_deleting_root: "No puede borrar una carpeta principal"
     only_one_folder: "No puede establecer la ruta de la carpeta y la ID de la carpeta"
+  for: por
   global_message_icons: 
     announcement: anuncio
     calendar: Calendario
@@ -6580,6 +6604,8 @@ es:
       url: "Envío de URL"
     total: Total
     total_column_header: 
+      move_to_end: "Mover al final"
+      move_to_front: "Mover al principio"
       options: Opciones
       switch_to_percent: "Cambiar a porcentaje"
       switch_to_points: "Cambiar a puntos"
@@ -6691,6 +6717,7 @@ es:
       close_rubric: "Cerrar rúbrica"
       close_score: Cerrar
       close_score_screenreader: "Cerrar detalles de calificación"
+      collapse: "Contraer todos los grupos de resultados de dominio de aprendizaje."
       collapse_title: Contraer
       comment_count: 
         one: "1 comentario"
@@ -6698,6 +6725,7 @@ es:
       comment_count_screenreader: "Leer comentarios"
       comments: Comentarios
       disabled_for_student_view: "Las puntuaciones de los alumnos de prueba no se incluyen en las estadísticas de las calificaciones"
+      expand: "Expandir todos los grupos de resultados de dominio de aprendizaje."
       expand_title: Expandir
       faculty_journal: "Revista de Profesores para %{user}"
       for_course: "Para el curso,"
@@ -6746,6 +6774,7 @@ es:
         view_scoring_details: "Ver los detalles de la Calificación"
       total: Total
     gradebook2: 
+      accessibility_warning: "Aviso: No se puede acceder a la vista de cuadrícula del libro de calificaciones. Haga clic aquí para utilizar la vista individual en su lugar."
       arrange_columns_by_due_date: "Ordenar las columnas por fecha límite"
       arrange_columns_by_group: "Ordenar las columnas por grupo de tareas"
       download_scores: "Descargar calificaciones (.csv)"
@@ -6775,6 +6804,7 @@ es:
         current: Actual
         student: Estudiante
       page_title: "Historial del Libro de Calificaciones"
+      regraded: "Calificada de nuevo"
       revert: "Revertir a esta calificación"
       submission_count: 
         one: "1 cambio"
@@ -7356,6 +7386,7 @@ es:
       assignment_details: "Detalles de la Tarea"
       conversation_details: "Detalles de la conversación"
       discussion_details: "Detalles del debate"
+      peer_review_details: "Detalles de la revisión por pares"
       x_more: "%{x} más..."
       x_new_in_announcements: 
         one: "*1* anuncio"
@@ -7369,6 +7400,9 @@ es:
       x_new_in_discussions: 
         one: "*1* debate"
         other: "*%{count}* debates"
+      x_new_in_peer_reviews: 
+        one: "*1* revisión por pares"
+        other: "*%{count}* revisiones por pares"
     local: Local
     select: 
       prompt: Seleccione
@@ -7561,7 +7595,9 @@ es:
   last_user_access_title: "Acceso del último usuario"
   layouts: 
     application: 
+      by_instructure: "Por Instructure"
       group_switch: Cambiar
+      javascript_required: "Debe tener activado JavaScript para poder acceder a este sitio."
       keyboard_navigation: 
         close: "Pulse la tecla coma para cerrar este cuadro de diálogo"
       links: 
@@ -7585,6 +7621,7 @@ es:
     menu: 
       view_all_accounts: "Ver todas las cuentas"
       view_all_groups: "Ver todos los grupos"
+      view_all_or_customize: "Ver todo o Personalizar"
     mobile_auth: 
       log_in_to_canvas: "Iniciar sesión en Canvas"
   learning_mastery_gradebook_description: "El libro de calificaciones de dominio del aprendizaje representa el modo en el que los profesores pueden ver de un vistazo el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
@@ -8509,10 +8546,13 @@ es:
         audio_comment: "Este mensaje incluye comentarios de media. Para reproducirlos o responder a ellos, haga click en el enlace a continuación:"
         html: 
           attached_files: "Archivos adjuntos:"
+          audio_comment: "Este mensaje contiene comentarios multimedia. Para escucharlos o responder, haga clic en el enlace que aparece a continuación:"
           download: descargar
+          reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este correo electrónico."
           subject: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           unknown_user: "Usuario desconocido"
           view_message: "Ver este mensaje en Conversaciones"
+        reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este correo electrónico."
         subject: "%{user_name} le acaba de enviar un mensaje en Canvas."
         unknown_user: "Usuario Desconocido"
         view_message: "Ver este mensaje en Conversaciones"
@@ -9136,6 +9176,7 @@ es:
         discussion_entry_reply_message: "Participe en la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
         html: 
           body: "%{user} ha publicado un comentario nuevo en la conversación %{discussion_topic} para %{course}:"
+          discussion_entry_reply_message: "Únase a la conversación utilizando el enlace que aparece a continuación o agregue un comentario respondiendo a este mensaje."
           link: "Haga clic aquí para participar en la conversación"
           subject: "Nuevo comentario para %{discussion_topic}: %{course}"
         subject: "Comentario Nuevo para %{discussion_topic}: %{course}"
@@ -9706,7 +9747,6 @@ es:
         published: Publicado
     post_grades_dialog_title: "Publicar calificaciones en SIS"
     progression_module_collection: 
-      module_progress_for: "Progreso del módulo para %h{student_link}"
       module_progress_for_student: "Progreso del módulo para %{student.name}"
       no_modules_found: "No se han encontrado módulos"
     progression_module_view: 
@@ -9719,6 +9759,10 @@ es:
       no_students_found: "No se han encontrado alumnos"
       student_progress: "Progreso del alumno"
   modules_item_controller: 
+    max_score_complete: "consiguió una puntuación no superior a  *score*"
+    max_score_incomplete: "debe conseguir una puntuación de no más de *score*"
+    min_score_complete: "consiguió una puntuación de al menos *score*"
+    min_score_incomplete: "debe conseguir una puntuación de al menos *score*"
     must_contribute_complete: "contribuyó al contenido de la página"
     must_contribute_incomplete: "debe contribuir al contenido de la página"
     must_submit_complete: "envió la tarea"
