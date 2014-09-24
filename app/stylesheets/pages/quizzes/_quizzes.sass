@@ -30,8 +30,11 @@ $selectedBorderColor: #31b5ff
 li.quiz
   cursor: pointer
 
-  .ellipses
-    color: #7c7c7c
+  .ellipses, i[class^=icon-]:not(.icon-publish)
+    @if $use_high_contrast 
+      color: $canvas-neutral
+    @else 
+      color: darken($canvas-neutral, 40)
 
   .ig-title
     right: 554px
