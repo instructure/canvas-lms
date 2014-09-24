@@ -10147,7 +10147,6 @@ ar:
         published: منشور
     post_grades_dialog_title: "نشر الدرجات في SIS"
     progression_module_collection: 
-      module_progress_for: "تقدم الوحدة الخاص بـ %h{student_link}"
       module_progress_for_student: "تقدم الوحدة الخاص بـ %{student.name}"
       no_modules_found: "لم يتم العثور على أي وحدات"
     progression_module_view: 
