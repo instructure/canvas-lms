@@ -52,24 +52,27 @@
       padding: 0;
 
       & > a {
-        display: block;
-        padding: 4px 12px;
+        display: block;        
         color: ensure-contrast($gray, $lightBackground);
+        padding: 4px 8px 4px 12px;
+        &:hover {
+          @if $use_high_contrast {
+            background: #333;
+            color: #fff;
+          } 
+          @else { background: $white; }
+        }
+        &:hover {
+          text-decoration: none;
+          background: $course-sidenav_list-item--bg-color;  
+          color: $course-sidenav_list-item--active-font-color;        
+        }
 
         & > span {
           white-space: nowrap;
         }
 
-        &:hover {
-          text-decoration: none;
-          @if $use_high_contrast {
-            background: #333;
-            color: #fff;
-          } @else {
-          background: $white;  
-          }
-          
-        }
+        
       }
 
       &:last-child > a {
@@ -84,19 +87,12 @@
   }
 
   a.active {
-    @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-    } @else {
-    background: $white;  
-    } 
+    /// active state colors and backgrounds on left sidenav            
+    background: $course-sidenav_list-item--bg-color;
+    color: $course-sidenav_list-item--active-font-color;
     &:hover {      
-      @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-      } @else {
-      background: $white;  
-      } 
+      background: $course-sidenav_list-item--bg-color;  
+      color: $course-sidenav_list-item--active-font-color;
     }
   }
 }
