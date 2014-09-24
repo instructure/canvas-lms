@@ -9784,7 +9784,6 @@ fr:
         published: "Date de publication"
     post_grades_dialog_title: "Publier les notes sur SIS"
     progression_module_collection: 
-      module_progress_for: "Progression dans le module pour %h{student_link}"
       module_progress_for_student: "Progression dans le module pour %{student.name}"
       no_modules_found: "Aucun module trouvé"
     progression_module_view: 
