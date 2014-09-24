@@ -9805,7 +9805,6 @@ zh:
         published: 已发布
     post_grades_dialog_title: "发布评分到 SIS"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} 学习单元的进度"
       module_progress_for_student: "%{student.name} 学习单元的进度"
       no_modules_found: 未找到学习单元
     progression_module_view: 
