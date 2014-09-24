@@ -82,15 +82,22 @@ class Assignment < ActiveRecord::Base
   validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
-    # only accept the url and new_tab params, the other accessible
+    # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
-    attrs.slice!(:url, :new_tab)
+    content = case attrs['content_type']
+                when 'Lti::MessageHandler'
+                  Lti::MessageHandler.find(attrs['content_id'].to_i)
+                when 'ContextExternalTool'
+                  ContextExternalTool.find(attrs['content_id'].to_i)
+              end
+    attrs[:content] = content if content
+    attrs.slice!(:url, :new_tab, :content)
     false
   }
   before_validation do |assignment|
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
-      assignment.external_tool_tag.content_type = "ContextExternalTool"
+      assignment.external_tool_tag.content_type ||= "ContextExternalTool"
     else
       assignment.association(:external_tool_tag).reset
     end

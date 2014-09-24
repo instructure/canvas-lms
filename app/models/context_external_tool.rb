@@ -93,7 +93,11 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
+    if type.to_s == 'module_item'
+      !!(self.selectable && (self.domain || self.url))
+    else
+      self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
+    end
   end
 
   def set_placement!(type, value=true)

@@ -82,7 +82,7 @@
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
-        <a href="<%= context_url(@context, :context_external_tools_url, :selectable => 1, :include_parents => '1', :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, controller:'lti/lti_apps', action:'launch_definitions', placements: %w{module_item resource_selection} , :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <table>
           <tr>
             <td colspan="2">

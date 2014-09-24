@@ -43,6 +43,9 @@ module Lti
           "tool_proxy_guid" => tool_proxy.guid
         }
 
+        #TODO: setting the tool_proxy to active should be a initiated through the UI by an admin/teacher
+        tool_proxy.update_attribute(:workflow_state, 'active')
+
         render json: json, status: :created
       else
         render json: {error: 'unauthorized'}, status: :unauthorized

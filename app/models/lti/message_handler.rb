@@ -24,6 +24,8 @@ module Lti
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
     has_many :links, :class_name => 'Lti::LtiLink'
 
+    has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
+
     serialize :capabilities
     serialize :parameters
 

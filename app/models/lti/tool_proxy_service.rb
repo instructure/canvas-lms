@@ -100,7 +100,6 @@ module Lti
 
     def process_resources(tp, tool_proxy)
       resource_handlers = tp.tool_profile.resource_handlers
-
       if tp.tool_profile.messages.present?
         product_name = tp.tool_profile.product_instance.product_info.product_name
         rh = IMS::LTI::Models::ResourceHandler.new.from_json(

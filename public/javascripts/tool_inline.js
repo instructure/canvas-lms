@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-define(['jquery', 'jquery.google-analytics'], function($) {
+define(['jquery', 'jquery.google-analytics', 'compiled/jquery/ModuleSequenceFooter'], function($) {
 
 var $toolForm = $("#tool_form")
 
@@ -123,6 +123,16 @@ window.addEventListener('message', function(e) {
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
   }
+
+    if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
+      $('#module_sequence_footer').moduleSequenceFooter({
+          assetType: 'Lti',
+          assetID: ENV.LTI.SEQUENCE.ASSET_ID,
+          courseID: ENV.LTI.SEQUENCE.COURSE_ID
+      });
+    }
+
 });
+
 
 });

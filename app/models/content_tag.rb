@@ -29,7 +29,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :content, :polymorphic => true
   validates_inclusion_of :content_type, :allow_nil => true, :in => ['Attachment', 'Assignment', 'WikiPage',
     'ContextModuleSubHeader', 'Quizzes::Quiz', 'ExternalUrl', 'LearningOutcome', 'DiscussionTopic',
-    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment']
+    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler']
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'LearningOutcomeGroup',
     'Assignment', 'Account', 'Quizzes::Quiz']

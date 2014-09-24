@@ -4,9 +4,9 @@ module Lti
   describe ToolConsumerProfileCreator do
 
     let(:root_account) { mock('root account', lti_guid: 'my_guid') }
-    let(:account) { mock('account', root_account: root_account) }
+    let(:account) { mock('account', id: 3, root_account: root_account) }
     let(:tcp_url) {'http://example.instructure.com/tcp/uuid'}
-    subject { ToolConsumerProfileCreator.new(account, tcp_url, 'example.instructure.com', 'account') }
+    subject { ToolConsumerProfileCreator.new(account, tcp_url) }
 
     describe '#create' do
 
@@ -48,12 +48,12 @@ module Lti
       it 'creates the registration service' do
         profile = subject.create
         reg_srv = profile.service_offered.find {|srv| srv.id.include? 'ToolProxy.collection'}
+
         expect(reg_srv.id).to eq "#{tcp_url}#ToolProxy.collection"
-        expect(reg_srv.endpoint).to eq 'https://example.instructure.com/api/lti/accounts/{account_id}/tool_proxy'
+        expect(reg_srv.endpoint).to include "3/tool_proxy"
         expect(reg_srv.type).to eq 'RestService'
         expect(reg_srv.format).to eq ["application/vnd.ims.lti.v2.toolproxy+json"]
         expect(reg_srv.action).to include 'POST'
-
       end
 
       it 'add the basic_launch capability' do

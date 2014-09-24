@@ -53,7 +53,7 @@ module Lti
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
           @lti_launch.link_text = resource_handler.name
           @lti_launch.launch_type = message.launch_presentation_document_target
-
+          module_sequence(message_handler)
           render template: 'lti/framed_launch' and return
         end
       end
@@ -62,6 +62,24 @@ module Lti
 
 
     private
+
+    def module_sequence(message_handler)
+      env_hash = {}
+      if params[:module_item_id]
+        context_module_tag = ContextModuleItem.find_tag_with_preferred([message_handler], params[:module_item_id])
+        @lti_launch.launch_type = 'window' if context_module_tag.new_tab
+        context_module_tag.context_module_action(@current_user, :read)
+        sequence_asset = context_module_tag.try(:content)
+        if sequence_asset
+          env_hash[:SEQUENCE] = {
+            :ASSET_ID => sequence_asset.id,
+            :COURSE_ID => @context.id,
+          }
+          js_hash = {:LTI => env_hash}
+          js_env(js_hash)
+        end
+      end
+    end
 
     def custom_params(parameters, tool_proxy, resource_link_id)
       params = IMS::LTI::Models::Parameter.from_json(parameters || [])

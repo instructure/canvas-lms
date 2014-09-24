@@ -1,11 +1,13 @@
 module Lti
   class ToolConsumerProfileCreator
 
-    def initialize(account, tcp_url, domain, context_type)
+    def initialize(context, tcp_url)
+      @context = context
       @tcp_url = tcp_url
-      @context_type = context_type
-      @root_account = account.root_account
-      @domain = domain
+      @root_account = context.root_account
+      uri = URI.parse(@tcp_url)
+      @domain = uri.host
+      @scheme = uri.scheme
     end
 
     def create
@@ -54,7 +56,7 @@ module Lti
     def create_tp_registration_service
       reg_srv = IMS::LTI::Models::RestService.new
       reg_srv.id = "#{@tcp_url}#ToolProxy.collection"
-      reg_srv.endpoint = "https://#{@domain}/api/lti/#{@context_type}s/{#{@context_type}_id}/tool_proxy"
+      reg_srv.endpoint = "#{@scheme}://#{@domain}/api/lti/#{@context.class.name.downcase}s/#{@context.id}/tool_proxy"
       reg_srv.type = 'RestService'
       reg_srv.format = ['application/vnd.ims.lti.v2.toolproxy+json']
       reg_srv.action = 'POST'
@@ -64,7 +66,7 @@ module Lti
     def create_tp_item_service
       reg_srv = IMS::LTI::Models::RestService.new
       reg_srv.id = "#{@tcp_url}#ToolProxy.item"
-      reg_srv.endpoint = "https://#{@domain}/api/lti/tool_settings/tool_proxy/{tool_proxy_id}"
+      reg_srv.endpoint = "#{@scheme}://#{@domain}/api/lti/tool_settings/tool_proxy/{tool_proxy_id}"
       reg_srv.type = 'RestService'
       reg_srv.format = ["application/vnd.ims.lti.v2.toolproxy+json"]
       reg_srv.action = ['GET']
@@ -74,7 +76,7 @@ module Lti
     def create_tp_settings_service
       reg_srv = IMS::LTI::Models::RestService.new
       reg_srv.id = "#{@tcp_url}#ToolProxySettings"
-      reg_srv.endpoint = "https://#{@domain}/api/lti/tool_settings/tool_proxy/{tool_proxy_id}"
+      reg_srv.endpoint = "#{@scheme}://#{@domain}/api/lti/tool_settings/tool_proxy/{tool_proxy_id}"
       reg_srv.type = 'RestService'
       reg_srv.format = ['application/vnd.ims.lti.v2.toolsettings+json', 'application/vnd.ims.lti.v2.toolsettings.simple+json']
       reg_srv.action = ['GET', 'PUT']
@@ -84,7 +86,7 @@ module Lti
     def create_binding_settings_service
       reg_srv = IMS::LTI::Models::RestService.new
       reg_srv.id = "#{@tcp_url}#ToolProxyBindingSettings"
-      reg_srv.endpoint = "https://#{@domain}/api/lti/tool_settings/bindings/{binding_id}"
+      reg_srv.endpoint = "#{@scheme}://#{@domain}/api/lti/tool_settings/bindings/{binding_id}"
       reg_srv.type = 'RestService'
       reg_srv.format = ['application/vnd.ims.lti.v2.toolsettings+json', 'application/vnd.ims.lti.v2.toolsettings.simple+json']
       reg_srv.action = ['GET', 'PUT']
@@ -94,7 +96,7 @@ module Lti
     def create_link_settings_service
       reg_srv = IMS::LTI::Models::RestService.new
       reg_srv.id = "#{@tcp_url}#LtiLinkSettings"
-      reg_srv.endpoint = "https://#{@domain}/api/lti/tool_settings/links/{tool_proxy_id}"
+      reg_srv.endpoint = "#{@scheme}://#{@domain}/api/lti/tool_settings/links/{tool_proxy_id}"
       reg_srv.type = 'RestService'
       reg_srv.format = ['application/vnd.ims.lti.v2.toolsettings+json', 'application/vnd.ims.lti.v2.toolsettings.simple+json']
       reg_srv.action = ['GET', 'PUT']

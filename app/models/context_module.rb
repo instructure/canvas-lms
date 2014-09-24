@@ -372,16 +372,17 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = (self.context.feature_enabled?(:draft_state) ? 'unpublished' : workflow_state)
       added_item.save
       added_item
-    elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool'
+    elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool' || params[:type] == 'lti/message_handler'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
-      tool = ContextExternalTool.find_external_tool(params[:url], self.context, params[:id].to_i)
-      unless tool
-        tool = ContextExternalTool.new
-        tool.id = 0
-      end
+
+      content = if params[:type] == 'lti/message_handler'
+                  Lti::MessageHandler.for_context(context).where(id: params[:id]).first
+                else
+                  ContextExternalTool.find_external_tool(params[:url], self.context, params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
+                end
       added_item.attributes = {
-        :content => tool,
+        content: content,
         :url => params[:url],
         :new_tab => params[:new_tab],
         :tag_type => 'context_module',
