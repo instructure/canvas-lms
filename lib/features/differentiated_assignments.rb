@@ -20,11 +20,11 @@ module Features
   module DifferentiatedAssignments
     class ModuleEvaluator < Struct.new(:course_id)
       def perform
-        ContextModuleProgression.joins(:context_module).
-        where(:context_modules => { :context_type => 'Course', :context_id => course_id}).
-        find_each do |prog|
-          prog.mark_as_outdated!
-        end
+        ContextModuleProgression.joins(:context_module).readonly(false).
+          where(:context_modules => { :context_type => 'Course', :context_id => course_id}).
+          find_each do |prog|
+            prog.mark_as_outdated!
+          end
       end
     end
   end

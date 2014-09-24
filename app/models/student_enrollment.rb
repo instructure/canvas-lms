@@ -34,6 +34,7 @@ class StudentEnrollment < Enrollment
     if self.course.feature_enabled?(:differentiated_assignments)
       ContextModuleProgression.for_user(self.user_id).
         joins(:context_module).
+        readonly(false).
         where(:context_modules => { :context_type => 'Course', :context_id => self.course_id}).
         each do |prog|
           prog.mark_as_outdated!
