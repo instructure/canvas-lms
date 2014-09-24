@@ -60,7 +60,7 @@ describe "Canvas::Redis" do
       Canvas.redis.set('blah', 'blah').should == nil
     end
 
-    it "should protect against ERR command errors" do
+    it "should protect against max # of client errors" do
       Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("ERR max number of clients reached")).once
       Canvas.redis.read('blah').should == nil
     end
@@ -68,6 +68,9 @@ describe "Canvas::Redis" do
     it "should pass through other command errors" do
       Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
       expect { Canvas.redis.evalsha('xxx') }.to raise_error(Redis::CommandError)
+
+      Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("ERR no such key")).once
+      expect { Canvas.redis.renamenx('no-such-key', 'new-key') }.to raise_error(Redis::CommandError)
     end
 
     describe "redis failure" do
