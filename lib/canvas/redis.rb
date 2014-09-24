@@ -58,7 +58,7 @@ module Canvas::Redis
     # exist.
     # These are both CommandErrors, so we can only differentiate based on the
     # exception message.
-    if e.is_a?(::Redis::CommandError) && e.message !~ /\bERR\b/
+    if e.is_a?(::Redis::CommandError) && e.message !~ /\bmax number of clients reached\b/
       raise
     end
 
