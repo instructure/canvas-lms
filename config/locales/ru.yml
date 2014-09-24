@@ -9744,7 +9744,6 @@ ru:
         published: Опубликовано
     post_grades_dialog_title: "Опубликовать оценки в SIS"
     progression_module_collection: 
-      module_progress_for: "Ход выполнения модуля %h{student_link}"
       module_progress_for_student: "Ход выполнения модуля %{student.name}"
       no_modules_found: "Модулей не найдено"
     progression_module_view: 
