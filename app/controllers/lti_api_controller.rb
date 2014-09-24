@@ -72,11 +72,20 @@ class LtiApiController < ApplicationController
     return render :text => '', :status => 200
   end
 
+  def logout_service
+    token = Lti::LogoutService::Token.parse_and_validate(params[:token])
+    verify_oauth(token.tool)
+    Lti::LogoutService.register_logout_callback(token.pseudonym, params[:callback])
+    return render :text => '', :status => 200
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    return render :text => e, :status => 401
+  end
+
   protected
 
-  def verify_oauth
+  def verify_oauth(tool = nil)
     # load the external tool to grab the key and secret
-    @tool = ContextExternalTool.find(params[:tool_id])
+    @tool = tool || ContextExternalTool.find(params[:tool_id])
 
     # verify the request oauth signature, timestamp and nonce
     begin

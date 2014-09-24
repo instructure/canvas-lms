@@ -686,6 +686,7 @@ class PseudonymSessionsController < ApplicationController
   def logout_current_user
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'logout')
+    Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
   end
 
