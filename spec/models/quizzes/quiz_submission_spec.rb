@@ -1092,6 +1092,37 @@ describe Quizzes::QuizSubmission do
     end
 
   end
+  describe "#needs_grading" do
+    before :once do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.due_at = 3.hours.ago
+      @quiz.save!
+    end
+    before :each do
+      @submission = @quiz.generate_submission(@student)
+      @submission.end_at = @quiz.due_at
+      @submission.save!
+      @resp = Quizzes::QuizSubmission.needs_grading
+    end
+    it "finds an outstanding submissions" do
+      @resp.size.should == 1
+    end
+    it "returns quiz_submission information" do
+      @resp.first.should be_a(Quizzes::QuizSubmission)
+      @resp.first.id.should == @submission.id
+    end
+    it "returns user information" do
+      @resp.first.user.should be_a(User)
+      @resp.first.user.id.should == @student.id
+    end
+    it "returns items which require grading" do
+      @resp.map(&:needs_grading?).all?.should be true
+    end
+  end
 
   describe "#questions_regraded_since_last_attempt" do
     before :once do

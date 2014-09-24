@@ -221,6 +221,20 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def self.needs_grading
+     resp = where("(
+         quiz_submissions.workflow_state = 'untaken'
+         AND quiz_submissions.end_at < :time
+       ) OR
+       (
+         quiz_submissions.workflow_state = 'completed'
+         AND quiz_submissions.submission_data IS NOT NULL
+       )", {time: Time.now})
+     resp.select! { |qs| qs.needs_grading? }
+     resp
+   end
+
+  # There is also a needs_grading scope which needs to replicate this logic
   def needs_grading?(strict=false)
     if strict && self.untaken? && self.overdue?(true)
       true

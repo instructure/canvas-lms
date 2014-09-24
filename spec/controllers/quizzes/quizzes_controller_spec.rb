@@ -141,7 +141,7 @@ describe Quizzes::QuizzesController do
       user_session(@student)
       course_quiz(active = true)
 
-      Quizzes::SubmissionManager.expects(:grade_outstanding_submissions_in_course)
+      Quizzes::OutstandingQuizSubmissionManager.expects(:grade_by_course)
 
       get 'index', :course_id => @course.id
     end

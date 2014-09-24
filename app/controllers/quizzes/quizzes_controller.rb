@@ -108,10 +108,9 @@ class Quizzes::QuizzesController < ApplicationController
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
     })
 
-    # TODO: stop doing this here
     if @current_user.present?
-      Quizzes::SubmissionManager.send_later_if_production(:grade_outstanding_submissions_in_course,
-        @current_user.id, @context.id, @context.class.to_s)
+      Quizzes::OutstandingQuizSubmissionManager.send_later_if_production(:grade_by_course,
+        @context)
     end
 
     log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
