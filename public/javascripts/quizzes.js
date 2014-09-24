@@ -3697,7 +3697,7 @@ define([
     });
     $question.bind('recompute_variables', function(event, in_dom) {
       $question.find(".variables .variable").each(function() {
-        $(this).find(".variable_setting:first").trigger('change', in_dom ? null : {recompute: true});
+        $(this).find(".variable_setting:first").trigger('change', in_dom ? { recompute: true, cache: true } : { cache: true });
       });
     });
     $question.bind('settings_change', function(event, remove) {
@@ -3716,6 +3716,7 @@ define([
       }
       $question.find(".combinations_holder").showIf($question.find(".combinations tbody tr").length > 0);
     });
+
     $question.find(".variables").delegate('.variable_setting', 'change', function(event, options) {
       var question_type = $question.find(".question_type").val();
       if (question_type != 'calculated_question') {
@@ -3723,7 +3724,7 @@ define([
       }
       var $variable = $(event.target).parents(".variable")
       var data = $variable.data('cached_data');
-      if (!data || !options || !options.cache) {
+      if (!data || !options || !options.cache || (options.recompute && options.cache)) {
         data = $variable.getFormData();
         data.min = parseFloat(data.min) || 0;
         data.max = Math.max(data.min, parseFloat(data.max) || 0);
