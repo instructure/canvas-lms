@@ -69,9 +69,12 @@ module Lti
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
                 '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
-                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' }
+                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
             }
         )
+        if pseudonym
+          substitutions.merge!({'$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) }})
+        end
       end
 
       substitutions
