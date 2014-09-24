@@ -278,10 +278,39 @@ class PseudonymSessionsController < ApplicationController
       params['logoutRequest'] =~ %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(.*)</samlp:SessionIndex>}m
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      return render :text => "OK", :status => :ok if Pseudonym.release_cas_ticket($1)
+      return render :text => "OK", :status => :ok if Pseudonym.release_cas_ticket($1,last_cas_ticket($1))
     end
     render :text => "NO SESSION FOUND", :status => :not_found
   end
+
+  def last_cas_ticket(ticket)
+    #Finds out if there have been later cas based logins for this user.
+    #By defaul assume that it is not the last login
+    last_ticket = false
+    user_id = Canvas.redis.get("cas_session:#{ticket}")
+    #find the other service tickests for this user and the time(in seconds) that
+    #were created
+    users_service_tickets = Canvas.redis.keys("cas_session:#{user_id}:*")
+    #this is brute force and could be made more elegant.  It basically
+    #reverse the redis hash and makes a new one keyed by the time the
+    #ticket was created in canvas.
+    tickets = Hash.new
+    users_service_tickets.each do |key|
+      if other_date_key = Canvas.redis.get(key)
+        tickets[other_date_key] = key
+      end
+    end
+    #The new has is sorted and the last ticket created is found and
+    #compared to the ticket we are working on.  If they match we know we
+    #are working on the last ticket and can act differently about shutting
+    #down the pseudonym
+    most_recent_ticket = tickets[tickets.keys.sort.last]
+    if most_recent_ticket.split(':').last.eql?(ticket)
+      last_ticket = true
+    end
+    last_ticket
+  end
+
 
   def clear_file_session
     session.delete('file_access_user_id')

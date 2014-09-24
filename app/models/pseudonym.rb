@@ -434,17 +434,35 @@ class Pseudonym < ActiveRecord::Base
 
   def claim_cas_ticket(ticket)
     return unless Canvas.redis_enabled?
-    Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
+    Canvas.redis.setex("cas_session:#{ticket}", 1.day,global_id)
+    Canvas.redis.setex("cas_session:#{global_id}:#{ticket}", 1.day,DateTime.now.to_i)
   end
 
-  def self.release_cas_ticket(ticket)
+  def self.release_cas_ticket(ticket, last_ticket = false)
+    #TODO in ruby 2.x convert to named arguments
+    #TODO in the case this is the last service ticket for the
+    #user they should have thier login fully reset and be logged
+    #out.  Imagine the case of the compromised account and
+    #sending the SLO commond from CAS to log the user out
+    #of everything thing they are logged into.
     return unless Canvas.redis_enabled?
     redis_key = "cas_session:#{ticket}"
-    if id = Canvas.redis.get(redis_key)
+    id = Canvas.redis.get(redis_key)
+    redis_user_service_tickets = "cas_session:#{redis_key}"
+    redis_timestamp_key = "cas_session:#{id}:#{ticket}"
+    date = Canvas.redis.get(redis_timestamp_key)
+    if id && date
       pseudonym = Pseudonym.find_by_id(id)
       Canvas.redis.del(redis_key)
+      Canvas.redis.del(redis_timestamp_key)
     end
-    pseudonym.try(:reset_persistence_token!)
+    #remove the key storing the time the ticket was created
+    Canvas.redis.del(redis_user_service_tickets) if last_ticket
+    #since this is the last ticket remove the container and everything in it
+    Canvas.redis.del(redis_user_service_tickets.split(':')[0,1].join(':')) if last_ticket
+    pseudonym.try(:reset_persistence_token!) if last_ticket
     pseudonym
   end
+
+
 end
