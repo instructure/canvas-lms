@@ -7,14 +7,6 @@ body
     background-color: #f7f7f7    
   min-width: $min_main_width
 
-  @if $use_high_contrast
-    background: white
-  @else
-    @if $is-k12
-      background: white
-    @else
-      background-color: #efefef
-  
   &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
