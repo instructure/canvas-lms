@@ -629,47 +629,6 @@ if defined? ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
   end
 end
 
-# join dependencies in AR 3 insert the conditions right away, but because we have
-# some reflection conditions that rely on joined tables, we need to insert them later on
-
-# e.g.: LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
-#       AND courses.workflow_state='available'
-#       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
-
-# to:   LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
-#       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
-#       WHERE courses.workflow_state='available'
-ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
-  def conditions
-    unless @conditions
-      @conditions = reflection.conditions.reverse
-      chain.reverse.each_with_index do |reflection, i|
-        if reflection.options[:joins]
-          @join_conditions ||= []
-          @join_conditions << sanitize(@conditions[i], @tables[i])
-          @conditions[i] = []
-        end
-      end
-    end
-    @conditions
-  end
-
-  def join_to_with_join_conditions(*args)
-    relation = join_to_without_join_conditions(*args)
-    relation = relation.where(@join_conditions) if @join_conditions.present?
-    @join_conditions = []
-    relation
-  end
-  alias_method_chain :join_to, :join_conditions if CANVAS_RAILS3 # TODO RAILS4: this changed drastically
-end
-
-ActiveRecord::Associations::Preloader::Association.class_eval do
-  def build_scope_with_joins
-    build_scope_without_joins.joins(preload_options[:joins] || options[:joins])
-  end
-  alias_method_chain :build_scope, :joins
-end
-
 ActiveRecord::Relation.class_eval do
   def find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
