@@ -1332,12 +1332,12 @@ class ActiveRecord::Migration
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
-    def transactional?
-      @transactional != false
-    end
+    if CANVAS_RAILS3
+      attr_accessor :disable_ddl_transaction
 
-    def disable_ddl_transaction!
-      @transactional = false
+      def disable_ddl_transaction!
+        @disable_ddl_transaction = true
+      end
     end
 
     def tag(*tags)
@@ -1366,8 +1366,10 @@ class ActiveRecord::Migration
     end
   end
 
-  def transactional?
-    connection.supports_ddl_transactions? && self.class.transactional?
+  if CANVAS_RAILS3
+    def disable_ddl_transaction
+      self.class.disable_ddl_transaction
+    end
   end
 
   def tags
@@ -1376,7 +1378,10 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :transactional?, :tags, :to => :migration
+  delegate :connection, :tags, to: :migration
+  if CANVAS_RAILS3
+    delegate :disable_ddl_transaction, to: :migration
+  end
 
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?
@@ -1477,17 +1482,23 @@ class ActiveRecord::Migrator
           record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
         end
       rescue => e
-        canceled_msg = migration.transactional? ? "this and " : ""
+        canceled_msg = use_transaction?(migration)? "this and " : ""
         raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
       end
     end
   end
 
-  def ddl_transaction(migration)
-    if migration.transactional?
-      migration.connection.transaction { yield }
-    else
-      yield
+  if CANVAS_RAILS3
+    def ddl_transaction(migration)
+      if use_transaction?(migration)
+        migration.connection.transaction { yield }
+      else
+        yield
+      end
+    end
+
+    def use_transaction?(migration)
+      !migration.disable_ddl_transaction && migration.connection.supports_ddl_transactions?
     end
   end
 end
