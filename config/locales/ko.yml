@@ -8978,7 +8978,6 @@ ko:
         prerequisites: "필수 조건"
         published: 게시됨
     progression_module_collection: 
-      module_progress_for: "%h{student_link}의 모듈 진행률"
       module_progress_for_student: "%{student.name}의 모듈 진행률"
       no_modules_found: "모듈을 찾을 수 없음"
     progression_module_view: 
