@@ -557,7 +557,7 @@ describe "LTI tool combination" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
     unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test.")
+    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test")
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access

@@ -100,6 +100,7 @@ class CanvasUnzip
 
     file = File.open(archive_filename)
     mime_type = File.mime_type?(file)
+
     if mime_type == 'application/x-gzip'
       file = Zlib::GzipReader.new(file)
       mime_type = 'application/x-tar' # it may not actually be a tar though, so rescue if there's a problem
@@ -120,10 +121,10 @@ class CanvasUnzip
           index += 1
         end
       rescue Gem::Package::TarInvalidError
-        raise UnknownArchiveType
+        raise UnknownArchiveType, "invalid tar"
       end
     else
-      raise UnknownArchiveType
+      raise UnknownArchiveType, "unknown mime type #{mime_type}"
     end
   end
 
