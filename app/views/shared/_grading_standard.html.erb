@@ -1,3 +1,4 @@
+<% grading_standard ||= nil %>
 <% grading_standard_list ||= false %>
 <% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
 <div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">

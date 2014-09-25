@@ -22,7 +22,6 @@
 
   <ul class='courses' style="list-style-type: none;">
     <%= render :partial => "course", :collection => @courses %>
-    <%= render :partial => "course" %>
   </ul>
 <% else %>
   <h3><%= @root_account.enrollment_terms.active.count > 1 ?

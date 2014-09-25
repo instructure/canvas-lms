@@ -1,4 +1,6 @@
-<% answer = display_answer 
+<%
+  display_answer ||= nil
+  answer = display_answer
   assessment_results ||= false
   question_type ||= OpenObject.new
   question ||= nil

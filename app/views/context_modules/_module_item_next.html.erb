@@ -1,4 +1,5 @@
 <%
+  module_item_next ||= nil
   module_item = module_item_next
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
   tag = module_item || nil; completion_criteria ||= nil; editable ||= false
