@@ -9716,7 +9716,6 @@ fa-IR:
         published: "منتشر شده"
     post_grades_dialog_title: "ارسال نمره ها به سامانه اطلاعات دانشجو"
     progression_module_collection: 
-      module_progress_for: "پیشرفت ماژول برای %h{student_link} "
       module_progress_for_student: "پیشرفت ماژول برای %{student.name}"
       no_modules_found: "هیچ ماژولی یافت نشد"
     progression_module_view: 
