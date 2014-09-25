@@ -975,6 +975,7 @@ describe CoursesController, type: :request do
       { :controller => 'courses', :action => 'index', :format => 'json' },
       { :include => ['sections'] })
 
+    json.sort_by! { |e| e['id'] }
     course1_section_json = json.first['sections']
 
     section = @course1.course_sections.first
