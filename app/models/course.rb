@@ -26,6 +26,9 @@ class Course < ActiveRecord::Base
   include HtmlTextHelper
   include TimeZoneHelper
 
+  attr_accessor :teacher_names
+  attr_writer :student_count
+
   attr_accessible :name,
                   :section,
                   :account,
@@ -2752,5 +2755,9 @@ class Course < ActiveRecord::Base
     else
       self.content_exports.non_admin(user)
     end
+  end
+
+  def student_count
+    read_attribute(:student_count) || @student_count
   end
 end

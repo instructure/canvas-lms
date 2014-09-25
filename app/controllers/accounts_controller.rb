@@ -719,9 +719,9 @@ class AccountsController < ApplicationController
       result
     end
     @courses.each do |course|
-      course.write_attribute(:student_count, course_to_student_counts[course.id] || 0)
+      course.student_count = course_to_student_counts[course.id] || 0
       course_teachers = courses_to_teachers[course.id] || []
-      course.write_attribute(:teacher_names, course_teachers.uniq(&:user_id).map(&:user_name))
+      course.teacher_names = course_teachers.uniq(&:user_id).map(&:user_name)
     end
   end
   protected :build_course_stats
