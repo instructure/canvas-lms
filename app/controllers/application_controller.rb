@@ -520,7 +520,7 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      courses = @context.enrollments.current.shard(@context).select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
           g.context.concluded?} : []
       if only_contexts.present?

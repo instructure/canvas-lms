@@ -93,8 +93,8 @@ module SearchHelper
         add_courses.call [context.course], :current
         add_sections.call context.course.sections_visible_to(@current_user, [context])
       else
-        add_courses.call @current_user.concluded_courses.with_each_shard, :concluded
-        add_courses.call @current_user.courses.with_each_shard, :current
+        add_courses.call @current_user.concluded_courses.shard(@current_user).to_a, :concluded
+        add_courses.call @current_user.courses.shard(@current_user).to_a, :current
         add_sections.call @current_user.messageable_sections
         add_groups.call @current_user.messageable_groups
       end

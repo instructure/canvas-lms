@@ -95,7 +95,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @context.is_a?(Course) && @user ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
+          @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles

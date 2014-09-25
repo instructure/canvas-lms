@@ -51,7 +51,7 @@
             <th><%= t('enrollments', 'Enrollments') %></th>
             <td><%= t('no_enrollments', 'no enrollments') %></td>
             <td>
-              <% enrollments = (user.current_enrollments + other_user.current_enrollments).sort_by{|e| [e.state_sortable, e.rank_sortable, Canvas::ICU.collation_key(e.course.name)] } %>
+              <% enrollments = (user.enrollments.current + other_user.enrollments.current).sort_by{|e| [e.state_sortable, e.rank_sortable, Canvas::ICU.collation_key(e.course.name)] } %>
               <% if enrollments.empty? %>
                 <%= t('no_enrollments', 'no enrollments') %>
               <% else %>
