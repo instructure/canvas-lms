@@ -14,12 +14,13 @@ define [
   FilesApp = React.createClass
     displayName: 'FilesApp'
 
-    onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults}) ->
+    onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults, searchResultCollection}) ->
       @setState
         currentFolder: currentFolder
         rootTillCurrentFolder: rootTillCurrentFolder
         showingSearchResults: showingSearchResults
         selectedItems: []
+        searchResultCollection: searchResultCollection
 
     getInitialState: ->
       {
@@ -32,11 +33,13 @@ define [
     mixins: [MultiselectableMixin]
 
     # for MultiselectableMixin
-    selectables: -> @state.currentFolder.children(@props.query)
+    selectables: ->
+      if @state.showingSearchResults
+        @state.searchResultCollection.models
+      else
+        @state.currentFolder.children(@props.query)
 
     render: withReactDOM ->
-      userCanManageFilesForContext = filesEnv.userHasPermission(@state.currentFolder, 'manage_files')
-
       if @state.currentFolder # when showing a folder
         contextType = @state.currentFolder.get('context_type').toLowerCase() + 's'
         contextId = @state.currentFolder.get('context_id')
@@ -44,6 +47,7 @@ define [
         contextType = filesEnv.contextType
         contextId = filesEnv.contextId
 
+      userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files')
 
       div null,
         Breadcrumbs({
