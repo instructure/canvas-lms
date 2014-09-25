@@ -49,10 +49,6 @@ module Canvas::Redis
     raise reply if reply.is_a?(Exception)
     reply
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
-    CanvasStatsd::Statsd.increment("redis.errors.all")
-    CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
-    Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
-
     # We want to rescue errors such as "max number of clients reached", but not
     # actual logic errors such as trying to evalsha a script that doesn't
     # exist.
@@ -61,6 +57,10 @@ module Canvas::Redis
     if e.is_a?(::Redis::CommandError) && e.message !~ /\bmax number of clients reached\b/
       raise
     end
+
+    CanvasStatsd::Statsd.increment("redis.errors.all")
+    CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
+    Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
     if self.ignore_redis_failures?
       ErrorReport.log_exception(:redis, e)
