@@ -9818,7 +9818,6 @@ en-AU:
         published: Published
     post_grades_dialog_title: "Post Grades to SIS"
     progression_module_collection: 
-      module_progress_for: "Module Progress for %h{student_link}"
       module_progress_for_student: "Module Progress for %{student.name}"
       no_modules_found: "No modules were found"
     progression_module_view: 
