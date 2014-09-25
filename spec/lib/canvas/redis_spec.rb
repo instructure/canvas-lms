@@ -66,6 +66,8 @@ describe "Canvas::Redis" do
     end
 
     it "should pass through other command errors" do
+      CanvasStatsd::Statsd.expects(:increment).never
+
       Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
       expect { Canvas.redis.evalsha('xxx') }.to raise_error(Redis::CommandError)
 
