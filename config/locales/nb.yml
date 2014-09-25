@@ -44,7 +44,7 @@ nb:
     account_settings: 
       account_surveys: Kontoundersøkelser
       avatars: Brukeravatar
-      delicious: Delicious
+      delicious: Deilige
       diigo: Diigo
       facebook: Facebook
       google_docs: "Google Docs"
@@ -4949,6 +4949,8 @@ nb:
       rss_feed: "%{course} strøm"
     unauthorized: 
       invalid_link: "Påmeldingslenka du brukte er ikke lenger gyldig. Kontakt kursets instruktør og sjekk at du er korrekt påmeldt."
+  create_item_base: 
+    there_was_an_error: "Det oppstod en feil ved lagring av \"%{title}\", vennligst prøv igjen."
   create_module_item: 
     assignment_name: Oppgavenavn
   create_module_item_quiz: 
@@ -6077,7 +6079,7 @@ nb:
     app_review_view: 
       posted_by_on: "Postet av *%{user.name}* *%{created_at}*"
     app_saved_message: "%{app} lagret."
-    assignment_menu_configured: "Oppdrag menyen konfigurert"
+    assignment_menu_configured: "Oppdrag meny konfigurert"
     buttons: 
       cancel: Avbryt
       delete: Slett
@@ -6149,6 +6151,7 @@ nb:
       all: Alle
       app_headder: "Eksterne apper"
       external_tools_note: "Apper er en enkel måte å legge til funksjoner i Canvas. De kan legges til individuelle kurs, eller til alle kurs i en konto. Når de er satt opp kan du lenke til dem fra kursmodulene og opprette oppgaver for vurderingsverktøy."
+      external_tools_references: "*Opplev nokre LTI verktøy* som fungerer fint med Canvas. Du kan også sjekke ut **Canvas Fellesskap emner om LTI verktøy**"
       installed: Installert
       not_installed: "Ikke installert"
       search_filter: "Filtrer etter navn"
@@ -9798,7 +9801,6 @@ nb:
         published: Publisert
     post_grades_dialog_title: "Send karakterer til SIS"
     progression_module_collection: 
-      module_progress_for: "Modulframdrift for %h{student_link}"
       module_progress_for_student: "Modulframdrift for %{student.name}"
       no_modules_found: "Ingen moduler funnet"
     progression_module_view: 
@@ -9846,6 +9848,10 @@ nb:
   new_facebook_message: "Du har en ny beskjed fra Canvas"
   new_quiz_moderate_desc: "Når utkastmodus og prøvestatistikk er tillatt/på, aktiveres den nye prøve-modereringssiden for en konto."
   new_quiz_statistics_desc: "Når Utkastmodus er tillatt/på, aktiveres den nye prøve-statistikksiden for en konto."
+  new_styles_description: |-
+      Vi jobber med en UI ansiktsløft til lerret. Snu dette videre til for å melde seg til å se den
+      oppdatert, forenklet utseendet og føles av lerretet grensesnittet. Dette er en svært "Arbeid pågår"
+      funksjonen og bør ikke slås på i produksjon for faktiske brukerne ennå.
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   not_a_number: "må være et positivt tall"
   notification: 
