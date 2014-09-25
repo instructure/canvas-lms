@@ -9599,7 +9599,6 @@ tr:
         published: Yayınlandı
     post_grades_dialog_title: "Notları ÖBS'ye Gönder"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} Modüldeki Durumu"
       module_progress_for_student: " %{student.name} Modüldeki Durumu"
       no_modules_found: "Modüller bulunamadı"
     progression_module_view: 
