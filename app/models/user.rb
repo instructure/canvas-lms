@@ -2570,4 +2570,10 @@ class User < ActiveRecord::Base
       dismiss_bouncing_channel_message!
     end
   end
+
+  def locale
+    result = super
+    result = nil unless I18n.locale_available?(result)
+    result
+  end
 end

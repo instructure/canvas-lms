@@ -135,8 +135,10 @@ class Account < ActiveRecord::Base
   include FeatureFlags
 
   def default_locale(recurse = false)
-    read_attribute(:default_locale) ||
-    (recurse && parent_account ? parent_account.default_locale(true) : nil)
+    result = read_attribute(:default_locale)
+    result ||= parent_account.default_locale(true) if recurse && parent_account
+    result = nil unless I18n.locale_available?(result)
+    result
   end
 
   cattr_accessor :account_settings_options
