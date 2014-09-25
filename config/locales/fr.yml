@@ -444,7 +444,7 @@ fr:
           restore_course: "Restaurer les cours"
         view_messages: "Afficher les notifications"
       admin_tools_cumb: "Outils d’administration"
-      admin_tools_title: "Outils Admin"
+      admin_tools_title: "Outils d’administration"
       auth_logging_content_pane: 
         auth_logging: "Connexions/déconnexions des utilisateurs"
       auth_logging_search_results: 
@@ -1276,7 +1276,7 @@ fr:
       recipients_required: "Un destinataire au moins est requis"
       threshold_should_be_numeric: "Le nombre indiqué doit être positif"
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
-  allow_opt_out_of_inbox: "Permet aux utilisateurs de sortir de la boîte de réception des conversations. Cela aura les conséquences suivantes : tous les messages et notifications des conversations seront envoyés sous forme d’alertes ASAP à l’adresse e-mail principale de l’utilisateur, le symbole des messages non lus de la boîte de réception des conversations et les préférences de notification seront masqués"
+  allow_opt_out_of_inbox: "Permet aux utilisateurs de sortir de la boîte de réception des conversations. Cela aura les conséquences suivantes : tous les messages et notifications des conversations seront envoyés sous forme d’alertes ASAP à l’adresse e-mail principale de l’utilisateur, et le symbole des messages non lus de la boîte de réception des conversations et les préférences de notification seront masqués."
   analytics: 
     course: 
       analytics: Analyse
@@ -3084,7 +3084,7 @@ fr:
     index: 
       buttons: 
         create: "Créer une exportation du cours"
-      content_exports: "Exportations du cours"
+      content_exports: "Exportations du contenu"
       export_type: "Type d’exportation"
       labels: 
         course: Cours
@@ -3160,7 +3160,7 @@ fr:
   content_migration: 
     bad_attachment: "Le fichier n’a pas été chargé correctement."
     errors: 
-      cannot_shift_and_remove: "cannot specify shift_dates and remove_dates simultaneously"
+      cannot_shift_and_remove: "impossible de spécifier shift_dates et remove_dates en même temps"
       import_error: "Erreur lors de l’importation :"
     missing_content_links_message: "Les références suivantes n’ont pas été trouvées :"
     missing_content_links_title: "Liens manquants trouvés dans le contenu importé"
@@ -3711,9 +3711,11 @@ fr:
         after: Après
         before: Avant
         or: OU
+        place: Placer
       move_module_item: 
         into: dans
         or: OU
+        place: Placer
       must_complete_prerequisites: "Ils doivent terminer"
       no_preprequisites: "Aucun prérequis défini"
       no_requirements: "Aucune condition requise définie"
@@ -4750,6 +4752,8 @@ fr:
           delete_section: "Supprimer la section"
           edit_section: "Modifier la section"
       megabytes: mégaoctets
+      move_module: 
+        place: Placer
       move_nav_item: 
         after: Après
         before: Avant
@@ -4936,7 +4940,7 @@ fr:
     unauthorized: 
       invalid_link: "Le lien d’inscription utilisé semble n’être plus valide. Contactez le formateur du cours pour vérifier si vous êtes toujours inscrit."
   create_item_base: 
-    there_was_an_error: "Une erreur s’est produite lors de l’enregistrement de \"%{title}\". Réessayez ultérieurement"
+    there_was_an_error: "Une erreur s’est produite lors de l’enregistrement de \"%{title}\". Réessayez ultérieurement."
   create_module_item: 
     assignment_name: "Nom du travail"
   create_module_item_quiz: 
@@ -6224,7 +6228,7 @@ fr:
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
   features: 
-    allow_opt_out_of_inbox: "Autoriser des utilisateurs à sortir de la boîte de réception"
+    allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
     better_file_browsing: "Meilleure navigation dans les fichiers"
     differentiated_assignments: "Travaux différenciés"
     draft_state: "État du brouillon"
@@ -6743,7 +6747,7 @@ fr:
       close_rubric: "Fermer le barème"
       close_score: Fermer
       close_score_screenreader: "Fermer les détails des résultats"
-      collapse: "Réduire tous les autres groupes de résultats pour la maîtrise de l’apprentissage"
+      collapse: "Réduire tous les groupes de résultats pour la maîtrise de l’apprentissage"
       collapse_title: Réduire
       comment_count: 
         one: 1 commentaire
@@ -12355,6 +12359,9 @@ fr:
         student_n: "Étudiant %{student_counter}"
         survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de toutes les tentatives de tous les utilisateurs."
         survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de la dernière tentative de chaque utilisateur."
+      statistics_cqs: 
+        page_title: "Statistiques CQS"
+      statistics_cqs_crumb: "Statistiques CQS"
       statistics_crumb: Statistiques
       submission_version: 
         attempt_number: "Tentative %{att_no}"
@@ -12535,8 +12542,8 @@ fr:
     upload_warning: "Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître."
   react_files: 
     cancel: Annuler
-    confirm_delete: "Voulez-vous vraiment supprimer %{name}?"
-    confirm_delete_selected: "Voulez-vous vraiment supprimer ces %{count} élémentsitems?"
+    confirm_delete: "Voulez-vous vraiment supprimer %{name} ?"
+    confirm_delete_selected: "Voulez-vous vraiment supprimer ces %{count} éléments ?"
     count_items_selected: "%{count} éléments sélectionnés"
     delete: Supprimer
     deleted_items_successfully: "%{count} éléments correctement supprimés"
@@ -12624,6 +12631,10 @@ fr:
         name: Nom
     welcome_to_canvas: "Bienvenue dans Canvas !"
   reply_from_name: "%{name} via les notifications Canvas "
+  respondus_soap_endpoint: 
+    plugin_settings: 
+      labels: 
+        enabled: "Activé (le convertisseur QTI doit être activé également)"
   restrict_student_access: 
     aria_label: 
       availableFrom: "Disponible depuis"
@@ -12639,6 +12650,7 @@ fr:
     options_2: 
       description: "Planifier la disponibilité des étudiants"
     title: 
+      default_title: Dialogue
       limit_student_access: "Limiter l’accès des étudiants"
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
   role_override: 
@@ -14154,34 +14166,71 @@ fr:
     madrid: Madrid
     magadan: Magadan
     marshall_is: "Îles Marshall"
+    mazatlan: Mazatlán
     melbourne: Melbourne
+    mexico_city: Mexico
+    mid_atlantic: Mid-Atlantic
+    midway_island: "Îles Midway"
     minsk: Minsk
+    monrovia: Monrovia
     monterrey: Monterrey
     moscow: Moscou
+    mountain_time_us_canada: "Heure des Rocheuses (États-Unis et Canada)"
     mumbai: Mumbai
+    muscat: Muscat
     nairobi: Nairobi
     new_caledonia: Nouvelle-Calédonie
+    new_delhi: "New Delhi"
+    newfoundland: Terre-Neuve
+    novosibirsk: Novossibirsk
+    nukualofa: Nuku'alofa
+    osaka: Osaka
+    pacific_time_us_canada: "Heure du Pacifique (États-Unis et Canada)"
     paris: Paris
+    perth: Perth
+    port_moresby: "Port Moresby"
     prague: Prague
+    pretoria: Pretoria
     quito: Quito
+    rangoon: Rangoun
+    riga: Riga
+    riyadh: Riyad
     rome: Rome
     samoa: Samoa
     santiago: Santiago
+    sapporo: Sapporo
     sarajevo: Sarajevo
     saskatchewan: Saskatchewan
     seoul: Séoul
     singapore: Singapour
     skopje: Skopje
+    sofia: Sofia
+    solomon_is: " Îles Salomon"
+    sri_jayawardenepura: "Sri Jayawardenapura"
+    st_petersburg: Saint-Pétersbourg
     stockholm: Stockholm
     sydney: Sydney
+    taipei: Taipei
+    tallinn: Tallinn
+    tashkent: Tachkent
+    tbilisi: "Tbilissi "
+    tehran: Téhéran
     tijuana: Tijuana
+    tokelau_is: "Tokelau "
     tokyo: Tokyo
+    ulaan_bataar: Oulan-Bator
+    urumqi: Ürümqi
+    utc: UTC
     vienna: Vienne
     vilnius: Vilnius
     vladivostok: Vladivostok
     volgograd: Volgograd
     warsaw: Varsovie
+    wellington: Wellington
+    west_central_africa: "Afrique de l’Ouest et du Centre "
+    yakutsk: Iakoutsk
     yerevan: Erevan
+    zagreb: Zagreb
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Décrire l’image pour améliorer l’accessibilité"
@@ -14253,6 +14302,8 @@ fr:
   unpublished_courses_title: "Cours non publiés"
   unsupported_package: "Package de contenu non pris en charge"
   unused_courses_title: "Cours non utilisés"
+  upload_button: 
+    upload: "Mettre en ligne"
   upload_progress_view: 
     processing: traitement
   user: 
