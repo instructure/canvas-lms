@@ -333,8 +333,16 @@ class SearchController < ApplicationController
     return unless asset_string =~ (/\A((\w+)_(\d+))/)
     asset_string = $1
     asset_type = $2.to_sym
-    return unless [:course, :section, :group].include?(asset_type)
-    return unless context = Context.find_by_asset_string(asset_string)
+    asset_id = $3
+    context = nil
+    case asset_type
+    when :course, :group
+      return unless context = Context.find_by_asset_string(asset_string)
+    when :section
+      return unless context = CourseSection.find(asset_id)
+    else
+      return
+    end
     return unless context.grants_right?(@current_user, :read_as_admin)
     @admin_context = context
   end
