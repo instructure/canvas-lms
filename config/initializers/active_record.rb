@@ -940,69 +940,12 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
           col
     }
   end
-
-  def after_transaction_commit(&block)
-    if open_transactions <= base_transaction_level
-      block.call
-    else
-      @after_transaction_commit ||= []
-      @after_transaction_commit << block
-    end
-  end
-
-  def after_transaction_commit_callbacks
-    @after_transaction_commit || []
-  end
-
-  # the alias_method_chain needs to happen in the subclass, since they all
-  # override commit_db_transaction
-  def commit_db_transaction_with_callbacks
-    commit_db_transaction_without_callbacks
-    run_transaction_commit_callbacks
-  end
-
-  # this will only be chained in in Rails.env.test?, but we still
-  # sometimes stub Rails.env.test? in specs to specifically
-  # test behavior like this, so leave the check in this code
-  def release_savepoint_with_callbacks
-    release_savepoint_without_callbacks
-    return unless Rails.env.test?
-    return if open_transactions > base_transaction_level
-    run_transaction_commit_callbacks
-  end
-
-  def base_transaction_level
-    return 0 unless Rails.env.test?
-    return 1 unless defined?(Onceler)
-    Onceler.base_transactions
-  end
-
-  def rollback_db_transaction_with_callbacks
-    rollback_db_transaction_without_callbacks
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
-
-  def run_transaction_commit_callbacks
-    return unless @after_transaction_commit.present?
-    # the callback could trigger a new transaction on this connection,
-    # and leaving the callbacks in @after_transaction_commit could put us in an
-    # infinite loop.
-    # so we store off the callbacks to a local var here.
-    callbacks = @after_transaction_commit
-    @after_transaction_commit = []
-    callbacks.each { |cb| cb.call() }
-  ensure
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
 end
 
 module MySQLAdapterExtensions
   def self.included(klass)
     klass::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
     klass.alias_method_chain :configure_connection, :pg_compat
-    klass.alias_method_chain :commit_db_transaction, :callbacks
-    klass.alias_method_chain :rollback_db_transaction, :callbacks
-    klass.alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 
   def rename_index(table_name, old_name, new_name)
@@ -1212,14 +1155,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   end
 end
 
-if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
-  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
-    alias_method_chain :commit_db_transaction, :callbacks
-    alias_method_chain :rollback_db_transaction, :callbacks
-    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
-  end
-end
-
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def func(name, *args)
@@ -1278,10 +1213,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
         ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
       end
     end
-
-    alias_method_chain :commit_db_transaction, :callbacks
-    alias_method_chain :rollback_db_transaction, :callbacks
-    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 end
 

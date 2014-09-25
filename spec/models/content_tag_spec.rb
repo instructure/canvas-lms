@@ -466,14 +466,14 @@ describe ContentTag do
   end
 
   it "should touch the module after committing the save" do
-    Rails.env.stubs(:test?).returns(false)
     course
     mod = @course.context_modules.create!
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
-    tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
-    expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
-    mod.connection.run_transaction_commit_callbacks
+    ContextModule.transaction do
+      tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+      expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
+    end
     expect(mod.reload.updated_at).to be > 5.seconds.ago
   end
 

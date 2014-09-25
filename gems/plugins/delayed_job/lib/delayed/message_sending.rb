@@ -19,18 +19,12 @@ module Delayed
         # transaction are visible
         connection = self.connection if respond_to?(:connection)
         connection ||= ActiveRecord::Base.connection
-        transactions = 0
-        # specs run in an outer transaction that needs to be ignored
-        transactions += 1 if Rails.env.test?
 
-        if connection.open_transactions > transactions
-          if !Rails.env.test? && (Delayed::Job != Delayed::Backend::ActiveRecord::Job ||
-              connection != Delayed::Job.connection)
-            connection.after_transaction_commit do
-              Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
-            end
-            return nil
+        if (Delayed::Job != Delayed::Backend::ActiveRecord::Job || connection != Delayed::Job.connection)
+          connection.after_transaction_commit do
+            Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
           end
+          return nil
         end
       end
 

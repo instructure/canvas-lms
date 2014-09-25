@@ -71,12 +71,12 @@ describe 'Delayed::Backend::Redis::Job' do
 
   describe "send_later" do
     it "should schedule job on transaction commit" do
-      Rails.env.stubs(:test?).returns(false)
       before_count = Delayed::Job.jobs_count(:current)
-      job = "string".send_later :reverse
-      expect(job).to be_nil
-      expect(Delayed::Job.jobs_count(:current)).to eq before_count
-      ActiveRecord::Base.connection.run_transaction_commit_callbacks
+      User.transaction do
+        job = "string".send_later :reverse
+        expect(job).to be_nil
+        expect(Delayed::Job.jobs_count(:current)).to eq before_count
+      end
       Delayed::Job.jobs_count(:current) == before_count + 1
     end
   end
