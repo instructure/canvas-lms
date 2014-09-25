@@ -1,3 +1,4 @@
+@import "base/environment"
 @import "pages/shared/move_dialog"
 
 .accessibility-warning
@@ -94,9 +95,15 @@
 
 .sortable-handle, .draggable-handle
   cursor: pointer
-  color: #b4b7ba
+  @if $use_high_contrast
+    color: darken($canvas-neutral, 10%)
+  @else
+    color: darken($canvas-neutral, 40%)
   a
-    color: #b4b7ba
+    @if $use_high_contrast
+      color: darken($canvas-neutral, 10%)
+    @else
+      color: darken($canvas-neutral, 40%)
 
 .sortable-handle
   margin: 0 0px 0 -30px
