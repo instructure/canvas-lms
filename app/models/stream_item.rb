@@ -35,6 +35,7 @@ class StreamItem < ActiveRecord::Base
 
   attr_accessible :context, :asset
   after_destroy :destroy_stream_item_instances
+  attr_accessor :unread
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data

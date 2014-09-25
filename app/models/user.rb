@@ -1805,7 +1805,7 @@ class User < ActiveRecord::Base
           next unless si.present?
           next if si.asset_type == 'Submission'
           next if si.context_type == "Course" && si.context.concluded?
-          si.data.write_attribute(:unread, sii.unread?)
+          si.unread = sii.unread?
           si
         end.compact
       end
