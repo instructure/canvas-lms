@@ -848,6 +848,7 @@ ActiveRecord::Relation.class_eval do
     relation = clone
     old_select = relation.select_values
     relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
+    relation.uniq_value = false
     if old_select.empty?
       relation.select_values.first << "*"
     else
@@ -1108,17 +1109,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     end
   end
 
-end
-
-if CANVAS_RAILS3
-  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
-else
-  module HasManyAllowJoins
-    def valid_options
-      super + [:joins]
-    end
-  end
-  ActiveRecord::Associations::Builder::HasMany.send(:prepend, HasManyAllowJoins)
 end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do

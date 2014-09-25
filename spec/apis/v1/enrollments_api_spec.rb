@@ -601,13 +601,13 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should list all of a user's enrollments in an account" do
-        e = @student.current_enrollments.first
+        e = @student.enrollments.current.first
         sis_batch = e.root_account.sis_batches.create
         SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
         e.sis_batch_id = sis_batch.id
         e.save!
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
+        enrollments = @student.enrollments.current.includes(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -657,7 +657,7 @@ describe EnrollmentsApiController, type: :request do
         recent_activity.record!(Time.zone.now - 5.minutes)
         recent_activity.record!(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
+        enrollments = @student.enrollments.current.includes(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -931,7 +931,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should list its own enrollments" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @user.current_enrollments.includes(:user).order("users.sortable_name ASC")
+        enrollments = @user.enrollments.current.includes(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,

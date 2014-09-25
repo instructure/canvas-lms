@@ -71,6 +71,12 @@ class Enrollment < ActiveRecord::Base
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
+  scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
+  scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }
+  scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
+  scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
+  scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
   def valid_role?
     return true if role.built_in?
 

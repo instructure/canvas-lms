@@ -480,7 +480,7 @@ class EnrollmentsApiController < ApplicationController
       if params[:state].present?
         enrollments = user.enrollments.where(enrollment_index_conditions(true))
       else
-        enrollments = user.current_and_invited_enrollments.where(enrollment_index_conditions)
+        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
       end
     else
       # otherwise check for read_roster rights on all of the requested
