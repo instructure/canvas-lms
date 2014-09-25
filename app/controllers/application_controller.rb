@@ -266,7 +266,7 @@ class ApplicationController < ActionController::Base
     if context.is_a?(UserProfile)
       name = name.to_s.sub(/context/, "profile")
     else
-      klass = context.class.base_ar_class
+      klass = context.class.base_class
       name = name.to_s.sub(/context/, klass.name.underscore)
       opts.unshift(context)
     end
@@ -1341,7 +1341,7 @@ class ApplicationController < ActionController::Base
         opts[:inline] = 1
       end
 
-      if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+      if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
         # it, so we're setting :download=>1 *because* we want to display inline.
         opts[:download] = 1 unless download

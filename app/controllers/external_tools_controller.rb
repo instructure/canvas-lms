@@ -318,7 +318,7 @@ class ExternalToolsController < ApplicationController
         raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")
       end
     else
-      selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
+      selection_type = params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
       if find_tool(params[:id], selection_type)
 
         @return_url = external_content_success_url('external_tool_redirect')

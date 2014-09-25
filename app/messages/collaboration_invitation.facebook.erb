@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations/<%= asset.collaboration.id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations/<%= asset.collaboration.id %>
 <% end %>
 
 <%= t :body, <<-BODY, :document => %{<b><a href="#{content(:link)}">#{h asset.collaboration.title}</a></b>}.html_safe, :course_or_group => asset.collaboration.context.name, :service => asset.collaboration.service_name unless asset.collaboration.user

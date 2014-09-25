@@ -20,7 +20,7 @@ class ActiveRecord::Base
       end
     end
     if options && options[:include_root]
-      result = {self.class.base_ar_class.model_name.element => result}
+      result = {self.class.base_class.model_name.element => result}
     end
     result
   end
@@ -118,7 +118,7 @@ class ActiveRecord::Base
 
   # little helper to keep checks concise and avoid a db lookup
   def has_asset?(asset, field = :context)
-    asset.id == send("#{field}_id") && asset.class.base_ar_class.name == send("#{field}_type")
+    asset.id == send("#{field}_id") && asset.class.base_class.name == send("#{field}_type")
   end
 
   def context_string(field = :context)
@@ -254,7 +254,7 @@ class ActiveRecord::Base
     hash = serializable_hash(options)
 
     if options[:permissions]
-      obj_hash = options[:include_root] ? hash[self.class.base_ar_class.model_name.element] : hash
+      obj_hash = options[:include_root] ? hash[self.class.base_class.model_name.element] : hash
       if self.respond_to?(:filter_attributes_for_user)
         self.filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
       end
@@ -280,12 +280,8 @@ class ActiveRecord::Base
     self.class.send :sanitize_sql_for_conditions, *args
   end
 
-  def self.base_ar_class
-    class_of_active_record_descendant(self)
-  end
-
   def self.reflection_type_name
-    base_ar_class.name.underscore
+    base_class.name.underscore
   end
 
   def wildcard(*args)
@@ -877,7 +873,7 @@ ActiveRecord::Relation.class_eval do
 
     sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
     sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
-    where(sql, *values.map { |value| [value, value.class.base_ar_class.name] }.flatten)
+    where(sql, *values.map { |value| [value, value.class.base_class.name] }.flatten)
   end
 end
 

@@ -33,16 +33,6 @@ def protect_attributes
 end
 
 describe 'Models' do
-
-  context "config/initializers/active_record.rb" do
-
-    it "should return the first descendant of ActiveRecord::Base when calling base_ar_class" do
-      Account.base_ar_class.should == Account
-      Group.base_ar_class.should == Group
-      TeacherEnrollment.base_ar_class.should == Enrollment
-    end
-  end
-
   it "should use attr_accessible or attr_protected" do
     ignore_classes = [
         ActiveRecord::Base,
