@@ -6,20 +6,6 @@ describe "quizzes" do
   include_examples "quizzes selenium tests"
 
   context "as a teacher" do
-    let(:due_at) { Time.zone.now }
-    let(:unlock_at) { Time.zone.now.advance(days:-2) }
-    let(:lock_at) { Time.zone.now.advance(days:4) }
-
-    def create_quiz_with_default_due_dates
-      @context = @course
-      @quiz = quiz_model
-      @quiz.generate_quiz_data
-      @quiz.due_at = due_at
-      @quiz.lock_at = lock_at
-      @quiz.unlock_at = unlock_at
-      @quiz.save!
-      @quiz
-    end
 
     before (:each) do
       course_with_teacher_logged_in
@@ -92,26 +78,6 @@ describe "quizzes" do
       f('#questions').should be_present
     end
 
-    it "should correctly hide form when cancelling quiz edit" do
-      get "/courses/#{@course.id}/quizzes/new"
-
-      wait_for_tiny f('#quiz_description')
-      click_questions_tab
-      click_new_question_button
-      ff(".question_holder .question_form").length.should == 1
-      f(".question_holder .question_form .cancel_link").click
-      ff(".question_holder .question_form").length.should == 0
-    end
-
-    it "should pop up calendar on top of #main" do
-      get "/courses/#{@course.id}/quizzes/new"
-      wait_for_ajaximations
-      fj('.due-date-row input:first + .ui-datepicker-trigger').click
-      cal = f('#ui-datepicker-div')
-      cal.should be_displayed
-      cal.style('z-index').should > f('#main').style('z-index')
-    end
-
     it "should edit a quiz" do
       @context = @course
       q = quiz_model
@@ -148,19 +114,7 @@ describe "quizzes" do
       f('#quiz_details').should be_displayed
     end
 
-    it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
-      5.times { @course.quizzes.create!(:title => "My Quiz") }
-      get "/courses/#{@course.id}/quizzes"
-      publish_multiple = f('.publish_multiple_quizzes_link')
-      cancel = f('#publish_multiple_quizzes_dialog .cancel_button')
-
-      5.times do
-        publish_multiple.click
-        ffj('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
-        cancel.click
-      end
-    end
-
+    
     it "should republish on save" do
       Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
@@ -291,33 +245,7 @@ describe "quizzes" do
       f('.attempts_left').text.should == '3'
     end
 
-    it "should flag a quiz question while taking a quiz as a teacher" do
-      quiz_with_new_questions(false)
-
-      get "/courses/#{@course.id}/quizzes/#{@q.id}"
-
-      expect_new_page_load do
-        f("#take_quiz_link").click
-        wait_for_ajaximations
-      end
-
-      #flag first question
-      hover_and_click("#question_#{@quest1.id} .flag_question")
-
-      #click second answer
-      f("#question_#{@quest2.id} .answers .answer:first-child input").click
-      f("#submit_quiz_button").click
-
-      #dismiss dialog and submit quiz
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.dismiss
-      f("#question_#{@quest1.id} .answers .answer:last-child input").click
-      expect_new_page_load {
-        f("#submit_quiz_button").click
-      }
-      f('#quiz_title').text.should == @q.title
-    end
-
+    
     it "should indicate when it was last saved" do
       take_quiz do
         indicator = f('#last_saved_indicator')
@@ -356,31 +284,6 @@ describe "quizzes" do
         wait_for_ajaximations
         error_displayed?.should be_false
         input.send_keys(:tab)
-        input.should have_attribute(:value, "1.0000")
-      end
-    end
-
-    it "should mark questions as answered when the window loses focus" do
-      @quiz = quiz_with_new_questions do |bank, quiz|
-        aq1 = bank.assessment_questions.create!
-        aq2 = bank.assessment_questions.create!
-        quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq1)
-        quiz.quiz_questions.create!(:question_data => {:name => "essay", 'question_type' => 'essay_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq2)
-      end
-      take_quiz do
-        wait_for_tiny f('.essay_question textarea.question_input')
-        input = f('.numerical_question_input')
-        input.click
-        input.send_keys('1')
-        in_frame f('.essay_question iframe')[:id] do
-          f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
-        end
-        sleep 1
-        wait_for_ajaximations
-        keep_trying_until {
-          ff('#question_list .answered').size.should == 1  
-        }
-        
         input.should have_attribute(:value, "1.0000")
       end
     end
@@ -644,26 +547,6 @@ describe "quizzes" do
       @quiz.reload.should be_deleted
     end
 
-    it "creates assignment with default due date" do
-      pending('daylight savings time fix')
-      get "/courses/#{@course.id}/quizzes/new"
-      wait_for_ajaximations
-      fill_assignment_overrides
-      replace_content(f('#quiz_title'), 'VDD Quiz')
-      expect_new_page_load do
-        click_save_settings_button
-        wait_for_ajax_requests
-      end
-      compare_assignment_times(Quizzes::Quiz.find_by_title('VDD Quiz'))
-    end
-
-    it "loads existing due date data into the form" do
-      @quiz = create_quiz_with_default_due_dates
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      wait_for_ajaximations
-      compare_assignment_times(@quiz.reload)
-    end
-
     it "can create overrides" do
       @quiz = create_quiz_with_default_due_dates
       default_section = @course.course_sections.first
@@ -694,133 +577,6 @@ describe "quizzes" do
       other_override = overrides.detect { |o| o.set_id == other_section.id }
       other_override.due_at.strftime('%b %-d, %y').
           should == other_section_due.to_date.strftime('%b %-d, %y')
-    end
-
-    it "should not show 'use for grading' as an option in rubrics" do
-      course_with_teacher_logged_in
-      @context = @course
-      q = quiz_model
-      q.generate_quiz_data
-      q.workflow_state = 'available'
-      q.save!
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      f('.al-trigger').click
-      f('.show_rubric_link').click
-      wait_for_ajaximations
-      fj('#rubrics .add_rubric_link:visible').click
-      keep_trying_until {
-        fj('.rubric_grading:visible').should be_nil
-      }
-    end
-
-    context "with draft state" do
-      before(:each) do
-        Account.default.enable_feature!(:draft_state)
-      end
-
-      it "should click the publish button to publish a quiz" do
-        @context = @course
-        q = quiz_model
-        q.unpublish!
-
-        get "/courses/#{@course.id}/quizzes/#{q.id}"
-        f('#quiz-publish-link').should_not include_text("Published")
-        f('#quiz-publish-link').should include_text("Publish")
-
-        expect_new_page_load do
-          f('.quiz-publish-button').click
-          wait_for_ajaximations
-        end
-
-        # move mouse to not be hover over the button
-        driver.mouse.move_to f('#footer')
-        keep_trying_until {
-          f('#quiz-publish-link').should include_text("Published")
-        }
-      end
-
-      it "should click the unpublish button to unpublish a quiz" do
-        @context = @course
-        q = quiz_model
-        q.publish!
-
-        get "/courses/#{@course.id}/quizzes/#{q.id}"
-        f('#quiz-publish-link').should include_text("Published")
-
-        expect_new_page_load do
-          f('.quiz-publish-button').click
-          wait_for_ajaximations
-        end
-
-        # move mouse to not be hover over the button
-        driver.mouse.move_to f('#footer')
-
-        keep_trying_until {
-          f('#quiz-publish-link').should_not include_text("Published")
-          f('#quiz-publish-link').should include_text("Publish")
-        }
-      end
-
-      it "should show a summary of due dates if there are multiple" do
-        create_quiz_with_default_due_dates
-        get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .date-due').should_not include_text "Multiple Dates"
-        f('.ig-details .date-available').should_not include_text "Multiple Dates"
-
-        add_due_date_override(@quiz)
-
-        get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .date-due').should include_text "Multiple Dates"
-        driver.mouse.move_to f('.ig-details .date-due a')
-        wait_for_ajaximations
-        tooltip = fj('.ui-tooltip:visible')
-        tooltip.should include_text 'New Section'
-        tooltip.should include_text 'Everyone else'
-
-        f('.ig-details .date-available').should include_text "Multiple Dates"
-        driver.mouse.move_to f('.ig-details .date-available a')
-        wait_for_ajaximations
-        tooltip = fj('.ui-tooltip:visible')
-        tooltip.should include_text 'New Section'
-        tooltip.should include_text 'Everyone else'
-      end
-    end
-
-    context "menu tools" do
-      before do
-        course_with_teacher_logged_in(:draft_state => true)
-        Account.default.enable_feature!(:lor_for_account)
-
-        @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-        @tool.quiz_menu = {:url => "http://www.example.com", :text => "Export Quiz"}
-        @tool.save!
-
-        @quiz = @course.quizzes.create!(:title => "score 10")
-      end
-
-      it "should show tool launch links in the gear for items on the index" do
-        get "/courses/#{@course.id}/quizzes"
-        wait_for_ajaximations
-
-        gear = f("#summary_quiz_#{@quiz.id} .al-trigger")
-        gear.click
-        link = f("#summary_quiz_#{@quiz.id} li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
-      end
-
-      it "should show tool launch links in the gear for items on the show page" do
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        wait_for_ajaximations
-
-        gear = f("#quiz_show .al-trigger")
-        gear.click
-        link = f("#quiz_show li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
-      end
     end
   end
 end
