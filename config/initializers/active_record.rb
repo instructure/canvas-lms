@@ -1,7 +1,17 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  def write_attribute(*args)
+  def write_attribute(attr_name, *args)
+    if CANVAS_RAILS3
+      column = column_for_attribute(attr_name)
+
+      unless column || @attributes.has_key?(attr_name)
+        raise "You're trying to create an attribute `#{attr_name}'. Writing arbitrary " \
+              "attributes on a model is deprecated. Please just use `attr_writer` etc." \
+              "from #{caller.first}"
+      end
+    end
+
     value = super
     value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
   end
