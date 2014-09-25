@@ -120,7 +120,7 @@ define [
               'aria-label': I18n.t('view', 'View')
               'data-tooltip': ''
             },
-            i className: 'icon-search'
+            i className: 'icon-eye'
 
           if @props.userCanManageFilesForContext
             button {
@@ -131,7 +131,7 @@ define [
               'aria-label': I18n.t('restrict_access', 'Restrict Access')
               'data-tooltip': ''
             },
-              i className: 'icon-unpublished'
+              i className: 'icon-cloud-lock'
 
           button {
             disabled: !showingButtons

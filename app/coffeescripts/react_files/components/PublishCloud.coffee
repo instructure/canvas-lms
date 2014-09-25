@@ -83,7 +83,7 @@ define [
             className:'btn-link published-status restricted'
             title: I18n.t('restricted_title', "Available from %{from_date} until %{until_date}",from_date: $.datetimeString(@props.model.get('unlock_at')), until_date: $.datetimeString(@props.model.get('lock_at')) )
             'aria-label': I18n.t('restricted_title', "Available from %{from_date} until %{until_date}",from_date: $.datetimeString(@props.model.get('unlock_at')), until_date: $.datetimeString(@props.model.get('lock_at')) ),
-              i className:'icon-calendar-day'
+              i className:'icon-cloud-lock'
         else if @state.published && @state.hidden
           button 
             'data-tooltip': 'left'
@@ -92,7 +92,7 @@ define [
             className:'btn-link published-status hiddenState'
             title: I18n.t('hidden_title', 'Hidden. Available with a link')
             'aria-label': I18n.t('label.hidden', 'Hidden. Available with a link'),
-              i className:'icon-paperclip'
+              i className:'icon-cloud-lock'
         else if @state.published
           button 
             'data-tooltip': 'left'
