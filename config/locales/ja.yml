@@ -9806,7 +9806,6 @@ ja:
         published: 公開済み
     post_grades_dialog_title: "成績表を SIS に投稿"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} のモジュールの進捗"
       module_progress_for_student: "%{student.name} のモジュールの進捗"
       no_modules_found: モジュールが見つかりませんでした
     progression_module_view: 
