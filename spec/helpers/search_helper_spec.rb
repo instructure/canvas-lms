@@ -34,6 +34,17 @@ describe SearchHelper do
       @contexts[:courses][@course.id][:permissions][:manage_assignments].should be_true
     end
 
+    it "only loads the section and its course when given a section context" do
+      course_with_teacher(:active_all => true)
+      course_with_teacher(:active_all => true, :user => @teacher)
+      @current_user = @teacher
+      second_section = @course.course_sections.create!(:name => 'second section')
+      load_all_contexts(context: second_section)
+
+      @contexts[:courses].count.should == 1
+      @contexts[:sections].count.should == 1
+    end
+
     describe "sharding" do
       specs_require_sharding
 
