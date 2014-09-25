@@ -386,6 +386,44 @@ describe ContextExternalTool do
     end
   end
 
+  describe "placements" do
+
+    it 'returns multiple requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('module_item', 'resource_selection').to_a.should eql([tool1, tool3].sort_by(&:name))
+    end
+
+    it 'it only returns a single requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('resource_selection').to_a.should eql([tool3])
+    end
+
+    it "doesn't return not selectable tools placements for moudle_item" do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.not_selectable = true
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('module_item').to_a.should eql([tool1])
+    end
+
+  end
+
   describe "find_integration_for" do
     it "should return nil if there are no matching integrations" do
       at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')

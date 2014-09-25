@@ -508,6 +508,24 @@ class ContextExternalTool < ActiveRecord::Base
   scope :having_setting, lambda { |setting| setting ? joins(:context_external_tool_placements).
       where("context_external_tool_placements.placement_type = ?", setting) : scoped }
 
+  scope :placements, lambda { |*placements|
+    if placements
+      module_item_sql = if placements.include? 'module_item'
+                          "(context_external_tools.not_selectable IS NOT TRUE AND
+                           ((COALESCE(context_external_tools.url, '') <> '' ) OR
+                           (COALESCE(context_external_tools.domain, '') <> ''))) OR "
+                        else
+                          ''
+                        end
+      where(module_item_sql + 'EXISTS (
+              SELECT * FROM context_external_tool_placements
+              WHERE context_external_tools.id = context_external_tool_placements.context_external_tool_id
+              AND context_external_tool_placements.placement_type IN (?) )', placements || [])
+    else
+      scoped
+    end
+  }
+
   def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)
     unless id.present?
