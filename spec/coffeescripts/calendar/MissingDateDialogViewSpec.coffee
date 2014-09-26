@@ -32,13 +32,12 @@ define [
     equal @dialog.render(), false
     equal $('.ui-dialog').length, 0
 
-  test 'should close the dialog on primary button press', ->
-    @dialog.render()
-    @dialog.$dialog.find('.btn-primary').click()
-    equal $('.ui-dialog').length, 0
-
-  test 'should run the success callback on secondary button press', ->
+  test 'should close the dialog on secondary button press', ->
     @dialog.render()
     @dialog.$dialog.find('.btn:not(.btn-primary)').click()
-    ok @dialog.options.success.calledOnce
+    equal $('.ui-dialog').length, 0
 
+  test 'should run the success callback on on primary button press', ->
+    @dialog.render()
+    @dialog.$dialog.find('.btn-primary').click()
+    ok @dialog.options.success.calledOnce

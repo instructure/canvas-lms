@@ -224,6 +224,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
+          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success: =>
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
