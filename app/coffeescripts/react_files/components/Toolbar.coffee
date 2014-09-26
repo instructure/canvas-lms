@@ -65,7 +65,7 @@ define [
       downloadTitle = if @props.selectedItems.length is 1
         I18n.t('download', 'Download')
       else
-        I18n.t('download_as_zip', 'Downlod as Zip')
+        I18n.t('download_as_zip', 'Download as Zip')
 
       header {
         className:'ef-header grid-row between-xs'
