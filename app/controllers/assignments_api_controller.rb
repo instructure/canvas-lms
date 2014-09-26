@@ -526,7 +526,7 @@ class AssignmentsApiController < ApplicationController
         scope = scope.published
       end
 
-      if @context.feature_enabled?(:differentiated_assignments)
+      if da_enabled = @context.feature_enabled?(:differentiated_assignments)
         scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
           scope.visible_to_student_in_course_with_da(user_ids, @context.id)
         end
@@ -553,16 +553,22 @@ class AssignmentsApiController < ApplicationController
           each { |a| a.has_no_overrides = true }
       end
 
-      include_visibility = Array(params[:include]).include?('assignment_visibility')
+      include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+
+      if include_visibility && da_enabled
+        assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
+      end
 
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
       hashes = assignments.map do |assignment|
+        visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
                         submission: submission, override_dates: override_dates,
                         include_visibility: include_visibility,
+                        assignment_visibilities: visibility_array,
                         needs_grading_count_by_section: needs_grading_count_by_section)
       end
 
@@ -590,7 +596,7 @@ class AssignmentsApiController < ApplicationController
         submission = @assignment.submissions.for_user(@current_user).first
       end
 
-      include_visibility = Array(params[:include]).include?('assignment_visibility')
+      include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
