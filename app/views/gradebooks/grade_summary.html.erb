@@ -27,11 +27,11 @@
     <% end %>
     <% if @presenter.editable? %>
         <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
-          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png", :alt => "" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
+          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"> <i class="icon-check-plus"></i> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
         </div>
         <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
           <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
-          <a href="#" class="btn revert_all_scores_link"><%= image_tag "back.png", :alt => "" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
+          <a href="#" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t('links.revert_score', "Revert to Actual Score") %></a>
         </div>
     <% end %>
     <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
@@ -228,7 +228,7 @@
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
           </span>
-          <%= image_tag "rubric.png", :alt => t('icons.rubric_results', 'See rubric results') %>
+          <i class="icon-rubric"></i>
         </a>
         <% if @presenter.turnitin_enabled? %>
           <%
@@ -293,14 +293,14 @@
                     <td>
                       <% graph = assignment_presenter.graph %>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= graph.title %>">
-                        <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topleft: 3px; -moz-border-radius-bottomleft: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topright: 3px; -moz-border-radius-bottomright: 3px; background: #fff;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.max_left %>px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border-width: 2px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 10px; margin: 5px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
                         <% if submission && submission.score %>
-                          <div style="position: absolute; top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background-color: #abd; overflow: hidden; -moz-border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
+                          <div class="grade-summary-graph-component" style="top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
                             <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => assignment.points_possible) %>">&nbsp;
                           </div>
                         <% end %>
@@ -377,5 +377,5 @@
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
 <input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
-<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
+<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><i class="icon-reply-2"></i></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
