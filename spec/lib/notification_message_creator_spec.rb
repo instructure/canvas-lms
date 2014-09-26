@@ -425,6 +425,24 @@ describe NotificationMessageCreator do
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
       @cc.notification_policies.reload.should_not be_empty
       @cc.delayed_messages.reload.should_not be_empty
+
+    end
+
+    it "should find an already existing notification policy" do
+      notification_model(category: 'TestWeekly')
+      @shard1.activate do
+        @user = User.create!
+        @cc = @user.communication_channels.create!(path: "user@example.com")
+        @cc.confirm!
+        @cc.notification_policies.create!(
+          :notification => @notification,
+          :frequency => @notification.default_frequency
+        )
+      end
+      Message.any_instance.stubs(:get_template).returns('template')
+      @cc.notification_policies.reload.count.should == 1
+      NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
+      @cc.notification_policies.reload.count.should == 1
     end
   end
 end
