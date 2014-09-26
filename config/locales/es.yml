@@ -2518,7 +2518,7 @@ es:
     edit_calendar_event: 
       calendar: "Calendario:"
       date: "Fecha:"
-      from: "Remitente:"
+      from: "Desde:"
       links: 
         more_options: "Más opciones"
       location: "Ubicación:"
