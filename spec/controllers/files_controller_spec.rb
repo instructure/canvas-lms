@@ -289,92 +289,109 @@ describe FilesController do
       response.should be_redirect
     end
 
-    it "should allow concluded students to read and download files" do
-      user_session(@student)
-      @enrollment.conclude
-      get 'show', :course_id => @course.id, :id => @file.id
-      response.should be_success
-      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      response.should be_redirect
+    describe "as a student" do
+      before do
+        user_session(@student)
+      end
+
+      it "should allow concluded students to read and download files" do
+        @enrollment.conclude
+        get 'show', :course_id => @course.id, :id => @file.id
+        response.should be_success
+        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+        response.should be_redirect
+      end
+
+      it "should mark files as viewed for module progressions if the file is previewed inline" do
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
+        json_parse.should == {'ok' => true}
+        @module.reload
+        @module.evaluate_for(@student).state.should eql(:completed)
+        @file.reload.last_inline_view.should > 1.minute.ago
+      end
+
+      it "should mark files as viewed for module progressions if the file is downloaded" do
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+        @module.reload
+        @module.evaluate_for(@student).state.should eql(:completed)
+        @file.reload.last_inline_view.should be_nil
+      end
+
+      it "should mark files as viewed for module progressions if the file is previewed inline" do
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
+        json_parse.should == {'ok' => true}
+        @module.reload
+        @module.evaluate_for(@student).state.should eql(:completed)
+        @file.reload.last_inline_view.should > 1.minute.ago
+      end
+
+      it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
+        file_in_a_module
+        Attachment.any_instance.stubs(:canvadocable?).returns true
+        get 'show', :course_id => @course.id, :id => @file.id, :format => :json
+        @module.reload
+        @module.evaluate_for(@student).state.should eql(:completed)
+        @file.reload.last_inline_view.should > 1.minute.ago
+      end
+
+      it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
+        owned_file = course_file
+        owned_file.display_name = 'holla'
+        owned_file.user_id = @student.id
+        owned_file.save
+        owned_file.destroy
+        get 'show', :course_id => @course.id, :id => owned_file.id
+        response.should be_redirect
+        flash[:notice].should match(/has been deleted/)
+        URI.parse(response['Location']).path.should == "/courses/#{@course.id}/files"
+      end
+
+      it 'displays a new file without incident' do
+        new_file = course_file
+        new_file.display_name = 'holla'
+        new_file.save
+
+        get 'show', :course_id => @course.id, :id => new_file.id
+        response.should be_success
+        assigns(:attachment).should == new_file
+      end
+
+      it "doesnt leak the name of unowned deleted files" do
+        unowned_file = @file
+        unowned_file.display_name = 'holla'
+        unowned_file.save
+        unowned_file.destroy
+
+        get 'show', :course_id => @course.id, :id => unowned_file.id
+        expect(response.status).to eq(404)
+        expect(assigns(:not_found_message)).to eq("This file has been deleted")
+      end
     end
 
-    it "should mark files as viewed for module progressions if the file is downloaded" do
-      user_session(@student)
-      file_in_a_module
-      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:completed)
-      @file.reload.last_inline_view.should be_nil
-    end
+    describe "as a teacher" do
+      before do
+        user_session @teacher
+      end
 
-    it "should mark files as viewed for module progressions if the file is previewed inline" do
-      user_session(@student)
-      file_in_a_module
-      get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
-      json_parse.should == {'ok' => true}
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:completed)
-      @file.reload.last_inline_view.should > 1.minute.ago
-    end
+      it "should work for quiz_statistics" do
+        quiz_model
+        file = @quiz.statistics_csv('student_analysis').csv_attachment
+        get 'show', :quiz_statistics_id => file.reload.context.id,
+          :file_id => file.id, :download => '1', :verifier => file.uuid
+        response.should be_redirect
+      end
 
-    it "should record the inline view when a teacher previews a student's submission" do
-      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
-      attachment_model :context => @student
-      @assignment.submit_homework @student, :attachments => [@attachment]
-
-      user_session @teacher
-      get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
-      response.should be_success
-      @attachment.reload.last_inline_view.should > 1.minute.ago
-    end
-
-    it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
-      user_session(@student)
-      file_in_a_module
-      Attachment.any_instance.stubs(:canvadocable?).returns true
-      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:completed)
-      @file.reload.last_inline_view.should > 1.minute.ago
-    end
-
-    it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
-      user_session @student
-      unowned_file = @file
-      unowned_file.display_name = 'holla'
-      unowned_file.save
-      unowned_file.destroy
-
-      get 'show', :course_id => @course.id, :id => unowned_file.id
-      assert_unauthorized
-
-      owned_file = course_file
-      owned_file.display_name = 'holla'
-      owned_file.user_id = @student.id
-      owned_file.save
-      owned_file.destroy
-
-      get 'show', :course_id => @course.id, :id => owned_file.id
-      response.should be_redirect
-      flash[:notice].should match(/has been deleted/)
-      URI.parse(response['Location']).path.should == "/courses/#{@course.id}/files"
-
-      new_file = course_file
-      new_file.display_name = 'holla'
-      new_file.save
-
-      get 'show', :course_id => @course.id, :id => new_file.id
-      response.should be_success
-      assigns(:attachment).should == new_file
-    end
-
-    it "should work for quiz_statistics" do
-      user_session @teacher
-      quiz_model
-      file = @quiz.statistics_csv('student_analysis').csv_attachment
-      get 'show', :quiz_statistics_id => file.reload.context.id,
-        :file_id => file.id, :download => '1', :verifier => file.uuid
-      response.should be_redirect
+      it "should record the inline view when a teacher previews a student's submission" do
+        @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
+        attachment_model :context => @student
+        @assignment.submit_homework @student, :attachments => [@attachment]
+        get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
+        response.should be_success
+        @attachment.reload.last_inline_view.should > 1.minute.ago
+      end
     end
 
     describe "canvadoc_session_url" do
