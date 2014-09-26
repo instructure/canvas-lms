@@ -37,18 +37,18 @@ nl:
     bad_response_all: "Kon de standaarden niet bijwerken."
     no_api_key: "Een API-sleutel is nodig om Academic Benchmarks te kunnen gebruiken"
     no_authority: "Kon geen toestemming vinden om bij te werken"
-    no_file: "Geen leerdoelbestand/bestand met leerdoel of toestemming opgegeven/gegeven"
+    no_file: "Geen bestand met leerdoel of toestemming opgegeven/gegeven"
     no_permissions: "Gebruiker mag geen globale leerdoelen bewerken"
     no_perms: "Gebruiker mag geen globale leerdoelen bewerken"
   account: 
     account_settings: 
-      account_surveys: "Account enquêtes????/enquêtes op account?????"
+      account_surveys: "Account enquêtes"
       avatars: "Avatars gebruiker"
-      delicious: Delicious/verrukkelijk
+      delicious: Delicious
       diigo: Diigo
       facebook: Facebook
       google_docs: "Google Docs"
-      google_docs_preview: "Google Docs voorbeeldweergave/voorbeeldweergave in Google Docs"
+      google_docs_preview: "Voorbeeldweergave in Google Docs."
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -66,7 +66,7 @@ nl:
     manually_created_courses: "Handmatig gemaakte cursussen"
     root_account_cant_have_sis_id: "SIS ID's kunnen niet voor hoofdaccounts worden ingesteld "
     sis_id_in_use: "SIS-ID \"%{sis_id}\" is al in gebruik"
-    tab_admin_tools: "Admin Beheertools/Beheertools voor Admin"
+    tab_admin_tools: "Beheertools voor Admin"
     tab_authentication: Verificatie
     tab_courses: Cursussen
     tab_developer_keys: "Sleutels voor ontwikkelaars"
@@ -94,7 +94,7 @@ nl:
     test_bind_failed: "Het koppelen is mislukt door de volgende fout: %{error}"
     test_connection_timeout: "Time-out bij het maken van verbinding"
     test_host_unknown: "Onbekende host: %{host}"
-    test_login_auth_exception: "Uitzondering bij aanmelden/inloggen: %{error}"
+    test_login_auth_exception: "Uitzondering bij aanmelden: %{error}"
     test_login_auth_failed: "Verificatie mislukt"
     test_search_failed: "Zoekopdracht mislukt door de volgende fout: %{error}"
   account_authorization_configs: 
@@ -109,8 +109,7 @@ nl:
       save_button: "Verificatie-instellingen opslaan"
       unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiker niet in canvas te vinden is."
     index: 
-      add_auth_desc: "Een identiteit van provider aan dit account toevoegen:/\n\
-          Een identiteit van provider toevoegen aan dit account "
+      add_auth_desc: "Een identiteit van provider toevoegen aan dit account: "
       canvas_login_tip: |-
           Als je, door de instellingen te configureren, je niet meer kunt aanmelden voeg dan
           *%{url1}*  aan het einde van de aanmeldings-url toe . Dit maakt het mogelijk
@@ -121,10 +120,10 @@ nl:
       delete_auth_link: "Verificatie verwijderen"
       edit_auth_link: "Gegevens bewerken"
       ip_address_list_description: "Als je een verificatieservice gebruikt die nodig is om de Canvas-servers rechtstreeks verbinding te laten maken met jouw servers, zoals LDAP,  dan moet je ervoor zorgen dat jouw servers verbindingen vanuit deze IP-adressen kunnen accepteren:"
-      no_auth_type_description: "Dit account integreert momenteel niet met een identity provider/identiteitsprovider."
+      no_auth_type_description: "Dit account integreert momenteel niet met een identiteitsprovider."
       page_title: Verificatie-instellingen
       profile_page_link_example: "Hier is bijvoorbeeld jouw profielpagina: [%{friendlyname}](%{url})"
-      settings_description: "Als een gebruiker zich via een externe identity provider/identiteitsprovider (IdP) wil verifiëren, moet deze gebruiker een login ID hebben die aan dit account gelinkt is en die ook overeenkomt met deze unieke Id van de IdP. Als je de huidige login-gegevens wilt bekijken/zien, ga dan naar de sectie \"Aanmeldings-gegevens\" op de profielpagina van de gebruiker. (Deze kun je vinden door de gebruiker op het tabblad \"Gebruikers\" te zoeken.)"
+      settings_description: "Als een gebruiker zich via een externe identiteitsprovider (IdP) wil verifiëren, moet deze gebruiker een login ID hebben die aan dit account gelinkt is en die ook overeenkomt met deze unieke Id van de IdP. Als je de huidige login-gegevens wilt bekijken/zien, ga dan naar de sectie \"Aanmeldings-gegevens\" op de profielpagina van de gebruiker. (Deze kun je vinden door de gebruiker op het tabblad \"Gebruikers\" te zoeken.)"
       settings_title: Verificatie-instellingen
       test_ldap_link: "Verificatie testen"
     ldap_settings: 
@@ -141,9 +140,9 @@ nl:
       secondary_ldap_label: "Secundaire LDAP"
       setting_type_ldap: LDAP
     ldap_settings_fields: 
-      auth_filter_description: "Gebruiken *%{placeholder}* als tijdelijke plaatsaanduiding voor de gebruikersnaam, opgegeven door de gebruiker, bijvoorbeeld: *(sAMAccountName=%{placeholder})*"
+      auth_filter_description: " *%{placeholder}* gebruiken als tijdelijke plaatsaanduiding voor de gebruikersnaam, opgegeven door de gebruiker, bijvoorbeeld: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "Leeg laten om het huidige wachtwoord te blijven gebruiken."
-      identifer_format_description: "Het LDAP kenmerk te gebruiken voor het opzoeken van de Canvas-aanmelding. Dit veld leeg laten om de gebruiker zelf een naam op te laten geven."
+      identifer_format_description: "Het LDAP kenmerk gebruiken voor het opzoeken van de Canvas-aanmelding. Dit veld leeg laten om de gebruikersnaam, door de gebruiker opgegeven, te gebruiken."
       labels: 
         auth_base: Basis
         auth_filter: Filter
@@ -155,7 +154,7 @@ nl:
         auth_password: Wachtwoord
         auth_port: Poort
         auth_username: Gebruikersnaam
-        identifier_format: Aanmeldings-ID-kenmerk
+        identifier_format: "Kenmerk op Aanmeldings-ID"
         no_tls: "Geen TLS"
         simple_tls: "Eenvoudige TLS"
         start_tls: "TLS starten"
@@ -165,32 +164,32 @@ nl:
         user: Gebruikersnaam
       ldap_test_login_button: Toetsaanmelding
       test_ldap_bind_help_body: "Jouw LDAP-server heeft de verbinding geweigerd. Mogelijke oplossingen:"
-      test_ldap_bind_help_fixes_1: "De opgegeven filtertekenreeks (bijvoorbeeld ('sAMAccountName={{login}})') controleren"
-      test_ldap_bind_help_fixes_2: "Heeft de gebruikersnaam meer informatie scoping informatie nodig? (bijvoorbeeld 'cn=Canvas,ou=personen,dc=voorbeeld,dc=nl')."
+      test_ldap_bind_help_fixes_1: "De opgegeven filter-tekenreeks (bijvoorbeeld ('sAMAccountName={{login}})') controleren"
+      test_ldap_bind_help_fixes_2: "Heeft de gebruikersnaam meer scoping informatie nodig? (bijvoorbeeld 'cn=Canvas,ou=personen,dc=voorbeeld,dc=nl')."
       test_ldap_bind_help_header: "Canvas kan geen verbinding  (aanmelding) met jouw LDAP-server maken"
-      test_ldap_bind_label: "Bezig met LDAP-verbinding te testen..."
-      test_ldap_connection_help_body: "De verbinding is of onderbroken of geweigerd. Mogelijke oplossingen:"
+      test_ldap_bind_label: "Bezig met het testen van LDAP-verbinding..."
+      test_ldap_connection_help_body: "De verbinding is óf onderbroken óf geweigerd. Mogelijke oplossingen:"
       test_ldap_connection_help_fixes_1: "Canvas is bezig verbinding te maken met %{ips}"
       test_ldap_connection_help_fixes_2: "Dit was slechts een verbindingstest. SSL-certificaten zijn niet gevalideerd."
       test_ldap_connection_help_fixes_3: "Jouw instellingen voor firewall controleren. Hebben alle Canvas-IP-adressen toegang tot jouw server?"
-      test_ldap_connection_help_header: "Canvas kan geen verbinding maken met jouw LDAP-server"
-      test_ldap_connection_label: "Bezig met verbinding te testen..."
+      test_ldap_connection_help_header: "Canvas kan geen verbinding met jouw LDAP-server maken"
+      test_ldap_connection_label: "Bezig met testen van verbinding..."
       test_ldap_dialog_close: Sluiten
-      test_ldap_dialog_page_title: "Bezig met van jouw LDAP-configuratie het testen"
+      test_ldap_dialog_page_title: "Bezig met testen van jouw LDAP-configuratie"
       test_ldap_login_form_header: "Een geldige LDAP-gebruikersnaam en -wachtwoord aangeven om aanmelding te testen:"
-      test_ldap_login_help_header: "De LDAP-server weigerde jouw  verificatiegegevens"
-      test_ldap_login_label: "Bezig met de aanmeldings-id van de gebruiker te testen....."
-      test_ldap_search_help_body: "De zoekopdracht is of mislukt of heeft 0 resultaat opgeleverd. Mogelijke oplossingen:"
-      test_ldap_search_help_fixes_1: "De opgegeven filtertekenreeks (bijvoorbeeld ('sAMAccountName={{login}})') controleren"
+      test_ldap_login_help_header: "De LDAP-server weigerde jouw  referenties/verificatiegegevens"
+      test_ldap_login_label: "Bezig met het testen van de aanmelding van gebruiker ....."
+      test_ldap_search_help_body: "De zoekopdracht is óf mislukt óf heeft 0 resultaat opgeleverd. Mogelijke oplossingen:"
+      test_ldap_search_help_fixes_1: "De opgegeven filter-tekenreeks (bijvoorbeeld ('sAMAccountName={{login}})') controleren"
       test_ldap_search_help_fixes_2: "De opgegeven zoekbasis (bijvoorbeeld 'ou=personeel,dc=voorbeeld,dc=nl') controleren."
       test_ldap_search_help_fixes_3: "Controleren of het gebruikersobject in LDAP gemachtigd is om te zoeken in de opgegeven zoekbasis."
-      test_ldap_search_help_header: "Canvas kan jouw LDAP-aanvraag niet natrekken"
-      test_ldap_search_label: "Bezig met het testen of er  in LDAP gezocht kan worden"
+      test_ldap_search_help_header: "Canvas kan jouw LDAP-aanvraag niet zoeken"
+      test_ldap_search_label: "Bezig met het testen of er  in LDAP gezocht kan worden...."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Laatste time-out mislukt"
       ldap_timeout_failure_help2: "Als Canvas te vaak een time-out ondervindt bij het communiceren met de LDAP-server dan zullen verdere aanmelding pogingen om die LDAP-server te gebruiken blokkeren voor %{time}."
     login_required: "moet opgegeven worden"
-    no_changing_auth_types: "Kan het type autorisatieconfiguratie niet wijzigen, verwijder deze en maak een nieuwe configuratie aan."
+    no_changing_auth_types: "Kan type autorisatieconfiguratie niet wijzigen, verwijder deze en maak een nieuwe configuratie aan."
     no_discovery_url: "Niets ingesteld"
     password_required: "moet opgegeven worden"
     saml_required: "Een SAML configuratie is nodig om het te testen."
@@ -198,25 +197,25 @@ nl:
       auth_type: Type
       auth_url: "Aanmeldings-url voor deze configuratie"
       certificate_fingerprint: " Certificaat van Vingerafdruk"
-      change_password_url: "Wachtwoord link wijzigen"
+      change_password_url: "Link voor wachtwoord wijzigen"
       discovery_url: "Discovery URL:"
-      discovery_url_description: "Wanneer een discovery url wordt ingesteld, dan zal Canvas alle gebruikers naar die URL doorsturen wanneer zij geverifieerd moeten worden. Die pagina zal de gebruiker moeten helpen om erachter te komen waar zij moeten aanmelden. Als er geen discovery url is geconfigureerd, dan zal de eerste SAML-configuratie gebruikt worden om te proberen om de gebruiker te verifiëren."
+      discovery_url_description: "Wanneer een discovery url is ingesteld, dan zal Canvas alle gebruikers naar die URL doorsturen wanneer zij geverifieerd moeten worden. Die pagina zal de gebruiker moeten helpen om erachter te komen waar zij zich moeten aanmelden. Als er geen discovery url is geconfigureerd, dan zal de eerste SAML-configuratie gebruikt worden om te proberen om de gebruiker te verifiëren."
       identifier_format: ID-format
       idp_entity_id: "/ldP ID entiteit"
       labels: 
         certificate_fingerprint: " Certificaat van vingerafdruk"
-        change_password_url: "Wachtwoord link wijzigen"
+        change_password_url: "Link van wachtwoord wijzigen"
         identifier_format: ID-format
         idp_entity_id: "ldP ID entiteit"
-        log_in_url: "Inloggen op URL"
-        log_out_url: "Uitloggen op URL"
+        log_in_url: "Aanmelden op URL"
+        log_out_url: "Afmelden op URL"
         login_attribute: Aanmeldings-kenmerk
         login_handle_name: Aanmeldings-label
         position: Positie
         requested_authn_context: Verificatiecontext
         unkown_user_url: "Onbekende url gebruiker"
-      log_in_url: "Inloggen op URL"
-      log_out_url: "Uitloggen op URL"
+      log_in_url: "Aanmelden op URL"
+      log_out_url: "Afmelden op URL"
       login_attribute: Aanmeldings-kenmerk
       login_handle_name: Aanmeldings-label
       login_handle_name_description: "Het label wordt gebruikt voor unieke aanmeldings-IDs. Voorbeelden: Aanmelden, Gebruikersnaam, cursist-ID, enzovoort"
@@ -224,8 +223,8 @@ nl:
       position: Positie
       refresh_debugging: Vernieuwen
       requested_authn_context: Verificatiecontext
-      saml_debug_instructions: "Zodra je met foutopsoring begint wordt alle info over de volgende SAML-aanmeldingpoging verzameld. Klik op \"Vernieuwen\" om te zien of er al meer informatie/data verzameld is/zijn, of klik op \"Foutopsporing stoppen\" om de verzamelde gegevens te wissen en te stoppen met de huidige foutopsporing poging."
-      saml_debugging: Foutopsoring
+      saml_debug_instructions: "Zodra je met foutopsporing begint zal alle info over de volgende SAML-aanmeldingspoging verzameld worden. Klikken op \"Vernieuwen\" om te zien of er al meer informatie/data verzameld is/zijn, of klikken op \"Foutopsporing stoppen\" om de verzamelde gegevens te wissen en te stoppen met de huidige foutopsporing poging."
+      saml_debugging: Foutopsporing
       save_button: "Verificatie-instellingen opslaan"
       start_debugging: "Foutopsporing starten"
       stop_debugging: "Foutopsporing stoppen"
@@ -245,28 +244,28 @@ nl:
         idp_response_encoded: "IdP LoginResponse gecodeerd"
         idp_response_xml_decrypted: "IdP LoginResponse gedecodeerd"
         idp_response_xml_encrypted: "IdP LoginResponse gecodeerd"
-        is_valid_login_response: "Canvas denkt response geldig is"
-        logged_in_user_id: "Ingelogde gebruikers-id"
-        login_response_validation_error: Validatiefout
-        login_to_canvas_success: "Gebruiker succesvol ingelogd op Canvas"
+        is_valid_login_response: "Canvas denkt dat response geldig is"
+        logged_in_user_id: "Aangemelde gebruikers-id"
+        login_response_validation_error: "Fout in Validatie"
+        login_to_canvas_success: "Gebruiker succesvol aangemeld op Canvas"
         logout_request_id: "Log out aanvraag-id"
-        logout_to_idp_url: "LogoutRequest gecodeerde URL"
+        logout_to_idp_url: "Gecodeerde URL voor LogoutRequest"
         logout_to_idp_xml: "LogoutRequest XML verstuurd naar IdP"
         request_id: Aanvraag-ID
-        state_of_debug: "Bezig met status te testen"
-        to_idp_url: "LoginRequest gecodeerde URL"
+        state_of_debug: "Bezig met testen van status"
+        to_idp_url: "Gecodeerde URL voor LoginRequest"
         to_idp_xml: "LoginRequest XML verstuurd naar IdP"
       logout_request_to_idp: "LogoutRequest verstuurd naar IdP"
       logout_response_from_idp: "LogoutResponse van IdP"
       saml_required: "Een SAML-configuratie is nodig om SAML te testen"
   account_notification: 
     errors: 
-      invalid_account_notification_end_at: "Eindtijd van de account-melding gaat starttijd vooraf"
+      invalid_account_notification_end_at: "Eindtijd van de account-melding gaat aan starttijd vooraf"
   account_notifications: 
-    announcement_created_notice: "Aankondiging succesvol gemaakt"
-    announcement_creation_failed_notice: "Het maken van aankondiging mislukt"
-    announcement_deleted_notice: "Het verwijderen van aankondiging gelukt"
-    permission_denied_notice: "Je kunt geen aankondigingen voor dat account maken"
+    announcement_created_notice: "Aankondiging succesvol (aan)gemaakt"
+    announcement_creation_failed_notice: "Het (aan)maken van aankondiging mislukt"
+    announcement_deleted_notice: "Aankondiging verwijderd"
+    permission_denied_notice: "Je kunt geen aankondigingen voor dat account (aan)maken"
   account_reports: 
     default: 
       all_terms: "Alle periodes"
@@ -276,7 +275,7 @@ nl:
       end_text: "Eindigen op: %{end_at};"
       error_text: "Mislukt. Geef de volgende foutcode aan jouw systeem beheerder door: ErrorReport:%{error};"
       extra_text_term: "Periode: %{term_name};"
-      message: "%{type} rapport succesvol gegenereerd met de volgende instellingen. Account: %{account}; %{options}"
+      message: "%{type} rapport gegenereerd met de volgende instellingen. Account: %{account}; %{options}"
       section_text: "Voor sectie: %{section};"
       start_text: "Beginnen bij: %{start_at};"
       term_text: "Periode: %{term_name};"
@@ -288,12 +287,12 @@ nl:
     report_header_account_id: account_id
     report_header_assessment_id: evaluatie-id
     report_header_assessment_question: evaluatievraag
-    report_header_assessment_question_id: evaluatievraag-id
-    report_header_assessment_title: evaluatietitel
-    report_header_assessment_type: "type evaluatie"
-    report_header_assignment_id: opdracht-id
-    report_header_assignment_title: opdrachttitel
-    report_header_assignment_url: opdracht-url
+    report_header_assessment_question_id: "id voor evaluatieaanvraag"
+    report_header_assessment_title: "titel van evaluatie"
+    report_header_assessment_type: "evaluatie type"
+    report_header_assignment_id: "id voor opdracht"
+    report_header_assignment_title: "titel van opdracht"
+    report_header_assignment_url: "url van opdracht"
     report_header_associated_user_id: gekoppelde_gebruikers_id
     report_header_attempt: poging
     report_header_canvas_account_id: canvas_account_id
@@ -311,7 +310,7 @@ nl:
     report_header_course_name: cursusnaam
     report_header_course_sis: "cursus sis"
     report_header_course_sis_id: "cursus sis-id"
-    report_header_created_at: "gemaakt op"
+    report_header_created_at: "(aan)gemaakt op"
     report_header_current_score: "huidige score"
     report_header_email: e-mail
     report_header_end__date: eind_datum
@@ -324,7 +323,7 @@ nl:
     report_header_last_access_at: "laatste toegang op"
     report_header_last_ip: "laatste ip"
     report_header_last_name: achter_naam
-    report_header_learning_outcome_id: leerresultaat-id
+    report_header_learning_outcome_id: "id voor leerresultaat"
     report_header_learning_outcome_name: "naam van het leerresultaat"
     report_header_login_id: aanmeldings-id
     report_header_long__name: lange_naam
@@ -9782,6 +9781,7 @@ nl:
         published: Gepubliceerd
     post_grades_dialog_title: "Eindcijfers op SIS posten"
     progression_module_collection: 
+      module_progress_for: "Voortgang in module voor %{student_link}"
       module_progress_for_student: "Voortgang in module voor %{student.name}"
       no_modules_found: "Er zijn geen modules gevonden"
     progression_module_view: 
@@ -9829,7 +9829,7 @@ nl:
   new_facebook_message: "Er is een nieuw bericht van Canvas"
   new_quiz_moderate_desc: "Wanneer conceptstatus en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina voor het overzien van de nieuwe toets voor een account in. "
   new_quiz_statistics_desc: "Wanneer conceptstatus en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina van de statistieken van de nieuwe toets voor een account in."
-  new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Word in Progress\" functie en moet nog niet in productie ingeschakeld worden voor werkelijke gebruikers. "
+  new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet in productie ingeschakeld worden voor werkelijke gebruikers. "
   no_migration_file: "Bestand nodig om inhoud te migreren."
   not_a_number: "moet een positief getal zijn"
   notification: 
