@@ -484,6 +484,10 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
+            if params[:hide_student_names]
+              env_hash[:HIDE_STUDENT_NAMES] = true
+              env_hash[:STUDENT_ID] = params[:student_id]
+            end
             if @sequence_asset
               env_hash[:SEQUENCE] = {
                 :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
@@ -953,7 +957,13 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def child_topic
-    extra_params = {:headless => 1} if params[:headless]
+    if params[:headless]
+      extra_params = {
+        :headless => 1,
+        :hide_student_names => params[:hide_student_names],
+        student_id => params[:student_id]
+      }
+    end
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
     @topic.message = @root_topic.message

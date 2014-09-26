@@ -118,6 +118,33 @@ describe "speed grader" do
     end
   end
 
+  context "url submissions" do
+    before do
+      @assignment.update_attributes! submission_types: 'online_url',
+                                     title: "url submission"
+      student_in_course
+      @assignment.submit_homework(@student, :submission_type => "online_url", :workflow_state => "submitted", :url => "http://www.instructure.com")
+    end
+
+    it "should properly show and hide student name when name hidden toggled" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+      in_frame 'speedgrader_iframe' do
+        expect(f('.not_external')).to include_text("User")
+      end
+
+      f("#settings_link").click
+      f('#hide_student_names').click
+
+      expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+      wait_for_ajaximations
+
+      in_frame 'speedgrader_iframe' do
+        expect(f('.not_external')).to include_text("This Student")
+      end
+    end
+  end
+
   context "quiz submissions" do
     before do
       @assignment.update_attributes! points_possible: 10,
@@ -159,64 +186,160 @@ describe "speed grader" do
         end
       end
     end
+
+    it "should hide student's name from quiz if hide student names is enabled" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+      f("#settings_link").click
+      f('#hide_student_names').click
+      expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+      wait_for_ajaximations
+
+      keep_trying_until { f('#speedgrader_iframe') }
+      in_frame 'speedgrader_iframe' do
+        expect(f('#main')).to include_text("Quiz Results for Student")
+      end
+    end
   end
 
-  it "should display discussion entries for only one student" do
-    #make assignment a discussion assignment
-    @assignment.points_possible = 5
-    @assignment.submission_types = 'discussion_topic'
-    @assignment.title = 'some topic'
-    @assignment.description = 'a little bit of content'
-    @assignment.save!
-    @assignment.update_quiz_or_discussion_topic
+  context "discussion submissions" do
+    before do
+      #make assignment a discussion assignment
+      @assignment.update_attributes! points_possible: 5,
+                                     submission_types: 'discussion_topic',
+                                     title: 'some topic',
+                                     description: 'a little bit of content'
 
-    #create and enroll first student
-    student = user_with_pseudonym(
-        :name => 'first student',
-        :active_user => true,
-        :username => 'student@example.com',
-        :password => 'qwerty'
-    )
-    @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-    #create and enroll second student
-    student_2 = user_with_pseudonym(
-        :name => 'second student',
-        :active_user => true,
-        :username => 'student2@example.com',
-        :password => 'qwerty'
-    )
-    @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
+      #create and enroll first student
+      student = user_with_pseudonym(
+          :name => 'first student',
+          :active_user => true,
+          :username => 'student@example.com',
+          :password => 'qwerty'
+      )
+      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      #create and enroll second student
+      student_2 = user_with_pseudonym(
+          :name => 'second student',
+          :active_user => true,
+          :username => 'student2@example.com',
+          :password => 'qwerty'
+      )
+      @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
 
-    #create discussion entries
-    first_message = 'first student message'
-    second_message = 'second student message'
-    discussion_topic = DiscussionTopic.where(assignment_id: @assignment).first
-    entry = discussion_topic.discussion_entries.
-        create!(:user => student, :message => first_message)
-    entry.update_topic
-    entry.context_module_action
-    attachment_thing = attachment_model(:context => student_2, :filename => 'horse.js')
-    entry_2 = discussion_topic.discussion_entries.
-        create!(:user => student_2, :message => second_message, :attachment => attachment_thing)
-    entry_2.update_topic
-    entry_2.context_module_action
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-    #check for correct submissions in speed grader iframe
-    keep_trying_until { f('#speedgrader_iframe') }
-    in_frame 'speedgrader_iframe' do
-      expect(f('#main')).to include_text(first_message)
-      expect(f('#main')).not_to include_text(second_message)
+      #create discussion entries
+      @first_message = 'first student message'
+      @second_message = 'second student message'
+      @discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+      entry = @discussion_topic.discussion_entries.
+          create!(:user => student, :message => @first_message)
+      entry.update_topic
+      entry.context_module_action
+      @attachment_thing = attachment_model(:context => student_2, :filename => 'horse.js')
+      entry_2 = @discussion_topic.discussion_entries.
+          create!(:user => student_2, :message => @second_message, :attachment => @attachment_thing)
+      entry_2.update_topic
+      entry_2.context_module_action
     end
-    f('#gradebook_header a.next').click
-    wait_for_ajax_requests
-    in_frame 'speedgrader_iframe' do
-      expect(f('#main')).not_to include_text(first_message)
-      expect(f('#main')).to include_text(second_message)
-      url = f('#main div.attachment_data a')['href']
-      expect(url).to be_include "/files/#{attachment_thing.id}/download?verifier=#{attachment_thing.uuid}"
-      expect(url).not_to be_include "/courses/#{@course}"
+
+    it "should display discussion entries for only one student" do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+      #check for correct submissions in speed grader iframe
+      keep_trying_until { f('#speedgrader_iframe') }
+      in_frame 'speedgrader_iframe' do
+        expect(f('#main')).to include_text(@first_message)
+        expect(f('#main')).not_to include_text(@second_message)
+      end
+      f('#gradebook_header a.next').click
+      wait_for_ajax_requests
+      in_frame 'speedgrader_iframe' do
+        expect(f('#main')).not_to include_text(@first_message)
+        expect(f('#main')).to include_text(@second_message)
+        url = f('#main div.attachment_data a')['href']
+        expect(url).to be_include "/files/#{@attachment_thing.id}/download?verifier=#{@attachment_thing.uuid}"
+        expect(url).not_to be_include "/courses/#{@course}"
+      end
+    end
+
+    context "when student names hidden" do
+      it "should hide name of student on discussion iframe" do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        f("#settings_link").click
+        f('#hide_student_names').click
+        expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+        wait_for_ajaximations
+
+        #check for correct submissions in speed grader iframe
+        keep_trying_until { f('#speedgrader_iframe') }
+        in_frame 'speedgrader_iframe' do
+          expect(f('#main')).to include_text("This Student")
+        end
+      end
+
+      it "should hide student names and show name of grading teacher entries " +
+        "on both discussion links" do
+        teacher = @course.teachers.first
+        teacher_message = "why did the taco cross the road?"
+
+        teacher_entry = @discussion_topic.discussion_entries.
+          create!(:user => teacher, :message => teacher_message)
+        teacher_entry.update_topic
+        teacher_entry.context_module_action
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        f("#settings_link").click
+        f('#hide_student_names').click
+        expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+        wait_for_ajaximations
+
+        #check for correct submissions in speed grader iframe
+        keep_trying_until { f('#speedgrader_iframe') }
+        in_frame 'speedgrader_iframe' do
+          f('#discussion_view_link').click
+          authors = ff('h2.discussion-title span')
+          expect(authors[0]).to include_text("This Student")
+          expect(authors[1]).to include_text("Discussion Participant")
+          expect(authors[2]).to include_text(teacher.name)
+        end
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        keep_trying_until { f('#speedgrader_iframe') }
+        in_frame 'speedgrader_iframe' do
+          f('.header_title a').click
+          authors = ff('h2.discussion-title span')
+          expect(authors[0]).to include_text("This Student")
+          expect(authors[1]).to include_text("Discussion Participant")
+          expect(authors[2]).to include_text(teacher.name)
+        end
+      end
+
+      it "should hide avatars on entries on both discussion links" do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        f("#settings_link").click
+        f('#hide_student_names').click
+        expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+        wait_for_ajaximations
+
+        #check for correct submissions in speed grader iframe
+        keep_trying_until { f('#speedgrader_iframe') }
+        in_frame 'speedgrader_iframe' do
+          f('#discussion_view_link').click
+          expect(ff('.avatar').length).to eq 0
+        end
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        keep_trying_until { f('#speedgrader_iframe') }
+        in_frame 'speedgrader_iframe' do
+          f('.header_title a').click
+          expect(ff('.avatar').length).to eq 0
+        end
+      end
     end
   end
 

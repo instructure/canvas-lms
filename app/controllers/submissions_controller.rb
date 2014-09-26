@@ -151,6 +151,7 @@ class SubmissionsController < ApplicationController
             format.html {
               quiz_params = {
                 headless: 1,
+                hide_student_name: params[:hide_student_name],
                 user_id: @submission.user_id,
                 version: params[:version] || @submission.quiz_submission_version
               }
