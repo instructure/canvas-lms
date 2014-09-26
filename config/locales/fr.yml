@@ -65,7 +65,7 @@ fr:
     feedback_feature_request_sub: "Vous avez une suggestion d'amélioration de Canvas ?"
     manually_created_courses: "Cours créés manuellement"
     root_account_cant_have_sis_id: "Les ID SIS ne peuvent pas être définis sur les comptes racines."
-    sis_id_in_use: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
+    sis_id_in_use: "L’ID SIS « %{sis_id} » est déjà utilisé."
     tab_admin_tools: "Outils d’administration"
     tab_authentication: Authentification
     tab_courses: Cours
@@ -638,9 +638,9 @@ fr:
     courses: 
       courses_crumb: Cours
       no_results_message: "Aucun résultat trouvé"
-      page_title: "Résultats de la recherche de cours pour \"%{query}\""
-      search_results_crumb: "Résultats de la recherche pour \"%{query}\""
-      title: "Résultats de la recherche de cours pour \"%{query}\""
+      page_title: "Résultats de la recherche de cours pour « %{query} »"
+      search_results_crumb: "Résultats de la recherche pour « %{query} »"
+      title: "Résultats de la recherche de cours pour « %{query} »"
     courses_right_side: 
       all_terms: "Tous les trimestres"
       course_filtering: "Filtrage des cours"
@@ -845,11 +845,11 @@ fr:
       email_notification_from_description: "Ce paramètre permet à l’administrateur d’ajouter la marque ou de libeller le texte spécifiant l’expéditeur dans toutes les notifications envoyées depuis Canvas pour ce compte."
       email_notification_from_settings: "Paramètres « Expéditeur » à utiliser dans les notifications par e-mail"
       enabled_web_serices_title: "Services Web activés"
-      equall_endpoint_help: "URL de votre service Equella. Elle ressemblera probablement à ceci : \"%{sample_url}\"."
+      equall_endpoint_help: "URL de votre service Equella. Elle ressemblera probablement à ceci : %{sample_url}."
       equella_settings_title: "Paramètres d’Equella"
       feature_options: "Options de la fonction"
       features_title: Fonctions
-      global_announcements_description: "Les annonces générales sont pour vous le moyen de publier des messages sur le tableau de bord de tous les utilisateurs de votre compte. Ils apparaîtront sur le tableau de bord de chaque utilisateur pendant toute la durée spécifiée, ou jusqu’à ce que l’utilisateur clique sur le lien \"fermer\" pour ignorer le message d’alerte. **Ces annonces doivent être utilisées avec modération.**"
+      global_announcements_description: "Les annonces générales sont pour vous le moyen de publier des messages sur le tableau de bord de tous les utilisateurs de votre compte. Ils apparaîtront sur le tableau de bord de chaque utilisateur pendant toute la durée spécifiée, ou jusqu’à ce que l’utilisateur clique sur le lien « fermer  pour ignorer le message d’alerte. **Ces annonces doivent être utilisées avec modération.**"
       global_announcements_title: "Annonces générales"
       global_js_and_css_includes_description: "Ces fichiers seront ajoutés à tous les chargements des pages de votre compte"
       global_js_and_css_includes_title: "Inclusions globales JavaScript et CSS"
@@ -961,7 +961,7 @@ fr:
       quiz_ip_filters_help_message: |-
           Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée.
           
-          Spécifiez un ensemble de filtres d’adresses IP pouvant être utilisé par les enseignants pour protéger l’accès aux questionnaires. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque ("192.168.217.1/24" ou "192.168.217.1/255.255.255.0")."
+          Spécifiez un ensemble de filtres d’adresses IP pouvant être utilisé par les enseignants pour protéger l’accès aux questionnaires. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque (192.168.217.1/24 ou 192.168.217.1/255.255.255.0).
       quiz_ip_filters_help_title: "Que sont les filtres IP de questionnaire ?"
       quiz_ip_filters_help_tooltip: "Que sont les filtres IP de questionnaire ?"
       quiz_ip_filters_title: "Filtres d’adresses IP pour les questionnaires"
@@ -1339,8 +1339,8 @@ fr:
       try_disabling_the_unread_filters: "Essayez de désactiver le filtre « Non lu(s) »."
       unread: "Non lues"
       your_search_did_not_match_any_announcements: "Votre recherche ne correspond à aucune annonce."
-    podcast_feed_description_course: "Tout fichier multimédia lié ou intégré à des annonces dans le cours \"%{course}\" apparaîtra dans ce flux."
-    podcast_feed_description_group: "Tout fichier multimédia lié ou intégré à des annonces dans le groupe \"%{group}\" apparaîtra dans ce flux."
+    podcast_feed_description_course: "Tout fichier multimédia lié ou intégré à des annonces dans le cours %{course} apparaîtra dans ce flux."
+    podcast_feed_description_group: "Tout fichier multimédia lié ou intégré à des annonces dans le groupe %{group} apparaîtra dans ce flux."
     podcast_feed_name: "Flux podcast d’annonces pour %{course}"
   application: 
     errors: 
@@ -1396,7 +1396,7 @@ fr:
       missing_group_category: "Les rendez-vous de groupe doivent avoir une catégorie de groupe."
   appt_calendar_event_dialog: 
     invalid_participants: "Vous devez autoriser au moins un utilisateur à participer."
-    title: "Editer %{name}"
+    title: "Modifier %{name}"
     update: "Mettre à jour"
   aria_labels: 
     unlock_at_date: "Déverrouiller à la date"
@@ -1543,7 +1543,7 @@ fr:
       group_weight: "%{groupWeight}% du total"
       manage: Gérer
       move: "Déplacer vers..."
-      move_to_accessibility_warning: "Avertissement : pour une meilleure accessibilité lors de la réorganisation des travaux et des groupes, utilisez l’option Move To Dialog du menu."
+      move_to_accessibility_warning: "Avertissement : pour une meilleure accessibilité lors de la réorganisation des travaux et des groupes, utilisez l’option Accéder à la boîte de dialogue du menu."
     assignment_group_selector: 
       assignment_group: "Groupe de tâches"
       assignment_group_options: 
@@ -1867,7 +1867,7 @@ fr:
     messages: 
       adding_group: "Ajout d’un groupe..."
       agree_to_pledge: "Vous devez accepter cet engagement avant d’envoyer une tâche."
-      not_submitted_yet: "Vous n’avez pas terminé d’envoyer votre tâche. Vous devez encore cliquer sur \"Envoyer\" pour terminer l’envoi. Voulez-vous quitter cette page ?"
+      not_submitted_yet: "Vous n’avez pas terminé d’envoyer votre tâche. Vous devez encore cliquer sur Envoyer pour terminer l’envoi. Voulez-vous quitter cette page ?"
       now_overdue: "Cette tâche est à présent en retard. Tout nouvel envoi sera signalé comme tâche en retard. Voulez-vous continuer ?"
       overdue: "Cette tâche est en retard. Voulez-vous toujours l’envoyer ?"
       record_before_submitting: "Enregistrer avant l’envoi"
@@ -2054,7 +2054,7 @@ fr:
       instructions: 
         from_external_tool: "Sélectionnez un outil dans la liste ci-dessous pour le charger et envoyer une ressource qu’il fournit."
         google_docs: "Sélectionnez le fichier dans la liste ci-dessous."
-        media_recording: "Utilisez le lien ci-dessous pour enregistrer votre envoi. Cliquez sur \"Enregistrer\" lorsque vous avez terminé et que vous êtes prêt à envoyer votre devoir."
+        media_recording: "Utilisez le lien ci-dessous pour enregistrer votre envoi. Cliquez sur Enregistrer lorsque vous avez terminé et que vous êtes prêt à envoyer votre devoir."
         online_text_entry: "Copiez et collez ou saisissez votre envoi ici."
         online_url: "Copiez et collez le lien vers le site Web que vous souhaitez envoyer pour cette tâche."
       invalid_google_docs_domain: "Domaine non valide"
@@ -2151,15 +2151,15 @@ fr:
         no_assignment_group: "Erreur. Vous devez d’abord ajouter un groupe de travaux. Cliquez sur Créer un groupe de travaux pour savoir comment."
       instructions: 
         wizard: 
-          details: "Une tâche se compose de bien d’autres choses que des dates d’échéance et des points. Si vous souhaitez saisir une description, autoriser le téléchargement de fichiers, modifier le type de notation ou d’autres actions, cliquez sur le nom de la tâche ou sur l’icône %{edit_icon} puis sur \"autres options\"."
+          details: "Une tâche se compose de bien d’autres choses que des dates d’échéance et des points. Si vous souhaitez saisir une description, autoriser le téléchargement de fichiers, modifier le type de notation ou d’autres actions, cliquez sur le nom de la tâche ou sur l’icône %{edit_icon} puis sur « Plus d’options ."
           group: 
             screenreader_step1: "Les groupes de travaux servent à organiser les travaux. Vous attribuez un nom à chaque groupe. Si vous décidez de pondérer la note finale en fonction des groupes, vous pouvez également définir une note en pourcentage pour chacun d’eux. Cliquez sur « Ajouter un groupe de travaux » pour créer un groupe."
             step1: "Les groupes de travaux permettent d’organiser les travaux. Vous devez fournir un nom pour chaque groupe. Si vous choisissez de pondérer la note finale en fonction des groupes (*où ?*), vous pouvez également définir une note en pourcentage pour chaque groupe. Cliquez sur « Créer un nouveau groupe » pour créer un nouveau groupe."
           overview: "Cette page permet de paramétrer votre cours à un niveau plus avancé. Vous pouvez ajouter des tâches, les grouper puis pondérer ces groupes. L’idée étant de commencer par vous organiser puis d’entrer ensuite dans les détails. Mais pour commencer, vous pouvez déjà réaliser beaucoup."
-          quizzes: "Les questionnaires sont des types particuliers de tâches. Vous pouvez créer ou importer des questionnaires en cliquant sur le lien \"Questionnaires\" dans la barre latérale à gauche."
+          quizzes: "Les questionnaires sont des types particuliers de tâches. Vous pouvez créer ou importer des questionnaires en cliquant sur le lien Questionnaires dans la barre latérale à gauche."
           screenreader_details: "Un travail implique beaucoup plus que les dates d’échéance et les points. Si vous souhaitez fournir une description, autoriser les envois de fichiers, changer le type de notation ou tout autre attribut, cliquez sur le nom du travail ou sur l’icône de modification, puis sur « Plus d’options »."
           screenreader_step1: "Les travaux sont toujours organisés en groupes. Aussi, pour en ajouter un, vous devez d’abord savoir dans quel groupe vous allez le placer. Sélectionnez le groupe et cliquez sur « Ajouter le travail dans » ou cliquez sur l’icône Ajouter pour commencer un nouveau travail pour un groupe."
-          step1: "Les tâches sont toujours organisées en groupes. Par conséquent, pour ajouter une tâche, vous devez commencer par connaître le groupe auquel vous souhaitez l’ajouter. Sélectionnez le groupe puis cliquez sur \"Ajouter la tâche à\" ou cliquez sur l’icône %{add_icon} pour commencer un nouveau travail de groupe."
+          step1: "Les tâches sont toujours organisées en groupes. Par conséquent, pour ajouter une tâche, vous devez commencer par connaître le groupe auquel vous souhaitez l’ajouter. Sélectionnez le groupe puis cliquez sur « Ajouter la tâche à » ou cliquez sur l’icône %{add_icon} pour commencer un nouveau travail de groupe."
           step2: "Très bien ! À présent, complétez vos informations. Vous pouvez entrer un titre pour votre travail, une date d’échéance et le nombre de points possibles. Si vous souhaitez ajouter d’autre choses, vous le pourrez uniquement après la création de la tâche."
           step3: "Terminé. La tâche a été ajoutée au groupe. Si vous amenez la souris sur la tâche, vous verrez apparaître un groupe d’options. Voici leur signification :"
       links: 
@@ -2794,15 +2794,15 @@ fr:
       descriptions: 
         assignment: "Bien. Maintenant, cliquez sur l’onglet Tâche pour créer une tâche au lieu d’un événement calendaire."
         assignment_done: "Vous avez terminé ! La tâche a été créée. Vous pouvez cliquer dessus pour afficher ses informations, modifier et supprimer l’événement, ou la faire glisser vers un autre jour pour modifier sa date."
-        change_date: "Cette opération est simple. Faites simplement glisser l’événement vers une autre date puis relâchez pour le déposer. Ou, cliquez sur l’événement puis sur \"Modifier\" pour apporter des changements plus spécifiques."
+        change_date: "Cette opération est simple. Faites simplement glisser l’événement vers une autre date puis relâchez pour le déposer. Ou, cliquez sur l’événement puis sur Modifier pour apporter des changements plus spécifiques."
         create: "Pour créer un événement dans le calendrier, commencez par cliquer sur le jour du calendrier où vous souhaitez le situer."
-        create_assignment: "Comme avec un événement de calendrier, cliquez sur la date à laquelle vous souhaitez ajouter la tâche. Vous pouvez aussi créer une tâche sans date d’échéance en cliquant sur la zone \"Événements non datés\" (*où ?*)."
+        create_assignment: "Comme avec un événement de calendrier, cliquez sur la date à laquelle vous souhaitez ajouter la tâche. Vous pouvez aussi créer une tâche sans date d’échéance en cliquant sur la zone Événements non datés (*où ?*)."
         delete: "Cliquez sur l’événement ou la tâche à supprimer dans le calendrier."
-        delete2: "Puis, cliquez sur \"Supprimer\" (*où ?*) et l’événement sera supprimé."
+        delete2: "Puis, cliquez sur Supprimer (*où ?*) et l’événement sera supprimé."
         delete_done: "C’est terminé. Vous êtes un vrai pro de la suppression !"
         done: "Vous avez terminé ! L’événement a été créé. Vous pouvez cliquer dessus pour afficher les informations, modifier et supprimer l’événement, ou le faire glisser vers un autre jour pour modifier sa date."
-        edit: "Très bien ! À présent, entrez un nom pour l’événement (*où ?*). Vous pouvez, si vous le souhaitez, spécifier une heure de début et de fin pour l’événement. Ou juste une heure de début. Ou vous ne spécifiez aucune heure. Pour terminer, cliquez sur \"Envoyer\"."
-        edit_assignment: "À présent, entrez un nom pour la tâche (*où ?*) et le groupe de tâches auquel il appartient. Vous pouvez également spécifier une date d’échéance si vous le souhaitez. Pour terminer, cliquez sur \"Envoyer\"."
+        edit: "Très bien ! À présent, entrez un nom pour l’événement (*où ?*). Vous pouvez, si vous le souhaitez, spécifier une heure de début et de fin pour l’événement. Ou juste une heure de début. Ou vous ne spécifiez aucune heure. Pour terminer, cliquez sur Envoyer."
+        edit_assignment: "À présent, entrez un nom pour la tâche (*où ?*) et le groupe de tâches auquel il appartient. Vous pouvez également spécifier une date d’échéance si vous le souhaitez. Pour terminer, cliquez sur Envoyer."
       labels: 
         i_would_like_to: "Je souhaite"
       links: 
@@ -2813,7 +2813,7 @@ fr:
   canvas: 
     migration: 
       errors: 
-        file_does_not_exist: "Le fichier \"%{file_path}\" n’existe pas dans le contenu et n’a pas été importé."
+        file_does_not_exist: "Le fichier %{file_path} n’existe pas dans le contenu et n’a pas été importé."
       warning: 
         unzip_warning: "Le package de contenu a bien été décompressé, mais un avertissement a été émis."
     plugins: 
@@ -2927,7 +2927,7 @@ fr:
           pour travailler de manière collaborative sur des tâches telles que les essais de groupe ou la prise de note.  Cette page constitue pour eux
           (et vous) un endroit simple pour conserver la trace de ces collaborations, et pour les créer
           sans avoir à échanger de e-mail.
-      how_to_start_a_new_collaboration: "Pour en savoir plus sur un type particulier de collaboration, cliquez sur \"Démarrer une nouvelle collaboration\" puis choisissez le type voulu dans la liste déroulante."
+      how_to_start_a_new_collaboration: "Pour en savoir plus sur un type particulier de collaboration, cliquez sur Démarrer une nouvelle collaboration, puis choisissez le type voulu dans la liste déroulante."
       links: 
         delete: "Supprimer cette collaboration"
         edit: "Modifier cette collaboration"
@@ -2989,8 +2989,8 @@ fr:
       titles: 
         welcome_aboard: Bienvenue !
     confirm_failed: 
-      details: "Il semblerait que vous ayez déjà confirmé votre inscription. Essayez de vous *connecter* avec l’adresse de messagerie et le mot de passe que vous avez enregistrés. Si vous ne vous souvenez pas de votre mot de passe, cliquez sur le lien \"Mot de passe oublié\" pour obtenir un nouveau lien et vous connecter et reconfigurer votre mot de passe."
-      feedback: "Si le problème persiste, cliquez sur l’onglet \"Commentaires\" en haut à droite et expliquez-nous votre problème."
+      details: "Il semblerait que vous ayez déjà confirmé votre inscription. Essayez de vous *connecter* avec l’adresse de messagerie et le mot de passe que vous avez enregistrés. Si vous ne vous souvenez pas de votre mot de passe, cliquez sur le lien « Mot de passe oublié  pour obtenir un nouveau lien et vous connecter et reconfigurer votre mot de passe."
+      feedback: "Si le problème persiste, cliquez sur l’onglet Commentaires en haut à droite et expliquez-nous votre problème."
       page_title: "Échec de la confirmation d’inscription"
       titles: 
         problems_with_registration: "Problème avec l’inscription"
@@ -3079,7 +3079,7 @@ fr:
       process: "Traiter les données"
     errors: 
       couldnt_create: "Impossible de créer l’exportation du contenu."
-      error: "Erreur lors de l’exportation du cours. Veuillez en informer votre administrateur système et lui donner l’identifiant d’exportation suivant : \"%{code}\""
+      error: "Erreur lors de l’exportation du cours. Veuillez en informer votre administrateur système et lui donner l’identifiant d’exportation suivant : %{code}"
       not_found: "L’exportation n’existe pas"
     index: 
       buttons: 
@@ -3113,7 +3113,7 @@ fr:
     errors: 
       failed: "L’importation du cours a échoué avec l’erreur suivante :"
       import_failed: "Une erreur est survenue lors de l’importation pour la migration.  Veuillez en informer votre administrateur système et lui fournir le code suivant : « %{code} »"
-      no_only_and_except: "Vous ne pouvez pas utiliser les options\"uniquement\" et \"excepté\" en même temps."
+      no_only_and_except: "Vous ne pouvez pas utiliser les options « uniquement » et « excepté  en même temps."
     files: 
       buttons: 
         cancel: Annuler
@@ -3706,7 +3706,7 @@ fr:
       module: module
       module_details: "Les modules sont affichés dans l’ordre séquentiel, par conséquent seuls ceux placés au-dessus de %{name} peuvent être définis comme prérequis."
       module_name: "Nom du module"
-      modules_keyboard_hint_updated: "Avertissement : pour une meilleure accessibilité, utilisez l’option Move To Dialog du menu."
+      modules_keyboard_hint_updated: "Avertissement : pour une meilleure accessibilité, utilisez l’option Accéder à la boîte de dialogue du menu."
       move_module: 
         after: Après
         before: Avant
@@ -3797,7 +3797,7 @@ fr:
           student_progress: "Afficher la progression de l’étudiant pour ce module"
       manager_module: "Gérer le module"
       module_will_unlock_at: "Se déverrouillera le *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: "Avertissement : pour une meilleure accessibilité, utilisez l’option Move To Dialog du menu."
+      modules_keyboard_drag_and_drop: "Avertissement : pour une meilleure accessibilité, utilisez l’option Accéder à la boîte de dialogue du menu."
       progression_complete_count: "*%{count}* terminés"
       progression_started_count: "*%{count}* en cours"
       reorder_modules: "Faire glisser les modules pour les réorganiser"
@@ -3809,7 +3809,7 @@ fr:
       titles: 
         course_modules: "Modules du cours"
     module_complete: Terminé
-    module_empty: "Le module \"%{module}\" ne contient aucun élément"
+    module_empty: "Le module %{module} ne contient aucun élément"
     module_item: 
       drag_to_reorder: "Faites glisser l’élément pour le classer ou le déplacer dans un autre module"
       images: 
@@ -4157,8 +4157,8 @@ fr:
     default_name: "Mon cours"
     default_short_name: Cours-101
     errors: 
-      sis_in_use: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
-    file_copy_error: "Impossible de copier le fichier \"%{name}\""
+      sis_in_use: "L’ID SIS « %{sis_id}  est déjà utilisé."
+    file_copy_error: "Impossible de copier le fichier %{name}"
     grade_export_types: 
       instructure_csv: "Fichier CSV Instructure"
     grade_publishing_status: 
@@ -4191,7 +4191,7 @@ fr:
   course_copy_not_allowed_error: "Vous n’avez pas l’autorisation requise pour copier le cours source."
   course_exports: 
     errors: 
-      assignment: "L’exportation de la tâche \"%{title}\" a échoué"
+      assignment: "L’exportation de la tâche %{title} a échoué"
       assignment_groups: "Échec de l’exportation des groupes de tâches"
       assignment_is_locked: "Impossible de copier la tâche « %{title} », car elle est verrouillée."
       assignments: "Échec de l’exportation de certaines tâches"
@@ -4200,7 +4200,7 @@ fr:
       course_settings: "Échec de l’exportation des paramètres du cours"
       events: "Échec de l’exportation des événements du calendrier"
       external_feeds: "Échec de l’exportation des flux externes"
-      file: "L’exportation du fichier \"%{file_name}\" a échoué"
+      file: "L’exportation du fichier %{file_name} a échoué"
       file_meta: "Échec de l’exportation des métadonnées du fichier"
       files: "Échec de l’exportation de certains fichiers"
       grading_standards: "Échec de l’exportation des critères de notation"
@@ -4211,17 +4211,17 @@ fr:
       media_files_too_large: "Les fichiers multimédias n’ont pas été exportés parce que leur taille totale était trop importante."
       module_meta: "Échec de l’exportation des métadonnées du module"
       organization: "Échec de la génération de la structure d’organisation"
-      question_bank: "Échec de l’exportation de la banque de questions \"%{title}\""
-      quiz: "Échec de l’exportation du questionnaire \"%{title}\""
+      question_bank: "Échec de l’exportation de la banque de questions %{title}"
+      quiz: "Échec de l’exportation du questionnaire %{title}"
       quiz_is_locked: "Impossible de copier le quizz « %{title} », car il est verrouillé."
       quizzes: "Échec de l’exportation de certains questionnaires"
       resources: "Échec de liaison de certaines ressources."
       rubrics: "Échec de l’exportation des barèmes"
-      topic: "Échec de l’exportation du sujet de discussion \"%{title}\""
+      topic: "Échec de l’exportation du sujet de discussion %{title}"
       topic_is_locked: "Impossible de copier le sujet « %{title} », car il est verrouillé."
       topics: "Échec de l’exportation de certains sujets"
       web_links: "Échec de l’exportation de certains liens Web"
-      wiki_page: "Échec de l’exportation de la page Wiki \"%{title}\""
+      wiki_page: "Échec de l’exportation de la page Wiki %{title}"
       wiki_pages: "Échec de l’exportation de pages Wiki"
     errors_list_message: "Erreurs d’exportation pour l’exportation %{export_id} :"
     unknown_titles: 
@@ -4310,7 +4310,7 @@ fr:
   course_search: 
     cant_be_blank: "Ne doit pas être vide"
   course_section: 
-    sis_id_taken: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
+    sis_id_taken: "L’ID SIS « %{sis_id}  est déjà utilisé."
   course_settings: 
     buttons: 
       add_section: "Ajouter une section"
@@ -4733,7 +4733,7 @@ fr:
         is_public: "Rendre ce cours visible publiquement"
         language: Langue
         license: Licence
-        open_enrollment: "Ajouter un lien \"Rejoindre ce cours\" à la page d’accueil du cours"
+        open_enrollment: "Ajouter un lien Rejoindre ce cours à la page d’accueil du cours"
         public_syllabus: "Rendre public le programme de ce cours"
         restrict_enrollments_to_course_dates: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates"
         root_account_id: "Compte racine"
@@ -4758,7 +4758,7 @@ fr:
         after: Après
         before: Avant
         or: OU
-      nav_items_keyboard_drag_and_drop: "Avertissement : pour une meilleure accessibilité, utilisez l’option Move To Dialog du menu."
+      nav_items_keyboard_drag_and_drop: "Avertissement : pour une meilleure accessibilité, utilisez l’option Accéder à la boîte de dialogue du menu."
       no_date: "Aucune date définie"
       no_language_preference: "Non définie (paramétrable par l’utilisateur, %{language} par défaut)"
       none: Aucun
@@ -4940,7 +4940,7 @@ fr:
     unauthorized: 
       invalid_link: "Le lien d’inscription utilisé semble n’être plus valide. Contactez le formateur du cours pour vérifier si vous êtes toujours inscrit."
   create_item_base: 
-    there_was_an_error: "Une erreur s’est produite lors de l’enregistrement de \"%{title}\". Réessayez ultérieurement."
+    there_was_an_error: "Une erreur s’est produite lors de l’enregistrement de %{title}. Réessayez ultérieurement."
   create_module_item: 
     assignment_name: "Nom du travail"
   create_module_item_quiz: 
@@ -5320,7 +5320,7 @@ fr:
     created_entry_notice: "L’entrée a été créée."
     deleted_entry_notice: "Cette entrée a été supprimée"
     disabled_podcasts_notice: "Les podcast n’ont pas été activés pour ce sujet."
-    podcast_description: "Les fichiers multimédias liés ou intégrés à des entrées dans le sujet \"%{title}\" apparaîtront dans ce flux."
+    podcast_description: "Les fichiers multimédias liés ou intégrés à des entrées dans le sujet %{title} apparaîtront dans ce flux."
     podcast_feed_title: "Flux podcast de billets %{title}"
     posts_feed_title: "Flux de billets %{title}"
     updated_entry_notice: "L’entrée a été mise à jour."
@@ -5723,7 +5723,7 @@ fr:
     teacher_assistant: AE
   enrollment_term: 
     errors: 
-      not_unique: "L’ID SIS \"%{sis_source_id}\" est déjà utilisé."
+      not_unique: "L’ID SIS « %{sis_source_id}  est déjà utilisé."
   eportfolio: 
     buttons: 
       done_editing: "Modification terminée"
@@ -5948,7 +5948,7 @@ fr:
             Vous êtes prêt à commencer ? Cliquez sur le bouton.
     wizard_box: 
       finish: 
-        body: "Vous êtes prêt à commencer ? Vous pourrez toujours revenir à l’assistant à partir de n’importe quelle page en cliquant sur le lien \"%{help_link_text}\" qu’elle contient."
+        body: "Vous êtes prêt à commencer ? Vous pourrez toujours revenir à l’assistant à partir de n’importe quelle page en cliquant sur le lien « %{help_link_text}  qu’elle contient."
       headers: 
         finish: Allons-y !
         getting_started: Démarrage
@@ -5964,21 +5964,21 @@ fr:
       links: 
         portfolio: "Afficher le portefeuille"
       page_content: 
-        body1: "Le contenu de la page que vous voyez affiché est visible par tous les visiteurs. Pour modifier ce contenu, cliquez sur le lien \"%{edit_link_text}\" (%{showme}) et la page passera en mode édition."
+        body1: "Le contenu de la page que vous voyez affiché est visible par tous les visiteurs. Pour modifier ce contenu, cliquez sur le lien « %{edit_link_text}  (%{showme}) et la page passera en mode édition."
         body2: "À présent nous allons apporter des modifications. Par exemple, vous pouvez choisir de renommer la page ou de modifier les options de commentaires (%{showme1}). Vous pouvez afficher un aperçu de vos modifications, les enregistrer ou les annuler à tout moment en cliquant sur le bouton à droite (%{showme2})."
         body3: "Le contenu se divise en sous-sections qui ont chacune un bord en pointillé. Vous pouvez supprimer ou modifier le contenu d’une sous-section en cliquant sur les icônes %{edit_icon} ou %{delete_icon} en haut à droite dans la sous-section."
         body4: "Pour ajouter de nouvelles sous-sections, cliquez sur le type de contenu que vous souhaitez ajouter dans la liste d’options sur le côté droit de la page (%{showme})."
       pages: 
-        body1: "Les sections comprennent plusieurs pages. Vous pouvez afficher la liste des pages de la section actuelle sur le côté droit de la page (%{showme1}). Pour organiser ou ajouter des pages, cliquez sur le lien \"%{manage_pages}\" (%{showme2})."
+        body1: "Les sections comprennent plusieurs pages. Vous pouvez afficher la liste des pages de la section actuelle sur le côté droit de la page (%{showme1}). Pour organiser ou ajouter des pages, cliquez sur le lien « %{manage_pages}  (%{showme2})."
         body2: "Vous pouvez renommer une page en cliquant sur l’icône %{edit_icon} qui s’affiche, supprimer une page en cliquant sur l’icône %{delete_icon}, ou réorganiser les pages en cliquant dessus puis en les déplaçant."
       sections: 
-        body1: "Les sections apparaissent dans une liste sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages. Pour organiser ou ajouter des sections, cliquez sur le lien \"%{manage_sections}\" (%{showme2})."
+        body1: "Les sections apparaissent dans une liste sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages. Pour organiser ou ajouter des sections, cliquez sur le lien « %{manage_sections} » (%{showme2})."
         body2: "Vous pouvez renommer une section en cliquant sur l’icône %{edit_icon} qui s’affiche, réorganiser les sections en cliquant dessus puis en les déplaçant, ou supprimer des sections en cliquant sur l’icône %{delete_icon}."
       settings: 
-        body: "Pour modifier les paramètres de votre portefeuille, cliquez sur le lien \"Paramètres du portefeuille électronique\" (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
+        body: "Pour modifier les paramètres de votre portefeuille, cliquez sur le lien « Paramètres du portefeuille électronique» (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
       submissions: 
         body1: "Vous avez peut-être remarqué en bas de cette page la liste des envois récents de vos classes (%{showme}). Vous pouvez rapidement ajouter des envois aux nouvelles pages de votre portefeuille à partir de cette page. Cliquez simplement sur l’envoi à ajouter pour afficher une boîte de dialogue."
-        body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur \"Ajouter une page\" vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
+        body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur Ajouter une page, vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
   errors: 
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
@@ -6021,7 +6021,7 @@ fr:
     no_attached_file: "Vous devez joindre au moins un fichier à cette tâche."
     registration_incomplete: "Vous devez confirmer votre adresse e-mail pour pouvoir consulter cette page."
     required: Requis
-    sis_id_in_use: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
+    sis_id_in_use: "L’ID SIS « %{sis_id}  est déjà utilisé."
     unsaved_changes: "Vous avez des modifications non enregistrées."
   external_content: 
     cancel: 
@@ -6207,7 +6207,7 @@ fr:
       weekly: Hebdomadaire
     settings: 
       back_to_messages: "Revenir aux messages"
-      link_needed: "Avant de configurer l’application Canvas Facebook, vous devez la lier à votre connexion Canvas. Pour plus d’informations, cliquez sur \"Bienvenue\"."
+      link_needed: "Avant de configurer l’application Canvas Facebook, vous devez la lier à votre connexion Canvas. Pour plus d’informations, cliquez sur Bienvenue."
       notifications_config_notice: "Les notifications de Canvas peuvent être envoyées automatiquement vers votre compte Facebook. Vous trouverez ci-dessous le type de notifications que vous pouvez envoyer. Vous pouvez modifier vos préférences de notifications à tout moment, soit ici, soit dans Canvas."
       settings_title: "Paramètres de notification Canvas"
       updating_preferences: "Mise à jour des préférences..."
@@ -6259,7 +6259,7 @@ fr:
     change_name: "Changer le nom"
     message: "Il existe déjà un élément appelé « %{name} » à cet emplacement. Voulez-vous remplacer le fichier existant ?"
     name: Nom
-    prompt: "Remplacer \"%{name}\" par"
+    prompt: "Remplacer %{name} par"
     rename_title: Copier
     replace: Remplacer
   filebrowserview: 
@@ -6415,7 +6415,7 @@ fr:
     show: 
       messages: 
         file_locked: "Ce fichier n’est pas encore déverrouillé."
-        folder_locked: "Le dossier \"%{folder}\" qui contient ce fichier a été verrouillé."
+        folder_locked: "Le dossier %{folder} qui contient ce fichier a été verrouillé."
     text_show: 
       page_title: "Aperçu de fichier"
     titles: 
@@ -6448,7 +6448,7 @@ fr:
     errors: 
       invalid_recursion: "Un dossier ne peut pas être son propre parent."
       invalid_root_folder_name: "Impossible de changer le dossier racine"
-    folder_created: "Dossier \"%{name}\" créé"
+    folder_created: "Dossier %{name} créé"
   folders: 
     event_updated: "L’événement a été mis à jour."
     file_zip_in_process: "Compression des fichiers toujours en cours..."
@@ -6704,7 +6704,7 @@ fr:
       attendance_info: "Aucune tâche de participation n’a été créée."
       buttons: 
         add_assignment: "Ajouter une tâche"
-      edit_attendance_info: "Pour modifier les informations d’une tâche de participation, cliquez sur l’icône de liste déroulante sous le nom de la tâche, puis cliquez sur \"Modifier la tâche\"."
+      edit_attendance_info: "Pour modifier les informations d’une tâche de participation, cliquez sur l’icône de liste déroulante sous le nom de la tâche, puis cliquez sur Modifier la tâche."
       headers: 
         attendance: Participation
         edit_attendance: "Modifier les informations de participation"
@@ -6739,7 +6739,7 @@ fr:
       assessment_by: "Évaluation par %{name}"
       assignments: Travaux
       buttons: 
-        show_what_if: "Afficher les notes \"hypothétiques\" enregistrées"
+        show_what_if: "Afficher les notes hypothétiques enregistrées"
       change_score_instructions: "Cliquez sur une note et entrez une nouvelle valeur pour voir comment le changement affectera votre total."
       click_to_change: "Cliquer pour tester une note différente"
       close_comments: Fermer
@@ -7139,8 +7139,8 @@ fr:
         add_group: "Créer un ensemble de groupes"
       course_group_explanation: "Les groupes d’étudiants sont très utiles pour organiser les étudiants autour d’activités telles que des projets ou des essais de groupe. Chaque groupe d’étudiants reçoit son calendrier, son tableau de discussion et ses outils de collaboration afin de s’organiser et de travailler ensemble plus efficacement."
       drag_and_drop_instructions: "Cliquez et faites glisser les étudiants dans un autre groupe."
-      get_started_info: "Pour commencer, cliquez sur le lien \"Créer un ensemble de groupes\" à droite."
-      group_assignment_instructions: "Vous pouvez attribuer des étudiants aléatoirement dans des groupes de taille spécifique, ou créer et organiser des groupes manuellement. Une fois que vos groupes sont créés, vous pouvez définir les tâches comme des tâches \"d’envoi groupé\", ce qui signifie que chaque groupe fera un envoi pour tous les utilisateurs du groupe."
+      get_started_info: "Pour commencer, cliquez sur le lien « Créer un ensemble de groupes  à droite."
+      group_assignment_instructions: "Vous pouvez attribuer des étudiants aléatoirement dans des groupes de taille spécifique, ou créer et organiser des groupes manuellement. Une fois que vos groupes sont créés, vous pouvez définir les tâches comme des tâches « d’envoi groupé , ce qui signifie que chaque groupe fera un envoi pour tous les utilisateurs du groupe."
       group_pages: "Pages de groupe"
       headings: 
         account_groups: "Groupes d’étudiants au niveau compte"
@@ -7169,7 +7169,7 @@ fr:
       self_signup_help_tooltip: "Que sont les groupes d’inscription libre ?"
     edit_group_set: "Modifier l’ensemble de groupes"
     errors: 
-      category_in_use: "\"%{category_name}\" est déjà utilisé"
+      category_in_use: "« %{category_name}  est déjà utilisé"
       creating_category_failed: "Échec de la création d’une catégorie, veuillez réessayer"
       creating_group_failed: "Échec de la création d’un groupe"
       group_full: "Le groupe est plein."
@@ -7462,7 +7462,7 @@ fr:
   importers/assignment_importer: 
     errors: 
       import: 
-        external_tool_url: "L’URL pour la tâche de l’outil externe \"%{assignment_name}\" n’est pas valide."
+        external_tool_url: "L’URL pour la tâche de l’outil externe %{assignment_name} n’est pas valide."
     imported_assignments_group: "Travaux importés"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Les paramètres de sécurité de l’outil externe « %{tool_name} » doivent être définis dans les paramètres du cours."
@@ -7475,10 +7475,10 @@ fr:
     failed_import_media_objects: "Échec de l’importation des objets multimédias"
     file_import_warning: "Le fichier %{file} est introuvable"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter \"%{title}\"."
+    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter %{title}."
   importers/learning_outcome_importer: 
-    no_context_found: "Les acquis externes sont introuvables pour \"%{title}\". Création d’une copie."
-    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter \"%{title}\"."
+    no_context_found: "Les acquis externes sont introuvables pour %{title}. Création d’une copie."
+    no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter %{title}."
   importers/rubric_importer: 
     no_context_found: "Le barème externe est introuvable pour « %{title} ». Création d’une copie."
   importers/wiki_page_importer: 
@@ -8573,7 +8573,7 @@ fr:
         subject: "Échec de l’exportation du cours : %{course}"
     content_export_finished: 
       email: 
-        body: "L’exportation de contenu pour \"%{course}\" est terminée."
+        body: "L’exportation de contenu pour %{course} est terminée."
         html: 
           body2: "L’exportation de votre cours *%{course}* est terminée."
           link: "Cliquez ici pour afficher les exportations"
@@ -8917,7 +8917,7 @@ fr:
     file_unpublished_module: "Ce fichier fait partie d’un module non publié et n’est pas encore disponible."
     forgot_password: 
       email: 
-        associated_login: "Cette adresse est associée à la connexion \"%{login_identifier}\"."
+        associated_login: "Cette adresse est associée à la connexion %{login_identifier}."
         html: 
           associated_login: "Cette adresse est associée à l’identifiant de connexion « %{login_identifier} »."
           click_to_reset: "Cliquez ici pour définir un nouveau mot de passe"
@@ -9324,8 +9324,8 @@ fr:
         body: "Alerte Canvas - %{count} nouveaux fichiers pour %{name}"
     new_student_organized_group: 
       email: 
-        body_account: "Un nouveau groupe organisé par les étudiants intitulé \"%{group_name}\" a été créé pour le compte %{account}. Son premier membre est %{user}."
-        body_course: "Un nouveau groupe organisé par les étudiants intitulé \"%{group_name}\" a été créé pour le cours %{course}. Son premier membre est %{user}."
+        body_account: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le compte %{account}. Son premier membre est %{user}."
+        body_course: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le cours %{course}. Son premier membre est %{user}."
         details: "Pour obtenir plus d’informations sur ce groupe, cliquez sur le lien ci-dessous :"
         html: 
           body_account: "Un nouveau groupe organisé par les étudiants et intitulé « %{group_name} » a été créé pour le compte %{account}. Son premier membre est %{user}."
@@ -9339,12 +9339,12 @@ fr:
         body_account: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le compte %{account}. Son premier membre est %{user}."
         body_course: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le cours %{course}. Son premier membre est %{user}."
       sms: 
-        body_account: "Un nouveau groupe intitulé \"%{group_name}\" a été créé pour le compte %{account}. Son premier membre est %{user}."
-        body_course: "Un nouveau groupe intitulé \"%{group_name}\" a été créé pour le cours %{course}. Son premier membre est %{user}."
+        body_account: "Un nouveau groupe intitulé %{group_name} a été créé pour le compte %{account}. Son premier membre est %{user}."
+        body_course: "Un nouveau groupe intitulé %{group_name} a été créé pour le cours %{course}. Son premier membre est %{user}."
         detail: "Informations complémentaires sur %{url}"
       summary: 
-        body_account: "Un nouveau groupe organisé par les étudiants intitulé \"%{group_name}\" a été créé pour le compte %{account}. Son premier membre est %{user}."
-        body_course: "Un nouveau groupe organisé par les étudiants intitulé \"%{group_name}\" a été créé pour le cours %{course}. Son premier membre est %{user}."
+        body_account: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le compte %{account}. Son premier membre est %{user}."
+        body_course: "Un nouveau groupe organisé par les étudiants intitulé %{group_name} a été créé pour le cours %{course}. Son premier membre est %{user}."
         subject: "Nouveau groupe d’étudiants pour %{course_or_account}"
       twitter: 
         body_account: "Alerte Canvas - Nouveau groupe : %{group_name} pour le compte %{account}"
@@ -9824,7 +9824,7 @@ fr:
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
-    how_to_unmute: "Après avoir mis cette tâche en mode silencieux, vous pouvez recommencer à envoyer des notifications en cliquant sur le lien \"Annuler une tâche silencieuse\"."
+    how_to_unmute: "Après avoir mis cette tâche en mode silencieux, vous pouvez recommencer à envoyer des notifications en cliquant sur le lien « Annuler une tâche silencieuse ."
     mute_assignment: "Tâche silencieuse"
     score_change_notifications: "Notifications de changement de notes"
     see_grade: "Leur note pour la tâche"
@@ -10392,7 +10392,7 @@ fr:
       description: "EtherPad est à présent un projet libre et ouvert. Vous pouvez utiliser un certain nombre d’instances publiques hébergées d’EtherPad. Notamment :"
       edupad: eduPad
       hints: 
-        domain: "N’incluez pas la partie \"http://\" ou des barres obliques."
+        domain: "N’incluez pas la partie « http://  ou des barres obliques."
       host_your_own: "Ou, vous pouvez aussi [créer votre propre site EtherPad](%{etherpad_url})."
       labels: 
         domain: Domaine
@@ -10418,8 +10418,8 @@ fr:
         domain_settings: "Paramètres du domaine"
       hints: 
         api_key: "Également appelée Jeton du client"
-        canvas_domain: "domaine spécifié dans \"URL Canvas\""
-        canvas_name: "chemin spécifié dans \"Page Canvas\""
+        canvas_domain: "domaine spécifié dans «URL Canvas »"
+        canvas_name: "chemin spécifié dans « Page Canvas "
         disable_ssl: "Utiliser uniquement pour les tests en local"
       labels: 
         api_key: "Clé API"
@@ -10474,7 +10474,7 @@ fr:
       description: "Enregistrement et lecture audio/vidéo Kaltura"
       name: Kaltura
     kaltura_settings: 
-      account_settings: "Ces valeurs se trouvent dans la console de gestion Kaltura sous \"Paramètres -> Paramètres d’intégration\"."
+      account_settings: "Ces valeurs se trouvent dans la console de gestion Kaltura sous Paramètres -> Paramètres d’intégration."
       cache_explanation: "L’absence de paramètre indique une mise en cache sans limites, 0 indique qu’il n’y a pas de mise en cache."
       description: |-
           Vous aurez besoin d’un compte soit sur [Kaltura.com](%{kaltura_url})
@@ -10496,9 +10496,9 @@ fr:
         ui_conf_ids: "ID de configuration de l’IU"
       hide_rte_button_note: "(toujours là pour les conversations/SpeedGrader/envois de travaux personnels en enregistrements multimédias)"
       hints: 
-        domain: "Pour les comptes hébergés, utilisez \"www.kaltura.com\"."
-        resource_domain: "Pour les comptes hébergés, utilisez \"cdn.kaltura.com\"."
-        rtmp_domain: "Pour les comptes hébergés, utilisez \"www.kaltura.com\"."
+        domain: "Pour les comptes hébergés, utilisez www.kaltura.com."
+        resource_domain: "Pour les comptes hébergés, utilisez cdn.kaltura.com."
+        rtmp_domain: "Pour les comptes hébergés, utilisez www.kaltura.com."
       kaltura_path_example: "par ex."
       kaltura_sis_explanation: "Détermine si les données SIS vérifiées sur les utilisateurs et les cours seront fournies à Kaltura."
       labels: 
@@ -10528,8 +10528,8 @@ fr:
           Définissez les options de configuration suivantes pour garantir un fonctionnement correct
           de votre intégration avec LinkedIn :
           
-          * **Application Type :** défini sur  "Application Web"
-          * **Live Status :** défini sur  "En direct"
+          * **Application Type :** défini sur Application Web
+          * **Live Status :** défini sur En direct
           * **OAuth Redirect URL :** défini sur %{oauth_url}
           * Après avoir enregistré votre application, prenez note de la clé API et de la clé secrète.
       domain_name: domaine
@@ -10601,9 +10601,9 @@ fr:
           Définissez les options de configuration suivantes pour garantir un fonctionnement correct
           de votre application Twitter :
           
-          * **Application Type :** défini sur  "Navigateur"
+          * **Application Type :** défini sur Navigateur
           * **Callback URL :** défini sur %{callback_url}
-          * **Default Access type :** défini sur  "Lire, Écrire et message privé"
+          * **Default Access type :** défini sur Lire, Écrire et message privé
           * Après avoir enregistré votre application, prenez note du code client et du secret client.
       domain_name: domaine
       labels: 
@@ -10861,7 +10861,7 @@ fr:
           Ces notifications vous seront envoyées comme messages directs dont vous serez l’expéditeur
           et le destinataire, et n’apparaîtront pas dans votre sphère publique.
       unknown_service: Inconnu
-      web_services: "Canvas peut vous simplifier la vie en se jumelant aux outils Web que vous utilisez déjà. Cliquez sur un service dans \"Autres services\" pour le constater par vous-même."
+      web_services: "Canvas peut vous simplifier la vie en se jumelant aux outils Web que vous utilisez déjà. Cliquez sur un service dans Autres services pour le constater par vous-même."
     purpose_required: "La fonction doit être indiquée"
     resending: "renvoi en cours..."
     secondary_nav: 
@@ -12844,7 +12844,7 @@ fr:
   section: 
     confirms: 
       delete_enrollment: "Voulez-vous vraiment supprimer cette inscription définitivement ?"
-    default_course_name: "ID de cours \"%{course_id}\""
+    default_course_name: "ID de cours %{course_id}"
     enrolled_as_designer: "inscrit comme concepteur"
     enrolled_as_limited_designer: "inscrit comme concepteur avec accès aux sections uniquement"
     enrolled_as_limited_observer: "inscrit comme observateur avec accès aux sections seulement"
@@ -13473,7 +13473,7 @@ fr:
     select_content_dialog: 
       add_to_module: "Ajouter %{item} au *module*"
       assignment_item: Tâche
-      assignment_notice: "Sélectionnez le travail que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant \"Nouvelle tâche\"."
+      assignment_notice: "Sélectionnez le travail que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant Nouvelle tâche."
       content_page_item: "Page de contenu"
       discussion_item: Discussion
       domain_match_notice: "pour utiliser cet outil, le domaine doit correspondre à %{domain}"
@@ -13482,7 +13482,7 @@ fr:
       external_url_item: "URL externe"
       external_url_notice: "Entrez une URL et le nom d’une page pour ajouter un lien entre l’URL d’un site Web et ce *module*."
       file_item: Fichier
-      file_notice: "Sélectionnez le fichier que vous souhaitez associer à ce *module*, ou ajoutez un fichier en sélectionnant \"Nouveau fichier\"."
+      file_notice: "Sélectionnez le fichier que vous souhaitez associer à ce *module*, ou ajoutez un fichier en sélectionnant Nouveau fichier."
       indent_level: 
         one: "*Retrait 1 niveau*"
         other: "*Retrait %{count} niveaux*"
@@ -13508,11 +13508,11 @@ fr:
       options: 
         assignments: Tâches
       quiz_item: Questionnaire
-      quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant \"Nouveau questionnaire\"."
+      quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant Nouveau questionnaire."
       sub_header_notice: "Tapez le texte du titre de paragraphe à ajouter pour le *module*"
       text_header_item: "Texte de l’en-tête"
-      topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant \"Nouveau sujet\"."
-      wiki_page_notice: "Sélectionnez la page Wiki que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant \"Nouvelle page\"."
+      topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant Nouveau sujet."
+      wiki_page_notice: "Sélectionnez la page Wiki que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant Nouvelle page."
     sequence_footer: 
       full_course_sequence: "voir la séquence complète du cours"
       next: Suivant
@@ -13537,9 +13537,9 @@ fr:
         log_in: "Veuillez vous connecter"
         unauthorized_action: "Non autorisé"
       unauthorized_1: "Vous n’êtes pas autorisé à accéder à cette page. Veuillez vérifier si vous avez les autorisations nécessaires pour afficher ce contenu."
-      unauthorized_2: "Si vous pensez avoir l’autorisation d’afficher cette page, cliquez sur le lien \"Aide\" pour informer le service d’assistance du problème."
+      unauthorized_2: "Si vous pensez avoir l’autorisation d’afficher cette page, cliquez sur le lien Aide pour informer le service d’assistance du problème."
       unauthorized_action: "L’accès à cette page est réservé aux utilisateurs autorisés. Vous devez vous connecter pour en afficher le contenu."
-      unauthorized_user: "%{user_name}, vous devez vous connecter pour afficher cette page. Cliquez sur \"Mot de passe oublié\" si vous avez oublié votre mot de passe ou ne le connaissez pas."
+      unauthorized_user: "%{user_name}, vous devez vous connecter pour afficher cette page. Cliquez sur Mot de passe oublié si vous avez oublié votre mot de passe ou ne le connaissez pas."
       unauthorized_user_is_other: "%{current_user}, vous n’êtes pas autorisé à afficher cette page. Le lien qui a ouvert cette page était destiné à **%{unauthorized_user} (%{unauthorized_user_email})**. S’il s’agit de vous, essayez de vous déconnecter puis de vous reconnecter à l’aide de cette adresse de messagerie pour accéder à cette page."
     unauthorized_feed: 
       bad_params: "Les paramètres du flux auquel vous avez essayé d’accéder ne sont pas valides."
@@ -13673,7 +13673,7 @@ fr:
     buttons: 
       process_data: "Traiter les données"
     errors: 
-      import_failed_code: "Une erreur s’est produite lors de l’importation des données SIS. Aucun enregistrement importé. Veuillez en informer votre administrateur système et lui fournir le code suivant: \"%{code}\""
+      import_failed_code: "Une erreur s’est produite lors de l’importation des données SIS. Aucun enregistrement importé. Veuillez en informer votre administrateur système et lui fournir le code suivant: %{code}"
       import_failed_messages: "Aucun enregistrement SIS importé L’importation a échoué avec ces messages :"
     headers: 
       import_errors: "Erreurs empêchant l’importation"
@@ -14358,7 +14358,7 @@ fr:
       add_login: "Ajouter une connexion"
       update_login: "Mettre à jour la connexion"
     confirms: 
-      delete_login: "Voulez-vous vraiment supprimer la connexion \"%{login}\" ?"
+      delete_login: "Voulez-vous vraiment supprimer la connexion %{login} ?"
     notices: 
       cant_delete_last_login: "Impossible de supprimer la dernière connexion d’un utilisateur"
       mfa_reset: "Réinitialisation de l’authentification multifacteur"
@@ -14546,7 +14546,7 @@ fr:
       titles: 
         all_users: "Tous les utilisateurs"
         choose_term: "Choisir un trimestre"
-        search_results: "Résultats de recherche pour \"%{search_term}\""
+        search_results: "Résultats de recherche pour %{search_term}"
     linkedin_added: "Le compte LinkedIn a été ajouté."
     linkedin_fail: "Échec d’autorisation pour LinkedIn. Veuillez réessayer"
     logins: 
@@ -14878,9 +14878,9 @@ fr:
         anyone: Tous
         only_teachers: "Uniquement les enseignants"
         teachers_and_students: "Enseignant et étudiants"
-      course_home_wiki_page_description: "Vous pouvez utiliser cette page pour organiser ou présenter votre cours comme bon vous semble. Vous pouvez aisément créer des liens vers des tâches, des fichiers, etc. à l’aide de la section \"Outils de mise en page\" qui s’affichera à droite lorsque vous commencerez vos modifications."
+      course_home_wiki_page_description: "Vous pouvez utiliser cette page pour organiser ou présenter votre cours comme bon vous semble. Vous pouvez aisément créer des liens vers des tâches, des fichiers, etc. à l’aide de la section Outils de mise en page qui s’affichera à droite lorsque vous commencerez vos modifications."
       course_wiki_page_description: "Vous pouvez utiliser ce Wiki pour créer des pages supplémentaires ou des descriptions des documents de votre cours. Vous pouvez aisément créer des liens vers des pages Wiki à partir de tâches, ou vers d’autres documents et fichiers de cours depuis n’importe quelle page Wiki. C’est l’endroit idéal pour expliquer des concepts difficiles, participer à des projets de groupe, ou créer presque n’importe quel type de page nécessaire à votre cours."
-      default_wiki_page_description: "Cette page est la page Wiki par défaut, et les étudiants la verront lorsqu’ils cliqueront sur l’onglet \"Pages\" de ce cours."
+      default_wiki_page_description: "Cette page est la page Wiki par défaut, et les étudiants la verront lorsqu’ils cliqueront sur l’onglet Pages de ce cours."
       default_wiki_page_is_course_home_page_warning: "Pour l’instant, elle est également définie comme page par défaut, par conséquent les          visiteurs de votre cours verront cette page en premier. Vous pouvez modifier cela dans [la page d’accueil du cours](%{link})."
       editing_content: "Modification du contenu."
       editing_roles: 
@@ -14907,7 +14907,7 @@ fr:
       cannot_edit: "Vous n’avez pas le droit de modifier la page « %{title} »."
       cannot_read_revisions: "Vous n’êtes pas autorisé à réviser les anciennes révisions de « %{title} »."
       create_non_existent_page: "La page « %{title} » n’existe pas, mais vous pouvez la créer ci-dessous."
-      page_deleted: "La page \"%{title}\" a été supprimée."
+      page_deleted: "La page %{title} a été supprimée."
       page_does_not_exist: "La page « %{title} » n’existe pas."
       page_updated: "La page a été mise à jour."
     page_link: 
