@@ -16,11 +16,13 @@
 <header class="quiz-header">
   <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>
   <% if @submission.preview? %>
-    <% draft_preview_title = t('headers.draft_preview',
+    <% preview_title = @quiz.published? ? t('headers.published_preview',
+            "This is a preview of the published version of the quiz") : 
+            t('headers.draft_preview',
             "This is a preview of the draft version of the quiz") %>
     <h3>
-      <i class="icon-warning"><span class="screenreader-only"><%= draft_preview_title %></span></i>
-      <%= draft_preview_title %>
+      <i class="icon-warning"><span class="screenreader-only"><%= preview_title %></span></i>
+      <%= preview_title %>
     </h3>
   <% end %>
   <%= before_label(:started, "Started") %>
