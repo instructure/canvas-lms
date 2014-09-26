@@ -77,6 +77,7 @@ module Api::V1::StreamItem
         json = submission_json(stream_item.asset, stream_item.asset.assignment, current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
         json.delete('id')
         hash.merge! json
+        hash['submission_id'] = stream_item.asset.id
 
         # backwards compat from before using submission_json
         hash['assignment']['title'] = hash['assignment']['name']
@@ -98,13 +99,12 @@ module Api::V1::StreamItem
     end
   end
 
-  def api_render_stream_for_contexts(contexts, paginate_url)
-    opts = {}
-    opts[:contexts] = contexts if contexts.present?
-
+  def api_render_stream(opts)
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).includes(:stream_item)
-      Api.paginate(scope, self, self.send(paginate_url, @context), default_per_page: 21).to_a
+      scope = scope.joins(:stream_item).where("stream_items.asset_type=?", opts[:asset_type]) if opts.has_key?(:asset_type)
+      scope = scope.joins('inner join "submissions" on "submissions"."id"="asset_id"').where('"submissions"."user_id"=?', opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+      Api.paginate(scope, self, self.send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end
     render :json => items.select(&:stream_item).map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
   end

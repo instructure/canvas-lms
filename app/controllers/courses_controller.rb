@@ -800,7 +800,7 @@ class CoursesController < ApplicationController
   def activity_stream
     get_context
     if authorized_action(@context, @current_user, :read)
-      api_render_stream_for_contexts([@context], :api_v1_course_activity_stream_url)
+      api_render_stream(contexts: [@context], paginate_url: :api_v1_course_activity_stream_url)
     end
   end
 

@@ -483,6 +483,60 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @API Mark submission as read
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/read.json' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  def mark_submission_read
+    change_topic_read_state("read")
+  end
+
+  # @API Mark submission as unread
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/read.json' \
+  #        -X DELETE \
+  #        -H "Authorization: Bearer <token>"
+  def mark_submission_unread
+    change_topic_read_state("unread")
+  end
+
+  def change_topic_read_state(new_state)
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @user = get_user_considering_section(params[:user_id])
+    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
+
+    render_state_change_result @submission.change_read_state(new_state, @current_user)
+  end
+
+  # the result of several state change functions are the following:
+  #  nil - no current user
+  #  true - state is already set to the requested state
+  #  participant with errors - something went wrong with the participant
+  #  participant with no errors - the change went through
+  # this function renders a 204 No Content for a success, or a Bad Request
+  # for failure with participant errors if there are any
+  def render_state_change_result(result)
+    if result == true || result.try(:errors).blank?
+      render :nothing => true, :status => :no_content
+    else
+      render :json => result.try(:errors) || {}, :status => :bad_request
+    end
+  end
+
   def map_user_ids(user_ids)
     Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end

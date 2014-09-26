@@ -561,7 +561,14 @@ class UsersController < ApplicationController
   #   }
   def activity_stream
     if @current_user
-      api_render_stream_for_contexts(nil, :api_v1_user_activity_stream_url)
+      # this endpoint has undocumented params (context_code, submission_user_id and asset_type) to
+      # support submission comments in the conversations inbox.
+      # please replace this with a more reasonable solution at your earliest convenience
+      opts = {paginate_url: :api_v1_user_activity_stream_url}
+      opts[:asset_type] = params[:asset_type] if params.has_key?(:asset_type)
+      opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
+      opts[:submission_user_id] = params[:submission_user_id] if params.has_key?(:submission_user_id)
+      api_render_stream(opts)
     else
       render_unauthorized_action
     end

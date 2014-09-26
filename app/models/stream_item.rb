@@ -302,6 +302,8 @@ class StreamItem < ActiveRecord::Base
     case object
     when DiscussionTopic
       object.read_state(user_id)
+    when Submission
+      object.read_state(user_id)
     else
       nil
     end

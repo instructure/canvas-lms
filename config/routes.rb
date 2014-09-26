@@ -892,6 +892,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :submissions_api) do
       def submissions_api(context, path_prefix = context)
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
+        delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
         get "#{context.pluralize}/:#{context}_id/students/submissions", controller: :submissions_api, action: :for_students, as: "#{path_prefix}_student_submissions"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :show, as: "#{path_prefix}_assignment_submission"

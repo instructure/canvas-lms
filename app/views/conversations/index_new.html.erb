@@ -17,10 +17,22 @@
         <option value="starred"><%= t(:starred, "Starred") %></option>
         <option value="sent"><%= t(:sent, "Sent") %></option>
         <option value="archived"><%= t(:archived, "Archived") %></option>
+        <option value="submission_comments"><%= t(:submission_comments, "Submission Comments") %></option>
       </select>
     </div>
 
-    <div class="actions">
+    <div class="actions" id="submission-comment-actions" style="display: none;">
+      <button class="btn"
+              id="submission-reply-btn"
+              title="<%= t(:reply, "Reply") %>"
+              data-tooltip
+              disabled>
+        <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
+        <i class="icon-reply-2"></i>
+      </button>
+    </div>
+
+    <div class="actions" id="conversation-actions">
       <button class="btn"
               id="compose-btn"
               title="<%= t(:compose_new_message, "Compose a new message") %>"

@@ -1145,6 +1145,8 @@ class Submission < ActiveRecord::Base
     return nil unless current_user
     return true if new_state == self.read_state(current_user)
 
+    StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
+
     ContentParticipation.create_or_update({
       :content => self,
       :user => current_user,

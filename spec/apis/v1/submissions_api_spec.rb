@@ -2489,4 +2489,36 @@ describe 'Submissions API', type: :request do
       /canvadoc_session/
     )
   end
+
+
+  def course_with_student_and_submitted_homework
+    course_with_teacher(:active_all => true)
+    @teacher = @user
+    student_in_course
+    @student = @user
+    @user = @teacher # @user needs to be the user making the api calls later
+    @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+    @submission = @assignment.submit_homework(@student)
+  end
+
+  it 'marks as read' do
+    course_with_student_and_submitted_homework
+    @submission.add_comment(:author => @student, :comment => "some comment")
+    raw_api_call(:put,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
+             {course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s,
+               action: 'mark_submission_read', controller: 'submissions_api', format: 'json'})
+    expect(@submission.reload.read?(@teacher)).to be_truthy
+  end
+
+  it 'marks as unread' do
+    course_with_student_and_submitted_homework
+    @submission.add_comment(:author => @student, :comment => "some comment")
+    @submission.change_read_state('read', @teacher)
+    raw_api_call(:delete,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
+             {course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s,
+               action: 'mark_submission_unread', controller: 'submissions_api', format: 'json'})
+    expect(@submission.reload.read?(@teacher)).to be_falsey
+  end
 end
