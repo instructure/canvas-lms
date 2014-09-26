@@ -9801,6 +9801,7 @@ nb:
         published: Publisert
     post_grades_dialog_title: "Send karakterer til SIS"
     progression_module_collection: 
+      module_progress_for: "Modulframdrift for %{student_link}"
       module_progress_for_student: "Modulframdrift for %{student.name}"
       no_modules_found: "Ingen moduler funnet"
     progression_module_view: 
@@ -10021,6 +10022,15 @@ nb:
       updated_wiki_page: "Oppdaterte wikiside"
       web_conference_invitation: "Invitasjon til nettkonferanse"
     no_subject: "Intet emne"
+    other_description: |-
+        *Instruktør og Administrator bare:*
+        
+        * Kurs innmelding
+        * Rapport generert
+        * Innhold eksport
+        * Migrasjon rapport
+        * Ny brukerkonto bruker
+        * Ny studentgruppe
     other_display: "Administrative varsler"
     reminder_display: Påminnelse
     student_appointment_description: |-
