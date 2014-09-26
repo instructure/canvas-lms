@@ -7687,6 +7687,8 @@ zh_Hant:
       feedback: 按一下此處告诉我们發生了什麼。
     help: 說明
     show_me_where: 顯示在何處
+  locales: 
+    zh_Hant: 繁體中文
   logged_out_user: "已登出的使用者 %{user_counter}"
   lti: 
     lti_message: 
@@ -9681,7 +9683,6 @@ zh_Hant:
         published: 已發佈
     post_grades_dialog_title: "公佈成績至 SIS"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} 的模組進度"
       module_progress_for_student: "%{student.name} 的模組進度"
       no_modules_found: 找不到模組
     progression_module_view: 
@@ -10991,6 +10992,7 @@ zh_Hant:
   qti_img_matching_question: 匯入的相符問題兩側均包含影像，這並不受支援
   qti_img_matching_question_distractors: 匯入的相符問題包含選項裡面的影像，無法固定，因為其也包含干擾項
   qti_name: "QTI 轉換器"
+  qualified_locale: zh-HK
   question_answered: 已回答
   question_bank: 
     align_outcomes: 對齊成果
