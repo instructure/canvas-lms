@@ -1275,7 +1275,7 @@ pt:
       recipients_required: "É obrigatório pelo menos um destinatário"
       threshold_should_be_numeric: "Este valor deve ser um número positivo."
   allow_lor_tools: "Permitir que os utilizadores vejam e utilizem ferramentas externas configuradas para LOR."
-  allow_opt_out_of_inbox: "Permitir que os utilizadores cancelem a função de Caixa de entrada de conversas. Isso irá fazer com que todas as mensagens e notificações de conversas sejam enviadas como notificações ASAP para a conta de e-mail principal do utilizador, ocultar o ícone de mensagens não lidas da Caixa de entrada de conversas e ocultar as preferências de notificação de Conversas."
+  allow_opt_out_of_inbox: "Permitir que os utilizadores cancelem a função de Caixa de entrada de conversas. Isso irá fazer com que todas as mensagens e notificações de conversas sejam enviadas como notificações ASAP para a conta de e-mail principal do utilizador, além de ocultar o ícone de mensagens não lidas da Caixa de entrada de conversas e ocultar as preferências de notificação de Conversas."
   analytics: 
     course: 
       analytics: Estatísticas
@@ -1542,7 +1542,7 @@ pt:
       group_weight: "%{groupWeight}% do total"
       manage: Gerir
       move: "Mover para…"
-      move_to_accessibility_warning: "Aviso: para melhor acessibilidade na reorganização de tarefas e grupos, utilize a opção Mover para caixa de diálogo que se encontra no menu."
+      move_to_accessibility_warning: "Aviso: para melhor acessibilidade na reorganização de tarefas e grupos, utilize a opção Mover para que se encontra no menu."
     assignment_group_selector: 
       assignment_group: "Grupo de tarefa"
       assignment_group_options: 
@@ -3165,7 +3165,7 @@ pt:
   content_migration: 
     bad_attachment: "O ficheiro não foi carregado com sucesso."
     errors: 
-      cannot_shift_and_remove: "não é possível especificar shift_dates e remove_dates simultaneamente"
+      cannot_shift_and_remove: "não é possível especificar mudar_datas e remover_datas simultaneamente"
       import_error: "Erro de importação:"
     missing_content_links_message: "Não foi possível resolver as seguintes referências:"
     missing_content_links_title: "Foram encontradas ligações em falta no conteúdo importado"
@@ -3711,7 +3711,7 @@ pt:
       module: módulo
       module_details: "Os módulos são mostrados por ordem sequencial; assim, apenas os módulos acima de %{name} podem ser definidos como pré-requisitos."
       module_name: "Nome do módulo"
-      modules_keyboard_hint_updated: "Aviso: para melhor acessibilidade, utilize a opção Mover para caixa de diálogo que se encontra no menu."
+      modules_keyboard_hint_updated: "Aviso: para melhor acessibilidade, utilize a opção Mover para que se encontra no menu."
       move_module: 
         after: Depois
         before: Antes
@@ -3802,7 +3802,7 @@ pt:
           student_progress: "Ver o progresso do aluno neste módulo"
       manager_module: "Gerir módulo"
       module_will_unlock_at: "Será desbloqueado em *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: "Aviso: para melhor acessibilidade, utilize a opção Mover para caixa de diálogo que se encontra no menu."
+      modules_keyboard_drag_and_drop: "Aviso: para melhor acessibilidade, utilize a opção Mover para que se encontra no menu."
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em curso"
       reorder_modules: "Arrastar para reordenar os módulos"
@@ -4763,7 +4763,7 @@ pt:
         after: Depois
         before: Antes
         or: OU
-      nav_items_keyboard_drag_and_drop: "Aviso: para melhor acessibilidade, utilize a opção Mover para caixa de diálogo que se encontra no menu."
+      nav_items_keyboard_drag_and_drop: "Aviso: para melhor acessibilidade, utilize a opção Mover para que se encontra no menu."
       no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo utilizador, predefinição em %{language})"
       none: Nenhum
@@ -6133,7 +6133,7 @@ pt:
       delete_tool: "Eliminar ferramenta"
       edit_tool: "Editar ferramenta"
     external_tools_collection_view: 
-      app_headder: "Aplicativos externas"
+      app_headder: "Aplicações externas"
     finished: 
       load_failure_message: "Houve um problema com o carregamento da ferramenta específica. Entre em contato com seu administrador se o problema persistir."
       load_failure_title: "Falha ao carregar a ferramenta"
@@ -9815,11 +9815,11 @@ pt:
     min_score_complete: "obteve no mínimo *score*"
     min_score_incomplete: "tem de obter no mínimo *score*"
     must_contribute_complete: "contribuiu para o conteúdo da página"
-    must_contribute_incomplete: "têm de contribuir para o conteúdo da página"
+    must_contribute_incomplete: "tem de contribuir para o conteúdo da página"
     must_submit_complete: "enviou a tarefa"
-    must_submit_incomplete: "têm de enviar a tarefa"
+    must_submit_incomplete: "tem de enviar a tarefa"
     must_view_complete: "visualizou a página"
-    must_view_incomplete: "têm de visualizar a página"
+    must_view_incomplete: "tem de visualizar a página"
   moodle_dropdown_many_warning_title: "Existem %{count} perguntas de várias listas pendentes neste banco que podem ter sido importadas incorretamente"
   moodle_dropdown_warning_title: "Pergunta de várias listas pendentes pode ter sido importada incorretamente"
   moodle_formula_many_warning_title: "Existem %{count} perguntas de fórmulas neste banco para as quais será necessário gerar de novo as respostas possíveis"
