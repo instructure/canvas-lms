@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
-  describe "QTI 1.2 zip with id prepender value" do
+  describe "QTI 1.2 zip" do
     before(:all) do
       @archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'plain_qti.zip')
       unzipped_file_path = File.join(File.dirname(@archive_file_path), "qti_#{File.basename(@archive_file_path, '.zip')}", 'oi')
@@ -9,15 +9,16 @@ if Qti.migration_executable
       @course = Course.create!(:name => 'tester')
       @migration = ContentMigration.create(:context => @course)
       
-      @converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :id_prepender=>'prepend_test', :content_migration => @migration)
+      @converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :content_migration => @migration)
       @converter.export
       @course_data = @converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
+      @migration.set_default_settings
       @migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)      
     end
 
     after(:all) do
@@ -58,30 +59,30 @@ if Qti.migration_executable
       @course.attachments.count.should == 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_display_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
-      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path.should == "course files/#{dir}/#{@migration.id}/image.png"
+      @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1").full_display_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
+      @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path.should == "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do
-      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
-      c_att = @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
+      c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1007")
-      c_att = @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821")
+      aq = @course.assessment_questions.find_by_migration_id("QUE_1007")
+      c_att = @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1014")
-      c_att = @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22")
+      aq = @course.assessment_questions.find_by_migration_id("QUE_1014")
+      c_att = @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1053")
-      c_att = @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1")
+      aq = @course.assessment_questions.find_by_migration_id("QUE_1053")
+      c_att = @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
     end
@@ -94,18 +95,19 @@ if Qti.migration_executable
     it "should use new attachments for imports with same file names" do
       # run a second migration and check that there are different attachments on the questions
       migration = ContentMigration.create(:context => @course)
-      converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :id_prepender=>'test2', :content_migration => migration)
+      converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :content_migration => migration, :id_prepender => 'test2')
       converter.export
       course_data = converter.course.with_indifferent_access
       course_data['all_files_export'] ||= {}
       course_data['all_files_export']['file_path'] = course_data['all_files_zip']
       migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
+      migration.migration_settings[:id_prepender] = 'test2'
       Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
       
       # Check the first import
-      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
-      c_att = @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
+      c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
@@ -121,18 +123,18 @@ if Qti.migration_executable
 
   QTI_EXPORT_ASSESSMENT = {
           :assessments=>
-                  [{:migration_id=>"prepend_test_A1001",
+                  [{:migration_id=>"A1001",
                     :questions=>
-                            [{:migration_id=>"prepend_test_QUE_1003", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1007", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1014", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1018", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1022", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1031", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1037", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1043", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1049", :question_type=>"question_reference"},
-                             {:migration_id=>"prepend_test_QUE_1053", :question_type=>"question_reference"}],
+                            [{:migration_id=>"QUE_1003", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1007", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1014", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1018", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1022", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1031", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1037", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1043", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1049", :question_type=>"question_reference"},
+                             {:migration_id=>"QUE_1053", :question_type=>"question_reference"}],
                     :question_count=>10,
                     :quiz_type=>nil,
                     :quiz_name=>"Quiz",

@@ -67,6 +67,9 @@ module Importers
     def self.import_content(course, data, params, migration)
       params ||= {:copy=>{}}
       logger.debug "starting import"
+
+      Importers::ContentImporterHelper.add_assessment_id_prepend(course, data, migration)
+
       course.full_migration_hash = data
       course.external_url_hash = {}
       course.migration_results = []

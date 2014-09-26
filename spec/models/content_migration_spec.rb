@@ -252,7 +252,9 @@ describe ContentMigration do
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true
-      cm.migration_settings['overwrite_quizzes'] = true
+
+      # having this set used to always prepend the id, and it would get set it there were any other imported quizzes/questions
+      cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
       cm.save!
 
       package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
@@ -268,6 +270,9 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
+      cm.migration_settings['overwrite_quizzes'] = true
+      cm.migration_settings['id_prepender'] = 'somethingelse'
+      cm.save!
       # run again
       cm.queue_migration
       run_jobs

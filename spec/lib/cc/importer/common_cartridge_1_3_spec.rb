@@ -142,7 +142,7 @@ describe "Standard Common Cartridge importing" do
       if Qti.qti_enabled?
         archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
         unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-        @export_folder = File.join(File.dirname(archive_file_path), "cc_inline_qti")
+        @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_inline_qti")
         @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
         @converter.export
         @course_data = @converter.course.with_indifferent_access
