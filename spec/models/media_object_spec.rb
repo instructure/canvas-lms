@@ -66,11 +66,11 @@ describe MediaObject do
       MediaObject.create!(:context => user, :media_id => "test2")
       MediaObject.create!(:context => user, :media_id => "test3")
       MediaObject.build_media_objects(data, Account.default.id)
-      media_object = MediaObject.find_by_attachment_id(@a1.id)
+      media_object = MediaObject.where(attachment_id: @a1).first
       media_object.should_not be_nil
-      media_object = MediaObject.find_by_attachment_id(@a2.id)
+      media_object = MediaObject.where(attachment_id: @a2).first
       media_object.should_not be_nil
-      media_object = MediaObject.find_by_attachment_id(@a3.id)
+      media_object = MediaObject.where(attachment_id: @a3).first
       media_object.should_not be_nil
     end
   end

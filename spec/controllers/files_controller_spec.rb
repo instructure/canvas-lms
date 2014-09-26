@@ -56,7 +56,7 @@ describe FilesController do
     folder = nil
     while components.size > 1
       component = components.shift
-      folder = @course.folders.find_by_name(component)
+      folder = @course.folders.where(name: component).first
       folder ||= @course.folders.create!(:name => component, :workflow_state => "visible", :parent_folder => folder)
     end
     filename = components.shift

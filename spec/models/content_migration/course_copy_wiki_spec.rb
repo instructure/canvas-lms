@@ -12,8 +12,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      page1_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page1))
-      page2_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2))
+      page1_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page1)).first
+      page2_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first
       page2_to.body.should == body % [@copy_to.id, page1_to.url]
     end
 
@@ -27,7 +27,7 @@ describe ContentMigration do
       @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
       run_course_copy
       @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
-      @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
+      @copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
     end
 
     context "wiki front page" do
@@ -38,7 +38,7 @@ describe ContentMigration do
         @copy_to.wiki.unset_front_page!
         run_course_copy
 
-        new_page = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+        new_page = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
         @copy_to.wiki.front_page.should == new_page
       end
 

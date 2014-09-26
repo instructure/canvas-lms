@@ -317,7 +317,7 @@ describe ConversationMessage do
       cp = @teacher.initiate_conversation([@user])
       cm = cp.add_message("initial message", :root_account_id => Account.default.id)
 
-      cp2 = cp.conversation.conversation_participants.find_by_user_id(@user.id)
+      cp2 = cp.conversation.conversation_participants.where(user_id: @user).first
       cp2.workflow_state.should == 'unread'
       cm.reply_from({
         :purpose => 'general',

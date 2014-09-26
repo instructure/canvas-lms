@@ -267,7 +267,7 @@ describe RubricsController do
       assigns[:rubric].should eql(@rubric)
       assigns[:rubric].title.should eql("new title")
       assigns[:association].should eql(@rubric_association)
-      assigns[:rubric].rubric_associations.find_by_id(@rubric_association.id).title.should eql("some title")
+      assigns[:rubric].rubric_associations.where(id: @rubric_association).first.title.should eql("some title")
       response.should be_success
     end
 

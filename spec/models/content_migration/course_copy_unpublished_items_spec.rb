@@ -17,9 +17,9 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.context_modules.count.should == 2
-      cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
+      cm_2 = @copy_to.context_modules.where(migration_id: mig_id(cm)).first
       cm_2.workflow_state.should == 'active'
-      cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
+      cm2_2 = @copy_to.context_modules.where(migration_id: mig_id(cm2)).first
       cm2_2.workflow_state.should == 'unpublished'
     end
 
@@ -37,7 +37,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_copy = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
       mod1_copy.content_tags.count.should == 2
 
       mod1_copy.content_tags.each do |tag_copy|
@@ -56,9 +56,9 @@ describe ContentMigration do
 
       run_course_copy
 
-      dt1_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1))
+      dt1_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first
       dt1_copy.workflow_state.should == 'unpublished'
-      dt2_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt2))
+      dt2_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt2)).first
       dt2_copy.workflow_state.should == 'active'
     end
 
@@ -69,7 +69,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      wiki2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki))
+      wiki2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first
       wiki2.workflow_state.should == 'unpublished'
     end
 
@@ -89,7 +89,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      quiz_to = @copy_to.quizzes.find_by_migration_id(mig_id(@quiz))
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(@quiz)).first
       quiz_to.should_not be_nil
       quiz_to.assignment.should_not be_nil
       quiz_to.assignment.should be_unpublished

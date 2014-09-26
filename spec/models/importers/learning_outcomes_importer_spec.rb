@@ -30,9 +30,9 @@ describe "Importing Learning Outcomes" do
     Importers::LearningOutcomeImporter.process_migration(data, migration)
 
     context.learning_outcomes.count.should == 2
-    lo1 = LearningOutcome.find_by_migration_id("bdf6dc13-5d8f-43a8-b426-03380c9b6781")
+    lo1 = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     lo1.description.should == "Outcome 1: Read stuff"
-    lo2 = LearningOutcome.find_by_migration_id("fa67b467-37c7-4fb9-aef4-21a33a06d0be")
+    lo2 = LearningOutcome.where(migration_id: "fa67b467-37c7-4fb9-aef4-21a33a06d0be").first
     lo2.description.should == "Outcome 2: follow directions"
 
     log = context.root_outcome_group

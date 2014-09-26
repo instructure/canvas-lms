@@ -30,7 +30,7 @@ describe "Importing wikis" do
         Importers::WikiPageImporter.import_from_migration(data, context)
         context.wiki.wiki_pages.count.should == 1
 
-        wiki = WikiPage.find_by_migration_id(data[:migration_id])
+        wiki = WikiPage.where(migration_id: data[:migration_id]).first
         wiki.title.should == data[:title]
       end
     end
@@ -47,7 +47,7 @@ describe "Importing wikis" do
     
     # The wiki references should resolve to course urls
     context.wiki.wiki_pages.count.should == 18
-    wiki = WikiPage.find_by_migration_id('res00146')
+    wiki = WikiPage.where(migration_id: 'res00146').first
     (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-a-to-d/).should_not be_nil
     (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-e-f-g-h/).should_not be_nil
     (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-i-j-k-l-m/).should_not be_nil

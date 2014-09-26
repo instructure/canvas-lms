@@ -153,7 +153,7 @@ describe Importers::CalendarEventImporter do
         Importers::CalendarEventImporter.import_from_migration(data, context)
         context.calendar_events.count.should == 1
 
-        event = CalendarEvent.find_by_migration_id(data[:migration_id])
+        event = CalendarEvent.where(migration_id: data[:migration_id]).first
         event.title.should == data[:title]
         event.description.gsub("&#x27;", "'").index(data[:description]).should_not be_nil
       end

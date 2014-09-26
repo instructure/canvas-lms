@@ -36,7 +36,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(data, context)
           Importers::AssignmentImporter.import_from_migration(data, context)
         }.to change(Assignment, :count).by(1)
-        a = Assignment.find_by_migration_id(data[:migration_id])
+        a = Assignment.where(migration_id: data[:migration_id]).first
         
         a.title.should == data[:title]
         a.description.should include(data[:instructions]) if data[:instructions]
@@ -59,7 +59,7 @@ describe "Importing assignments" do
     rubric.save!
 
     Importers::AssignmentImporter.import_from_migration(assignment_hash, context)
-    a = Assignment.find_by_migration_id(assignment_hash[:migration_id])
+    a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
     a.points_possible.should == rubric.points_possible
   end
   

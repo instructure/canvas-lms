@@ -50,7 +50,7 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      new_topic = @copy_to.discussion_topics.find_by_migration_id(CC::CCHelper.create_key(topic))
+      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
       new_topic.should_not be_nil
       new_topic.message.should == topic.message
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
@@ -89,10 +89,10 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_att = @copy_to.attachments.find_by_migration_id(CC::CCHelper.create_key(att))
+      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
       new_att.should_not be_nil
 
-      new_topic = @copy_to.discussion_topics.find_by_migration_id(CC::CCHelper.create_key(topic))
+      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
       new_topic.should_not be_nil
       new_topic.message.should match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
@@ -106,7 +106,7 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.enroll_student(student)
-      new_att = @copy_to.attachments.find_by_migration_id(CC::CCHelper.create_key(att))
+      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
       new_att.should be_present
 
       new_att.grants_right?(student, :download).should be_false
@@ -121,9 +121,9 @@ describe ContentMigration do
 
       run_course_copy
 
-      mod1_to = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
       tag_to = mod1_to.content_tags.first
-      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
@@ -141,14 +141,14 @@ describe ContentMigration do
 
       run_course_copy
 
-      att_to1 = @copy_to.attachments.find_by_migration_id(mig_id(att1))
-      att_to2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+      att_to1 = @copy_to.attachments.where(migration_id: mig_id(att1)).first
+      att_to2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
 
-      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
       page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
       page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
 
-      dt_to = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt))
+      dt_to = @copy_to.discussion_topics.where(migration_id: mig_id(dt)).first
       dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
       dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
     end
@@ -205,27 +205,27 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).should_not be_nil
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt2)).should be_nil
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt3)).should_not be_nil
+      @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first.should_not be_nil
+      @copy_to.discussion_topics.where(migration_id: mig_id(dt2)).first.should be_nil
+      @copy_to.discussion_topics.where(migration_id: mig_id(dt3)).first.should_not be_nil
 
-      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).should_not be_nil
-      @copy_to.context_modules.find_by_migration_id(mig_id(cm2)).should be_nil
+      @copy_to.context_modules.where(migration_id: mig_id(cm)).first.should_not be_nil
+      @copy_to.context_modules.where(migration_id: mig_id(cm2)).first.should be_nil
 
-      @copy_to.attachments.find_by_migration_id(mig_id(att)).should_not be_nil
-      @copy_to.attachments.find_by_migration_id(mig_id(att2)).should be_nil
+      @copy_to.attachments.where(migration_id: mig_id(att)).first.should_not be_nil
+      @copy_to.attachments.where(migration_id: mig_id(att2)).first.should be_nil
 
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).should_not be_nil
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki2)).should be_nil
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first.should_not be_nil
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki2)).first.should be_nil
 
-      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).should_not be_nil
-      @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
+      @copy_to.rubrics.where(migration_id: mig_id(rub1)).first.should_not be_nil
+      @copy_to.rubrics.where(migration_id: mig_id(rub2)).first.should be_nil
 
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should be_nil
-      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should be_nil
+      @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.should be_nil
+      @copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first.should be_nil
 
-      @copy_to.external_feeds.find_by_migration_id(mig_id(ef1)).should_not be_nil
-      @copy_to.external_feeds.find_by_migration_id(mig_id(ef2)).should be_nil
+      @copy_to.external_feeds.where(migration_id: mig_id(ef1)).first.should_not be_nil
+      @copy_to.external_feeds.where(migration_id: mig_id(ef2)).first.should be_nil
     end
 
     it "should re-copy deleted items" do
@@ -260,18 +260,18 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).destroy
-      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).destroy
-      @copy_to.attachments.find_by_migration_id(mig_id(att)).destroy
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).destroy
-      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).destroy
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
-      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).destroy if Qti.qti_enabled?
-      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).destroy
-      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).destroy
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).destroy
-      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).destroy
-      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).destroy
+      @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first.destroy
+      @copy_to.context_modules.where(migration_id: mig_id(cm)).first.destroy
+      @copy_to.attachments.where(migration_id: mig_id(att)).first.destroy
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first.destroy
+      @copy_to.rubrics.where(migration_id: mig_id(rub1)).first.destroy
+      @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.destroy
+      @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.destroy if Qti.qti_enabled?
+      @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.destroy
+      @copy_to.assignment_groups.where(migration_id: mig_id(ag)).first.destroy
+      @copy_to.assignments.where(migration_id: mig_id(asmnt)).first.destroy
+      @copy_to.grading_standards.where(migration_id: mig_id(gs)).first.destroy
+      @copy_to.calendar_events.where(migration_id: mig_id(cal)).first.destroy
 
       @cm = ContentMigration.create!(
         :context => @copy_to,
@@ -283,21 +283,21 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).workflow_state.should == 'active'
-      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).workflow_state.should == 'active'
+      @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first.workflow_state.should == 'active'
+      @copy_to.context_modules.where(migration_id: mig_id(cm)).first.workflow_state.should == 'active'
       @copy_to.attachments.count.should == 1
-      @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
-      rub2 = @copy_to.rubrics.find_by_migration_id(mig_id(rub1))
+      @copy_to.attachments.where(migration_id: mig_id(att)).first.file_state.should == 'available'
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state.should == 'active'
+      rub2 = @copy_to.rubrics.where(migration_id: mig_id(rub1)).first
       rub2.workflow_state.should == 'active'
       rub2.rubric_associations.first.bookmarked.should == true
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
-      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
-      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
-      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == asmnt.workflow_state
-      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
-      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
+      @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state.should == 'active'
+      @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state.should == 'created' if Qti.qti_enabled?
+      @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state.should == 'public'
+      @copy_to.assignment_groups.where(migration_id: mig_id(ag)).first.workflow_state.should == 'available'
+      @copy_to.assignments.where(migration_id: mig_id(asmnt)).first.workflow_state.should == asmnt.workflow_state
+      @copy_to.grading_standards.where(migration_id: mig_id(gs)).first.workflow_state.should == 'active'
+      @copy_to.calendar_events.where(migration_id: mig_id(cal)).first.workflow_state.should == 'active'
     end
 
     it "should copy course attributes" do
@@ -337,7 +337,7 @@ describe ContentMigration do
       @copy_to.storage_quota.should == 444
       @copy_to.hide_final_grades.should == true
       @copy_to.grading_standard_enabled.should == true
-      gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
+      gs_2 = @copy_to.grading_standards.where(migration_id: mig_id(gs)).first
       gs_2.data.should == gs.data
       @copy_to.grading_standard.should == gs_2
       @copy_to.name.should == "tocourse"
@@ -364,11 +364,11 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool_to = @copy_to.context_external_tools.find_by_migration_id(mig_id(tool))
+      tool_to = @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first
       tool_to.url.should == tool.url.sub("http://derp.derp", "https://derp.derp")
-      tag1_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag1))
+      tag1_to = @copy_to.context_module_tags.where(migration_id: mig_id(tag1)).first
       tag1_to.url.should == tag1.url.sub("http://derp.derp", "https://derp.derp")
-      tag2_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag2))
+      tag2_to = @copy_to.context_module_tags.where(migration_id: mig_id(tag2)).first
       tag2_to.url.should == tag2.url.sub("http://derp.derp", "https://derp.derp")
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
@@ -403,7 +403,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.attachments.find_by_migration_id(mig_id(att)).media_entry_id.should == media_id
+        @copy_to.attachments.where(migration_id: mig_id(att)).first.media_entry_id.should == media_id
       }.to change { Delayed::Job.jobs_count(:tag, 'MediaObject.add_media_files') }.by(0)
     end
 
@@ -428,7 +428,7 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.calendar_events.count.should == 2
-      cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
+      cal_2 = @copy_to.calendar_events.where(migration_id: CC::CCHelper.create_key(cal)).first
       cal_2.title.should == cal.title
       cal_2.start_at.to_i.should == cal.start_at.to_i
       cal_2.end_at.to_i.should == cal.end_at.to_i
@@ -436,7 +436,7 @@ describe ContentMigration do
       cal_2.all_day_date.should == cal.all_day_date
       cal_2.description = body_with_link % @copy_to.id
 
-      cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
+      cal2_2 = @copy_to.calendar_events.where(migration_id: CC::CCHelper.create_key(cal2)).first
       cal2_2.title.should == cal2.title
       cal2_2.start_at.to_i.should == cal2.start_at.to_i
       cal2_2.end_at.to_i.should == cal2.end_at.to_i

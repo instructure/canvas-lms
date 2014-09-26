@@ -1122,7 +1122,7 @@ describe Enrollment do
       group.add_user(user)
 
       # mark the membership as deleted
-      membership = group.group_memberships.find_by_user_id(user.id)
+      membership = group.group_memberships.where(user_id: user).first
       membership.workflow_state = 'deleted'
       membership.save!
 

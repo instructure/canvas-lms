@@ -2397,7 +2397,7 @@ describe Course, 'grade_publishing' do
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C1,C1,C1,,,active")
-      @course = Course.find_by_sis_source_id("C1")
+      @course = Course.where(sis_source_id: "C1").first
       @course.assignment_groups.create(:name => "Assignments")
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
@@ -2418,7 +2418,7 @@ describe Course, 'grade_publishing' do
       a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
 
       def getpseudonym(user_sis_id)
-        pseudo = Pseudonym.find_by_sis_user_id(user_sis_id)
+        pseudo = Pseudonym.where(sis_user_id: user_sis_id).first
         pseudo.should_not be_nil
         pseudo
       end
@@ -2430,13 +2430,13 @@ describe Course, 'grade_publishing' do
       end
 
       def getsection(section_sis_id)
-        section = CourseSection.find_by_sis_source_id(section_sis_id)
+        section = CourseSection.where(sis_source_id: section_sis_id).first
         section.should_not be_nil
         section
       end
 
       def getenroll(user_sis_id, section_sis_id)
-        e = Enrollment.find_by_user_id_and_course_section_id(getuser(user_sis_id).id, getsection(section_sis_id).id)
+        e = Enrollment.where(user_id: getuser(user_sis_id), course_section_id: getsection(section_sis_id)).first
         e.should_not be_nil
         e
       end
@@ -2453,13 +2453,13 @@ describe Course, 'grade_publishing' do
       a2.grade_student(getuser("S6"), { :grade => "10", :grader => getuser("T1") })
 
       stud5, stud6, sec4 = nil, nil, nil
-      Pseudonym.find_by_sis_user_id("S5").tap do |p|
+      Pseudonym.where(sis_user_id: "S5").first.tap do |p|
         stud5 = p
         p.sis_user_id = nil
         p.save
       end
 
-      Pseudonym.find_by_sis_user_id("S6").tap do |p|
+      Pseudonym.where(sis_user_id: "S6").first.tap do |p|
         stud6 = p
         p.sis_user_id = nil
         p.save
@@ -2474,7 +2474,7 @@ describe Course, 'grade_publishing' do
       GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map{|x|getuser(x).id}, @course.id)
       @course.reload
 
-      teacher = Pseudonym.find_by_sis_user_id("T1")
+      teacher = Pseudonym.where(sis_user_id: "T1").first
       teacher.should_not be_nil
 
       @plugin = Canvas::Plugin.find!('grade_export')
@@ -2493,8 +2493,8 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"
+          "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.where(user_id: stud5.user, course_section_id: getsection("S3")).first.id},active,85\n" +
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.where(user_id: stud6.user, course_section_id: sec4.id).first.id},active,90\n"
       SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(teacher.user)
 
@@ -2508,8 +2508,8 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75,C\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+          "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.where(user_id: stud5.user, course_section_id: getsection("S3")).first.id},active,85,B\n" +
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.where(user_id: stud6.user, course_section_id: sec4.id).first.id},active,90,A-\n"
       SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(teacher.user)
 
@@ -2522,8 +2522,8 @@ describe Course, 'grade_publishing' do
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75,C\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
-          "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+          "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.where(user_id: stud5.user, course_section_id: getsection("S3")).first.id},active,85,B\n" +
+          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.where(user_id: stud6.user, course_section_id: sec4.id).first.id},active,90,A-\n"
       SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(admin)
     end
@@ -2912,9 +2912,9 @@ describe Course, "inherited_assessment_question_banks" do
 
     banks = @course.inherited_assessment_question_banks(true)
     banks.order(:id).should == [root_bank, account_bank, bank]
-    banks.find_by_id(bank.id).should eql bank
-    banks.find_by_id(account_bank.id).should eql account_bank
-    banks.find_by_id(root_bank.id).should eql root_bank
+    banks.where(id: bank).first.should eql bank
+    banks.where(id: account_bank).first.should eql account_bank
+    banks.where(id: root_bank).first.should eql root_bank
   end
 end
 

@@ -1176,7 +1176,7 @@ describe DiscussionTopic do
 
     it "should return the materialized view if it's up to date" do
       run_jobs
-      view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+      view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
       @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, []]
     end
 

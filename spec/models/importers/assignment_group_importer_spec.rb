@@ -36,7 +36,7 @@ describe "Importing Assignment Groups" do
           Importers::AssignmentGroupImporter.import_from_migration(data, context)
           Importers::AssignmentGroupImporter.import_from_migration(data, context)
         }.to change(AssignmentGroup, :count).by(1)
-        g = AssignmentGroup.find_by_migration_id(data[:migration_id])
+        g = AssignmentGroup.where(migration_id: data[:migration_id]).first
 
         g.name.should == data[:title]
       end

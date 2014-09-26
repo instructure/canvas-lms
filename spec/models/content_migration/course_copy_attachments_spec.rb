@@ -14,7 +14,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_attachment = @copy_to.attachments.find_by_migration_id(mig_id(old_attachment))
+      new_attachment = @copy_to.attachments.where(migration_id: mig_id(old_attachment)).first
       new_attachment.should_not be_nil
       new_attachment.full_path.should == "course files/folder_1/folder_2/folder_3/merge.test"
       folder.reload
@@ -29,7 +29,7 @@ describe ContentMigration do
       run_course_copy
 
       to_root = Folder.root_folders(@copy_to).first
-      new_attachment = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      new_attachment = @copy_to.attachments.where(migration_id: mig_id(att)).first
       new_attachment.should_not be_nil
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
@@ -48,7 +48,7 @@ describe ContentMigration do
       run_course_copy
 
       atts.each do |att|
-        new_att = @copy_to.attachments.find_by_migration_id(mig_id(att))
+        new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
         new_att.full_path.should == att.full_path
       end
     end
@@ -82,9 +82,9 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.attachments.count.should == 2
-      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      att_2 = @copy_to.attachments.where(migration_id: mig_id(att)).first
       att_2.should_not be_nil
-      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+      att2_2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
       att2_2.should_not be_nil
 
       @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
@@ -104,8 +104,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      att2 = @copy_to.attachments.find_by_filename('first.png')
-      page2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      att2 = @copy_to.attachments.where(filename: 'first.png').first
+      page2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
       page2.body.should include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 

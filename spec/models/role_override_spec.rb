@@ -136,7 +136,7 @@ describe RoleOverride do
         new_override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => false)
         @account.role_overrides.size.should == @initial_count - 1
         new_override.should be_nil
-        RoleOverride.find_by_id(@existing_override.id).should be_nil
+        RoleOverride.where(id: @existing_override).first.should be_nil
       end
     end
 

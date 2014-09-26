@@ -34,7 +34,7 @@ describe "Importing modules" do
         Importers::ContextModuleImporter.import_from_migration(data, context)
         context.context_modules.count.should == 1
 
-        mod = ContextModule.find_by_migration_id(data[:migration_id])
+        mod = ContextModule.where(migration_id: data[:migration_id]).first
         mod.content_tags.count.should == data[:items].count{|m|m[:linked_resource_type]=='URL_TYPE'}
         mod.name.should == data[:title]
       end
@@ -100,11 +100,11 @@ describe "Importing modules" do
     topic.reload
 
     topic.content_tags.count.should == 2
-    tag1 = topic.content_tags.find_by_migration_id('mig1')
+    tag1 = topic.content_tags.where(migration_id: 'mig1').first
     tag1.url.should == 'http://exmpale.com/stuff?custom_heresacustomfields=hooray+and+stuff'
     tag1.content.should == tool1
 
-    tag2 = topic.content_tags.find_by_migration_id('mig2')
+    tag2 = topic.content_tags.where(migration_id: 'mig2').first
     tag2.url.should == 'http://exmpale2.com/stuff?query=yay&custom_different=field'
     tag2.content.should == tool2
   end

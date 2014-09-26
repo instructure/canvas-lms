@@ -73,7 +73,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
       tool.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     end
 
@@ -87,7 +87,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
       tool.course_navigation.should_not be_nil
       tool.course_navigation.should == @tool_from.course_navigation
       tool.editor_button.should_not be_nil
@@ -106,7 +106,7 @@ describe ContentMigration do
                     :url => "https://www.example.com/launch"
       run_course_copy
 
-      tool_copy = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+      tool_copy = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
       tag = @copy_to.context_modules.first.content_tags.first
       tag.content_type.should == 'ContextExternalTool'
       tag.content_id.should == tool_copy.id

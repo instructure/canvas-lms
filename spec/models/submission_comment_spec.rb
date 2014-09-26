@@ -183,7 +183,7 @@ This text has a http://www.google.com link in it...
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @teacher}))
       }.to change(ContentParticipation, :count).by(1)
-      ContentParticipation.find_by_user_id(@student).should be_unread
+      ContentParticipation.where(user_id: @student).first.should be_unread
       @submission.unread?(@student).should be_true
     end
 

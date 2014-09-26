@@ -91,7 +91,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @assignment.workflow_state = "available"
       @assignment.submission_types = "online_quiz"
       @assignment.save
-      @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+      @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
       @quiz.anonymous_submissions = false
       @quiz.quiz_type = "survey"
 

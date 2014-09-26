@@ -38,7 +38,7 @@ describe ContentMigration do
       @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
       @cm.copy_options = {:assignments => {mig_id(from_assign) => true}}
       run_course_copy
-      to_assign = @copy_to.assignments.find_by_migration_id!(mig_id(from_assign))
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
       to_outcomes.should eql [mig_id(@outcome)]
     end
@@ -50,16 +50,16 @@ describe ContentMigration do
       @cm.copy_options = {:all_assignments => true}
       run_course_copy
 
-      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
-      to_assign.assignment_group.should == @copy_to.assignment_groups.find_by_migration_id(mig_id(g))
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      to_assign.assignment_group.should == @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
     end
 
     it "should link assignments to assignment groups on complete export" do
       g = @copy_from.assignment_groups.create!(:name => "group")
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
       run_export_and_import
-      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
-      to_assign.assignment_group.should == @copy_to.assignment_groups.find_by_migration_id(mig_id(g))
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      to_assign.assignment_group.should == @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
     end
 
     it "should not link assignments to assignment groups on selective export" do
@@ -71,7 +71,7 @@ describe ContentMigration do
       run_export_and_import do |export|
         export.selected_content = { 'assignments' => { mig_id(from_assign) => "1" } }
       end
-      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       to_assign.assignment_group.should_not == unrelated_group
       unrelated_group.reload.name.should_not eql g.name
     end
@@ -98,7 +98,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
         @assignment[attr].should == new_assignment[attr]
       end
@@ -139,7 +139,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_copy = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
       mod1_copy.should_not be_nil
       if Qti.qti_enabled?
         mod1_copy.content_tags.count.should == 8
@@ -148,20 +148,20 @@ describe ContentMigration do
       end
 
 
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt1)).should_not be_nil
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page)).should_not be_nil
-      @copy_to.attachments.find_by_migration_id(mig_id(att)).should_not be_nil
-      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).should_not be_nil
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
-      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil if Qti.qti_enabled?
+      @copy_to.assignments.where(migration_id: mig_id(asmnt1)).first.should_not be_nil
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first.should_not be_nil
+      @copy_to.attachments.where(migration_id: mig_id(att)).first.should_not be_nil
+      @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.should_not be_nil
+      @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first.should_not be_nil
+      @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.should_not be_nil if Qti.qti_enabled?
 
-      @copy_to.context_modules.find_by_migration_id(mig_id(mod2)).should be_nil
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt2)).should be_nil
-      @copy_to.attachments.find_by_migration_id(mig_id(att2)).should be_nil
-      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2)).should be_nil
-      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
-      @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
+      @copy_to.context_modules.where(migration_id: mig_id(mod2)).first.should be_nil
+      @copy_to.assignments.where(migration_id: mig_id(asmnt2)).first.should be_nil
+      @copy_to.attachments.where(migration_id: mig_id(att2)).first.should be_nil
+      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first.should be_nil
+      @copy_to.context_external_tools.where(migration_id: mig_id(tool2)).first.should be_nil
+      @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first.should be_nil
+      @copy_to.quizzes.where(migration_id: mig_id(quiz2)).first.should be_nil
     end
 
     it "should copy module prerequisites" do
@@ -174,8 +174,8 @@ describe ContentMigration do
 
         run_course_copy
 
-        to_mod = @copy_to.context_modules.find_by_migration_id(mig_id(mod))
-        to_mod2 = @copy_to.context_modules.find_by_migration_id(mig_id(mod2))
+        to_mod = @copy_to.context_modules.where(migration_id: mig_id(mod)).first
+        to_mod2 = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
         to_mod2.prerequisites.should_not == []
         to_mod2.prerequisites[0][:id].should eql(to_mod.id)
       end
@@ -250,7 +250,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(@asmnt))
+        asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
         asmnt_2.freeze_on_copy.should be_nil
         asmnt_2.copied.should be_nil
       end

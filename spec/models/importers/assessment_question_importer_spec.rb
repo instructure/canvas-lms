@@ -69,7 +69,7 @@ describe "Assessment Question import from hash" do
     migration = ContentMigration.create!(:context => context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, q[:question_bank_name])
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  q[:question_bank_name]).first
     bank.assessment_questions.count.should == 1
     bank.assessment_questions.first.migration_id.should == q[:migration_id]
   end
@@ -81,9 +81,9 @@ describe "Assessment Question import from hash" do
     migration = ContentMigration.create!(:context => context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    q = AssessmentQuestion.find_by_migration_id(q_hash[:migration_id])
+    q = AssessmentQuestion.where(migration_id: q_hash[:migration_id]).first
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, q_hash[:question_bank_name])
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  q_hash[:question_bank_name]).first
     bank_aq = bank.assessment_questions.first
     bank_aq.id.should == q.id
   end
@@ -95,9 +95,9 @@ describe "Assessment Question import from hash" do
     migration = ContentMigration.create!(:context => context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    q = AssessmentQuestion.find_by_migration_id(q_hash[:migration_id])
+    q = AssessmentQuestion.where(migration_id: q_hash[:migration_id]).first
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, AssessmentQuestionBank.default_imported_title)
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  AssessmentQuestionBank.default_imported_title).first
     bank_aq = bank.assessment_questions.first
     bank_aq.id.should == q.id
   end
@@ -114,16 +114,16 @@ describe "Assessment Question import from hash" do
     context.assessment_question_banks.count.should eql(3)
     context.assessment_questions.count.should eql(4)
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, 'Group1')
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  'Group1').first
     bank.assessment_questions.count.should eql(1)
     bank.assessment_questions.first.migration_id.should eql('1')
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, 'Assmnt1')
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  'Assmnt1').first
     bank.assessment_questions.count.should eql(2)
     ['2','3'].member?(bank.assessment_questions.first.migration_id).should_not be_nil
     ['2','3'].member?(bank.assessment_questions.last.migration_id).should_not be_nil
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, "test question bank")
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  "test question bank").first
     bank.assessment_questions.count.should eql(1)
     bank.assessment_questions.first.migration_id.should eql('4')
   end
@@ -134,13 +134,13 @@ describe "Assessment Question import from hash" do
     data = {'assessment_questions' => {'assessment_questions' => [question]}}
     migration = ContentMigration.create!(:context => context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, question[:question_bank_name])
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  question[:question_bank_name]).first
     question_data = {:aq_data => {}, :qq_ids => {}}
-    question_data[:aq_data][question[:migration_id]] = context.assessment_questions.find_by_migration_id(question[:migration_id])
+    question_data[:aq_data][question[:migration_id]] = context.assessment_questions.where(migration_id: question[:migration_id]).first
 
     quiz = get_import_data 'cengage', 'quiz'
     Importers::QuizImporter.import_from_migration(quiz, context, nil, question_data)
-    quiz = context.quizzes.find_by_migration_id(quiz[:migration_id])
+    quiz = context.quizzes.where(migration_id: quiz[:migration_id]).first
 
     group = quiz.quiz_groups.first
     group.assessment_question_bank_id.should == bank.id
@@ -158,11 +158,11 @@ def test_question_import(hash_name, system, question_type=nil)
   Importers::AssessmentQuestionImporter.process_migration(data, migration)
   context.assessment_questions.count.should == 1
 
-  db_aq = AssessmentQuestion.find_by_migration_id(q[:migration_id])
+  db_aq = AssessmentQuestion.where(migration_id: q[:migration_id]).first
   db_aq.migration_id.should == q[:migration_id]
   db_aq.name == q[:question_name]
 
-  bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, AssessmentQuestionBank.default_imported_title)
+  bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  AssessmentQuestionBank.default_imported_title).first
   bank_aq = bank.assessment_questions.first
   bank_aq.id.should == db_aq.id
 end

@@ -168,7 +168,7 @@ describe Assignment do
 
     it "should update when enrollment changes" do
       @assignment.needs_grading_count.should eql(1)
-      @course.enrollments.find_by_user_id(@user.id).destroy
+      @course.enrollments.where(user_id: @user.id).first.destroy
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
       e = @course.enroll_student(@user)
@@ -227,7 +227,7 @@ describe Assignment do
       old_timestamp = Time.now.utc - 1.minute
       @assignment.needs_grading_count.should eql(1)
       Assignment.where(:id => @assignment).update_all(:updated_at => old_timestamp)
-      @course.enrollments.find_by_user_id(@user.id).destroy
+      @course.enrollments.where(user_id: @user).first.destroy
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
       @assignment.updated_at.should > old_timestamp
@@ -1575,11 +1575,11 @@ describe Assignment do
       it "should include re-submitted submissions in the list of submissions needing grading" do
         @assignment.should be_published
         @assignment.submissions.size.should == 1
-        Assignment.need_grading_info(15).find_by_id(@assignment.id).should be_nil
+        Assignment.need_grading_info(15).where(id: @assignment).first.should be_nil
         @assignment.submit_homework(@stu1, :body => "Changed my mind!")
         @sub1.reload
         @sub1.body.should == "Changed my mind!"
-        Assignment.need_grading_info(15).find_by_id(@assignment.id).should_not be_nil
+        Assignment.need_grading_info(15).where(id: @assignment).first.should_not be_nil
       end
     end
 

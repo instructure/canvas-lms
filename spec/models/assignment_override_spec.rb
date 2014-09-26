@@ -28,7 +28,7 @@ describe AssignmentOverride do
     @override.stubs(:assignment_override_students).once.returns stub(:destroy_all)
     @override.expects(:save!).once
     @override.destroy
-    AssignmentOverride.find_by_id(@override.id).should_not be_nil
+    AssignmentOverride.where(id: @override).first.should_not be_nil
     @override.workflow_state.should == 'deleted'
   end
 

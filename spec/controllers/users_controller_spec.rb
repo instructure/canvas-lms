@@ -390,7 +390,7 @@ describe UsersController do
       it "should ignore the password if not self enrolling" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'student' }
         response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
+        u = User.where(name: 'Jacob Fugal').first
         u.should be_pre_registered
         u.pseudonym.should be_password_auto_generated
       end
@@ -410,7 +410,7 @@ describe UsersController do
         it "should ignore the password if self enrolling with an email pseudonym" do
           post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
           response.should be_success
-          u = User.find_by_name 'Jacob Fugal'
+          u = User.where(name: 'Jacob Fugal').first
           u.should be_pre_registered
           u.pseudonym.should be_password_auto_generated
         end
@@ -426,7 +426,7 @@ describe UsersController do
         it "should auto-register the user if self enrolling" do
           post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
           response.should be_success
-          u = User.find_by_name 'Jacob Fugal'
+          u = User.where(name: 'Jacob Fugal').first
           @course.students.should include(u)
           u.should be_registered
           u.pseudonym.should_not be_password_auto_generated
@@ -447,7 +447,7 @@ describe UsersController do
 
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
         response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
+        u = User.where(name: 'Jacob Fugal').first
         u.should be_pre_registered
         response.should be_success
         u.observed_users.should include(@user)
@@ -493,7 +493,7 @@ describe UsersController do
 
         it "should allow setting a password" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal' }
-          u = User.find_by_name 'Jacob Fugal'
+          u = User.where(name: 'Jacob Fugal').first
           u.should be_present
           u.pseudonym.should_not be_password_auto_generated
         end

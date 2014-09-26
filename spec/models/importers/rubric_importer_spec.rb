@@ -37,7 +37,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(data, migration)
         Importers::RubricImporter.import_from_migration(data, migration)
         context.rubrics.count.should == 1
-        r = Rubric.find_by_migration_id(data[:migration_id])
+        r = Rubric.where(migration_id: data[:migration_id]).first
         
         r.title.should == data[:title]
         r.description.should include(data[:description]) if data[:description]

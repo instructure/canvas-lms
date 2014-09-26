@@ -44,7 +44,7 @@ describe ContentMigration do
       @copy_to.context_module_tags.first.content.should == @tool
       @copy_to.tab_configuration.should == [ {"id" =>0 }, {"id" => "context_external_tool_#{@tool.id}"} ]
       @copy_to.learning_outcome_links.first.content.should == @outcome
-      to_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       to_assignment.rubric.should == @rubric
       @copy_to.quizzes.first.quiz_groups.first.assessment_question_bank.should == @bank
     end
@@ -59,7 +59,7 @@ describe ContentMigration do
       @copy_to.context_module_tags.first.content.should be_nil
       @copy_to.tab_configuration.should == [{'id'=>0}]
       @copy_to.learning_outcome_links.first.content.context.should == @copy_to
-      to_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       to_assignment.rubric.context.should == @copy_to
       @copy_to.quizzes.first.quiz_groups.first.assessment_question_bank.should be_nil
 

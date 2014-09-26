@@ -164,7 +164,7 @@ describe ContentMigration do
 
           run_course_copy
 
-          assignment2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+          assignment2 = @copy_to.assignments.where(migration_id: mig_id(assignment)).first
           assignment2.due_at.in_time_zone(local_time_zone)
         end
       ensure
@@ -299,12 +299,12 @@ describe ContentMigration do
         run_course_copy
       end
 
-      asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+      asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(asmnt)).first
       asmnt_2.all_day.should be_true
       asmnt_2.due_at.strftime("%H:%M").should == "23:59"
       asmnt_2.all_day_date.should == Date.parse("Jun 21 2012")
 
-      cal_2 = @copy_to.calendar_events.find_by_migration_id(mig_id(cal))
+      cal_2 = @copy_to.calendar_events.where(migration_id: mig_id(cal)).first
       cal_2.all_day.should be_true
       cal_2.all_day_date.should == Date.parse("Jun 21 2012")
       cal_2.start_at.utc.should == cal.start_at.utc

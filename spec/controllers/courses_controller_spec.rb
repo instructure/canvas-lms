@@ -1470,14 +1470,14 @@ describe CoursesController do
         it "should set storage_quota" do
           post 'create', { :account_id => @account.id, :course =>
               { :name => 'xyzzy', :storage_quota => 111.megabytes } }
-          @course = @account.courses.find_by_name('xyzzy')
+          @course = @account.courses.where(name: 'xyzzy').first
           @course.storage_quota.should == 111.megabytes
         end
 
         it "should set storage_quota_mb" do
           post 'create', { :account_id => @account.id, :course =>
               { :name => 'xyzpdq', :storage_quota_mb => 111 } }
-          @course = @account.courses.find_by_name('xyzpdq')
+          @course = @account.courses.where(name: 'xyzpdq').first
           @course.storage_quota_mb.should == 111
         end
       end
@@ -1519,14 +1519,14 @@ describe CoursesController do
         it "should ignore storage_quota" do
           post 'create', { :account_id => @account.id, :course =>
               { :name => 'xyzzy', :storage_quota => 111.megabytes } }
-          @course = @account.courses.find_by_name('xyzzy')
+          @course = @account.courses.where(name: 'xyzzy').first
           @course.storage_quota.should == @account.default_storage_quota
         end
 
         it "should ignore storage_quota_mb" do
           post 'create', { :account_id => @account.id, :course =>
               { :name => 'xyzpdq', :storage_quota_mb => 111 } }
-          @course = @account.courses.find_by_name('xyzpdq')
+          @course = @account.courses.where(name: 'xyzpdq').first
           @course.storage_quota_mb.should == @account.default_storage_quota / 1.megabyte
         end
       end

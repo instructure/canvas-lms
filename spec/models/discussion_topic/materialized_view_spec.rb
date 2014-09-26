@@ -25,7 +25,7 @@ describe DiscussionTopic::MaterializedView do
 
   before :once do
     topic_with_nested_replies
-    @view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+    @view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
   end
 
   describe ".materialized_view_for" do
@@ -58,7 +58,7 @@ describe DiscussionTopic::MaterializedView do
   end
 
   it "should build a materialized view of the structure, participants and entry ids" do
-    view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+    view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view_without_send_later
     structure, participant_ids, entry_ids = @topic.materialized_view
     view.materialized_view_json.should == [structure, participant_ids, entry_ids, []]

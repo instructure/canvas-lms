@@ -51,7 +51,7 @@ describe Alert do
         alert.criteria = []
         alert.criteria be_empty
 
-        AlertCriterion.find_by_id(original_criterion_id).should be_nil
+        AlertCriterion.where(id: original_criterion_id).first.should be_nil
       end
     end
 

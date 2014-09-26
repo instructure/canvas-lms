@@ -46,7 +46,7 @@ describe Importers::ContextExternalToolImporter do
       end
 
       @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
+      tool = @course.context_external_tools.where(migration_id: '1').first
       tool.domain.should == 'example.com'
       tool.url.should be_blank
       tool.name.should == 'example.com'
@@ -67,7 +67,7 @@ describe Importers::ContextExternalToolImporter do
       end
 
       @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
+      tool = @course.context_external_tools.where(migration_id: '1').first
       tool.domain.should == 'example.com'
       tool.url.should be_blank
       tool.name.should == 'example.com'
@@ -88,7 +88,7 @@ describe Importers::ContextExternalToolImporter do
       end
 
       @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
+      tool = @course.context_external_tools.where(migration_id: '1').first
       tool.domain.should == 'example.com'
       tool.url.should be_blank
       tool.name.should == 'example.com'
@@ -109,7 +109,7 @@ describe Importers::ContextExternalToolImporter do
       end
 
       @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
+      tool = @course.context_external_tools.where(migration_id: '1').first
       tool.domain.should == 'example.com'
       tool.url.should be_blank
       tool.name.should == 'example.com'
@@ -129,7 +129,7 @@ describe Importers::ContextExternalToolImporter do
       end
 
       @course.context_external_tools.map(&:migration_id).sort.should == ['1']
-      tool = @course.context_external_tools.find_by_migration_id('1')
+      tool = @course.context_external_tools.where(migration_id: '1').first
       tool.domain.should == 'example.com'
       tool.url.should be_blank
       tool.name.should == 'example.com'

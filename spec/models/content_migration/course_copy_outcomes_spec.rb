@@ -29,8 +29,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
+      @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.should_not be_nil
+      @copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first.should_not be_nil
     end
 
     it "should copy learning outcome alignments with question banks" do
@@ -51,8 +51,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_lo = @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo))
-      new_bank = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(bank))
+      new_lo = @copy_to.learning_outcomes.where(migration_id: mig_id(lo)).first
+      new_bank = @copy_to.assessment_question_banks.where(migration_id: mig_id(bank)).first
 
       new_lo.alignments.count.should == 1
       new_alignment = new_lo.alignments.first
@@ -171,8 +171,8 @@ describe ContentMigration do
 
       to_root = @copy_to.root_outcome_group
       to_root.child_outcome_links.count.should == 2
-      to_root.child_outcome_links.find_by_content_id(lo.id).should_not be_nil
-      to_root.child_outcome_links.find_by_content_id(lo2.id).should_not be_nil
+      to_root.child_outcome_links.where(content_id: lo.id).first.should_not be_nil
+      to_root.child_outcome_links.where(content_id: lo2.id).first.should_not be_nil
     end
 
     it "should create outcomes in new course if external context not found" do
@@ -266,7 +266,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_lo2 = @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2))
+      new_lo2 = @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo2)).first
       to_rub = @copy_to.rubrics.first
       to_assign = @copy_to.assignments.first
 
@@ -284,7 +284,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
+      rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
       rub.should_not be_nil
 
       [:description, :id, :points].each do |k|
@@ -296,7 +296,7 @@ describe ContentMigration do
         end
       end
 
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
       asmnt2.rubric_association.hide_score_total.should == true
@@ -311,9 +311,9 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
+      rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
       rub.should_not be_nil
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       asmnt2.rubric.id.should == rub.id
     end
   end

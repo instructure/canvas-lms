@@ -150,7 +150,7 @@ describe GradebookUploadsController do
       @gi.parse!
       post 'update', :course_id => @course.id, :json_data_to_submit => @gi.to_json
 
-      a = @course.assignments.find_by_title("Third Assignment")
+      a = @course.assignments.where(title: "Third Assignment").first
       a.should_not be_nil
       a.title.should == "Third Assignment"
       a.points_possible.should == 15
@@ -182,7 +182,7 @@ describe GradebookUploadsController do
       }
       JSON
       post 'update', :course_id => @course.id, :json_data_to_submit => uploaded_json
-      @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
+      @submission = @assignment.reload.submissions.where(user_id: @student).first
       @submission.grade.should == "40%"
       @submission.score.should == 4
     end
@@ -240,12 +240,12 @@ describe GradebookUploadsController do
         JSON
         post 'update', :course_id => @course.id, :json_data_to_submit => uploaded_json
 
-        a1_sub1 = @assignment.reload.submissions.find_by_user_id(@student1.id)
-        a1_sub2 = @assignment.reload.submissions.find_by_user_id(@student2.id)
+        a1_sub1 = @assignment.reload.submissions.where(user_id: @student1).first
+        a1_sub2 = @assignment.reload.submissions.where(user_id: @student2).first
         a1_sub1.grade.should == '7'
         a1_sub2.should == nil
-        a2_sub1 = @assignment2.reload.submissions.find_by_user_id(@student1.id)
-        a2_sub2 = @assignment2.reload.submissions.find_by_user_id(@student2.id)
+        a2_sub1 = @assignment2.reload.submissions.where(user_id: @student1).first
+        a2_sub2 = @assignment2.reload.submissions.where(user_id: @student2).first
         a2_sub1.should == nil
         a2_sub2.grade.should == '9'
       end

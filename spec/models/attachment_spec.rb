@@ -945,13 +945,13 @@ describe Attachment do
     end
 
     it "should generate the thumbnail on the fly" do
-      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       thumb.should == nil
 
       @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
       url = @attachment.thumbnail_url(:size => "640x>")
       url.should be_present
-      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       thumb.should be_present
       url.should == thumb.authenticated_s3_url
     end
@@ -961,7 +961,7 @@ describe Attachment do
       url = @attachment.thumbnail_url(:size => "640x>")
       @attachment.expects(:create_dynamic_thumbnail).never
       url = @attachment.thumbnail_url(:size => "640x>")
-      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       url.should be_present
       thumb.should be_present
       url.should == thumb.authenticated_s3_url
@@ -1007,7 +1007,7 @@ describe Attachment do
 
       @attachment.reload
       @attachment.need_notify.should_not be_true
-      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should_not be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should_not be_nil
     end
 
     it "should send a batch notification" do
@@ -1021,7 +1021,7 @@ describe Attachment do
       Attachment.do_notifications
 
       [att1, att2, att3].each {|att| att.reload.need_notify.should_not be_true}
-      Message.find_by_user_id_and_notification_name(@student.id, 'New Files Added').should_not be_nil
+      Message.where(user_id: @student, notification_name: 'New Files Added').first.should_not be_nil
     end
 
     it "should not notify before a file finishes uploading" do
@@ -1040,13 +1040,13 @@ describe Attachment do
       Time.stubs(:now).returns(new_time)
       Attachment.do_notifications
       [att1, att2, att3].each {|att| att.reload.need_notify.should be_true}
-      Message.find_by_user_id_and_notification_name(@student.id, 'New Files Added').should be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should be_nil
 
       new_time = Time.now + 4.minutes
       Time.stubs(:now).returns(new_time)
       Attachment.do_notifications
       [att1, att2, att3].each {|att| att.reload.need_notify.should_not be_true}
-      Message.find_by_user_id_and_notification_name(@student.id, 'New Files Added').should_not be_nil
+      Message.where(user_id: @student, notification_name: 'New Files Added').first.should_not be_nil
     end
 
     it "should discard really old pending notifications" do
@@ -1059,8 +1059,8 @@ describe Attachment do
 
       @attachment.reload
       @attachment.need_notify.should be_false
-      Message.find_by_user_id_and_notification_name(@student.id, 'New Files Added').should be_nil
-      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should be_nil
     end
 
     it "should respect save_without_broadcasting" do
@@ -1088,7 +1088,7 @@ describe Attachment do
       @teacher.register!
       cc = @teacher.communication_channels.create!(:path => "default@example.com")
       cc.confirm!
-      NotificationPolicy.create!(:notification => Notification.find_by_name('New File Added'), :communication_channel => cc, :frequency => "immediately")
+      NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
 
@@ -1101,15 +1101,15 @@ describe Attachment do
 
       @attachment.reload
       @attachment.need_notify.should_not be_true
-      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
-      Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should be_nil
+      Message.where(user_id: @teacher, notification_name: 'New File Added').first.should_not be_nil
     end
 
     it "should not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
       cc = @teacher.communication_channels.create!(:path => "default@example.com")
       cc.confirm!
-      NotificationPolicy.create!(:notification => Notification.find_by_name('New File Added'), :communication_channel => cc, :frequency => "immediately")
+      NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
 
@@ -1122,8 +1122,8 @@ describe Attachment do
 
       @attachment.reload
       @attachment.need_notify.should_not be_true
-      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
-      Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
+      Message.where(user_id: @student, notification_name: 'New File Added').first.should be_nil
+      Message.where(user_id: @teacher, notification_name: 'New File Added').first.should_not be_nil
     end
 
     it "should not fail if the attachment context does not have participants" do

@@ -54,7 +54,7 @@ describe RoleOverridesController do
     role.workflow_state = 'active'
     role.save!
     delete 'remove_role', :account_id => @account.id, :role => 'NewRole'
-    @account.roles.find_by_name('NewRole').should be_inactive
+    @account.roles.where(name: 'NewRole').first.should be_inactive
   end
 
   describe "create" do
@@ -114,7 +114,7 @@ describe RoleOverridesController do
       it "should delete an existing override if override is nil and locked is not truthy" do
         post_with_settings(:locked => '0')
         @account.role_overrides(true).size.should == @initial_count - 1
-        RoleOverride.find_by_id(@existing_override.id).should be_nil
+        RoleOverride.where(id: @existing_override).first.should be_nil
       end
     end
 
@@ -131,7 +131,7 @@ describe RoleOverridesController do
       it "should create the override if override has a value" do
         post_with_settings(:override => 'unchecked')
         @account.role_overrides(true).size.should == @initial_count + 1
-        override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+        override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
         override.should_not be_nil
         override.enabled.should be_false
       end
@@ -139,14 +139,14 @@ describe RoleOverridesController do
       it "should create the override if override is nil but locked is truthy" do
         post_with_settings(:locked => 'true')
         @account.role_overrides(true).size.should == @initial_count + 1
-        override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+        override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
         override.should_not be_nil
         override.locked.should be_true
       end
 
       it "sets override as false when override is unchecked" do 
         post_with_settings(:override => 'unchecked')
-        override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+        override = @account.role_overrides(true).where(permission: @permission, enrollment_type: @role).first
         override.should_not be_nil
         override.enabled.should be_false
         override.locked.should be_nil
@@ -155,7 +155,7 @@ describe RoleOverridesController do
 
       it "sets the override to locked when specifiying locked" do
         post_with_settings(:locked => 'true')
-        override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+        override = @account.role_overrides(true).where(permission: @permission, enrollment_type: @role).first
         override.should_not be_nil
         override.enabled.should be_nil
         override.locked.should be_true

@@ -34,7 +34,7 @@ describe "Importing Groups" do
         Importers::GroupImporter.import_from_migration(data, context)
         Importers::GroupImporter.import_from_migration(data, context)
         context.groups.count.should == 1
-        g = Group.find_by_migration_id(data[:migration_id])
+        g = Group.where(migration_id: data[:migration_id]).first
 
         g.name.should == data[:title]
       end
@@ -52,13 +52,13 @@ describe "Importing Groups" do
 
     category['topics'].each do |topic|
       topic['group_id'] = category['group_id']
-      group = Group.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, topic['group_id'])
+      group = Group.where(context_id: context, context_type: context.class.to_s, migration_id: topic['group_id']).first
       if group
         Importers::DiscussionTopicImporter.import_from_migration(topic, group)
       end
     end
 
-    group = Group.find_by_migration_id(data[:migration_id])
+    group = Group.where(migration_id: data[:migration_id]).first
     group.discussion_topics.count.should == 1
   end
 

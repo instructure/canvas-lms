@@ -143,9 +143,9 @@ describe Account do
       end
 
       it "should list associated courses by term" do
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T001")}).map(&:sis_source_id).sort.should == ["C001", "C001S"]
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T002")}).map(&:sis_source_id).sort.should == []
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T003")}).map(&:sis_source_id).sort.should == ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T001").first}).map(&:sis_source_id).sort.should == ["C001", "C001S"]
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T002").first}).map(&:sis_source_id).sort.should == []
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T003").first}).map(&:sis_source_id).sort.should == ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
       end
 
       it "should list associated nonenrollmentless courses" do
@@ -153,9 +153,9 @@ describe Account do
       end
 
       it "should list associated nonenrollmentless courses by term" do
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T001"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001", "C001S"]
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T002"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == []
-        @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T003"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C005", "C007", "C005S", "C007S"].sort
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001", "C001S"]
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == []
+        @account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C005", "C007", "C005S", "C007S"].sort
       end
     end
 
@@ -166,9 +166,9 @@ describe Account do
       end
 
       it "should list associated courses by term" do
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T001")}).map(&:sis_source_id).sort.should == ["C001S"]
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T002")}).map(&:sis_source_id).sort.should == []
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T003")}).map(&:sis_source_id).sort.should == ["C005S", "C006S", "C007S", "C008S", "C009S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T001").first})).map(&:sis_source_id).sort.should == ["C001S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T002").first})).map(&:sis_source_id).sort.should == []
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T003").first})).map(&:sis_source_id).sort.should == ["C005S", "C006S", "C007S", "C008S", "C009S"]
       end
 
       it "should list associated nonenrollmentless courses" do
@@ -176,9 +176,9 @@ describe Account do
       end
 
       it "should list associated nonenrollmentless courses by term" do
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T001"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001S"]
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T002"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == []
-        @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T003"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C005S", "C007S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == []
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C005S", "C007S"]
       end
     end
   end

@@ -349,7 +349,7 @@ describe DiscussionEntry do
       @topic.unread_count(@s1).should == 0
 
       @entry.change_read_state("read", @s2)
-      @topic.discussion_topic_participants.find_by_user_id(@s2.id).should_not be_nil
+      @topic.discussion_topic_participants.where(user_id: @s2).first.should_not be_nil
       @topic.change_read_state("read", @s2)
       @s2entry = @topic.discussion_entries.create!(:message => "s2 entry", :user => @s2)
       @s1entry.change_read_state("read", @s2)

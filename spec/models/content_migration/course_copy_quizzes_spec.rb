@@ -19,7 +19,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
+      @copy_to.quizzes.where(migration_id: mig_id(@quiz)).first.should_not be_nil
     end
 
     it "should create a new assignment and module item if copying a new quiz (even if the assignment migration_id matches)" do
@@ -66,8 +66,8 @@ describe ContentMigration do
       @copy_to.assignments.map(&:title).sort.should == ["published quiz"]
       @copy_to.context_module_tags.map(&:title).sort.should == ["published quiz", "unpublished quiz"]
 
-      @copy_to.quizzes.find_by_title("published quiz").should_not be_unpublished
-      @copy_to.quizzes.find_by_title("unpublished quiz").should be_unpublished
+      @copy_to.quizzes.where(title: "published quiz").first.should_not be_unpublished
+      @copy_to.quizzes.where(title: "unpublished quiz").first.should be_unpublished
 
       quiz.title = "edited published quiz"
       quiz.save!
@@ -92,8 +92,8 @@ describe ContentMigration do
       @copy_to.assignments.map(&:title).sort.should == ["edited published quiz"]
       @copy_to.context_module_tags.map(&:title).sort.should == ["edited published quiz", "edited unpublished quiz"]
 
-      @copy_to.quizzes.find_by_title("edited published quiz").should_not be_unpublished
-      @copy_to.quizzes.find_by_title("edited unpublished quiz").should be_unpublished
+      @copy_to.quizzes.where(title: "edited published quiz").first.should_not be_unpublished
+      @copy_to.quizzes.where(title: "edited unpublished quiz").first.should be_unpublished
     end
 
     it "should duplicate quizzes and associated items if overwrite_quizzes is false" do
@@ -154,7 +154,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      q = @copy_to.quizzes.find_by_migration_id(mig_id(sp))
+      q = @copy_to.quizzes.where(migration_id: mig_id(sp)).first
       q.should_not be_nil
       q.question_count.should == 1
     end
@@ -170,7 +170,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      newquiz2 = @copy_to.quizzes.find_by_migration_id(mig_id(quiz2))
+      newquiz2 = @copy_to.quizzes.where(migration_id: mig_id(quiz2)).first
       newquiz2.quiz_questions.first.question_data['question_name'].should == 'test question 2'
     end
 
@@ -206,7 +206,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      q2 = @copy_to.quizzes.find_by_migration_id(mig_id(q))
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
       q2.quiz_data.size.should eql(2)
       ans_count = 0
       q2.quiz_data.each do |qd|
@@ -241,7 +241,7 @@ describe ContentMigration do
       run_course_copy
 
       [asmnt_unpub, asmnt_pub, graded_survey_unpub, graded_survey_pub, survey_pub, survey_unpub, practice_unpub, practice_pub].each do |orig|
-        q = @copy_to.quizzes.find_by_migration_id(mig_id(orig))
+        q = @copy_to.quizzes.where(migration_id: mig_id(orig)).first
         "#{q.title} - #{q.workflow_state}".should == "#{orig.title} - #{orig.workflow_state}" # titles in there to help identify what type failed
         q.quiz_type.should == orig.quiz_type
       end
@@ -270,7 +270,7 @@ describe ContentMigration do
 
       run_course_copy(["User didn't have permission to reference question bank in quiz group Question Group"])
 
-      q = @copy_to.quizzes.find_by_migration_id(mig_id(q1))
+      q = @copy_to.quizzes.where(migration_id: mig_id(q1)).first
       q.should_not be_nil
       q.quiz_groups.count.should == 3
       g = q.quiz_groups[0]
@@ -337,8 +337,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).should be_nil
+      @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.should_not be_nil
+      @copy_to.assignments.where(migration_id: mig_id(asmnt)).first.should be_nil
     end
 
     it "should copy all quiz attributes" do
@@ -439,10 +439,10 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       run_course_copy
 
       @copy_to.attachments.count.should == 4
-      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
-      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
-      att3_2 = @copy_to.attachments.find_by_migration_id(mig_id(att3))
-      att4_2 = @copy_to.attachments.find_by_migration_id(mig_id(att4))
+      att_2 = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      att2_2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
+      att3_2 = @copy_to.attachments.where(migration_id: mig_id(att3)).first
+      att4_2 = @copy_to.attachments.where(migration_id: mig_id(att4)).first
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.active_quiz_questions.first
@@ -480,7 +480,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       run_course_copy
 
-      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from1))
+      aq = @copy_to.assessment_questions.where(migration_id: mig_id(aq_from1)).first
 
       aq.question_data[:question_text].should == data[:question_text]
       aq.question_data[:answers][0][:html].should == data[:answers][0][:html]
@@ -492,7 +492,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:neutral_comments_html].should == data[:neutral_comments_html]
 
       # and the matching question
-      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from2))
+      aq = @copy_to.assessment_questions.where(migration_id: mig_id(aq_from2)).first
       aq.question_data[:answers][0][:html].should == data2[:answers][0][:html]
       aq.question_data[:answers][0][:left_html].should == data2[:answers][0][:left_html]
       aq.question_data[:answers][1][:html].should == data2[:answers][1][:html]
@@ -548,7 +548,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       run_course_copy
 
-      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from1))
+      aq = @copy_to.assessment_questions.where(migration_id: mig_id(aq_from1)).first
 
       aq.question_data[:answers][0][:text].should == data[:answers][0][:text]
       aq.question_data[:answers][1][:text].should == data[:answers][1][:text]
@@ -571,10 +571,10 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       run_course_copy
 
-      aqb2 = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(aqb))
+      aqb2 = @copy_to.assessment_question_banks.where(migration_id: mig_id(aqb)).first
       aqb2.assessment_questions.count.should == 1
 
-      quiz2 = @copy_to.quizzes.find_by_migration_id(mig_id(quiz))
+      quiz2 = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
       quiz2.quiz_questions.count.should == 1
       qq2 = quiz2.quiz_questions.first
       qq2.assessment_question_id.should == aqb2.assessment_questions.first.id
@@ -589,7 +589,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       quiz.publish!
       @cm.copy_options = { 'everything' => '0', 'quizzes' => { mig_id(quiz) => "1" } }
       run_course_copy
-      dest_quiz = @copy_to.quizzes.find_by_migration_id mig_id(quiz)
+      dest_quiz = @copy_to.quizzes.where(migration_id:  mig_id(quiz)).first
       dest_quiz.assignment_group.migration_id.should eql mig_id(group)
     end
 
@@ -605,7 +605,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       run_export_and_import do |export|
         export.selected_content = { 'quizzes' => { mig_id(quiz) => "1" } }
       end
-      dest_quiz = @copy_to.quizzes.find_by_migration_id mig_id(quiz)
+      dest_quiz = @copy_to.quizzes.where(migration_id:  mig_id(quiz)).first
       dest_quiz.assignment_group.migration_id.should_not eql decoy_assignment_group
       decoy_assignment_group.reload.name.should_not eql group.name
     end

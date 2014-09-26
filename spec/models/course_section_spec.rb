@@ -34,9 +34,9 @@ describe CourseSection, "moving to new course" do
     e.save!
     course1.reload
 
-    course1.course_sections.find_by_id(cs.id).should_not be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should_not be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     e.root_account.should eql(account1)
     e.course.should eql(course1)
 
@@ -46,9 +46,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should be_nil
-    course2.course_sections.find_by_id(cs.id).should_not be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should be_nil
+    course2.course_sections.where(id: cs).first.should_not be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     e.root_account.should eql(account2)
     e.course.should eql(course2)
 
@@ -58,9 +58,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should_not be_nil
+    course1.course_sections.where(id: cs).first.should be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should_not be_nil
     e.root_account.should eql(account2)
     e.course.should eql(course3)
 
@@ -70,9 +70,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should_not be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should_not be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     e.root_account.should eql(account1)
     e.course.should eql(course1)
 
@@ -82,9 +82,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should_not be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should_not be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     e.root_account.should eql(account1)
     e.course.should eql(course1)
   end
@@ -167,9 +167,9 @@ describe CourseSection, "moving to new course" do
     course3.save
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should_not be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should_not be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     cs.nonxlist_course.should be_nil
     e.root_account.should eql(account1)
     cs.crosslisted?.should be_false
@@ -183,9 +183,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should be_nil
-    course2.course_sections.find_by_id(cs.id).should_not be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should be_nil
+    course2.course_sections.where(id: cs).first.should_not be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account2)
     cs.crosslisted?.should be_true
@@ -200,9 +200,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should_not be_nil
+    course1.course_sections.where(id: cs).first.should be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should_not be_nil
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account3)
     cs.crosslisted?.should be_true
@@ -217,9 +217,9 @@ describe CourseSection, "moving to new course" do
     cs.reload
     e.reload
 
-    course1.course_sections.find_by_id(cs.id).should_not be_nil
-    course2.course_sections.find_by_id(cs.id).should be_nil
-    course3.course_sections.find_by_id(cs.id).should be_nil
+    course1.course_sections.where(id: cs).first.should_not be_nil
+    course2.course_sections.where(id: cs).first.should be_nil
+    course3.course_sections.where(id: cs).first.should be_nil
     cs.nonxlist_course.should be_nil
     e.root_account.should eql(account1)
     cs.crosslisted?.should be_false

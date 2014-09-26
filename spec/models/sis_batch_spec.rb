@@ -153,7 +153,7 @@ describe SisBatch do
         "course_id,short_name,long_name,account_id,term_id,status\n" +
         "another_course,not-delete,not deleted not changed,,term1,active"
       ])
-      @c4 = @account.courses.find_by_course_code('not-delete')
+      @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
@@ -188,7 +188,7 @@ s2,test_1,section2,active},
       @c2.reload.should be_available
       @c3.reload.should be_available
       @c4.reload.should be_claimed
-      @cnew = @account.reload.courses.find_by_course_code('TC 101')
+      @cnew = @account.reload.courses.where(course_code: 'TC 101').first
       @cnew.should_not be_nil
       @cnew.sis_batch_id.should == @batch.id
       @cnew.should be_claimed
@@ -197,7 +197,7 @@ s2,test_1,section2,active},
       @s2.reload.should be_active
       @s3.reload.should be_active
       @s4.reload.should be_active
-      @s5 = @cnew.course_sections.find_by_sis_source_id('s2')
+      @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
       @s5.should_not be_nil
 
       @e1.reload.should be_active
@@ -227,7 +227,7 @@ s2,test_1,section2,active},
 %{course_id,short_name,long_name,account_id,term_id,status
 another_course,not-delete,not deleted not changed,,term1,active}
       ])
-      @c4 = @account.courses.find_by_course_code('not-delete')
+      @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
@@ -266,7 +266,7 @@ s2,test_1,section2,active},
       @c2.reload.should be_available
       @c3.reload.should be_available
       @c4.reload.should be_claimed
-      @cnew = @account.reload.courses.find_by_course_code('TC 101')
+      @cnew = @account.reload.courses.where(course_code: 'TC 101').first
       @cnew.should_not be_nil
       @cnew.sis_batch_id.should == @batch.id
       @cnew.should be_claimed
@@ -275,7 +275,7 @@ s2,test_1,section2,active},
       @s2.reload.should be_active
       @s3.reload.should be_active
       @s4.reload.should be_deleted
-      @s5 = @cnew.course_sections.find_by_sis_source_id('s2')
+      @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
       @s5.should_not be_nil
 
       @e1.reload.should be_deleted
@@ -332,10 +332,10 @@ s2,test_1,section2,active},
           section_1,user_1,student,active}
           ])
 
-      @user = Pseudonym.find_by_sis_user_id('user_1').user
-      @section = CourseSection.find_by_sis_source_id('section_1')
+      @user = Pseudonym.where(sis_user_id: 'user_1').first.user
+      @section = CourseSection.where(sis_source_id: 'section_1').first
       @course = @section.course
-      @enrollment1 = @course.student_enrollments.find_by_user_id(@user.id)
+      @enrollment1 = @course.student_enrollments.where(user_id: @user).first
 
       @user.should be_registered
       @section.should be_active
@@ -352,7 +352,7 @@ s2,test_1,section2,active},
       @section.reload.should be_active
       @course.reload.should be_claimed
       @enrollment1.reload.should be_deleted
-      @enrollment2 = @course.teacher_enrollments.find_by_user_id(@user.id)
+      @enrollment2 = @course.teacher_enrollments.where(user_id: @user).first
       @enrollment2.should be_active
 
       # only supply sections; course left alone

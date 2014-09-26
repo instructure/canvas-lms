@@ -38,7 +38,7 @@ describe Importers::DiscussionTopicImporter do
         Importers::DiscussionTopicImporter.import_from_migration(data, context)
         context.discussion_topics.count.should == 1
 
-        topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
+        topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
         topic.title.should == data[:title]
         parsed_description = Nokogiri::HTML::DocumentFragment.parse(data[:description]).to_s
         topic.message.index(parsed_description).should_not be_nil
@@ -69,7 +69,7 @@ describe Importers::DiscussionTopicImporter do
           Importers::DiscussionTopicImporter.import_from_migration(data, context)
           context.discussion_topics.count.should == 1
 
-          topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
+          topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
           topic.title.should == data[:title]
           topic.message.index(data[:text]).should_not be_nil
         end
@@ -87,7 +87,7 @@ describe Importers::DiscussionTopicImporter do
     data[:topics_to_import] = {data[:migration_id] => true}
     Importers::DiscussionTopicImporter.import_from_migration(data, context)
 
-    topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
+    topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
     topic.attachment.should be_nil
   end
 end

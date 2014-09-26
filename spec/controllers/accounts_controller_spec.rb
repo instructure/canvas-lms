@@ -138,7 +138,7 @@ describe AccountsController do
       post 'add_account_user', :account_id => @account.id, :membership_type => 'AccountAdmin', :user_list => 'testadmin@example.com'
       response.should be_success
 
-      new_admin = CommunicationChannel.find_by_path('testadmin@example.com').user
+      new_admin = CommunicationChannel.where(path: 'testadmin@example.com').first.user
       new_admin.should_not be_nil
       @account.reload
       @account.account_users.map(&:user).should be_include(new_admin)
@@ -161,7 +161,7 @@ describe AccountsController do
       account_with_admin_logged_in(account: a)
       post 'remove_account_user', account_id: a.id, id: au_id
       response.should be_redirect
-      AccountUser.find_by_id(au_id).should be_nil
+      AccountUser.where(id: au_id).first.should be_nil
     end
 
     it "should verify that the membership is in the caller's account" do
@@ -177,7 +177,7 @@ describe AccountsController do
       rescue ActiveRecord::RecordNotFound
         # rails2 passes the exception through here
       end
-      AccountUser.find_by_id(au_id).should_not be_nil
+      AccountUser.where(id: au_id).first.should_not be_nil
     end
   end
 

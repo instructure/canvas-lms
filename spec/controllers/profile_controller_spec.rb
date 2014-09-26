@@ -155,8 +155,8 @@ describe ProfileController do
       response.should be_success
 
       @user.reload
-      @user.user_services.find_by_service('skype').visible?.should be_false
-      @user.user_services.find_by_service('twitter').visible?.should be_true
+      @user.user_services.where(service: 'skype').first.visible?.should be_false
+      @user.user_services.where(service: 'twitter').first.visible?.should be_true
     end
 
     it "should let you set your profile links" do
