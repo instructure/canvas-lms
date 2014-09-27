@@ -5906,6 +5906,7 @@ zh_Hant:
       links: 
         portfolio: 檢視檔案袋
       page_content: 
+        body1: "您在頁面上看到的內容與任何瀏覽者看到的內容相同。要編輯此內容，按一下『%{edit_link_text}』連結 (%{showme})，頁面會切換到編輯模式。"
         body2: "您現在正在編輯！如果您想，則可以重命名頁面或更改註解選項 (%{showme1})。您可以在任何時間透過按一下右側 (%{showme2}) 的按鈕儲存、預覽或取消更改。"
         body3: "內容分為子章節，每個子章節都有虛線邊框。您可以透過按一下子章節右上角的 %{edit_icon} 或 %{delete_icon} 圖示刪除或編輯子章節的內容。"
         body4: "要添加新的子章節，找到並按一下要在頁面 (%{showme}) 右側的選項清單中添加的內容類別型。"
@@ -8427,6 +8428,11 @@ zh_Hant:
       facebook: 
         body: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件建立於 %{service}。"
         body_with_user: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件由 %{user} 建立於 %{service}。"
+      sms: 
+        body: |-
+            您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。
+            
+            在 %{link} 上有更多資訊
       summary: 
         body: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件建立於 %{service}，已透過您的電子郵件地址 %{email} 邀請了您。"
         body_with_user: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件由 %{user} 建立於 %{service}，已透過您的電子郵件地址 %{email} 邀請了您。"
@@ -9683,6 +9689,7 @@ zh_Hant:
         published: 已發佈
     post_grades_dialog_title: "公佈成績至 SIS"
     progression_module_collection: 
+      module_progress_for: "%{student_link} 的模組進度"
       module_progress_for_student: "%{student.name} 的模組進度"
       no_modules_found: 找不到模組
     progression_module_view: 
