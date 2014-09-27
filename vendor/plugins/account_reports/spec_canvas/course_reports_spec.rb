@@ -23,13 +23,11 @@ describe "Course Account Reports" do
 
   before(:each) do
 
-    Notification.find_or_create_by_name("Report Generated")
-    Notification.find_or_create_by_name("Report Generation Failed")
+    Notification.where(name: "Report Generated").first_or_create
+    Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @admin = account_admin_user(:account => @account)
-    @default_term = @account.enrollment_terms.active.find_or_create_by_name(
-      EnrollmentTerm::DEFAULT_TERM_NAME
-    )
+    @default_term = @account.default_enrollment_term
 
     @sub_account = Account.create(:parent_account => @account, :name => 'Math')
     @sub_account.sis_source_id = 'sub1'

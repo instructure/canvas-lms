@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/conference/index" do
   before do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'www.example.com' })
   end
 

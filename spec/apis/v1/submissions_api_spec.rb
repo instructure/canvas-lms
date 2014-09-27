@@ -374,7 +374,7 @@ describe 'Submissions API', type: :request do
     @context = @course
     @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model(:group_category => @group.group_category)})
     @topic.refresh_subtopics # since the DJ won't happen in time
-    @child_topic = @group.discussion_topics.find_by_root_topic_id(@topic.id)
+    @child_topic = @group.discussion_topics.where(root_topic_id: @topic).first
 
     e1 = @child_topic.discussion_entries.create!(:message => 'main entry', :user => @user)
     se1 = @child_topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
@@ -2285,7 +2285,7 @@ describe 'Submissions API', type: :request do
     it "should work with section ids" do
       @section = @course.default_section
       json = api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" } })
-      @submission = @assignment.submissions.find_by_user_id(@user.id)
+      @submission = @assignment.submissions.where(user_id: @user).first
       @submission.should be_present
       @submission.url.should == 'http://www.example.com/a/b?q=1'
     end
@@ -2294,7 +2294,7 @@ describe 'Submissions API', type: :request do
       def do_submit(opts)
         json = api_call(:post, @url, @args, { :submission => opts })
         response['Location'].should == "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}"
-        @submission = @assignment.submissions.find_by_user_id(@user.id)
+        @submission = @assignment.submissions.where(user_id: @user).first
         @submission.should be_present
         json.slice('user_id', 'assignment_id', 'score', 'grade').should == {
           'user_id' => @user.id,
@@ -2313,7 +2313,7 @@ describe 'Submissions API', type: :request do
 
       it "should create with an initial comment" do
         json = api_call(:post, @url, @args, { :comment => { :text_comment => "ohai teacher" }, :submission => { :submission_type => "online_url", :url => "http://www.example.com/a/b" } })
-        @submission = @assignment.submissions.find_by_user_id(@user.id)
+        @submission = @assignment.submissions.where(user_id: @user).first
         @submission.submission_comments.size.should == 1
         @submission.submission_comments.first.attributes.slice('author_id', 'comment').should == {
           'author_id' => @user.id,

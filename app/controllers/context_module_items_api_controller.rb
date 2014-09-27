@@ -569,7 +569,7 @@ class ContextModuleItemsApiController < ApplicationController
         end
         result[:items] << hash
       end
-      modules = @context.context_modules.find_all_by_id(module_ids.to_a)
+      modules = @context.context_modules.where(id: module_ids.to_a)
       result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
 
       render :json => result

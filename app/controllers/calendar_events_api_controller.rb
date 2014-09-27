@@ -700,7 +700,7 @@ class CalendarEventsApiController < ApplicationController
         @context_codes += AppointmentGroup.
           reservable_by(@current_user).
           intersecting(@start_date, @end_date).
-          find_all_by_id(group_codes).
+          where(id: group_codes).
           map(&:asset_string)
       end
       # include manageable appointment group events for the specified contexts

@@ -15,7 +15,7 @@ shared_examples_for "question bank basic tests" do
     end
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
-    question_bank = AssessmentQuestionBank.find_by_title(title)
+    question_bank = AssessmentQuestionBank.where(title: title).first
     question_bank.should be_present
     question_bank.workflow_state.should == "active"
     f("#question_bank_adding .title").should include_text title

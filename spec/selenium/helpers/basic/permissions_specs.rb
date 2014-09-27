@@ -133,7 +133,7 @@ shared_examples_for "permission tests" do
         select_enable(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_true
           role_override.locked.should be_false
         end
@@ -143,7 +143,7 @@ shared_examples_for "permission tests" do
         select_enable_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_true
           role_override.locked.should be_true
         end
@@ -153,7 +153,7 @@ shared_examples_for "permission tests" do
         select_disable(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_false
           role_override.locked.should be_false
         end
@@ -163,7 +163,7 @@ shared_examples_for "permission tests" do
         select_disable_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_false
           role_override.locked.should be_true
         end
@@ -173,14 +173,14 @@ shared_examples_for "permission tests" do
         select_disable(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.nil?.should be_false
         end
 
         select_default(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.nil?.should be_true
         end
       end
@@ -189,7 +189,7 @@ shared_examples_for "permission tests" do
         select_default_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.nil?.should be_true
           role_override.locked.should be_true
         end
@@ -211,7 +211,7 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
 
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_true
           role_override.locked.should be_false
         end
@@ -221,7 +221,7 @@ shared_examples_for "permission tests" do
         select_enable_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_true
           role_override.locked.should be_true
         end
@@ -231,7 +231,7 @@ shared_examples_for "permission tests" do
         select_disable(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_false
           role_override.locked.should be_false
         end
@@ -241,7 +241,7 @@ shared_examples_for "permission tests" do
         select_disable_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.should be_false
           role_override.locked.should be_true
         end
@@ -251,14 +251,14 @@ shared_examples_for "permission tests" do
         select_disable(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.nil?.should be_false
         end
 
         select_default(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.nil?.should be_true
         end
       end
@@ -267,7 +267,7 @@ shared_examples_for "permission tests" do
         select_default_and_lock(permission_name, role_name)
 
         keep_trying_until do
-          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override = RoleOverride.where(enrollment_type: role.name).first
           role_override.enabled.nil?.should be_true
           role_override.locked.should be_true
         end

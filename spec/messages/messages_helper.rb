@@ -18,7 +18,7 @@
 
 def generate_message(notification_name, path_type, asset, options = {})
   raise "options must be a hash!" unless options.is_a? Hash
-  @notification = Notification.find_by_name(notification_name.to_s) || Notification.create!(:name => notification_name.to_s)
+  @notification = Notification.where(name: notification_name.to_s).first_or_create!
   user = options[:user]
   asset_context = options[:asset_context]
   data = options[:data] || {}

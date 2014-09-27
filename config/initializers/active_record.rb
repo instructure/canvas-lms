@@ -79,7 +79,7 @@ class ActiveRecord::Base
     # TODO: start checking asset_types, if provided
     strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
       next result if asset_types && !asset_types.include?(klass)
-      result.concat((klass.constantize.find_all_by_id(id_pairs.map(&:last)) rescue []))
+      result.concat((klass.constantize.where(id: id_pairs.map(&:last)).to_a rescue []))
     end
   end
 

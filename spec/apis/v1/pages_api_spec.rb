@@ -458,7 +458,7 @@ describe "Pages API", type: :request do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page' }})
-        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
         page.title.should == 'New Wiki Page!'
         page.url.should == 'new-wiki-page'
         page.body.should == 'hello new page'
@@ -471,7 +471,7 @@ describe "Pages API", type: :request do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                  { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                  { :wiki_page => { :title => 'New Wiki Page', :body => 'content to process' } })
-        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
         page.title.should == 'New Wiki Page'
         page.url.should == 'new-wiki-page'
         page.body.should == 'processed content'
@@ -482,7 +482,7 @@ describe "Pages API", type: :request do
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :published => true, :front_page => true}})
 
-        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
         page.is_front_page?.should be_true
 
         wiki = @course.wiki
@@ -508,7 +508,7 @@ describe "Pages API", type: :request do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :published => true, :title => 'New Wiki Page!', :body => 'hello new page' }})
-        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
         page.should be_active
         json['published'].should be_true
       end
@@ -520,7 +520,7 @@ describe "Pages API", type: :request do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :published => false, :title => 'New Wiki Page!', :body => 'hello new page' }})
-        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
         page.should be_unpublished
         json['published'].should be_false
       end
@@ -537,7 +537,7 @@ describe "Pages API", type: :request do
         json['published'].should be_true
 
         @course.wiki.get_front_page_url.should == front_page_url
-        page = @course.wiki.wiki_pages.find_by_url!(front_page_url)
+        page = @course.wiki.wiki_pages.where(url: front_page_url).first!
         page.should be_published
       end
 
@@ -836,7 +836,7 @@ describe "Pages API", type: :request do
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => 'nonexistent-url' },
                  { :wiki_page => { :body => 'Nonexistent page content' } })
-        page = @wiki.wiki_pages.find_by_url!('nonexistent-url')
+        page = @wiki.wiki_pages.where(url: 'nonexistent-url').first!
         page.should_not be_nil
         page.body.should == 'Nonexistent page content'
       end
@@ -850,9 +850,8 @@ describe "Pages API", type: :request do
           @notify_page.update_attribute(:created_at, 1.hour.ago)
           @notification = Notification.create! :name => "Updated Wiki Page"
           @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
-          @teacher.email_channel.notification_policies.
-              find_or_create_by_notification_id(@notification.id).
-              update_attribute(:frequency, 'immediately')
+          @teacher.email_channel.notification_policies.create!(notification: @notification,
+                                                               frequency: 'immediately')
         end
         
         it "should notify iff the notify_of_update flag is set" do
@@ -1318,7 +1317,7 @@ describe "Pages API", type: :request do
     it "should create a group wiki page" do
       json = api_call(:post, "/api/v1/groups/#{@group.id}/pages?wiki_page[title]=newpage",
                {:controller=>'wiki_pages_api', :action=>'create', :format=>'json', :group_id=>@group.to_param, :wiki_page => {'title' => 'newpage'}})
-      page = @group.wiki.wiki_pages.find_by_url!(json['url'])
+      page = @group.wiki.wiki_pages.where(url: json['url']).first!
       page.title.should == 'newpage'
     end
     

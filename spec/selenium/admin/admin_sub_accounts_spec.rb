@@ -62,7 +62,7 @@ describe "admin sub accounts" do
     click_account_action_link(sub_account.id, '.edit_account_link')
     edit_account_info("#account_#{sub_account.id} #account_name", edit_name)
     f("#account_#{sub_account.id}").should include_text(edit_name)
-    Account.find_by_id(sub_account.id).name.should == edit_name
+    Account.where(id: sub_account).first.name.should == edit_name
   end
 
   it "should validate sub account count on main account" do

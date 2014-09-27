@@ -736,13 +736,13 @@ describe AssignmentsApiController, type: :request do
       @assignment = Assignment.find @json['id']
       @assignment.assignment_overrides.count.should == 2
 
-      @adhoc_override = @assignment.assignment_overrides.find_by_set_type('ADHOC')
+      @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
       @adhoc_override.should_not be_nil
       @adhoc_override.set.should == [@student]
       @adhoc_override.due_at_overridden.should be_true
       @adhoc_override.due_at.to_i.should == @adhoc_due_at.to_i
 
-      @section_override = @assignment.assignment_overrides.find_by_set_type('CourseSection')
+      @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
       @section_override.should_not be_nil
       @section_override.set.should == @course.default_section
       @section_override.due_at_overridden.should be_true
@@ -801,15 +801,13 @@ describe AssignmentsApiController, type: :request do
       @student.register!
       @student.communication_channels.create(
         :path => "student@instructure.com").confirm!
-      @student.email_channel.notification_policies.
-        find_or_create_by_notification_id(notification.id).
-        update_attribute(:frequency, 'immediately')
+      @student.email_channel.notification_policies.create!(notification: notification,
+                                                           frequency: 'immediately')
 
       @ta.register!
       @ta.communication_channels.create(:path => "ta@instructure.com").confirm!
-      @ta.email_channel.notification_policies.
-        find_or_create_by_notification_id(notification.id).
-        update_attribute(:frequency, 'immediately')
+      @ta.email_channel.notification_policies.create!(notification: notification,
+                                                      frequency: 'immediately')
 
       @override_due_at = Time.parse('2002 Jun 22 12:00:00')
 
@@ -1214,8 +1212,7 @@ describe AssignmentsApiController, type: :request do
 
         it "updates any ADHOC overrides" do
           @assignment.assignment_overrides.count.should == 2
-          @adhoc_override = @assignment.assignment_overrides.
-            find_by_set_type('ADHOC')
+          @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
           @adhoc_override.should_not be_nil
           @adhoc_override.set.should == [@student]
           @adhoc_override.due_at_overridden.should be_true
@@ -1223,8 +1220,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "updates any CourseSection overrides" do
-          @section_override = @assignment.assignment_overrides.
-            find_by_set_type('CourseSection')
+          @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
           @section_override.should_not be_nil
           @section_override.set.should == @course.default_section
           @section_override.due_at_overridden.should be_true
@@ -1257,9 +1253,8 @@ describe AssignmentsApiController, type: :request do
         @notification = Notification.create! :name => "Assignment Changed"
         student_in_course(:course => @course, :active_all => true)
         @student.communication_channels.create(:path => "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.
-          find_or_create_by_notification_id(@notification.id).
-          update_attribute(:frequency, 'immediately')
+        @student.email_channel.notification_policies.create!(notification: @notification,
+                                                             frequency: 'immediately')
         @assignment = @course.assignments.create!
         Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
         @adhoc_due_at = 5.days.from_now

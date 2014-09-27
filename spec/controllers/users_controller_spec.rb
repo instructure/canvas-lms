@@ -312,7 +312,7 @@ describe UsersController do
         assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
-        Pseudonym.find_all_by_unique_id('jacob@instructure.com').should == [p]
+        Pseudonym.by_unique_id('jacob@instructure.com').should == [p]
       end
 
       it "should not complain about conflicting ccs, in any state" do
@@ -340,7 +340,7 @@ describe UsersController do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         response.should be_success
 
-        Pseudonym.find_all_by_unique_id('jacob@instructure.com').should == [p]
+        Pseudonym.by_unique_id('jacob@instructure.com').should == [p]
         p.reload
         p.should be_active
         p.user.should be_pre_registered

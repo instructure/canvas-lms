@@ -219,7 +219,7 @@ module Context
     elsif (klass.column_names & ['context_id', 'context_type']).length == 2
       res = klass.where(context_id: context, context_type: context.class.to_s, id: id).first
     elsif klass == Attachment
-      res = klass.find_by_id(id)
+      res = klass.where(id: id).first
       res = nil if context && res && res.context != context
     else
       res = klass.where(id: id).first

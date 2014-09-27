@@ -1214,15 +1214,15 @@ class CoursesController < ApplicationController
         locks = {}
         types.each do |type, ids|
           if type == 'assignment'
-            @context.assignments.active.find_all_by_id(ids).compact.each do |assignment|
+            @context.assignments.active.where(id: ids).each do |assignment|
               locks[assignment.asset_string] = assignment.locked_for?(@current_user)
             end
           elsif type == 'quiz'
-            @context.quizzes.active.include_assignment.find_all_by_id(ids).compact.each do |quiz|
+            @context.quizzes.active.include_assignment.where(id: ids).each do |quiz|
               locks[quiz.asset_string] = quiz.locked_for?(@current_user)
             end
           elsif type == 'discussion_topic'
-            @context.discussion_topics.active.find_all_by_id(ids).compact.each do |topic|
+            @context.discussion_topics.active.where(id: ids).each do |topic|
               locks[topic.asset_string] = topic.locked_for?(@current_user)
             end
           end

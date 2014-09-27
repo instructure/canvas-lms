@@ -10,7 +10,7 @@ describe "account admin manage groups" do
     replace_content form.find_element(:css, "input[type=text]"), name
     submit_form(form)
     wait_for_ajaximations
-    category = account.group_categories.find_by_name(name)
+    category = account.group_categories.where(name: name).first
     category.should_not be_nil
     category
   end
@@ -155,7 +155,7 @@ describe "account admin manage groups" do
       f("#group_name").send_keys(name)
       f("#group_#{group.id} .btn").click
       wait_for_ajaximations
-      group = @admin_account.groups.find_by_name(name)
+      group = @admin_account.groups.where(name: name).first
       group.should_not be_nil
     end
 

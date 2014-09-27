@@ -522,8 +522,7 @@ describe Submission do
 
       it "should submit to turnitin for the original submitter" do
         submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
-        submissions = Submission.find_all_by_assignment_id @a.id
-        submissions.each do |s|
+        Submission.where(assignment_id: @a).each do |s|
           if s.id == submission.id
             s.turnitin_data[:last_processed_attempt].should > 0
           else

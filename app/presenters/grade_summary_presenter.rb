@@ -70,7 +70,7 @@ class GradeSummaryPresenter
 
   def selectable_courses
     courses_with_grades.to_a.select do |course|
-      student_enrollment = course.all_student_enrollments.find_by_user_id(student)
+      student_enrollment = course.all_student_enrollments.where(user_id: student).first
       student_enrollment.grants_right?(@current_user, :read_grades)
     end
   end
@@ -80,11 +80,11 @@ class GradeSummaryPresenter
       if @id_param # always use id if given
         validate_id
         user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(user_id) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: user_id).first }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(@current_user) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: @current_user).first }
       end
     end
   end
@@ -135,7 +135,7 @@ class GradeSummaryPresenter
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")
-      .find_all_by_user_id(student)
+      .where(user_id: student).to_a
 
       if @context.feature_enabled?(:differentiated_assignments)
         visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)

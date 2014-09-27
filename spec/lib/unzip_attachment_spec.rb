@@ -54,15 +54,15 @@ describe UnzipAttachment do
     describe 'after processing' do
       before { unzipper.process; @course.reload }
 
-      let(:first_attachment) { @course.attachments.find_by_display_name('first_entry.txt') }
-      let(:second_attachment) { @course.attachments.find_by_display_name('second_entry.txt') }
+      let(:first_attachment) { @course.attachments.where(display_name: 'first_entry.txt').first }
+      let(:second_attachment) { @course.attachments.where(display_name: 'second_entry.txt').first }
 
       it "should unzip the file, create folders, and stick the contents of the zipped file as attachments in the folders" do
         first_attachment.should_not be_nil
         first_attachment.folder.name.should eql('course files')
         second_attachment.should_not be_nil
         second_attachment.folder.full_name.should eql('course files/adir')
-        @course.folders.find_by_full_name('course files/adir').should_not be_nil
+        @course.folders.where(full_name:'course files/adir').should be_exists
       end
 
       it "should be able to overwrite files in a folder on the database" do
@@ -72,12 +72,12 @@ describe UnzipAttachment do
         unzipper.process
         @course.reload
 
-        attachment_group_1 = @course.attachments.find_all_by_display_name('first_entry.txt')
+        attachment_group_1 = @course.attachments.where(display_name: 'first_entry.txt').to_a
         attachment_group_1.size.should eql(2)
         attachment_group_1.any?{|a| a.file_state == 'deleted' }.should eql(true)
         attachment_group_1.any?{|a| a.file_state == 'available' }.should eql(true)
 
-        attachment_group_2 = @course.attachments.find_all_by_display_name('second_entry.txt')
+        attachment_group_2 = @course.attachments.where(display_name: 'second_entry.txt').to_a
         attachment_group_2.size.should eql(2)
         attachment_group_2.any?{|a| a.file_state == 'deleted' }.should eql(true)
         attachment_group_2.any?{|a| a.file_state == 'available' }.should eql(true)
@@ -91,7 +91,7 @@ describe UnzipAttachment do
         first_attachment.reload
         first_attachment.file_state.should == 'deleted'
 
-        new_attachment = @course.attachments.active.find_by_display_name!('first_entry.txt')
+        new_attachment = @course.attachments.active.where(display_name: 'first_entry.txt').first
         new_attachment.id.should_not == first_attachment.id
 
         attachment_tag.reload
@@ -119,7 +119,7 @@ describe UnzipAttachment do
 
       @course.attachments.count.should == 6
       %w(a b c d e f).each_with_index do |letter, index|
-        @course.attachments.find_by_position(index).display_name.should == "#{letter}.txt"
+        @course.attachments.where(position: index).first.display_name.should == "#{letter}.txt"
       end
     end
 

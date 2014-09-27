@@ -447,7 +447,7 @@ describe "Groups API", type: :request do
 
     it "should not allow other workflow_state modifications" do
       @user = @moderator
-      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      @membership = @community.group_memberships.where(user_id: @member).first
       json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "requested"
       })
@@ -466,7 +466,7 @@ describe "Groups API", type: :request do
 
     it "should not allow other workflow_state modifications using users/:user_id endpoint" do
       @user = @moderator
-      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      @membership = @community.group_memberships.where(user_id: @member).first
       json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :workflow_state => "requested"
       })
@@ -509,7 +509,7 @@ describe "Groups API", type: :request do
 
     it "should allow changing moderator privileges" do
       @user = @moderator
-      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      @membership = @community.group_memberships.where(user_id: @member).first
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => true
       })
@@ -523,7 +523,7 @@ describe "Groups API", type: :request do
 
     it "should allow changing moderator privileges using users/:user_id endpoint" do
       @user = @moderator
-      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      @membership = @community.group_memberships.where(user_id: @member).first
       api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
           :moderator => true
       })
@@ -537,7 +537,7 @@ describe "Groups API", type: :request do
 
     it "should not allow a member to change moderator privileges" do
       @user = @member
-      @membership = @community.group_memberships.find_by_user_id(@moderator.id)
+      @membership = @community.group_memberships.where(user_id: @moderator).first
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => false
       }, {}, :expected_status => 401)
@@ -546,7 +546,7 @@ describe "Groups API", type: :request do
 
     it "should not allow a member to change moderator privileges using users/:user_id endpoint" do
       @user = @member
-      @membership = @community.group_memberships.find_by_user_id(@moderator.id)
+      @membership = @community.group_memberships.where(user_id: @moderator).first
       api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :moderator => false
       }, {}, :expected_status => 401)

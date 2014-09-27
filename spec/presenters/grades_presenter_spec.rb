@@ -43,19 +43,19 @@ describe GradesPresenter do
     end
 
     it 'uniqs out duplicates' do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => 3))
+      StudentEnrollment.stubs(active: stub(where: [3]))
       presenter.observed_enrollments.should == [3]
     end
 
     it 'removes nil enrollments' do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => nil))
+      StudentEnrollment.stubs(active: stub(where: []))
       presenter.observed_enrollments.should == []
     end
 
     context 'exclusions' do
       before do
         active_enrollments = stub('active_enrollments')
-        active_enrollments.stubs(:find_by_user_id_and_course_id).returns(1, 2, 3)
+        active_enrollments.stubs(:where).returns([1], [2], [3])
         StudentEnrollment.stubs(:active => active_enrollments)
       end
 
@@ -138,7 +138,7 @@ describe GradesPresenter do
     let(:student_enrollment) { student_enrollment = stub('student_enrollment', attrs.merge(:student? => true)) }
 
     before do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => stub))
+      StudentEnrollment.stubs(active: stub(where: [stub]))
       observed_enrollment.stubs(:shard).returns(shard)
     end
 

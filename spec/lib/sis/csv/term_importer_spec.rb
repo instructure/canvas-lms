@@ -50,13 +50,13 @@ describe SIS::CSV::TermImporter do
     )
     EnrollmentTerm.count.should == before_count + 3
 
-    t1 = @account.enrollment_terms.find_by_sis_source_id('T001')
+    t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
     t1.should_not be_nil
     t1.name.should == 'Winter11'
     t1.start_at.to_s(:db).should == '2011-01-05 00:00:00'
     t1.end_at.to_s(:db).should == '2011-04-14 00:00:00'
 
-    t2 = @account.enrollment_terms.find_by_sis_source_id('T002')
+    t2 = @account.enrollment_terms.where(sis_source_id: 'T002').first
     t2.should_not be_nil
     t2.name.should == 'Winter12'
     t2.start_at.should be_nil

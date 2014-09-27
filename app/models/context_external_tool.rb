@@ -485,7 +485,7 @@ class ContextExternalTool < ActiveRecord::Base
   # the teacher).
   def self.find_external_tool(url, context, preferred_tool_id=nil)
     contexts = contexts_to_search(context)
-    preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id) if preferred_tool_id
+    preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
     if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
       return preferred_tool
     end
@@ -554,7 +554,7 @@ class ContextExternalTool < ActiveRecord::Base
       tool = context.context_external_tools.having_setting(type).where(id: id).first
     end
     if !tool
-      tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', context.account_chain, id)
+      tool = ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain, id: id).first
     end
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
@@ -567,7 +567,7 @@ class ContextExternalTool < ActiveRecord::Base
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
       tools += context.context_external_tools.having_setting(type.to_s)
     end
-    tools += ContextExternalTool.having_setting(type.to_s).find_all_by_context_type_and_context_id('Account', context.account_chain)
+    tools += ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain)
   end
 
   def self.serialization_excludes; [:shared_secret,:settings]; end

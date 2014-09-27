@@ -126,7 +126,7 @@ describe "API", type: :request do
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
-      @submission = @assignment.submissions.find_by_user_id(@user.id)
+      @submission = @assignment.submissions.where(user_id: @user).first
       @submission.attachments.map { |a| a.id }.sort.should == [a1.id, a2.id]
       @submission.submission_comments.first.comment.should == "yay"
     end

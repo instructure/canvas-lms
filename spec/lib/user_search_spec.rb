@@ -10,7 +10,7 @@ describe UserSearch do
     let(:users) { UserSearch.for_user_in_context('Stewart', course, user).to_a }
     let(:names) { users.map(&:name) }
     let(:user) { User.last }
-    let(:student) { User.find_by_name(search_names.last) }
+    let(:student) { User.where(name: search_names.last).first }
 
     before do
       teacher = User.create!(:name => 'Tyler Teacher')
@@ -124,7 +124,7 @@ describe UserSearch do
           it 'can match an SIS id and a user name in the same query' do
             pseudonym.sis_user_id = "MARTHA_SIS_ID"
             pseudonym.save!
-            other_user = User.find_by_name('Martha Stewart')
+            other_user = User.where(name: 'Martha Stewart').first
             results = UserSearch.for_user_in_context("martha", course, user)
             results.should include(user)
             results.should include(other_user)
@@ -142,7 +142,7 @@ describe UserSearch do
           it 'can match an email and a name in the same query' do
             results = UserSearch.for_user_in_context("giver", course, user)
             results.should include(user)
-            results.should include(User.find_by_name('Rosemary Giver'))
+            results.should include(User.where(name: 'Rosemary Giver').first)
           end
 
           it 'will not match channels where the type is not email' do

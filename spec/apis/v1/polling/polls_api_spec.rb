@@ -243,7 +243,7 @@ describe Polling::PollsController, type: :request do
         delete_destroy
 
         response.code.should == '204'
-        Polling::Poll.find_by_id(@poll.id).should be_nil
+        Polling::Poll.where(id: @poll).should_not be_exists
       end
 
       it "deletes all associated poll choices" do
@@ -253,8 +253,8 @@ describe Polling::PollsController, type: :request do
         @user = @teacher
         delete_destroy
         response.code.should == '204'
-        Polling::PollChoice.find_by_id(choice_a.id).should be_nil
-        Polling::PollChoice.find_by_id(choice_b.id).should be_nil
+        Polling::PollChoice.where(id: choice_a).should_not be_exists
+        Polling::PollChoice.where(id: choice_b).should_not be_exists
       end
     end
 
@@ -263,7 +263,7 @@ describe Polling::PollsController, type: :request do
         student_in_course(:active_all => true, :course => @course)
         delete_destroy
         response.code.should == '401'
-        Polling::Poll.find_by_id(@poll.id).should == @poll
+        Polling::Poll.where(id: @poll).first.should == @poll
       end
     end
   end

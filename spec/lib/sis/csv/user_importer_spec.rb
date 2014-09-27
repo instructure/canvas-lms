@@ -32,7 +32,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Uno")
     user.short_name.should eql("User Uno")
@@ -49,7 +49,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno 2,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Uno 2")
     user.short_name.should eql("User Uno 2")
@@ -67,7 +67,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno 2,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("My Awesome Name")
     user.short_name.should eql("My Awesome Name")
@@ -78,7 +78,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,short_name,email,status",
         "user_1,user1,User,Uno,The Uno,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Uno")
     user.short_name.should eql("The Uno")
@@ -96,7 +96,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status,short_name",
         "user_2,user2,User,Dos,user2@example.com,active,The Dos"
     )
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Dos")
     user.short_name.should eql("The Dos")
@@ -115,7 +115,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,full_name,email,status",
         "user_1,user1,User Uno,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Uno")
 
@@ -132,7 +132,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,email,status,full_name",
         "user_2,user2,user2@example.com,active,User Dos"
     )
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Dos")
 
@@ -150,7 +150,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,sortable_name,email,status",
         "user_1,user1,User,Uno,\"One, User\",user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Uno")
     user.sortable_name.should eql("One, User")
@@ -168,7 +168,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status,sortable_name",
         "user_2,user2,User,Dos,user2@example.com,active,\"Two, User\""
     )
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.account.should eql(@account)
     user.name.should eql("User Dos")
     user.sortable_name.should eql("Two, User")
@@ -187,7 +187,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
       "user_1,user1,badpassword,John,St. Clair,user@example.com,active,"
     )
-    user = Pseudonym.find_by_unique_id('user1').user
+    user = Pseudonym.by_unique_id('user1').first.user
     user.name.should == 'John St. Clair'
     user.sortable_name.should == 'St. Clair, John'
     user.first_name.should == 'John'
@@ -199,14 +199,14 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,,,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.name.should eql(" ")
 
     process_csv_data_cleanly(
         "user_id,login_id,email,status",
         "user_2,user2,user2@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.name.should eql(" ")
   end
 
@@ -215,7 +215,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,full_name,email,status",
         "user_1,user1,,,User One,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.name.should eql("User One")
     user.sortable_name.should eql("One, User")
 
@@ -223,7 +223,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,full_name,email,status",
         "user_2,user2,User,Dos,User Two,user2@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.name.should eql("User Two")
     user.sortable_name.should eql("Two, User")
   end
@@ -234,7 +234,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
       "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("password")}"
     )
-    user1 = CommunicationChannel.find_by_path('user@example.com').user
+    user1 = CommunicationChannel.by_path('user@example.com').first.user
     p = user1.pseudonyms.first
     p.valid_arbitrary_credentials?('badpassword').should be_true
 
@@ -242,7 +242,7 @@ describe SIS::CSV::UserImporter do
     p.password_confirmation = 'lessbadpassword'
     p.save
 
-    user2 = CommunicationChannel.find_by_path('user2@example.com').user
+    user2 = CommunicationChannel.by_path('user2@example.com').first.user
     p = user2.pseudonyms.first
     p.valid_arbitrary_credentials?('password').should be_true
 
@@ -274,8 +274,8 @@ describe SIS::CSV::UserImporter do
   end
 
   it "should allow setting and resetting of passwords" do
-    CommunicationChannel.find_by_path("user1@example.com").should be_nil
-    CommunicationChannel.find_by_path("user2@example.com").should be_nil
+    CommunicationChannel.by_path("user1@example.com").first.should be_nil
+    CommunicationChannel.by_path("user2@example.com").first.should be_nil
 
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
@@ -285,7 +285,7 @@ describe SIS::CSV::UserImporter do
 
     user1_persistence_token = nil
     user2_persistence_token = nil
-    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
       user1_persistence_token = p.persistence_token
       p.valid_arbitrary_credentials?('password1').should be_true
       p.valid_arbitrary_credentials?('password2').should be_false
@@ -294,7 +294,7 @@ describe SIS::CSV::UserImporter do
     end
 
     user2_sis_ssha = nil
-    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
       user2_persistence_token = p.persistence_token
       user2_sis_ssha = p.sis_ssha
       p.valid_arbitrary_credentials?('encpass1').should be_true
@@ -310,7 +310,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,,User,Dos,user2@example.com,active,#{user2_sis_ssha}"
     )
 
-    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
       user1_persistence_token.should == p.persistence_token
       p.valid_arbitrary_credentials?('password1').should be_true
       p.valid_arbitrary_credentials?('password2').should be_false
@@ -318,7 +318,7 @@ describe SIS::CSV::UserImporter do
       p.valid_arbitrary_credentials?('password4').should be_false
     end
 
-    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
       user2_persistence_token.should == p.persistence_token
       p.valid_arbitrary_credentials?('encpass1').should be_true
       p.valid_arbitrary_credentials?('encpass2').should be_false
@@ -333,7 +333,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass2")}"
     )
 
-    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
       user1_persistence_token.should_not == p.persistence_token
       p.valid_arbitrary_credentials?('password1').should be_false
       p.valid_arbitrary_credentials?('password2').should be_true
@@ -345,7 +345,7 @@ describe SIS::CSV::UserImporter do
       user1_persistence_token = p.persistence_token
     end
 
-    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
       user2_persistence_token.should_not == p.persistence_token
       p.valid_arbitrary_credentials?('encpass1').should be_false
       p.valid_arbitrary_credentials?('encpass2').should be_true
@@ -364,7 +364,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass3")}"
     )
 
-    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
       user1_persistence_token.should == p.persistence_token
       p.valid_arbitrary_credentials?('password1').should be_false
       p.valid_arbitrary_credentials?('password2').should be_false
@@ -372,7 +372,7 @@ describe SIS::CSV::UserImporter do
       p.valid_arbitrary_credentials?('password4').should be_true
     end
 
-    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+    CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
       user2_persistence_token.should == p.persistence_token
       p.valid_arbitrary_credentials?('encpass1').should be_false
       p.valid_arbitrary_credentials?('encpass2').should be_false
@@ -389,7 +389,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "U1,@,User,Uno,user@example.com,active"
     )
-    CommunicationChannel.find_by_path('user@example.com').should be_nil
+    CommunicationChannel.by_path('user@example.com').first.should be_nil
 
     importer.errors.map(&:last).should == []
     importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is invalid"]
@@ -402,9 +402,9 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.pseudonyms.count.should == 1
-    user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
+    user.pseudonyms.by_unique_id('user1').first.sis_user_id.should == 'user_1'
 
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
@@ -412,9 +412,9 @@ describe SIS::CSV::UserImporter do
     )
     importer.errors.should == []
     importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.pseudonyms.count.should == 1
-    user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
+    user.pseudonyms.by_unique_id('user1').first.sis_user_id.should == 'user_1'
     Pseudonym.count.should == (p_count + 1)
   end
 
@@ -432,8 +432,8 @@ describe SIS::CSV::UserImporter do
     )
     importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
     importer.errors.should == []
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user2"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id.should == "user3"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id.should == "user2"
   end
 
   it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
@@ -448,8 +448,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user3,User,Uno,user1@example.com,active",
       "user_2,user1,User,Dos,user2@example.com,active"
     )
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user1"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id.should == "user3"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id.should == "user1"
   end
 
   it "should allow a user to update information" do
@@ -463,7 +463,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user2,User,Uno-Dos,user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.last_name.should == "Uno-Dos"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.last_name.should == "Uno-Dos"
   end
 
   it "should allow a user to update display name specifically" do
@@ -477,7 +477,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,The Uno-Dos,user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.short_name.should == "The Uno-Dos"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.short_name.should == "The Uno-Dos"
   end
 
   it "should allow a user to update full name name specifically" do
@@ -491,7 +491,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Dos,user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.name.should == "User Dos"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.name.should == "User Dos"
   end
 
   it "should allow a user to update sortable name specifically" do
@@ -505,7 +505,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,\"Two, User\",user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Two, User"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name.should == "Two, User"
   end
 
   it "should allow a user to update emails specifically" do
@@ -517,7 +517,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active"
       )
 
-      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
+      Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email.should == "user1@example.com"
 
       Time.stubs(:now).returns(now)
       process_csv_data_cleanly(
@@ -525,7 +525,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user2@example.com,active"
       )
 
-      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+      Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email.should == "user2@example.com"
     end
   end
 
@@ -535,14 +535,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Uno,user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Uno, User"
+    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name.should == "Uno, User"
 
     process_csv_data_cleanly(
         "user_id,login_id,full_name,email,status",
         "user_1,user1,User Dos,user1@example.com,active"
     )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Dos, User"
+    Pseudonym.where(account_id:@account, sis_user_id: "user_1").first.user.sortable_name.should == "Dos, User"
   end
 
   it "should add two users with different user_ids, login_ids, but the same email" do
@@ -555,7 +555,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_2,user2,User,Dos,user@example.com,active"
     )
-    user2 = Pseudonym.find_by_unique_id('user2').user
+    user2 = Pseudonym.by_unique_id('user2').first.user
     user1.should_not == user2
     user2.last_name.should == "Dos"
     user2.pseudonyms.count.should == 1
@@ -571,8 +571,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
-    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
+    user2 = Pseudonym.by_unique_id('user2').first.user
     user1.should_not == user2
     user1.last_name.should == "Uno"
     user2.last_name.should == "Dos"
@@ -591,8 +591,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user@example.com,deleted",
       "user_2,user2,User,Dos,user@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
-    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
+    user2 = Pseudonym.by_unique_id('user2').first.user
     user1.should_not == user2
     user1.last_name.should == "Uno"
     user2.last_name.should == "Dos"
@@ -611,8 +611,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
-    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
+    user2 = Pseudonym.by_unique_id('user2').first.user
     user1.should_not == user2
     user1.last_name.should == "Uno"
     user2.last_name.should == "Dos"
@@ -638,7 +638,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
     user1.communication_channels.create!(:path => 'JT@instructure.com')
 
     process_csv_data_cleanly(
@@ -657,7 +657,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
     user1.email_channel.destroy
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -678,7 +678,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_2,user2,User,Dos,user1@example.com,deleted"
     )
-    user2 = Pseudonym.find_by_unique_id('user2').user
+    user2 = Pseudonym.by_unique_id('user2').first.user
     user1.should_not == user2
     user1.last_name.should == "Uno"
     user2.last_name.should == "Dos"
@@ -707,7 +707,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
+    user1 = Pseudonym.by_unique_id('user1').first.user
     [u1, u2].should_not be_include(user1)
     user1.communication_channels.length.should == 1
     user1.email.should == 'user1@example.com'
@@ -720,7 +720,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,deleted"
     )
-    p = Pseudonym.find_by_unique_id('user1')
+    p = Pseudonym.by_unique_id('user1').first
     p.should be_deleted
     u = p.user
     u.communication_channels.length.should == 1
@@ -735,8 +735,8 @@ describe SIS::CSV::UserImporter do
     )
     importer.errors.should == []
     importer.warnings.map{|x| x[1]}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
-    Pseudonym.find_by_unique_id('user1').should_not be_nil
-    Pseudonym.find_by_unique_id('user2').should be_nil
+    Pseudonym.by_unique_id('user1').first.should_not be_nil
+    Pseudonym.by_unique_id('user2').first.should be_nil
   end
 
   it "should not present an error for the same login_id with different case for same user" do
@@ -745,7 +745,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_1,USer1,User,Uno,user1@example.com,active"
     )
-    Pseudonym.find_by_sis_user_id('user_1').unique_id.should == 'USer1'
+    Pseudonym.where(sis_user_id: 'user_1').first.unique_id.should == 'USer1'
   end
 
   it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
@@ -753,8 +753,8 @@ describe SIS::CSV::UserImporter do
     u.register!
     p_count = Pseudonym.count
     p = u.pseudonyms.create!(:unique_id => "user2", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
-    Pseudonym.find_by_unique_id('user1').should be_nil
-    Pseudonym.find_by_unique_id('user2').should_not be_nil
+    Pseudonym.by_unique_id('user1').first.should be_nil
+    Pseudonym.by_unique_id('user2').first.should_not be_nil
     p.sis_user_id.should be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -762,8 +762,8 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,User,Dos,user2@example.com,active"
     )
     p.reload
-    Pseudonym.find_by_unique_id('user1').should_not be_nil
-    Pseudonym.find_by_unique_id('user2').should_not be_nil
+    Pseudonym.by_unique_id('user1').first.should_not be_nil
+    Pseudonym.by_unique_id('user2').first.should_not be_nil
     Pseudonym.count.should == (p_count + 2)
     p.sis_user_id.should == "user_2"
   end
@@ -773,9 +773,9 @@ describe SIS::CSV::UserImporter do
     u.register!
     p_count = Pseudonym.count
     p = u.pseudonyms.create!(:unique_id => "user2@example.com", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
-    Pseudonym.find_by_unique_id('user1').should be_nil
-    Pseudonym.find_by_unique_id('user2').should be_nil
-    Pseudonym.find_by_unique_id('user2@example.com').should_not be_nil
+    Pseudonym.by_unique_id('user1').first.should be_nil
+    Pseudonym.by_unique_id('user2').first.should be_nil
+    Pseudonym.by_unique_id('user2@example.com').first.should_not be_nil
     p.sis_user_id.should be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -783,9 +783,9 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,User,Dos,user2@example.com,active"
     )
     p.reload
-    Pseudonym.find_by_unique_id('user1').should_not be_nil
-    Pseudonym.find_by_unique_id('user2').should_not be_nil
-    Pseudonym.find_by_unique_id('user2@example.com').should be_nil
+    Pseudonym.by_unique_id('user1').first.should_not be_nil
+    Pseudonym.by_unique_id('user2').first.should_not be_nil
+    Pseudonym.by_unique_id('user2@example.com').first.should be_nil
     Pseudonym.count.should == (p_count + 2)
     p.sis_user_id.should == "user_2"
   end
@@ -796,14 +796,14 @@ describe SIS::CSV::UserImporter do
       "user_1  ,user1   ,User   ,Uno   ,The Uno   ,\"Uno, User   \",user@example.com   ,active  ",
       "   user_2,   user2,   User,   Dos,   The Dos,\"   Dos, User\",   user2@example.com,  active"
     )
-    user = CommunicationChannel.find_by_path('user@example.com').user
+    user = CommunicationChannel.by_path('user@example.com').first.user
     user.should_not be_nil
     user.name.should == "User Uno"
     user.sortable_name.should == "Uno, User"
     user.short_name.should == "The Uno"
     p = user.pseudonyms.first
     p.unique_id.should == "user1"
-    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user = CommunicationChannel.by_path('user2@example.com').first.user
     user.should_not be_nil
     user.name.should == "User Dos"
     user.sortable_name.should == "Dos, User"
@@ -817,7 +817,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    p = Pseudonym.find_by_unique_id('user1')
+    p = Pseudonym.by_unique_id('user1').first
     user1 = p.user
     user1.last_name.should == "Uno"
     user1.pseudonyms.count.should == 1
@@ -848,7 +848,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,,active"
     )
-    p = Pseudonym.find_by_unique_id('user1')
+    p = Pseudonym.by_unique_id('user1').first
     user1 = p.user
     user1.last_name.should == "Uno"
     user1.pseudonyms.count.should == 1
@@ -877,7 +877,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,,active"
     )
-    p = Pseudonym.find_by_unique_id('user1')
+    p = Pseudonym.by_unique_id('user1').first
     p.unique_id = 'user5'
     p.save!
     process_csv_data_cleanly(
@@ -886,8 +886,8 @@ describe SIS::CSV::UserImporter do
     )
     p.reload
     p.unique_id.should == 'user5'
-    Pseudonym.find_by_unique_id('user1').should be_nil
-    Pseudonym.find_by_unique_id('user3').should be_nil
+    Pseudonym.by_unique_id('user1').first.should be_nil
+    Pseudonym.by_unique_id('user3').first.should be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user3,User,Uno,,active",
@@ -895,8 +895,8 @@ describe SIS::CSV::UserImporter do
     )
     p.reload
     p.unique_id.should == 'user3'
-    Pseudonym.find_by_unique_id('user1').should be_nil
-    Pseudonym.find_by_unique_id('user5').should be_nil
+    Pseudonym.by_unique_id('user1').first.should be_nil
+    Pseudonym.by_unique_id('user5').first.should be_nil
   end
 
   it "should handle display name stickiness" do
@@ -904,7 +904,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,short_name,email,status",
         "user_1,user1,User,Uno,The Uno,,active"
     )
-    user = Pseudonym.find_by_unique_id('user1').user
+    user = Pseudonym.by_unique_id('user1').first.user
     user.short_name = 'The Amazing Uno'
     user.save!
     process_csv_data_cleanly(
@@ -927,7 +927,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,full_name,email,status",
         "user_1,user1,User Uno,,active"
     )
-    user = Pseudonym.find_by_unique_id('user1').user
+    user = Pseudonym.by_unique_id('user1').first.user
     user.name = 'The Amazing Uno'
     user.save!
     process_csv_data_cleanly(
@@ -950,7 +950,7 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,sortable_name,email,status",
         "user_1,user1,User,Uno,\"One, User\",,active"
     )
-    user = Pseudonym.find_by_unique_id('user1').user
+    user = Pseudonym.by_unique_id('user1').first.user
     user.sortable_name = 'Uno, The Amazing'
     user.save!
     process_csv_data_cleanly(
@@ -974,8 +974,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,deleted"
     )
-    user1 = @account.pseudonyms.find_by_sis_user_id('user_1')
-    user2 = @account.pseudonyms.find_by_sis_user_id('user_2')
+    user1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
+    user2 = @account.pseudonyms.where(sis_user_id: 'user_2').first
     user1.workflow_state.should == 'active'
     user2.workflow_state.should == 'deleted'
     user1.user.workflow_state.should == 'registered'
@@ -1003,45 +1003,45 @@ describe SIS::CSV::UserImporter do
       "test_1,user_1,teacher,,active,,,",
       ",user_1,student,S002,active,,,"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,,active,,,",
       ",user_1,student,S002,active,,,"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted"
     )
-    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
   end
 
   context 'account associations' do
@@ -1061,8 +1061,8 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,deleted"
       )
-      user1 = @account.pseudonyms.find_by_sis_user_id('user_1')
-      user2 = @account.pseudonyms.find_by_sis_user_id('user_2')
+      user1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
+      user2 = @account.pseudonyms.where(sis_user_id: 'user_2').first
       user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
       user2.user.user_account_associations.should be_empty
 
@@ -1079,21 +1079,21 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
-      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user = @account.pseudonyms.where(sis_user_id: 'user_1').first
       user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
 
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,deleted"
       )
-      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user = @account.pseudonyms.where(sis_user_id: 'user_1').first
       user.user.user_account_associations.should be_empty
 
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
-      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user = @account.pseudonyms.where(sis_user_id: 'user_1').first
       user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
     end
 
@@ -1114,13 +1114,13 @@ describe SIS::CSV::UserImporter do
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,")
-      @account.pseudonyms.find_by_sis_user_id('user_1').user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      @account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,"
       )
-      @pseudo1 = @account.pseudonyms.find_by_sis_user_id('user_1')
-      @pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id].sort
+      @pseudo1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
+      @pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
 
       @account = @account2
       process_csv_data_cleanly(
@@ -1136,44 +1136,44 @@ describe SIS::CSV::UserImporter do
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,")
-      @account.pseudonyms.find_by_sis_user_id('user_1').user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      @account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,"
       )
-      @pseudo2 = @account.pseudonyms.find_by_sis_user_id('user_1')
-      @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+      @pseudo2 = @account.pseudonyms.where(sis_user_id: 'user_1').first
+      @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       UserMerge.from(@pseudo1.user).into(@pseudo2.user)
-      @user = @account1.pseudonyms.find_by_sis_user_id('user_1').user
-      @account2.pseudonyms.find_by_sis_user_id('user_1').user.should == @user
+      @user = @account1.pseudonyms.where(sis_user_id: 'user_1').first.user
+      @account2.pseudonyms.where(sis_user_id: 'user_1').first.user.should == @user
 
-      @user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account1.id, @account2.id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+      @user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account1.id, @account2.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       @account = @account1
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,deleted")
-      @account1.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+      @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
         pseudo.workflow_state.should == 'deleted'
         pseudo.user.workflow_state.should == 'registered'
       end
-      @account2.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+      @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
         pseudo.workflow_state.should == 'active'
         pseudo.user.workflow_state.should == 'registered'
       end
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active")
-      @account1.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id, @account1.id].sort
+      @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
         pseudo.workflow_state.should == 'active'
         pseudo.user.workflow_state.should == 'registered'
       end
-      @account2.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id, @account1.id].sort
+      @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
         pseudo.workflow_state.should == 'active'
         pseudo.user.workflow_state.should == 'registered'
       end
@@ -1185,7 +1185,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    user_1 = Pseudonym.find_by_unique_id('user1').user
+    user_1 = Pseudonym.by_unique_id('user1').first.user
     user_1.email.should == 'user1@example.com'
     user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
     process_csv_data_cleanly(
@@ -1193,8 +1193,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active"
     )
-    user_1 = Pseudonym.find_by_unique_id('user1').user
-    user_2 = Pseudonym.find_by_unique_id('user2').user
+    user_1 = Pseudonym.by_unique_id('user1').first.user
+    user_2 = Pseudonym.by_unique_id('user2').first.user
     user_1.email.should == 'user1@example.com'
     user_2.email.should == 'user2@example.com'
     user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
@@ -1208,7 +1208,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,#{@pseudonym.unique_id},User,Uno,#{@pseudonym.unique_id},active"
     )
-    user_1 = Pseudonym.find_by_sis_user_id('user_1').user
+    user_1 = Pseudonym.where(sis_user_id: 'user_1').first.user
     user_1.should_not == @non_sis_user
     user_1.pseudonym.should_not == @pseudonym
   end
@@ -1220,7 +1220,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    user_1 = Pseudonym.find_by_sis_user_id('user_1').user
+    user_1 = Pseudonym.where(sis_user_id: 'user_1').first.user
     user_1.should_not == @non_sis_user
     user_1.pseudonym.should_not == @pseudonym
   end

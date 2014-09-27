@@ -1184,9 +1184,8 @@ describe Quizzes::QuizzesController do
         @section = @course.course_sections.create!
 
         @student.communication_channels.create(:path => "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.
-          find_or_create_by_notification_id(@notification.id).
-          update_attribute(:frequency, 'immediately')
+        @student.email_channel.notification_policies.create!(notification: @notification,
+                                                             frequency: 'immediately')
 
         course_quiz
         @quiz.generate_quiz_data

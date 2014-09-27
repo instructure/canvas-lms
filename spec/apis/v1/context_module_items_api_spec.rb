@@ -314,7 +314,7 @@ describe "Module Items API", type: :request do
         json['title'].should == new_title
         json['indent'].should == new_indent
 
-        tag = @module1.content_tags.find_by_id(json['id'])
+        tag = @module1.content_tags.where(id: json['id']).first
         tag.should_not be_nil
         tag.title.should == new_title
         tag.content_type.should == 'Assignment'
@@ -332,7 +332,7 @@ describe "Module Items API", type: :request do
 
         json['page_url'].should == wiki_page.url
 
-        tag = @module1.content_tags.find_by_id(json['id'])
+        tag = @module1.content_tags.where(id: json['id']).first
         tag.content_type.should == 'WikiPage'
         tag.content_id.should == wiki_page.id
       end
@@ -374,7 +374,7 @@ describe "Module Items API", type: :request do
 
         json['new_tab'].should == true
 
-        tag = @module1.content_tags.find_by_id(json['id'])
+        tag = @module1.content_tags.where(id: json['id']).first
         tag.new_tab.should == true
       end
 
@@ -389,7 +389,7 @@ describe "Module Items API", type: :request do
         json['type'].should == 'ExternalUrl'
         json['external_url'].should == new_url
 
-        tag = @module1.content_tags.find_by_id(json['id'])
+        tag = @module1.content_tags.where(id: json['id']).first
         tag.should_not be_nil
         tag.content_type.should == 'ExternalUrl'
         tag.url.should == new_url
@@ -408,7 +408,7 @@ describe "Module Items API", type: :request do
 
         json['position'].should == 3
 
-        tag = @module1.content_tags.find_by_id(json['id'])
+        tag = @module1.content_tags.where(id: json['id']).first
         tag.should_not be_nil
         tag.position.should == 3
 

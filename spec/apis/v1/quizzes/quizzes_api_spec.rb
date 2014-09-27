@@ -371,7 +371,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         # so register and enable it for these test
         Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
                 :settings => {:enabled => false}})
-        setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+        setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
         setting.settings = {:enabled => true}
         setting.save!
       end

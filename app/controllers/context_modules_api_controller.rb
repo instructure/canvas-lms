@@ -455,7 +455,7 @@ class ContextModulesApiController < ApplicationController
       return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
 
       module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
-      modules = @context.context_modules.not_deleted.find_all_by_id(module_ids)
+      modules = @context.context_modules.not_deleted.where(id: module_ids)
       return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
 
       completed_ids = []

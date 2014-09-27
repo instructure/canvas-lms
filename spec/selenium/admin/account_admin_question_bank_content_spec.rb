@@ -50,7 +50,7 @@ describe "account admin question bank" do
 
 
   def verify_added_question(name, question_text, chosen_question_type)
-    question = AssessmentQuestion.find_by_name(name)
+    question = AssessmentQuestion.where(name: name).first
     question.should be_present
     question_data = question.question_data
     question_data[:question_type].should == chosen_question_type
@@ -130,7 +130,7 @@ describe "account admin question bank" do
     wait_for_ajaximations
     submit_dialog("#move_question_dialog", '.submit_button')
     wait_for_ajaximations
-    question_bank_2.assessment_questions.find_by_name(@question.name).should be_present
+    question_bank_2.assessment_questions.where(name: @question.name).first.should be_present
   end
 
   it "should bookmark a question bank" do
@@ -150,7 +150,7 @@ describe "account admin question bank" do
     replace_content(question_bank_title, new_title)
     question_bank_title.send_keys(:return)
     wait_for_ajaximations
-    AssessmentQuestionBank.find_by_title(new_title).should be_present
+    AssessmentQuestionBank.where(title: new_title).first.should be_present
   end
 
   it "should delete a question bank" do
@@ -191,7 +191,7 @@ describe "account admin question bank" do
     end
 
     def move_questions_validation(bank_name, questions)
-      new_question_bank = AssessmentQuestionBank.find_by_title(bank_name)
+      new_question_bank = AssessmentQuestionBank.where(title: bank_name).first
       new_question_bank.should be_present
       new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
@@ -242,7 +242,7 @@ describe "account admin question bank" do
       add_outcome_to_bank(@outcome)
       fj("[data-id=#{@outcome.id}]:visible").should include_text("60%")
       @question_bank.reload.learning_outcome_alignments.count.should be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(0.6)
+      learning_outcome_tag = @question_bank.learning_outcome_alignments.where(mastery_score: 0.6).first
       learning_outcome_tag.should be_present
     end
 
@@ -251,7 +251,7 @@ describe "account admin question bank" do
       wait_for_ajax_requests
       add_outcome_to_bank(@outcome, 40)
       fj("[data-id=#{@outcome.id}]:visible .content").should include_text("mastery at 40%")
-      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.find_by_mastery_score(0.4)
+      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.where(mastery_score: 0.4).first
       learning_outcome_tag.should be_present
     end
 

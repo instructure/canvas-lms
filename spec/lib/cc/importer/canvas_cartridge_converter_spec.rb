@@ -75,20 +75,20 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     #compare settings
-    ag1_2 = @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag1))
+    ag1_2 = @copy_to.assignment_groups.where(migration_id: CC::CCHelper.create_key(ag1)).first
     ag1_2.name.should == ag1.name
     ag1_2.position.should == ag1.position
     ag1_2.group_weight.should == ag1.group_weight
     ag1_2.rules.should == ag1.rules
 
-    ag2_2 = @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag2))
+    ag2_2 = @copy_to.assignment_groups.where(migration_id: CC::CCHelper.create_key(ag2)).first
     ag2_2.name.should == ag2.name
     ag2_2.position.should == ag2.position
     ag2_2.group_weight.should == ag2.group_weight
     ag2_2.rules.should == "drop_lowest:2\ndrop_highest:5\n"
 
-    @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag3)).should_not be_nil
-    @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag4)).should be_nil
+    @copy_to.assignment_groups.where(migration_id: CC::CCHelper.create_key(ag3)).should be_exists
+    @copy_to.assignment_groups.where(migration_id: CC::CCHelper.create_key(ag4)).should_not be_exists
 
     #import assignment
     hash = {:migration_id=>CC::CCHelper.create_key(a),
@@ -150,7 +150,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
     
     #compare settings
-    t1 = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(tool1))
+    t1 = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(tool1)).first
     t1.url.should == tool1.url
     t1.name.should == tool1.name
     t1.description.should == tool1.description
@@ -191,7 +191,7 @@ describe "Canvas Cartridge importing" do
     t1.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
     t1.settings[:vendor_extensions].should == [] 
     
-    t2 = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(tool2))
+    t2 = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(tool2)).first
     t2.domain.should == tool2.domain
     t2.url.should == nil
     t2.name.should == tool2.name
@@ -240,7 +240,7 @@ describe "Canvas Cartridge importing" do
     Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
     @copy_to.save!
 
-    mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
+    mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
     mod1_2.content_tags.count.should == mod1.content_tags.count
     tag = mod1_2.content_tags.first
     tag.content_id.should == tool_to.id
@@ -274,7 +274,7 @@ describe "Canvas Cartridge importing" do
     Importers::ExternalFeedImporter.process_migration({'external_feeds'=>hash}, @migration)
     @copy_to.save!
   
-    ef_2 = @copy_to.external_feeds.find_by_migration_id(CC::CCHelper.create_key(ef))
+    ef_2 = @copy_to.external_feeds.where(migration_id: CC::CCHelper.create_key(ef)).first
     ef_2.url.should == ef.url
     ef_2.title.should == ef.title
     ef_2.feed_type.should == ef.feed_type
@@ -299,7 +299,7 @@ describe "Canvas Cartridge importing" do
     Importers::GradingStandardImporter.process_migration({'grading_standards'=>hash}, @migration)
     @copy_to.save!
   
-    gs_2 = @copy_to.grading_standards.find_by_migration_id(CC::CCHelper.create_key(gs))
+    gs_2 = @copy_to.grading_standards.where(migration_id: CC::CCHelper.create_key(gs)).first
     gs_2.title.should == gs.title
     gs_2.data.should == gs.data
   end
@@ -379,22 +379,22 @@ describe "Canvas Cartridge importing" do
     
     import_learning_outcomes
     
-    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.where(migration_id: CC::CCHelper.create_key(lo)).first
     lo_2.short_description.should == lo.short_description
     lo_2.description.should == lo.description
     lo_2.data.with_indifferent_access.should == lo.data.with_indifferent_access
     
-    lo2_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
+    lo2_2 = @copy_to.created_learning_outcomes.where(migration_id: CC::CCHelper.create_key(lo2)).first
     lo2_2.short_description.should == lo2.short_description
     lo2_2.description.should == lo2.description
     lo2_2.data.with_indifferent_access.should == lo2.data.with_indifferent_access
     
-    lo_g_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g))
+    lo_g_2 = @copy_to.learning_outcome_groups.where(migration_id: CC::CCHelper.create_key(lo_g)).first
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
     lo_g_2.child_outcome_links.length.should == 1
     
-    lo_g2_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g2))
+    lo_g2_2 = @copy_to.learning_outcome_groups.where(migration_id: CC::CCHelper.create_key(lo_g2)).first
     lo_g2_2.title.should == lo_g2.title
     lo_g2_2.description.should == lo_g2.description
     lo_g2_2.child_outcome_links.length.should == 0
@@ -434,13 +434,13 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     @copy_to.rubric_associations.count.should == 2
-    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.where(migration_id: CC::CCHelper.create_key(lo)).first
     lo_2.should_not be_nil
-    rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
+    rubric_2 = @copy_to.rubrics.where(migration_id: CC::CCHelper.create_key(rubric)).first
     rubric_2.title.should == rubric.title
     rubric_2.data[1][:learning_outcome_id].should == lo_2.id
 
-    rubric2_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric2))
+    rubric2_2 = @copy_to.rubrics.where(migration_id: CC::CCHelper.create_key(rubric2)).first
     rubric2_2.title.should == rubric2.title
   end
   
@@ -510,7 +510,7 @@ describe "Canvas Cartridge importing" do
     Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
     @copy_to.save!
     
-    mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
+    mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
     mod1_2.name.should == mod1.name
     mod1_2.unlock_at.to_i.should == mod1.unlock_at.to_i
     mod1_2.require_sequential_progress.should == mod1.require_sequential_progress
@@ -528,17 +528,17 @@ describe "Canvas Cartridge importing" do
     cr2 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
     cr2[:type].should == 'must_view'
     
-    mod2_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod2))
+    mod2_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod2)).first
     mod2_2.prerequisites.length.should == 1
     mod2_2.prerequisites.first.should == {:type=>"context_module", :name=>mod1_2.name, :id=>mod1_2.id}
     
-    mod3_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod3))
+    mod3_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod3)).first
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
     @migration.old_warnings_format.first.first.should == %{Import Error: Module Item - "Example 3"}
     
-    mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
+    mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
     mod4_2.content_tags.first.title.should == att_tag.title
     att_2.reload
     att_2.display_name.should == 'boring.txt'
@@ -572,7 +572,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
     
-    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     page_2.title.should == page.title
     page_2.url.should == page.url
     page_2.body.should == body_with_link % ([ @copy_to.id, attachment_import.id ] * 4)
@@ -630,7 +630,7 @@ describe "Canvas Cartridge importing" do
 
     ErrorReport.last.message.should =~ /nil wiki/
 
-    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     page_2.title.should == page.title
     page_2.url.should == page.url
     page_2.editing_roles.should == page.editing_roles
@@ -655,7 +655,7 @@ describe "Canvas Cartridge importing" do
     #import into new course
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
     
-    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     page_2.title.should == page.title
     page_2.url.should == page.url
     page_2.body.should match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
@@ -680,7 +680,7 @@ describe "Canvas Cartridge importing" do
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id
     asmnt.points_possible = 9.8
-    asmnt.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Whatever")
+    asmnt.assignment_group = @copy_from.assignment_groups.where(name: "Whatever").first_or_create
     asmnt.peer_reviews_due_at = 2.weeks.from_now
     asmnt.allowed_extensions = ["doc", "odt"]
     asmnt.unlock_at = 1.day.from_now
@@ -708,7 +708,7 @@ describe "Canvas Cartridge importing" do
     #import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
-    asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
+    asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     asmnt_2.title.should == asmnt.title
     asmnt_2.description.should == (body_with_link % @copy_to.id)
     asmnt_2.points_possible.should == asmnt.points_possible
@@ -747,7 +747,7 @@ describe "Canvas Cartridge importing" do
     #import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
-    asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
+    asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     asmnt_2.submission_types.should == "external_tool"
     
     asmnt_2.external_tool_tag.should_not be_nil
@@ -776,7 +776,7 @@ XML
     #import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
-    asmnt_2 = @copy_to.assignments.find_by_migration_id('ia24c092694901d2a5529c142accdaf0b')
+    asmnt_2 = @copy_to.assignments.where(migration_id: 'ia24c092694901d2a5529c142accdaf0b').first
     asmnt_2.submission_types.should == "external_tool"
     
     # the url was invalid so it won't be there
@@ -808,7 +808,7 @@ XML
     #import
     Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
 
-    dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
+    dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
     dt_2.delayed_post_at.to_i.should == dt.delayed_post_at.to_i
@@ -826,7 +826,7 @@ XML
     
     assignment = @copy_from.assignments.build
     assignment.submission_types = 'discussion_topic'
-    assignment.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Stupid Group")
+    assignment.assignment_group = @copy_from.assignment_groups.where(name: "Stupid Group").first_or_create
     assignment.title = dt.title
     assignment.points_possible = 13.37
     assignment.due_at = 1.week.from_now
@@ -848,7 +848,7 @@ XML
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
     #have assignment group ready:
-    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    @copy_to.assignment_groups.where(name: "Distractor").first_or_create
     ag1 = @copy_to.assignment_groups.new
     ag1.name = "Stupid Group"
     ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
@@ -856,7 +856,7 @@ XML
     #import
     Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
 
-    dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
+    dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
     dt_2.type.should == dt.type
@@ -881,7 +881,7 @@ XML
 
     assignment = @copy_from.assignments.build
     assignment.submission_types = 'discussion_topic'
-    assignment.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Stupid Group")
+    assignment.assignment_group = @copy_from.assignment_groups.where(name: "Stupid Group").first_or_create
     assignment.title = dt.title
     assignment.points_possible = 13.37
     assignment.due_at = 1.week.from_now
@@ -912,7 +912,7 @@ XML
     cm = ContentMigration.new(:context => @copy_to, :copy_options => {:everything => "1"})
     Importers::DiscussionTopicImporter.process_discussion_topics_migration([hash], cm)
 
-    dt_2 = group2.discussion_topics.find_by_migration_id(migration_id)
+    dt_2 = group2.discussion_topics.where(migration_id: migration_id).first
     dt_2.title.should == dt.title
     dt_2.message.should == body
     dt_2.type.should == dt.type
@@ -959,14 +959,14 @@ XML
                  "show_correct_answers"=>true}
     
     #have assignment group ready:
-    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    @copy_to.assignment_groups.where(name: "Distractor").first_or_create
     ag = @copy_to.assignment_groups.new
     ag.name = "Stupid Group"
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
     
     Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, nil, {})
-    q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
+    q = @copy_to.quizzes.where(migration_id: "ie3d8f8adfad423eb225229c539cdc450").first
     a = q.assignment
     a.assignment_group.id.should == ag.id
     q.assignment_group_id.should == ag.id
@@ -1026,8 +1026,8 @@ XML
     migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
     Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-    q = @copy_to.quizzes.find_by_migration_id("quizmigrationid")
-    a = @copy_to.assignments.find_by_migration_id("assignmentmigrationid")
+    q = @copy_to.quizzes.where(migration_id: "quizmigrationid").first
+    a = @copy_to.assignments.where(migration_id: "assignmentmigrationid").first
 
     q.assignment_id.should == a.id
     a.submission_types.should == "online_quiz"
@@ -1076,11 +1076,11 @@ XML
     migration.migration_settings[:migration_ids_to_import] = {copy: {'everything' => 1}}
     Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-    mo.media_tracks.find_by_locale('en').content.should eql('pretend this is a track file')
-    mo.media_tracks.find_by_locale('tlh').content.should eql("Qapla'")
+    mo.media_tracks.where(locale: 'en').first.content.should eql('pretend this is a track file')
+    mo.media_tracks.where(locale: 'tlh').first.content.should eql("Qapla'")
 
-    @copy_to.attachments.find_by_migration_id('abc').should be_deleted
-    @copy_to.attachments.find_by_migration_id('def').should be_deleted
+    @copy_to.attachments.where(migration_id: 'abc').first.should be_deleted
+    @copy_to.attachments.where(migration_id: 'def').first.should be_deleted
   end
 
   context "warnings for missing links in imported html" do
@@ -1175,7 +1175,7 @@ XML
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-      event = @copy_to.calendar_events.find_by_migration_id("id4bebe19c7b729e22543bed8a5a02dcb")
+      event = @copy_to.calendar_events.where(migration_id: "id4bebe19c7b729e22543bed8a5a02dcb").first
 
       migration.migration_issues.count.should == 1
       warning = migration.migration_issues.first
@@ -1228,8 +1228,8 @@ XML
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-      topic1 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b5224")
-      topic2 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b52242")
+      topic1 = @copy_to.discussion_topics.where(migration_id: "iaccaf448c9f5218ff2a89d1d846b5224").first
+      topic2 = @copy_to.discussion_topics.where(migration_id: "iaccaf448c9f5218ff2a89d1d846b52242").first
 
       migration.migration_issues.count.should == 2
 
@@ -1305,7 +1305,7 @@ XML
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-      wiki = @copy_to.wiki.wiki_pages.find_by_migration_id("i642b8969dbfa332fd96ec9029e96156a")
+      wiki = @copy_to.wiki.wiki_pages.where(migration_id: "i642b8969dbfa332fd96ec9029e96156a").first
       migration.migration_issues.count.should == 1
       warning = migration.migration_issues.first
       warning.issue_type.should == "warning"
@@ -1345,25 +1345,25 @@ describe "cc assignment extensions" do
   it "should parse canvas data from cc extension" do
     @migration.migration_issues.count.should == 0
 
-    att = @course.attachments.find_by_migration_id('ieee173de6109d169c627d07bedae0595')
+    att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
 
     # see common_cartridge_converter_spec
     # should get all the cc assignments
     @course.assignments.count.should == 3
-    assignment1 = @course.assignments.find_by_migration_id("icd613a5039d9a1539e100058efe44242")
+    assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
     assignment1.grading_type.should == 'pass_fail'
     assignment1.points_possible.should == 20
     assignment1.description.should include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
     assignment1.submission_types.should == "online_text_entry,online_url,media_recording,online_upload" # overridden
 
-    assignment2 = @course.assignments.find_by_migration_id("icd613a5039d9a1539e100058efe44242copy")
+    assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
     assignment2.grading_type.should == 'points'
     assignment2.points_possible.should == 21
     assignment2.description.should include('hi, the canvas meta stuff does not have submission types')
     assignment2.submission_types.should == "online_upload,online_text_entry,online_url"
 
     # and the canvas only one as well
-    assignment3 = @course.assignments.find_by_migration_id("ifb359e06083b6eb3a294a7ac2c69e451")
+    assignment3 = @course.assignments.where(migration_id: "ifb359e06083b6eb3a294a7ac2c69e451").first
     assignment3.description.should include("This is left to all custom canvas stuff.")
     assignment3.workflow_state.should == 'unpublished'
   end
@@ -1400,17 +1400,17 @@ describe "matching question reordering" do
     @migration.migration_issues.count.should == 2
     @course.assessment_questions.count.should == 3
 
-    broken1 = @course.assessment_questions.find_by_migration_id("m20b544d870a086de6e59b79e6dd9186cf_quiz_question")
+    broken1 = @course.assessment_questions.where(migration_id: "m20b544d870a086de6e59b79e6dd9186cf_quiz_question").first
     mi1 = @migration.migration_issues.detect{|mi| mi.description ==
         "Imported matching question contains images on both sides, which is unsupported"}
     mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text").should == true
 
-    broken2 = @course.assessment_questions.find_by_migration_id("m22b544d870a086de6e59b79e6dd9186be_quiz_question")
+    broken2 = @course.assessment_questions.where(migration_id: "m22b544d870a086de6e59b79e6dd9186be_quiz_question").first
     mi2 = @migration.migration_issues.detect{|mi| mi.description ==
         "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"}
     mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text").should == true
 
-    fixed = @course.assessment_questions.find_by_migration_id("m21e0c78d05b78dc312bbc0dc77b963781_quiz_question")
+    fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
     fixed.question_data[:answers].each do |answer|
       Nokogiri::HTML(answer[:left_html]).at_css("img").should be_present
       Nokogiri::HTML(answer[:right]).at_css("img").should be_blank

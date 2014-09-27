@@ -166,7 +166,7 @@ XML
     response.should be_success
     response.content_type.should == 'application/xml'
     Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content.should == failure_type
-    @assignment.submissions.find_by_user_id(@student.id).should be_nil
+    @assignment.submissions.where(user_id: @student).should_not be_exists
   end
 
   def check_success
@@ -186,13 +186,13 @@ XML
     end
     
     it "should allow updating the submission score" do
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      @assignment.submissions.where(user_id: @student).should_not be_exists
       make_call('body' => replace_result('0.6'))
       check_success
       
       verify_xml(response)
       
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.should be_present
       submission.should be_graded
       submission.should be_submitted_at
@@ -205,7 +205,7 @@ XML
       check_success
     
       verify_xml(response)
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.score.should == 12
       submission.body.should == "oioi"
     end
@@ -216,7 +216,7 @@ XML
       check_success
     
       verify_xml(response)
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.submission_type.should == 'online_text_entry'
       submission.body.should == text
     end
@@ -226,7 +226,7 @@ XML
       check_success
     
       verify_xml(response)
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.submission_type.should == 'online_url'
       submission.score.should == 12
       submission.url.should == "http://www.example.com/lti"
@@ -237,7 +237,7 @@ XML
       check_success
     
       verify_xml(response)
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.score.should == nil
       submission.body.should == "oioi"
     end
@@ -248,8 +248,8 @@ XML
       xml = Nokogiri::XML.parse(response.body)
       xml.at_css('imsx_codeMajor').content.should == 'failure'
       xml.at_css('imsx_description').content.should == "No score given"
-    
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+
+      @assignment.submissions.where(user_id: @student).should_not be_exists
     end
     
     it "should fail if bad score given" do
@@ -258,8 +258,8 @@ XML
       xml = Nokogiri::XML.parse(response.body)
       xml.at_css('imsx_codeMajor').content.should == 'failure'
       xml.at_css('imsx_description').content.should == "Score is not between 0 and 1"
-    
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+
+      @assignment.submissions.where(user_id: @student).should_not be_exists
     end
 
     it "should fail if assignment has no points possible" do
@@ -275,7 +275,7 @@ XML
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result('0.75', nil))
       response.should be_success
-      submissions = @assignment.submissions.find_all_by_user_id(@student.id)
+      submissions = @assignment.submissions.where(user_id: @student).to_a
       comments    = submissions.first.submission_comments
       submissions.count.should == 1
       comments.count.should == 1
@@ -286,7 +286,7 @@ to because the assignment has no points possible.
     end
 
     it "should reject out of bound scores" do
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      @assignment.submissions.where(user_id: @student).should_not be_exists
       make_call('body' => replace_result('-1'))
       check_failure('failure')
       make_call('body' => replace_result('1.1'))
@@ -294,19 +294,19 @@ to because the assignment has no points possible.
 
       make_call('body' => replace_result('0.0'))
       check_success
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.should be_present
       submission.score.should == 0
 
       make_call('body' => replace_result('1.0'))
       check_success
-      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission = @assignment.submissions.where(user_id: @student).first
       submission.should be_present
       submission.score.should == 20
     end
 
     it "should reject non-numeric scores" do
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      @assignment.submissions.where(user_id: @student).should_not be_exists
       make_call('body' => replace_result("OHAI SCORES"))
       check_failure('failure')
     end
@@ -476,27 +476,27 @@ to because the assignment has no points possible.
       response.content_type.should == 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
       xml.at_css('message_response > statusinfo > codemajor').content.should == failure_type
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      @assignment.submissions.where(user_id: @student).should_not be_exists
       xml
     end
 
     describe "basic-lis-updateresult" do
       it "should allow updating the submission score" do
-        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        @assignment.submissions.where(user_id: @student).should_not be_exists
         make_call('body' => update_result('0.6'))
         xml = check_success
 
         xml.at_css('message_response > result > sourcedid').content.should == source_id()
         xml.at_css('message_response > result > resultscore > resultvaluesourcedid').content.should == 'decimal'
         xml.at_css('message_response > result > resultscore > textstring').content.should == '0.6'
-        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission = @assignment.submissions.where(user_id: @student).first
         submission.should be_present
         submission.should be_graded
         submission.score.should == 12
       end
 
       it "should reject out of bound scores" do
-        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        @assignment.submissions.where(user_id: @student).should_not be_exists
         make_call('body' => update_result('-1'))
         check_failure('Failure')
         make_call('body' => update_result('1.1'))
@@ -504,19 +504,19 @@ to because the assignment has no points possible.
 
         make_call('body' => update_result('0.0'))
         check_success
-        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission = @assignment.submissions.where(user_id: @student).first
         submission.should be_present
         submission.score.should == 0
 
         make_call('body' => update_result('1.0'))
         check_success
-        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission = @assignment.submissions.where(user_id: @student).first
         submission.should be_present
         submission.score.should == 20
       end
 
       it "should reject non-numeric scores" do
-        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        @assignment.submissions.where(user_id: @student).should_not be_exists
         make_call('body' => update_result("OHAI SCORES"))
         check_failure('Failure')
       end
@@ -525,7 +525,7 @@ to because the assignment has no points possible.
         make_call('body' => update_result('1.0'))
 
         check_success
-        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission = @assignment.submissions.where(user_id: @student).first
         submission.grader_id.should be_nil
       end
     end

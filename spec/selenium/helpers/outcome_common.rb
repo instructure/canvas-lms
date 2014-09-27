@@ -130,7 +130,7 @@ def should_create_a_learning_outcome_with_a_new_rating_root_level
                                         "Does Not Meet Expectations\n0 Points"]
   f('table.criterion .total').text.should == "Total Points\n5 Points"
   # db
-  LearningOutcome.find_by_short_description(outcome_name).should be_present
+  LearningOutcome.where(short_description: outcome_name).first.should be_present
 end
 
 def should_create_a_learning_outcome_nested
@@ -171,7 +171,7 @@ def should_create_a_learning_outcome_nested
   # should show outcome in main content window
   f(".outcomes-content .title").text.should == outcome_name
   # db
-  LearningOutcome.find_by_short_description(outcome_name).should be_present
+  LearningOutcome.where(short_description: outcome_name).first.should be_present
 end
 
 def should_edit_a_learning_outcome_and_delete_a_rating
@@ -209,7 +209,7 @@ def should_edit_a_learning_outcome_and_delete_a_rating
   ratings.map { |r| r.text }.should == ["Lame\n1 Points"]
   f('table.criterion .total').text.should == "Total Points\n1 Points"
 # db
-  LearningOutcome.find_by_short_description(edited_title).should be_present
+  LearningOutcome.where(short_description: edited_title).first.should be_present
 end
 
 def should_delete_a_learning_outcome
@@ -230,7 +230,7 @@ def should_delete_a_learning_outcome
   ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
   f('.outcomes-content .title').text.should == 'Setting up Outcomes'
   # db
-  LearningOutcome.find_by_id(@outcome.id).workflow_state.should == 'deleted'
+  LearningOutcome.where(id: @outcome).first.workflow_state.should == 'deleted'
   refresh_page # to make sure it was correctly deleted
   ff('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
 end
@@ -291,7 +291,7 @@ def should_create_an_outcome_group_root_level
   # title
   f(".outcomes-content .title").text.should == group_title
   # db
-  LearningOutcomeGroup.find_by_title(group_title).should be_present
+  LearningOutcomeGroup.where(title: group_title).first.should be_present
 end
 
 def should_create_a_learning_outcome_with_a_new_rating_nested
@@ -332,7 +332,7 @@ def should_create_a_learning_outcome_with_a_new_rating_nested
   # should show group in main content window
   f(".outcomes-content .title").text.should == nested_group_title
   # db
-  LearningOutcomeGroup.find_by_title(nested_group_title).should be_present
+  LearningOutcomeGroup.where(title: nested_group_title).first.should be_present
 end
 
 def should_edit_an_outcome_group
@@ -360,7 +360,7 @@ def should_edit_an_outcome_group
   # title
   f(".outcomes-content .title").text.should == edited_title
   # db
-  LearningOutcomeGroup.find_by_title(edited_title).should be_present
+  LearningOutcomeGroup.where(title: edited_title).first.should be_present
 end
 
 def should_delete_an_outcome_group
@@ -381,7 +381,7 @@ def should_delete_an_outcome_group
   ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
   fj('.outcomes-content .title').text.should == "Setting up Outcomes"
   # db
-  LearningOutcomeGroup.find_by_id(@outcome_group.id).workflow_state.should == 'deleted'
+  LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state.should == 'deleted'
   refresh_page # to make sure it was correctly deleted
   ffj('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
 end

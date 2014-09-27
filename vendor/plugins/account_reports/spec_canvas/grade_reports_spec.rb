@@ -22,10 +22,10 @@ describe "Default Account Reports" do
   include ReportSpecHelper
 
   before(:each) do
-    Notification.find_or_create_by_name("Report Generated")
-    Notification.find_or_create_by_name("Report Generation Failed")
+    Notification.where(name: "Report Generated").first_or_create
+    Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @default_term = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
+    @default_term = @account.default_enrollment_term
   end
 
   # The report should get all the grades for the term provided

@@ -307,9 +307,7 @@ class Quizzes::QuizzesController < ApplicationController
       @banks_hash = {}
       bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)
       unless bank_ids.empty?
-        AssessmentQuestionBank.active.find_all_by_id(bank_ids).compact.each do |bank|
-          @banks_hash[bank.id] = bank
-        end
+        @banks_hash = AssessmentQuestionBank.active.where(id: bank_ids).index_by(&:id)
       end
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
@@ -467,7 +465,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def publish
     if authorized_action(@context, @current_user, :manage_assignments)
-      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact
+      @quizzes = @context.quizzes.active.where(id: params[:quizzes])
       @quizzes.each(&:publish!)
 
       flash[:notice] = t('notices.quizzes_published',
@@ -485,7 +483,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def unpublish
     if authorized_action(@context, @current_user, :manage_assignments)
-      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| q.available? }
+      @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select{|q| q.available? }
       @quizzes.each(&:unpublish!)
 
       flash[:notice] = t('notices.quizzes_unpublished',

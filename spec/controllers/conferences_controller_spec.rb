@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ConferencesController do
   before :once do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     course_with_teacher(active_all: true, user: user_with_pseudonym(active_all: true))
     student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
@@ -75,7 +75,7 @@ describe ConferencesController do
 
     it "should not list conferences that use a disabled plugin" do
       user_session(@teacher)
-      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
 
       @conference = @course.web_conferences.create!(:conference_type => 'AdobeConnect', :duration => 60, :user => @teacher)

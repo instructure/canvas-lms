@@ -28,7 +28,7 @@ module Api
 
         context "for user context attachment links" do
           before do
-            Attachment.stubs(:find_by_id).with("1").returns(stub(context_type: "User"))
+            Attachment.stubs(:where).with(id: "1").returns(stub(first: stub(context_type: "User")))
           end
 
           it 'returns the raw string for a user content link' do
@@ -44,7 +44,7 @@ module Api
 
         it 'strips out verifiers for Course links and scopes them to the course' do
           course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:find_by_id).with("1").returns(course_attachment)
+          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
           raw_link = "/files/1/download?verifier=123"
           Link.new(raw_link).to_corrected_s.should == "/courses/1/files/1/download?"
         end

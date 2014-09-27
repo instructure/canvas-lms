@@ -114,7 +114,7 @@ describe DeveloperKeysController, type: :request do
                     {:controller => 'developer_keys', :action => 'destroy', :format => 'json',
                      :id => key.id.to_s})
     
-    DeveloperKey.find_by_id(key.id).should be_nil
+    DeveloperKey.where(id: key).should_not be_exists
   end
   
   def unauthorized_api_call(*args)

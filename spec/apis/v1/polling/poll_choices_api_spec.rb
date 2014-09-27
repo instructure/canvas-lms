@@ -270,7 +270,7 @@ describe Polling::PollChoicesController, type: :request do
         delete_destroy
 
         response.code.should == '204'
-        Polling::PollChoice.find_by_id(@poll_choice.id).should be_nil
+        Polling::PollChoice.where(id: @poll_choice).should_not be_exists
       end
     end
 
@@ -280,7 +280,7 @@ describe Polling::PollChoicesController, type: :request do
         delete_destroy
 
         response.code.should == '401'
-        Polling::PollChoice.find_by_id(@poll_choice.id).should == @poll_choice
+        Polling::PollChoice.where(id: @poll_choice).first.should == @poll_choice
       end
     end
   end

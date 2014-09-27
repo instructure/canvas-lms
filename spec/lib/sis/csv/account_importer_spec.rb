@@ -60,19 +60,19 @@ describe SIS::CSV::AccountImporter do
     )
     Account.count.should == before_count + 4
 
-    a1 = @account.sub_accounts.find_by_sis_source_id('A001')
+    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     a1.should_not be_nil
     a1.parent_account_id.should == @account.id
     a1.root_account_id.should == @account.id
     a1.name.should == 'Humanities'
 
-    a2 = a1.sub_accounts.find_by_sis_source_id('A002')
+    a2 = a1.sub_accounts.where(sis_source_id: 'A002').first
     a2.should_not be_nil
     a2.parent_account_id.should == a1.id
     a2.root_account_id.should == @account.id
     a2.name.should == 'English'
 
-    a3 = a2.sub_accounts.find_by_sis_source_id('A003')
+    a3 = a2.sub_accounts.where(sis_source_id: 'A003').first
     a3.should_not be_nil
     a3.parent_account_id.should == a2.id
     a3.root_account_id.should == @account.id
@@ -91,10 +91,10 @@ describe SIS::CSV::AccountImporter do
     Account.count.should == before_count + 4
 
     ['A001', 'A002', 'A003', 'A004'].each do |id|
-      Account.find_by_sis_source_id(id).parent_account.should == @account
+      Account.where(sis_source_id: id).first.parent_account.should == @account
     end
-    Account.find_by_sis_source_id('A002').workflow_state.should == "deleted"
-    Account.find_by_sis_source_id('A003').name.should == "English Literature"
+    Account.where(sis_source_id: 'A002').first.workflow_state.should == "deleted"
+    Account.where(sis_source_id: 'A003').first.name.should == "English Literature"
 
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -104,17 +104,17 @@ describe SIS::CSV::AccountImporter do
     )
     Account.count.should == before_count + 4
 
-    a1 = Account.find_by_sis_source_id('A001')
-    a2 = Account.find_by_sis_source_id('A002')
-    a3 = Account.find_by_sis_source_id('A003')
-    a4 = Account.find_by_sis_source_id('A004')
+    a1 = Account.where(sis_source_id: 'A001').first
+    a2 = Account.where(sis_source_id: 'A002').first
+    a3 = Account.where(sis_source_id: 'A003').first
+    a4 = Account.where(sis_source_id: 'A004').first
     a1.parent_account.should == @account
     a2.parent_account.should == a1
     a3.parent_account.should == a2
     a4.parent_account.should == a2
 
-    Account.find_by_sis_source_id('A002').workflow_state.should == "deleted"
-    Account.find_by_sis_source_id('A003').name.should == "English Literature"
+    Account.where(sis_source_id: 'A002').first.workflow_state.should == "deleted"
+    Account.where(sis_source_id: 'A003').first.name.should == "English Literature"
 
   end
 
@@ -123,12 +123,12 @@ describe SIS::CSV::AccountImporter do
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active"
     )
-    Account.find_by_sis_source_id('A001').name.should == "Humanities"
+    Account.where(sis_source_id: 'A001').first.name.should == "Humanities"
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Math,active"
     )
-    Account.find_by_sis_source_id('A001').tap do |a|
+    Account.where(sis_source_id: 'A001').first.tap do |a|
       a.name.should == "Math"
       a.name = "Science"
       a.save!
@@ -137,7 +137,7 @@ describe SIS::CSV::AccountImporter do
       "account_id,parent_account_id,name,status",
       "A001,,History,active"
     )
-    Account.find_by_sis_source_id('A001').name.should == "Science"
+    Account.where(sis_source_id: 'A001').first.name.should == "Science"
   end
 
   it 'should match headers case-insensitively' do
@@ -148,7 +148,7 @@ describe SIS::CSV::AccountImporter do
     )
     Account.count.should == before_count + 1
 
-    a1 = @account.sub_accounts.find_by_sis_source_id('A001')
+    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     a1.should_not be_nil
     a1.parent_account_id.should == @account.id
     a1.root_account_id.should == @account.id

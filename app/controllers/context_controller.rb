@@ -315,7 +315,7 @@ class ContextController < ApplicationController
       @entries = []
       @topics.each do |topic|
         @entries << topic if topic.user_id == @user.id
-        @entries.concat topic.discussion_entries.active.find_all_by_user_id(@user.id)
+        @entries.concat topic.discussion_entries.active.where(user_id: @user)
       end
       @entries = @entries.sort_by {|e| e.created_at }
       @enrollments = @context.enrollments.for_user(@user) rescue []

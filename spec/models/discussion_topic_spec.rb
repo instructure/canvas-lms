@@ -806,7 +806,7 @@ describe DiscussionTopic do
       topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
       topic.discussion_entries.create!(:message => "student message for grading", :user => @student)
 
-      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions = Submission.where(user_id: @student, assignment_id: assignment).to_a
       submissions.count.should == 1
       student_submission = submissions.first
       assignment.grade_student(@student, {:grade => 9})
@@ -814,7 +814,7 @@ describe DiscussionTopic do
       student_submission.workflow_state.should == 'graded'
 
       topic.discussion_entries.create!(:message => "student message 2 for grading", :user => @student)
-      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions = Submission.where(user_id: @student, assignment_id: assignment).to_a
       submissions.count.should == 1
       student_submission = submissions.first
       student_submission.workflow_state.should == 'graded'

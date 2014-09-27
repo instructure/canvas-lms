@@ -79,7 +79,7 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1,available",
       "G002,,Group 2,available")
     Group.count.should == 2
-    Group.find_by_sis_source_id('G001').update_attribute(:name, 'Group 1-1')
+    Group.where(sis_source_id: 'G001').first.update_attribute(:name, 'Group 1-1')
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1-b,available",

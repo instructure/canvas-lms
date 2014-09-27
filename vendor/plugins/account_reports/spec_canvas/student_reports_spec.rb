@@ -22,8 +22,8 @@ describe 'Student reports' do
   include ReportSpecHelper
 
   before do
-    Notification.find_or_create_by_name('Report Generated')
-    Notification.find_or_create_by_name('Report Generation Failed')
+    Notification.where(name: "Report Generated").first_or_create
+    Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @course1 = course(:course_name => 'English 101', :account => @account,
                       :active_course => true)

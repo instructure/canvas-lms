@@ -5,7 +5,7 @@ describe "account admin courses tab" do
 
   def add_course(course_name, has_student = false)
     Account.default.courses.create(:name => course_name).offer!
-    course = Course.find_by_name(course_name)
+    course = Course.where(name: course_name).first
     if (has_student)
       user = User.create(:name => "student 1")
       course.enroll_user(user, "StudentEnrollment", {:enrollment_state => "active"})
@@ -41,7 +41,7 @@ describe "account admin courses tab" do
         f("#course_course_code").send_keys(course_code)
         submit_form("#add_course_form")
         refresh_page # we need to refresh the page so the course shows up
-        course = Course.find_by_name(course_name)
+        course = Course.where(name: course_name).first
         course.should be_present
         course.course_code.should == course_code
         f("#course_#{course.id}").should be_displayed

@@ -135,7 +135,6 @@ describe "Admins API", type: :request do
     context "with AccountAdmin membership" do
       before :once do
         @au = @account.account_users.create! :user => @new_user
-        @account.account_users.find_by_user_id(@new_user.id).should_not be_nil
       end
 
       it "should remove AccountAdmin membership implicitly" do
@@ -144,12 +143,12 @@ describe "Admins API", type: :request do
         json['id'].should == @au.id
         json['role'].should == 'AccountAdmin'
         json['status'].should == 'deleted'
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        @account.account_users.where(user_id: @new_user).should_not be_exists
       end
 
       it "should remove AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        @account.account_users.where(user_id: @new_user).should_not be_exists
       end
 
       it "should 404 if the user doesn't exist" do
@@ -163,7 +162,7 @@ describe "Admins API", type: :request do
       it "should work by sis user id" do
         api_call(:delete, @base_path + "sis_user_id:badmin",
                  @path_opts.merge(:user_id => "sis_user_id:badmin"))
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        @account.account_users.where(user_id: @new_user).should_not be_exists
       end
     end
 
@@ -174,17 +173,17 @@ describe "Admins API", type: :request do
 
       it "should remove a custom membership from a user" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should be_nil
+        @account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin').should_not be_exists
       end
 
       it "should 404 if the membership type doesn't exist" do
         api_call(:delete, @path + "?role=Blah", @path_opts.merge(:role => "Blah"), {}, {}, :expected_status => 404)
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should_not be_nil
+        @account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin').should be_exists
       end
 
       it "should 404 if the membership type isn't specified" do
         api_call(:delete, @path, @path_opts, {}, {}, :expected_status => 404)
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should_not be_nil
+        @account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin').should be_exists
       end
     end
 
@@ -196,17 +195,17 @@ describe "Admins API", type: :request do
 
       it "should leave the AccountAdmin membership alone when deleting the custom membership" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["AccountAdmin"]
+        @account.account_users.where(user_id: @new_user).pluck(:membership_type).should == ["AccountAdmin"]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership implicitly" do
         api_call(:delete, @path, @path_opts)
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["CustomAdmin"]
+        @account.account_users.where(user_id: @new_user).pluck(:membership_type).should == ["CustomAdmin"]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["CustomAdmin"]
+        @account.account_users.where(user_id: @new_user).pluck(:membership_type).should == ["CustomAdmin"]
       end
     end
   end

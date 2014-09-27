@@ -25,7 +25,7 @@ include Api
 describe "Conferences API", type: :request do
   before :once do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     @category_path_options = { :controller => "conferences", :format => "json" }
     course_with_teacher(:active_all => true)
@@ -54,7 +54,7 @@ describe "Conferences API", type: :request do
     end
 
     it "should not list conferences for disabled plugins" do
-      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
       @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
                                                                                          :duration => 60,

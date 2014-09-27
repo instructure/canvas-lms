@@ -565,7 +565,7 @@ describe Quizzes::QuizSubmission do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
-      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results = @outcome.learning_outcome_results.where(user_id: @user).to_a
       @results.length.should eql(2)
       @results = @results.sort_by(&:associated_asset_id)
       @results.first.associated_asset.should eql(@q1.assessment_question)
@@ -596,7 +596,7 @@ describe Quizzes::QuizSubmission do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
-      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results = @outcome.learning_outcome_results.where(user_id: @user).to_a
       @results.length.should eql(2)
       @results = @results.sort_by(&:associated_asset_id)
       @results.first.associated_asset.should eql(@q1.assessment_question)
@@ -613,7 +613,7 @@ describe Quizzes::QuizSubmission do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
-      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results = @outcome.learning_outcome_results.where(user_id: @user).to_a
       @results.length.should eql(2)
       @results = @results.sort_by(&:associated_asset_id)
       @results.first.associated_asset.should eql(@q1.assessment_question)

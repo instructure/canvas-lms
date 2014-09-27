@@ -124,7 +124,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_6,designer,S001,active,,,",
       "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
     )
-    course = @account.courses.find_by_sis_source_id("test_1")
+    course = @account.courses.where(sis_source_id: "test_1").first
     course.teachers.map(&:name).should be_include("User Uno")
     course.students.first.name.should == "User Dos"
     course.tas.first.name.should == "User Tres"
@@ -154,7 +154,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,,active,,1985-08-24,2011-08-29"
     )
-    course = @account.courses.find_by_sis_source_id("test_1")
+    course = @account.courses.where(sis_source_id: "test_1").first
     course.teacher_enrollments.first.tap do |e|
       e.start_at.should == DateTime.parse("1985-08-24")
       e.end_at.should == DateTime.parse("2011-08-29")
@@ -179,9 +179,9 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,TC 101,Test Course 101,,,active",
       "test_2,TC 102,Test Course 102,,,active"
     )
-    bad_course = @account.courses.find_by_sis_source_id("test_1")
+    bad_course = @account.courses.where(sis_source_id: "test_1").first
     bad_course.course_sections.length.should == 0
-    good_course = @account.courses.find_by_sis_source_id("test_2")
+    good_course = @account.courses.where(sis_source_id: "test_2").first
     good_course.course_sections.length.should == 0
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -227,16 +227,16 @@ describe SIS::CSV::EnrollmentImporter do
       ",user_5,student,S201,active,",
       ",user_6,student,S202,active,"
     )
-    course1 = @account.courses.find_by_sis_source_id("test_1")
-    course2 = @account.courses.find_by_sis_source_id("test_2")
+    course1 = @account.courses.where(sis_source_id: "test_1").first
+    course2 = @account.courses.where(sis_source_id: "test_2").first
     course1.default_section.users.first.name.should == "User Uno"
-    section1_1 = course1.course_sections.find_by_sis_source_id("S101")
+    section1_1 = course1.course_sections.where(sis_source_id: "S101").first
     section1_1.users.first.name.should == "User Dos"
-    section1_2 = course1.course_sections.find_by_sis_source_id("S102")
+    section1_2 = course1.course_sections.where(sis_source_id: "S102").first
     section1_2.users.first.name.should == "User Tres"
-    section2_1 = course2.course_sections.find_by_sis_source_id("S201")
+    section2_1 = course2.course_sections.where(sis_source_id: "S201").first
     section2_1.users.map(&:name).sort.should == ["User Cuatro", "User Cinco"].sort
-    section2_2 = course2.course_sections.find_by_sis_source_id("S202")
+    section2_2 = course2.course_sections.where(sis_source_id: "S202").first
     section2_2.users.first.name.should == "User Seis"
 
     # exercise batch updating account associations
@@ -322,7 +322,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,deleted,"
     )
-    @course = Course.find_by_sis_source_id('test_1')
+    @course = Course.where(sis_source_id: 'test_1').first
     scope = Enrollment.where(:course_id => @course)
     scope.count.should == 1
     @enrollment = scope.first
@@ -350,9 +350,9 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,active,",
       "test_1,user_1,teacher,,active,"
     )
-    @course = Course.find_by_sis_source_id('test_1')
+    @course = Course.where(sis_source_id: 'test_1').first
     @course.enrollments.count.should == 2
-    @user = Pseudonym.find_by_sis_user_id('user_1').user
+    @user = Pseudonym.where(sis_user_id: 'user_1').first.user
     @course.enrollments.map(&:user).should == [@user, @user]
   end
 
@@ -374,11 +374,11 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,observer_1,observer,,active,user_1",
       "test_1,observer_1,observer,,active,user_2"
     )
-    @course = Course.find_by_sis_source_id('test_1')
+    @course = Course.where(sis_source_id: 'test_1').first
     @course.enrollments.count.should == 4
-    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
-    @user1 = Pseudonym.find_by_sis_user_id('user_1').user
-    @user2 = Pseudonym.find_by_sis_user_id('user_2').user
+    @observer = Pseudonym.where(sis_user_id: 'observer_1').first.user
+    @user1 = Pseudonym.where(sis_user_id: 'user_1').first.user
+    @user2 = Pseudonym.where(sis_user_id: 'user_2').first.user
     @course.observer_enrollments.map(&:user).should == [@observer, @observer]
     @course.observer_enrollments.map(&:associated_user_id).sort.should == [@user1.id, @user2.id].sort
   end
@@ -400,8 +400,8 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,active,",
       "test_2,user_1,student,,active,"
     )
-    @course1 = Course.find_by_sis_source_id('test_1')
-    @course2 = Course.find_by_sis_source_id('test_2')
+    @course1 = Course.where(sis_source_id: 'test_1').first
+    @course2 = Course.where(sis_source_id: 'test_2').first
     @course1.default_section.crosslist_to_course(@course2)
     @course2.course_sections.count.should == 2
 
@@ -430,11 +430,11 @@ describe SIS::CSV::EnrollmentImporter do
         "test_1,observer_1,observer,,active,user_1",
         "test_1,user_2,student,,active,"
     )
-    @course = Course.find_by_sis_source_id('test_1')
+    @course = Course.where(sis_source_id: 'test_1').first
     @course.enrollments.count.should == 3
-    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
-    @user1 = Pseudonym.find_by_sis_user_id('user_1').user
-    @user2 = Pseudonym.find_by_sis_user_id('user_2').user
+    @observer = Pseudonym.where(sis_user_id: 'observer_1').first.user
+    @user1 = Pseudonym.where(sis_user_id: 'user_1').first.user
+    @user2 = Pseudonym.where(sis_user_id: 'user_2').first.user
 
     @observer.enrollments.size.should == 1
     observer_enrollment = @observer.enrollments.first
@@ -463,7 +463,7 @@ describe SIS::CSV::EnrollmentImporter do
         "test_1,observer_1,observer,,active,user_1"
     )
 
-    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
+    @observer = Pseudonym.where(sis_user_id: 'observer_1').first.user
     @observer.enrollments.count.should == 1
 
     process_csv_data_cleanly(

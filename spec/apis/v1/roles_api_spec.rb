@@ -186,7 +186,7 @@ describe "Roles API", type: :request do
                                    'post_to_forum' => { 'explicit' => 'false' },
                                    'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' }} })
       @account.reload
-      overrides = @account.role_overrides.find_all_by_enrollment_type('WeirdStudent').index_by(&:permission)
+      overrides = @account.role_overrides.where(enrollment_type: 'WeirdStudent').index_by(&:permission)
       overrides['read_forum'].enabled.should be_true
       overrides['read_forum'].locked.should be_false
       overrides['moderate_forum'].enabled.should be_false
@@ -238,12 +238,12 @@ describe "Roles API", type: :request do
 
         @account.reload
         @account.roles.active.map(&:name).should include(@role)
-        @account.roles.find_by_name(@role).workflow_state.should == 'active'
+        @account.roles.where(name: @role).first.workflow_state.should == 'active'
         json['workflow_state'].should == 'active'
       end
 
       it "should recycle a deleted role" do
-        course_role = @account.roles.find_by_name!(@role)
+        course_role = @account.roles.where(name: @role).first!
         course_role.destroy
         @account.roles.active.map(&:name).should_not be_include @role
 
@@ -253,7 +253,7 @@ describe "Roles API", type: :request do
                         { :role => @role, :base_role_type => 'TeacherEnrollment'})
 
         course_role.reload
-        @account.roles.active.find_by_name!(@role).should == course_role
+        @account.roles.active.where(name: @role).first!.should == course_role
         course_role.should be_active
         course_role.deleted_at.should be_nil
         course_role.base_role_type.should == 'TeacherEnrollment'
@@ -261,17 +261,17 @@ describe "Roles API", type: :request do
       end
 
       it "should discard old role overrides when recycling a deleted role" do
-        course_role = @account.roles.find_by_name!(@role)
+        course_role = @account.roles.where(name: @role).first!
         course_role.destroy
         @account.roles.active.map(&:name).should_not be_include @role
-        @account.reload.role_overrides.find_all_by_enrollment_type(@role).map(&:permission).should == %w(read_reports)
+        @account.reload.role_overrides.where(enrollment_type: @role).pluck(:permission).should == %w(read_reports)
 
         api_call(:post, "/api/v1/accounts/#{@account.id}/roles",
                   { :controller => 'role_overrides', :action => 'add_role',
                     :format => 'json', :account_id => @account.id.to_param },
                   { :role => @role, :base_role_type => 'StudentEnrollment',
                     :permissions => { 'manage_calendar' => { :enabled => '1', :explicit => '1' }} })
-        @account.reload.role_overrides.find_all_by_enrollment_type(@role).map(&:permission).should == %w(manage_calendar)
+        @account.reload.role_overrides.where(enrollment_type: @role).pluck(:permission).should == %w(manage_calendar)
       end
     end
 
@@ -352,7 +352,7 @@ describe "Roles API", type: :request do
     it "should create the override if explicit is 1 and enabled has a value" do
       api_call_with_settings(:explicit => '1', :enabled => '0')
       @account.role_overrides(true).size.should == @initial_count + 1
-      override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
       override.enabled.should be_false
     end
@@ -360,7 +360,7 @@ describe "Roles API", type: :request do
     it "should create an override for course-level roles" do
       api_call_with_settings(:base_role_type => 'TeacherEnrollment', :explicit => '1', :enabled => '0')
       @account.role_overrides(true).size.should == @initial_count + 1
-      override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
       override.enabled.should be_false
     end
@@ -368,14 +368,14 @@ describe "Roles API", type: :request do
     it "should create the override if enabled is nil but locked is 1" do
       api_call_with_settings(:locked => '1')
       @account.role_overrides(true).size.should == @initial_count + 1
-      override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
       override.locked.should be_true
     end
 
     it "should only set the parts that are specified" do
       api_call_with_settings(:explicit => '1', :enabled => '0')
-      override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
       override.enabled.should be_false
       override.locked.should be_nil
@@ -386,7 +386,7 @@ describe "Roles API", type: :request do
       r.save!
 
       api_call_with_settings(:locked => '1')
-      override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
       override.enabled.should be_nil
       override.locked.should be_true
@@ -405,10 +405,10 @@ describe "Roles API", type: :request do
             restricted_permission => { :explicit => '1', :enabled => '1' } } })
 
       @account.role_overrides(true).size.should == @initial_count + 1 # not 2
-      override = @account.role_overrides.find_by_permission_and_enrollment_type(restricted_permission, @role)
+      override = @account.role_overrides.where(permission: restricted_permission, enrollment_type: @role).first
       override.should be_nil
 
-      override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+      override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
       override.should_not be_nil
     end
 
@@ -523,7 +523,7 @@ describe "Roles API", type: :request do
           { :permissions =>
             { :read_forum => { :explicit => 1, :enabled => 0 }}},
             {}, { :expected_status => 404 })
-        RoleOverride.find_all_by_enrollment_type('nonexistent').should be_empty
+        RoleOverride.where(enrollment_type: 'nonexistent').should_not be_exists
       end
 
       it "should be able to change permissions for account admins" do
@@ -560,7 +560,7 @@ describe "Roles API", type: :request do
 
         @account.reload
 
-        override = @account.role_overrides.find_by_permission_and_enrollment_type('read_question_banks', role_name)
+        override = @account.role_overrides.where(permission: 'read_question_banks', enrollment_type: role_name).first
         override.should be_nil
       end
     end

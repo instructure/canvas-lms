@@ -741,8 +741,7 @@ RSpec.configure do |config|
 
   def custom_role(base, name, opts={})
     account = opts[:account] || @account
-    role = account.roles.find_by_name(name)
-    role ||= account.roles.create :name => name
+    role = account.roles.where(name: name).first_or_initialize
     role.base_role_type = base
     role.save!
     role
@@ -806,7 +805,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -831,7 +830,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }

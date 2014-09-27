@@ -126,7 +126,7 @@ class GradebooksController < ApplicationController
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
       @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @submissions = @context.submissions.find_all_by_user_id(@enrollment.user_id)
+      @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
       @user = @enrollment.user
       render :action => "student_attendance"
       # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment

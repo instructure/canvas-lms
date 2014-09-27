@@ -32,7 +32,7 @@ describe "Standard Common Cartridge importing" do
       a = @course.assignments.first
       a.title.should == 'Cool Assignment'
       a.points_possible.should == 11
-      att = @course.attachments.find_by_migration_id("extensionresource1")
+      att = @course.attachments.where(migration_id: "extensionresource1").first
       a.description.gsub("\n", '').should == "<p>You should turn this in for points.</p><ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"
     end
@@ -111,13 +111,13 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import supported variant" do
-      @course.assignments.find_by_migration_id('Resource1').should_not be_nil
+      @course.assignments.where(migration_id: 'Resource1').should be_exists
       @course.assignments.count.should == 1
     end
 
     it "should ignore non-preferred variant" do
-      @course.discussion_topics.find_by_migration_id('Resource2').should be_nil
-      @course.discussion_topics.find_by_migration_id('Resource10').should be_nil
+      @course.discussion_topics.where(migration_id: 'Resource2').should_not be_exists
+      @course.discussion_topics.where(migration_id: 'Resource10').should_not be_exists
       @course.discussion_topics.count.should == 2
     end
 

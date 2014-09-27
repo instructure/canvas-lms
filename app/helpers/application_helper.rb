@@ -373,7 +373,7 @@ module ApplicationHelper
 
   def active_external_tool_by_id(tool_id)
     # don't use for groups. they don't have account_chain_ids
-    tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
+    tool = @context.context_external_tools.active.where(tool_id: tool_id).first
     return tool if tool
 
     # account_chain_ids is in the order we need to search for tools

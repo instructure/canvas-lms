@@ -175,7 +175,7 @@ describe "site admin jobs ui" do
         filter_jobs(FlavorTags::FUTURE)
         f("#jobs-refresh").click
         wait_for_ajax_requests
-        job = Delayed::Job.find_by_tag("String#capitalize")
+        job = Delayed::Job.where(tag: "String#capitalize").first
         f("#jobs-grid .l0").text.should == job.id.to_s
       end
 

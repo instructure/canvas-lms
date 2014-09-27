@@ -349,7 +349,7 @@ describe EnrollmentsApiController, type: :request do
           sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
           course(:account => sub_account)
 
-          @course.account.roles.active.find_by_name('newrole').should be_nil
+          @course.account.roles.active.where(name: 'newrole').should_not be_exists
           @course.account.get_course_role('newrole').should_not be_nil
 
           @path = "/api/v1/courses/#{@course.id}/enrollments"

@@ -63,7 +63,7 @@ describe SIS::CSV::AbstractCourseImporter do
     AbstractCourse.last.tap do |c|
       c.name.should == "Humanities"
       c.short_name.should == "Hum101"
-      c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T001')
+      c.enrollment_term.should == EnrollmentTerm.where(sis_source_id: 'T001').first
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -73,10 +73,10 @@ describe SIS::CSV::AbstractCourseImporter do
     AbstractCourse.last.tap do |c|
       c.name.should == "Mathematics"
       c.short_name.should == "Math101"
-      c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T002')
+      c.enrollment_term.should == EnrollmentTerm.where(sis_source_id: 'T002').first
       c.name = "Physics"
       c.short_name = "Phys101"
-      c.enrollment_term = EnrollmentTerm.find_by_sis_source_id('T003')
+      c.enrollment_term = EnrollmentTerm.where(sis_source_id: 'T003').first
       c.save!
     end
     process_csv_data_cleanly(
@@ -87,7 +87,7 @@ describe SIS::CSV::AbstractCourseImporter do
     AbstractCourse.last.tap do |c|
       c.name.should == "Physics"
       c.short_name.should == "Phys101"
-      c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T003')
+      c.enrollment_term.should == EnrollmentTerm.where(sis_source_id: 'T003').first
     end
   end
 

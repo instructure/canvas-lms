@@ -102,15 +102,15 @@ describe SIS::CSV::SectionImporter do
     )
     CourseSection.count.should == before_count + 2
 
-    course = @account.courses.find_by_sis_source_id("C001")
+    course = @account.courses.where(sis_source_id: "C001").first
 
-    s1 = course.course_sections.find_by_sis_source_id('S001')
+    s1 = course.course_sections.where(sis_source_id: 'S001').first
     s1.should_not be_nil
     s1.name.should == 'Sec1'
     s1.start_at.to_s(:db).should == '2011-01-05 00:00:00'
     s1.end_at.to_s(:db).should == '2011-04-14 00:00:00'
 
-    s2 = course.course_sections.find_by_sis_source_id('S002')
+    s2 = course.course_sections.where(sis_source_id: 'S002').first
     s2.should_not be_nil
     s2.name.should == 'Sec2'
     s2.start_at.should be_nil
@@ -133,11 +133,11 @@ describe SIS::CSV::SectionImporter do
       "sec3,test1,Test Course 3,active,2011-04-14 00:00:00,",
       "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
     )
-    course = @account.courses.find_by_sis_source_id('test1')
-    course.course_sections.find_by_sis_source_id("sec1").restrict_enrollments_to_section_dates.should be_false
-    course.course_sections.find_by_sis_source_id("sec2").restrict_enrollments_to_section_dates.should be_true
-    course.course_sections.find_by_sis_source_id("sec3").restrict_enrollments_to_section_dates.should be_true
-    course.course_sections.find_by_sis_source_id("sec4").restrict_enrollments_to_section_dates.should be_true
+    course = @account.courses.where(sis_source_id: 'test1').first
+    course.course_sections.where(sis_source_id: "sec1").first.restrict_enrollments_to_section_dates.should be_false
+    course.course_sections.where(sis_source_id: "sec2").first.restrict_enrollments_to_section_dates.should be_true
+    course.course_sections.where(sis_source_id: "sec3").first.restrict_enrollments_to_section_dates.should be_true
+    course.course_sections.where(sis_source_id: "sec4").first.restrict_enrollments_to_section_dates.should be_true
   end
 
   it 'should support start/end date and restriction stickiness' do
@@ -145,12 +145,12 @@ describe SIS::CSV::SectionImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test1,TC 101,Test Course 1,,,active,,"
     )
-    course = @account.courses.find_by_sis_source_id('test1')
+    course = @account.courses.where(sis_source_id: 'test1').first
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
       "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
     )
-    course.course_sections.find_by_sis_source_id("sec4").tap do |section|
+    course.course_sections.where(sis_source_id: "sec4").first.tap do |section|
       section.restrict_enrollments_to_section_dates.should be_true
       section.start_at.should == DateTime.parse("2011-04-14 00:00:00")
       section.end_at.should == DateTime.parse("2011-05-14 00:00:00")
@@ -163,7 +163,7 @@ describe SIS::CSV::SectionImporter do
       "section_id,course_id,name,status,start_date,end_date",
       "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
     )
-    course.course_sections.find_by_sis_source_id("sec4").tap do |section|
+    course.course_sections.where(sis_source_id: "sec4").first.tap do |section|
       section.restrict_enrollments_to_section_dates.should be_false
       section.start_at.should == DateTime.parse("2010-04-14 00:00:00")
       section.end_at.should == DateTime.parse("2010-05-14 00:00:00")
@@ -210,42 +210,42 @@ describe SIS::CSV::SectionImporter do
       "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
     )
 
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = course.course_sections.find_by_sis_source_id("S001")
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
     course.associated_accounts.map(&:id).sort.should == [@account.id]
-    @account.courses.find_by_sis_source_id("X001").should be_nil
+    @account.courses.where(sis_source_id: "X001").first.should be_nil
 
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,active"
     )
 
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
     xlist_course.associated_accounts.map(&:id).sort.should == [@account.id]
-    course = @account.courses.find_by_sis_source_id("C001")
+    course = @account.courses.where(sis_source_id: "C001").first
     course.associated_accounts.map(&:id).sort.should == [@account.id]
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course)
-    course.course_sections.find_by_sis_source_id("S001").should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+    course.course_sections.where(sis_source_id: "S001").first.should be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
 
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,deleted"
     )
 
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    xlist_course.course_sections.where(sis_source_id: "S001").first.should be_nil
     xlist_course.associated_accounts.map(&:id).sort.should == [@account.id]
-    s1 = course.course_sections.find_by_sis_source_id("S001")
+    s1 = course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
     course.associated_accounts.map(&:id).sort.should == [@account.id]
 
     xlist_course.name.should == "Test Course 101"
@@ -270,8 +270,8 @@ describe SIS::CSV::SectionImporter do
       "S004,C002,Sec4,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
       "S005,C002,Sec5,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
     )
-    @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+    @account.courses.where(sis_source_id: "C001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "C002").first.deleted?.should be_false
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,active",
@@ -279,23 +279,23 @@ describe SIS::CSV::SectionImporter do
       "X002,S004,active",
       "X002,S005,active"
     )
-    @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 101"
-    @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 102"
+    @account.courses.where(sis_source_id: "C001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "C002").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X002").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X001").first.name.should == "Test Course 101"
+    @account.courses.where(sis_source_id: "X002").first.name.should == "Test Course 102"
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 103,Test Course 103,,,active",
       "C002,TC 104,Test Course 104,,,active"
     )
-    @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 103"
-    @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 104"
+    @account.courses.where(sis_source_id: "C001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "C002").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X002").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X001").first.name.should == "Test Course 103"
+    @account.courses.where(sis_source_id: "X002").first.name.should == "Test Course 104"
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,deleted",
@@ -303,10 +303,10 @@ describe SIS::CSV::SectionImporter do
       "X002,S004,deleted",
       "X002,S005,deleted"
     )
-    @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
-    @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
+    @account.courses.where(sis_source_id: "C001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "C002").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X001").first.deleted?.should be_false
+    @account.courses.where(sis_source_id: "X002").first.deleted?.should be_false
   end
 
   it 'should work with xlists with an xlist course defined' do
@@ -321,38 +321,38 @@ describe SIS::CSV::SectionImporter do
       "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
     )
 
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = course.course_sections.find_by_sis_source_id("S001")
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
-    @account.courses.find_by_sis_source_id("X001").should_not be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
+    @account.courses.where(sis_source_id: "X001").first.should_not be_nil
 
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,active"
     )
 
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course)
-    course.course_sections.find_by_sis_source_id("S001").should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+    course.course_sections.where(sis_source_id: "S001").first.should be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
 
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",
       "X001,S001,deleted"
     )
 
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
-    s1 = course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    xlist_course.course_sections.where(sis_source_id: "S001").first.should be_nil
+    s1 = course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should be_nil
-    course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+    course.course_sections.where(sis_source_id: "S002").first.should_not be_nil
 
     xlist_course.name.should == "Test Course 102"
   end
@@ -379,13 +379,13 @@ describe SIS::CSV::SectionImporter do
       "X001,S005,active"
     )
 
-    xlist_course_1 = @account.courses.find_by_sis_source_id("X001")
-    xlist_course_2 = @account.courses.find_by_sis_source_id("X002")
-    xlist_course_1.course_sections.find_by_sis_source_id("S001").should_not be_nil
-    xlist_course_1.course_sections.find_by_sis_source_id("S002").should_not be_nil
-    xlist_course_1.course_sections.find_by_sis_source_id("S003").should_not be_nil
-    xlist_course_2.course_sections.find_by_sis_source_id("S004").should_not be_nil
-    xlist_course_1.course_sections.find_by_sis_source_id("S005").should_not be_nil
+    xlist_course_1 = @account.courses.where(sis_source_id: "X001").first
+    xlist_course_2 = @account.courses.where(sis_source_id: "X002").first
+    xlist_course_1.course_sections.where(sis_source_id: "S001").first.should_not be_nil
+    xlist_course_1.course_sections.where(sis_source_id: "S002").first.should_not be_nil
+    xlist_course_1.course_sections.where(sis_source_id: "S003").first.should_not be_nil
+    xlist_course_2.course_sections.where(sis_source_id: "S004").first.should_not be_nil
+    xlist_course_1.course_sections.where(sis_source_id: "S005").first.should_not be_nil
   end
 
   it 'should be idempotent with active xlists' do
@@ -403,9 +403,9 @@ describe SIS::CSV::SectionImporter do
         "X001,S001,active"
       )
 
-      xlist_course = @account.courses.find_by_sis_source_id("X001")
-      course = @account.courses.find_by_sis_source_id("C001")
-      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      xlist_course = @account.courses.where(sis_source_id: "X001").first
+      course = @account.courses.where(sis_source_id: "C001").first
+      s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
     end
@@ -425,9 +425,9 @@ describe SIS::CSV::SectionImporter do
       "X001,S001,active"
     )
 
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course)
 
@@ -437,8 +437,8 @@ describe SIS::CSV::SectionImporter do
         "X001,S001,deleted"
       )
 
-      course = @account.courses.find_by_sis_source_id("C001")
-      s1 = course.course_sections.find_by_sis_source_id("S001")
+      course = @account.courses.where(sis_source_id: "C001").first
+      s1 = course.course_sections.where(sis_source_id: "S001").first
       s1.should_not be_nil
       s1.nonxlist_course.should be_nil
     end
@@ -459,9 +459,9 @@ describe SIS::CSV::SectionImporter do
         "X00#{i},S001,active"
       )
 
-      xlist_course = @account.courses.find_by_sis_source_id("X00#{i}")
-      course = @account.courses.find_by_sis_source_id("C001")
-      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      xlist_course = @account.courses.where(sis_source_id: "X00#{i}").first
+      course = @account.courses.where(sis_source_id: "C001").first
+      s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
       s1.course.should eql(xlist_course)
@@ -472,8 +472,8 @@ describe SIS::CSV::SectionImporter do
       "X101,S001,deleted"
     )
 
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = course.course_sections.find_by_sis_source_id("S001")
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should be_nil
     s1.course.should eql(course)
@@ -493,9 +493,9 @@ describe SIS::CSV::SectionImporter do
       "xlist_course_id,section_id,status",
       "X001,S001,active"
     )
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course)
     s1.course.should eql(xlist_course)
@@ -505,9 +505,9 @@ describe SIS::CSV::SectionImporter do
       "section_id,course_id,name,start_date,end_date,status",
       "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course = @account.courses.find_by_sis_source_id("C001")
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course = @account.courses.where(sis_source_id: "C001").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course)
     s1.course.should eql(xlist_course)
@@ -525,9 +525,9 @@ describe SIS::CSV::SectionImporter do
       "section_id,course_id,name,start_date,end_date,status",
       "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
-    course1 = @account.courses.find_by_sis_source_id("C001")
-    course2 = @account.courses.find_by_sis_source_id("C002")
-    s1 = course1.course_sections.find_by_sis_source_id("S001")
+    course1 = @account.courses.where(sis_source_id: "C001").first
+    course2 = @account.courses.where(sis_source_id: "C002").first
+    s1 = course1.course_sections.where(sis_source_id: "S001").first
     s1.course.should eql(course1)
     process_csv_data_cleanly(
       "section_id,course_id,name,start_date,end_date,status",
@@ -553,10 +553,10 @@ describe SIS::CSV::SectionImporter do
       "xlist_course_id,section_id,status",
       "X001,S001,active"
     )
-    xlist_course = @account.courses.find_by_sis_source_id("X001")
-    course1 = @account.courses.find_by_sis_source_id("C001")
-    course2 = @account.courses.find_by_sis_source_id("C002")
-    s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course1 = @account.courses.where(sis_source_id: "C001").first
+    course2 = @account.courses.where(sis_source_id: "C002").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
     s1.should_not be_nil
     s1.nonxlist_course.should eql(course1)
     s1.course.should eql(xlist_course)
@@ -584,7 +584,7 @@ describe SIS::CSV::SectionImporter do
     )
 
     def with_section(&block)
-      CourseSection.find_by_root_account_id_and_sis_source_id(@account.id, 'S001').tap(&block)
+      CourseSection.where(root_account_id: @account, sis_source_id: 'S001').first.tap(&block)
     end
     def check_section_crosslisted(sis_id)
       with_section do |s|
@@ -611,7 +611,7 @@ describe SIS::CSV::SectionImporter do
     )
     check_section_not_crosslisted
     with_section do |s|
-      s.crosslist_to_course(Course.find_by_root_account_id_and_sis_source_id(@account.id, 'C002'))
+      s.crosslist_to_course(Course.where(root_account_id: @account, sis_source_id: 'C002').first)
     end
     check_section_crosslisted 'C002'
     process_csv_data_cleanly(
@@ -655,7 +655,7 @@ describe SIS::CSV::SectionImporter do
     )
 
     def with_section(&block)
-      CourseSection.find_by_root_account_id_and_sis_source_id(@account.id, 'S001').tap(&block)
+      CourseSection.where(root_account_id: @account, sis_source_id: 'S001').first.tap(&block)
     end
     def check_section_crosslisted(sis_id)
       with_section do |s|
@@ -718,16 +718,16 @@ describe SIS::CSV::SectionImporter do
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C003,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.find_by_sis_source_id("C003").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A002').id].sort
-      CourseSection.find_by_sis_source_id("S001").course_account_associations.map(&:account_id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A002').id].sort
-      Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      Course.where(sis_source_id: "C003").first.associated_accounts.map(&:id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
+      CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
+      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.find_by_sis_source_id("C003").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A002').id].sort
-      Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-      CourseSection.find_by_sis_source_id("S001").course_account_associations.map(&:account_id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      Course.where(sis_source_id: "C003").first.associated_accounts.map(&:id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
+      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
     it 'should change course account associations when a section is crosslisted and the original section\'s course changes via sis' do
@@ -735,23 +735,23 @@ describe SIS::CSV::SectionImporter do
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id].sort
-      CourseSection.find_by_sis_source_id("S001").course_account_associations.map(&:account_id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id].sort
+      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id].sort
+      CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-      CourseSection.find_by_sis_source_id("S001").course_account_associations.map(&:account_id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id].sort
+      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id].sort
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C003,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.find_by_sis_source_id("C003").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A002').id].sort
-      Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-      CourseSection.find_by_sis_source_id("S001").course_account_associations.map(&:account_id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A002').id].sort
+      Course.where(sis_source_id: "C003").first.associated_accounts.map(&:id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
+      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort.should == [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
     end
   end
 

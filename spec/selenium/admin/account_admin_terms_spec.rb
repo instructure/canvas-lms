@@ -72,7 +72,7 @@ describe "account admin terms" do
       click_term_action_link(ff('.term')[0], '.delete_term_link')
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      EnrollmentTerm.find_by_name(term_name).workflow_state.should == 'deleted'
+      EnrollmentTerm.where(name: term_name).first.workflow_state.should == 'deleted'
       validate_term_display
     end
 

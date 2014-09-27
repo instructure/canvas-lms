@@ -1006,8 +1006,8 @@ describe Conversation do
     source.merge_into(target)
 
     lambda { source.reload }.should raise_error(ActiveRecord::RecordNotFound)
-    ConversationParticipant.find_all_by_conversation_id(source.id).should == []
-    ConversationMessage.find_all_by_conversation_id(source.id).should == []
+    ConversationParticipant.where(conversation_id: source).should == []
+    ConversationMessage.where(conversation_id: source).should == []
 
     target.reload
     target.participants(true).map(&:id).should == [sender.id, target_user.id]

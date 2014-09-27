@@ -1203,7 +1203,7 @@ describe DiscussionTopicsController, type: :request do
         { :message => @message })
       json.should_not be_nil
       json['id'].should_not be_nil
-      @entry = DiscussionEntry.find_by_id(json['id'])
+      @entry = DiscussionEntry.where(id: json['id']).first
       @entry.should_not be_nil
       @entry.discussion_topic.should == @topic
       @entry.user.should == @user
@@ -1217,7 +1217,7 @@ describe DiscussionTopicsController, type: :request do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message })
-      @entry = DiscussionEntry.find_by_id(json['id'])
+      @entry = DiscussionEntry.where(id: json['id']).first
       json.should == {
         "id" => @entry.id,
         "parent_id" => @entry.parent_id,
@@ -1238,7 +1238,7 @@ describe DiscussionTopicsController, type: :request do
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
         { :message => @message })
-      @entry = DiscussionEntry.find_by_id(json['id'])
+      @entry = DiscussionEntry.where(id: json['id']).first
       @entry.parent_entry.should == top_entry
     end
 
@@ -1249,7 +1249,7 @@ describe DiscussionTopicsController, type: :request do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message, :attachment => data })
-      @entry = DiscussionEntry.find_by_id(json['id'])
+      @entry = DiscussionEntry.where(id: json['id']).first
       @entry.attachment.should_not be_nil
       @entry.attachment.context.should eql @user
     end
@@ -1262,7 +1262,7 @@ describe DiscussionTopicsController, type: :request do
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
         { :message => @message, :attachment => data })
-      @entry = DiscussionEntry.find_by_id(json['id'])
+      @entry = DiscussionEntry.where(id: json['id']).first
       @entry.attachment.should_not be_nil
       @entry.attachment.context.should eql @user
     end

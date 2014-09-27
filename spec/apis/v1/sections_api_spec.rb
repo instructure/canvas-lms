@@ -223,7 +223,7 @@ describe SectionsController, type: :request do
       it "should create a section with default parameters" do
         json = api_call(:post, @path_prefix, @path_params)
         @course.reload
-        @course.active_course_sections.find_by_id(json['id'].to_i).should_not be_nil
+        @course.active_course_sections.where(id: json['id'].to_i).should be_exists
       end
 
       it "should find the course by SIS ID" do
@@ -231,7 +231,7 @@ describe SectionsController, type: :request do
         json = api_call(:post, "/api/v1/courses/sis_course_id:SISCOURSE/sections",
           { :controller => 'sections', :action => 'create', :course_id => "sis_course_id:SISCOURSE", :format => 'json' })
         @course.reload
-        @course.active_course_sections.find_by_id(json['id'].to_i).should_not be_nil
+        @course.active_course_sections.where(id: json['id'].to_i).should be_exists
       end
 
       it "should create a section with custom parameters" do

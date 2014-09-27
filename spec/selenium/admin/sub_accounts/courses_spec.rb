@@ -20,7 +20,7 @@ describe "sub account courses" do
       f("#course_course_code").send_keys(course_code)
       submit_form("#add_course_form")
       refresh_page # we need to refresh the page so the course shows up
-      course = Course.find_by_name(course_name)
+      course = Course.where(name: course_name).first
       course.should be_present
       course.course_code.should == course_code
       f("#course_#{course.id}").should be_displayed

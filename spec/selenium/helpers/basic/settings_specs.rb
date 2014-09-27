@@ -16,9 +16,9 @@ shared_examples_for "settings basic tests" do
       f("#user_lists_processed_people .person").text.should == address
       f(".add_users_button").click
       wait_for_ajax_requests
-      user = User.find_by_name(address)
+      user = User.where(name: address).first
       user.should be_present
-      admin = AccountUser.find_by_user_id(user.id)
+      admin = AccountUser.where(user_id: user).first
       admin.should be_present
       admin.membership_type.should == "AccountAdmin"
       f("#enrollment_#{admin.id} .email").text.should == address
@@ -39,7 +39,7 @@ shared_examples_for "settings basic tests" do
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
-      AccountUser.find_by_id(admin_id).should be_nil
+      AccountUser.where(id: admin_id).should_not be_exists
     end
   end
 

@@ -825,7 +825,7 @@ describe Quizzes::Quiz do
         each { |qs| qs[0].send(qs[1]).should be_false }
 
     # now actually enable the plugin
-    setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+    setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
     setting.settings = {:enabled => true}
     setting.save!
 
@@ -1274,7 +1274,7 @@ describe Quizzes::Quiz do
       course_with_teacher_logged_in(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
-      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create(quiz_question_id: question.id, regrade_option: "current_correct_only")
       @quiz.current_regrade.should == regrade
     end
@@ -1283,7 +1283,7 @@ describe Quizzes::Quiz do
       course_with_teacher_logged_in(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
-      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create(quiz_question_id: question.id, regrade_option: "disabled")
       @quiz.current_regrade.should be_nil
     end
@@ -1296,7 +1296,7 @@ describe Quizzes::Quiz do
     it "returns the correct question ids" do
       course_with_teacher_logged_in(active_all: true, course: @course)
       q = @quiz.quiz_questions.create!
-      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
       rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
       @quiz.current_quiz_question_regrades.should == [rq]
     end
@@ -1308,7 +1308,7 @@ describe Quizzes::Quiz do
       course_with_teacher_logged_in(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
-      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id,quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
         regrade_option: 'current_correct_only')
@@ -1335,16 +1335,12 @@ describe Quizzes::Quiz do
       first_regrade_time = 1.hour.ago
       Timecop.freeze(first_regrade_time) do
         # regrade once
-        regrade1 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
-          qr.user_id = @teacher.id
-        end
+        regrade1 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
         regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
       end
 
       # regrade twice
-      regrade2 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
-        qr.user_id = @teacher.id
-      end
+      regrade2 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number - 1, user: @teacher)
       regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
       regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
 
@@ -1361,16 +1357,12 @@ describe Quizzes::Quiz do
       first_regrade_time = 1.hour.ago
       Timecop.freeze(first_regrade_time) do
         # regrade once
-        regrade1 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
-          qr.user_id = @teacher.id
-        end
+        regrade1 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
         regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
       end
 
       # regrade twice
-      regrade2 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
-        qr.user_id = @teacher.id
-      end
+      regrade2 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number - 1, user: @teacher)
       regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'disabled')
       regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
 

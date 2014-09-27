@@ -86,10 +86,10 @@ class Conversation < ActiveRecord::Base
     private_hash = private ? private_hash_for(users) : nil
     transaction do
       if private
-        conversation = users.first.all_conversations.find_by_private_hash(private_hash).try(:conversation)
+        conversation = users.first.all_conversations.where(private_hash: private_hash).first.try(:conversation)
         # for compatibility during migration, before ConversationParticipant has finished populating
         if Setting.get('populate_conversation_participants_private_hash_complete', '0') == '0'
-          conversation ||= Conversation.find_by_private_hash(private_hash)
+          conversation ||= Conversation.where(private_hash: private_hash).first
         end
       end
       unless conversation
@@ -513,7 +513,7 @@ class Conversation < ActiveRecord::Base
     return unless private_hash_changed?
     existing = self.shard.activate do
       ConversationParticipant.send(:with_exclusive_scope) do
-        ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+        ConversationParticipant.where(private_hash: private_hash).first.try(:conversation)
       end
     end
     if existing

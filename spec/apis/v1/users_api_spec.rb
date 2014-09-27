@@ -446,7 +446,7 @@ describe "Users API", type: :request do
                           }
                       }
       )
-      users = User.find_all_by_name "Test User"
+      users = User.where(name: "Test User").to_a
       users.length.should eql 1
       user = users.first
       user.sms_channel.workflow_state.should == 'active'
@@ -480,7 +480,7 @@ describe "Users API", type: :request do
             }
           }
         )
-        users = User.find_all_by_name "Test User"
+        users = User.where(name: "Test User").to_a
         users.length.should eql 1
         user = users.first
         user.name.should eql "Test User"
@@ -635,7 +635,7 @@ describe "Users API", type: :request do
         }
       )
       response.should be_success
-      users = User.find_all_by_name "Test User"
+      users = User.where(name: "Test User").to_a
       users.size.should == 1
       users.first.pseudonyms.first.unique_id.should == "test"
       email = users.first.communication_channels.email.first
@@ -1042,7 +1042,7 @@ describe "Users API", type: :request do
         { controller: 'users', action: 'merge_into', format: 'json',
           id: @user2.to_param, destination_user_id: @user1.to_param }
       )
-      Pseudonym.find_by_sis_user_id('user_sis_id_02').user_id.should == @user1.id
+      Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id.should == @user1.id
       @user2.pseudonyms.should be_empty
     end
 
@@ -1061,7 +1061,7 @@ describe "Users API", type: :request do
           destination_account_id: account.to_param
         }
       )
-      Pseudonym.find_by_sis_user_id('user_sis_id_02').user_id.should == @user1.id
+      Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id.should == @user1.id
       @user2.pseudonyms.should be_empty
     end
 

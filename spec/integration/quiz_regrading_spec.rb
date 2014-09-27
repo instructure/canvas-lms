@@ -34,7 +34,7 @@ describe "QuizRegrading" do
   before do
     course_with_student_logged_in(active_all: true)
     quiz_model(course: @course)
-    @regrade = @quiz.quiz_regrades.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = @student.id }
+    @regrade = @quiz.quiz_regrades.where(quiz_id: @quiz.id, quiz_version: @quiz.version_number).first_or_create(user: @student)
     @regrade.should_not be_new_record
     @true_false_question = create_quiz_question!({
       :points_possible => 1,

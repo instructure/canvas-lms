@@ -176,14 +176,14 @@ describe ContentExportsApiController, type: :request do
     it "should set skip notifications flag" do
       json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports",
         { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge', skip_notifications: true })
-      export = t_course.content_exports.find_by_id(json['id'])
+      export = t_course.content_exports.where(id: json['id']).first
       export.send_notification?.should be_false
     end
 
     it "should create a qti export" do
       json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=qti",
         { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'qti' })
-      export = t_course.content_exports.find_by_id(json['id'])
+      export = t_course.content_exports.where(id: json['id']).first
       export.should_not be_nil
       export.workflow_state.should eql 'created'
       export.export_type.should eql 'qti'
@@ -195,7 +195,7 @@ describe ContentExportsApiController, type: :request do
     it "should create a course export and update progress" do
       json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
         { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' })
-      export = t_course.content_exports.find_by_id(json['id'])
+      export = t_course.content_exports.where(id: json['id']).first
       export.should_not be_nil
       export.workflow_state.should eql 'created'
       export.export_type.should eql 'common_cartridge'
@@ -255,7 +255,7 @@ describe ContentExportsApiController, type: :request do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:context_modules => {mod.asset_string => "1"}}})
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.should_not be_nil
         export.workflow_state.should eql 'created'
         export.export_type.should eql 'common_cartridge'
@@ -280,22 +280,22 @@ describe ContentExportsApiController, type: :request do
 
         run_jobs
 
-        @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
-        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        @course.context_modules.where(migration_id: CC::CCHelper.create_key(mod)).should be_exists
+        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         copied_page.should_not be_nil
-        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
+        @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy)).should_not be_exists
 
-        copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
+        copied_att = @course.attachments.where(filename: att_to_copy.filename).first
         copied_att.should_not be_nil
         copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
-        @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+        @course.attachments.where(filename: att_to_not_copy.filename).should_not be_exists
       end
 
       it "should create a selective course export with arrays of ids" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:context_modules => [mod.id]}})
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.should_not be_nil
         export.workflow_state.should eql 'created'
         export.export_type.should eql 'common_cartridge'
@@ -320,22 +320,22 @@ describe ContentExportsApiController, type: :request do
 
         run_jobs
 
-        @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
-        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        @course.context_modules.where(migration_id: CC::CCHelper.create_key(mod)).should be_exists
+        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         copied_page.should_not be_nil
-        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
+        @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy)).should_not be_exists
 
-        copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
+        copied_att = @course.attachments.where(filename: att_to_copy.filename).first
         copied_att.should_not be_nil
         copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
-        @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+        @course.attachments.where(filename: att_to_not_copy.filename).should_not be_exists
       end
 
       it "should select quizzes correctly" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:quizzes => [quiz_to_copy.id]} })
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.settings['selected_content']['quizzes'].should == {CC::CCHelper.create_key(quiz_to_copy) => "1"}
         export.export_object?(quiz_to_copy).should be_true
       end
@@ -344,27 +344,27 @@ describe ContentExportsApiController, type: :request do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:modules => [mod.id]} })
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.export_object?(mod).should be_true
 
         tag = mod.content_tags.first
         json2 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:module_items => [tag.id]} })
-        export2 = t_course.content_exports.find_by_id(json2['id'])
+        export2 = t_course.content_exports.where(id: json2['id']).first
         export2.export_object?(tag).should be_true
 
         json3 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                  { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                  { :select => {:pages => [page_to_copy.id]} })
-        export3 = t_course.content_exports.find_by_id(json3['id'])
+        export3 = t_course.content_exports.where(id: json3['id']).first
         export3.export_object?(page_to_copy).should be_true
 
         file = attachment_model(context: t_course)
         json4 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                  { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                  { :select => {:files => [file.id]} })
-        export4 = t_course.content_exports.find_by_id(json4['id'])
+        export4 = t_course.content_exports.where(id: json4['id']).first
         export4.export_object?(file).should be_true
       end
 
@@ -372,7 +372,7 @@ describe ContentExportsApiController, type: :request do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
                                 { :select => {:module_items => [mod.content_tags.first.id]} })
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         run_jobs
 
         export.reload
@@ -386,9 +386,9 @@ describe ContentExportsApiController, type: :request do
 
         run_jobs
 
-        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         copied_page.should_not be_nil
-        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
+        @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy)).should_not be_exists
       end
     end
   end
@@ -446,7 +446,7 @@ describe ContentExportsApiController, type: :request do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
                         { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
         run_jobs
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.should be_present
         export.attachment.should be_present
         export.attachment.display_name.should eql 'course_files_export.zip'
@@ -462,7 +462,7 @@ describe ContentExportsApiController, type: :request do
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param,
                                   export_type: 'zip', select: {'folders' => [@sub_folder.to_param], 'attachments' => [file3.to_param]} })
         run_jobs
-        export = t_course.content_exports.find_by_id(json['id'])
+        export = t_course.content_exports.where(id: json['id']).first
         export.should be_present
         export.attachment.should be_present
         export.attachment.display_name.should eql 'course_files_export.zip'
@@ -506,7 +506,7 @@ describe ContentExportsApiController, type: :request do
           json = api_call_as_user(t_student, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
                           { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
           run_jobs
-          export = t_course.content_exports.find_by_id(json['id'])
+          export = t_course.content_exports.where(id: json['id']).first
           export.should be_present
           export.attachment.should be_present
           tf = export.attachment.open need_local_file: true
