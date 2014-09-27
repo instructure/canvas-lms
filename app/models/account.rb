@@ -824,6 +824,10 @@ class Account < ActiveRecord::Base
     # any user with an association to this account can read the outcomes in the account
     given{ |user| user && self.user_account_associations.where(user_id: user).exists? }
     can :read_outcomes
+
+    # any user with an admin enrollment in one of the courses can read
+    given { |user| user && self.courses.where(:id => user.enrollments.admin.pluck(:course_id)).exists? }
+    can :read
   end
 
   alias_method :destroy!, :destroy

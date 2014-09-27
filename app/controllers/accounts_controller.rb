@@ -117,9 +117,30 @@ class AccountsController < ApplicationController
           @accounts = []
         end
         ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
-        render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || []) }
+        render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], false) }
       end
     end
+  end
+
+  # @API List accounts for course admins
+  # List accounts that the current user can view through their admin course enrollments.
+  # (Teacher, TA, or designer enrollments).
+  # Only returns "id", "name", "workflow_state", "root_account_id" and "parent_account_id"
+  #
+  # @returns [Account]
+  def course_accounts
+    if @current_user
+        course_accounts = BookmarkedCollection.wrap(Account::Bookmarker,
+          Account.where(:id => Account.joins(:courses => :enrollments).merge(
+            @current_user.enrollments.admin.except(:select)).
+            select("accounts.id").uniq.with_each_shard.map(&:id))
+        )
+      @accounts = Api.paginate(course_accounts, self, api_v1_accounts_url)
+    else
+      @accounts = []
+    end
+    ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
+    render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
   end
 
   # @API Get a single account
@@ -138,7 +159,8 @@ class AccountsController < ApplicationController
         ActiveRecord::Associations::Preloader.new(@courses, :enrollment_term).run
         build_course_stats
       end
-      format.json { render :json => account_json(@account, @current_user, session, params[:includes] || []) }
+      format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
+                                                 !@account.grants_right?(@current_user, session, :manage)) }
     end
   end
 
