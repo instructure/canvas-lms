@@ -53,6 +53,9 @@ environment_configuration(defined?(config) && config) do |config|
   # (it also takes forever)
   config.active_record.schema_format = :sql
 
+  # Do not dump schema after migrations.
+  config.active_record.dump_schema_after_migration = false
+
   unless CANVAS_RAILS3
     config.eager_load = true
   end

@@ -199,6 +199,20 @@ namespace :lint do
   end
 end
 
+if Rails.version < '4.1'
+  old_task = Rake::Task['db:_dump']
+  old_actions = old_task.actions.dup
+  old_task.actions.clear
+
+  old_task.enhance do
+    if ActiveRecord::Base.dump_schema_after_migration == false
+      # do nothing
+    else
+      old_actions.each(&:call)
+    end
+  end
+end
+
 namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do

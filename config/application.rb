@@ -12,6 +12,13 @@ else
   Bundler.require(:default, Rails.env) if defined?(Bundler)
 end
 
+if Rails.version < '4.1'
+  ActiveRecord::Base.class_eval do
+    mattr_accessor :dump_schema_after_migration, instance_writer: false
+    self.dump_schema_after_migration = true
+  end
+end
+
 module CanvasRails
   class Application < Rails::Application
     config.autoload_paths += [config.root.join('lib').to_s]
