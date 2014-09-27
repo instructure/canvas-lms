@@ -1094,13 +1094,14 @@ CanvasRails::Application.routes.draw do
       delete 'users/:user_id/logins/:id', :action => :destroy
     end
 
-    scope(:controller => :accounts) do
-      get 'accounts', :action => :index, :path_name => :accounts
-      get 'accounts/:id', :action => :show, :path_name => :account
-      put 'accounts/:id', :action => :update
-      get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
-      get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
-      get 'accounts/:account_id/courses/:id', :controller => :courses, :action => :show, :path_name => 'account_course_show'
+    scope(controller: :accounts) do
+      get 'accounts', action: :index, as: :accounts
+      get 'course_accounts', :action => :course_accounts, :as => :course_accounts
+      get 'accounts/:id', action: :show, as: :account
+      put 'accounts/:id', action: :update
+      get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
+      get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
+      get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
     end
 
     scope(:controller => :sub_accounts) do
