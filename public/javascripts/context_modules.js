@@ -369,7 +369,8 @@ define([
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
-        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
+        var data = $module.getTemplateData({textValues: ['name', 'unlock_at_untranslated', 'require_sequential_progress', 'publish_final_grade']});
+        data['unlock_at'] = data['unlock_at_untranslated'];
         $form.fillFormData(data, {object_name: 'context_module'});
         var isNew = false;
         if($module.attr('id') == 'context_module_new') {
@@ -384,7 +385,7 @@ define([
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
-        $form.find("#unlock_module_at").prop('checked', data.unlock_at).change()
+        $form.find("#unlock_module_at").prop('checked', data.unlock_at).change();
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
@@ -625,6 +626,7 @@ define([
 
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
+      unformatted_unlock_at = data.context_module.unlock_at;
       data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
@@ -638,7 +640,8 @@ define([
         hrefValues: ['id']
       });
 
-      $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date());
+      $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(unformatted_unlock_at) > new Date());
+      $module.find(".unlock_at_untranslated").html(unformatted_unlock_at);
       $module.find(".footer .prerequisites").empty();
 
       for(var idx in data.context_module.prerequisites) {
