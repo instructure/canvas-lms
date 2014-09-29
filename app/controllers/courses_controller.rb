@@ -123,6 +123,11 @@ require 'set'
 #           "example": 81259,
 #           "type": "integer"
 #         },
+#         "enrollment_term_id": {
+#           "description": "the enrollment term associated with the course",
+#           "example": 34,
+#           "type": "integer"
+#         },
 #         "start_at": {
 #           "description": "the start date for the course, if applicable",
 #           "example": "2012-06-01T00:00:00-06:00",
