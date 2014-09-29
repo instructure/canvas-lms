@@ -232,7 +232,7 @@ Implemented for: Canvas LMS}
     mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
       self.workflow_state = 'imported'
-      self.migration_settings[:imported_assets] = ["quiz_xyz"]
+      self.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
     end
     ContentMigration.stubs(:new).returns(mock_migration)
     ContentMigration.stubs(:find).with(mock_migration.id).returns(mock_migration)
@@ -285,7 +285,7 @@ Implemented for: Canvas LMS}
       item_id.should == 'pending'
       @token.should == context
 
-      @mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
+      @mock_migration.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
       @mock_migration.workflow_state = 'imported'
 
       status, details, context, item_id = soap_request(
