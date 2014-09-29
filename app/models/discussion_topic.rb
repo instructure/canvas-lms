@@ -477,9 +477,10 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :visible_to_students_with_da_enabled, lambda { |user_ids|
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     joins("LEFT JOIN assignment_student_visibilities ON assignment_student_visibilities.assignment_id = discussion_topics.assignment_id").
-    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids)
+    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids).
+    where("discussion_topics.context_id IN (?)",course_ids)
    }
 
   alias_attribute :available_from, :delayed_post_at

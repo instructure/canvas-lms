@@ -417,7 +417,7 @@ class ContentTag < ActiveRecord::Base
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
 
-  scope :visible_to_students_with_da_enabled, lambda { |user_ids|
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     joins("LEFT JOIN discussion_topics ON discussion_topics.id = content_tags.content_id AND content_type = 'DiscussionTopic'").
     joins("LEFT JOIN quiz_student_visibilities ON quiz_student_visibilities.quiz_id = content_tags.content_id AND content_type IN ('Quiz','Quizzes::Quiz')").
     joins("LEFT JOIN assignment_student_visibilities ON ((assignment_student_visibilities.assignment_id = content_tags.content_id AND content_type = 'Assignment')
@@ -427,6 +427,7 @@ class ContentTag < ActiveRecord::Base
                OR (assignment_student_visibilities.assignment_id IS NOT NULL AND assignment_student_visibilities.user_id IN (?))
                OR (quiz_student_visibilities.quiz_id IS NOT NULL AND quiz_student_visibilities.user_id IN (?))
               )",Quizzes::Quiz.class_names, user_ids, user_ids).
+    where("content_tags.context_id IN (?)",course_ids).
     uniq
    }
 

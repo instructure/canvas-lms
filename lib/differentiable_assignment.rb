@@ -45,4 +45,11 @@ module DifferentiableAssignment
     # if observer is following no students, do not filter based on differentiated assignments
     observed_student_ids.any? ? filter_block.call(collection, user_ids) : collection
   end
+
+  # can filter scope of Assignments, DiscussionTopics, Quizzes, or ContentTags
+  def self.scope_filter(scope, user, context, opts={})
+    self.filter(scope, user, context, opts) do |scope, user_ids|
+      scope.visible_to_students_in_course_with_da(user_ids, context.id)
+    end
+  end
 end

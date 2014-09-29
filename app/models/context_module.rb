@@ -313,12 +313,12 @@ class ContextModule < ActiveRecord::Base
   def filter_tags_for_da(tags, user, opts={})
 
     scope_filter = Proc.new{|tags, user_ids, course_id, opts|
-      tags.visible_to_students_with_da_enabled(user_ids)
+      tags.visible_to_students_in_course_with_da(user_ids, course_id)
     }
 
     array_filter = Proc.new{|tags, user_ids, course_id, opts|
       visible_assignments = opts[:assignment_visibilities] || AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
-      visible_discussions = opts[:discussion_visibilities] || DiscussionTopic.where(context_id: course_id).visible_to_students_with_da_enabled(user_ids).pluck(:id)
+      visible_discussions = opts[:discussion_visibilities] || DiscussionTopic.visible_to_students_in_course_with_da(user_ids, course_id).pluck(:id)
       visible_quizzes = opts[:quiz_visibilities] || Quizzes::QuizStudentVisibility.where(user_id: user_ids, course_id: course_id).pluck(:quiz_id)
       tags.select{|tag|
         case tag.content_type;

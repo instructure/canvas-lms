@@ -905,13 +905,13 @@ describe ContextModule do
       end
       # if tags are preloaded we shouldn't filter by a scope (as that requires re-fetching the tags)
       it "should not reload the tags if already loaded" do
-        ContentTag.expects(:visible_to_students_with_da_enabled).never
+        ContentTag.expects(:visible_to_students_in_course_with_da).never
         ActiveRecord::Associations::Preloader.new(@module, content_tags: :content).run
         @module.content_tags_visible_to(@student_1)
       end
       # if tags are not preloaded we should filter by a scope (as will be quicker than filtering an array)
       it "should filter use a cope to filter content tags if they arent already loaded" do
-        ContentTag.expects(:visible_to_students_with_da_enabled).once
+        ContentTag.expects(:visible_to_students_in_course_with_da).once
         @module.content_tags_visible_to(@student_1)
       end
       it "should filter differentiated discussions" do

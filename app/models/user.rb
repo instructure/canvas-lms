@@ -1353,9 +1353,7 @@ class User < ActiveRecord::Base
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     published_visible_assignments = course.active_assignments.published
     if course.feature_enabled?(:differentiated_assignments)
-      published_visible_assignments = DifferentiableAssignment.filter(published_visible_assignments,self,course, is_teacher: false) do |assignment_scope,user_ids|
-        assignment_scope.visible_to_student_in_course_with_da(user_ids, course.id)
-      end
+      published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
     end
     published_visible_assignments
   end

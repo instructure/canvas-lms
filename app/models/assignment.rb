@@ -1579,9 +1579,14 @@ class Assignment < ActiveRecord::Base
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
+
+  # shim to get MRA build passing (remove once MRA is patched)
+  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+    visible_to_students_in_course_with_da(user_id, course_id)
   }
 
   # course_ids should be courses that restrict visibility based on overrides

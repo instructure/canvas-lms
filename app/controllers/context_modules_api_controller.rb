@@ -380,8 +380,8 @@ class ContextModulesApiController < ApplicationController
         end
 
         opts[:assignment_visibilities] = AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, @context.id)
-        opts[:discussion_visibilities] = DiscussionTopic.where(course_id: @context.id).visible_to_students_with_da_enabled(user_ids).pluck(:id)
-        opts[:quiz_visibilities] = Quizzes::QuizStudentVisibility.where(user_id: user_ids, course_id: @context.id).pluck(:quiz_id)
+        opts[:discussion_visibilities] = DiscussionTopic.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
+        opts[:quiz_visibilities] = Quizzes::Quiz.visible_to_students_in_course_with_da(user_ids,@context.id).pluck(:quiz_id)
       end
 
       render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact

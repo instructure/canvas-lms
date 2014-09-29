@@ -516,7 +516,7 @@ describe ContentTag do
     end
   end
 
-  describe "visible_to_students_with_da_enabled" do
+  describe "visible_to_students_in_course_with_da" do
     before do
       course_with_student(active_all: true)
       @section = @course.course_sections.create!(name: "test section")
@@ -534,10 +534,10 @@ describe ContentTag do
       end
       it "returns assignments if there is visibility" do
         create_section_override_for_assignment(@assignment, {course_section: @section})
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
       end
       it "does not return assignments if there is no visibility" do
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
       end
     end
     context "discussions" do
@@ -558,16 +558,16 @@ describe ContentTag do
         })
       end
       it "returns discussions without attached assignments" do
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
       end
       it "returns discussions with attached assignments if there is visibility" do
         set_up_discussion
         create_section_override_for_assignment(@assignment, {course_section: @section})
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
       end
       it "does not return discussions with attached assignments if there is no visibility" do
         set_up_discussion
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
       end
     end
     context "quizzes" do
@@ -582,10 +582,10 @@ describe ContentTag do
       end
       it "returns a quiz if there is visibility" do
         create_section_override_for_quiz(@quiz, course_section: @section)
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
       end
       it "does not return quiz if there is visibility" do
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
       end
     end
     context "other" do
@@ -593,7 +593,7 @@ describe ContentTag do
         @page = @course.wiki.wiki_pages.create!(:title => "some page")
         @module = @course.context_modules.create!(:name => "module")
         @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
-        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
       end
     end
   end

@@ -527,9 +527,7 @@ class AssignmentsApiController < ApplicationController
       end
 
       if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-        scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
-          scope.visible_to_student_in_course_with_da(user_ids, @context.id)
-        end
+        scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
       end
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))

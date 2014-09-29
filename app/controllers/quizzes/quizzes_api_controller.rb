@@ -293,9 +293,7 @@ class Quizzes::QuizzesApiController < ApplicationController
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
 
         if @context.feature_enabled?(:differentiated_assignments)
-          scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
-            scope.visible_to_students_in_course_with_da(user_ids, @context.id)
-          end
+          scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
         end
 
         unless is_authorized_action?(@context, @current_user, :manage_assignments)

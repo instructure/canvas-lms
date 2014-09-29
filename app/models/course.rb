@@ -313,9 +313,7 @@ class Course < ActiveRecord::Base
     end
 
     if self.feature_enabled?(:differentiated_assignments)
-      tags = DifferentiableAssignment.filter(tags, user, self, is_teacher: user_is_teacher) do |tags, user_ids|
-        tags.visible_to_students_with_da_enabled(user_ids)
-      end
+      tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
     end
 
     tags

@@ -276,9 +276,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.filter(scope, @current_user, @context) do |scope, user_ids|
-        scope.visible_to_students_with_da_enabled(user_ids)
-      end
+      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
