@@ -23,6 +23,11 @@ define [
           contextId: 'course_id'
           contextType: 'courses'
         userCanManageFilesForContext: canManageFiles
+        dndOptions:
+          onItemDragStart: ->
+          onItemDragEnterOrOver: ->
+          onItemDragLeaveOrEnd: ->
+          onItemDrop: ->
 
       @component = React.renderComponent(FolderChild(@sampleProps(true)), $('<div>').appendTo('body')[0])
       @buttonEnabled = (component, isEnabled = true) ->

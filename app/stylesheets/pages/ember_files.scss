@@ -130,8 +130,7 @@ $ef-thumbnail-size: 36px;
   width: $ef-thumbnail-size !important;
   color: $base-font-color-dark;
   &:before {
-    font-size: $ef-thumbnail-size - 16px !important;
-    left: 7px;
+    font-size: $ef-thumbnail-size - 7px !important;
   }
 }
 
@@ -307,6 +306,23 @@ i[class*=UploadDropZone__instructions--icon-upload] {
   font-size: 1.3em;
   font-weight: bold;
 }
+
+.activeDragTarget {
+  background-color: $base-list-item-background--selected !important;
+  box-shadow: inset 0 0 0px 2px $canvas-primary;
+}
+
+.DragFeedback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  > * {
+    position: absolute;
+  }
+}
+
 
 
 

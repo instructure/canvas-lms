@@ -17,6 +17,7 @@ define [
         onlyShowFolders: true,
         rootFoldersToShow: @props.rootFoldersToShow
         onClick: @onClick
+        dndOptions: @props.dndOptions
         href: @hrefFor
       }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode())
       @expandTillCurrentFolder(@props)

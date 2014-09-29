@@ -68,6 +68,7 @@ define [
             isSelected: child in @props.selectedItems
             toggleSelected: @props.toggleItemSelected.bind(null, child)
             userCanManageFilesForContext: @props.userCanManageFilesForContext
+            dndOptions: @props.dndOptions
         LoadingIndicator isLoading: !@state.collection.loadedAll
         if @state.collection.loadedAll and (@state.collection.length is 0)
           div ref: 'noResultsFound',

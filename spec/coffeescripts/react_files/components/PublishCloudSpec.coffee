@@ -60,10 +60,7 @@ define [
     equal @publishCloud.state.published, true, "published state should be true"
     equal @publishCloud.state.hidden, false, "hidden is false"
 
-  module 'PublishCloud#getInitialState',
-    setup: ->
-    teardown: ->
-      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+  module 'PublishCloud#getInitialState'
 
   test "sets published initial state based on params model hidden property", ->
     model = new FilesystemObject(locked: false, id: 42)
@@ -73,6 +70,7 @@ define [
     equal @publishCloud.state.published, !model.get('locked'), "not locked is published"
     equal @publishCloud.state.restricted, false, "restricted should be false"
     equal @publishCloud.state.hidden, false, "hidden should be false"
+    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   test "restricted is true when lock_at/unlock_at is set", ->
     model = new FilesystemObject(hidden: false, lock_at: '123', unlock_at: '123', id: 42)
@@ -81,11 +79,9 @@ define [
     @publishCloud = React.renderComponent(PublishCloud(props), $('#fixtures')[0])
 
     equal @publishCloud.state.restricted, true, "restricted is true when lock_at/ulock_at is set"
+    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
-  module 'PublishCloud#extractStateFromModel',
-    setup: ->
-    teardown: ->
-      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+  module 'PublishCloud#extractStateFromModel'
 
   test "returns object that can be used to set state", ->
     model = new FilesystemObject(locked: true, hidden: true, lock_at: '123', unlock_at: '123', id: 42)
@@ -94,3 +90,4 @@ define [
 
     newModel = new FilesystemObject(locked: false, hidden: true, lock_at: null, unlock_at: null) 
     deepEqual @publishCloud.extractStateFromModel(newModel), {hidden: true, published: true, restricted: false}, "returns object to set state with"
+    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)

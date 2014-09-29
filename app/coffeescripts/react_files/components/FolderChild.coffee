@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'i18n!react_files'
   'react'
   'react-router'
@@ -6,11 +7,12 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'
   './ItemCog'
+  './FilesystemObjectThumbnail'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
   './PublishCloud'
-], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud) ->
+], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud) ->
 
 
   FolderChild = React.createClass
@@ -39,20 +41,40 @@ define [
       @props.model.collection.remove(@props.model) if @props.model.isNew()
       @setState(editing: false)
 
-
-    render: withReactDOM ->
-      div {
+    getAttributesForRootNode: ->
+      attrs =
         onClick: @props.toggleSelected
-        className: "ef-item-row #{'ef-item-selected' if @props.isSelected}"
+        className: "ef-item-row
+                   #{'ef-item-selected' if @props.isSelected}
+                   #{'activeDragTarget' if @state.isActiveDragTarget}"
         role: 'row'
         'aria-selected': @props.isSelected
-      },
+        draggable: true
+        onDragStart: =>
+          @props.toggleSelected() unless @props.isSelected
+          @props.dndOptions.onItemDragStart arguments...
+
+      if @props.model instanceof Folder
+        toggleActive = (setActive) =>
+          @setState({isActiveDragTarget: setActive}) if @state.isActiveDragTarget isnt setActive
+        attrs.onDragEnter = attrs.onDragOver = (event) =>
+          @props.dndOptions.onItemDragEnterOrOver(event, toggleActive(true))
+        attrs.onDragLeave = attrs.onDragEnd = (event) =>
+          @props.dndOptions.onItemDragLeaveOrEnd(event, toggleActive(false))
+        attrs.onDrop = (event) =>
+          @props.dndOptions.onItemDrop(event, @props.model, toggleActive(false))
+      attrs
+
+
+
+    render: withReactDOM ->
+      div @getAttributesForRootNode(),
         label className: 'screenreader-only', role: 'gridcell',
           input {
             type: 'checkbox'
             className: 'multiselectable-toggler'
             checked: @props.isSelected
-            onChange: ->
+            onChange: -> #noop, will be caught by 'click' on root node
           }
           I18n.t('labels.select', 'Select This Item')
 
@@ -82,19 +104,13 @@ define [
               className: 'media'
             },
               span className: 'pull-left',
-                i className: 'icon-folder media-object ef-big-icon'
+                FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
                 @props.model.displayName()
           else
             a href: @props.model.get('url'), className: 'media',
               span className: 'pull-left',
-                if @props.model.get('thumbnail_url')
-                  span
-                    className: 'media-object ef-thumbnail'
-                    style:
-                      backgroundImage: "url('#{ @props.model.get('thumbnail_url') }')"
-                else
-                  i className:'icon-document media-object ef-big-icon'
+                FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
                 @props.model.displayName()
 

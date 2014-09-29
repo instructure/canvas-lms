@@ -8,8 +8,9 @@ define [
   './FolderTree'
   './FilesUsage'
   '../mixins/MultiselectableMixin'
+  '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, filesEnv) ->
+], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp = React.createClass
     displayName: 'FilesApp'
@@ -30,7 +31,7 @@ define [
         selectedItems: undefined
       }
 
-    mixins: [MultiselectableMixin]
+    mixins: [MultiselectableMixin, dndMixin]
 
     # for MultiselectableMixin
     selectables: ->
@@ -74,6 +75,10 @@ define [
             FolderTree({
               rootTillCurrentFolder: @state.rootTillCurrentFolder
               rootFoldersToShow: filesEnv.rootFolders
+              dndOptions:
+                onItemDragEnterOrOver: @onItemDragEnterOrOver
+                onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
+                onItemDrop: @onItemDrop
             })
           div {
             className:'ef-directory'
@@ -90,6 +95,12 @@ define [
               toggleAllSelected: @toggleAllSelected
               areAllItemsSelected: @areAllItemsSelected
               userCanManageFilesForContext: userCanManageFilesForContext
+              dndOptions:
+                onItemDragStart: @onItemDragStart
+                onItemDragEnterOrOver: @onItemDragEnterOrOver
+                onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
+                onItemDrop: @onItemDrop
+
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext
             FilesUsage({
