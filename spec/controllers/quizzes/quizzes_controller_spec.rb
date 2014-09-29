@@ -371,6 +371,27 @@ describe Quizzes::QuizzesController do
       response.should be_success
       submission.reload.has_seen_results.should == true
     end
+
+    it "does not attempt to lock results if there is a settings only submission" do
+      Account.default.disable_feature! :quiz_stats
+      user_session(@student)
+
+      course_quiz(true)
+      @quiz.lock_at = 2.days.ago
+      @quiz.one_time_results = true
+      @quiz.save!
+      @quiz.publish!
+
+      sub_manager = Quizzes::SubmissionManager.new(@quiz)
+      submission = sub_manager.find_or_create_submission(@student, nil, 'settings_only')
+      submission.manually_unlocked = true
+      submission.save!
+
+      get 'show', course_id: @course.id, id: @quiz.id
+
+      response.should be_success
+      submission.reload.has_seen_results.should be_nil
+    end
   end
 
   describe "GET 'show' with quiz stats enabled" do

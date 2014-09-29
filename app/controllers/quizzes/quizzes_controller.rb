@@ -911,7 +911,7 @@ class Quizzes::QuizzesController < ApplicationController
 
     submission = @submission || get_submission
 
-    return unless submission.present?
+    return if submission.blank? || submission.settings_only?
 
     if submission.results_visible? && !submission.has_seen_results?
       Quizzes::QuizSubmission.where({ id: submission }).update_all({
