@@ -42,6 +42,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
+  # @property [Fixnum] submission_question_index
+  # @private
+  #
+  # A counter used in generating question names for students based on the
+  # position of the question within the quiz_data set.
+  #
+  # See #generate_submission
+  # See #generate_submission_question
+  attr_readonly :submission_question_index
+
   has_many :quiz_questions, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizQuestion'
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
@@ -553,7 +563,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if q[:pick_count]
         question_count += q[:actual_pick_count] || q[:pick_count]
       else
-        question_count += 1 unless q[:question_type] == "text_only_question"
+        question_count += 1 unless q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
       end
     end
     question_count || 0
@@ -608,11 +618,28 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def generate_submission_question(q)
-    @idx ||= 1
-    q[:name] = t '#quizzes.quiz.question_name_counter', "Question %{question_number}", :question_number => @idx
-    if q[:question_type] == 'text_only_question'
+    @submission_question_index = 0 if @submission_question_index.nil?
+
+    unless q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
+      @submission_question_index += 1
+    end
+
+    self.class.decorate_question_for_submission(q, @submission_question_index)
+  end
+
+  # TODO: could this stop mutating the question object and instead return the
+  # decorated version?
+  #
+  # this currently has too many side-effects: on quiz_data, @stored_questions,
+  # and (what we really want) a submissions's quiz_data...
+  #
+  # anyway if ur wondering why any of these fields are being modified in a spec
+  # when you are just innocently calling Quiz#generate_submission, you know why
+  def self.decorate_question_for_submission(q, position)
+    q[:name] = t '#quizzes.quiz.question_name_counter', "Question %{question_number}", :question_number => position
+
+    if q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
       q[:name] = t '#quizzes.quiz.default_text_only_question_name', "Spacer"
-      @idx -= 1
     elsif q[:question_type] == 'fill_in_multiple_blanks_question'
       text = q[:question_text]
       variables = q[:answers].map { |a| a[:blank_id] }.uniq
@@ -651,7 +678,6 @@ class Quizzes::Quiz < ActiveRecord::Base
       q[:question_text] = text
     end
     q[:question_name] = q[:name]
-    @idx += 1
     q
   end
 
@@ -662,7 +688,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     submission.retake
     submission.attempt = (submission.attempt + 1) rescue 1
     user_questions = []
-    @idx = 1
+    @submission_question_index = 0
     @stored_questions = nil
     @submission_questions = self.stored_questions
     if preview

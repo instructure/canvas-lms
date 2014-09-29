@@ -68,13 +68,21 @@ class Quizzes::QuizRegrader::Submission
   REGRADE_KEEP_FIELDS = (%w{id position name question_name published_at}).to_set
 
   def regraded_question_data
+    pos = 0
+
     submission.quiz_data.map do |question|
       id = question[:id]
+
+      pos += 1 unless question[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
+
       if submitted_answer_ids.include?(id)
-        question.keep_if {|k, v| REGRADE_KEEP_FIELDS.include?(k) }
+        question.keep_if {|k, v| REGRADE_KEEP_FIELDS.include?(k.to_s) }
 
         quiz_question = question_regrades[id].quiz_question
-        data  = quiz_question.question_data
+        data  = Quizzes::Quiz.decorate_question_for_submission(
+          quiz_question.question_data,
+          pos
+        )
         group = quiz_question.quiz_group
 
         if group && group.pick_count
