@@ -51,6 +51,11 @@ define [
       userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files')
 
       div null,
+        # For whatever reason, VO in Safari didn't like just the h1 tag.
+        # Sometimes it worked, others it didn't, this makes it work always
+        header {},
+          h1 {className: 'screenreader-only'},
+              I18n.t('files_heading', "Files")
         Breadcrumbs({
           rootTillCurrentFolder: @state.rootTillCurrentFolder
           query: @props.query

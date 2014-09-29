@@ -335,7 +335,11 @@ class FilesController < ApplicationController
         }
       }
     end
+
+    @page_title = t('files_page_title', 'Files')
+
     js_env :FILES_CONTEXTS => files_contexts
+
     render :text => "".html_safe, :layout => true
   end
 
