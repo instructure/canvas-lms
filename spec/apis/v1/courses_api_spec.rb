@@ -282,6 +282,7 @@ describe CoursesController, type: :request do
         course_response = post_params['course'].merge({
           'account_id' => @account.id,
           'root_account_id' => @account.id,
+          'enrollment_term_id' => term.id,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -340,6 +341,7 @@ describe CoursesController, type: :request do
         course_response = post_params['course'].merge({
           'account_id' => @account.id,
           'root_account_id' => @account.id,
+          'enrollment_term_id' => term.id,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -354,7 +356,6 @@ describe CoursesController, type: :request do
           'id' => new_course.id,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
         )
-        course_response.delete 'enrollment_term_id' #not included in the response
         json.should eql course_response
       end
 
@@ -1895,7 +1896,8 @@ describe CoursesController, type: :request do
         'public_syllabus' => @course1.public_syllabus,
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
-        'apply_assignment_group_weights' => false
+        'apply_assignment_group_weights' => false,
+        'enrollment_term_id' => @course.enrollment_term_id
       }
     end
 
