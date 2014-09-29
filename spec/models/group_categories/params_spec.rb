@@ -61,6 +61,12 @@ module GroupCategories
         params.auto_leader.should be_nil
       end
 
+      it 'is nil with auto_leading disabled from form submission of an existing record' do
+        raw_args = {auto_leader: "first", enable_auto_leader: "0"}
+        params = build_params(raw_args)
+        expect(params.auto_leader).to be(nil)
+      end
+
       it 'passes through valid values when auto leading is enabled' do
         params = build_params(enable_auto_leader: true, auto_leader_type: "random")
         params.auto_leader.should == 'random'
@@ -84,6 +90,25 @@ module GroupCategories
       it 'is first if first is passed in raw' do
         valid_inputs = ['first', :first, "FIRST"]
         check_passthrough_raw_param(valid_inputs, :auto_leader, 'first')
+      end
+
+      describe "when there's a collision between raw and formbased" do
+
+        #because this would indicate it's not actively trying to be deleted
+        it 'uses the raw value if form value not from a checkbox form' do
+          params = build_params(auto_leader_type: "FIRST", auto_leader: "random")
+          expect(params.auto_leader).to eq("random")
+        end
+
+        it 'nils out the param if disabled from the form' do
+          params = build_params(enable_auto_leader: false, auto_leader_type: "FIRST", auto_leader: "random")
+          expect(params.auto_leader).to be(nil)
+        end
+
+        it 'uses the form value if form is enabled' do
+          params = build_params(enable_auto_leader: true, auto_leader_type: "FIRST", auto_leader: "random")
+          expect(params.auto_leader).to eq("first")
+        end
       end
     end
 
@@ -124,24 +149,24 @@ module GroupCategories
     describe '#assign_unassigned_members' do
       it 'is false if self signup is on' do
         params = build_params(enable_self_signup: true)
-        params.assign_unassigned_members.should be_false
+        params.assign_unassigned_members.should be(false)
       end
 
       it 'is false if split groups arent set' do
         params = build_params(enable_self_signup: false, split_groups: '0')
-        params.assign_unassigned_members.should be_false
+        params.assign_unassigned_members.should be(false)
       end
 
       it 'is false if create_group_count is empty' do
         params = build_params(enable_self_signup: false,
           split_groups: '1', create_group_count: nil, split_group_count: nil)
-        params.assign_unassigned_members.should be_false
+        params.assign_unassigned_members.should be(false)
       end
 
       it 'is true without self signup and with a split count' do
         params = build_params(enable_self_signup: false,
           split_groups: '1', create_group_count: nil, split_group_count: '3')
-        params.assign_unassigned_members.should be_true
+        params.assign_unassigned_members.should be(true)
       end
     end
 

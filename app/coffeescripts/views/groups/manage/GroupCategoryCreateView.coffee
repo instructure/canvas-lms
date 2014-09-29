@@ -22,8 +22,6 @@ define [
       GroupCategoryEditView::els
       '.admin-signup-controls': '$adminSignupControls'
       '#split_groups': '$splitGroups'
-      '.auto-group-leader-toggle': '$autoGroupLeaderToggle'
-      '.auto-group-leader-controls': '$autoGroupLeaderControls'
       '.admin-signup-controls input[name=split_groups][value=1]': '$autoGroupSplitControl'
 
     events: _.extend {},
@@ -32,16 +30,9 @@ define [
       'click .auto-group-leader-toggle': 'toggleAutoGroupLeader'
       'click .admin-signup-controls input[name=split_groups]' : 'setVisibilityOfGroupLeaderControls'
 
-
     afterRender: ->
       super()
       @setVisibilityOfGroupLeaderControls()
-      @toggleAutoGroupLeader()
-
-    toggleAutoGroupLeader: ->
-      enabled = @$autoGroupLeaderToggle.prop 'checked'
-      @$autoGroupLeaderControls.find('label.radio').css opacity: if enabled then 1 else 0.5
-      @$autoGroupLeaderControls.find('input[name=auto_leader_type]').prop('disabled', !enabled)
 
     setVisibilityOfGroupLeaderControls: ->
       splitGroupsChecked = @$autoGroupSplitControl.prop("checked")

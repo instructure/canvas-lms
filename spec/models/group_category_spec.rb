@@ -31,18 +31,19 @@ describe GroupCategory do
 
   context "protected_name_for_context?" do
     it "should be false for 'Student Groups' in accounts" do
-      GroupCategory.protected_name_for_context?('Student Groups', account).should be_false
+      is_protected = GroupCategory.protected_name_for_context?('Student Groups', account)
+      expect(is_protected).to be_falsey
     end
 
     it "should be true for 'Student Groups' in courses" do
       course = @course
-      GroupCategory.protected_name_for_context?('Student Groups', course).should be_true
+      expect(GroupCategory.protected_name_for_context?('Student Groups', course)).to be_truthy
     end
 
     it "should be true for 'Imported Groups' in both accounts and courses" do
       course = @course
-      GroupCategory.protected_name_for_context?('Imported Groups', account).should be_true
-      GroupCategory.protected_name_for_context?('Imported Groups', course).should be_true
+      expect(GroupCategory.protected_name_for_context?('Imported Groups', account)).to be_truthy
+      expect(GroupCategory.protected_name_for_context?('Imported Groups', course)).to be_truthy
     end
   end
 
@@ -137,12 +138,12 @@ describe GroupCategory do
   context 'allows_multiple_memberships?' do
     it "should be true iff the category is student organized or communities" do
       course = @course
-      GroupCategory.student_organized_for(course).allows_multiple_memberships?.should be_true
-      account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?.should be_false
-      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_false
-      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_false
-      course.group_categories.create(:name => 'Random Category').allows_multiple_memberships?.should be_false
-      GroupCategory.communities_for(account).allows_multiple_memberships?.should be_true
+      GroupCategory.student_organized_for(course).allows_multiple_memberships?.should be_truthy
+      account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?.should be_falsey
+      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_falsey
+      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_falsey
+      course.group_categories.create(:name => 'Random Category').allows_multiple_memberships?.should be_falsey
+      GroupCategory.communities_for(account).allows_multiple_memberships?.should be_truthy
     end
   end
 
@@ -192,21 +193,15 @@ describe GroupCategory do
     @category = GroupCategory.new
     @category.name = "foo"
     @category.context = course()
-    @category.configure_self_signup(true, false)
-    @category.self_signup?.should be_true
-    @category.unrestricted_self_signup?.should be_true
+    @category.self_signup = 'enabled'
+    expect(@category.self_signup?).to be_truthy
+    expect(@category.unrestricted_self_signup?).to be_truthy
   end
 
   it "should default to no self signup" do
     category = GroupCategory.new
-    category.self_signup?.should be_false
-    category.unrestricted_self_signup?.should be_false
-  end
-
-  it 'passes through a valid auto leader value when auto leader is enabled' do
-    category = GroupCategory.new
-    category.configure_auto_leader(true, 'RANDOM')
-    category.auto_leader.should == 'random'
+    expect(category.self_signup?).to be_falsey
+    expect(category.unrestricted_self_signup?).to be_falsey
   end
 
   context "has_heterogenous_group?" do

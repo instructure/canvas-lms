@@ -17,8 +17,8 @@ module GroupCategories
 
     describe 'intializer' do
       it 'accepts a category and context' do
-        category = stub('group_category')
-        context = stub('course')
+        category = double('group_category')
+        context = double('course')
         policy = ParamsPolicy.new(category, context)
         policy.group_category.should == category
         policy.context.should == context
@@ -27,7 +27,7 @@ module GroupCategories
 
     describe '#populate_with' do
       let(:category){ MockGroupCategory.new() }
-      let(:context){ stub('course') }
+      let(:context){ double('course') }
       let(:policy){ ParamsPolicy.new(category, context) }
 
       it 'configures the self_signup accoring to the params' do
@@ -37,7 +37,13 @@ module GroupCategories
 
       it 'sets up the autoleader value' do
         policy.populate_with({enable_auto_leader: "1", auto_leader_type: 'RANDOM'}, populate_options)
-        category.auto_leader.should == 'random'
+        expect(category.auto_leader).to eq('random')
+      end
+
+      it "can null out an existing autoleader value" do
+        category.auto_leader = "FIRST"
+        policy.populate_with({enable_auto_leader: "0", auto_leader_type: 'RANDOM'}, populate_options)
+        expect(category.auto_leader).to be(nil)
       end
 
       it 'lets you override the name' do
