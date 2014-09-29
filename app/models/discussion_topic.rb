@@ -727,7 +727,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && self.available_for?(user) }
+    given { |user| self.user && self.user == user && self.available_for?(user) && self.visible_for?(user) }
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
@@ -739,7 +739,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.active? && self.available_for?(user) && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.available_for?(user) && self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) }#students.include?(user) }
     can :reply and can :read
 
     given { |user, session| self.active? && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }

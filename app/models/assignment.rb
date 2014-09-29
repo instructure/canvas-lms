@@ -865,7 +865,8 @@ class Assignment < ActiveRecord::Base
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
       context.grants_right?(user, session, :participate_as_student) &&
-      !locked_for?(user)
+      !locked_for?(user) &&
+      visible_to_user?(user)
     }
     can :submit and can :attach_submission_comment_files
 

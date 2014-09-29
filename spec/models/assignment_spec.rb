@@ -262,6 +262,19 @@ describe Assignment do
           end
         end
       end
+
+      context "permissions" do
+        before :once do
+          @course.enable_feature!(:differentiated_assignments)
+          @assignment.submission_types = "online_text_entry"
+          @assignment.save!
+        end
+
+        it "should not allow students without visibility to submit" do
+          @assignment.check_policy(@student1).should include :submit
+          @assignment.check_policy(@student2).should_not include :submit
+        end
+      end
     end
 
     describe "visible_to_observer?" do

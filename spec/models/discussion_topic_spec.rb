@@ -224,6 +224,10 @@ describe DiscussionTopic do
         it "should be visible to a teacher" do
           @topic.visible_for?(@teacher).should be_true
         end
+        it "should not grant reply permissions to a student without an override" do
+          @topic.check_policy(@student1).should include :reply
+          @topic.check_policy(@student2).should_not include :reply
+        end
         context "active_participants_with_visibility" do
           it "should filter participants by visibility" do
             [@student1, @teacher].each do |user|

@@ -78,7 +78,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter,
     :require_lockdown_browser, :require_lockdown_browser_for_results,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at,
-    :hide_correct_answers_at, :require_lockdown_browser_monitor, 
+    :hide_correct_answers_at, :require_lockdown_browser_monitor,
     :lockdown_browser_monitor_data, :only_visible_to_overrides
   ]
 
@@ -1107,7 +1107,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade
 
-    given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
+    given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
     can :submit
 
     given do |user, session|
@@ -1121,7 +1121,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given do |user, session|
       available? &&
-        context.grants_right?(user, session, :participate_as_student)
+        context.grants_right?(user, session, :participate_as_student) &&
+        visible_to_user?(user)
     end
     can :read and can :submit
   end

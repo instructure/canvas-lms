@@ -1717,7 +1717,7 @@ describe Quizzes::Quiz do
   describe 'differentiated assignments' do
     context 'visible_to_user?' do
       before :once do
-        course_with_teacher_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true, course: @course)
         @course_section = @course.course_sections.create
         @student1, @student2 = create_users(2, return_type: :record)
         @quiz = Quizzes::Quiz.create!({
@@ -1738,10 +1738,17 @@ describe Quizzes::Quiz do
         @course.reload
       end
       context 'DA feature on' do
-        before {@course.enable_feature!(:differentiated_assignments)}
+        before { @course.enable_feature!(:differentiated_assignments) }
         context 'student with override' do
           it 'should show the quiz if there is an override' do
             @quiz.visible_to_user?(@student1).should be_true
+          end
+          it "should grant submit rights" do
+            @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
+            @course.stubs(:grants_right?).with(@student1, nil, :manage_assignments).returns(false)
+            @course.stubs(:grants_right?).with(@student1, nil, :manage_grades).returns(false)
+            @quiz.grants_right?(@student1, :submit).should == true
+            @course.unstub(:grants_right?)
           end
         end
         context 'student without override' do
@@ -1752,6 +1759,12 @@ describe Quizzes::Quiz do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
             @quiz.visible_to_user?(@student2).should be_true
+          end
+          it 'should not grant submit rights' do
+            @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
+            @course.stubs(:grants_right?).with(@student2, nil, :manage_assignments).returns(false)
+            @course.stubs(:grants_right?).with(@student2, nil, :manage_grades).returns(false)
+            @quiz.grants_right?(@student2, :submit).should == false
           end
         end
         context 'observer' do
