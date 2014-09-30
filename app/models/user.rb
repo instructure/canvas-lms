@@ -1628,7 +1628,14 @@ class User < ActiveRecord::Base
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
           ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
-          res.concat(pending_enrollments.map { |e| c = e.course; c.write_attribute(:primary_enrollment, e.type); c.write_attribute(:primary_enrollment_rank, e.rank_sortable.to_s); c.write_attribute(:primary_enrollment_state, e.workflow_state); c.write_attribute(:invitation, e.uuid); c })
+          res.concat(pending_enrollments.map do |e|
+            c = e.course
+            c.primary_enrollment = e.type
+            c.primary_enrollment_rank = e.rank_sortable.to_s
+            c.primary_enrollment_state = e.workflow_state
+            c.invitation = e.uuid
+            c
+          end)
           res.uniq!
         end
       end
