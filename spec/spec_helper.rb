@@ -1225,7 +1225,7 @@ RSpec.configure do |config|
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
         'spec run_jobs',
-        Delayed::Worker.queue,
+        Delayed::Settings.queue,
         0,
         Delayed::MAX_PRIORITY)
       run_job(job)

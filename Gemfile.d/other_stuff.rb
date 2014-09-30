@@ -33,6 +33,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.6'
   gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.15'
+gem 'canvas-jobs', '0.9.5'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.2.5', :require => 'diff/lcs'
 
