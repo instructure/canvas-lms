@@ -228,7 +228,6 @@ class ContextController < ApplicationController
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
       @prior_users = @context.prior_users.
-        select("users.*, NULL AS prior_enrollment").
         by_top_enrollment.merge(Enrollment.not_fake).
         paginate(:page => params[:page], :per_page => 20)
 
@@ -237,7 +236,7 @@ class ContextController < ApplicationController
         # put the relevant prior enrollment on each user
         @context.prior_enrollments.where({:user_id => users.keys}).
           top_enrollment_by(:user_id, :student).
-          each { |e| users[e.user_id].write_attribute :prior_enrollment, e }
+          each { |e| users[e.user_id].prior_enrollment = e }
       end
     end
   end
