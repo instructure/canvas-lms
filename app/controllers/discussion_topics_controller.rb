@@ -479,6 +479,7 @@ class DiscussionTopicsController < ApplicationController
             }
             if @sequence_asset
               env_hash[:SEQUENCE] = {
+                :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
                 :ASSET_ID => @sequence_asset.id,
                 :COURSE_ID => @sequence_asset.context.id,
               }
