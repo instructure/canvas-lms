@@ -1131,7 +1131,7 @@ class Assignment < ActiveRecord::Base
   SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
                              media_comment_id media_comment_type]
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment]).to_set
+                                    %w[comment group_comment attachments]).to_set
 
   def submit_homework(original_student, opts={})
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
