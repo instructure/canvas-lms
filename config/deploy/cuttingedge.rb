@@ -1,3 +1,7 @@
+require 'capistrano-scm-copy'
+set :scm, :copy
+set :copy_local_tar, "/usr/local/bin/gtar" if `uname` =~ /Darwin/
+
 set :stage, :cuttingedge
 role :app, "canvas-edge.tier2.sfu.ca"
 role :db, "canvas-edge.tier2.sfu.ca", :primary => true
