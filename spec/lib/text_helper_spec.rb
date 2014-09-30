@@ -33,56 +33,10 @@ describe TextHelper do
   end
 
   context "datetime_string" do
-
-    it "should just give the start if no end is provided" do
+    it "formats datetimes" do
       datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
       th.datetime_string(datetime).should == "Jan 1 at 12pm"
     end
-
-    it "should omit the time if shorten_midnight is true and it's (due) at midnight" do
-      datetime = Time.zone.now.midnight
-      th.datetime_string(datetime, :event, nil, true).should == th.date_string(datetime, :no_words)
-      datetime -= 1.minute
-      th.datetime_string(datetime, :due_date, nil, true).should == th.date_string(datetime, :no_words)
-    end
-
-    it "should ignore end if the type is due_date" do
-      datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
-      expected = "Jan 1 by 12pm"
-      th.datetime_string(datetime, :due_date).should == expected
-      th.datetime_string(datetime, :due_date, datetime + 1.hour).should == expected
-    end
-
-    it "should give a multi-day range if start and end are on different days" do
-      start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-      end_datetime = start_datetime + 2.days
-      th.datetime_string(start_datetime, :event, end_datetime).should ==
-        "Jan 1 at 12pm to Jan 3 at 12pm"
-    end
-
-    it "should give a same-day range if start and end are on the same day" do
-      start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-      end_datetime = start_datetime.advance(:hours => 1)
-      th.datetime_string(start_datetime, :event, end_datetime).should ==
-        "Jan 1 from 12pm to  1pm"
-    end
-
-    it "should include the year if the current year isn't the same" do
-      today = Time.zone.now
-      nextyear = today.advance(:years => 1)
-      datestring = th.datetime_string nextyear
-      datestring.split[2].to_i.should == nextyear.year
-      th.datetime_string(today).split.size.should == (datestring.split.size - 1)
-    end
-
-    it "accepts a timezone override" do
-      datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-      mountain = th.datetime_string(datetime, :event, nil, false, ActiveSupport::TimeZone["America/Denver"])
-      central = th.datetime_string(datetime, :event, nil, false, ActiveSupport::TimeZone["America/Chicago"])
-      mountain.should == "Jan 1 at  5am"
-      central.should == "Jan 1 at  6am"
-    end
-
   end
 
   context "time_string" do

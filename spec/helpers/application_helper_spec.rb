@@ -118,6 +118,12 @@ describe ApplicationHelper do
       it 'uses the simple title for nil context' do
         context_sensitive_datetime_title(Time.now, nil, just_text: true).should == "Mar 13 at  1:12am"
       end
+
+      it 'crosses date boundaries appropriately' do
+        Timecop.freeze(Time.utc(2013,3,13,7,12))
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+      end
     end
 
     describe '#friendly_datetime' do
