@@ -147,8 +147,8 @@ class ContextModule < ActiveRecord::Base
   alias_method :published?, :active?
 
   def publish_items!
-    self.content_tags.select{|t| t.unpublished?}.each do |tag|
-      tag.publish
+    self.content_tags.each do |tag|
+      tag.publish if tag.unpublished?
       tag.update_asset_workflow_state!
     end
   end

@@ -467,6 +467,20 @@ describe "Modules API", type: :request do
         @wiki_page.active?.should == true
       end
 
+      it "should publish module tag items even if the tag itself is already published" do
+        # surreptitiously set up a terrible pre-DS => post-DS transition state
+        ContentTag.where(:id => @wiki_page_tag.id).update_all(:workflow_state => 'active')
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                        {:controller => "context_modules_api", :action => "update", :format => "json",
+                         :course_id => "#{@course.id}", :id => "#{@module1.id}"},
+                        {:module => {:published => '1'}}
+        )
+
+        @wiki_page.reload
+        @wiki_page.active?.should == true
+      end
+
       it "should unpublish modules" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
