@@ -307,28 +307,6 @@ describe FilesController do
       @file.reload.last_inline_view.should be_nil
     end
 
-    it "should not mark a file as viewed for module progressions if the file is locked" do
-      user_session(@student)
-      file_in_a_module
-      @file.locked = true
-      @file.save!
-      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:unlocked)
-      @file.reload.last_inline_view.should be_nil
-    end
-
-    it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
-      user_session(@student)
-      file_in_a_module
-      @file.locked = true
-      @file.save!
-      get 'show', :course_id => @course.id, :id => @file.id
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:unlocked)
-      @file.reload.last_inline_view.should be_nil
-    end
-
     it "should mark files as viewed for module progressions if the file is previewed inline" do
       user_session(@student)
       file_in_a_module

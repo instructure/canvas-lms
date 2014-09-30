@@ -601,4 +601,26 @@ describe ContentTag do
       @module.reload.completion_requirements.should == [{id: @tag2.id, type: 'must_submit'}]
     end
   end
+
+  it "should sync tag published state with attachment locked state" do
+    course
+    att = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new("blah"),
+                             :folder => Folder.unfiled_folder(@course), :context => @course)
+    att.locked = true
+    att.save!
+
+    a_module = @course.context_modules.create!(:name => "module")
+    tag = a_module.add_item({ :type => 'attachment', :id => att.id })
+    tag.unpublished?.should be_true
+
+    att.locked = false
+    att.save!
+    tag.reload
+    tag.unpublished?.should be_false
+
+    att.locked = true
+    att.save!
+    tag.reload
+    tag.unpublished?.should be_true
+  end
 end
