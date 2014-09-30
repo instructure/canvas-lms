@@ -3,12 +3,14 @@ define [
   'react'
   'react-router'
   'compiled/react_files/components/Toolbar'
-], ($, React, Router, Toolbar) ->
+  'compiled/react_files/routes'
+], ($, React, Router, Toolbar, routes) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
   module 'Toolbar',
     setup: ->
+      @routes = React.addons.TestUtils.renderIntoDocument(routes)
       @toolbar = React.renderComponent(Toolbar({params: 'foo', query:'', selectedItems: '', contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
     teardown: ->
       React.unmountComponentAtNode(@toolbar.getDOMNode().parentNode)

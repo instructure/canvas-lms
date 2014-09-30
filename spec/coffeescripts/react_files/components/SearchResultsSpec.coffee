@@ -5,9 +5,16 @@ define [
   'compiled/collections/FilesCollection'
 ], (React, Router, SearchResults, FilesCollection) ->
   module 'SearchResults#render',
+    setup: ->
+      sinon.stub(Router, 'Link').returns('link')
+      sinon.stub($, 'ajax').returns($.Deferred().resolve())
+
+    teardown: ->
+      Router.Link.restore()
+      $.ajax.restore()
+
   test 'when collection is loaded and empty display no matches found', ->
-    sinon.stub(Router, 'Link').returns('link')
-    sinon.stub($, 'ajax').returns($.Deferred().resolve())
+
     props =
       params: {}
       query: {}
@@ -28,5 +35,4 @@ define [
     ok @searchResults.refs.noResultsFound, 'Displays the no results text'
 
     React.unmountComponentAtNode($('#fixtures')[0])
-    Router.Link.restore()
-    $.ajax.restore()
+

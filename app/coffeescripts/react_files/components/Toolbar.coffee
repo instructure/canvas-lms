@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'i18n!react_files'
   'react'
   'react-router'
@@ -10,7 +11,7 @@ define [
   './RestrictedDialogForm'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -19,6 +20,7 @@ define [
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
       contextType: customPropTypes.contextType.isRequired
       contextId: customPropTypes.contextId.isRequired
+
 
     onSubmitSearch: (event) ->
       event.preventDefault()
@@ -49,6 +51,17 @@ define [
       $.when(promises...).then ->
         $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
       @props.clearSelectedItems()
+
+    getPreviewQuery: ->
+      return unless @props.selectedItems.length
+      if @props.selectedItems.length is 1
+        {preview: @props.selectedItems[0].id}
+      else
+        {
+          preview: @props.selectedItems[0].id
+          only_preview: @props.selectedItems.map((item) -> item.id).join(',')
+        }
+
 
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -96,14 +109,14 @@ define [
 
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
-          button {
-            disabled: !showingButtons
-            className: 'ui-button btn-view'
-            onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
-            title: I18n.t('view', 'View')
-            'aria-label': I18n.t('view', 'View')
-            'data-tooltip': ''
-          },
+          Router.Link  {
+              to: (if @props.currentFolder?.urlPath() then 'folder' else 'rootFolder'),
+              query: @getPreviewQuery()
+              splat: @props.currentFolder?.urlPath()
+              className: 'ui-button btn-view'
+              title: I18n.t('view', 'View')
+              'data-tooltip': ''
+            },
             i className: 'icon-search'
 
           if @props.userCanManageFilesForContext
