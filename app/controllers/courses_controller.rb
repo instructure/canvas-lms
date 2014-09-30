@@ -238,6 +238,10 @@ require 'set'
 #         "restrict_enrollments_to_course_dates": {
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "course_format": {
+#           "example": "online",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -480,6 +484,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
+  # @argument course[course_format] [String]
+  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
   # @returns Course
   def create
@@ -1740,6 +1747,8 @@ class CoursesController < ApplicationController
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
+  # @argument course[course_format] [String]
+  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \

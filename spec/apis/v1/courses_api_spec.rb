@@ -277,6 +277,7 @@ describe CoursesController, type: :request do
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
+            'course_format'                        => 'online',
           }
         }
         course_response = post_params['course'].merge({
@@ -481,7 +482,8 @@ describe CoursesController, type: :request do
         'hide_final_grades' => false,
         'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
-        'default_view' => 'new default view'
+        'default_view' => 'new default view',
+        'course_format' => 'on_campus'
       }, 'offer' => true }
     end
 
@@ -522,6 +524,7 @@ describe CoursesController, type: :request do
         @course.workflow_state.should == 'available'
         @course.apply_group_weights?.should == true
         @course.default_view.should == 'new default view'
+        @course.course_format.should == 'on_campus'
       end
 
       it "should not change dates that aren't given" do

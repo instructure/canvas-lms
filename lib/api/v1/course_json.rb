@@ -40,6 +40,7 @@ module Api::V1
       @hash['public_description'] = description(@course)
       @hash['hide_final_grades'] = @course.hide_final_grades?
       @hash['workflow_state'] = @course.api_state
+      @hash['course_format'] = @course.course_format if @course.course_format.present?
       clear_unneeded_fields(@hash)
     end
 
