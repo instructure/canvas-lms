@@ -1,3 +1,7 @@
+require 'capistrano-scm-copy'
+set :scm, :copy
+set :copy_local_tar, "/usr/local/bin/gtar" if `uname` =~ /Darwin/
+
 set :stage, :production
 set :app_node_prefix, "canvas-ap"
 set :canvas_url, 'https://canvas.sfu.ca'

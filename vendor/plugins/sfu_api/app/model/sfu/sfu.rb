@@ -35,9 +35,9 @@ module SFU
         REST.json REST.course_info_url, "&course=#{course}&term=#{term}"
       end
 
-      def sections_exists?(json_data, section_code)
+      def sections_exists?(json_data, section)
         json_data.any? do |info|
-          info["course"]["section"].to_s.downcase.eql?(section_code)
+          info["course"]["section"].to_s.downcase.eql?(section)
         end
       end
 
@@ -57,27 +57,27 @@ module SFU
         end
       end
 
-      def is_enrollment_section?(json_data, section_code)
+      def is_enrollment_section?(json_data, section)
         json_data.any? do |info|
-          info["course"]["section"].to_s.downcase.eql?(section_code) && info["course"]["classType"].to_s.downcase.eql?("e")
+          info["course"]["section"].to_s.downcase.eql?(section) && info["course"]["classType"].to_s.downcase.eql?("e")
         end
       end
 
-      def associated_class_for_section(json_data, section_code)
+      def associated_class_for_section(json_data, section)
         associated_class = nil
         json_data.each do |info|
-          associated_class = info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section_code)
+          associated_class = info["course"]["associatedClass"] if info["course"]["section"].to_s.downcase.eql?(section)
         end
         associated_class
       end
 
-      def section_tutorials(course_code, term_code, section_code)
+      def section_tutorials(course_code, term_code, section)
         details = info(course_code, term_code)
         sections = []
         has_no_child_sections = true
 
-        if details != "[]" && is_enrollment_section?(details, section_code)
-          associated_class = associated_class_for_section(details, section_code)
+        if details != "[]" && is_enrollment_section?(details, section)
+          associated_class = associated_class_for_section(details, section)
           have_tutorials = have_tutorials?(details, associated_class)
           have_labs = have_labs?(details, associated_class)
 
@@ -99,12 +99,12 @@ module SFU
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
-        sections << section_code.upcase if has_no_child_sections && sections_exists?(details, section_code)
+        sections << section.upcase if has_no_child_sections && sections_exists?(details, section)
 
         sections
       end
 
-      def title(course_code, term_code, section_code)
+      def title(course_code, term_code, section)
         details = info(course_code, term_code)
         title = nil
         if details == 500
@@ -114,7 +114,7 @@ module SFU
         elsif details != "[]"
           details.each do |info|
             section = info["course"]["section"].downcase
-            title = info["course"]["title"] if section.eql? section_code.downcase
+            title = info["course"]["title"] if section.eql? section.downcase
           end
         end
         title

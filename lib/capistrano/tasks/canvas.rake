@@ -9,6 +9,14 @@ end
 
 namespace :canvas do
 
+  desc "Fix ownership on canvas install directory"
+  task :fix_owner do
+    on roles(:all) do
+      user = fetch :user
+      execute :chown, '-R', "#{user}:#{user}", "#{release_path}"
+    end
+  end
+
   desc "Set application nodes from config file"
   task :set_app_nodes do
     on primary :db do
@@ -26,7 +34,6 @@ namespace :canvas do
 
   desc "Run the copy_config script"
   task :copy_config do
-    puts "original"
     on roles(:all) do
       execute "sudo CANVASDIR=#{release_path} /etc/init.d/canvasconfig start"
     end
@@ -57,12 +64,4 @@ namespace :canvas do
     end
   end
 
-end
-
-namespace :wtf do
-  task :hostname do
-    on roles(:all) do
-      execute :hostname
-    end
-  end
 end
