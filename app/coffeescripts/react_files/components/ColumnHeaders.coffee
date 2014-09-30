@@ -4,8 +4,7 @@ define [
   'react-router'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-], (_, React, {Link}, withReactDOM, preventDefault) ->
-
+], (_, React, ReactRouter, withReactDOM, preventDefault) ->
 
   columns = [
     displayName: 'Name'
@@ -47,7 +46,7 @@ define [
           columns.map (column) =>
             isSortedCol = sort is column.property
             div key: column.property, className: "#{column.className} #{'current-filter' if isSortedCol}",
-              Link _.defaults({to: @props.to, query: @queryParamsFor(column.property)}, @props.params),
+              ReactRouter.Link _.defaults({to: @props.to, query: @queryParamsFor(column.property)}, @props.params),
                 column.displayName
                 i className:'icon-arrow-up'   if isSortedCol and order is 'asc'
                 i className:'icon-arrow-down' if isSortedCol and order is 'desc'

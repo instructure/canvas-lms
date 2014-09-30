@@ -41,6 +41,10 @@ describe ExternalToolsController, type: :request do
       search_call(@course)
     end
 
+    it "should only find selectable tools" do
+      only_selectables(@course)
+    end
+
     it "should create an external tool" do
       create_call(@course)
     end
@@ -214,6 +218,10 @@ describe ExternalToolsController, type: :request do
       search_call(@account, "account")
     end
 
+    it "should only find selectable tools" do
+      only_selectables(@account, "account")
+    end
+
     it "should create an external tool" do
       create_call(@account, "account")
     end
@@ -301,6 +309,18 @@ describe ExternalToolsController, type: :request do
     json.map{|h| h['id']}.sort.should == ids.sort
   end
 
+  def only_selectables(context, type="course")
+    context.context_external_tools.create!(:name => "first", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti", :not_selectable => true)
+    not_selectable = context.context_external_tools.create!(:name => "second", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti")
+
+    json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?selectable=true",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :"#{type}_id" => context.id.to_s, :selectable => 'true'})
+
+    json.length.should == 1
+    json.first['id'].should == not_selectable.id
+  end
+
   def create_call(context, type="course")
     json = api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
                     {:controller => 'external_tools', :action => 'create', :format => 'json',
@@ -383,6 +403,7 @@ describe ExternalToolsController, type: :request do
     et.description = "For testing stuff"
     et.consumer_key = "oi"
     et.shared_secret = "hoyt"
+    et.not_selectable = true
     et.url = "http://www.example.com/ims/lti"
     et.workflow_state = 'public'
     et.custom_fields = {:key1 => 'val1', :key2 => 'val2'}
@@ -396,6 +417,11 @@ describe ExternalToolsController, type: :request do
     et.course_home_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.course_settings_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course settings sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.global_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "global navigation", display_type: 'full_width', visibility: 'admins'}
+    et.assignment_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment menu", display_type: 'full_width', visibility: 'admins'}
+    et.discussion_topic_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic menu", display_type: 'full_width', visibility: 'admins'}
+    et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
+    et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
+    et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
     et.save!
     et
   end
@@ -454,6 +480,7 @@ describe ExternalToolsController, type: :request do
      "domain"=>nil,
      "url"=>"http://www.example.com/ims/lti",
      "id"=>et ? et.id : nil,
+     "not_selectable"=> et ? et.not_selectable : nil,
      "workflow_state"=>"public",
      "vendor_help_link"=>nil,
      "resource_selection"=>
@@ -528,7 +555,47 @@ describe ExternalToolsController, type: :request do
           "visibility"=>'admins',
           "display_type"=>'full_width',
           "selection_height"=>400,
-          "selection_width"=>800}
+          "selection_width"=>800},
+     "assignment_menu"=>
+         {"text"=>"assignment menu",
+          "label"=>"assignment menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "discussion_topic_menu"=>
+         {"text"=>"discussion topic menu",
+          "label"=>"discussion topic menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "module_menu"=>
+         {"text"=>"module menu",
+          "label"=>"module menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "quiz_menu"=>
+         {"text"=>"quiz menu",
+          "label"=>"quiz menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+     "wiki_page_menu"=>
+         {"text"=>"wiki page menu",
+          "label"=>"wiki page menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
     }
   end
 end

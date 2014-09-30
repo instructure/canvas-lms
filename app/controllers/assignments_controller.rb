@@ -54,7 +54,11 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
+        :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
+        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
       })
+
 
       respond_to do |format|
         format.html do
@@ -66,7 +70,8 @@ class AssignmentsController < ApplicationController
   end
 
   def old_index
-    if @context == @current_user || authorized_action(@context, @current_user, :read)
+    return redirect_to(dashboard_url) if @context == @current_user
+    if authorized_action(@context, @current_user, :read)
       get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
       get_sorted_assignments
       add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
@@ -110,7 +115,7 @@ class AssignmentsController < ApplicationController
 
       if @context.feature_enabled?(:differentiated_assignments) && @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
         respond_to do |format|
-          flash[:error] = t 'notices.assignment_not_availible', "The assignment you requested is not availible to your course section."
+          flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
         end
         return
@@ -160,6 +165,8 @@ class AssignmentsController < ApplicationController
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
+      @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
+
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
@@ -168,7 +175,8 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'attendance'
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
           format.html { render :action => 'show' }
         end
@@ -276,7 +284,14 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
+
+      student_scope = if @assignment.differentiated_assignments_applies?
+                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
+                      else
+                        @context.students_visible_to(@current_user)
+                      end
+
+      @students = student_scope.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

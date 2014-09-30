@@ -31,3 +31,13 @@ define [
 
     window.confirm.restore()
     $.ajax.restore()
+
+  test 'clicking restricted dialog opens a dialog', ->
+    sinon.stub(React, 'renderComponent')
+    sinon.spy($.fn, 'dialog')
+    Simulate.click(@itemCog.refs.restrictedDialog.getDOMNode())
+
+    ok $.fn.dialog.calledOnce, 'opens a restricted dialog window'
+    ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
+    $.fn.dialog.restore()
+    React.renderComponent.restore()

@@ -7,8 +7,9 @@ require [
   'compiled/views/quizzes/NoQuizzesView'
   'compiled/views/quizzes/IndexView'
   'compiled/collections/QuizCollection'
+  'compiled/models/QuizOverrideLoader'
   'compiled/util/vddTooltip'
-], (I18n, $, _, Backbone, QuizItemGroupView, NoQuizzesView, IndexView, QuizCollection, vddTooltip) ->
+], (I18n, $, _, Backbone, QuizItemGroupView, NoQuizzesView, IndexView, QuizCollection, QuizOverrideLoader, vddTooltip) ->
 
   class QuizzesIndexRouter extends Backbone.Router
     routes:
@@ -46,6 +47,14 @@ require [
         flags:           ENV.FLAGS
         urls:            ENV.URLS
       @view.render()
+      @loadOverrides() if @shouldLoadOverrides()
+
+    loadOverrides: ->
+      quizModels = [ 'assignment', 'open', 'surveys' ].reduce (out, quizType) =>
+        out.concat(@quizzes[quizType].collection.models)
+      , []
+
+      QuizOverrideLoader(quizModels, ENV.URLS.assignment_overrides)
 
     createQuizItemGroupView: (collection, title, type) ->
       options = @allQuizzes.options
@@ -59,6 +68,9 @@ require [
         listId: "#{type}-quizzes"
         title: title
         toggleMessage: @translations.toggleMessage
+
+    shouldLoadOverrides: ->
+      true
 
   # Start up the page
   router = new QuizzesIndexRouter

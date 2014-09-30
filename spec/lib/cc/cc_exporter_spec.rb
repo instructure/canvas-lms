@@ -466,5 +466,32 @@ describe "Common Cartridge exporting" do
       html_file = variant_tag.next_element.attribute('href').value
       @zip_file.read("#{assignment_id}/test-assignment.html").should be_include "<em>what?</em>"
     end
+
+    it "should export unpublished modules and items" do
+      cm1 = @course.context_modules.create!(name: "published module")
+      cm1.publish
+      cm2 = @course.context_modules.create!(name: "unpublished module")
+      cm2.unpublish
+
+      tag1_1 = cm1.add_item(type: 'external_url', title: 'unpub url', url: 'https://example.com')
+      tag1_1.workflow_state = 'unpublished'
+      tag1_1.save!
+      tag1_2 = cm1.add_item(type: 'external_url', title: 'pub url', url: 'https://example.com')
+      tag1_2.workflow_state = 'published'
+      tag1_2.save!
+
+      tag2_1 = cm2.add_item(type: 'external_url', title: 'unpub url 2', url: 'https://example.com')
+      tag2_1.workflow_state = 'unpublished'
+      tag2_1.save!
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export
+
+      @manifest_doc.at_css("item[identifier=#{mig_id(tag1_1)}]").should_not be_nil
+      @manifest_doc.at_css("item[identifier=#{mig_id(tag1_2)}]").should_not be_nil
+      @manifest_doc.at_css("item[identifier=#{mig_id(tag2_1)}]").should_not be_nil
+    end
+
   end
 end

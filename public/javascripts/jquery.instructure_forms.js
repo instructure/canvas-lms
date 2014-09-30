@@ -21,6 +21,7 @@ define([
   'jquery' /* jQuery, $ */,
   'underscore',
   'compiled/xhr/FakeXHR',
+  'compiled/behaviors/authenticity_token',
   'jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */,
   'jquery.disableWhileLoading' /* disableWhileLoading */,
   'jquery.google-analytics' /* trackEvent */,
@@ -30,7 +31,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $, _, FakeXHR) {
+], function(INST, I18n, $, _, FakeXHR, authenticity_token) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -339,10 +340,8 @@ define([
   $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
-    if(!formData.authenticity_token) {
-      // TODO: remove me once we stop proxying file uploads
-      formData.authenticity_token = ENV.AUTHENTICITY_TOKEN;
-    }
+    // TODO: remove me once we stop proxying file uploads
+    formData.authenticity_token = authenticity_token();
     var fileNames = {};
     files.each(function() {
       fileNames[$(this).attr('name')] = true;
@@ -381,10 +380,8 @@ define([
     });
   }
   $.ajaxFileUpload = function(options) {
-    if(!options.data.authenticity_token) {
-      // TODO: remove me once we stop proxying file uploads
-      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN;
-    }
+    // TODO: remove me once we stop proxying file uploads
+    options.data.authenticity_token = authenticity_token();
     $.toMultipartForm(options.data, function(params) {
       $.sendFormAsBinary({
         url: options.url,

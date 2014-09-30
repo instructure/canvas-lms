@@ -1,6 +1,6 @@
 require 'active_support'
 
-class CanvasLogger < ActiveSupport::BufferedLogger
+class CanvasLogger < (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger)
   attr_reader :log_path
 
   def initialize(log_path, level = DEBUG, options = {})

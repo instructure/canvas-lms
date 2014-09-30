@@ -1,69 +1,65 @@
 define [
+  'i18n!react_files'
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/models/Folder'
-  'compiled/models/File'
+  'compiled/models/FilesystemObject'
   './RestrictedDialogForm'
-  './DialogAdapter'
-  'i18n!react_files'
-], (React, withReactDOM, preventDefault, Folder, File, RestrictedDialogForm, $DialogAdapter, I18n) ->
+  '../utils/openMoveDialog'
+  'jquery'
+  'jqueryui/dialog'
+], (I18n, React, withReactDOM, preventDefault, FilesystemObject, RestrictedDialogForm, openMoveDialog, $) ->
 
-  # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
 
-    getInitialState: ->
-      restrictedDialogOpen: false
-
+    # === React Functions === #
     propTypes:
-      model: React.PropTypes.oneOfType([
-        React.PropTypes.instanceOf(File),
-        React.PropTypes.instanceOf(Folder)
-      ])
+      model: React.PropTypes.instanceOf(FilesystemObject)
 
-    isAFolderCog: -> @props.model instanceof Folder
+    # === Custom Functions === #
 
-    openRestrictedDialog: preventDefault ->
-      @setState restrictedDialogOpen: true
-
-    closeRestrictedDialog: ->
-      @setState restrictedDialogOpen: false
-
-    deleteItem: preventDefault ->
+    deleteItem: ->
       message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
-        name: @props.model.get('name') || @props.model.get('display_name')
+        name: @props.model.displayName()
       })
       if confirm message
         @props.model.destroy()
 
+    # Function Summary
+    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
+    # dialog window. This allows us to do react things inside of this all ready rendered
+    # jQueryUI widget
+    openRestrictedDialog: ->
+      $dialog = $('<div>').dialog
+        title: I18n.t("title.limit_student_access", "Limit student access")
+        width: 400
+        close: ->
+          React.unmountComponentAtNode this
+          $(this).remove()
+
+      React.renderComponent(RestrictedDialogForm({
+        model: @props.model
+        closeDialog: -> $dialog.dialog('close')
+      }), $dialog[0])
+
+
     render: withReactDOM ->
-      div null,
+      span {},
 
-        $DialogAdapter open: @state.restrictedDialogOpen, title: I18n.t("title.limit_student_access", "Limit student access"),
-          RestrictedDialogForm closeDialog: @closeRestrictedDialog
+        button className:'al-trigger al-trigger-gray btn btn-link', 'aria-label': I18n.t('settings', 'Settings'),
+          i className:'icon-settings',
+          i className:'icon-mini-arrow-down'
 
-        div className:'ef-hover-options',
-          a href:'#', className: 'adminCog-download-link',
-            i className:'icon-download'
-
-          div className:'ef-admin-gear',
-            div null,
-              a className:'al-trigger al-trigger-gray', role:'button', 'aria-haspopup':'true', 'aria-owns':'content-1', 'aria-label': I18n.t('aria_label.settings', 'Settings'), href:'#',
-                i className:'icon-settings',
-                i className:'icon-mini-arrow-down'
-
-              ul id:'content-1', className:'al-options', role:'menu', tabIndex:'0', 'aria-hidden':'true', 'aria-expanded':'false', 'aria-activedescendant':'content-2',
-
-                li {},
-                  a href:'#', onClick: @props.startEditingName, id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit Name', 'Edit Name'
-                li {},
-                  a onClick: @openRestrictedDialog, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Restrict Access', 'Restrict Access'
-                li {},
-                  a ref: 'deleteLink', onClick: @deleteItem, href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete', 'Delete'
-
-                (li {},
-                  a href:'#', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Download as Zip',
-                    'Download as Zip'
-                ) if @isAFolderCog()
-
-
+        ul className:'al-options',
+          li {},
+            a href:'#', onClick: preventDefault(@props.startEditingName),
+              I18n.t('edit_name', 'Edit Name')
+          li {},
+            a href:'#', onClick: preventDefault(@openRestrictedDialog), ref: 'restrictedDialog',
+              I18n.t('restrict_access', 'Restrict Access')
+          li {},
+            a href:'#', onClick: preventDefault(openMoveDialog.bind(null, [@props.model])),
+              I18n.t('move', 'Move')
+          li {},
+            a href:'#', onClick: preventDefault(@deleteItem), ref: 'deleteLink',
+              I18n.t('delete', 'Delete')

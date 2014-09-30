@@ -1,3 +1,5 @@
+@import "base/environment";
+
 @mixin hideForPhone {
   @media (max-width:767px){
     display: none;
@@ -29,8 +31,6 @@ $border: #e5e4e4;
   height: 30px;
   width: 240px;
   flex: 1 1 0;
-  -webkit-flex: 1 1 0;
-  -ms-flex: 1 1 0;
 
   .icon-search{
     position: absolute;
@@ -54,19 +54,16 @@ $border: #e5e4e4;
 
 .ef-main-buttons{
   display: flex;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   justify-content: flex-end;
-  -webkit-justify-content: flex-end;
-  -ms-flex-pack: end;
-
-  flex: 2 2 0;
-  -webkit-flex: 2 2 0;
-  -ms-flex: 2 0;
-
-  .btn{
-    margin-right: 5px;
+  flex: 3 3 0;
+  position: relative;
+  .ui-buttonset, .ui-button {
+    display: inline-block;
   }
+}
+.ef-selected-items-actions {
+  position: absolute;
+  left: 8px;
 }
 
 .ef-admin-cog{
@@ -78,11 +75,7 @@ $border: #e5e4e4;
   padding-left: 20px;
   padding-right: 20px;
   display: flex;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   align-items: center;
-  -webkit-align-items: center;
-  -ms-flex-align: center;
 }
 
 .ef-breadcrumbs{
@@ -92,8 +85,6 @@ $border: #e5e4e4;
   height: 40px;
   display: flex;
   align-items: center;
-  -webkit-align-items: center;
-  -ms-flex-align: center;
 
   a {
     background-color: transparent;
@@ -119,22 +110,12 @@ $border: #e5e4e4;
 .ef-main{
   min-height: 500px;
   display: flex;
-  display: -webkit-flex;
-  display: -ms-flexbox;
 
   .ef-folder-content{
     border-right: 1px solid #f2f2f2;
     display: flex;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-
     flex-direction: column;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-
     flex: 1 1 0;
-    -webkit-flex: 1 1 0;
-    -ms-flex: 1 0;
     padding: 0px;
 
     [role=tree]{
@@ -142,7 +123,7 @@ $border: #e5e4e4;
       margin: 10px;
     }
 
-    i{
+    i {
       color: black;
     }
 
@@ -163,130 +144,30 @@ $border: #e5e4e4;
 
     .ef-folder-list{
       flex: 10 10 0;
-      -webkit-flex: 10 10 0;
-      -ms-flex: 10 0;
-
       font-size: 12px;
     }
 
     .ef-folder-totals{
       display: flex;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-
       align-items: center;
-      -webkit-align-items: center;
-      -ms-flex-align: center;
-
       justify-content: flex-start;
-      -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-
       flex: 1 1 0;
-      -webkit-flex: 1 1 0;
-      -ms-flex: 1 0;
       height: 30px;
       font-size: 16px;
       border-top: 1px solid $border;
       padding-left: 20px;
     }
   }
+}
+.ef-directory{
+  margin: 10px;
+  flex: 3 3 0;
+  display: flex;
+  flex-direction: column;
 
-  .ef-directory{
-    margin: 10px;
-    flex: 3 3 0;
-    -webkit-flex: 3 3 0;
-    -ms-flex: 3 0;
-
-    display: flex;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-
-    flex-direction: column;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-
-
-
-    .ef-item-row{
-      display: flex;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      padding: 5px;
-
-      &.currently-selected-item{
-        background-color: #d9edf9;
-
-        .ef-hover-options{
-          display: flex;
-          display: -webkit-flex;
-          display: -ms-flexbox;
-        }
-      }
-
-      &:hover{
-        background-color: #d9edf9;
-      }
-
-      &:hover .ef-hover-options{
-        display: flex;
-        display: -webkit-flex;
-        display: -ms-flexbox;
-      }
-    }
-
-    .ef-name-col{
-      flex: 8 8 0;
-      -webkit-flex: 8 8 0;
-      -ms-flex: 8 0;
-    }
-
-    .ef-date-created-col{
-      flex: 3 3 0;
-      -webkit-flex: 3 3 0;
-      -ms-flex: 3 0;
-      @include hideForPhone;
-    }
-
-    .ef-date-modified-col{
-      flex: 3 3 0;
-      -webkit-flex: 3 3 0;
-      -ms-flex: 3 0;
-      @include hideForPhone;
-    }
-    
-    .ef-modified-by-col{
-      flex: 3 3 0;
-      -webkit-flex: 3 3 0;
-      -ms-flex: 3 0;
-      @include hideForPhone;
-    }
-    
-    .ef-size-col{
-      flex: 2 2 0;
-      -webkit-flex: 2 2 0;
-      -ms-flex: 2 0;
-      @include hideForPhone;
-    }
-
-    .ef-links-col{
-      display: flex;
-      width: 85px;
-    }
-
-    .ef-hover-options{
-      .al-trigger{
-        color: black;
-      }
-      display: none;
-      margin-left: 14px;
-    }
-  }
 }
 .ef-directory-header{
   display: flex;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   padding: 5px;
   border-bottom: 1px solid #f2f2f2;
 
@@ -294,6 +175,69 @@ $border: #e5e4e4;
     color: black;
   }
 }
+
+
+
+.ef-item-row{
+  display: flex;
+  padding: 5px;
+  user-select: none; /* so that we can shift-click to select */
+
+  &.ef-item-selected{
+    background-color: #d9edf9;
+  }
+
+  .al-trigger {
+    opacity: 0
+  }
+  &:hover .al-trigger,
+  .al-trigger.ui-state-active {
+    opacity: 1
+  }
+
+
+  &:hover{
+    background-color: #d9edf9;
+  }
+}
+
+.ef-name-col{
+  flex: 8 8 0;
+}
+
+.ef-date-created-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-date-modified-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-modified-by-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-size-col{
+  flex: 2 2 0;
+  @include hideForPhone;
+}
+
+.ef-links-col{
+  display: flex;
+  width: 85px;
+}
+
+.ef-hover-options{
+  .al-trigger{
+    color: black;
+  }
+  margin-left: 14px;
+}
+
+
 
 .ef-thumbnail {
   width: 45px;
@@ -306,4 +250,31 @@ $border: #e5e4e4;
   position: absolute;
   top: 0;
   right: 0;
+}
+.file-rename-form__form-label {
+  float: left;
+  margin-top: 5px;
+  padding-right: 5px;
+}
+.upload-progress-view__bar-container {
+  height: 3px;
+  margin-bottom: 12px;
+  background: $canvas-neutral;
+  width: 100%;
+}
+.upload-progress-view__label {
+  margin-left: 5px;
+  margin-top: 5px;
+  color: ensure-contrast(#000, $canvas-secondary);
+  font-size: 0.95em;
+}
+.upload-progress-view__indeterminate{
+  margin-left: 6px;
+  margin-bottom: 2px;
+}
+.upload-progress-view__bar {
+  position: relative;
+  background: $canvas-primary;
+  border: none;
+  height: 3px;
 }

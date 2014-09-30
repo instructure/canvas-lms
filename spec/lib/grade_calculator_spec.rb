@@ -366,27 +366,15 @@ describe GradeCalculator do
       @user.enrollments.first.computed_final_score.should eql(48.4)
     end
 
-    context "draft state" do
-      it "should not include unpublished assignments when draft state is enabled" do
-        two_graded_assignments
+    it "should not include unpublished assignments" do
+      two_graded_assignments
 
-        @course.account.enable_feature!(:draft_state)
-        @assignment2.unpublish
+      @course.enable_feature!(:draft_state)
+      @assignment2.unpublish
 
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(40.0)
-        @user.enrollments.first.computed_final_score.should eql(40.0)
-      end
-
-      it "should include unpublished assignments when draft state is disabled" do
-        two_graded_assignments
-
-        @assignment2.unpublish
-
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(60.0)
-        @user.enrollments.first.computed_final_score.should eql(60.0)
-      end
+      @user.reload
+      @user.enrollments.first.computed_current_score.should eql(40.0)
+      @user.enrollments.first.computed_final_score.should eql(40.0)
     end
   end
 
@@ -596,6 +584,88 @@ describe GradeCalculator do
         @course.update_attribute :group_weighting_scheme, 'equal'
         grade = 145.0 # ((9 + 5 + 10 + 5) / (10 + 10)) * 100
         check_grades(grade, grade)
+      end
+    end
+
+    context "differentiated assignments grade calculation" do
+      def set_up_course_for_differentiated_assignments(enabler_method)
+          @course.send(enabler_method, :differentiated_assignments)
+          set_grades [[5, 20], [15, 20], [10,20], [nil, 20], [20, 20], [10,20], [nil, 20]]
+          @assignments.each do |a|
+            a.only_visible_to_overrides = true
+            a.save!
+          end
+          @overridden_lowest = @assignments[0]
+          @overridden_highest = @assignments[1]
+          @overridden_middle = @assignments[2]
+          @non_overridden_lowest = @assignments[3]
+          @non_overridden_highest = @assignments[4]
+          @non_overridden_middle = @assignments[5]
+          @not_graded = @assignments.last
+
+          @user.enrollments.each(&:destroy)
+          @section = @course.course_sections.create!(name: "test section")
+          student_in_section(@section, user: @user)
+
+          create_section_override_for_assignment(@overridden_lowest, course_section: @section)
+          create_section_override_for_assignment(@overridden_highest, course_section: @section)
+          create_section_override_for_assignment(@overridden_middle, course_section: @section)
+      end
+
+      def get_user_points_and_course_total(user,course)
+        calc = GradeCalculator.new [user.id], course.id
+        final_grade_info = calc.compute_scores.first.last.first
+        [final_grade_info[:total], final_grade_info[:possible]]
+      end
+
+      context "DA enabled" do
+        before do
+          set_up_course_for_differentiated_assignments(:enable_feature!)
+        end
+        it "should calculate scores based on visible assignments only" do
+          # 5 + 15 + 10 + 20 + 10
+          get_user_points_and_course_total(@user,@course).should == [60,100]
+        end
+        it "should drop the lowest visible when that rule is in place" do
+          @group.update_attribute(:rules, 'drop_lowest:1')
+          # 5 + 15 + 10 + 20 + 10 - 5
+          get_user_points_and_course_total(@user,@course).should == [55,80]
+        end
+        it "should drop the highest visible when that rule is in place" do
+          @group.update_attribute(:rules, 'drop_highest:1')
+          # 5 + 15 + 10 + 20 + 10 - 20
+          get_user_points_and_course_total(@user,@course).should == [40,80]
+        end
+        it "shouldnt count an invisible assingment with never drop on" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          # 5 + 15 + 10 + 20 + 10 - 10 - 10
+          get_user_points_and_course_total(@user,@course).should == [40,60]
+        end
+      end
+
+      context "DA disabled" do
+        before do
+          set_up_course_for_differentiated_assignments(:disable_feature!)
+        end
+        it "should calculate scores based on all active assignments" do
+          # 5 + 15 + 10 + 0 + 20 + 10
+          get_user_points_and_course_total(@user,@course).should == [60,140]
+        end
+        it "should drop the lowest visible when that rule is in place" do
+          @group.update_attribute(:rules, 'drop_lowest:1')
+          # 5 + 15 + 10 + 0 + 20 + 10 - 0
+          get_user_points_and_course_total(@user,@course).should == [60,120]
+        end
+        it "should drop the highest visible when that rule is in place" do
+          @group.update_attribute(:rules, 'drop_highest:1')
+          # 5 + 15 + 10 + 0 + 20 + 10 - 20
+          get_user_points_and_course_total(@user,@course).should == [40,120]
+        end
+        it "shouldnt count an invisible assingment with never drop on" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@non_overridden_lowest.id}")
+          # 5 + 15 + 10 + 0 + 20 + 10 - 5 - 0
+          get_user_points_and_course_total(@user,@course).should == [55,100]
+        end
       end
     end
   end

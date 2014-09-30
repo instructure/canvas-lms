@@ -129,6 +129,17 @@
                     <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
                   <% end %>
                 <% end %>
+
+                <% if can_do(@context, @current_user, :manage_content) %>
+                  <% (@discussion_topic_menu_tools || []).each do |tool_hash| %>
+                    <li>
+                      <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&discussion_topics[]=<%= @topic.id %>" tabindex="-1" role="menuitem">
+                        <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                        <%= tool_hash[:title] %>
+                      </a>
+                    </li>
+                  <% end %>
+                <% end %>
               </ul>
             </div>
           <% end %>

@@ -199,163 +199,11 @@ describe "varied due dates" do
 
   context "on the assignments page" do
 
-    def assert_due_date(response, expected)
-      doc = Nokogiri::HTML(response.body)
-
-      [ "#assignment_#{@assignment.id} .date_text",
-        "#right-side .event a em"
-      ].each do |selector|
-        doc.at_css(selector).text.should include(
-          expected.is_a?(String) ? expected : date_string(expected)
-        )
-      end
-      assert_coming_up_due_date(response, expected)
-    end
-
     def formatted_date(string)
       TextHelper.date_string(string)
     end
 
     context "an assignment that has a course due date and a section due date" do
-
-      context "as a student" do
-
-        context "in the base section" do
-          it "shows the course due date" do
-            user_session(@student1)
-            get "/assignments"
-
-            assert_due_date response, @course_due_date
-            response.body.should_not include formatted_date(@section_due_date)
-            response.body.should_not include multiple_due_dates
-          end
-        end
-
-        context "in the overridden section" do
-          it "shows the section due date" do
-            user_session(@student2)
-            get "/assignments"
-
-            assert_due_date response, @section_due_date
-            response.body.should_not include formatted_date(@course_due_date)
-            response.body.should_not include multiple_due_dates
-          end
-        end
-
-        context "in both the base section and the overridden section (it could happen)" do
-          it "shows the more lenient due date (section due date in this case)" do
-            user_session(@student2)
-            get "/assignments"
-
-            assert_due_date response, @section_due_date
-            response.body.should_not include formatted_date(@course_due_date)
-            response.body.should_not include multiple_due_dates
-          end
-        end
-      end
-
-      context "as the teacher" do
-        it "shows multiple due dates" do
-          course_with_teacher_logged_in(:course => @course, :active_all => true)
-          get "/assignments"
-
-          assert_due_date response, multiple_due_dates
-          response.body.should_not include formatted_date(@course_due_date)
-          response.body.should_not include formatted_date(@section_due_date)
-        end
-      end
-
-      context "as a TA" do
-        it "shows multiple due dates" do
-          course_with_ta(:course => @course, :active_all => true)
-          user_session(@ta)
-
-          get "/assignments"
-
-          assert_due_date response, multiple_due_dates
-          response.body.should_not include formatted_date(@course_due_date)
-          response.body.should_not include formatted_date(@section_due_date)
-        end
-      end
-
-      context "as an observer" do
-        before do
-          course_with_observer(:course => @course, :active_all => true)
-          user_session(@observer)
-        end
-
-        context "assigned to students" do
-          context "assigned to a student in the base section" do
-            it "shows the course due date" do
-              @enrollment.update_attribute(:associated_user_id, @student1.id)
-              get "/assignments"
-
-              assert_due_date response, @course_due_date
-              response.body.should_not include formatted_date(@section_due_date)
-              response.body.should_not include multiple_due_dates
-            end
-          end
-
-          context "assigned to a student in the overridden section" do
-            it "shows the section due date" do
-              @enrollment.update_attribute(:associated_user_id, @student2.id)
-              get "/assignments"
-
-              assert_due_date response, @section_due_date
-              response.body.should_not include formatted_date(@course_due_date)
-              response.body.should_not include multiple_due_dates
-            end
-          end
-
-          context "assigned to a student in multiple sections" do
-            it "shows the more lenient due date (section in this case)" do
-              @enrollment.update_attribute(:associated_user_id, @student3.id)
-              get "/assignments"
-
-              assert_due_date response, @section_due_date
-              response.body.should_not include formatted_date(@course_due_date)
-              response.body.should_not include multiple_due_dates
-            end
-          end
-        end
-
-        context "not assigned to any students" do
-          context "enrolled in the base section" do
-            it "shows the course due date" do
-              get "/assignments"
-
-              assert_due_date response, @course_due_date
-              response.body.should_not include formatted_date(@section_due_date)
-              response.body.should_not include multiple_due_dates
-            end
-          end
-
-          context "enrolled in the overridden section" do
-            it "shows the section due date" do
-              @enrollment.course_section = @section ; @enrollment.save!
-
-              get "/assignments"
-
-              assert_due_date response, @section_due_date
-              response.body.should_not include formatted_date(@course_due_date)
-              response.body.should_not include multiple_due_dates
-            end
-          end
-        end
-      end
-
-      context "as a course designer" do
-        it "shows multiple due dates" do
-          course_with_designer(:course => @course, :active_all => true)
-          user_session(@designer)
-
-          get "/assignments"
-
-          assert_due_date response, multiple_due_dates
-          response.body.should_not include formatted_date(@course_due_date)
-          response.body.should_not include formatted_date(@section_due_date)
-        end
-      end
 
       describe "as an account admin, accessing the course assignments page" do
         before do
@@ -375,18 +223,6 @@ describe "varied due dates" do
             AssignmentOverride.delete_all
             get course_assignments_path(@course)
             response.body.should include formatted_date(@course_due_date)
-          end
-        end
-      end
-
-      describe "with caching" do
-        it "shows the right due dates" do
-          enable_cache do
-            { @student1 => @course_due_date, @student2 => @section_due_date }.each do |student, due_date|
-              user_session(student)
-              get "/assignments"
-              assert_due_date response, due_date
-            end
           end
         end
       end

@@ -194,6 +194,7 @@ class ProfileController < ApplicationController
       return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
     else
       @user = @current_user
+      @user.dismiss_bouncing_channel_message!
     end
     @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired

@@ -57,6 +57,7 @@ describe ExternalToolsController do
       it "generates launch params for a ContentItemSelectionResponse message" do
         user_session(@teacher)
         Lti::Asset.stubs(:opaque_identifier_for).returns('ABC123')
+        HostUrl.stubs(:outgoing_email_address).returns('some_address')
 
         @course.root_account.lti_guid = 'root-account-guid'
         @course.root_account.name = 'root account'
@@ -73,10 +74,14 @@ describe ExternalToolsController do
         lti_launch.params['lti_version'].should == 'LTI-1p0'
         lti_launch.params['context_id'].should == 'ABC123'
         lti_launch.params['resource_link_id'].should == 'ABC123'
+        lti_launch.params['context_title'].should == 'a course'
+        lti_launch.params['roles'].should == 'Instructor'
         lti_launch.params['tool_consumer_instance_guid'].should == 'root-account-guid'
         lti_launch.params['tool_consumer_instance_name'].should == 'root account'
-        lti_launch.params['context_title'].should == 'a course'
+        lti_launch.params['tool_consumer_instance_contact_email'].should == 'some_address'
         lti_launch.params['launch_presentation_return_url'].should start_with 'http'
+        lti_launch.params['launch_presentation_locale'].should == 'en'
+        lti_launch.params['launch_presentation_document_target'].should == 'iframe'
       end
 
       it "sends content item json for a course" do
@@ -103,9 +108,23 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "assignments%5B%5D=#{assignment.id}"
+        params.should include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.assignment'
         placement['placementOf']['title'].should == 'an assignment'
+      end
+
+      it "sends content item json for a discussion topic" do
+        user_session(@teacher)
+        topic = @course.discussion_topics.create!(:title => "blah")
+        get :show, :course_id => @course.id, id: @tool.id, :discussion_topics => [topic.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "select%5Bdiscussion_topics%5D%5B%5D=#{topic.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.discussion_topic'
+        placement['placementOf']['title'].should == 'blah'
       end
 
       it "sends content item json for a quiz" do
@@ -117,7 +136,7 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "quizzes%5B%5D=#{quiz.id}"
+        params.should include "select%5Bquizzes%5D%5B%5D=#{quiz.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
         placement['placementOf']['title'].should == 'a quiz'
       end
@@ -131,9 +150,26 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "modules%5B%5D=#{context_module.id}"
+        params.should include "select%5Bmodules%5D%5B%5D=#{context_module.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.module'
         placement['placementOf']['title'].should == 'a module'
+      end
+
+      it "sends content item json for a module item" do
+        user_session(@teacher)
+        context_module = @course.context_modules.create!(name: 'a module')
+        quiz = @course.quizzes.create!(title: 'a quiz')
+        tag = context_module.add_item(:id => quiz.id, :type => 'quiz')
+
+        get :show, :course_id => @course.id, id: @tool.id, :module_items => [tag.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        migration_url = placement['placementOf']['@id']
+        params = migration_url.split('?').last.split('&')
+
+        migration_url.should start_with api_v1_course_content_exports_url(@course)
+        params.should include "select%5Bmodule_items%5D%5B%5D=#{tag.id}"
+        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
+        placement['placementOf']['title'].should == 'a quiz'
       end
 
       it "sends content item json for a page" do
@@ -145,7 +181,7 @@ describe ExternalToolsController do
         params = migration_url.split('?').last.split('&')
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "pages%5B%5D=#{page.id}"
+        params.should include "select%5Bpages%5D%5B%5D=#{page.id}"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.page'
         placement['placementOf']['title'].should == 'a page'
       end
@@ -159,9 +195,9 @@ describe ExternalToolsController do
 
         migration_url.should start_with api_v1_course_content_exports_url(@course)
         params.should include 'export_type=common_cartridge'
-        params.should include 'pages%5B%5D=1'
-        params.should include 'pages%5B%5D=6'
-        params.should include 'assignments%5B%5D=6'
+        params.should include "select%5Bpages%5D%5B%5D=1"
+        params.should include "select%5Bpages%5D%5B%5D=6"
+        params.should include "select%5Bassignments%5D%5B%5D=6"
         placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
         placement['placementOf']['title'].should == 'a course'
       end
@@ -359,6 +395,7 @@ describe ExternalToolsController do
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
     <blti:extensions platform="canvas.instructure.com">
       <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:property name="not_selectable">true</lticm:property>
       <lticm:options name="editor_button">
         <lticm:property name="url">http://example.com/editor</lticm:property>
         <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
@@ -380,6 +417,7 @@ describe ExternalToolsController do
       assigns[:tool].url.should == "http://example.com/other_url"
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
+      assigns[:tool].not_selectable.should be_truthy
       assigns[:tool].has_placement?(:editor_button).should be_true
     end
 

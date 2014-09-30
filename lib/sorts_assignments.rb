@@ -63,7 +63,7 @@ class SortsAssignments
     assignments.select do |assignment|
       assignment.grants_right?(user, session, :grade) &&
         assignment.expects_submission? &&
-        assignment.needs_grading_count_for_user(user) > 0
+        Assignments::NeedsGradingCountQuery.new(assignment, user).count > 0
     end
   end
 

@@ -7,3 +7,13 @@ gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 
 gem 'canvas_text_helper', path: '../canvas_text_helper'
+
+platforms :ruby_20, :ruby_21 do
+  gem 'iconv', '1.0.4'
+end
+
+require File.expand_path("../../../config/canvas_rails4", __FILE__)
+
+if CANVAS_RAILS3
+  gem 'activesupport', '~> 3.2.0'
+end

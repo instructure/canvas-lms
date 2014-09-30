@@ -168,9 +168,11 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
 
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_message, '')
     end
-  end
 
-  describe "#process_single__CNVS-5873" do
+    it "works with multipart emails with no html part" do
+      test_message('multipart_mixed_no_html_part.eml')
+    end
+
     it "should be able to extract text and html bodies from nested_multipart_sample.eml" do
       test_message('nested_multipart_sample.eml')
     end

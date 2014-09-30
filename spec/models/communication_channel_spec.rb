@@ -103,7 +103,15 @@ describe CommunicationChannel do
     communication_channel_model
     @cc.path_type.should eql('email')
   end
-  
+
+  it "should provide a confirmation url" do
+    HostUrl.expects(:protocol).returns('https')
+    HostUrl.expects(:context_host).returns('test.canvas.com')
+    CanvasSlug.expects(:generate).returns('abc123')
+    communication_channel_model
+    @cc.confirmation_url.should eql('https://test.canvas.com/register/abc123')
+  end
+
   it "should only allow email, or sms as path types" do
     communication_channel_model
     @cc.path_type = 'email'; @cc.save

@@ -2,14 +2,6 @@
 <% @active_tab = "authentication" %>
 <% content_for :page_title do %><%= t(:page_title, "Authentication Settings")%><% end %>
 
-<% content_for :page_header do %>
-    <h1><%= t(:title, "Authentication Settings") %></h1>
-<% end %>
-
-<% content_for :page_subhead do %>
-    <h2><%= @account.name %></h2>
-<% end %>
-
 <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
         <%  has_auth = @account_configs.any? %>

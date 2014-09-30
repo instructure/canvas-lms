@@ -622,6 +622,7 @@ class Attachment < ActiveRecord::Base
     extras = []
     if options[:no_redirect]
       extras << {'success_action_status' => '201'}
+      extras << {'success_url' => res[:success_url]}
     elsif res[:success_url]
       extras << {'success_action_redirect' => res[:success_url]}
     end
@@ -1316,7 +1317,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.submit_to_canvadocs(ids)
-    Attachment.find_each(ids).each do |a|
+    Attachment.where(id: ids).find_each do |a|
       a.submit_to_canvadocs
     end
   end
@@ -1780,12 +1781,12 @@ class Attachment < ActiveRecord::Base
 
   def canvadoc_url(user)
     return unless canvadocable?
-    "/canvadoc_session?#{preview_params(user, "canvadoc")}"
+    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
   def crocodoc_url(user)
     return unless crocodoc_available?
-    "/crocodoc_session?#{preview_params(user, "crocodoc")}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
   end
 
   def preview_params(user, type)

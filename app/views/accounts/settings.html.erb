@@ -15,7 +15,9 @@
   end
 %>
 
+
 <% content_for :right_side do %>
+  <%= render :partial => "screenreader_heading" %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
@@ -30,6 +32,7 @@
     }
   </style>
 <% end %>
+
 
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
@@ -104,7 +107,7 @@ TEXT
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
                 <td>
-                  <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
+                  <%= f.time_zone_select :default_time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
                 </td>
               </tr>
               <%= f.fields_for :settings do |settings| %>
@@ -316,6 +319,11 @@ TEXT
               <div>
                 <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>
                 <%= settings.label     :edit_institution_email, :en => "Users can delete their institution-assigned email address" %>
+              </div>
+
+              <div>
+                <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
+                <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
               </div>
             <% end %>
             <% unless @account.site_admin? %>

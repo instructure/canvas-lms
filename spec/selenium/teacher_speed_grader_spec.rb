@@ -584,6 +584,7 @@ describe "speed grader" do
     end
 
     it "should display average submission grade for total assignment submissions" do
+      pending('testbot fragile')
       create_and_enroll_students(2)
 
       submit_and_grade_homework(@students[0], 10)

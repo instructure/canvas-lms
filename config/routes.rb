@@ -32,7 +32,7 @@ CanvasRails::Application.routes.draw do
   match 'register/:nonce' => 'communication_channels#confirm', :as => :registration_confirmation
   # deprecated
   match 'pseudonyms/:id/register/:nonce' => 'communication_channels#confirm', :as => :registration_confirmation_deprecated
-  match 'confirmations/:user_id/re_send/:id' => 'communication_channels#re_send_confirmation', :as => :re_send_confirmation, :id => nil
+  match 'confirmations/:user_id/re_send(/:id)' => 'communication_channels#re_send_confirmation', :as => :re_send_confirmation, :id => nil
   match 'forgot_password' => 'pseudonyms#forgot_password', :as => :forgot_password
   match 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#confirm_change_password', :as => :confirm_change_password, :via => :get
   match 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#change_password', :as => :change_password, :via => :post
@@ -306,6 +306,7 @@ CanvasRails::Application.routes.draw do
       match 'submission_versions' => 'quizzes/quizzes#submission_versions', :as => :submission_versions
       match 'history' => 'quizzes/quizzes#history', :as => :history
       match 'statistics' => 'quizzes/quizzes#statistics', :as => :statistics
+      match 'statistics_cqs' => 'quizzes/quizzes#statistics_cqs', :as => :statistics_cqs
       match 'read_only' => 'quizzes/quizzes#read_only', :as => :read_only
       match 'submission_html' => 'quizzes/quizzes#submission_html', :as => :submission_html
 
@@ -396,9 +397,6 @@ CanvasRails::Application.routes.draw do
   end
 
   match 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', :as => :quiz_statistics_download, :download => '1'
-
-  match '/crocodoc_session' => 'crocodoc_sessions#show', :via => :get, :as => :crocodoc_session
-  match '/canvadoc_session' => 'canvadoc_sessions#show', :via => :get, :as => :canvadoc_session
 
   resources :page_views, :only => [:update]
   match 'media_objects' => 'context#create_media_object', :as => :create_media_object, :via => :post
@@ -1327,6 +1325,10 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy
     end
 
+    scope(:controller => 'quizzes/quiz_assignment_overrides') do
+      get "courses/:course_id/quizzes/assignment_overrides", :action => :index, :path_name => 'course_quiz_assignment_overrides'
+    end
+
     scope(:controller => 'quizzes/quizzes_api') do
       get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
       post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
@@ -1376,6 +1378,10 @@ CanvasRails::Application.routes.draw do
 
     scope(:controller => 'quizzes/quiz_extensions') do
       post 'courses/:course_id/quizzes/:quiz_id/extensions', :action => :create, :path_name => 'course_quiz_extensions_create'
+    end
+
+    scope(:controller => 'quizzes/course_quiz_extensions') do 
+      post 'courses/:course_id/quiz_extensions', :action => :create, :path_name => 'course_quiz_extensions_create'
     end
 
     scope(:controller => 'quizzes/quiz_submission_questions') do
@@ -1558,6 +1564,10 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/grading_standards', :action => :create
       post 'courses/:course_id/grading_standards', :action => :create
     end
+
+    get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', :as => :crocodoc_session
+    get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

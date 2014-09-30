@@ -53,15 +53,15 @@ describe AssignmentsController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       user_session(@student)
-      
+
       get 'index', :course_id => @course.id
       assigns[:assignments].should_not be_nil
       assigns[:assignment_groups].should_not be_nil
     end
-    
+
     it "should retrieve course assignments if they exist" do
       user_session(@student)
 
@@ -72,12 +72,12 @@ describe AssignmentsController do
       assigns[:assignments].should_not be_empty
       assigns[:assignments][0].should eql(@assignment)
     end
-    
+
     it "should create a default group if none exist" do
       course_with_student_logged_in(:active_all => true)
 
       get 'index', :course_id => @course.id
-      
+
       assigns[:assignment_groups][0].name.should eql("Assignments")
     end
 
@@ -103,30 +103,8 @@ describe AssignmentsController do
         assigns[:js_env][:PERMISSIONS][:manage].should be_false
       end
     end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "should show assignments for all shards" do
-        user_session(@student)
-        @assignment1 = @assignment
-
-        @shard2.activate do
-          account = Account.create!
-          course2 = account.courses.create!
-          course2.offer!
-          @assignment2 = course_assignment(course2)
-          course2.enroll_student(@student).accept!
-        end
-
-        get 'index'
-        assigns[:assignments].length.should == 2
-        assigns[:assignments].should be_include(@assignment1)
-        assigns[:assignments].should be_include(@assignment2)
-      end
-    end
   end
-  
+
   describe "GET 'show'" do
     it "should return 404 on non-existant assignment" do
       #controller.use_rails_error_handling!
@@ -226,7 +204,7 @@ describe AssignmentsController do
       get 'syllabus', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>1,'hidden'=>true}])
@@ -261,14 +239,14 @@ describe AssignmentsController do
       assigns[:assignment].workflow_state.should == 'unpublished'
     end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       #controller.use_rails_error_handling!
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should create assignment" do
       user_session(@student)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
@@ -306,14 +284,14 @@ describe AssignmentsController do
       assigns[:assignment].should be_unpublished
     end
   end
-  
+
   describe "GET 'edit'" do
     it "should require authorization" do
       #controller.use_rails_error_handling!
       get 'edit', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should find assignment" do
       user_session(@student)
       get 'edit', :course_id => @course.id, :id => @assignment.id

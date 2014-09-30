@@ -86,6 +86,12 @@ class DiscussionEntry < ActiveRecord::Base
     p.whenever { |record|
       record.just_created && record.active?
     }
+
+    p.dispatch :announcement_reply
+    p.to { discussion_topic.user }
+    p.whenever { |record|
+      record.discussion_topic.is_announcement && record.just_created && record.active?
+    }
   end
 
   on_create_send_to_streams do

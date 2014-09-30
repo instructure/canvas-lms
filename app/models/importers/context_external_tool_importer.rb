@@ -40,6 +40,7 @@ module Importers
       end
       item.domain = hash[:domain] unless hash[:domain].blank?
       item.privacy_level = hash[:privacy_level] || 'name_only'
+      item.not_selectable = hash[:not_selectable] if hash[:not_selectable]
       item.consumer_key ||= hash[:consumer_key] || 'fake'
       item.shared_secret ||= hash[:shared_secret] || 'fake'
       item.settings = create_tool_settings(hash)

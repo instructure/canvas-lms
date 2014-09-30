@@ -29,7 +29,7 @@ class Cacher < ActiveRecord::Observer
       if obj.account_id == Account.site_admin.id
         Shard.default.activate do
           (0...Account.all_site_admin_account_users_copies).each do |i|
-            Rails.cache.delete("all_site_admin_account_users#{i}")
+            Rails.cache.delete("all_site_admin_account_users2:#{i}")
           end
         end
       end

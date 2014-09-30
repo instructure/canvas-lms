@@ -10,7 +10,7 @@ describe "assignments" do
 
     def manually_create_assignment(assignment_title = 'new assignment')
       get "/courses/#{@course.id}/assignments"
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       wait_for_ajaximations
       replace_content(f('#assignment_title'), assignment_title)
       expect_new_page_load { f('.more_options_link').click }
@@ -86,6 +86,8 @@ describe "assignments" do
 
       #check peer reviews option
       form = f("#edit_assignment_form")
+      assignment_points_possible = f("#assignment_points_possible")
+      replace_content(assignment_points_possible, "5")
       form.find_element(:css, '#assignment_peer_reviews').click
       wait_for_ajaximations
       form.find_element(:css, '#assignment_automatic_peer_reviews').click
@@ -128,7 +130,7 @@ describe "assignments" do
 
       #create assignment
       click_option('#right-side select.assignment_groups_select', 'second group')
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       wait_for_ajaximations
       f('#assignment_title').send_keys(assignment_name)
       f('.ui-datepicker-trigger').click
@@ -136,7 +138,6 @@ describe "assignments" do
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       wait_for_ajaximations
-      f('#assignment_points_possible').send_keys('5')
       submit_form('#add_assignment_form')
 
       #make sure assignment was added to correct assignment group
@@ -163,6 +164,8 @@ describe "assignments" do
           replace_content f('#assignment_points_possible'), ('1')
         end
         click_option('#assignment_submission_type', 'No Submission')
+        assignment_points_possible = f("#assignment_points_possible")
+        replace_content(assignment_points_possible, "5")
         submit_assignment_form
         f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
@@ -210,10 +213,12 @@ describe "assignments" do
         group = @course.assignment_groups.first
         AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
-        f('.add_assignment_link').click
+        f('#right-side .add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
+        assignment_points_possible = f("#assignment_points_possible")
+        replace_content(assignment_points_possible, "5")
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"
@@ -226,7 +231,7 @@ describe "assignments" do
 
     it "should verify that self sign-up link works in more options" do
       get "/courses/#{@course.id}/assignments"
-      f('.add_assignment_link').click
+      f('#right-side .add_assignment_link').click
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
       f('#has_group_category').click
@@ -264,7 +269,7 @@ describe "assignments" do
         group = @course.assignment_groups.first
         AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
-        f('.add_assignment_link').click
+        f('#right-side .add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
@@ -278,7 +283,7 @@ describe "assignments" do
       end
     end
 
-    it "should validate points for percentage grading (> 0)" do
+    def point_validation
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
                                                    :name => assignment_name,
@@ -286,40 +291,70 @@ describe "assignments" do
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
+      yield if block_given?
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+      fj('.error_text div').text.should == "Points possible must be more than 0 for selected grading type"
+    end
+
+    it "should validate points for percentage grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+      }
     end
 
     it "should validate points for percentage grading (!= '')" do
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
-      replace_content f('#assignment_points_possible'), ('')
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+        replace_content f('#assignment_points_possible'), ('')
+      }
     end
 
     it "should validate points for percentage grading (digits only)" do
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
+    end
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
-      replace_content f('#assignment_points_possible'), ('taco')
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+    it "should validate points for letter grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+      }
+    end
+
+    it "should validate points for letter grading (!= '')" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+        replace_content f('#assignment_points_possible'), ('')
+      }
+    end
+
+    it "should validate points for letter grading (digits only)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
+    end
+
+    it "should validate points for GPA scale grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+      }
+    end
+
+    it "should validate points for GPA scale grading (!= '')" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+        replace_content f('#assignment_points_possible'), ('')
+      }
+    end
+
+    it "should validate points for GPA scale grading (digits only)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
     end
 
     context "frozen assignment_group_id" do
@@ -538,6 +573,69 @@ describe "assignments" do
             @assignment.reload.active_assignment_overrides.count.should == 1
           end
         end
+      end
+    end
+
+    context "menu tools" do
+      before do
+        course_with_teacher_logged_in(:draft_state => true)
+        Account.default.enable_feature!(:lor_for_account)
+
+        @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool.assignment_menu = {:url => "http://www.example.com", :text => "Export Assignment"}
+        @tool.quiz_menu = {:url => "http://www.example.com", :text => "Export Quiz"}
+        @tool.discussion_topic_menu = {:url => "http://www.example.com", :text => "Export DiscussionTopic"}
+        @tool.save!
+
+        @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
+      end
+
+      it "should show tool launch links in the gear for items on the index" do
+        plain_assignment = @assignment
+
+        quiz_assignment = assignment_model(:submission_types => "online_quiz", :course => @course)
+        quiz_assignment.reload
+        quiz = quiz_assignment.quiz
+
+        topic_assignment = assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)
+        topic_assignment.reload
+        topic = topic_assignment.discussion_topic
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        gear = f("#assignment_#{plain_assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{plain_assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{plain_assignment.id}"
+
+        gear = f("#assignment_#{topic_assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{topic_assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{topic.id}"
+
+        gear = f("#assignment_#{quiz_assignment.id} .al-trigger")
+        gear.click
+        link = f("#assignment_#{quiz_assignment.id} li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
+      end
+
+      it "should show tool launch links in the gear for items on the show page" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        gear = f("#assignment_show .al-trigger")
+        gear.click
+        link = f("#assignment_show li a.menu_tool_link")
+        link.should be_displayed
+        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
       end
     end
   end

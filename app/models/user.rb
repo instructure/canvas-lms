@@ -264,7 +264,7 @@ class User < ActiveRecord::Base
     elsif record.validation_root_account
       course = record.validation_root_account.self_enrollment_course_for(value)
       record.self_enrollment_course = course
-      if course && course.self_enrollment?
+      if course && course.self_enrollment_enabled?
         record.errors.add(attr, "full") if course.self_enrollment_limit_met?
         record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
       else
@@ -994,6 +994,14 @@ class User < ActiveRecord::Base
       )
     end
     can :manage_user_details and can :manage_logins and can :rename
+
+    given do |user|
+      user && (
+        self.grants_right?(user, :manage_logins) ||
+          (self.grants_right?(user, :manage) && self.pseudonyms.none? {|p| p.system_created?})
+      )
+    end
+    can :delete
   end
 
   def can_masquerade?(masquerader, account)
@@ -1300,7 +1308,7 @@ class User < ActiveRecord::Base
   end
 
   def prefers_high_contrast?
-    feature_enabled?(:high_contrast)
+    !!feature_enabled?(:high_contrast)
   end
 
   def manual_mark_as_read?
@@ -1332,7 +1340,23 @@ class User < ActiveRecord::Base
   def assignments_visibile_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     if course.feature_enabled?(:differentiated_assignments)
-      course.active_assignments.visible_to_student_in_course_with_da(self.id, course.id)
+      return assignments_visible_as_observer(course) if course.user_has_been_observer?(self)
+      course.active_assignments.published.visible_to_student_in_course_with_da(self.id, course.id)
+    else
+      course.active_assignments.published
+    end
+  end
+
+  def assignments_visible_as_observer(course)
+    return [] unless course.user_has_been_observer?(self)
+
+    observed_student_ids = ObserverEnrollment.observed_student_ids(course, self)
+    if self.student_enrollments.any?
+      observed_student_ids.concat self.student_enrollments.pluck(:user_id)
+    end
+
+    if course.feature_enabled?(:differentiated_assignments) && observed_student_ids.any?
+      course.active_assignments.visible_to_student_in_course_with_da(observed_student_ids, course.id)
     else
       course.active_assignments
     end
@@ -1357,7 +1381,10 @@ class User < ActiveRecord::Base
           due_after = opts[:due_after] || 4.weeks.ago
 
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            courses = Course.find(shard_course_ids)
+            courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
             Assignment.for_course(shard_course_ids).
+              filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
               published.
               due_between_with_overrides(due_after,1.week.from_now).
               not_ignored_by(self, 'submitting').
@@ -1396,7 +1423,7 @@ class User < ActiveRecord::Base
               not_ignored_by(self, 'grading').
               need_grading_info(limit)
             Assignment.send :preload_associations, as, :context
-            as.reject{|a| a.needs_grading_count_for_user(self) == 0}
+            as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
@@ -1616,7 +1643,7 @@ class User < ActiveRecord::Base
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
-    self.shard.activate do
+    enrollments = self.shard.activate do
       res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
         res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
         if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
@@ -1626,6 +1653,10 @@ class User < ActiveRecord::Base
         res
       end
     end + temporary_invitations
+    if opts[:preload_courses]
+      Enrollment.send(:preload_associations, enrollments, [:course])
+    end
+    enrollments
   end
 
   def cached_not_ended_enrollments
@@ -1891,7 +1922,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     return @appointment_context_codes if @appointment_context_codes
     ret = {:primary => [], :secondary => []}
-    cached_current_enrollments.each do |e|
+    cached_current_enrollments(preload_courses: true).each do |e|
       next unless e.student? && e.active?
       ret[:primary] << "course_#{e.course_id}"
       ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2155,7 +2186,7 @@ class User < ActiveRecord::Base
     return @menu_data if @menu_data
     coalesced_enrollments = []
 
-    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_courses => true)
     cached_enrollments.each do |e|
 
       next if e.state_based_on_date == :inactive
@@ -2502,5 +2533,36 @@ class User < ActiveRecord::Base
 
   def content_exports_visible_to(user)
     self.content_exports.where(user_id: user)
+  end
+
+  def show_bouncing_channel_message!
+    self.preferences[:show_bouncing_channel_message] = true
+    self.save!
+  end
+
+  def show_bouncing_channel_message?
+    !!self.preferences[:show_bouncing_channel_message]
+  end
+
+  def dismiss_bouncing_channel_message!
+    self.preferences[:show_bouncing_channel_message] = false
+    self.save!
+  end
+
+  def bouncing_channel_message_dismissed?
+    self.preferences[:show_bouncing_channel_message] == false
+  end
+
+  def update_bouncing_channel_message!(channel=nil)
+    force_set_bouncing = channel && channel.bouncing? && !channel.imported?
+    set_bouncing = force_set_bouncing || self.communication_channels.unretired.any? { |cc| cc.bouncing? && !cc.imported? }
+
+    if force_set_bouncing
+      show_bouncing_channel_message!
+    elsif set_bouncing
+      show_bouncing_channel_message! unless bouncing_channel_message_dismissed?
+    else
+      dismiss_bouncing_channel_message!
+    end
   end
 end

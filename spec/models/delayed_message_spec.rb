@@ -64,21 +64,6 @@ describe DelayedMessage do
       @delayed_message.save!
       DelayedMessage.for(@assignment).should == [@delayed_message]
     end
-
-    it "should have a scope to order the messages by a field" do
-      notification = notification_model
-      cc = user.communication_channels.create!(:path => 'path@example.com')
-      nps = (1..3).inject([]) do |list, e|
-        list << cc.notification_policies.create!(:notification => notification, :frequency => Notification::FREQ_IMMEDIATELY)
-      end
-      dms = nps.map do |np|
-        DelayedMessage.create!(:notification => notification,
-                               :notification_policy => np,
-                               :context => cc,
-                               :communication_channel => cc)
-      end
-      DelayedMessage.by(:notification_policy_id).map(&:id).should eql(dms.map(&:id).sort)
-    end
     
     it "should have a scope to filter by the state" do
       notification = notification_model :name => 'New Stuff'

@@ -187,6 +187,53 @@ describe DiscussionTopic do
       @course.enroll_teacher(new_teacher).accept!
       @topic.visible_for?(new_teacher).should be_true
     end
+
+    context "differentiated assignements" do
+      before do
+        @course = course(:active_course => true)
+        discussion_topic_model(:user => @teacher)
+        @course_section = @course.course_sections.create
+        @student1, @student2, @student3 = create_users(3, return_type: :record)
+
+        @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @assignment.submission_types = 'discussion_topic'
+        @assignment.save!
+        @topic.assignment_id = @assignment.id
+        @topic.save!
+        @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @student)
+        @entry1.created_at = 1.week.ago
+        @entry1.save
+
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        @course.reload
+      end
+
+      context "feature flag on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should be visible to a student with an override" do
+          @topic.visible_for?(@student1).should be_true
+        end
+        it "should not be visible to a student without an override" do
+          @topic.visible_for?(@student2).should be_false
+        end
+        it "should be visible to a teacher" do
+          @topic.visible_for?(@teacher).should be_true
+        end
+      end
+
+      context "feature flag off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should be visible to everybody in the class" do
+          [@student1,@student2,@teacher].each do |user|
+            @topic.visible_for?(user).should be_true
+          end
+        end
+      end
+    end
   end
 
   describe "allow_student_discussion_topics setting" do

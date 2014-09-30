@@ -53,7 +53,7 @@ describe Course do
 
     context "without term end date" do
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -70,7 +70,7 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -87,13 +87,30 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attribute(:conclude_at, nil)
+        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
         @course.should_not be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
+
+    context "with coures dates not overriding term dates" do
+      before do
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+      end
+
+      it "should ignore course dates if not set to override term dates when calculating soft-concluded state" do
+        @course.enrollment_term.update_attribute(:end_at, nil)
+        @course.should_not be_soft_concluded
+
+        @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
         @course.should be_soft_concluded
       end
     end
@@ -413,6 +430,8 @@ describe Course do
     end
 
     it "should clear content" do
+      @course.root_account.allow_self_enrollment!
+
       @course.discussion_topics.create!
       @course.quizzes.create!
       @course.assignments.create!
@@ -458,6 +477,22 @@ describe Course do
       @course.uuid.should_not == @new_course.uuid
       @course.wiki_id.should_not == @new_course.wiki_id
       @course.replacement_course_id.should == @new_course.id
+    end
+
+    it "should not have self enrollment enabled if account setting disables it" do
+      @course.self_enrollment = true
+      @course.save!
+      @course.self_enrollment_enabled?.should == false
+
+      account = @course.root_account
+      account.allow_self_enrollment!
+      @course.self_enrollment = true
+      @course.save!
+      @course.reload.self_enrollment_enabled?.should == true
+
+      account.settings.delete(:self_enrollment)
+      account.save!
+      @course.reload.self_enrollment_enabled?.should == false
     end
 
     it "should retain original course profile" do
@@ -3201,7 +3236,10 @@ end
 
 describe Course do
   describe "self_enrollment" do
-    let_once(:c1) { course }
+    let_once(:c1) do
+      Account.default.allow_self_enrollment!
+      course
+    end
     it "should generate a unique code" do
       c1.self_enrollment_code.should be_nil # normally only set when self_enrollment is enabled
       c1.update_attribute(:self_enrollment, true)
@@ -3589,6 +3627,13 @@ describe Course do
       @course.enroll_user(@user1)
 
       @course.enrollments.count.should == enrollment_count
+    end
+
+    it 'should allow deleted enrollments to be resurrected as active' do
+      course_with_student({ :active_enrollment => true })
+      @enrollment.destroy
+      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', { :enrollment_state => 'active' })
+      @enrollment.workflow_state.should eql 'active'
     end
 
     context "unique enrollments" do

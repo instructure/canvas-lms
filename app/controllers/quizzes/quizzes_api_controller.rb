@@ -259,6 +259,7 @@
 #         }
 #       }
 #     }
+#
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
   include Filters::Quizzes
@@ -270,7 +271,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #
   # Returns the list of Quizzes in this course.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial title of the quizzes to match and return.
   #
   # @example_request
@@ -319,76 +320,76 @@ class Quizzes::QuizzesApiController < ApplicationController
   #
   # Create a new quiz for this course.
   #
-  # @argument quiz[title] [String]
+  # @argument quiz[title] [Required, String]
   #   The quiz title.
   #
-  # @argument quiz[description] [Optional, String]
+  # @argument quiz[description] [String]
   #   A description of the quiz.
   #
   # @argument quiz[quiz_type] ["practice_quiz"|"assignment"|"graded_survey"|"survey"]
   #   The type of quiz.
   #
-  # @argument quiz[assignment_group_id] [Optional, Integer]
+  # @argument quiz[assignment_group_id] [Integer]
   #   The assignment group id to put the assignment in. Defaults to the top
   #   assignment group in the course. Only valid if the quiz is graded, i.e. if
   #   quiz_type is "assignment" or "graded_survey".
   #
-  # @argument quiz[time_limit] [Optional, Integer]
+  # @argument quiz[time_limit] [Integer]
   #   Time limit to take this quiz, in minutes. Set to null for no time limit.
   #   Defaults to null.
   #
-  # @argument quiz[shuffle_answers] [Optional, Boolean]
+  # @argument quiz[shuffle_answers] [Boolean]
   #   If true, quiz answers for multiple choice questions will be randomized for
   #   each student. Defaults to false.
   #
-  # @argument quiz[hide_results] [Optional, String, "always"|"until_after_last_attempt"]
+  # @argument quiz[hide_results] [String, "always"|"until_after_last_attempt"]
   #   Dictates whether or not quiz results are hidden from students.
   #   If null, students can see their results after any attempt.
   #   If "always", students can never see their results.
   #   If "until_after_last_attempt", students can only see results after their
   #   last attempt. (Only valid if allowed_attempts > 1). Defaults to null.
   #
-  # @argument quiz[show_correct_answers] [Optional, Boolean]
+  # @argument quiz[show_correct_answers] [Boolean]
   #   Only valid if hide_results=null
   #   If false, hides correct answers from students when quiz results are viewed.
   #   Defaults to true.
   #
-  # @argument quiz[show_correct_answers_at] [Optional, Timestamp]
+  # @argument quiz[show_correct_answers_at] [Timestamp]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will be visible by students only after this
   #   date, otherwise the correct answers are visible once the student hands in
   #   their quiz submission.
   #
-  # @argument quiz[hide_correct_answers_at] [Optional, Timestamp]
+  # @argument quiz[hide_correct_answers_at] [Timestamp]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will stop being visible once this date has
   #   passed. Otherwise, the correct answers will be visible indefinitely.
   #
-  # @argument quiz[allowed_attempts] [Optional, Integer]
+  # @argument quiz[allowed_attempts] [Integer]
   #   Number of times a student is allowed to take a quiz.
   #   Set to -1 for unlimited attempts.
   #   Defaults to 1.
   #
-  # @argument quiz[scoring_policy] [Optional, String, "keep_highest"|"keep_latest"]
+  # @argument quiz[scoring_policy] [String, "keep_highest"|"keep_latest"]
   #   Required and only valid if allowed_attempts > 1.
   #   Scoring policy for a quiz that students can take multiple times.
   #   Defaults to "keep_highest".
   #
-  # @argument quiz[one_question_at_a_time] [Optional, Boolean]
+  # @argument quiz[one_question_at_a_time] [Boolean]
   #   If true, shows quiz to student one question at a time.
   #   Defaults to false.
   #
-  # @argument quiz[cant_go_back] [Optional, Boolean]
+  # @argument quiz[cant_go_back] [Boolean]
   #   Only valid if one_question_at_a_time=true
   #   If true, questions are locked after answering.
   #   Defaults to false.
   #
-  # @argument quiz[access_code] [Optional, String]
+  # @argument quiz[access_code] [String]
   #   Restricts access to the quiz with a password.
   #   For no access code restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[ip_filter] [Optional, String]
+  # @argument quiz[ip_filter] [String]
   #   Restricts access to the quiz to computers in a specified IP range.
   #   Filters can be a comma-separated list of addresses, or an address followed by a mask
   #
@@ -400,25 +401,25 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   For no IP filter restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[due_at] [Optional, Timestamp]
+  # @argument quiz[due_at] [Timestamp]
   #   The day/time the quiz is due.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[lock_at] [Optional, Timestamp]
+  # @argument quiz[lock_at] [Timestamp]
   #   The day/time the quiz is locked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[unlock_at] [Optional, Timestamp]
+  # @argument quiz[unlock_at] [Timestamp]
   #   The day/time the quiz is unlocked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[published] [Optional, Boolean]
+  # @argument quiz[published] [Boolean]
   #   Whether the quiz should have a draft state of published or unpublished.
   #   NOTE: If students have started taking the quiz, or there are any
   #   submissions for the quiz, you may not unpublish a quiz and will recieve
   #   an error.
   #
-  # @argument quiz[one_time_results] [Optional, Boolean]
+  # @argument quiz[one_time_results] [Boolean]
   #   Whether students should be prevented from viewing their quiz results past
   #   the first time (right after they turn the quiz in.)
   #   Only valid if "hide_results" is not set to "always".
@@ -491,7 +492,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @argument order[][type] ["question"|"group"]
   #   The type of item is either 'question' or 'group'
   #
-  # <b>204 No Content<b> response code is returned if the reorder was successful.
+  # <b>204 No Content</b> response code is returned if the reorder was successful.
   def reorder
     if authorized_action(@quiz, @current_user, :update)
       Quizzes::QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!

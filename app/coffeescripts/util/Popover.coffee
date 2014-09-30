@@ -1,4 +1,3 @@
-
 define [
   'jquery'
 ], ($) ->
@@ -23,13 +22,28 @@ define [
       @trigger = $(clickEvent.currentTarget)
       @el = $(@content)
               .addClass('carat-bottom')
-              .attr( "role", "dialog" )
               .data('popover', this)
-              .keyup (event) =>
-                @hide() if event.keyCode is $.ui.keyCode.ESCAPE
+              .keydown (event) =>
+                # if the user hits the escape key, reset the focus to what it was.
+                if event.keyCode is $.ui.keyCode.ESCAPE
+                  @hide()
+                  @previousTarget.focus() if @previousTarget and @previousTarget.is(':visible')
+                # If the user tabs or shift-tabs away, close.
+                return unless event.keyCode is $.ui.keyCode.TAB
+                tabbables = $ ":tabbable", @el
+                index = $.inArray event.target, tabbables
+                return if index == -1
+
+                if event.shiftKey
+                  @hide() if index == 0
+                else
+                  @hide() if index == tabbables.length-1
+
       @el.delegate '.popover_close', 'click', (event) =>
         event.preventDefault()
         @hide()
+        # set focus back to the previously focused item.
+        @previousTarget.focus() if @previousTarget and @previousTarget.is(':visible')
 
       @show(clickEvent)
 
@@ -38,19 +52,23 @@ define [
       activePopovers.push(this)
       id = "popover-#{idCounter++}"
       @trigger.attr
-        "aria-haspopup" : true
-        "aria-owns" : id
+        "aria-expanded" : true
+        "aria-controls" : id
+      @previousTarget = clickEvent.currentTarget
 
       @el
-        .attr({
+        .attr(
           'id' : id
-          'aria-hidden' : false
-          'aria-expanded' : true
-        })
+        )
         .appendTo(document.body)
         .show()
-      @el.find(':tabbable').not('.popover_close').first().focus(1)
       @position()
+      @el.find(':tabbable').first().focus()
+      setTimeout(
+        () =>
+          @el.find(':tabbable').first().focus()
+        , 100
+      )
 
       # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
@@ -70,10 +88,9 @@ define [
         activePopovers.splice(index, 1) if this is popover
 
       @el.detach()
+      @trigger.attr 'aria-expanded', false
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
-
-      @trigger.focus() if @trigger && @trigger.is(':visible')
 
     ignoreOutsideClickSelector: '.ui-dialog'
 

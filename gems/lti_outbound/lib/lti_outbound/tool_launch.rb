@@ -77,6 +77,7 @@ module LtiOutbound
       hash['text'] = CGI::escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
+      hash['ext_roles'] = '$Canvas.xuser.allRoles'
 
       hash['custom_canvas_enrollment_state'] = '$Canvas.enrollment.enrollmentState'
 

@@ -123,7 +123,7 @@ describe GradingStandard do
 
   context "score_to_grade" do
     it "should compute correct grades" do
-      input = [['A', 0.90], ['B', 0.80], ['C', 0.675], ['D', 0.55], ['M', 0.00]]
+      input = [['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.55], ['M', 0.00]]
       standard = GradingStandard.new
       standard.data = input
       standard.score_to_grade(1005).should eql("A")
@@ -131,15 +131,16 @@ describe GradingStandard do
       standard.score_to_grade(100).should eql("A")
       standard.score_to_grade(99).should eql("A")
       standard.score_to_grade(90).should eql("A")
-      standard.score_to_grade(89.999).should eql("B")
-      standard.score_to_grade(89.001).should eql("B")
-      standard.score_to_grade(89).should eql("B")
-      standard.score_to_grade(88.999).should eql("B")
+      standard.score_to_grade(89.999).should eql("B+")
+      standard.score_to_grade(88.601).should eql("B+")
+      standard.score_to_grade(88.6).should eql("B+")
+      standard.score_to_grade(88.599).should eql("B")
       standard.score_to_grade(80).should eql("B")
+      standard.score_to_grade(79.999).should eql("C")
       standard.score_to_grade(79).should eql("C")
-      standard.score_to_grade(67.501).should eql("C")
-      standard.score_to_grade(67.5).should eql("C")
-      standard.score_to_grade(67.499).should eql("D")
+      standard.score_to_grade(69.501).should eql("C")
+      standard.score_to_grade(69.5).should eql("C")
+      standard.score_to_grade(69.499).should eql("D")
       standard.score_to_grade(60).should eql("D")
       standard.score_to_grade(50).should eql("M")
       standard.score_to_grade(0).should eql("M")

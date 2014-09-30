@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:form_authenticity_token).returns('asdf')
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
   end
 
@@ -126,11 +125,14 @@ describe ApplicationController do
   end
 
   describe "js_env" do
+    before do
+      controller.stubs(:api_request?).returns(false)
+    end
+
     it "should set items" do
       HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
       controller.js_env :FOO => 'bar'
       controller.js_env[:FOO].should == 'bar'
-      controller.js_env[:AUTHENTICITY_TOKEN].should == 'asdf'
       controller.js_env[:files_domain].should == 'files.example.com'
     end
 
@@ -157,6 +159,22 @@ describe ApplicationController do
     it "should not allow overwriting a key" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error
+    end
+
+    it 'gets appropriate settings from the root account' do
+      root_account = stub(global_id: 1, open_registration?: true)
+      HostUrl.stubs(file_host: 'files.example.com')
+      controller.instance_variable_set(:@domain_root_account, root_account)
+      controller.js_env[:SETTINGS][:open_registration].should be_truthy
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should set the global id for the domain_root_account" do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID].should == Account.default.global_id
+      end
     end
   end
 

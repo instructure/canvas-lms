@@ -2,7 +2,7 @@
   jammit_css :profile_show, :tinymce
   js_bundle :profile_show
   @body_classes << 'not-editing'
-  js_env PROFILE: @user_data
+  js_env PROFILE: @user_data if @user_data[:can_edit]
   js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
 %>
 <%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
@@ -11,7 +11,7 @@
       <% if @user_data[:can_edit] %>
         <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
       <% else %>
-        <%= avatar(@user_data[:id], size: 128) %>
+        <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>
     </div>
     <div class="image-block-content row-fluid">

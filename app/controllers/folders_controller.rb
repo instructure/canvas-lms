@@ -365,7 +365,7 @@ class FoldersController < ApplicationController
   # @subtopic Folders
   # Creates a folder in the specified context
   #
-  # @argument name [String]
+  # @argument name [Required, String]
   #   The name of the folder
   #
   # @argument parent_folder_id [String]

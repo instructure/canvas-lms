@@ -1,3 +1,5 @@
+# This YAML file is auto-generated from a Transifex import.
+# Do not edit it by hand, your changes will be overwritten.
 --- 
 ko: 
   EditAppointmentGroupDetails: 
@@ -111,7 +113,6 @@ ko:
       settings_description: "사용자가 외부 ID 공급자(IdP)를 통해서 인증하려면 사용자는 이 계정에 연결되어 있으면서 IdP가 반환하는 고유 식별자와 일치하는 로그인 식별자를 가지고 있어야 합니다. 사용자의 현재 로그인은 (\"사용자\" 탭에서 사용자 검색으로 찾을 수 있는) 사용자 프로필 페이지의 \"로그인 정보\" 섹션에서 확인할 수 있습니다."
       settings_title: "인증 설정"
       test_ldap_link: "테스트 인증"
-      title: "인증 설정"
     ldap_settings: 
       add_secondary_ldap_server_link: "보조 LDAP 서버 추가"
       auth_type_label: 유형
@@ -387,8 +388,6 @@ ko:
         time: 시간
         user: 사용자
       course_search_form: 
-        labels: 
-          find_deleted_course: "삭제된 과목 찾기"
         select_default: "과목 선택"
         select_label: "과목 선택"
       course_search_results: 
@@ -436,7 +435,6 @@ ko:
         generate_activity_username: "*%{user}*의 일반 활동"
         message_date_from: "시작 날짜"
         message_date_to: "끝 날짜"
-        search: 검색
         search_people: "사람 검색"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -918,7 +916,6 @@ ko:
           기본 값으로 UI 변경이 SIS 가져오기 변경에 대해 더 높은 우선 순위를 갖습니다. 필드 수의 경우, 관리자가 UI를 통해 해당 필드를 변경한 경우에 SIS 가져오기는 해당 필드의 자료를 변경하지 않습니다. 이 옵션을 선택하면 SIS 가져오기는 UI 변경을 재정의합니다.  
           자세한 내용은 설명서를 참고하십시오.
       override_sis_stickiness_label: "UI 변경 재정의"
-      page_header: "SIS 가져오기"
       page_title: "SIS 가져오기"
       pending_batches_count: 
         one: "%{count}개의 배치 작업이 처리 대기 중입니다."
@@ -1232,7 +1229,6 @@ ko:
     labels: 
       due: 마감
     name_is_required: "이름이 필요합니다!"
-    percentage_points_possible: "백분률 평가에서 가능한 점수는 0 이상이어야 함"
     points_possible_number: "가능한 점수는 숫자이어야 함"
     select_external_tool_dialog_title: "외부 도구 구성"
     submission_action_take_quiz: "%{title} 보기"
@@ -1573,7 +1569,6 @@ ko:
         pass_fail: 완료/미완료
         percent: 퍼센트
         points: 점
-      view_grading_levels: "평가 수준 보기"
     group_category_selector: 
       grade_group_students_individually: "각 학생에게 개별적으로 평점 할당"
       group_category_options: "새 그룹 범주"
@@ -3392,7 +3387,6 @@ ko:
       module: 모듈
       module_details: "모듈은 순서대로 표시되므로 %{name} 위에 있는 모듈만 필수 조건으로 추가할 수 있습니다."
       module_name: "모듈 이름"
-      modules_keyboard_hint: "과목 모듈이나 모듈 항목의 순서를 바꾸려면 먼저 스크린 리더에서 커서를 끄십시오. JAWS에서 Insert-z 입니다. 첫 번째 모듈을 선택하려면 탭을 누르십시오. 모듈이나 모듈 항목을 선택하려면 업/다운을 누르십시오. 끌기를 시작할 모듈이나 모듈 항목을 선택하려면 스페이스를 누르십시오. 대상을 선택하려면 업/다운을 누르십시오. 그리고 나서 대상 뒤에 선택한 항목을 놓으려면 스페이스를 다시 누르십시오."
       must_complete_prerequisites: "다음을 마쳐야 함"
       no_preprequisites: "정의된 필수 조건 없음"
       no_requirements: "정의된 요구 조건 없음"
@@ -3994,7 +3988,6 @@ ko:
         confirm_delete: "이 과목을 삭제하시겠습니까? 삭제하고 나면 학생과 교사는 더 이상 과목에 액세스할 수 없습니다. 이를 과목 드롭다운에서만 제거하려면 *과목을 종결해야 합니다*."
         confirm_delete_addendum: "과목을 종결할 권한이 없는 경우에는 *과목 종료 날짜를 바꾸거나* 관리자에게 과목 종결을 요청할 수 있습니다."
       headings: 
-        confirm: "작업 확인"
         confirm_conclude: "과목 종결 확인"
         confirm_delete: "과목 삭제 확인"
       titles: 
@@ -4458,8 +4451,6 @@ ko:
       new: "새 항목"
       new_discussion_entries: "새 토론 항목"
       new_discussions: "새 토론"
-      num_assignments: "과제 수"
-      num_submissions: "제출물 수"
       page_title: "과목 통계"
       quiz: 퀴즈
       quiz_questions: "퀴즈 문제"
@@ -5594,12 +5585,6 @@ ko:
     saving: "저장 중..."
     shared_secret: "공유 시크릿"
     submit: 제출
-    tool_post_iframe: 
-      load_tool_button: "%{tool} 로드"
-      load_tool_new_tab_button: "새 창에 %{tool} 로드"
-      new_tab: "이 도구는 새 브라우저 창에 로드해야 함"
-      new_tab_expired: "이 도구의 세션이 만료되었습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
-      new_tab_loaded: "이 도구를 새 브라우저 창에 성공적으로 로드했습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
     user_navigation_configured: "사용자 탐색이 구성됨"
   facebook: 
     authorization_required: "승인된 사용자만 해당 페이지를 액세스할 수 있음"
@@ -5659,7 +5644,6 @@ ko:
       ? "on"
       : 켜기
       release_notes: "배포 노트"
-      toggle_feature_details: "기능 세부 정보 토글"
     feature_flag_admin_view: 
       no_features_available: "현재 사용할 수 있는 기능이 없음"
   features: 
@@ -6054,6 +6038,8 @@ ko:
     example_csv_file: "예제 CSV 파일"
     existing_assignment_example: "기존 과제 (581)"
     explanation_of_required_columns: "이 열을 *모두* 가져야 하고 행 당 하나가 *필요*합니다."
+    instructions: 
+      csv_download_and_upload: "불확실한 경우에는 언제든지 CSV를 다운로드해서 원하는 평점을 바꾸고 같은 파일을 다시 업로드할 수 있습니다."
     labels: 
       upload: "업로드할 CSV 파일 선택:"
     leaving_id_will_match_better_can_add_new_assignment: "ID를 그대로 두면(이 경우에는 \"(581)\" 부분) 일치가 잘되도록 합니다. 곧바로 만드는 새 과제를 추가할 수도 있습니다."
@@ -6661,7 +6647,6 @@ ko:
     member_tooltip_show: "그룹 명부 보기"
     membership_pending: 
       group_join_request: "그룹 참여 요청"
-      group_join_request_acknowledged: "요청에 감사드립니다. 계속 관심을 기울여 주십시오."
       group_join_request_info: "이 그룹에 참여 요청을 했습니다. 요청이 수락되거나 거부되면 알림을 받게 됩니다."
     messages: 
       creating_group: "그룹 만드는 중..."
@@ -6916,22 +6901,12 @@ ko:
       previous: 이전
   layouts: 
     application: 
-      instructure_description: "오픈 소스 학습 관리 시스템인 Canvas의 개발사 Instructure"
       keyboard_navigation: 
         close: "대화 상자를 닫으려면 콤마를 누름"
       links: 
         close: 닫기
         dashboard: "내 대시보드"
         skip_to_content: "내용으로 건너 뛰기"
-      menu: 
-        assignments: 과제
-        assignments_needing_grading: 평가하기
-        assignments_needing_submitting: 제출하기
-        assignments_recently_graded: "최근에 평가됨"
-        calendar: 달력
-        grades: 평점
-      navigation: 
-        main: "주 탐색"
       open_source_learning_management_system: "오픈 소스 LMS"
     facebook: 
       title: "Facebook 페이지"
@@ -6947,7 +6922,6 @@ ko:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "모든 계정 보기"
-      view_all_enrollments: "모든 과목 보기"
       view_all_groups: "모든 그룹 보기"
     mobile_auth: 
       log_in_to_canvas: "Canvas에 로그인"
@@ -8599,38 +8573,6 @@ ko:
       twitter: 
         body_account: "Canvas 알림 - 새 그룹: %{account} 계정의 %{group_name}"
         body_course: "Canvas 알림 - 새 그룹: %{course} 과목의 %{group_name}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user}이(가) %{website}에 교사로 등록했습니다."
-        html: 
-          body: "%{user}이(가) %{website}에 교사로 등록했습니다."
-          details: "교사를 보려면 여기를 클릭"
-          email: 이메일
-          phone: 전화
-          school_name: "학교 이름"
-          school_position: "학교 위치"
-          subject: "새 교사 등록"
-        labels: 
-          email: 이메일
-          phone: 전화
-          school_name: "학교 이름"
-          school_position: "학교 위치"
-        subject: "새 교사 등록"
-      facebook: 
-        body: "%{user}이(가) %{website}에 교사로 등록했습니다."
-        subject: "새 교사 등록"
-      sms: 
-        body: "%{user}이(가) %{website}에 교사로 등록했습니다."
-      summary: 
-        body: "%{user}이(가) Canvas에 교사로 등록했습니다."
-        labels: 
-          email: 이메일
-          phone: 전화
-          school_name: "학교 이름"
-          school_position: "학교 위치"
-        subject: "새 교사 등록"
-      twitter: 
-        body: "Canvas 알림 - 새 교사: %{user}, %{account}"
     new_user: 
       email: 
         body: "새 사용자 %{user}이(가) %{account} 계정에 등록했습니다."
@@ -9036,7 +8978,6 @@ ko:
         prerequisites: "필수 조건"
         published: 게시됨
     progression_module_collection: 
-      module_progress_for: "%h{student_link}의 모듈 진행률"
       module_progress_for_student: "%{student.name}의 모듈 진행률"
       no_modules_found: "모듈을 찾을 수 없음"
     progression_module_view: 
@@ -9216,7 +9157,6 @@ ko:
       new_file_added: "새 파일 추가됨"
       new_files_added: "새 파일 추가됨"
       new_student_organized_group: "새 학생 구성 그룹"
-      new_teacher_registration: "새 교사 등록"
       new_user: "새 사용자"
       pseudonym_registration: "필명 등록"
       report_generated: "보고서 생성됨"
@@ -9730,9 +9670,6 @@ ko:
     respondus_soap_endpoint: 
       description: "Respondus QTI 업로드를 위한 SOAP 끝점"
       name: "Respondus SOAP 끝점"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "사용함 (QTI 변환기도 사용해야 함)"
     scribd: 
       description: "Scribd 문서 미리 보기"
       name: Scribd
@@ -10834,7 +10771,6 @@ ko:
         hints: 
           group_pick_count: "현재까지 %{pick_count}개 선택함"
         labels: 
-          add_questions_to_group: "퀴즈 그룹에 문제 추가"
           group_name: "그룹 이름"
           group_pick_count: 선택
           group_points: 점
@@ -10982,25 +10918,7 @@ ko:
         unnamed_quiz_results: "%{user}의 퀴즈 결과"
         unnamed_survey_results: "%{user}의 설문 결과"
       index: 
-        buttons: 
-          publish_quizzes: "퀴즈 게시"
-        headers: 
-          assignment_quizzes: "과제 퀴즈"
-          course_quizzes: "과목 퀴즈"
-          practice_quizzes: "연습 퀴즈"
-          publish_multiple_quizzes: "여러 퀴즈 게시"
-          surveys: 설문
-          unpublished_quizzes: "게시 안 된 퀴즈"
-        labels: 
-          publish_multiple_quizzes: "이번에 게시하려는 퀴즈를 선택"
-        links: 
-          create_new_quiz: "새 퀴즈 만들기"
-          manage_question_banks: "문제 은행 관리"
-          publish_multiple_quizzes: "여러 퀴즈 게시"
-        no_quizzes: "사용 가능한 퀴즈가 없음"
         page_titles: 퀴즈
-        titles: 
-          this_quiz_is_locked: "이 퀴즈는 현재 잠겨있습니다. 세부 정보를 보려면 클릭하십시오."
       invalid_ip: 
         quiz_protected: "이 퀴즈는 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
         survey_protected: "이 설문은 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
@@ -11502,8 +11420,6 @@ ko:
     upload_info: "이전에 다운로드한 학생의 제출물 파일을 바꿨다면 다시 압축해서 아래 양식에 압축 파일을 업로드하십시오. 학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다."
     upload_warning: "파일의 이름을 인식할 수 있도록 제출물 파일의 이름을 변경하지 마십시오."
   react_files: 
-    aria_label: 
-      settings: 설정
     errors: 
       no_match: 
         suggestions: "제안:"
@@ -11972,7 +11888,6 @@ ko:
         one: "참여자 %{count}명"
         other: "참여자 %{count}명"
     current_enrollment: 
-      course_unpublished: "이 과목을 아직 게시하지 않음"
       enrolled_as_designer: "디자이너로 등록"
       enrolled_as_observer: "감독자로 등록"
       enrolled_as_student: "학생으로 등록"
@@ -12059,8 +11974,6 @@ ko:
       titles: 
         mastery_level: "숙달을 설정할 퍼센트"
         select_and_add_criterion: "기준 선택 및 추가"
-    flash_notice: 
-      close: 닫기
     flash_notices: 
       close: 닫기
     footer_links: 
@@ -12420,8 +12333,6 @@ ko:
     unauthorized_feed: 
       bad_params: "액세스하려는 피드에 대한 매개 변수가 유효하지 않습니다."
       feedback: "URL이 작동해야 한다고 생각하시는 경우에는 아래 링크를 클릭하고 어떻게 여기로 왔는지 알려주시면 살펴보도록 하겠습니다."
-      headings: 
-        problem: "피드를 로드하는 데 문제가 있습니다."
       links: 
         feedback: "찾고 있는 것을 알려주십시오."
       title: "잘못된 피드"
@@ -12818,7 +12729,6 @@ ko:
       prompts: 
         delete: "이 학기를 삭제하시겠습니까?"
       titles: 
-        enrollment_terms: "등록 학기"
         term_details: "학기 세부 정보"
       update_term: "학기 업데이트"
     term: 
@@ -12949,8 +12859,6 @@ ko:
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
   unsupported_package: "지원하지 않는 내용 묶음"
-  upload_button: 
-    files: 파일
   user: 
     default_user_name: 사용자
     errors: 
@@ -13133,8 +13041,6 @@ ko:
         delete_user: "%{user_name} 삭제"
       titles: 
         confirm_delete: "사용자 삭제 확인"
-        confirm_deletion_of_user: "%{user_name} 삭제 확인"
-        delete_user: "사용자 삭제"
         really_delete_user: "%{user_name} 삭제"
     enrollment: 
       course_not_published: "과목을 아직 게시하지 않았음"

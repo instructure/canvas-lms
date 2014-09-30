@@ -1,8 +1,0 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
-<% define_content :subject do %>
-  <%= t :subject, "New Teacher Registration" %>
-<% end %>
-
-<%= t :subject, "New Teacher Registration" %>
-
-<%= t :body, "%{user} just registered as a teacher at %{website}.", :user => %{<a href="#{content :link}"><b>#{h asset.name }</b></a>}.html_safe, :website => (HostUrl.context_host(asset.latest_pseudonym.account) rescue nil) || HostUrl.default_host %>

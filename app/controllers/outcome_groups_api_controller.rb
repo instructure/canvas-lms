@@ -201,16 +201,16 @@ class OutcomeGroupsApiController < ApplicationController
   # the same context as this outcome group, and must not be a descendant of
   # this outcome group (i.e. no cycles allowed).
   #
-  # @argument title [Optional, String]
+  # @argument title [String]
   #   The new outcome group title.
   #
-  # @argument description [Optional, String]
+  # @argument description [String]
   #   The new outcome group description.
   #
-  # @argument vendor_guid [Optional, String]
+  # @argument vendor_guid [String]
   #   A custom GUID for the learning standard.
   #
-  # @argument parent_outcome_group_id [Optional, Integer]
+  # @argument parent_outcome_group_id [Integer]
   #   The id of the new parent outcome group.
   #
   # @returns OutcomeGroup
@@ -378,29 +378,29 @@ class OutcomeGroupsApiController < ApplicationController
   # default of 0. If no ratings are provided, the mastery_points parameter is
   # ignored.
   #
-  # @argument outcome_id [Optional, Integer]
+  # @argument outcome_id [Integer]
   #   The ID of the existing outcome to link.
   #
-  # @argument title [Optional, String]
+  # @argument title [String]
   #   The title of the new outcome. Required if outcome_id is absent.
   #
-  # @argument display_name [Optional, String]
+  # @argument display_name [String]
   #   A friendly name shown in reports for outcomes with cryptic titles,
   #   such as common core standards names.
   #
-  # @argument description [Optional, String]
+  # @argument description [String]
   #   The description of the new outcome.
   #
-  # @argument vendor_guid [Optional, String]
+  # @argument vendor_guid [String]
   #   A custom GUID for the learning standard.
   #
-  # @argument mastery_points [Optional, Integer]
+  # @argument mastery_points [Integer]
   #   The mastery threshold for the embedded rubric criterion.
   #
-  # @argument ratings[][description] [Optional, String]
+  # @argument ratings[][description] [String]
   #   The description of a rating level for the embedded rubric criterion.
   #
-  # @argument ratings[][points] [Optional, Integer]
+  # @argument ratings[][points] [Integer]
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
   # @returns OutcomeLink
@@ -528,13 +528,13 @@ class OutcomeGroupsApiController < ApplicationController
   # Creates a new empty subgroup under the outcome group with the given title
   # and description.
   #
-  # @argument title [String]
+  # @argument title [Required, String]
   #   The title of the new outcome group.
   #
-  # @argument description [Optional, String]
+  # @argument description [String]
   #   The description of the new outcome group.
   #
-  # @argument vendor_guid [Optional, String]
+  # @argument vendor_guid [String]
   #   A custom GUID for the learning standard
   #
   # @returns OutcomeGroup
@@ -587,7 +587,7 @@ class OutcomeGroupsApiController < ApplicationController
   # outcome group, or from an associated account. The source group cannot be
   # the root outcome group of its context.
   #
-  # @argument source_outcome_group_id [Integer]
+  # @argument source_outcome_group_id [Required, Integer]
   #   The ID of the source outcome group.
   #
   # @returns OutcomeGroup

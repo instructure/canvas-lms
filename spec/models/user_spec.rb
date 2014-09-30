@@ -1740,12 +1740,15 @@ describe User do
 
   describe "assignments_visibile_in_course" do
     before do
-      @course = course(:active_course => true)
+      @teacher_enrollment = course_with_teacher(:active_course => true)
+      @course.enable_feature!(:draft_state)
       @course_section = @course.course_sections.create
       @student1 = User.create
       @student2 = User.create
       @student3 = User.create
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+      @unpublished_assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: false)
+      @unpublished_assignment.unpublish
       @course.enroll_student(@student2, :enrollment_state => 'active')
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student1)
@@ -1753,21 +1756,13 @@ describe User do
       @course.reload
     end
 
-    context "draft state off" do
-      before {@course.disable_feature!(:draft_state)}
-      it "should return all active assignments" do
-        @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
-        @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_true
-      end
-    end
-
-    context "draft state on" do
-      before {@course.enable_feature!(:draft_state)}
-      context "differentiated_assignment on" do
+    context "as student" do
+      context "differentiated_assignments on" do
         before {@course.enable_feature!(:differentiated_assignments)}
         it "should return assignments only when a student has overrides" do
           @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
           @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+          @student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment).should be_false
         end
 
         it "should not return students outside the class" do
@@ -1775,11 +1770,66 @@ describe User do
         end
       end
 
-      context "differentiated_assignment off" do
-        before {@course.disable_feature!(:differentiated_assignments)}
-        it "should return all published assignments" do
+      context "differentiated_assignments off" do
+        before {
+          @course.disable_feature!(:differentiated_assignments)
+        }
+        it "should return all assignments" do
           @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
-          @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        end
+      end
+    end
+
+    context "as teacher" do
+      it "should return all assignments" do
+        @teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        @teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@unpublished_assignment).should be_true
+      end
+    end
+
+    context "as observer" do
+      before do
+        @observer = User.create
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      end
+      context "differentiated_assignments on" do
+        before{@course.enable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be false" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+      end
+      context "differentiated_assignments off" do
+        before{@course.disable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            @observer.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          end
         end
       end
     end
@@ -1875,6 +1925,49 @@ describe User do
       @quiz.save!
       assignments = @student.assignments_needing_submitting(:contexts => [@course])
       assignments[0].has_attribute?(:only_visible_to_overrides).should be_true
+    end
+
+    def create_course_with_assignment_needing_submitting(opts={})
+      student = opts[:student]
+      course_with_student_logged_in(:active_all => true, :user => student)
+      @course.enrollments.each(&:destroy!) #student removed from default section
+      section = @course.course_sections.create!
+      student_in_section(section, user: student)
+      assignment_quiz([], :course => @course, :user => student)
+      @assignment.only_visible_to_overrides = true
+      @assignment.publish
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      if opts[:differentiated_assignments]
+        @course.enable_feature!(:differentiated_assignments)
+      end
+      if opts[:override]
+        create_section_override_for_assignment(@assignment, {course_section: section})
+      end
+      @assignment
+    end
+
+    context "differentiated_assignments" do
+      context "feature flag on" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_false
+        end
+
+        it "should return the assignments with an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
+        end
+      end
+
+      context "feature flag off" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should return the assignment without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
+        end
+      end
     end
   end
 
@@ -2558,5 +2651,27 @@ describe User do
     user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
     user.reset_unread_conversations_counter
     user.reload.unread_conversations_count.should == 5
+  end
+
+  describe 'group_memberships' do
+    before :once do
+      course_with_student active_all: true
+      @group = Group.create! context: @course, name: "group"
+      @group.users << @student
+      @group.save!
+    end
+
+    it "doesn't include deleted groups in current_group_memberships" do
+      @student.current_group_memberships.size.should == 1
+      @group.destroy
+      @student.current_group_memberships.size.should == 0
+    end
+
+    it "doesn't include deleted groups in group_memberships_for" do
+      @student.group_memberships_for(@course).size.should == 1
+      @group.destroy
+      @student.group_memberships_for(@course).size.should == 0
+    end
+
   end
 end

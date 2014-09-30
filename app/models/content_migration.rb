@@ -32,6 +32,7 @@ class ContentMigration < ActiveRecord::Base
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
+  after_save :handle_import_in_progress_notice
   DATE_FORMAT = "%m/%d/%Y"
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
@@ -605,6 +606,33 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  # maps the key in the copy parameters hash to the asset string prefix
+  # (usually it's just .singularize; weird names needing special casing go here :P)
+  def self.asset_string_prefix(key)
+    case key
+    when 'quizzes'
+      'quizzes:quiz'
+    else
+      key.singularize
+    end
+  end
+
+  def self.collection_name(key)
+    key = key.to_s
+    case key
+    when 'modules'
+      'context_modules'
+    when 'module_items'
+      'content_tags'
+    when 'pages'
+      'wiki_pages'
+    when 'files'
+      'attachments'
+    else
+      key
+    end
+  end
+
   # strips out the "id_" prepending the migration ids in the form
   # also converts arrays of migration ids (or real ids for course exports) into the old hash format
   def self.process_copy_params(hash, for_content_export=false, return_asset_strings=false)
@@ -617,6 +645,7 @@ class ContentMigration < ActiveRecord::Base
     new_hash = {}
 
     hash.each do |key, value|
+      key = collection_name(key)
       case value
       when Hash # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
         new_sub_hash = {}
@@ -637,7 +666,7 @@ class ContentMigration < ActiveRecord::Base
         # or :select => {:context_modules => [blahblahblah, blahblahblah2]} for normal migration ids
         sub_hash = {}
         if for_content_export
-          asset_type = key.to_s.singularize
+          asset_type = asset_string_prefix(key.to_s)
           value.each do |id|
             sub_hash[process_key.call("#{asset_type}_#{id}")] = '1'
           end
@@ -676,5 +705,15 @@ class ContentMigration < ActiveRecord::Base
 
   def find_external_tool_translation(migration_id)
     @external_tool_translation_map && migration_id && @external_tool_translation_map[migration_id]
+  end
+
+  def handle_import_in_progress_notice
+    return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
+    if (new_record? || (workflow_state_changed? && workflow_state_was == 'created')) &&
+        %w(pre_processing pre_processed exporting importing).include?(workflow_state)
+      context.add_content_notice(:import_in_progress, 4.hours)
+    elsif workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+      context.remove_content_notice(:import_in_progress)
+    end
   end
 end

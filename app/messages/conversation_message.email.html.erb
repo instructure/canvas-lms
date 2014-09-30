@@ -43,7 +43,7 @@
           </tr>
           <tr>
             <td valign="top" align="left">
-              <a href="<%= content :link %>">
+              <a href="mailto:<%= author_email_address %>">
                 <%= author_email_address%>
               </a>
             </td>
@@ -57,10 +57,16 @@
   <p>
     <b><%= author_short_name%></b>
     <br/>
-    <a href="<%= content :link %>">
+    <a href="mailto:<%= author_email_address %>">
       <%= author_email_address%>
     </a>
   </p>
+<% end %>
+
+<% if asset.has_media_objects? %>
+<p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
+<% else %>
+<p><%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %></p>
 <% end %>
 
 

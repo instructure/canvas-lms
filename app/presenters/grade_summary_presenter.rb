@@ -138,7 +138,8 @@ class GradeSummaryPresenter
       .find_all_by_user_id(student)
 
       if @context.feature_enabled?(:differentiated_assignments)
-        ss = ss.select{ |submission| submission.assignment_visible_to_student?(student_id)}
+        visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)
+        ss.select!{ |submission| visible_assignment_ids.include?(submission.assignment_id) }
       end
 
       assignments_index = assignments.index_by(&:id)

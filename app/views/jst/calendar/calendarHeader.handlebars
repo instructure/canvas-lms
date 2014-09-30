@@ -1,6 +1,6 @@
 <div class="calendar_header header-table">
   <div class="recommend_agenda screenreader-only">
-    <button id="use_agenda">{{#t "links.screenreader_recommend_agenda"}}Screenreader users: Use the Agenda to view events{{/t}}</button>
+    <button id="use_agenda">{{#t "links.improved_accessibility_recommend_agenda"}}Warning: For improved accessibility, please use the "Agenda view" Calendar.{{/t}}</button>
   </div>
   <div class="header-table-row">
     <div class="header-table-cell header-table-left">
@@ -15,13 +15,13 @@
         <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
       </span>
       <span class="calendar_view_buttons btn-group" role="radiogroup">
-        <button type="button" id="week" class="btn" role="radio" aria-checked="false">
+        <button type="button" id="week" class="btn calendar-button" role="radio" aria-checked="false">
           {{#t "links.calendar_week"}}Week{{/t}}
-          <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to screenreaders. Use the Agenda View instead.{{/t}}</span>
+          <span class="screenreader-only accessibility-warning">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to screenreaders. Use the Agenda View instead.{{/t}}</span>
         </button>
-        <button type="button" id="month" class="btn" role="radio" aria-checked="false">
+        <button type="button" id="month" class="btn calendar-button" role="radio" aria-checked="false">
           {{#t "links.calendar_month"}}Month{{/t}}
-          <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to screenreaders. Use the Agenda View instead.{{/t}}</span>
+          <span class="screenreader-only accessibility-warning">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to screenreaders. Use the Agenda View instead.{{/t}}</span>
         </button>
         <button type="button" id="agenda" class="btn" role="radio" aria-checked="false">
           {{#t "links.calendar_agenda"}}Agenda{{/t}}

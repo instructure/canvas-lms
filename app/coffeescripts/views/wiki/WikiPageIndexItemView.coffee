@@ -1,11 +1,12 @@
 define [
   'Backbone'
+  'underscore'
   'compiled/views/wiki/WikiPageIndexEditDialog'
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/PublishIconView'
   'jst/wiki/WikiPageIndexItem'
   'compiled/jquery/redirectClickTo'
-], (Backbone, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, template) ->
+], (Backbone, _, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
     template: template
@@ -38,6 +39,10 @@ define [
       json.CAN =
         MANAGE: !!@WIKI_RIGHTS.manage
         PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
+
+      json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
+      _.each json.wiki_page_menu_tools, (tool) =>
+        tool.url = tool.base_url + "&pages[]=#{@model.get("page_id")}"
       json
 
     render: ->
@@ -54,7 +59,7 @@ define [
       @publishIconView.render()
 
     afterRender: ->
-      @$el.redirectClickTo(@$wikiPageLink)
+      @$el.find('td:first').redirectClickTo(@$wikiPageLink)
 
     settingsMenu: (ev) ->
       ev?.preventDefault()

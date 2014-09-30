@@ -28,7 +28,11 @@
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>
     <li id="current_context_code" style="display: none;"><%= @context.try_rescue(:asset_string) %></li>
     <li class="user_long_name" style="display: none;"><%= @current_user.name %></li>
-    <li class="logout"><%= link_to t('links.logout', "Logout"), logout_path, :method => :delete %></li>
+    <li class="logout">
+      <%= form_tag(logout_path, method: :delete, id: 'identity-logout-form') do %>
+        <%= link_to(t('links.logout', "Logout"), logout_path, onclick: "document.getElementById('identity-logout-form').submit(); return false") %>
+      <% end %>
+    </li>
   <% end %>
   <% if help_link %>
     <li id="identity-help-container"><%= help_link %></li>

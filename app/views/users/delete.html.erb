@@ -1,13 +1,5 @@
 <% content_for :page_title do %><%= t('titles.confirm_delete', 'Confirm Delete User') %><% end %>
 
-<% content_for :page_header do %>
-  <h1><%= t('titles.delete_user', 'Delete User') %></h1>
-<% end %>
-
-<% content_for :page_subhead do %>
-  <h2><%= t('titles.confirm_deletion_of_user', 'Confirm deletion of %{user_name}', :user_name => @user.name) %></h2>
-<% end %>
-
 <div style="width: 500px; margin-left: auto; margin-right: auto; margin-top: 10px;">
   <h2><%= t('titles.really_delete_user', 'Really delete %{user_name}', :user_name => @user.name) %></h2>
   <%= t('are_you_sure', 'Are you sure you want to delete this user account?') %>

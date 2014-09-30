@@ -1,4 +1,5 @@
 @import base/environment
+@import "pages/shared/menu_tools.scss"
 
 $backgroundColor: #dfe9f0
 $borderColor: #AAA
@@ -1741,3 +1742,25 @@ ul#quiz_versions
     cursor: move
   .links a
     left: 0
+
+li.quiz.quiz-loading-overrides
+  // totally hide the content of the "Available" column
+  .date-available
+    visibility: hidden
+
+  // hide the content of the "Due" column, but show the spinner instead:
+  .date-due
+    min-height: inherit
+    height: 20px
+    overflow: hidden
+
+  // Spinner hax:
+  .date-due:before
+    content: "\00a0"
+    display: block
+    background-image: url("/images/ajax-loader-black-on-white.gif")
+    background-color: white
+    background-position: 90% 50%
+    background-repeat: no-repeat
+    opacity: 0.35
+    width: 100%

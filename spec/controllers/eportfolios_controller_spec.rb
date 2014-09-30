@@ -109,6 +109,63 @@ describe EportfoliosController do
       response.should be_success
       assigns[:page].should_not be_nil
     end
+
+    describe "assigns[:owner_url]" do
+      before do
+        @portfolio.public = true
+        @portfolio.save!
+      end
+
+      it "should not get set when not logged in" do
+        get 'show', :id => @portfolio.id
+        assigns[:owner_url].should be_nil
+      end
+
+      context "with profiles enabled" do
+        before do
+          Account.default.update_attribute :settings, enable_profiles: true
+        end
+
+        it "should be the profile url" do
+          user_session(@user)
+          get 'show', :id => @portfolio.id
+          assigns[:owner_url].should == user_profile_url(@portfolio.user)
+        end
+
+        it "should not get set when portfolio owner is not visible to user" do
+          user_session user(active_all: true)
+          get 'show', :id => @portfolio.id
+          assigns[:owner_url].should be_nil
+        end
+      end
+
+      context "with profiles disabled" do
+        before do
+          Account.default.update_attribute :settings, enable_profiles: false
+        end
+
+        it "should be the settings url for the owner" do
+          user_session(@user)
+          get 'show', :id => @portfolio.id
+          assigns[:owner_url].should == profile_url
+        end
+
+        it "should be the user url for an admin" do
+          user_with_pseudonym(user: @portfolio.user)
+          user_session(account_admin_user)
+          get 'show', :id => @portfolio.id
+          assigns[:owner_url].should == user_url(@portfolio.user)
+        end
+
+        it "should not get set otherwise" do
+          course_with_teacher(active_all: true)
+          student_in_course(course: @course, user: @portfolio.user)
+          user_session(@teacher)
+          get 'show', :id => @portfolio.id
+          assigns[:owner_url].should be_nil
+        end
+      end
+    end
   end
   
   describe "PUT 'update'" do

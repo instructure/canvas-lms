@@ -45,7 +45,7 @@ describe LtiOutbound::ToolLaunch do
       tool.name = 'tool_name'
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
     end
-    teacher_role = LtiOutbound::LTIRole::INSTRUCTOR
+    teacher_role = LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR
     @user = LtiOutbound::LTIUser.new.tap do |user|
       user.avatar_url = 'avatar_url'
       user.current_roles = 'current_roles'
@@ -317,7 +317,7 @@ describe LtiOutbound::ToolLaunch do
 
   describe '#for_assignment!' do
     it 'includes assignment outcome service params for student' do
-      student_role = LtiOutbound::LTIRole::LEARNER
+      student_role = LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
       @user.current_roles = [student_role]
       @tool_launch.for_assignment!(@assignment, '/my/test/url', '/my/other/test/url')
 

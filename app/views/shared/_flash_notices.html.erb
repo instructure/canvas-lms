@@ -1,15 +1,8 @@
-<% notices = flash_notices()
-# static messages (i.e. ones that are present on page load) need to push
-# the content down, since they don't auto-dismiss themselves. but they
-# also need to be fixed so they remain visible when you scroll down so we
-# put a copy of them in this hidden (but layout-ed) buffer
+<%
+notices = flash_notices()
+js_env(:notices => notices)
 %>
-<ul id="flash_message_buffer" aria-hidden="true">
-  <%= render :partial => "shared/flash_notice", :collection => notices %>
-</ul>
-<ul id="flash_message_holder">
-  <%= render :partial => "shared/flash_notice", :collection => notices %>
-</ul>
-<div id="flash_screenreader_holder" class="screenreader-only" role="alert">
-	<%= render :partial => "shared/flash_notice", :collection => notices %>
-</div>
+
+<ul role="alert" aria-live="assertive" id="flash_message_holder"></ul>
+<div role="alert" aria-live="assertive" id="flash_screenreader_holder" class="screenreader-only"></div>
+

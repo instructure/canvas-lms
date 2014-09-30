@@ -1,10 +1,6 @@
 <% add_crumb t('#crumbs.confirmation', "Confirmation") %>
 <% content_for :page_title, t('titles.confirm', 'Confirm Action') %>
 
-<% content_for :page_header do %>
-  <h1><%= t('headings.confirm', %{Confirm Action}) %></h1>
-<% end %>
-
 <div style="margin: 10px auto; width: 600px;">
   <% if params[:event] == "delete" %>
     <h1><%= t('headings.confirm_delete', %{Confirm Course Deletion}) %></h1>

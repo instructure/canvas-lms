@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.5.1'..'1.6.3'
+required_bundler_version = '1.6.0'..'1.7.2'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 
 unless required_bundler_version.include?(Bundler::VERSION)
@@ -45,24 +45,59 @@ else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
-# patch bundler to do github over https
-if respond_to?(:git_source)
-  git_source(:github) do |repo_name|
-    repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-    "https://github.com/#{repo_name}.git"
-  end
-else
-  # bundler 1.5 doesn't have an API for it, so we have to munge the internals
-  unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
-    class Bundler::Dsl
-      alias_method :_old_normalize_options, :_normalize_options
-      def _normalize_options(name, version, opts)
-        _old_normalize_options(name, version, opts)
-        opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
+# force a different lockfile for rails 4
+unless CANVAS_RAILS3
+  Bundler::SharedHelpers.class_eval do
+    class << self
+      def default_lockfile
+        Pathname.new("#{Bundler.default_gemfile}.lock4")
       end
     end
   end
+
+  Bundler::Dsl.class_eval do
+    def to_definition(lockfile, unlock)
+      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
+    end
+  end
 end
+
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
+end
+
+module CanvasBundlerRuntime
+  def self.included(klass)
+    klass.send(:remove_method, :cache)
+  end
+
+  def cache(custom_path = nil)
+    cache_path = cache_path(custom_path)
+    FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
+
+    all_platforms = true # Bundler.config[:all_platforms]
+    Bundler.ui.info "Updating files in vendor/cache"
+    specs = if all_platforms
+              @definition.resolve.map(&:__materialize__)
+            else
+              self.specs
+            end
+    specs.each do |spec|
+      spec.source.send(:fetch_gem, spec) if all_platforms && spec.source.respond_to?(:fetch_gem, true)
+      spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
+    end
+
+    Dir[cache_path.join("*/.git")].each do |git_dir|
+      FileUtils.rm_rf(git_dir)
+      FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
+    end
+
+    prune_cache(custom_path) unless Bundler.settings[:no_prune]
+  end
+end
+Bundler::Runtime.send(:include, CanvasBundlerRuntime)
 
 if RUBY_VERSION >= '2.2'
   gem 'syck', github: 'tenderlove/syck'

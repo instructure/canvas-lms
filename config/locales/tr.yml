@@ -1,3 +1,5 @@
+# This YAML file is auto-generated from a Transifex import.
+# Do not edit it by hand, your changes will be overwritten.
 --- 
 tr: 
   EditAppointmentGroupDetails: 
@@ -123,7 +125,6 @@ tr:
       settings_description: "Bir kullanıcının harici bir kimlik sağlayıcı (IdP) kullanarak kimlik doğrulaması yapılabilmesi için, kullanıcının hesabına bağlı ve bu IdP tarafından döndürülen benzersiz tanımlayıcı ile eşleşen bir oturum tanımlayıcısı olması gerekir. Bir kullanıcının geçerli oturum açma olaylarını görmek için, kullanıcının profil sayfasında \"Oturum Açma Bilgileri\" bölümüne bakın."
       settings_title: "Kimlik Doğrulama Ayarları"
       test_ldap_link: "Kimlik Doğrulamayı Test et"
-      title: "Kimlik Doğrulama Ayarları"
     ldap_settings: 
       add_secondary_ldap_server_link: "İkincil LDAP Sunucusu Ekle"
       auth_type_label: Tür
@@ -476,8 +477,6 @@ tr:
         time: Zaman
         user: Kullanıcı
       course_search_form: 
-        labels: 
-          find_deleted_course: "Silinmiş derslerde bul"
         select_default: "Ders seçiniz"
         select_label: "Ders seçiniz"
       course_search_results: 
@@ -535,7 +534,6 @@ tr:
         generate_activity_username: "*%{user}* İçin Etkinlik Oluştur"
         message_date_from: Tarih
         message_date_to: Tarih
-        search: Ara
         search_people: "Kişi ara"
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -1037,7 +1035,6 @@ tr:
           Varsayılan olarak Kullanıcı Arabirimindeki değişikliklerin ÖBS içe aktarmadaki değişikliklere göre önceliği vardır; çoğu alan için eğer yönetici bir alanı Kullanıcı Arabiriminden değiştirmişse ÖBS içe aktarımı bu alandaki verileri değiştirmeyecektir. Bu tercihi seçerseniz SIS aktarımındaki değişiklikler Kullanıcı Arabirimindekilerin üzerine yazılır. 
           Ayrıntılar için belgelere bakın.
       override_sis_stickiness_label: "Arayüz değişikliklerinin üzerine yaz"
-      page_header: "ÖBS İçe Aktarımı"
       page_title: "ÖBS İçe Aktarımı"
       pending_batches_count: 
         one: "İşlenmeyi bekleyen %{count} toplu işlem."
@@ -1383,7 +1380,6 @@ tr:
     labels: 
       due: Bitiş
     name_is_required: "İsim zorunludur!"
-    percentage_points_possible: "Yüzde olarak notlamak için olası puanlar 0'dan büyük olmalı"
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     select_external_tool_dialog_title: "Harici Araçları Ayarla"
     submission_action_take_quiz: "%{title} al"
@@ -1748,7 +1744,6 @@ tr:
         pass_fail: Tamamladı/Tamamlamadı
         percent: Yüzde
         points: Puanlar
-      view_grading_levels: "Değerlendirme Kademesini Gör"
     group_category_selector: 
       grade_group_students_individually: "Her öğrenciye aynı değerlendirme notu ata"
       group_assignment_header: "Grup Ödevi"
@@ -2400,7 +2395,6 @@ tr:
         calendar_month: Ay
         calendar_scheduler: Zamanlayıcı
         calendar_week: Hafta
-        screenreader_recommend_agenda: "Ekranokuyucu kullanıcıları: Olayları görmek için Gündem'i kullanın"
       loading: Yükleniyor
       my_appointment_groups: "Randevu Gruplarım"
     calendar_navigator: 
@@ -3640,7 +3634,6 @@ tr:
       module: modül
       module_details: "Modüller sıralı bir şekilde gösterilmektedir bu yüzden yalnızca aşağıdaki %{name} modüller ön koşul olarak belirlenebilir."
       module_name: "Modül Adı"
-      modules_keyboard_hint: "Ders modüllerinin ve modül öğelerinin sırasını değiştirmek için ilk olarak ekran okuyucunuzda imlecinizi devre dışı bırakın. JAWS için Insert-z. İlk modülü seçmek için sekme tuşuna basın. Bir modülü ya da modül öğesini seçmek için aşağı yukarı ok tuşlarına basın. Sürüklemeye başlamadan önce modülü ya da modül öğesini seçmek için boşluk tuşuna basın. Daha sonra hedefi belirlemek için yukarı ve aşağı ok tuşlarına basın. Hedefe geldikten sonra seçimi yerine bırakmak için ikinci kez boşluk tuşuna basın."
       must_complete_prerequisites: "Tamamlamaları gerek"
       no_preprequisites: "Belirlenmiş ön koşul yok"
       no_requirements: "Belirlenmiş ön koşul yok"
@@ -4309,7 +4302,6 @@ tr:
         confirm_delete: "Bu dersi silmek istediğinize emin misiniz? Silerseniz, öğrenciler ve öğretmenler birdaha erişemeyeceklerdir. Eğer açılır menüden kaldırılmasını istiyorsanız *dersi sonlandırmalısınız*."
         confirm_delete_addendum: "Dersi sonlandırmaya izin vermiyorsa, *ders bitiş tarihini değiştirmelisiniz* veya yöneticiye dersin sonlandırılması için başvurun."
       headings: 
-        confirm: "Eylemi Onayla"
         confirm_conclude: "Dersi Sonlandırmayı Onayla"
         confirm_delete: "Dersi Silmeyi Onayla"
       titles: 
@@ -4651,7 +4643,6 @@ tr:
           delete_section: "Bölümü Sil"
           edit_section: "Bölümü Düzenle"
       megabytes: megabyte
-      navigation_keyboard_hint: "Eğer ekran okuyucusu kullanılıyorsa, ders gezinme bağlantılarının sırasını değiştirmek için ekran okuyucu programınızda görsel imleci devre dışı bırakın. (Bunun için JAWS programında Insert-z ye basın). Sayfanın en üstüne gelmek için Ctrl + Home butonuna basın. Sonra, ilk ders gezinme bağlantısına gelene kadar sekme tuşuna basın. Gitmek istediğiniz bağlantıyı duyana kadar aşağı ve yukarı ok tuşlarıyla ilerleyip seçmek için boşluk tuşuna basın. Sonrasında, yeni pozisyonu belirleyene kadar yukarı ve aşağı ok tuşlarını kullanın. Son olarak, bulunduğunuz bağlantıdan sonra doğrudan gittiğiniz bağlantıyı belirlemek için tekrar boşluk tuşuna basın. Bitirdiğinizde, görsel imleci tekrar etkinleştirin."
       no_date: "Ayarlanmış Gün Yok"
       no_language_preference: "Ayarlanmadı (kullanıcı düzenleyebilir, varsayılan dil %{language})"
       none: Yok
@@ -4805,8 +4796,6 @@ tr:
       new: Yeni
       new_discussion_entries: "Yeni Tartışma Yazıları"
       new_discussions: "Yeni Tartışmalar"
-      num_assignments: "# Ödevler"
-      num_submissions: "# Gönderiler"
       page_title: "Ders İstatistikeri"
       quiz: "Kısa Sınav"
       quiz_questions: "Kısa Sınav Soruları"
@@ -6033,12 +6022,6 @@ tr:
     saving: Kaydediliyor...
     shared_secret: "Shared Secret"
     submit: Gönder
-    tool_post_iframe: 
-      load_tool_button: "%{tool} Yükle"
-      load_tool_new_tab_button: "%{tool} aracını yeni pencerede Yükle"
-      new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
-      new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
-      new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
     user_navigation_configured: "Kullanıcı gezinme menüsü yapılandırıldı"
   facebook: 
     authorization_required: "Yalnızca yetkili kullanıcılar bu sayfaya erişebilir"
@@ -6099,7 +6082,6 @@ tr:
       ? "on"
       : Açık
       release_notes: "kararlı sürüm notları"
-      toggle_feature_details: "Özellik seçeneklerini değiştir"
     feature_flag_admin_view: 
       feature_options: "Özellik Seçenekleri"
       no_features_available: "Şu anda kullanılabilir özellik yok"
@@ -7195,7 +7177,6 @@ tr:
     member_tooltip_show: "Grup listesini göster"
     membership_pending: 
       group_join_request: "Gruba Katılım İsteği"
-      group_join_request_acknowledged: "İstek için teşekkürler, lütfen bizi izlemeye devam edin"
       group_join_request_info: "Bu grup katılım isteğinizi aldı. İsteğiniz kabul ya da red edildiğinde bilgilendirieleceksiniz."
     messages: 
       creating_group: "Grup Oluşturuluyor..."
@@ -7290,9 +7271,6 @@ tr:
       create: "%{model} Yarat"
       submit: "%{model} Kaydet"
       update: "%{model} Güncelle"
-  high_contrast_description: |-
-      Canvas kullanıcı ara biriminin yüksek çözünürlüklü versiyonunu isterseniz bunu
-      etkinleştirin. Görme engeli veya okumada zorluk çeken kişiler için yararlı olabilir.
   html5_first_videos_description: |-
       Varsayılan olarak, Canvas videoları oynatmak için önce Flash'ı deneyecek. Önce HTML5'i
       kullanıp sonra Flash'a dönmek için bu seçeneği etkinleştirin.
@@ -7474,23 +7452,12 @@ tr:
   layouts: 
     application: 
       group_switch: Değiştir
-      instructure_description: "Instructure, açık kaynak kod öğrenme yönetim sistemi Canvas'ın yapımcıları"
       keyboard_navigation: 
         close: "Bu diyaloğu kapatmak için noktaya basın"
       links: 
         close: Kapat
         dashboard: "Kontrol Panelim"
         skip_to_content: "Bu İçeriği Atla"
-      menu: 
-        assignments: Ödevler
-        assignments_needing_grading: Notlandırılacak
-        assignments_needing_submitting: "Teslim Edilecek"
-        assignments_recently_graded: "Yakın Zamanda Notlandırılan"
-        calendar: Takvim
-        grades: Notlar
-      navigation: 
-        main: "Ana Gezinme Menüsü"
-        user_menu: "Kullanıcı Menüsü"
       open_source_learning_management_system: "Açık Kaynak Kod ÖYS"
     facebook: 
       title: "Facebook Sayfası"
@@ -7507,7 +7474,6 @@ tr:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: "Tüm hesapları göster"
-      view_all_enrollments: "Tüm dersleri göster"
       view_all_groups: "Tüm grupları görüntüle"
     mobile_auth: 
       log_in_to_canvas: "Canvas'ta Oturum Aç"
@@ -9202,38 +9168,6 @@ tr:
       twitter: 
         body_account: "Canvas Uyarısı - %{account} hesabı için yeni grup: %{group_name}"
         body_course: "Canvas Uyarısı - %{course} dersi için yeni grup: %{group_name}"
-    new_teacher_registration: 
-      email: 
-        body: "%{user} kullanıcısı az önce, %{website} sayfasına öğretmen olarak kaydoldu."
-        html: 
-          body: "%{user} kullanıcısı, %{website} sayfasına öğretmen olarak kaydoldu."
-          details: "Öğretmen görünümü için tıklayınız"
-          email: Eposta
-          phone: Telefon
-          school_name: "Okul Adı"
-          school_position: "Okul Pozisyonunuz"
-          subject: "Yeni Öğretmen Kaydı"
-        labels: 
-          email: Eposta
-          phone: Telefon
-          school_name: "Okul Adı"
-          school_position: "Okul Pozisyonunuz"
-        subject: "Yeni Öğretmen Kaydı"
-      facebook: 
-        body: "%{user} kullanıcısı az önce, %{website} sayfasına öğretmen olarak kaydoldu."
-        subject: "Yeni Öğretmen Kaydı"
-      sms: 
-        body: "%{user} kullanıcısı az önce, %{website} sayfasına öğretmen olarak kaydoldu."
-      summary: 
-        body: "%{user} kullanıcısı az önce, Canvas'a öğretmen olarak kaydoldu."
-        labels: 
-          email: Eposta
-          phone: Telefon
-          school_name: "Okul Adı"
-          school_position: "Okul Pozisyonunuz"
-        subject: "Yeni Öğretmen Kaydı"
-      twitter: 
-        body: "Canvas Uyarısı - Yeni Öğretmen: %{user}, %{account}"
     new_user: 
       email: 
         body: "%{user} adına yeni bir kullanıcı %{account} hesabı için az önce kaydoldu"
@@ -9665,7 +9599,6 @@ tr:
         published: Yayınlandı
     post_grades_dialog_title: "Notları ÖBS'ye Gönder"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} Modüldeki Durumu"
       module_progress_for_student: " %{student.name} Modüldeki Durumu"
       no_modules_found: "Modüller bulunamadı"
     progression_module_view: 
@@ -9707,9 +9640,6 @@ tr:
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   name: "Academic Benchmark İçeri Aktarıcı"
   new_facebook_message: "Canvas'tan yeni bir mesajınız var"
-  new_styles_description: |-
-      Canvas için makyajlı bir Kullanıcı Arabirimi üzerinde çalışıyoruz. Güncel ve
-      basitleştirilmiş Canvas arayüzünü görmek ve hisstemek için bu seçeneği açın.
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   not_a_number: "pozitif bir sayı olmalı"
   notification: 
@@ -9852,7 +9782,6 @@ tr:
       new_file_added: "Yeni Dosya Eklendi"
       new_files_added: "Yeni Dosya Eklendi"
       new_student_organized_group: "Yeni Öğrenci Grupları"
-      new_teacher_registration: "Yeni Öğretmen Kaydı"
       new_user: "Yeni Kullanıcı"
       pseudonym_registration: "Pseudonym Kaydı"
       report_generated: "Rapor Oluşturuldu"
@@ -10406,9 +10335,6 @@ tr:
     respondus_soap_endpoint: 
       description: "Respondus QTI yüklemeleri için SOAP Endpoint"
       name: "Respondus SOAP Endpoint"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "Etkinleştirilmiş (QTI Dönüştürücüyü de etkinleştirmeli)"
     scribd: 
       description: "Scribd belge önizlemeleri"
       name: Scribd
@@ -11610,7 +11536,6 @@ tr:
         hints: 
           group_pick_count: "Şu ana kadar %{pick_count} seçildi"
         labels: 
-          add_questions_to_group: "Bu kısa sınav grubu için soru ekle"
           group_name: "Grup İsmi"
           group_pick_count: Seç
           group_points: Puanlar
@@ -11762,25 +11687,7 @@ tr:
         unnamed_quiz_results: "%{user}'ın Kısa Sınav Sonuçları"
         unnamed_survey_results: "%{user}'ın Anket Sonuçları"
       index: 
-        buttons: 
-          publish_quizzes: "Kısa Sınavları Yayınla"
-        headers: 
-          assignment_quizzes: "Ödev Kısa Sınavları"
-          course_quizzes: "Ders Kısa Sınavları"
-          practice_quizzes: "Deneme Kısa Sınavları"
-          publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
-          surveys: Anketler
-          unpublished_quizzes: "Yayınlanmamış Kısa Sınavlar"
-        labels: 
-          publish_multiple_quizzes: "Bu zamanlarda yayınlamak istediğiniz kısa sınavları seçiniz"
-        links: 
-          create_new_quiz: "Yeni Kısa Sınav Oluştur"
-          manage_question_banks: "Soru Bankalarını Yönet"
-          publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
-        no_quizzes: "Kısa sınav bulunamadı"
         page_titles: "Kısa sınavlar"
-        titles: 
-          this_quiz_is_locked: "Bu kısa sınav şu anda kilitlidir. Ayrıntılı bilgi için tıklayınız."
       invalid_ip: 
         quiz_protected: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
         survey_protected: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
@@ -12333,8 +12240,6 @@ tr:
     upload_info: "Daha önce indirdiğiniz öğrencilerin gönderdikleri dosyalarda değişiklik yaptıysanız bunları zip dosyası olarak sıkıştırıp aşağıdaki form ile birlikte bu zipli dosyayı yükleyin. Öğrenciler değiştirilmiş dosyaları gönderi yorumlarında görecekler."
     upload_warning: "Gönderi dosyalarının adlarını değiştirmeyin ki bunları algılayabilelim."
   react_files: 
-    aria_label: 
-      settings: Ayarlar
     errors: 
       no_match: 
         suggestions: "Öneriler:"
@@ -12822,7 +12727,6 @@ tr:
         one: "1 katılımcı"
         other: "%{count} katılımcı"
     current_enrollment: 
-      course_unpublished: "Bu ders henüz yayınlanmadı"
       enrolled_as_designer: "Tasarımcı olarak kayıtlı"
       enrolled_as_observer: "Gözlemci olarak kayıtlı"
       enrolled_as_student: "Öğrenci olarak kayıtlı"
@@ -12915,8 +12819,6 @@ tr:
       titles: 
         mastery_level: "yeterlilik yüzdesinin üstünde"
         select_and_add_criterion: "Seç ve Kriter Ekle"
-    flash_notice: 
-      close: Kapat
     flash_notices: 
       close: Kapat
     footer_links: 
@@ -13285,8 +13187,6 @@ tr:
     unauthorized_feed: 
       bad_params: "Erişmeye çalıştığınız besleme parametreleri geçersiz."
       feedback: "Bu url'nin çalışması gerektiğine eminseniz lütfen aşağıdaki linke tıklayarak buraya nasıl geldiğinizi bildirin biz de inceleyelim."
-      headings: 
-        problem: "Beslemenin yüklenmesinde hata"
       links: 
         feedback: "Ne aradığınızı söyleyin"
       title: "Yanlış Besleme"
@@ -13747,7 +13647,6 @@ tr:
       prompts: 
         delete: "Bu koşulu silmek istediğinize emin misiniz?"
       titles: 
-        enrollment_terms: "Kayıt Dönemleri"
         term_details: "Dönem Ayrıntıları"
       update_term: "Dönemi Güncelle"
     term: 
@@ -13882,8 +13781,6 @@ tr:
   unpublished_courses_title: "Yayınlanmamış Kurslar"
   unsupported_package: "Desteklenmeyen içerik paketi"
   unused_courses_title: "Kullanılmayan Kurslar"
-  upload_button: 
-    files: Dosyalar
   user: 
     default_user_name: Kullanıcı
     errors: 
@@ -14067,8 +13964,6 @@ tr:
         delete_user: "%{user_name}'ı Sil"
       titles: 
         confirm_delete: "Kullanıcı Silme Onayı"
-        confirm_deletion_of_user: "%{user_name} silme onayı"
-        delete_user: "Kullanıcı Sil"
         really_delete_user: "%{user_name}'ı sil"
     enrollment: 
       course_not_published: "Bu ders henüz yayınlanmadı"

@@ -2,14 +2,6 @@
 <% @active_tab = "sub_accounts" %>
 <% content_for :page_title do %><%= t('titles.sub_accounts', 'Sub-Accounts') %><% end %>
 
-<% content_for :page_header do %>
-  <h1><%= t('titles.sub_accounts', 'Sub-Accounts') %></h1>
-<% end %>
-
-<% content_for :page_subhead do %>
-  <h2><%= @account.name %></h2>
-<% end %>
-
 <% content_for :right_side do %>
   <%= render :partial => 'shared/accounts_right_side_shared' %>
 <% end %>

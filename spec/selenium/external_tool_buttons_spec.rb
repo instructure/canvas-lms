@@ -74,6 +74,7 @@ describe "external tool buttons" do
   end
 
   it "should show limited number of external tool buttons" do
+    pending('fragile')
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")

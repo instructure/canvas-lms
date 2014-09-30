@@ -16,12 +16,12 @@
     </div>
 
     <div class="discussion-title">
-      <div role="heading" aria-level="3">
+      <h3 class="inline-block discussion-title-block">
         {{#if assignment}}
           <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
-      </div>
+      </h3>
       <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
@@ -123,6 +123,16 @@
                 >{{#t "move"}}Move To&hellip;{{/t}}</a>
               </li>
             {{/if}}
+          {{/if}}
+          {{#if ENV.permissions.manage_content}}
+            {{#each discussion_topic_menu_tools}}
+              <li>
+                <a class="menu_tool_link" href="{{url}}">
+                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                  {{title}}
+                </a>
+              </li>
+            {{/each}}
           {{/if}}
         </ul>
       {{/if}}

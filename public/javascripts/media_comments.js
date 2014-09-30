@@ -42,7 +42,7 @@ define([
   $.mediaComment.partnerData = function(params) {
     var hash = {
       context_code: $.mediaComment.contextCode(),
-      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
+      root_account_id: ENV.DOMAIN_ROOT_ACCOUNT_ID,
       context_source: ENV.CONTEXT_ACTION_SOURCE
     }
     if(ENV.SIS_SOURCE_ID){

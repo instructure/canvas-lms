@@ -14,8 +14,8 @@
             <div class="error_text"><%= flash[:delegated_message] %></div>
           </div>
         <% end %>
-        <% 
-           login_message = t('default_login_message', "Log in at your institution") 
+        <%
+           login_message = t('default_login_message', "Log in at your institution")
            if @domain_root_account && @domain_root_account.display_name
              login_message = t('login_at_account', "Log in at %{school_name}", :school_name => @domain_root_account.display_name)
            end
@@ -60,15 +60,15 @@
         </div>
       <% end %>
     <% end %>
-  
+
     <%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :style => "display: none;"} do |f| %>
-  
-      <p><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %></p>
+
+      <p id="forgot_password_instructions"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %></p>
       <div>
-        <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
+        <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input aria-describedby="forgot_password_instructions" class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
         <button type="submit" class="btn btn-primary"><%= t('buttons.request_password', 'Request Password') %></button>
       </div>
-  
+
       &larr; <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "login_link" %>
     <% end %>
   </div>

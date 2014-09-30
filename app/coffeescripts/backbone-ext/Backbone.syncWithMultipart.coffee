@@ -4,7 +4,8 @@ define [
   'vendor/backbone'
   'underscore'
   'jquery'
-], (Backbone, _, $) ->
+  'compiled/behaviors/authenticity_token'
+], (Backbone, _, $, authenticity_token) ->
 
   Backbone.syncWithoutMultipart = Backbone.sync
   Backbone.syncWithMultipart = (method, model, options) ->
@@ -42,7 +43,7 @@ define [
     if options.proxyAttachment
       $form.prepend """
         <input type='hidden' name='_method' value='#{httpMethod}' />
-        <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
+        <input type='hidden' name='authenticity_token' value='#{authenticity_token()}' />
         """
 
     _.each toForm(model.toJSON()), (el) ->

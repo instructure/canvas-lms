@@ -190,9 +190,9 @@ class NotificationMessageCreator
     # If any channel has a policy, even policy-less channels don't get the notification based on the
     # notification default frequency. Is that right?
     policies= []
-    user_has_policy = NotificationPolicy.for(user).for(@notification).exists?
+    user_has_policy = user.notification_policies.for(@notification).exists?
     if user_has_policy
-      policies += NotificationPolicy.for(user).for(@notification).by(['daily', 'weekly'])
+      policies += user.notification_policies.for(@notification).by(['daily', 'weekly'])
     elsif channel &&
         channel.active? &&
         ['daily', 'weekly'].include?(@notification.default_frequency)

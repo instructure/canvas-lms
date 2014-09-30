@@ -9,7 +9,7 @@ define [
   class UploadMediaTrackForm
 
     # video url needs to be the url to mp4 version of the video.
-    # it will be passed along to universalsubtitles.org
+    # it will be passed along to amara.org
     constructor: (@mediaCommentId, @video_url) ->
       templateVars =
         languages: _.map(mejs.language.codes, (name, code) -> {name, code})

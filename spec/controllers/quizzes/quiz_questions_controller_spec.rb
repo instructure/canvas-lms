@@ -102,14 +102,28 @@ describe Quizzes::QuizQuestionsController do
       data[1][:id].should eql(654321)
       data[2][:id].should_not eql(654321)
     end
+
+    it 'bounces data thats too long' do
+      long_data = "abcdefghijklmnopqrstuvwxyz"
+      16.times do
+        long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
+      end
+      user_session(@teacher)
+      xhr :post, 'create', course_id: @course.id, quiz_id: @quiz, question: {
+        question_text: long_data
+      }
+      response.body.should =~ /max length is 16384/
+    end
   end
 
   describe "PUT 'update'" do
     before(:once) { quiz_question }
+
     it "should require authorization" do
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {}
       assert_unauthorized
     end
+
     it "should update a quiz question" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
@@ -134,6 +148,7 @@ describe Quizzes::QuizQuestionsController do
       assigns[:question].question_data[:answers].length.should eql(3)
       assigns[:quiz].should eql(@quiz)
     end
+
     it "should preserve ids, if provided, on update" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
@@ -164,6 +179,17 @@ describe Quizzes::QuizQuestionsController do
       data[1][:id].should eql(654321)
       data[2][:id].should_not eql(654321)
     end
+
+    it 'bounces data thats too long' do
+      long_data = "abcdefghijklmnopqrstuvwxyz"
+      16.times do
+        long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
+      end
+      user_session(@teacher)
+      xhr :put, 'update', course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
+        question_text: long_data
+      }
+      response.body.should =~ /max length is 16384/
+    end
   end
 end
-

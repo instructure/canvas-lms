@@ -135,7 +135,7 @@ describe "account admin question bank" do
 
   it "should bookmark a question bank" do
     @question_bank.bookmarked_for?(User.last).should be_false
-    f(".bookmark_bank_link").click
+    f("#right-side-wrapper .bookmark_bank_link").click
     wait_for_ajaximations
     @question_bank.reload
     @question_bank.bookmarked_for?(User.last).should be_true
@@ -143,7 +143,7 @@ describe "account admin question bank" do
   end
 
   it "should edit bank details" do
-    f(".edit_bank_link").click
+    f("#right-side .edit_bank_link").click
     wait_for_ajaximations
     question_bank_title = f("#assessment_question_bank_title")
     new_title = "bank 2"
@@ -154,7 +154,7 @@ describe "account admin question bank" do
   end
 
   it "should delete a question bank" do
-    f(".delete_bank_link").click
+    f("#right-side .delete_bank_link").click
     driver.switch_to.alert.accept
     wait_for_ajaximations
     @question_bank.reload

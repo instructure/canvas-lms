@@ -327,6 +327,21 @@ class ActiveRecord::Base
     value
   end
 
+  def self.coalesced_wildcard(*args)
+    value = args.pop
+    value = wildcard_pattern(value)
+    cols = coalesce_chain(args)
+    sanitize_sql_array ["(#{like_condition(cols, '?', false)})", value]
+  end
+
+  def self.coalesce_chain(cols)
+    "(#{cols.map{|col| coalesce_clause(col)}.join(" || ' ' || ")})"
+  end
+
+  def self.coalesce_clause(column)
+    "COALESCE(LOWER(#{column}), '')"
+  end
+
   def self.like_condition(value, pattern = '?', downcase = true)
     case connection.adapter_name
       when 'SQLite'
@@ -615,8 +630,12 @@ end
 
 unless defined? OpenDataExport
   # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
-  ActiveRecord::Associations::Builder::Association.class_eval do
-    ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+  if CANVAS_RAILS3
+    ActiveRecord::Associations::Builder::Association.class_eval do
+      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+    end
+  else
+    ActiveRecord::Associations::Builder::Association.valid_options << :exportable
   end
 end
 
@@ -660,7 +679,7 @@ ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
     @join_conditions = []
     relation
   end
-  alias_method_chain :join_to, :join_conditions
+  alias_method_chain :join_to, :join_conditions if CANVAS_RAILS3 # TODO RAILS4: this changed drastically
 end
 
 ActiveRecord::Associations::Preloader::Association.class_eval do
@@ -861,6 +880,19 @@ ActiveRecord::Relation.class_eval do
     else
       scope.to_a
     end
+  end
+
+  def polymorphic_where(args)
+    raise ArgumentError unless args.length == 1
+
+    column = args.first.first
+    values = args.first.last
+    original_length = values.length
+    values = values.compact
+
+    sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
+    sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
+    where(sql, *values.map { |value| [value, value.class.base_ar_class.name] }.flatten)
   end
 end
 
@@ -1171,7 +1203,16 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
 end
 
-ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+if CANVAS_RAILS3
+  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+else
+  module HasManyAllowJoins
+    def valid_options
+      super + [:joins]
+    end
+  end
+  ActiveRecord::Associations::Builder::HasMany.send(:prepend, HasManyAllowJoins)
+end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope

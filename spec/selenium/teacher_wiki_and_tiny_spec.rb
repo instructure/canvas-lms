@@ -74,7 +74,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         keep_trying_until { f("#wiki_page_new").should be_displayed }
 
         f('#wiki_page_new .new').click
-        f('#wiki_page_title').send_keys(title2)
+        f('#right-side #wiki_page_title').send_keys(title2)
         submit_form("#add_wiki_page_form")
 
         keep_trying_until { f("#wiki_page_editing_roles").should be_displayed }

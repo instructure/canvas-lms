@@ -799,7 +799,7 @@ describe "calendar2" do
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
         f('.fc-button-prev').click
-        f('.fc-day-number').click
+        f('#right-side .fc-day-number').click
         wait_for_ajaximations
         keep_trying_until { ffj('.ig-row').length.should == 1 }
       end

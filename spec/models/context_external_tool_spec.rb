@@ -347,6 +347,31 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "#substituted_custom_fields" do
+    it "substitutes custom fields for a placement" do
+      subject.user_navigation = {custom_fields: {'custom_a' => '$Custom.substitution'}}
+
+      custom_params = subject.substituted_custom_fields(:user_navigation, {'$Custom.substitution' => 'substituted_value'})
+      custom_params.should == {'custom_a' => 'substituted_value'}
+
+    end
+
+    it "executes procs" do
+      subject.course_navigation = {custom_fields: {'custom_b' => '$Custom.substitution'}}
+      custom_params = subject.substituted_custom_fields(:course_navigation, {'$Custom.substitution' => -> {'substituted_value'}})
+
+      custom_params.should == {'custom_b' => 'substituted_value'}
+    end
+
+    it "ignores constants" do
+      subject.account_navigation = {custom_fields: {'custom_c' => 'constant'}}
+      custom_params = subject.substituted_custom_fields(:account_navigation, {'$Custom.substitution' => 'substituted_value'})
+
+      custom_params.should == {'custom_c' => 'constant'}
+    end
+
+  end
   
   describe "all_tools_for" do
     it "should retrieve all tools in alphabetical order" do
@@ -357,7 +382,7 @@ describe ContextExternalTool do
       @tools << @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tools << @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tools << @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      ContextExternalTool.all_tools_for(@course).should eql(@tools.sort_by(&:name))
+      ContextExternalTool.all_tools_for(@course).to_a.should eql(@tools.sort_by(&:name))
     end
   end
 

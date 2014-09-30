@@ -25,7 +25,7 @@ describe 'Time Marshal override' do
     # Rails 3 adds an instance variable of UTC time zone, so we can't do
     # an exact match. I confirmed that Rails 2 can still load and safely
     # ignores the extra instance variable
-    dumped.should =~ /:\tTime\r\x05F\x1C\xC0\xF0IR\xAD/
+    dumped.should =~ /:\tTime\r\x05F\x1C\xC0\xF0IR\xAD/n
     reloaded = Marshal.load(dumped)
     reloaded.should == raw_time
   end
@@ -34,7 +34,13 @@ describe 'Time Marshal override' do
     old_time = Time.zone.parse('0010-05-13 04:12:51Z')
     raw_time = old_time.time
     dumped = Marshal.dump(raw_time)
-    dumped.should == "\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06EF"
+    # the last character differs between ruby 1.9 and ruby 2.1
+    dumped[0..-2].should == "\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06E"
+    %w{F T}.should be_include(dumped[-1])
+    dumped[-1] = 'F'
+    reloaded = Marshal.load(dumped)
+    reloaded.should == raw_time
+    dumped[-1] = 'T'
     reloaded = Marshal.load(dumped)
     reloaded.should == raw_time
     # confirm it works for TimeWithZone as well

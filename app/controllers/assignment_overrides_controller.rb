@@ -146,17 +146,17 @@ class AssignmentOverridesController < ApplicationController
   # @API Create an assignment override
   # @beta
   #
-  # @argument assignment_override[student_ids][] [Optional, Integer] The IDs of
+  # @argument assignment_override[student_ids][] [Integer] The IDs of
   #   the override's target students. If present, the IDs must each identify a
   #   user with an active student enrollment in the course that is not already
   #   targetted by a different adhoc override.
   #
-  # @argument assignment_override[title] [Optional] The title of the adhoc
+  # @argument assignment_override[title] The title of the adhoc
   #   assignment override. Required if student_ids is present, ignored
   #   otherwise (the title is set to the name of the targetted group or section
   #   instead).
   #
-  # @argument assignment_override[group_id] [Optional, Integer] The ID of the
+  # @argument assignment_override[group_id] [Integer] The ID of the
   #   override's target group. If present, the following conditions must be met
   #   for the override to be successful:
   #
@@ -166,24 +166,24 @@ class AssignmentOverridesController < ApplicationController
   #
   #   See {Appendix: Group assignments} for more info.
   #
-  # @argument assignment_override[course_section_id] [Optional, Integer] The ID
+  # @argument assignment_override[course_section_id] [Integer] The ID
   #   of the override's target section. If present, must identify an active
   #   section of the assignment's course not already targetted by a different
   #   override.
   #
-  # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[due_at] [Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
   #   May be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[unlock_at] [Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the unlock date. May be present but null to indicate the override
   #   removes any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[lock_at] [Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the lock date. May be present but null to indicate the override
@@ -221,28 +221,28 @@ class AssignmentOverridesController < ApplicationController
   # @API Update an assignment override
   # @beta
   #
-  # @argument assignment_override[student_ids][] [Optional, Integer] The IDs of the
+  # @argument assignment_override[student_ids][] [Integer] The IDs of the
   #   override's target students. If present, the IDs must each identify a
   #   user with an active student enrollment in the course that is not already
   #   targetted by a different adhoc override. Ignored unless the override
   #   being updated is adhoc.
   #
-  # @argument assignment_override[title] [Optional, String] The title of an adhoc
+  # @argument assignment_override[title] [String] The title of an adhoc
   #   assignment override. Ignored unless the override being updated is adhoc.
   #
-  # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[due_at] [Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
   #   May be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[unlock_at] [Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the unlock date. May be present but null to indicate the override
   #   removes any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
+  # @argument assignment_override[lock_at] [Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the lock date. May be present but null to indicate the override

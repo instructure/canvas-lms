@@ -31,7 +31,7 @@ module Api::V1::User
     # pseudonyms account for Pseudonym#works_for_account?
     User.send(:preload_associations, users, [{ :pseudonyms => :account }]) if user_json_is_admin?
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
-      # communication_channesl for User#email if it is not cached
+      # communication_channels for User#email if it is not cached
       User.send(:preload_associations, no_email_users, :communication_channels)
     end
   end
@@ -68,6 +68,7 @@ module Api::V1::User
         json[:email] = user.email
       end
       json[:locale] = user.locale if includes.include?('locale')
+      json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?('confirmation_url')
 
       if includes.include?('last_login')
         last_login = user.read_attribute(:last_login)

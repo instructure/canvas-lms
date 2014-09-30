@@ -146,6 +146,11 @@ class Quizzes::Quiz < ActiveRecord::Base
       @assignment_to_set = self.assignment
       self.assignment_id = nil
     end
+
+    if !self.require_lockdown_browser
+      self.require_lockdown_browser_for_results = false
+    end
+
     self.assignment_group_id ||= self.assignment.assignment_group_id if self.assignment
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
@@ -459,7 +464,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     # only update quiz submissions that:
     # 1. belong to this quiz;
-    # 2. haven't been started; and
+    # 2. have been started; and
     # 3. won't lose time through this change.
     where_clause = <<-END
       quiz_id = ? AND
@@ -706,10 +711,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
     # Admins can take the full quiz whenever they want
     unless user.is_a?(::User) && self.grants_right?(user, :grade)
-      submission.end_at = due_at if due_at && ::Time.now < due_at && (!submission.end_at || due_at < submission.end_at)
       submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
     end
     submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
+    if context.end_at && context.restrict_enrollments_to_course_dates
+      submission.end_at ||= context.end_at
+      submission.end_at = context.end_at if context.end_at && context.end_at < submission.end_at
+    else
+      submission.end_at ||= context.enrollment_term.end_at
+      submission.end_at = context.end_at if context.enrollment_term.end_at && context.enrollment_term.end_at < submission.end_at
+    end
     submission.finished_at = nil
     submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
@@ -1117,7 +1128,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias :require_lockdown_browser? :require_lockdown_browser
 
   def require_lockdown_browser_for_results
-    self[:require_lockdown_browser_for_results] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
+    self.require_lockdown_browser &&
+    self[:require_lockdown_browser_for_results] &&
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
@@ -1174,7 +1187,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def can_unpublish?
     !has_student_submissions? &&
-      (!assignment || !assignment.has_student_submissions?)
+      (assignment.blank? || assignment.can_unpublish?)
   end
 
   alias_method :unpublishable?, :can_unpublish?

@@ -62,6 +62,11 @@
         <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
       </td>
       <td class="email_actions hidden_for_single">
+        <% if c.bouncing? %>
+          <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>" aria-label="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>">
+            <i class="text text-warning icon-warning"></i>
+          </span>
+        <% end %>
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
@@ -110,6 +115,11 @@
       <td><a href="#" class="path"><%= c.path_description %></a></td>
       <td><%= c.path_type %></td>
       <td style="padding: 0; text-align: center;">
+        <% if c.bouncing? %>
+          <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>" aria-label="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>">
+            <i class="text text-warning icon-warning"></i>
+          </span>
+        <% end %>
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>

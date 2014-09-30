@@ -117,19 +117,28 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    it 'should paginate events' do
-      ids = 5.times.map { |i| @course.calendar_events.create(:title => "#{i}", :start_at => '2012-01-08 12:00:00').id }
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=2", {
-        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
-        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '2'})
-      json.size.should eql 2
-      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
+    it 'should sort and paginate events' do
+      undated = (1..7).map {|i| @course.calendar_events.create(title: "undated:#{i}", start_at: nil, end_at: nil).id }
+      dated = (1..18).map {|i| @course.calendar_events.create(title: "dated:#{i}", start_at: Time.parse('2012-01-20 12:00:00').advance(days: -i)).id }
+      ids = dated.reverse + undated
 
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=2&page=3", {
+      json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
-        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '2', :page => '3'})
-      json.size.should eql 1
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10'})
+      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[0...10]
+
+      json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '2'})
+      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[10...20]
+
+      json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '3'})
       response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[20...25]
     end
 
     it 'should ignore invalid end_dates' do
@@ -787,19 +796,28 @@ describe CalendarEventsApiController, type: :request do
       json.map { |event| event['title'] }.should == %w[1 2 3]
     end
 
-    it 'should paginate assignments' do
-      ids = create_assignments(@course.id, 25, due_at: '2012-01-08 12:00:00')
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=10", {
-        :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
-        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '10'})
-      json.size.should eql 10
-      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
+    it 'should sort and paginate assignments' do
+      undated = (1..7).map {|i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: nil).first }
+      dated = (1..18).map {|i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.parse('2012-01-20 12:00:00').advance(days: -i)).first }
+      ids = dated.reverse + undated
 
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
+      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
-        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '10', :page => '3'})
-      json.size.should eql 5
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10'})
+      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[0...10].map{|id| "assignment_#{id}"}
+
+      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '2'})
+      response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[10...20].map{|id| "assignment_#{id}"}
+
+      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+        :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '3'})
       response.headers['Link'].should match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
+      json.map{|a| a['id']}.should eql ids[20...25].map{|id| "assignment_#{id}"}
     end
 
     it 'should ignore invalid end_dates' do
@@ -915,6 +933,101 @@ describe CalendarEventsApiController, type: :request do
             'published assignment 1',
             'published assignment 2',
           ]
+        end
+      end
+    end
+
+    context 'differentiated assignments on' do
+      before :once do
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
+        @course.enable_feature!(:differentiated_assignments)
+
+        @student_in_overriden_section = User.create
+        @student_in_general_section = User.create
+
+        @course.enroll_student(@student_in_general_section, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student_in_overriden_section)
+
+
+        @only_vis_to_o, @not_only_vis_to_o = (1..2).map{@course.assignments.create(:title => 'test assig', :workflow_state => 'published',:due_at => '2012-01-07 12:00:00')}
+        @only_vis_to_o.only_visible_to_overrides = true
+        @only_vis_to_o.save!
+        [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
+
+        create_section_override_for_assignment(@only_vis_to_o, {course_section: @section})
+      end
+
+
+      context 'as a student' do
+        it "only shows events for visible assignments" do
+          json = api_call_as_user(@student_in_overriden_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+          json.size.should eql 2
+
+
+          json = api_call_as_user(@student_in_general_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+          json.size.should eql 1
+        end
+      end
+
+      context 'as an observer' do
+        before do
+          @observer = User.create
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+        end
+        context 'following a student with visibility' do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student_in_overriden_section.id) }
+          it "only shows events for assignments visible to that student" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+
+        context 'following two students with visibility' do
+          before do
+            @observer_enrollment.update_attribute(:associated_user_id, @student_in_overriden_section.id)
+            student_in_section(@section, user: @student_in_general_section)
+            @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student_in_general_section.id})
+          end
+          it "doesnt show duplicate events" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+
+        context 'following a student without visibility' do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student_in_general_section.id) }
+          it "only shows events for assignments visible to that student" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 1
+          end
+        end
+        context 'in a section only' do
+          it "shows events for all active assignment" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+      end
+
+      context 'as a teacher' do
+        it "shows events for all active assignment" do
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
         end
       end
     end

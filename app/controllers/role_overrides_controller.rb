@@ -95,7 +95,7 @@ class RoleOverridesController < ApplicationController
   # @API List roles
   # List the roles available to an account.
   #
-  # @argument account_id [String]
+  # @argument account_id [Required, String]
   #   The id of the account to retrieve roles for.
   #
   # @argument state[] [String, "active"|"inactive"]
@@ -156,10 +156,10 @@ class RoleOverridesController < ApplicationController
   # @API Get a single role
   # Retrieve information about a single role
   #
-  # @argument account_id [String]
+  # @argument account_id [Required, String]
   #   The id of the account containing the role
   #
-  # @argument role [String]
+  # @argument role [Required, String]
   #   The name and unique identifier for the role
   #
   # @returns Role
@@ -177,18 +177,18 @@ class RoleOverridesController < ApplicationController
   # @API Create a new role
   # Create a new course-level or account-level role.
   #
-  # @argument role [String]
+  # @argument role [Required, String]
   #   Label and unique identifier for the role.
   #
-  # @argument base_role_type [Optional, String, "AccountMembership"|"StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  # @argument base_role_type [String, "AccountMembership"|"StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Specifies the role type that will be used as a base
   #   for the permissions granted to this role.
   #
   #   Defaults to 'AccountMembership' if absent
   #
-  # @argument permissions[<X>][explicit] [Optional, Boolean]
+  # @argument permissions[<X>][explicit] [Boolean]
   #
-  # @argument permissions[<X>][enabled] [Optional, Boolean]
+  # @argument permissions[<X>][enabled] [Boolean]
   #   If explicit is 1 and enabled is 1, permission <X> will be explicitly
   #   granted to this role. If explicit is 1 and enabled has any other value
   #   (typically 0), permission <X> will be explicitly denied to this role. If
@@ -263,7 +263,7 @@ class RoleOverridesController < ApplicationController
   #
   #   Additional permissions may exist based on installed plugins.
   #
-  # @argument permissions[<X>][locked] [Optional, Boolean]
+  # @argument permissions[<X>][locked] [Boolean]
   #   If the value is 1, permission <X> will be locked downstream (new roles in
   #   subaccounts cannot override the setting). For any other value, permission
   #   <X> is left unlocked. Ignored if permission <X> is already locked
@@ -331,7 +331,7 @@ class RoleOverridesController < ApplicationController
   # continue to function with the same permissions they had previously.
   # Built-in roles cannot be deactivated.
   #
-  # @argument role [String]
+  # @argument role [Required, String]
   #   Label and unique identifier for the role.
   #
   # @returns Role
@@ -349,7 +349,7 @@ class RoleOverridesController < ApplicationController
   # @API Activate a role
   # Re-activates an inactive role (allowing it to be assigned to new users)
   #
-  # @argument role [String]
+  # @argument role [Required, String]
   #   Label and unique identifier for the role.
   #
   # @returns Role
@@ -376,8 +376,8 @@ class RoleOverridesController < ApplicationController
   # * AccountAdmin
   # * Any previously created custom role
   #
-  # @argument permissions[<X>][explicit] [Optional, Boolean]
-  # @argument permissions[<X>][enabled] [Optional, Boolean]
+  # @argument permissions[<X>][explicit] [Boolean]
+  # @argument permissions[<X>][enabled] [Boolean]
   #   These arguments are described in the documentation for the
   #   {api:RoleOverridesController#add_role add_role method}.
   #

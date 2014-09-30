@@ -4,8 +4,13 @@ body, html
   height: 100%
 body
   @if not $use_high_contrast
-    +bg-image('blue/bg', 'jpg', repeat, left, top, transparent, 150px, 150px)
+    background-color: #f7f7f7    
   min-width: $min_main_width
+
+  @if $use_high_contrast
+    background: white
+  @else
+    background-color: #efefef
 
   &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
@@ -24,7 +29,7 @@ body
       padding-top: 0
 
   &.embedded
-    #wrapper-container, #wrapper, #main
+    #application, #wrapper-container, #wrapper, #main
       height: 100%
     #main
       min-height: 0
@@ -41,6 +46,7 @@ body
       h2, .h2
         display: none
     .embedded-footer
+
       position: absolute
       bottom: 0
       width: 100%
@@ -77,9 +83,9 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $bodyBackground
-  border: 1px solid $listBorderColor
-  border-top: 0
+  background-color: $bodyBackground  
+  border: 1px solid #eee;
+  border-top: none;
   margin-bottom: 40px
   +pie-clearfix
   min-height: 450px
@@ -114,6 +120,8 @@ body
   #right-side-wrapper
     display: block
     float: right
+    position: absolute
+    top: 0
   #breadcrumbs + #right-side-wrapper
     margin-top: -28px
   #main
@@ -198,3 +206,11 @@ body
     // ie7 supports :first-child so this will work on everything we support.
     &:first-child
       border-left: none
+
+div.content_notice
+  margin: 12px
+  margin-bottom: 6px
+  div
+    display: inline-block
+  i
+    padding-right: 8px

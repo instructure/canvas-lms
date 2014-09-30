@@ -1,0 +1,9 @@
+`ext/` contains extensions modules to external packages.
+
+This may include helpers and plugins, and configuration of those packages as well.
+
+If a package has several extensions, it is better to create an extension entry
+point named by `ext/package.js` which will in turn include all the available
+extension packages. However, this might not always be applicable, so feel free
+to mix and match, but you should always create a package folder for any
+package that contains more than one extension.

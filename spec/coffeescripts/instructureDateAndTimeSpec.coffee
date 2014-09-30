@@ -168,12 +168,9 @@ define [
     equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at  7:00pm'
 
   test 'should translate into the profile locale', ->
-    # this matches current behavior, but is incorrect behavior. having the
-    # 12-hour 3:00 without a pm indicator doesn't allow it to be distinguished
-    # from 3:00am. leaving it to be fixed in an upcoming patchset
     tz.changeLocale(portuguese, 'pt_PT')
     I18n.locale = 'pt'
-    equal $.datetimeString('1970-01-01 15:00:00Z'), "Jan 1, 1970 em  3:00"
+    equal $.datetimeString('1970-01-01 15:00:00Z'), "Jan 1, 1970 em 15:00"
 
   # TODO: remove these second argument specs once the pickers know how to parse
   # localized datetimes

@@ -28,4 +28,11 @@ module Filters::Quizzes
 
     @quiz
   end
+
+  def require_course
+    @course = api_find(Course.active, params[:course_id])
+    params[:context_id] = params[:course_id]
+    params[:context_type] = 'Course'
+    authorized_action(@course, @current_user, :read)
+  end
 end

@@ -24,18 +24,18 @@ describe SubmissionList do
     lambda{@sl = SubmissionList.new(@course)}.should_not raise_error
     @sl.should be_is_a(SubmissionList)
     @sl.course.should eql(@course)
-  
+
     lambda{@sl = SubmissionList.new(@course)}.should_not raise_error
     @sl.course.should eql(@course)
-    
+
     lambda{@sl = SubmissionList.new(-1)}.should raise_error(ArgumentError, "Must provide a course.")
   end
-  
+
   it "should provide a dictionary in 'list'" do
     course_model
     SubmissionList.new(@course).list.should be_is_a(Dictionary)
   end
-  
+
   it "should create keys in the data when versions of submissions existed" do
     interesting_submission_list
     @sl.list.keys.should eql([Date.parse(Time.now.utc.to_s)])
@@ -67,11 +67,11 @@ describe SubmissionList do
   end
 
   context "named loops" do
-    
+
     before do
       interesting_submission_data
     end
-    
+
     it "should be able to loop on days" do
       available_keys = [:graders, :date]
       SubmissionList.days(@course).each do |day|
@@ -82,7 +82,7 @@ describe SubmissionList do
         day.date.should be_is_a(Date)
       end
     end
-    
+
     it "should be able to loop on graders" do
       available_keys = [:grader_id, :assignments, :name]
       SubmissionList.days(@course).each do |day|
@@ -108,7 +108,7 @@ describe SubmissionList do
         end
       end
     end
-    
+
     it "should be able to loop on assignments" do
       available_keys = [:submission_count, :name, :submissions, :assignment_id]
       SubmissionList.days(@course).each do |day|
@@ -126,7 +126,7 @@ describe SubmissionList do
         end
       end
     end
-    
+
     it "should be able to loop on submissions" do
       available_keys = [
         :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
@@ -139,7 +139,7 @@ describe SubmissionList do
         :student_user_id, :submission_id, :student_name, :submission_type,
         :updated_at, :url, :user_id, :workflow_state
       ]
-      
+
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.assignments.each do |assignment|
@@ -152,7 +152,7 @@ describe SubmissionList do
         end
       end
     end
-  
+
   end
 
   context "real data inspection" do
@@ -163,12 +163,65 @@ describe SubmissionList do
         File.expand_path(
           File.join(
             File.dirname(__FILE__),
-            "..", 
-            "fixtures", 
+            "..",
+            "fixtures",
             "submission_list_full_hash_list.yml"
+            )
           )
         )
-      )
+    end
+  end
+  context "regrading" do
+    before :each do
+    end
+
+    it 'should include regrade events in the final data' do
+      # Figure out how to manually regrade a test piece of data
+      interesting_submission_data
+      @assignment = @course.assignments.create!(title: 'some_assignment')
+      @quiz = Quizzes::Quiz.create!({:context => @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment"})
+      @quiz.workflow_state = 'published'
+      @quiz.quiz_data = [multiple_choice_question_data]
+      @quiz.save!
+      @qs = @quiz.generate_submission(@student)
+
+      @points = 15.0
+
+      @question = stub(:id => 1, :question_data => {:id => 1,
+          :regrade_option => 'full_credit',
+          :points_possible => @points},
+          :quiz_group => nil )
+
+      @question_regrade = stub(:quiz_question  => @question,
+        :regrade_option => "full_credit" )
+
+      @answer = { :question_id => 1, :points => @points, :text => ""}
+
+      @wrapper = Quizzes::QuizRegrader::Answer.new(@answer, @question_regrade)
+      @qs.grade_submission
+      @qs.score_before_regrade = 5.0
+      @qs.score = 4.0
+      @qs.attempt = 1
+      @qs.with_versioning(true, &:save!)
+      @qs.save!
+
+      @qs.score_before_regrade.should == 5.0
+      @qs.score.should == 4.0
+
+
+      @sl = SubmissionList.days(@course)
+      regrades = []
+      @sl.each do |day|
+        day.graders.each do |grader|
+          grader.assignments.each do |assignment|
+            assignment.submissions.each do |submission|
+              regrades.push submission.score_before_regrade if submission
+            end
+          end
+        end
+      end
+
+      regrades.include?(5.0).should be_truthy
     end
   end
 end
@@ -185,7 +238,7 @@ def interesting_submission_data(opts={})
   opts[:course] ||= {}
   opts[:assignment] ||= {}
   opts[:submission] ||= {}
-  
+
   @grader = user_model({:name => 'some_grader'}.merge(opts[:grader]))
   @grader2 = user_model({:name => 'another_grader'}.merge(opts[:grader]))
   @student = factory_with_protected_attributes(User, {:name => "some student", :workflow_state => "registered"}.merge(opts[:user]))
@@ -196,7 +249,7 @@ def interesting_submission_data(opts={})
   end
   @course.enroll_student(@student)
   @assignment = @course.assignments.new({
-    :title => "some assignment", 
+    :title => "some assignment",
     :points_possible => 10
   }.merge(opts[:assignment]))
   @assignment.workflow_state = "published"
@@ -213,7 +266,7 @@ def interesting_submission_data(opts={})
   @assignment.reload
   @assignment.grade_student(@student, {:grade => 10, :grader => @grader}.merge(opts[:submission]))
   @assignment = @course.assignments.create({
-    :title => "another assignment", 
+    :title => "another assignment",
     :points_possible => 10
   })
   @assignment.workflow_state = "published"

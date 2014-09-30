@@ -494,7 +494,10 @@ describe Quizzes::Quiz do
 
   it "should shuffle answers for the questions" do
     q = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}, {'answer_text' => '5'}, {'answer_text' => '6'}, {'answer_text' => '7'}, {'answer_text' => '8'}, {'answer_text' => '9'}, {'answer_text' => '10'}]})
+    q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question',
+      'answers' => [{'answer_text' => '1'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'},
+                    {'answer_text' => '5'}, {'answer_text' => '6'}, {'answer_text' => '7'}, {'answer_text' => '8'},
+                    {'answer_text' => '9'}, {'answer_text' => '10'}]})
     q.quiz_data.should be_nil
     q.generate_quiz_data
     q.save
@@ -625,6 +628,35 @@ describe Quizzes::Quiz do
       sub.save!
       sub2 = q.generate_submission(u)
       sub2.end_at.should be_nil
+    end
+    it 'should not set end_at to due_at' do
+      due_at = 1.day.from_now
+      u = User.create!(:name => "Fred Colon")
+      q = @course.quizzes.create!(:title => "locked tomorrow", :due_at => due_at)
+      sub2 = q.generate_submission(u)
+      sub2.end_at.should_not == due_at
+    end
+    it "should set end_at for course end dates" do
+      deadline = 1.day.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.conclude_at = deadline
+      @course.save!
+      u = User.create!(:name => "Fred Colon")
+      q = @course.quizzes.create!(:title => "locked tomorrow")
+      sub2 = q.generate_submission(u)
+      sub2.end_at.should == deadline
+    end
+    it "should set end_at for enrollment end dates" do
+      # when course.end_at doesn't exist
+      deadline = 1.day.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @course.enrollment_term.end_at = deadline
+      @course.enrollment_term.save!
+      u = User.create!(:name => "Fred Colon")
+      q = @course.quizzes.create!(:title => "locked tomorrow")
+      sub2 = q.generate_submission(u)
+      sub2.end_at.should == deadline
     end
 
     it "should shuffle submission questions" do
@@ -807,6 +839,17 @@ describe Quizzes::Quiz do
         each { |s| q1.send(s).should be_false }
     [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
         each { |s| q2.send(s).should be_true }
+  end
+
+  it 'should not report LDB to be required for viewing results if LDB is not required to take the quiz' do
+    Quizzes::Quiz.expects(:lockdown_browser_plugin_enabled?).twice.returns(true)
+
+    q = @course.quizzes.build
+    q.require_lockdown_browser_for_results = true
+    q.require_lockdown_browser_for_results.should be_false
+    q.require_lockdown_browser = true
+    q.require_lockdown_browser_for_results = true
+    q.require_lockdown_browser_for_results.should be_true
   end
 
   describe "non_shuffled_questions" do
@@ -1369,7 +1412,7 @@ describe Quizzes::Quiz do
   describe "#restrict_answers_for_concluded_course?" do
     let(:account){Account.new}
     let(:enrollment_term){EnrollmentTerm.new}
-    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term)}
+    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term, restrict_enrollments_to_course_dates: true)}
     let(:quiz){Quizzes::Quiz.new(context: course)}
 
     before {account.settings[:restrict_quiz_questions] = restrict_quiz_settings}

@@ -28,6 +28,20 @@ module ActiveRecord
       end
     end
 
+    describe ".coalesced_wildcard" do
+      it 'produces a useful wildcard string for a coalesced index' do
+        sql = Base.coalesced_wildcard('users.name', 'users.short_name', 'Sinatra, Frank')
+        sql.should == "((COALESCE(LOWER(users.name), '') || ' ' || COALESCE(LOWER(users.short_name), '')) LIKE '%sinatra, frank%')"
+      end
+    end
+
+    describe ".coalesce_chain" do
+      it "chains together many columns for combined matching" do
+        sql = Base.coalesce_chain(["foo.bar", "foo.baz", "foo.bang"])
+        sql.should == "(COALESCE(LOWER(foo.bar), '') || ' ' || COALESCE(LOWER(foo.baz), '') || ' ' || COALESCE(LOWER(foo.bang), ''))"
+      end
+    end
+
     describe "find_in_batches" do
       describe "with cursor" do
         before do

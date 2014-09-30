@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.discussion_topic_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Comment on Announcement %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<% end %>
+
+<%= t :body, "%{user} posted a new comment on the announcement: %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
+
+<%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+
+<%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %>
+<%= content :link %>

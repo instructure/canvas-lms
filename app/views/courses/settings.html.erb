@@ -89,9 +89,15 @@
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>
           <span class="course_form">
-            <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
+            <%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
           </span>
-          <span class="course_info time_zone"><%= @context.time_zone.name %></span>
+          <span class="course_info time_zone">
+            <% if name = @context.time_zone.try(:name) %>
+              <%= I18n.send(:translate, I18nTimeZone[name].keyify, name) %>
+            <% else %>
+              <%= t(:none, "None") %>
+            <% end %>
+          </span>
         </td>
       <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
@@ -294,7 +300,7 @@ TEXT
       </tr><tr>
         <td></td>
         <td colspan="3">
-          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
+          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">
             <% if @context.root_account.self_registration? %>
               <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can
@@ -436,18 +442,9 @@ TEXT
   <% if can_do @context, @current_user, :update %>
 
   <div id="tab-navigation">
-
-    <div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
-
-
-      <%= t('navigation_keyboard_hint',
-        'If using a screen reader, to change the order of the course navigation links,
-        Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS).
-        Press control-home to jump to the top of the page, then press the tab key until you reach the first course navigation link.
-        Press the up and down arrows until you hear the link you wish to move, and then press space to select it
-        Then, press the up and down arrow keys until you locate the new position.
-        Finally, press space again to place the link you are moving directly after the current link.
-        When finished, reenable the virtual buffer/cursor.') %>
+    <div class="screenreader-only drag_and_drop_warning" tabindex="0">
+      <%= t('nav_items_keyboard_drag_and_drop',
+      'Warning: For improved accessibility, please use the Move To Dialog option found in the menu.') %>
     </div>
 
     <% keyboard_navigation([
@@ -468,7 +465,30 @@ TEXT
       end %>
       <ul id="nav_enabled_list" aria-label="Enabled Links" class="nav_list connectedSortable">
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>" tabindex="0"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>"
+              id="nav_edit_tab_id_<%= tab[:id] %>"
+              tabindex="0"
+          >
+            <%= tab[:label] %>
+            <div role="application" class="admin-links">
+              <a class="al-trigger al-trigger-gray" role="button" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
+
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item">Disable</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item">Move</a>
+                </li>
+              </ul>
+            </div>
+            <span class="disabled_message"><%= tab[:disabled_message] %></span>
+          </li>
+
         <% end %>
       </ul>
 
@@ -480,7 +500,31 @@ TEXT
           </div>
         </li>
         <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>" class="navitem enabled" id="nav_edit_tab_id_<%= tab[:id] %>" tabindex="0"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li aria-label="<%= tab[:label] %>"
+              class="navitem enabled"
+              id="nav_edit_tab_id_<%= tab[:id] %>"
+              tabindex="0"
+          >
+            <%= tab[:label] %>
+            <div role="application" class="admin-links">
+                <a class="al-trigger al-trigger-gray" role="button" href="#">
+                  <i class="icon-settings"></i>
+                  <i class="icon-mini-arrow-down"></i>
+                  <span class="screenreader-only">Settings</span>
+                </a>
+
+                <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">
+                  <li role="presentation">
+                    <a href="#" class="icon-plus enable_nav_item_link" id="enable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Enable this item">Enable</a>
+                  </li>
+                  <li role="presentation">
+                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item">Move</a>
+                  </li>
+                </ul>
+              </div>
+              <span class="disabled_message"><%= tab[:disabled_message] %></span>
+
+          </li>
         <% end %>
       </ul>
 
@@ -488,6 +532,24 @@ TEXT
         <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
+    <form id="move_nav_item_form" style="display:none" class="form-dialog" title="Move Navigation Item">
+      <div class="form-dialog-content">
+        <h2><%= t('move_module.place', "Place ") %> <span id="move_nav_item_name"> </span></h2>
+        <div class="move-nav-item-before-after-container">
+          <input type="radio" name="move_location" value="before" id="move_location_before" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_before"><%= t('move_nav_item.before', "Before") %></label>
+            <strong class="move-nav-item-or"><%= t('move_nav_item.or', "OR") %></strong>
+          <input type="radio" name="move_location" value="after" id="move_location_after" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_after"><%= t('move_nav_item.after', "After") %></label>
+        </div>
+        <div class="move-nav-item-select-spacer">
+          <select name="move_nav_item_select" id="move_nav_item_select"></select>
+        </div>
+
+      </div>
+      <div class="form-controls">
+        <button type="button" id="move_nav_item_cancel_btn" class="btn cancel_move_dialog">Cancel</button>
+        <button type="submit" class="btn btn-primary">Move</button>
+      </div>
+    </form>
   </div>
 
   <% end %>
@@ -554,3 +616,4 @@ TEXT
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
 </div>
+

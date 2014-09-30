@@ -1,4 +1,37 @@
 module Canvas
+  # Canvas extensions to the base AMS. All instances of this class require a
+  # Controller instance to operate.
+  #
+  # Serializers inherting from this class will be equipped with several helper
+  # methods as well as runtime options.
+  #
+  # Methods available on your instance:
+  #
+  # @method session
+  # @return [ActiveRecord::Base] The controller's session.
+  #
+  # @method controller
+  # @return [ApplicationController]
+  #   The controller instance the serializer is bound to.
+  #
+  # @method accepts_jsonapi?
+  # @return [Boolean] Whether jsonapi header is present.
+  #
+  # @method polymorphic_url
+  # @return [String] good ole' rails URL helpers
+  #
+  # @method context
+  # @return [ActiveRecord::Base|NilClass]
+  #   If your controller has a @context, it'll be that. Otherwise, nil.
+  #
+  # @method stringify_json_ids?
+  # @return [Boolean]
+  #   Whether the stringify_json_ids? header is present.
+  #
+  # @method user
+  # @alias  current_user
+  # @return [ActiveRecord::Base|Hash|NilClass]
+  #   Whatever you pass in as options[:scope] to the serializer initializer.
   class APISerializer < ActiveModel::Serializer
     extend Forwardable
     include Canvas::APISerialization
@@ -24,6 +57,7 @@ module Canvas
 
     alias_method :user, :scope
     alias_method :current_user, :user
+
     def_delegators :@controller, :stringify_json_ids?, :polymorphic_url,
       :accepts_jsonapi?, :session, :context
 
@@ -33,21 +67,19 @@ module Canvas
     # options - see AMS documentation, however, you must pass a :controller
     # key with a controller.
     #
-    # methods available on your instance:
+    # @param [Hash] options[:serializer_options]
+    #   Implementation-specific options you can pass from controller to the
+    #   serializer instance. Useful for customizing output based on request
+    #   or controller state (i.e, minimal output in index views, but full in
+    #   show views).
     #
-    # session - controller's session
-    # controller - controller
-    # accepts_jsonapi? - if jsonapi header is present
-    # polymorphic_url - for good ole' rails URL helpers
-    # context - if your controller has a @context, it'll be that. Otherwise,
-    # nil.
-    # stringify_json_ids? - whether the stringify_json_ids? header is present
-    # user - whatever you passed as options[:scope]
-    # current_user - alias for user
+    #   Use these options in your serializer implementation using
+    #   #serializer_option(key)
     def initialize(object, options={})
       super(object, options)
       @controller = options[:controller]
       @sideloads = options.fetch(:includes, []).map(&:to_s)
+      @serializer_options = options.fetch(:serializer_options, {})
       unless controller
         raise ArgumentError.new("You must pass a controller to APISerializer!")
       end
@@ -186,6 +218,10 @@ module Canvas
       elsif instance.present?
         send("#{name}_url".to_sym)
       end
+    end
+
+    def serializer_option(key)
+      @serializer_options[key]
     end
   end
 end

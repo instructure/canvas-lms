@@ -216,7 +216,7 @@ describe "dashboard" do
       ffj(".to-do-list li:visible").size.should == 20
     end
 
-    it "should display assignments to do in to do list and assignments menu for a student" do
+    it "should display assignments to do in to do list for a student" do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -231,12 +231,6 @@ describe "dashboard" do
       f('#assignment-details').should include_text('Assignment Due Date Changed')
       #verify assignment is in to do list
       f('.to-do-list > li').should include_text(assignment.submission_action_string)
-
-      #verify assignment is in drop down
-      driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
-      wait_for_ajaximations
-      f('#assignments_menu_item').should include_text("To Turn In")
-      f('#assignments_menu_item').should include_text(assignment.title)
     end
 
     it "should display course name in course menu" do
@@ -399,7 +393,7 @@ describe "dashboard" do
       fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
     end
 
-    it "should display assignment to grade in to do list and assignments menu for a teacher" do
+    it "should display assignment to grade in to do list for a teacher" do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
@@ -411,21 +405,6 @@ describe "dashboard" do
 
         #verify assignment is in to do list
         f('.to-do-list > li').should include_text('Grade ' + assignment.title)
-
-        #verify assignment is in drop down
-        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
-
-        wait_for_ajaximations
-
-        f('#assignments_menu_item').should include_text("To Grade")
-        f('#assignments_menu_item').should include_text(assignment.title)
-
-        # should update the to-do list when the grader grades
-        assignment.grade_student(student, :grade => 1)
-        get "/"
-        driver.execute_script %{$('#assignments_menu_item').addClass('hover');}
-
-        f('#assignments_menu_item').should_not include_text("To Grade")
       end
     end
 

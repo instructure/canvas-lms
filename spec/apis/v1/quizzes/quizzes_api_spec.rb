@@ -382,7 +382,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it 'should allow setting require_lockdown_browser_for_results' do
-        api_update_quiz({'require_lockdown_browser_for_results' => false}, {'require_lockdown_browser_for_results' => true})
+        api_update_quiz({'require_lockdown_browser' => true, 'require_lockdown_browser_for_results' => false}, {'require_lockdown_browser_for_results' => true})
         updated_quiz.require_lockdown_browser_for_results.should be_true
       end
 

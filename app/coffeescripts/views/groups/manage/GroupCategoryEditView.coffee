@@ -46,7 +46,8 @@ define [
       @$selfSignupControls.find(':input').prop 'disabled', disabled
 
     validateFormData: (data, errors) ->
-      if !@$("[name=group_limit]")[0].validity.valid
+      groupLimit = @$("[name=group_limit]")
+      if groupLimit.length and !groupLimit[0].validity.valid
         {"group_limit": [{message: I18n.t('group_limit_number', 'Group limit must be a number') }]}
 
     toJSON: ->

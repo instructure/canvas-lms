@@ -7,10 +7,10 @@
 <% if show_course || show_user %>
 <div class="rs-margin-all">
   <% if show_course %>
-    <a href="#" class="add_course_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t(:add_course_link, "Add a New Course") %></a>
+    <a href="#" role="button" class="add_course_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t(:add_course_link, "Add a New Course") %></a>
   <% end %>
   <% if show_user %>
-    <a href="#" class="add_user_link btn button-sidebar-wide"><i class="icon-user-add"></i> <%= t(:add_user_link, "Add a New User") %></a>
+    <a href="#" role="button" class="add_user_link btn button-sidebar-wide"><i class="icon-user-add"></i> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
 </div>
 
@@ -58,7 +58,7 @@
       <% end %>
       <tr>
         <td colspan="2">
-          <%= check_box :pseudonym, :send_confirmation, :checked => true %> 
+          <%= check_box :pseudonym, :send_confirmation, :checked => true %>
           &nbsp;<%= label :pseudonym, :send_confirmation, :en => "Email the user about this account creation" %>
         </td>
       </tr>
