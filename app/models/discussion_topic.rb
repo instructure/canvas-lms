@@ -32,6 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category, :group_category_id
+  attr_accessor :user_has_posted
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'

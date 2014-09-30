@@ -383,7 +383,7 @@ class StreamItem < ActiveRecord::Base
     case res
     when DiscussionTopic, Announcement
       if res.require_initial_post
-        res.write_attribute(:user_has_posted, true)
+        res.user_has_posted = true
         if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
           original_res = res
           res = original_res.clone
