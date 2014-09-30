@@ -60,6 +60,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_create :assign_validation_token
 
   has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent', dependent: :destroy
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
@@ -563,6 +564,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.mark_completed
     Quizzes::SubmissionGrader.new(self).grade_submission
     self
+  end
+
+  def graded?
+    self.submission_data.is_a?(Array)
   end
 
   # Updates a simply_versioned version instance in-place.  We want
