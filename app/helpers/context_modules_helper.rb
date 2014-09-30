@@ -38,12 +38,6 @@ module ContextModulesHelper
     cache_key
   end
 
-  def module_item_published?(item)
-    # If I publish an attachment, but its folder is hidden, the file is still
-    # hidden, now what? WHAT DO WE DO?
-    item && ((item.content && item.content.respond_to?(:published?)) ? item.content : item).published?
-  end
-
   def module_item_publishable_id(item)
     if item.nil?
       ''

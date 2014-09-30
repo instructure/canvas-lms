@@ -342,7 +342,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
       @tag[:publishable] = module_item_publishable?(@tag)
-      @tag[:published] = module_item_published?(@tag)
+      @tag[:published] = @tag.published?
       @tag[:publishable_id] = module_item_publishable_id(@tag)
       @tag[:unpublishable] = module_item_unpublishable?(@tag)
       @tag[:graded] = @tag.graded?
