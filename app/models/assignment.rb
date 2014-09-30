@@ -18,6 +18,7 @@
 
 require 'set'
 require 'canvas/draft_state_validations'
+require 'bigdecimal'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -609,19 +610,19 @@ class Assignment < ActiveRecord::Base
     return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
 
     visible_student_ids = students_with_visibility.pluck(:id)
-    observed_students = ObserverEnrollment.observed_students(context, user)
 
-    has_visible_students = observed_students.any?{ |student, enrollments|
-      visible_student_ids.include?(student.id)
-    }
+    observed_students_ids = ObserverEnrollment.observed_student_ids(context, user)
 
-    # if the observer has any students, don't make decision based on section enrollments
-    return has_visible_students if observed_students.any?
+    # observers can be students as well, so their own assignments must be included
+    if user.student_enrollments.where(course_id: self.context_id).any?
+      observed_student_ids << user.id
+    end
 
-    enrollment_section_ids = context.observer_enrollments.for_user(user).pluck(:course_section_id)
-    has_visible_sections = self.active_assignment_overrides.where(:set_type => 'CourseSection').map(&:set_id).any?{ |ao_section_id|
-      enrollment_section_ids.include?(ao_section_id)
-    }
+    # if the observer doesn't have students, show them published assignments
+    has_visible_students = (observed_students_ids & visible_student_ids).any?
+    return has_visible_students if observed_students_ids.any?
+
+    self.published?
   end
 
   attr_accessor :saved_by
@@ -673,14 +674,14 @@ class Assignment < ActiveRecord::Base
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
       passed = if points_possible && points_possible > 0
-                 score > 0
+                 score.to_f > 0
                elsif given_grade
                  given_grade == "complete" || given_grade == "pass"
                end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
-        score = score.to_f / self.points_possible.to_f
+        score = (BigDecimal.new(score.to_s) / BigDecimal.new(points_possible.to_s)).to_f
         result = grading_standard_or_default.score_to_grade(score * 100)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered
@@ -1263,7 +1264,7 @@ class Assignment < ActiveRecord::Base
                 :methods => avatar_methods,
                 :only => [:name, :id])
     }
-    res[:context][:active_course_sections] = context.sections_visible_to(user).
+    res[:context][:active_course_sections] = context.sections_visible_to(user, self.sections_with_visibility(user)).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = enrollments.
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
@@ -1337,6 +1338,14 @@ class Assignment < ActiveRecord::Base
     Attachment.skip_thumbnails = nil
   end
 
+  def sections_with_visibility(user)
+    return context.active_course_sections unless self.differentiated_assignments_applies?
+
+    visible_student_ids = visible_students_for_speed_grader(user).map(&:id)
+    context.active_course_sections.joins(:student_enrollments).
+      where(:enrollments => {:user_id => visible_student_ids, :type => "StudentEnrollment"}).uniq.reorder("name")
+  end
+
   # quiz submission versions are too expensive to de-serialize so we have to
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
@@ -1373,12 +1382,6 @@ class Assignment < ActiveRecord::Base
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
-    visible_students = (
-      user ?
-        context.students_visible_to(user) :
-        context.participating_students
-    ).order_by_sortable_name.uniq.to_a
-
     if grade_as_group?
       submissions = self.submissions.includes(:user)
       users_with_submissions = submissions
@@ -1394,7 +1397,7 @@ class Assignment < ActiveRecord::Base
       group_category.groups.includes(:group_memberships => :user).map { |g|
         [g.name, g.users]
       }.map { |group_name, group_students|
-        visible_group_students = group_students & visible_students
+        visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
         representative ||= visible_group_students.first
@@ -1411,8 +1414,21 @@ class Assignment < ActiveRecord::Base
         representative
       }.compact
     else
-      visible_students
+      visible_students_for_speed_grader(user)
     end
+  end
+
+  # using this method instead of students_with_visibility so we
+  # can add the includes and students_visible_to/participating_students scopes
+  def visible_students_for_speed_grader(user)
+    @visible_students_for_speed_grader ||= {}
+    @visible_students_for_speed_grader[user.global_id] ||= (
+      student_scope = user ? context.students_visible_to(user) : context.participating_students
+      if self.differentiated_assignments_applies?
+        student_scope = student_scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
+      end
+      student_scope
+    ).order_by_sortable_name.uniq.to_a
   end
 
   def visible_rubric_assessments_for(user)
@@ -1478,7 +1494,13 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-    student_ids = context.student_ids
+
+    student_ids = if self.differentiated_assignments_applies?
+                    context.students.able_to_see_assignment_in_course_with_da(self.id, self.context.id).pluck(:id)
+                  else
+                    context.student_ids
+                  end
+
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
 
@@ -1588,6 +1610,24 @@ class Assignment < ActiveRecord::Base
   scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
+
+  # course_ids should be courses that restrict visibility based on overrides
+  # ie: courses with differentiated assignments on or in which the user is not a teacher
+  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids|
+    if course_ids.nil? || course_ids.empty?
+      active
+    else
+      joins(:assignment_student_visibilities).
+      where("""
+        (assignments.context_id NOT IN (?)
+        AND assignments.workflow_state<>'deleted')
+        OR (
+          assignment_student_visibilities.user_id IN (?)
+          AND assignment_student_visibilities.course_id IN (?)
+        )
+      """, course_ids, user_ids, course_ids)
+    end
   }
 
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
@@ -1821,34 +1861,6 @@ class Assignment < ActiveRecord::Base
           t('errors.cannot_save_att',
             "You don't have permission to edit the locked attribute %{att_name}",
             :att_name => att))
-      end
-    end
-  end
-
-  def needs_grading_count_for_user(user)
-    vis = self.context.section_visibilities_for(user)
-    self.shard.activate do
-      # the needs_grading_count trigger should change self.updated_at, invalidating the cache
-      Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
-        case self.context.enrollment_visibility_level_for(user, vis)
-          when :full, :limited
-            self.needs_grading_count
-          when :sections
-            self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
-                where(<<-SQL, self, self.context, vis.map {|v| v[:course_section_id]}).count(:id, :distinct => true)
-              submissions.assignment_id = ?
-                AND e.course_id = ?
-                AND e.course_section_id in (?)
-                AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-                AND e.workflow_state = 'active'
-                AND submissions.submission_type IS NOT NULL
-                AND (submissions.workflow_state = 'pending_review'
-                  OR (submissions.workflow_state = 'submitted'
-                    AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
-              SQL
-          else
-            0
-        end
       end
     end
   end

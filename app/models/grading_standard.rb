@@ -116,7 +116,7 @@ class GradingStandard < ActiveRecord::Base
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
-    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, (lower_bound * 10000).to_i / 10000.0 ] }
+    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] }
     write_attribute(:data, new_val)
     @ordered_scheme = nil
   end

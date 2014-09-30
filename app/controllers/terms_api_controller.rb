@@ -69,7 +69,7 @@ class TermsApiController < ApplicationController
   # requires permission to manage the account (when called on non-root
   # accounts, will be directed to the appropriate root account).
   #
-  # @argument workflow_state[] [Optional, String, 'active'| 'deleted'| 'all']
+  # @argument workflow_state[] [String, 'active'| 'deleted'| 'all']
   #   If set, only returns terms that are in the given state.
   #   Defaults to 'active'.
   #

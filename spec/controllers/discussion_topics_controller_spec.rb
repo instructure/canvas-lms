@@ -141,6 +141,18 @@ describe DiscussionTopicsController do
       assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_nil
     end
 
+    it "should setup speedgrader template for variable substitution" do
+      user_session(@teacher)
+      course_topic(:with_assignment => true)
+      get 'show', :course_id => @course.id, :id => @topic.id
+
+      # this is essentially a unit test for app/coffeescripts/models/Entry.coffee,
+      # making sure that we get back the expected format for this url template
+      template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
+      url = template.gsub(/%22:student_id%22/, '123')
+      url.should match "%7B%22student_id%22:123%7D"
+    end
+
     it "should mark as read when viewed" do
       user_session(@student)
       course_topic(:skip_set_user => true)

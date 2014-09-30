@@ -65,6 +65,12 @@
       <p>
         {{#t "will_not_be_added"}}These users had errors and will not be added. Please ensure they are formatted correctly.{{/t}}<br>
         <small>{{#t "example_formats"}}Examples: user@example.com, "First Last" &lt;user@example.com&gt;, "Last, First" &lt;user@example.com&gt;{{/t}}</small>
+        <br>
+        {{#ifSettingIs 'open_registration' true}}
+          {{!-- no-op --}}
+        {{else}}
+          {{#t "user_might_not_exist"}}If your format is correct, contact your Canvas Admin to ensure the user has a Canvas account.{{/t}}
+        {{/ifSettingIs}}
       </p>
       <ul class="createUsersErroredUsers">
         {{#each errored_users}}

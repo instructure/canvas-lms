@@ -16,6 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Document Previews
+# This API can only be accessed when another endpoint provides a signed URL.
+# It will simply redirect you to the 3rd party document preview..
+#
 class CanvadocSessionsController < ApplicationController
   include HmacHelper
 
@@ -27,7 +31,8 @@ class CanvadocSessionsController < ApplicationController
 
     if attachment.canvadocable?
       attachment.submit_to_canvadocs unless attachment.canvadoc_available?
-      redirect_to attachment.canvadoc.session_url
+      url = attachment.canvadoc.session_url
+      redirect_to url
     else
       render :text => "Not found", :status => :not_found
     end

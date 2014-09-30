@@ -121,7 +121,7 @@ class TabsController < ApplicationController
   #
   # @argument position [Integer] The new position of the tab, 1-based
   #
-  # @argument hidden \\ true, or false.
+  # @argument hidden [Boolean]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/tabs/tab_id \

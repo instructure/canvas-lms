@@ -155,16 +155,16 @@ class PseudonymsController < ApplicationController
   # @API Create a user login
   # Create a new login for an existing user in the given account.
   #
-  # @argument user[id] [String]
+  # @argument user[id] [Required, String]
   #   The ID of the user to create the login for.
   #
-  # @argument login[unique_id] [String]
+  # @argument login[unique_id] [Required, String]
   #   The unique ID for the new login.
   #
-  # @argument login[password] [Optional, String]
+  # @argument login[password] [String]
   #   The new login's password.
   #
-  # @argument login[sis_user_id] [Optional, String]
+  # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def create
@@ -228,14 +228,14 @@ class PseudonymsController < ApplicationController
   # @API Edit a user login
   # Update an existing login for a user in the given account.
   #
-  # @argument login[unique_id] [Optional, String]
+  # @argument login[unique_id] [String]
   #   The new unique ID for the login.
   #
-  # @argument login[password] [Optional, String]
+  # @argument login[password] [String]
   #   The new password for the login. Can only be set by an admin user if admins
   #   are allowed to change passwords for the account.
   #
-  # @argument login[sis_user_id] [Optional, String]
+  # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   def update

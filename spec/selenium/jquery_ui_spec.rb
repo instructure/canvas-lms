@@ -71,7 +71,7 @@ describe "jquery ui" do
     it "should let you replace content by selecting and typing instead of appending" do
       get "/courses/#{@course.id}/assignments"
       
-      f(".add_assignment_link").click
+      f("#right-side .add_assignment_link").click
       wait_for_ajaximations
       f(".ui-datepicker-trigger").click
       wait_for_ajaximations

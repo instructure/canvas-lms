@@ -22,7 +22,7 @@
 # a loop in a loop in a loop, it gets a little awkward for controllers
 # and views, so I contain it in a class with some helper methods.  The
 # dictionary comes from facets, a stable and mature library that's been
-# around for years.  A dictionary is just an ordered hash.  
+# around for years.  A dictionary is just an ordered hash. 
 # 
 # To use this: 
 # 
@@ -43,6 +43,7 @@
 # :assignment_id => the assignment id
 # :student_name => a printable name of the student
 # :graded_on => the day (not the time) the submission was made
+# :score_before_regrade => the score prior to regrading
 # 
 # The version data is actually pulled from some yaml storage through 
 # simply_versioned.
@@ -57,9 +58,9 @@ class SubmissionList
       :previous_grader, :process_attempts, :processed, :published_grade,
       :published_score, :safe_grader_id, :score, :student_entered_score,
       :student_user_id, :submission_id, :student_name, :submission_type,
-      :updated_at, :url, :user_id, :workflow_state
+      :updated_at, :url, :user_id, :workflow_state, :score_before_regrade
     ].freeze 
-  
+
   class << self
     # Shortcut for SubmissionList.each(course) { ... }
     def each(course, &block)
@@ -84,31 +85,31 @@ class SubmissionList
       new(course).list
     end
   end
-  
+
   # The course
   attr_reader :course
-  
+
   # The dictionary of submissions
   attr_reader :list
-  
+
   def initialize(course)
     raise ArgumentError, "Must provide a course." unless course && course.is_a?(Course)
     @course = course
     process
   end
-  
+
   # An iterator on a sorted and filtered list of submission versions.
   def each(&block)
     self.submission_entries.each do |entry|
       yield(entry)
     end
   end
-  
+
   # An iterator on the day only, not each submission
   def each_day(&block)
     self.list.each &block
   end
-  
+
   # An array of days with an array of grader open structs for that day and course.
   # TODO - This needes to be refactored, it is way slow and I cant figure out why.
   def days
@@ -118,7 +119,7 @@ class SubmissionList
     # puts "starting"
     # puts "---------------------------------------------------------------------------------"
     self.list.map do |day, value|
-      # puts "-----------------------------------------------item #{Time.now - current}----------------------------" 
+      # puts "-----------------------------------------------item #{Time.now - current}----------------------------"
       # current = Time.now
       OpenObject.new(:date => day, :graders => graders_for_day(day))
     end
@@ -130,7 +131,7 @@ class SubmissionList
 
   # A filtered list of hashes of all submission versions that change the
   # grade with all the meta data finally included. This list can be sorted
-  # and displayed. 
+  # and displayed.
   def submission_entries
     return @submission_entries if @submission_entries
     @submission_entries = filtered_submissions.map do |s|
@@ -154,40 +155,40 @@ class SubmissionList
       hsh = self.list[day].inject({}) do |h, submission|
         grader = submission[:grader]
         h[grader] ||= OpenObject.new(
-          :assignments => assignments_for_grader_and_day(grader, day), 
-          :name => grader, 
+          :assignments => assignments_for_grader_and_day(grader, day),
+          :name => grader,
           :grader_id => submission[:grader_id]
         )
         h
       end
       hsh.values
     end
-  
+
     # Returns an array of assignments with an array of submission open structs.
     def assignments_for_grader_and_day(grader, day)
       start = Time.now
       hsh = submission_entries.find_all {|e| e[:grader] == grader and e[:graded_on] == day}.inject({}) do |h, submission|
         assignment = submission[:assignment_name]
         h[assignment] ||= OpenObject.new(
-          :name => assignment, 
+          :name => assignment,
           :assignment_id => submission[:assignment_id],
           :submissions => []
         )
-      
+
         h[assignment].submissions << OpenObject.new(submission)
 
         h
       end
-    
+
       hsh.each do |k, v|
         v.submission_count = v.submissions.size
       end
       # puts "-------------------------------Time Spent in assignments_for_grader_and_day: #{Time.now-start}-------------------------------"
       hsh.values
     end
-  
+
     # Produce @list, wich is a sorted, filtered, list of submissions with
-    # all the meta data we need and no banned keys included. 
+    # all the meta data we need and no banned keys included.
     def process
       @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }.
           inject(Dictionary.new) do |d, se|
@@ -196,7 +197,7 @@ class SubmissionList
         d
       end
     end
-    
+
     # A hash of the current grades of each submission, keyed by submission.id
     def current_grade_map
       @current_grade_map ||= self.course.submissions.inject({}) do |hash, submission|
@@ -213,13 +214,13 @@ class SubmissionList
     end
 
     # Ensures that the final product only has approved keys in it.  This
-    # makes our final product much more yummy. 
+    # makes our final product much more yummy.
     def trim_keys(list)
       list.each do |hsh|
         hsh.delete_if { |key, v| ! VALID_KEYS.include?(key) }
       end
     end
-    
+
     # Creates a list of any submissions that change the grade. Adds:
     # * previous_grade
     # * previous_graded_at
@@ -236,18 +237,18 @@ class SubmissionList
       # submission 1 1/1/2009, submission 1 1/15/2009, submission 2 1/1/2009
       full_hash_list.sort_by! { |a| [a[:id], a[:updated_at]] }
       prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
-      
+
       @filtered_submissions = full_hash_list.inject([]) do |l, h|
-        
+
         # Don't update prior_grade or prior_submission unless there is a grade.
         # Also don't add it to the list.  Just pass the list to the next
-        # iteration of the block. 
+        # iteration of the block.
         next(l) unless h[:score]
 
         # If the submission is different (not null for the first one, or just
         # different than the last one), set the previous_grade to nil (this is
         # the first version that changes a grade), set the new_grade to this
-        # version's grade, and add this to the list. 
+        # version's grade, and add this to the list.
         if prior_submission_id != h[:submission_id]
           h[:previous_grade] = nil
           h[:previous_graded_at] = nil
@@ -256,10 +257,10 @@ class SubmissionList
           h[:new_score] = h[:score]
           h[:new_graded_at] = h[:graded_at]
           h[:new_grader] = h[:grader]
-          l << h 
+          l << h
         # If the prior_grade is different than the grade for this version, the
         # grade for this submission has been changed.  That's because we know
-        # that this submission must be the same as the prior submission. 
+        # that this submission must be the same as the prior submission.
         # Set the prevous grade and the new grade and add this to the list.
         # Remove the old submission so that it doesn't show up twice in the
         # grade history.
@@ -274,10 +275,10 @@ class SubmissionList
           h[:new_grader] = h[:grader]
           l << h
         end
-        
+
         # At this point, we are only working with versions that have changed a
         # grade.  Go ahead and save that grade and save this version as the
-        # prior version and iterate. 
+        # prior version and iterate.
         prior_grade = h[:grade]
         prior_score = h[:score]
         prior_graded_at = h[:graded_at]
@@ -291,18 +292,39 @@ class SubmissionList
     def yaml_list
       @yaml_list ||= self.course.submissions.map {|s| s.versions.map { |v| v.yaml } }.flatten
     end
-    
+
     # A list of hashes.  All the versions of all the submissions for a
-    # course, unfiltered and unsorted. 
+    # course, unfiltered and unsorted.
     def raw_hash_list
-      @hash_list ||= yaml_list.map { |y| YAML.load(y).symbolize_keys }
+      @hash_list ||= begin
+        hash_list = yaml_list.map { |y| YAML.load(y).symbolize_keys }
+        add_regrade_info(hash_list)
+      end
     end
-    
+
+    # This method will add regrade details to the existing raw_hash_list
+    def add_regrade_info(hash_list)
+      quiz_submission_ids = hash_list.map { |y| y[:quiz_submission_id]}.compact
+      return hash_list if quiz_submission_ids.blank?
+      quiz_submissions = Quizzes::QuizSubmission.where("id IN (?) AND score_before_regrade IS NOT NULL", quiz_submission_ids)
+      quiz_submissions.each do |qs|
+        matches = hash_list.select { |a| a[:id] == qs.submission_id}
+        matches.each do |h|
+          h[:score_before_regrade] = qs.score_before_regrade
+          h[:grader_id] = 'regraded'
+        end
+      end
+
+      hash_list
+    end
+
     # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
     def full_hash_list
       @full_hash_list ||= self.raw_hash_list.map do |h|
         h[:grader] = if h[:grader_id] && self.grader_map[h[:grader_id]]
           self.grader_map[h[:grader_id]].name
+        elsif h[:grader_id] == 'regraded'
+          I18n.t('gradebooks.history.regraded', "Regraded")
         else
           I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
         end
@@ -317,18 +339,18 @@ class SubmissionList
         h
       end
     end
-    
+
     # A unique list of all grader ids
     def all_grader_ids
       @all_grader_ids ||= raw_hash_list.map { |e| e[:grader_id] }.uniq.compact
     end
-    
+
     # A complete list of all graders that have graded submissions for this
-    # course as User models 
+    # course as User models
     def graders
       @graders ||= User.where(:id => all_grader_ids).all
     end
-    
+
     # A hash of graders by their ids, for easy lookup in full_hash_list
     def grader_map
       @grader_map ||= graders.inject({}) do |h, g|
@@ -341,13 +363,13 @@ class SubmissionList
     def all_student_ids
       @all_student_ids ||= raw_hash_list.map { |e| e[:user_id] }.uniq.compact
     end
-    
+
     # A complete list of all students that have submissions for this course
-    # as User models 
+    # as User models
     def students
       @students ||= User.where(:id => all_student_ids).all
     end
-    
+
     # A hash of students by their ids, for easy lookup in full_hash_list
     def student_map
       @student_map ||= students.inject({}) do |h, s|
@@ -360,12 +382,12 @@ class SubmissionList
     def all_assignment_ids
       @all_assignment_ids ||= raw_hash_list.map { |e| e[:assignment_id] }.uniq.compact
     end
-    
+
     # A complete list of assignments that have submissions for this course
     def assignments
       @assignments ||= Assignment.where(:id => all_assignment_ids).all
     end
-    
+
     # A hash of assignments by their ids, for easy lookup in full_hash_list
     def assignment_map
       @assignment_map ||= assignments.inject({}) do |h, a|

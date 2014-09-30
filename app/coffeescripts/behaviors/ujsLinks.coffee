@@ -1,7 +1,7 @@
 # copied from
 # https://github.com/rails/jquery-ujs
 
-define ['jquery'], ($) ->
+define ['jquery', 'compiled/behaviors/authenticity_token'], ($, authenticity_token) ->
 
   ##
   # Handles "data-method" on links such as:
@@ -13,9 +13,7 @@ define ['jquery'], ($) ->
     target = link.attr('target')
     form = $("<form method='post' action='#{href}'></form>")
     metadataInput = "<input name='_method' value='#{method }' type='hidden' />"
-
-    if ENV.AUTHENTICITY_TOKEN
-      metadataInput += "<input name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' type='hidden' />"
+    metadataInput += "<input name='authenticity_token' type='hidden' />"
 
     form.attr('target', target) if target
     form.hide().append(metadataInput).appendTo('body').submit()

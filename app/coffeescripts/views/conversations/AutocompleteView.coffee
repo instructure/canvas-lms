@@ -7,7 +7,8 @@ define [
   'compiled/models/ConversationSearchResult'
   'compiled/views/PaginatedCollectionView'
   'jst/conversations/autocompleteToken'
-  'jst/conversations/autocompleteResult'
+  'jst/conversations/autocompleteResult',
+  'compiled/jquery/scrollIntoView'
 ], (I18n, Backbone, $, _, PaginatedCollection, ConversationSearchResult, PaginatedCollectionView, tokenTemplate, resultTemplate) ->
 
   # Public: Helper method for capitalizing a string
@@ -108,6 +109,10 @@ define [
     # Returns an AutocompleteView instance.
     initialize: () ->
       super
+      # After battling chrome, firefox, and IE this seems to be the best place to
+      # inject some hackery to prevent focus/blur issues
+      $(document).on("mousedown", @_onDocumentMouseDown.bind(this))
+
       @render() # to initialize els
       @$span = @_initializeWidthSpan()
       setTimeout((=> @_disable() if @options.disabled), 0)
@@ -231,12 +236,36 @@ define [
       methodName = "_on#{capitalize(key)}Key"
       @[methodName].call(this, e) if typeof @[methodName] == 'function'
 
+    _onDocumentMouseDown: (e) ->
+      if !@$inputBox.hasClass('focused')
+        return
+
+      # this is a hack so we can click the scroll bar without losing the result list
+      parentClassName = '.ac'
+      targetParent = $(e.target).closest(parentClassName)
+      inputParent = @$input.closest(parentClassName)
+
+      # normally I would just preventDefault(), IE was making that difficult
+      @_shouldPreventBlur = targetParent.length && inputParent.length && targetParent[0] == inputParent[0]
+
+      if @_shouldPreventBlur
+        e.preventDefault()
+      else
+        # we are focused but we clicked outside of the area we care about unfocus
+        @_onInputBlur()
+
+
     # Internal: Remove focus styles on widget when input is blurred.
     #
     # e - Event object.
     #
     # Returns nothing.
     _onInputBlur: (e) ->
+      if @_shouldPreventBlur
+        @_shouldPreventBlur = false
+        @$input.focus()
+        return
+
       @$inputBox.removeClass('focused')
       @$placeholder.css(opacity: 1) unless @tokens.length or @$input.val()
       @_resetContext()
@@ -453,6 +482,10 @@ define [
     #
     # Returns nothing.
     _onArrowKey: (e, inc) ->
+      # no keyboard nav when popup isn't open
+      if @$resultWrapper.css('display') != 'block'
+        return
+
       e.preventDefault() && e.stopPropagation()
       @$resultList.find('li.selected:first').removeClass('selected')
 

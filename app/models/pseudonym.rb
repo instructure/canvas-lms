@@ -289,6 +289,10 @@ class Pseudonym < ActiveRecord::Base
   def managed_password?
     !!(self.sis_user_id && self.account && !self.account.password_authentication?)
   end
+
+  def system_created?
+    !!(self.sis_user_id && self.account)
+  end
   
   def valid_arbitrary_credentials?(plaintext_password)
     return false if self.deleted?

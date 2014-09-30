@@ -337,11 +337,11 @@ class ContextModulesApiController < ApplicationController
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name of the modules (and module items, if include['items'] is
   #   specified) to match and return.
   #
-  # @argument student_id [Optional]
+  # @argument student_id
   #   Returns module completion information for the student with this id.
   #
   # @example_request
@@ -391,7 +391,7 @@ class ContextModulesApiController < ApplicationController
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #
-  # @argument student_id [Optional]
+  # @argument student_id
   #   Returns module completion information for the student with this id.
   #
   # @example_request
@@ -413,10 +413,10 @@ class ContextModulesApiController < ApplicationController
   #
   # Update multiple modules in an account.
   #
-  # @argument module_ids[] [String]
+  # @argument module_ids[] [Required, String]
   #   List of ids of modules to update.
   #
-  # @argument event [String]
+  # @argument event [Required, String]
   #   The action to take on each module. Must be 'delete'.
   #
   # @response_field completed A list of IDs for modules that were updated.
@@ -468,24 +468,24 @@ class ContextModulesApiController < ApplicationController
   #
   # Create and return a new module
   #
-  # @argument module[name] [String]
+  # @argument module[name] [Required, String]
   #   The name of the module
   #
-  # @argument module[unlock_at] [Optional, DateTime]
+  # @argument module[unlock_at] [DateTime]
   #   The date the module will unlock
   #
-  # @argument module[position] [Optional, Integer]
+  # @argument module[position] [Integer]
   #   The position of this module in the course (1-based)
   #
-  # @argument module[require_sequential_progress] [Optional, Boolean]
+  # @argument module[require_sequential_progress] [Boolean]
   #   Whether module items must be unlocked in order
   #
-  # @argument module[prerequisite_module_ids][] [Optional, String]
+  # @argument module[prerequisite_module_ids][] [String]
   #   IDs of Modules that must be completed before this one is unlocked.
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
-  # @argument module[publish_final_grade] [Optional, Boolean]
+  # @argument module[publish_final_grade] [Boolean]
   #   Whether to publish the student's final grade for the course upon
   #   completion of this module.
   #
@@ -530,28 +530,28 @@ class ContextModulesApiController < ApplicationController
   #
   # Update and return an existing module
   #
-  # @argument module[name] [Optional, String]
+  # @argument module[name] [String]
   #   The name of the module
   #
-  # @argument module[unlock_at] [Optional, DateTime]
+  # @argument module[unlock_at] [DateTime]
   #   The date the module will unlock
   #
-  # @argument module[position] [Optional, Integer]
+  # @argument module[position] [Integer]
   #   The position of the module in the course (1-based)
   #
-  # @argument module[require_sequential_progress] [Optional, Boolean]
+  # @argument module[require_sequential_progress] [Boolean]
   #   Whether module items must be unlocked in order
   #
-  # @argument module[prerequisite_module_ids][] [Optional, String]
+  # @argument module[prerequisite_module_ids][] [String]
   #   IDs of Modules that must be completed before this one is unlocked
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
-  # @argument module[publish_final_grade] [Optional, Boolean]
+  # @argument module[publish_final_grade] [Boolean]
   #   Whether to publish the student's final grade for the course upon
   #   completion of this module.
   #
-  # @argument module[published] [Optional, Boolean]
+  # @argument module[published] [Boolean]
   #   Whether the module is published and visible to students
   #
   # @example_request

@@ -159,21 +159,21 @@ class WikiPagesApiController < ApplicationController
   #
   # Update the title or contents of the front page
   #
-  # @argument wiki_page[title] [Optional, String]
+  # @argument wiki_page[title] [String]
   #   The title for the new page. NOTE: changing a page's title will change its
   #   url. The updated url will be returned in the result.
   #
   # @argument wiki_page[body] [String]
   #   The content for the new page.
   #
-  # @argument wiki_page[hide_from_students] [Optional, Boolean]
+  # @argument wiki_page[hide_from_students] [Boolean]
   #   Whether the page should be hidden from students.
   #
   #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
   #   will be ignored and the value returned will always be the inverse of the
   #   +published+ value.
   #
-  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
   #
@@ -182,10 +182,10 @@ class WikiPagesApiController < ApplicationController
   #   "members":: For group wikis, allows editing by members of the group.
   #   "public":: Allows editing by any user.
   #
-  # @argument wiki_page[notify_of_update] [Optional, Boolean]
+  # @argument wiki_page[notify_of_update] [Boolean]
   #   Whether participants should be notified when this page changes.
   #
-  # @argument wiki_page[published] [Optional, Boolean]
+  # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
@@ -206,16 +206,16 @@ class WikiPagesApiController < ApplicationController
   #
   # List the wiki pages associated with a course or group
   #
-  # @argument sort [Optional, String, "title"|"created_at"|"updated_at"]
+  # @argument sort [String, "title"|"created_at"|"updated_at"]
   #   Sort results by this field.
   #
-  # @argument order [Optional, String, "asc"|"desc"]
+  # @argument order [String, "asc"|"desc"]
   #   The sorting order. Defaults to 'asc'.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial title of the pages to match and return.
   #
-  # @argument published [Optional, Boolean]
+  # @argument published [Boolean]
   #   If true, include only published paqes. If false, exclude published
   #   pages. If not present, do not filter on published status.
   #
@@ -262,7 +262,7 @@ class WikiPagesApiController < ApplicationController
   #
   # Create a new wiki page
   #
-  # @argument wiki_page[title] [String]
+  # @argument wiki_page[title] [Required, String]
   #   The title for the new page.
   #
   # @argument wiki_page[body] [String]
@@ -275,7 +275,7 @@ class WikiPagesApiController < ApplicationController
   #   will be ignored and the value returned will always be the inverse of the
   #   +published+ value.
   #
-  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
   #
@@ -287,14 +287,14 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[notify_of_update] [Boolean]
   #   Whether participants should be notified when this page changes.
   #
-  # @argument wiki_page[published] [Optional, Boolean]
+  # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
   #   will be ignored and the value returned will always be the inverse of the
   #   +hide_from_students+ value.
   #
-  # @argument wiki_page[front_page] [Optional, Boolean]
+  # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
   #
   # @example_request
@@ -356,7 +356,7 @@ class WikiPagesApiController < ApplicationController
   #   will be ignored and the value returned will always be the inverse of the
   #   +published+ value.
   #
-  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
   #
@@ -368,14 +368,14 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[notify_of_update] [Boolean]
   #   Whether participants should be notified when this page changes.
   #
-  # @argument wiki_page[published] [Optional, Boolean]
+  # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
   #   will be ignored and the value returned will always be the inverse of the
   #   +hide_from_students+ value.
   #
-  # @argument wiki_page[front_page] [Optional, Boolean]
+  # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
   #
   # @example_request
@@ -450,7 +450,7 @@ class WikiPagesApiController < ApplicationController
   # Retrieve the metadata and optionally content of a revision of the page.
   # Note that retrieving historic versions of pages requires edit rights.
   #
-  # @argument summary [Optional, Boolean]
+  # @argument summary [Boolean]
   #   If set, exclude page content from results
   #
   # @example_request
@@ -484,7 +484,7 @@ class WikiPagesApiController < ApplicationController
   #
   # Revert a page to a prior revision.
   #
-  # @argument revision_id [Integer]
+  # @argument revision_id [Required, Integer]
   #   The revision to revert to (use the
   #   {api:WikiPagesApiController#revisions List Revisions API} to see
   #   available revisions)

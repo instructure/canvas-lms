@@ -231,6 +231,15 @@ class Course < ActiveRecord::Base
 
   include FeatureFlags
 
+  include ContentNotices
+  define_content_notice :import_in_progress,
+    icon_class: 'icon-import-content',
+    alert_class: 'alert-info import-in-progress-notice',
+    template: 'courses/import_in_progress_notice',
+    should_show: ->(course, user) do
+      course.grants_right?(user, :manage_content)
+    end
+
   has_a_broadcast_policy
 
   def [](attr)
@@ -245,10 +254,10 @@ class Course < ActiveRecord::Base
         includes(:child_events).
         reject(&:hidden?) +
       AppointmentGroup.manageable_by(user, [asset_string]) +
-      assignments.active
+        user.assignments_visibile_in_course(self)
     else
       calendar_events.active.includes(:child_events).reject(&:hidden?) +
-      assignments.active
+        assignments.active
     end
   end
 
@@ -501,7 +510,7 @@ class Course < ActiveRecord::Base
   scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
   scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
   scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
-  scope :name_like, lambda { |name| where(wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
+  scope :name_like, lambda {|name| where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
   scope :active, -> { where("courses.workflow_state<>'deleted'") }
   scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
@@ -593,14 +602,14 @@ class Course < ActiveRecord::Base
   def user_is_instructor?(user)
     return unless user
     Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
-      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
+      user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
 
   def user_is_student?(user, opts = {})
     return unless user
     Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-      user.cached_current_enrollments(:include_future => opts[:include_future]).any? { |e|
+      user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
         e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
       }
     end
@@ -768,12 +777,16 @@ class Course < ActiveRecord::Base
     !!(self.account && self.account.self_enrollment_allowed?(self))
   end
 
+  def self_enrollment_enabled?
+    self.self_enrollment? && self.self_enrollment_allowed?
+  end
+
   def self_enrollment_code
     read_attribute(:self_enrollment_code) || set_self_enrollment_code
   end
 
   def set_self_enrollment_code
-    return if !self_enrollment? || read_attribute(:self_enrollment_code)
+    return if !self_enrollment_enabled? || read_attribute(:self_enrollment_code)
 
     # subset of letters and numbers that are unambiguous
     alphanums = 'ABCDEFGHJKLMNPRTWXY346789'
@@ -1035,13 +1048,13 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read and can :read_outcomes
 
-    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
+    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_courses: true).any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
     can :read and can :read_outcomes
 
     # Active students
     given { |user|
       available?  && user &&
-        user.cached_current_enrollments.any? { |e|
+        user.cached_current_enrollments(preload_courses: true).any? { |e|
         e.course_id == id && e.participating_student?
       }
     }
@@ -1180,7 +1193,7 @@ class Course < ActiveRecord::Base
   # Returns boolean or nil.
   def soft_concluded?
     now = Time.now
-    return end_at < now if end_at
+    return end_at < now if end_at && restrict_enrollments_to_course_dates
     enrollment_term.end_at && enrollment_term.end_at < now
   end
 
@@ -1639,8 +1652,8 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         e.attributes = {
           :course_section => section,
-          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : 'invited',
-          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
+          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state,
+          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
       end
       # if we're creating a new enrollment, we want to return it as the correct
       # subclass, but without using associations, we need to manually activate
@@ -2053,16 +2066,6 @@ class Course < ActiveRecord::Base
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :lock_all_announcements ]
-  end
-
-  def assert_assignment_group
-    has_group = Rails.cache.fetch(['has_assignment_group', self.id].cache_key) do
-      self.assignment_groups.active.count > 0
-    end
-    if !has_group
-      group = self.assignment_groups.new :name => t('#assignment_group.default_name', "Assignments"), :position => 1
-      group.save
-    end
   end
 
   def set_course_dates_if_blank(shift_options)

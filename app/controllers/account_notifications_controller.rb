@@ -74,25 +74,25 @@ class AccountNotificationsController < ApplicationController
   # @API Create a global notification
   # Create and return a new global notification for an account.
   #
-  # @argument account_notification[subject] [String]
+  # @argument account_notification[subject] [Required, String]
   #  The subject of the notification.
   #
-  # @argument account_notification[message] [String]
+  # @argument account_notification[message] [Required, String]
   #  The message body of the notification.
   #
-  # @argument account_notification[start_at] [DateTime]
+  # @argument account_notification[start_at] [Required, DateTime]
   #   The start date and time of the notification in ISO8601 format.
   #   e.g. 2014-01-01T01:00Z
   #
-  # @argument account_notification[end_at] [DateTime]
+  # @argument account_notification[end_at] [Required, DateTime]
   #   The end date and time of the notification in ISO8601 format.
   #   e.g. 2014-01-01T01:00Z
   #
-  # @argument account_notification[icon] [Optional, "warning"|"information"|"question"|"error"|"calendar"]
+  # @argument account_notification[icon] ["warning"|"information"|"question"|"error"|"calendar"]
   #   The icon to display with the notification.
   #   Note: Defaults to warning.
   #
-  # @argument account_notification_roles[] [Optional, String]
+  # @argument account_notification_roles[] [String]
   #   The role(s) to send global notification to.  Note:  ommitting this field will send to everyone
   #   Example:
   #     account_notification_roles: ["StudentEnrollment", "TeacherEnrollment"]

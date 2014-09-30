@@ -8,8 +8,9 @@ define [
     els:
       '.progress' : '$progress'
 
-    afterRender: -> 
-      @model.on 'change:completion', => @render()
+    initialize: =>
+      super
+      @listenTo @model, "change:completion", => @render()
 
     toJSON: -> 
       json = super

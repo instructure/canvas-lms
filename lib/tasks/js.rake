@@ -139,9 +139,56 @@ namespace :js do
     Canvas::RequireJs::PluginExtension.generate_all
   end
 
+  task :build_client_apps do
+    require 'config/initializers/client_app_symlinks'
+
+    Dir.glob('./client_apps/*/').each do |app_dir|
+      app_name = File.basename(app_dir)
+
+      Dir.chdir(app_dir) do
+        puts "Building client app '#{app_name}'"
+
+        begin
+          puts "\tRunning 'npm install --production'..."
+          output = `npm install --production`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            INSTALL FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Package installation failure for client app #{app_name}"
+          end
+        end
+
+        begin
+          puts "\tRunning 'npm run build --production'..."
+          output = `npm run build --production`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            BUILD FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Build script failed for client app #{app_name}"
+          end
+        end
+
+        puts "Client app '#{app_name}' was built successfully."
+      end
+    end
+
+    maintain_client_app_symlinks('public/javascripts')
+  end
+
   desc "generates compiled coffeescript, handlebars templates and plugin extensions"
   task :generate do
     require 'config/initializers/plugin_symlinks'
+    require 'config/initializers/client_app_symlinks'
     require 'fileutils'
     require 'canvas'
     require 'canvas/coffee_script'
@@ -155,6 +202,8 @@ namespace :js do
       Dir.glob('spec/plugins/*/javascripts/compiled')
     ]
     FileUtils.rm_rf(paths_to_remove)
+
+    Rake::Task['js:build_client_apps'].invoke
 
     threads = []
     threads << Thread.new do

@@ -124,10 +124,10 @@ module Polling
     # @argument poll_sessions[][course_id] [Required, Integer]
     #   The id of the course this session is associated with.
     #
-    # @argument poll_sessions[][course_section_id] [Optional, Integer]
+    # @argument poll_sessions[][course_section_id] [Integer]
     #   The id of the course section this session is associated with.
     #
-    # @argument poll_sessions[][has_public_results] [Optional, Boolean]
+    # @argument poll_sessions[][has_public_results] [Boolean]
     #   Whether or not results are viewable by students.
     #
     # @example_response
@@ -167,13 +167,13 @@ module Polling
     #
     # Update an existing poll session for this poll
     #
-    # @argument poll_sessions[][course_id] [Required, Integer]
+    # @argument poll_sessions[][course_id] [Integer]
     #   The id of the course this session is associated with.
     #
-    # @argument poll_sessions[][course_section_id] [Required, Integer]
+    # @argument poll_sessions[][course_section_id] [Integer]
     #   The id of the course section this session is associated with.
     #
-    # @argument poll_sessions[][has_public_results] [Optional, Boolean]
+    # @argument poll_sessions[][has_public_results] [Boolean]
     #   Whether or not results are viewable by students.
     #
     # @example_response

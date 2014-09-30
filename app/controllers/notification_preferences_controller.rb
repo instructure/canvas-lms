@@ -77,7 +77,7 @@ class NotificationPreferencesController < ApplicationController
 
   # @API Update a preference
   # Change the preference for a single notification for a single communication channel
-  # @argument notification_preferences[frequency] The desired frequency for this notification
+  # @argument notification_preferences[frequency] [Required] The desired frequency for this notification
   def update
     return render_unauthorized_action unless @user == @current_user
     # support both JSON API style (notification preferences is an array) and Canvas API style (it's a hash)
@@ -87,7 +87,7 @@ class NotificationPreferencesController < ApplicationController
 
   # @API Update multiple preferences
   # Change the preferences for multiple notifications for a single communication channel at once
-  # @argument notification_preferences[<X>][frequency] The desired frequency for <X> notification
+  # @argument notification_preferences[<X>][frequency] [Required] The desired frequency for <X> notification
   def update_all
     return render_unauthorized_action unless @user == @current_user
     policies = []

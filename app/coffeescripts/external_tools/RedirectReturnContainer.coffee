@@ -3,28 +3,33 @@ define [
 ], ($) ->
 
   class RedirectReturnContainer
-    # TODO: make this more general, so it can work for more than just the content migration redirect
+    successUrl: ENV.redirect_return_success_url
+    cancelUrl: ENV.redirect_return_cancel_url
+
     attachLtiEvents: ->
       $(window).on 'externalContentReady', @_contentReady
       $(window).on 'externalContentCancel', @_contentCancel
 
     _contentReady: (event, data) =>
-      @createMigration(data.url)
+      if data && data.return_type == "file"
+        @createMigration(data.url)
+      else
+        @redirectToSuccessUrl()
 
     _contentCancel: (event, data) =>
-      location.href = "/courses/#{ENV.course_id}"
+      location.href = @cancelUrl
 
-    createMigration: (file_url) ->
+    redirectToSuccessUrl: =>
+      location.href = @successUrl
+
+    createMigration: (file_url) =>
       data =
         migration_type: 'canvas_cartridge_importer'
         settings:
           file_url: file_url
 
       migrationUrl = "/api/v1/courses/#{ENV.course_id}/content_migrations"
-      $.ajaxJSON migrationUrl, "POST", data, @redirectToMigrationsPage, @handleError
-
-    redirectToMigrationsPage: ->
-      location.href = "/courses/#{ENV.course_id}/content_migrations"
+      $.ajaxJSON migrationUrl, "POST", data, @redirectToSuccessUrl, @handleError
 
     handleError: (data) ->
       $.flashError data.message

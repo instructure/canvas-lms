@@ -117,4 +117,9 @@ define [
         else
           $.datetimeString(json.lock_info.unlock_at)
 
+      json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
+      _.each json.wiki_page_menu_tools, (tool) =>
+        tool.url = tool.base_url + "&pages[]=#{@model.get("page_id")}"
+      json
+
       json

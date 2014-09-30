@@ -52,10 +52,10 @@ class UserObserveesController < ApplicationController
   # credentials are provided. Administrators can add observees given credentials or
   # the {api:UserObserveesController#update observee's id}.
   #
-  # @argument observee[unique_id] [String]
+  # @argument observee[unique_id] [Required, String]
   #   The login id for the user to observe.
   #
-  # @argument observee[password] [String]
+  # @argument observee[password] [Required, String]
   #   The password for the user to observe.
   #
   # @example_request

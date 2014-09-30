@@ -94,14 +94,14 @@ class GradingStandardsApiController < ApplicationController
   #      "D-" : 61,
   #      "F" : 0,
   #
-  # @argument title [String]
+  # @argument title [Required, String]
   #   The title for the Grading Standard.
   #
-  # @argument grading_scheme_entry[][name] [String]
+  # @argument grading_scheme_entry[][name] [Required, String]
   #   The name for an entry value within a GradingStandard that describes the range of the value
   #   e.g. A-
   #
-  # @argument grading_scheme_entry[][value] [Integer]
+  # @argument grading_scheme_entry[][value] [Required, Integer]
   #   The value for the name of the entry within a GradingStandard.
   #   The entry represents the lower bound of the range for the entry.
   #   This range includes the value up to the next entry in the GradingStandard,

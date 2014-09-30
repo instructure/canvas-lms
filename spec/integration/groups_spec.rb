@@ -43,4 +43,12 @@ describe GroupsController do
       response.body.should_not =~ /This group has received your request to join/
     end
   end
+
+  it "should render uncategorized groups" do
+    user_session(account_admin_user)
+    group = Account.default.groups.create!(name: 'SIS imported')
+
+    get "/groups/#{group.id}"
+    response.should be_success
+  end
 end

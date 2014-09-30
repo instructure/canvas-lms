@@ -1,0 +1,58 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.discussion_topic_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Comment on Announcement %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to join view the announcement" %>
+  </a>
+<% end %>
+
+<p><%= t :body, "%{user} posted a new comment on the announcement: %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
+
+<p>
+  <%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+</p>
+
+<% if avatar_enabled? %>
+  <table border="0" style="border-collapse: collapse">
+    <tr height="30px">
+      <td></td>
+    </tr>
+    <tr >
+      <td align="left" width="50px" ><img style="border-radius: 50px;" height= 50px width = 50px src= <%=author_avatar_url%> alt=<%=author_short_name%>> </td>
+      <td width="10"></td>
+      <td>
+        <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
+          <tr>
+            <td valign="bottom" align="left">
+              <b><%= author_short_name%></b>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top" align="left">
+              <a href="mailto:<%= author_email_address %>">
+                <%= author_email_address%>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+<% else %>
+  <p height="30px"></p>
+  <p>
+    <b><%= author_short_name%></b>
+    <br/>
+    <a href="mailto:<%= author_email_address %>">
+      <%= author_email_address%>
+    </a>
+  </p>
+<% end %>
+
+<p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %></p>

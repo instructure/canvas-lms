@@ -223,36 +223,36 @@ class Quizzes::QuizQuestionsController < ApplicationController
   #
   # Create a new quiz question for this quiz
   #
-  # @argument question[question_name] [Required, String]
+  # @argument question[question_name] [String]
   #   The name of the question.
   #
-  # @argument question[question_text] [Required, String]
+  # @argument question[question_text] [String]
   #   The text of the question.
   #
-  # @argument question[quiz_group_id] [Optional, Integer]
+  # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
   # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
-  # @argument question[position] [Optional, Integer]
+  # @argument question[position] [Integer]
   #   The order in which the question will be displayed in the quiz in relation to other questions.
   #
-  # @argument question[points_possible] [Optional, Integer]
+  # @argument question[points_possible] [Integer]
   #   The maximum amount of points received for answering this question correctly.
   #
-  # @argument question[correct_comments] [Optional, String]
+  # @argument question[correct_comments] [String]
   #   The comment to display if the student answers the question correctly.
   #
-  # @argument question[incorrect_comments] [Optional, String]
+  # @argument question[incorrect_comments] [String]
   #   The comment to display if the student answers incorrectly.
   #
-  # @argument question[neutral_comments] [Optional, String]
+  # @argument question[neutral_comments] [String]
   #   The comment to display regardless of how the student answered.
   #
-  # @argument question[text_after_answers] [Optional, String]
+  # @argument question[text_after_answers] [String]
   #
-  # @argument question[answers] [Optional, [Answer]]
+  # @argument question[answers] [[Answer]]
   #
   # @returns QuizQuestion
   def create
@@ -260,6 +260,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if params[:existing_questions]
         return add_questions
       end
+
       question_data = params[:question]
       question_data ||= {}
 
@@ -267,10 +268,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
 
-      @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
-      @quiz.did_edit if @quiz.created?
-
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
 
     end
   end
@@ -297,36 +299,36 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument id [Required, Integer]
   #   The quiz question's unique identifier.
   #
-  # @argument question[question_name] [Required, String]
+  # @argument question[question_name] [String]
   #   The name of the question.
   #
-  # @argument question[question_text] [Required, String]
+  # @argument question[question_text] [String]
   #   The text of the question.
   #
-  # @argument question[quiz_group_id] [Optional, Integer]
+  # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
   # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
-  # @argument question[position] [Optional, Integer]
+  # @argument question[position] [Integer]
   #   The order in which the question will be displayed in the quiz in relation to other questions.
   #
-  # @argument question[points_possible] [Optional, Integer]
+  # @argument question[points_possible] [Integer]
   #   The maximum amount of points received for answering this question correctly.
   #
-  # @argument question[correct_comments] [Optional, String]
+  # @argument question[correct_comments] [String]
   #   The comment to display if the student answers the question correctly.
   #
-  # @argument question[incorrect_comments] [Optional, String]
+  # @argument question[incorrect_comments] [String]
   #   The comment to display if the student answers incorrectly.
   #
-  # @argument question[neutral_comments] [Optional, String]
+  # @argument question[neutral_comments] [String]
   #   The comment to display regardless of how the student answered.
   #
-  # @argument question[text_after_answers] [Optional, String]
+  # @argument question[text_after_answers] [String]
   #
-  # @argument question[answers] [Optional, [Answer]]
+  # @argument question[answers] [[Answer]]
   #
   # @returns QuizQuestion
 
@@ -345,10 +347,12 @@ class Quizzes::QuizQuestionsController < ApplicationController
         end
       end
 
-      @question.question_data = question_data
-      @question.save
-      @quiz.did_edit if @quiz.created?
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question.question_data = question_data
+        @question.save
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
     end
   end
 
@@ -361,7 +365,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument id [Required, Integer]
   #   The quiz question's unique identifier
   #
-  # <b>204 No Content<b> response code is returned if the deletion was successful.
+  # <b>204 No Content</b> response code is returned if the deletion was successful.
 
   def destroy
     if authorized_action(@quiz, @current_user, :update)
@@ -373,6 +377,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   private
+
+  def guard_against_big_fields
+    begin
+      yield
+    rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
+      raise ex unless request.xhr?
+      render_xhr_exception(ex, ex.message)
+    end
+  end
 
   def require_question
     unless @question = @quiz.quiz_questions.active.find(params[:id])

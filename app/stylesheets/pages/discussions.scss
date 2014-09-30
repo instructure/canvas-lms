@@ -243,9 +243,14 @@ body.with-right-side.with-left-side {
   left: -32px;
 }
 
-.discussion-reply-action, .discussion-reply-action:hover {
-  color: #555;
+.discussion-reply-action {
+  @if $use_high_contrast { color: #666; }
+  @else { color: #888; }
   text-decoration: none;
+  &:hover, &:focus {
+    text-decoration: none;
+    color: #444;
+  }
 }
 
 .entry, .discussion_entry {
@@ -502,13 +507,14 @@ body.with-right-side.with-left-side {
   display: block;
   background-color: $bg-color;
   font-size: 11px;
-  color: ensure-contrast(#aaa, $bg-color);
   padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
+  @if $use_high_contrast { color: #666; }
+  @else { color: #888; }
   &:hover, &:focus {
-    color: #555;
+    color: #444;
     text-decoration: none;
   }
 }

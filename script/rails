@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 # This command will automatically be run when you run "rails" with Rails 3 gems installed from the root of your application.
 
-APP_PATH = File.expand_path('../../config/application',  __FILE__)
-require File.expand_path('../../config/boot',  __FILE__)
+# added by instructure:
+# resolve any symlinks in the file path, to avoid double-require issues
+require 'pathname'
+expanded_path = Pathname.new(__FILE__).realpath
+
+APP_PATH = File.expand_path('../../config/application',  expanded_path)
+require File.expand_path('../../config/boot',  expanded_path)
 require 'rails/commands'

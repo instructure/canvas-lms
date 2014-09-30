@@ -48,8 +48,8 @@
   z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
   @if $use_high_contrast
     background-color: #333
-  @else
-    +bg-image('canvas/header_bg', 'png', repeat-x, left, bottom, transparent, 28px, 70px)
+  @else    
+    background-color: #4b5662
   &.no-user
     background-position: 0 -25px
     min-height: 45px
@@ -77,13 +77,10 @@
   @if $use_high_contrast
     background-color: #555
   @else
-    +bg-image('canvas/top_bar_bg', 'png', repeat-x, left, top, transparent, 22px, 23px)
-  box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 1px
-  border-bottom-left-radius: 6px
+    background-color: #31383e
+  border-bottom-left-radius: 5px
   border-bottom-right-radius: 5px
-  border: 1px solid rgba(0,0,0, 0.3)
   border-top: 0
-
 
   li
     color: white
@@ -93,6 +90,9 @@
     padding-left: 8px
     &.first, &#identity-help-container
       border-left: none
+    form
+      margin: 0
+
   .user_name
     margin-right: 15px
     a
@@ -123,7 +123,6 @@
   float: left
   position: relative
   .menu-item-title, .menu-item-no-drop
-    text-shadow: 0px 0px 1px #000 /*this gives it the effect of looking thinner*/
     color: #fff
     font-size: 16px
     border: 1px solid transparent
@@ -142,20 +141,17 @@
     .menu-item-title
       text-shadow: none
       color: $menu-text-color
-      border-top-color: $menu-border-color
-      border-left-color: $menu-border-color
-      border-right-color: $menu-border-color
       background-color: $menu-background-color
 
     .menu-item-drop
       // bring it back on screen so you can see it
       left: 0
 
-  .menu-item-drop
-    border: 1px solid $menu-border-color
-    background-color: $menu-background-color
-    box-shadow: 7px 7px 9px rgba(0, 0, 0, 0.25)
-    top: 40px
+  .menu-item-drop    
+    background-color: $menu-background-color    
+    box-shadow: 0 2px 18px rgba(0, 0, 0, .30)
+    // brings it down by one pixel so it doesn't overlap
+    top: 41px 
     z-index: 99
     font-size: 13px
     // hide off screen, dont do display:none, so screenreaders can see it
@@ -184,7 +180,7 @@
       .menu-item-heading
         display: block
         padding: 9px 12px 3px
-        border-bottom: 1px solid lighten($borderColor, 22%)
+        // border-bottom: 1px solid lighten($borderColor, 22%)
         color: $menu-text-color
         font-size: 1.1em
         line-height: 20px
@@ -201,8 +197,6 @@
         display: block
         @if $use_high_contrast
           color: $menu-text-color
-        @else
-          color: #bcbcbc
         font-size: 9px
       .menu-item-drop-float-right
         float: right
@@ -230,16 +224,14 @@
 .menu-item-drop-column-list, .customListGhost
   +reset-list
   width: 270px
-  li
-    border-top: 1px solid #FAFAFA
-    border-bottom: 1px solid lighten($borderColor, 22%)
+  li        
     &:hover
       .name
         color: $linkColorHover
     a
       display: block
       line-height: 1.2
-      padding: 4px 12px 8px
+      padding: 8px 12px
       text-decoration: none
 
 .menu-item-drop.menuCustomListEditing

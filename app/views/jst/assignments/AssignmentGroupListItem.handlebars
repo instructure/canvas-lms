@@ -1,8 +1,11 @@
 <div id="assignment_group_{{id}}" data-id="{{id}}" class="assignment_group">
+
   <div class="ig-header" style="position:relative;">
     {{#if ENV.PERMISSIONS.manage}}
       <span class="sortable-handle">
-        <a href="#" class="icon-drag-handle"></a>
+        <a href="#" class="icon-drag-handle">
+        <span class="screenreader-only accessibility-warning">{{#t "move_to_accessibility_warning"}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}</span>
+        </a>
       </span>
     {{/if}}
     <h2
@@ -90,6 +93,7 @@
         </div>
       {{/if}}
     </div>
+
 
   </div>
 

@@ -240,6 +240,7 @@ describe "Pages API", type: :request do
                      "published" => true,
                      "front_page" => false,
                      "locked_for_user" => false,
+                     "page_id" => @hidden_page.id
         }
         json.should == expected
       end
@@ -262,6 +263,7 @@ describe "Pages API", type: :request do
                      "published" => true,
                      "front_page" => true,
                      "locked_for_user" => false,
+                     "page_id" => page.id
         }
         json.should == expected
       end
@@ -286,6 +288,7 @@ describe "Pages API", type: :request do
                      "published" => true,
                      "front_page" => true,
                      "locked_for_user" => false,
+                     "page_id" => @front_page.id
         }
         json.should == expected
       end

@@ -35,6 +35,8 @@
   notifications:
     - name: New Announcement
       delay_for: 0
+    - name: Announcement Created By You
+      delay_for: 0
 
 - category: Appointment Availability
   notifications:
@@ -186,8 +188,6 @@
     - name: Report Generation Failed
       delay_for: 0
     - name: New User
-      delay_for: 0
-    - name: New Teacher Registration
       delay_for: 0
     - name: New Student Organized Group
       delay_for: 0

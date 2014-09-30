@@ -21,11 +21,23 @@ class ContextModulesController < ApplicationController
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }
 
+  module ModuleIndexHelper
+    def load_modules
+      @modules = @context.modules_visible_to(@current_user)
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
+
+      @menu_tools = {}
+      [:assignment_menu, :module_menu, :quiz_menu, :wiki_page_menu].each do |type|
+        @menu_tools[type] = ContextExternalTool.all_tools_for(@context, :type => type,
+          :root_account => @domain_root_account, :current_user => @current_user)
+      end
+    end
+  end
+  include ModuleIndexHelper
+
   def index
     if authorized_action(@context, @current_user, :read)
-      @modules = @context.modules_visible_to(@current_user)
-
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
+      load_modules
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
         ContextModule.send(:preload_associations, @modules, [:content_tags])
@@ -44,7 +56,7 @@ class ContextModulesController < ApplicationController
         reevaluate_modules_if_locked(@tag)
         @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
         @progression.uncollapse! if @progression && @progression.collapsed?
-        content_tag_redirect(@context, @tag, :context_context_modules_url)
+        content_tag_redirect(@context, @tag, :context_context_modules_url, :modules)
       end
     end
   end

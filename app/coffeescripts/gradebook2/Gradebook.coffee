@@ -736,6 +736,11 @@ define [
       $(@spinner.el).remove()
       $('#gradebook-grid-wrapper').show()
       @uid = @grid.getUID()
+      $('#content').focus ->
+        $('#accessibility_warning').removeClass('screenreader-only')
+      $('#accessibility_warning').focus ->
+        $('#accessibility_warning').blur ->
+          $('#accessibility_warning').remove()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
           onResize: => @grid.resizeCanvas()

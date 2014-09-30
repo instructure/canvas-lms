@@ -795,7 +795,7 @@ describe "external tools" do
       end
 
       # should redirect to the content_migration page on success
-      driver.current_url.should match %r{/courses/\d+/content_migrations+}
+      driver.current_url.should match %r{/courses/\d+/content_migrations}
       @course.content_migrations.count.should == 1
     end
 
@@ -804,6 +804,160 @@ describe "external tools" do
       get "/courses/#{@course.id}"
       tool_link = f('a.course-home-sub-navigation-lti')
       tool_link.should be_nil
+    end
+  end
+
+  describe 'return url redirection' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @tool = @course.context_external_tools.create!(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+    end
+
+    def return_from_tool
+      ff("#tool_content").length.should == 1
+      keep_trying_until { f("#tool_content").should be_displayed }
+
+      expect_new_page_load do
+        in_frame('tool_content') do
+          keep_trying_until { ff("#basic_lti_link").length > 0 }
+          f("#basic_lti_link").click
+        end
+      end
+    end
+
+    context "for external assignments" do
+      before do
+        assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points', :description => "fluffy ponies!")
+        tag = @assignment.build_external_tool_tag(:url => @tool.url)
+        tag.content_type = 'ContextExternalTool'
+        tag.save!
+        @mod = @course.context_modules.create! name: 'TestModule'
+        @mod_item = @mod.add_item(:id => @assignment.id, :type => 'assignment')
+      end
+
+      it "should redirect back to the assignments page by default for an assignment tool" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f('.description').text.should match_ignoring_whitespace(@assignment.description)
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/assignments$}
+      end
+
+      it "should redirect back to the modules page if following a standard module item url" do
+        next_item = @mod.add_item(:type => 'external_url', :url => "http://#{HostUrl.default_host}", :title => 'pls view')
+        get "/courses/#{@course.id}/modules/items/#{@mod_item.id}"
+
+        f('#sequence_footer a.next')['href'].should end_with "/courses/#{@course.id}/modules/items/#{next_item.id}"
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/modules$}
+      end
+    end
+
+    context "for course navigation links" do
+      before do
+        settings = {
+            url: "http://#{HostUrl.default_host}/selection_test",
+            text: "tool text",
+            icon_url: "/images/add.png",
+            display_type: 'full_width'
+        }
+        [:course_navigation, :course_settings_sub_navigation].each do |type|
+          @tool.send(:"#{type}=", settings)
+        end
+        @tool.save!
+      end
+
+      it "should return to course settings page for course_settings_sub_navigation launches" do
+        Account.default.enable_feature!(:lor_for_account)
+        get "/courses/#{@course.id}/settings"
+        expect_new_page_load { f('.course-settings-sub-navigation-lti').click }
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+/settings$}
+      end
+
+      it "should return to course home for course_navigation launches" do
+        get "/courses/#{@course.id}"
+        expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+        return_from_tool
+
+        driver.current_url.should match %r{/courses/\d+$}
+      end
+    end
+
+    it "should return to the modules page for external tool module items" do
+      @mod = @course.context_modules.create! name: 'TestModule'
+      @mod_item = @mod.add_item(:id => @tool.id, :type => 'external_tool', :url => @tool.url)
+
+      get "/courses/#{@course.id}/modules/items/#{@mod_item.id}"
+
+      return_from_tool
+
+      driver.current_url.should match %r{/courses/\d+/modules$}
+    end
+
+    it "should return to the dashboard for global navigation" do
+      Account.default.enable_feature!(:lor_for_account)
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.global_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/"
+      expect_new_page_load {f("##{@tool.asset_string}_menu_item a").click }
+
+      return_from_tool
+      driver.current_url.should == "http://#{HostUrl.default_host}/"
+    end
+
+    it "should return to the account home page for account navigation" do
+      user_session(site_admin_user)
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.account_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/accounts/#{Account.default.id}"
+      expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+      return_from_tool
+
+      driver.current_url.should match %r{/accounts/\d+$}
+    end
+
+    it "should return to the user settings page for user navigation" do
+      @tool = Account.default.context_external_tools.new(
+          name: "new tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://#{HostUrl.default_host}/selection_test",
+      )
+      @tool.user_navigation = {:url => "http://#{HostUrl.default_host}/selection_test", :text => "Example URL 2"}
+      @tool.save!
+
+      get "/profile/settings"
+      expect_new_page_load { f("a.context_external_tool_#{@tool.id}").click }
+
+      return_from_tool
+
+      driver.current_url.should match %r{/about/\d+$}
     end
   end
 

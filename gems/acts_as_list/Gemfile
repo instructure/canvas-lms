@@ -1,2 +1,8 @@
 source 'https://rubygems.org'
 gemspec
+
+require File.expand_path("../../../config/canvas_rails4", __FILE__)
+
+if CANVAS_RAILS3
+  gem 'rails', '~> 3.2.0'
+end

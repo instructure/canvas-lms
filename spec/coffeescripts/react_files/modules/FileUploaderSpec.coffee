@@ -4,11 +4,17 @@ define [
   'jquery.ajaxJSON'
 ], (FileUploader, $) ->
 
+  mockFileOptions =  (name, type, size) ->
+    fileOptions =
+      file:
+        name: name
+        type: type
+        size: size
+
   module 'FileUploader',
     setup: ->
       folder = {id: 1}
-      file = {}
-      @uploader = new FileUploader(file, folder)
+      @uploader = new FileUploader(mockFileOptions('foo', 'bar', 1), folder)
 
     teardown: ->
       delete @uploader
@@ -23,19 +29,44 @@ define [
     $.ajaxJSON.restore()
 
 
-  test 'uploads file with data returned from files endpoint', ->
+  test 'stores params from preflight for actual upload', ->
     server = sinon.fakeServer.create()
     server.respondWith('POST',
                        '/api/v1/folders/1/files',
                        [ 200,
                          {"Content-Type": "application/json"},
-                         '{"upload_url": "/upload/url", "upload_params": [{"key": "value"}] }'
+                         '{"upload_url": "/upload/url", "upload_params": {"key": "value"}}'
                        ]
     )
 
     uploadStub = sinon.stub(@uploader, '_actualUpload')
     @uploader.upload()
-    server.respond()
-    ok uploadStub.calledWithMatch({upload_url: '/upload/url', upload_params: [{key: 'value'}]})
 
+    server.respond()
+
+    equal @uploader.uploadData.upload_url, '/upload/url'
+    equal @uploader.uploadData.upload_params.key, 'value'
+
+    uploadStub.restore()
     server.restore()
+
+  test 'roundProgress returns back rounded values', ->
+    sinon.stub(@uploader, 'getProgress').returns(0.18) # progress is [0 .. 1]
+    equal @uploader.roundProgress(), 18
+
+  test 'roundProgress returns back values no greater than 100', ->
+   sinon.stub(@uploader, 'getProgress').returns(1.1) # something greater than 100%
+   equal @uploader.roundProgress(), 100
+
+  test 'getFileName returns back the option name if one exists', ->
+    folder = {id: 1}
+    options = mockFileOptions('foo', 'bar', 1)
+    options.name = 'use this one'
+    @uploader = new FileUploader(options, folder)
+    equal @uploader.getFileName(), 'use this one'
+
+  test 'getFileName returns back the actual file if no optinal name is given', ->
+    folder = {id: 1}
+    options = mockFileOptions('foo', 'bar', 1)
+    @uploader = new FileUploader(options, folder)
+    equal @uploader.getFileName(), 'foo'

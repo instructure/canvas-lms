@@ -24,7 +24,6 @@
     <%= render :partial => "course", :collection => @courses %>
     <%= render :partial => "course" %>
   </ul>
-</div>
 <% else %>
   <h3><%= @root_account.enrollment_terms.active.count > 1 ?
           t(:no_courses_term_message, "There are no courses in this term") :

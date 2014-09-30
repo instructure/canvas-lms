@@ -99,7 +99,7 @@ function generate_js {
 
 function generate_css {
   echo_console_and_log "  Generating CSS ..."
-  bundle exec rake css:generate >>$LOG 2>&1 || \
+  npm run compile-sass >>$LOG 2>&1 || \
     ( echo "  failed to generate CSS (see $LOG)"; kill -INT $$ )
 }
 

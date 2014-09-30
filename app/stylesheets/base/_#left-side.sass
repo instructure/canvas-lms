@@ -1,13 +1,14 @@
 #left-side
   float: left
   width: $left_side_width
-  border-bottom: solid 1px #ccc
   display: none
 
 #section-tabs .section-tab-hidden a
-  @if $use_high_contrast
-    color: #555
-    background-color: #fff
-  @else
-    color: #bbb
+  @if $use_high_contrast  
+    color: darken($course-sidenav_list-item--inactive-font-color, 45%)  
+    background: lighten($course-sidenav_list-item--inactive-font-color, 15%)  
+  @else 
+    color: $course-sidenav_list-item--inactive-font-color
+
+
 

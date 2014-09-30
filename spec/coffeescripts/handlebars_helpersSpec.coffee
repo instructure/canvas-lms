@@ -183,3 +183,35 @@ define [
     tz.changeZone(detroit, 'America/Detroit')
     equal helpers.datetimeFormatted('1970-01-01 00:00:00', hash: {pubDate: false}),
       "Jan 1, 1970 at 12:00am"
+
+  module 'ifSettingIs',
+
+    test 'it runs primary case if setting matches', ->
+      ENV.SETTINGS = {key: 'value'}
+      semaphore = false
+      funcs = {
+        fn: (()-> semaphore = true ),
+        inverse: (()-> throw new Error("Dont call this!"))
+      }
+      helpers.ifSettingIs('key', 'value', funcs)
+      equal semaphore, true
+
+    test 'it runs inverse case if setting does not match', ->
+      ENV.SETTINGS = {key: 'NOTvalue'}
+      semaphore = false
+      funcs = {
+        inverse: (()-> semaphore = true ),
+        fn: (()-> throw new Error("Dont call this!"))
+      }
+      helpers.ifSettingIs('key', 'value', funcs)
+      equal semaphore, true
+
+    test 'it runs inverse case if setting does not exist', ->
+      ENV.SETTINGS = {}
+      semaphore = false
+      funcs = {
+        inverse: (()-> semaphore = true ),
+        fn: (()-> throw new Error("Dont call this!"))
+      }
+      helpers.ifSettingIs('key', 'value', funcs)
+      equal semaphore, true

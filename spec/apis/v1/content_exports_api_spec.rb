@@ -247,6 +247,9 @@ describe ContentExportsApiController, type: :request do
         mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
         mod
       end
+      let_once(:quiz_to_copy) do
+        t_course.quizzes.create! title: 'thaumolinguistics'
+      end
 
       it "should create a selective course export with old migration id format" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
@@ -326,6 +329,66 @@ describe ContentExportsApiController, type: :request do
         copied_att.should_not be_nil
         copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
         @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+      end
+
+      it "should select quizzes correctly" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:quizzes => [quiz_to_copy.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.settings['selected_content']['quizzes'].should == {CC::CCHelper.create_key(quiz_to_copy) => "1"}
+        export.export_object?(quiz_to_copy).should be_true
+      end
+
+      it "should select using shortened collection names" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:modules => [mod.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.export_object?(mod).should be_true
+
+        tag = mod.content_tags.first
+        json2 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:module_items => [tag.id]} })
+        export2 = t_course.content_exports.find_by_id(json2['id'])
+        export2.export_object?(tag).should be_true
+
+        json3 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                 { :select => {:pages => [page_to_copy.id]} })
+        export3 = t_course.content_exports.find_by_id(json3['id'])
+        export3.export_object?(page_to_copy).should be_true
+
+        file = attachment_model(context: t_course)
+        json4 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                 { :select => {:files => [file.id]} })
+        export4 = t_course.content_exports.find_by_id(json4['id'])
+        export4.export_object?(file).should be_true
+      end
+
+      it "should export by module item id" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:module_items => [mod.content_tags.first.id]} })
+        export = t_course.content_exports.find_by_id(json['id'])
+        run_jobs
+
+        export.reload
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
+
+        run_jobs
+
+        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        copied_page.should_not be_nil
+        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
       end
     end
   end
@@ -407,6 +470,14 @@ describe ContentExportsApiController, type: :request do
         Zip::File.open(tf) do |zf|
           zf.entries.map(&:name).should =~ %w(teh_folder/file2.txt file3.txt)
         end
+      end
+
+      it "should support 'files' in addition to 'attachments'" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param },
+                                { export_type: 'zip', select: {'files' => [@file1.id]} })
+        ce = ContentExport.find(json['id'])
+        ce.export_object?(@file1).should be true
       end
 
       context "as a student" do

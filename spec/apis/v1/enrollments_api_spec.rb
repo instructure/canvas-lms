@@ -471,6 +471,7 @@ describe EnrollmentsApiController, type: :request do
 
     context "self enrollment" do
       before :once do
+        Account.default.allow_self_enrollment!
         course(active_all: true)
         @course.update_attribute(:self_enrollment, true)
         @unenrolled_user = user_with_pseudonym
@@ -517,6 +518,21 @@ describe EnrollmentsApiController, type: :request do
         new_enrollment.type.should == 'StudentEnrollment'
         new_enrollment.should be_active
         new_enrollment.should be_self_enrolled
+      end
+
+      it "should not let anyone self-enroll if account disables it" do
+        account = @course.root_account
+        account.settings.delete(:self_enrollment)
+        account.save!
+
+        json = raw_api_call :post, @path, @path_options,
+                        {
+                            enrollment: {
+                                user_id: 'self',
+                                self_enrollment_code: @course.self_enrollment_code
+                            }
+                        }
+        response.code.should eql '400'
       end
     end
   end

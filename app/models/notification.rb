@@ -195,6 +195,8 @@ class Notification < ActiveRecord::Base
       FREQ_NEVER
     when 'Announcement'
       FREQ_IMMEDIATELY
+    when 'Announcement Created'
+      FREQ_NEVER
     when 'Calendar'
       FREQ_NEVER
     when 'Student Appointment Signups'
@@ -213,6 +215,8 @@ class Notification < ActiveRecord::Base
       FREQ_NEVER
     when 'DiscussionEntry'
       FREQ_DAILY
+    when 'Announcement Reply'
+        FREQ_NEVER
     when 'Due Date'
       FREQ_WEEKLY
     when 'Grading'
@@ -288,6 +292,8 @@ class Notification < ActiveRecord::Base
     t 'names.migration_import_finished', 'Migration Import Finished'
     t 'names.new_account_user', 'New Account User'
     t 'names.new_announcement', 'New Announcement'
+    t 'names.announcement_created_by_you', 'Announcement Created By You'
+    t 'names.announcement_reply', 'Announcement Reply'
     t 'names.new_context_group_membership', 'New Context Group Membership'
     t 'names.new_context_group_membership_invitation', 'New Context Group Membership Invitation'
     t 'names.new_course', 'New Course'
@@ -297,7 +303,6 @@ class Notification < ActiveRecord::Base
     t 'names.new_file_added', 'New File Added'
     t 'names.new_files_added', 'New Files Added'
     t 'names.new_student_organized_group', 'New Student Organized Group'
-    t 'names.new_teacher_registration', 'New Teacher Registration'
     t 'names.new_user', 'New User'
     t 'names.pseudonym_registration', 'Pseudonym Registration'
     t 'names.report_generated', 'Report Generated'
@@ -358,6 +363,10 @@ class Notification < ActiveRecord::Base
     case category
       when 'Announcement'
         t(:announcement_display, 'Announcement')
+      when 'Announcement Reply'
+        t(:announcement_reply_display, 'Announcement Reply')
+      when 'Announcement Created By You'
+        t(:announcement_created_by_you_display, 'Announcement Created By You')
       when 'Course Content'
         t(:course_content_display, 'Course Content')
       when 'Files'
@@ -408,7 +417,14 @@ class Notification < ActiveRecord::Base
   def category_description
     case category
     when 'Announcement'
-      t(:announcement_description, 'New announcement in your course')
+      t(:announcement_description, 'New Announcement in your course')
+    when 'Announcement Reply'
+      t(:announcement_reply, 'Replies to Announcements you create')
+    when 'Announcement Created By You'
+      mt(:announcement_created_by_you_description, <<-EOS)
+* Announcements created by you
+* Replies to announcements you've created
+EOS
     when 'Course Content'
         mt(:course_content_description, <<-EOS)
 Change to course content:
@@ -476,7 +492,6 @@ EOS
 * Content export
 * Migration report
 * New account user
-* New teacher registration
 * New student group
 EOS
     when 'Calendar'

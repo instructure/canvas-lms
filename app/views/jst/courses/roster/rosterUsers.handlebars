@@ -3,18 +3,18 @@
 <table class="roster table table-hover table-striped table-condensed table-vertically-center">
   <thead>
     <tr>
-      <th></th>
-      <th>{{#t "name"}}Name{{/t}}</th>
+      <th scope="col"><span class="screenreader-only">Profile Picture</span></th>
+      <th scope="col">{{#t "name"}}Name{{/t}}</th>
       {{#if canViewLoginIdColumn}}
-      <th>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
+      <th scope="col">{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
       {{/if}}
-      <th>{{#t "section"}}Section{{/t}}</th>
-      <th>{{#t "role"}}Role{{/t}}</th>
+      <th scope="col">{{#t "section"}}Section{{/t}}</th>
+      <th scope="col">{{#t "role"}}Role{{/t}}</th>
       {{#if ENV.permissions.read_reports}}
-      <th>{{#t "last_activity"}}Last Activity{{/t}}</th>
-      <th>{{#t "total_activity"}}Total Activity{{/t}}</th>
+      <th scope="col">{{#t "last_activity"}}Last Activity{{/t}}</th>
+      <th scope="col">{{#t "total_activity"}}Total Activity{{/t}}</th>
       {{/if}}
-      <th></th>
+      <th scope="col"><span class="screenreader-only">Administrative Links</span></th>
     </tr>
   </thead>
   <tbody class="collectionViewItems"></tbody>

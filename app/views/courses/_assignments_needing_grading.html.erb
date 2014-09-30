@@ -43,9 +43,14 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             </span>
           <% end %>
           <b><%= t 'headings.grade', 'Grade %{assignment}', :assignment => assignment.title %></b>
-          <em><%= t 'need_grading_count', { :one => '1 needs grading', :other => '%{count} need grading' }, :count => assignment.needs_grading_count_for_user(@current_user) %></em>
+          <em>
+            <%= t 'need_grading_count', { one: '1 needs grading', other: '%{count} need grading' }, count: Assignments::NeedsGradingCountQuery.new(assignment, @current_user).count %>
+          </em>
         </a>
-        <a class='disable_item_link grading' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+        <a class='disable_item_link grading' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'grading') %>">
+          <span class="screenreader-only"><%= t('images.alt.ignore', 'ignore') %></span>
+          <i class="icon-x"></i>
+        </a>
       </li>
     <% end %>
     <% needs_submitting.each_with_index do |assignment, i| %>
@@ -72,7 +77,10 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
           <b><%= assignment.submission_action_string %></b>
           <em><%= translated_due_date(assignment) %></em>
         </a>
-        <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+        <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>">
+          <span class="screenreader-only"><%= t('images.alt.ignore', 'ignore') %></span>
+          <i class="icon-x"></i>
+        </a>
       </li>
     <% end %>
     <% needs_reviewing.each_with_index do |assessment_request, i| %>
@@ -95,7 +103,9 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
                 <%= t('no_peer_review_due_date', 'due: No Due Date') %>
               <% end %>
             </em>
-          <a class='disable_item_link submitting' title="<%= t('links.title.ignore_review', %{Ignore this review}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assessment_request.asset_string, 'reviewing') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+          <a class='disable_item_link submitting' title="<%= t('links.title.ignore_review', %{Ignore this review}) %>" href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assessment_request.asset_string, 'reviewing') %>">
+            <span class="screenreader-only"><%= t('images.alt.ignore', 'ignore') %></span>
+            <i class="icon-x"></i>
           </a>
         </li>
       <% end %>

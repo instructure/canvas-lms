@@ -1,4 +1,5 @@
 require 'lib/canvas/require_js/plugin_extension'
+require 'lib/canvas/require_js/client_app_extension'
 module Canvas
   module RequireJs
     class << self
@@ -61,7 +62,16 @@ module Canvas
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
-        }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
+        }.update(cache_busting ? cache_busting_paths : {}).
+          update(plugin_paths).
+          update(Canvas::RequireJs::PluginExtension.paths).
+          update(Canvas::RequireJs::ClientAppExtension.paths).
+          to_json.
+          gsub(/([,{])/, "\\1\n    ")
+      end
+
+      def map
+        @map ||= Canvas::RequireJs::ClientAppExtension.map.to_json
       end
 
       def packages

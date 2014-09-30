@@ -82,6 +82,14 @@ describe AssignmentGroup do
         AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
       end
     end
+
+    context "logged out users" do
+      it "should return assignments for logged out users so that invited users can see them before accepting a course invite" do
+        @ag.visible_assignments(nil).count.should == 3
+        AssignmentGroup.visible_assignments(nil, @c, [@ag]).count.should == 3
+
+      end
+    end
   end
 
   context "broadcast policy" do

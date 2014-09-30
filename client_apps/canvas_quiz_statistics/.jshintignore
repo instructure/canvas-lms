@@ -1,0 +1,4 @@
+src/js/main.js
+src/js/bundles/**/*.js
+src/js/config/environments/development.js
+src/js/config/environments/development_local.js

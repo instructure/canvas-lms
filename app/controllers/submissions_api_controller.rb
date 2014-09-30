@@ -55,6 +55,8 @@ class SubmissionsApiController < ApplicationController
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.where(:user_id => visible_user_ids).all
 
+      bulk_load_attachments_and_previews(@submissions)
+
       includes = Array(params[:include])
 
       result = @submissions.map { |s| submission_json(s, @assignment, @current_user, session, @context, includes) }
@@ -174,7 +176,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.workflow_state != 'deleted'"
                       ).all
                     end
-      Submission.bulk_load_versioned_attachments(submissions)
+      bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
       seen_users = Set.new
@@ -230,6 +232,7 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
+    bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
@@ -285,28 +288,28 @@ class SubmissionsApiController < ApplicationController
   # must have permission to manage grades in the appropriate context (course or
   # section).
   #
-  # @argument comment[text_comment] [Optional, String]
+  # @argument comment[text_comment] [String]
   #   Add a textual comment to the submission.
   #
-  # @argument comment[group_comment] [Optional, Boolean]
+  # @argument comment[group_comment] [Boolean]
   #   Whether or not this comment should be sent to the entire group (defaults
   #   to false). Ignored if this is not a group assignment or if no text_comment
   #   is provided.
   #
-  # @argument comment[media_comment_id] [Optional, String]
+  # @argument comment[media_comment_id] [String]
   #   Add an audio/video comment to the submission. Media comments can be added
   #   via this API, however, note that there is not yet an API to generate or
   #   list existing media comments, so this functionality is currently of
   #   limited use.
   #
-  # @argument comment[media_comment_type] [Optional, String, "audio"|"video"]
+  # @argument comment[media_comment_type] [String, "audio"|"video"]
   #   The type of media comment being added.
   #
-  # @argument comment[file_ids][] [Optional,Integer]
+  # @argument comment[file_ids][] [Integer]
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument submission[posted_grade] [Optional, String]
+  # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
   #   fields on the submission record. This parameter can be passed in a few
   #   different formats:
@@ -336,7 +339,7 @@ class SubmissionsApiController < ApplicationController
   #   will only be accepted if the grade equals one of those two values.
   #
   #
-  # @argument rubric_assessment [Optional, RubricAssessment]
+  # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
   #   format is, for each row in the rubric:
@@ -440,6 +443,7 @@ class SubmissionsApiController < ApplicationController
       # submission without going through the model instance -- it'd be nice to
       # fix this at some point.
       @submission.reload
+      bulk_load_attachments_and_previews([@submission])
 
       json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
       json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
@@ -465,5 +469,12 @@ class SubmissionsApiController < ApplicationController
     end
     scope = @context.enrollments_visible_to(@current_user, opts)
     scope.pluck(:user_id)
+  end
+
+  def bulk_load_attachments_and_previews(submissions)
+    Submission.bulk_load_versioned_attachments(submissions)
+    attachments = submissions.flat_map &:versioned_attachments
+    Attachment.send :preload_associations, attachments,
+      [:canvadoc, :crocodoc_document]
   end
 end

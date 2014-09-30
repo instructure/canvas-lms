@@ -23,15 +23,3 @@ RSpec.configure do |config|
 end
 
 Time.zone = "UTC"
-
-module Rails
-  def self.env
-    @env ||= Env.new
-  end
-
-  class Env
-    def test?
-      false
-    end
-  end
-end

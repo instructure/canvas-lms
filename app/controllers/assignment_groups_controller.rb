@@ -96,7 +96,7 @@ class AssignmentGroupsController < ApplicationController
   #  "assignment_visibility" are only valid are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
-  # @argument override_assignment_dates [Optional, Boolean]
+  # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
   # @returns [AssignmentGroup]

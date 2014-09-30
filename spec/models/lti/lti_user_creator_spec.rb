@@ -88,7 +88,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::LEARNER]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "collects current active student view enrollments" do
@@ -96,7 +96,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::LEARNER]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "collects current active teacher enrollments" do
@@ -104,7 +104,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::INSTRUCTOR]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR]
         end
 
         it "collects current active ta enrollments" do
@@ -112,7 +112,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::TEACHING_ASSISTANT]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT]
         end
 
         it "collects current active course designer enrollments" do
@@ -120,7 +120,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::CONTENT_DEVELOPER]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER]
         end
 
         it "collects current active account user enrollments from an account" do
@@ -128,7 +128,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = account_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::ADMIN]
+          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "collects current active account user enrollments from a course" do
@@ -136,7 +136,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::ADMIN]
+          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "collects current active account user enrollments for the root account of a course" do
@@ -146,7 +146,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::ADMIN]
+          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "does not include enrollments from other courses" do
@@ -215,7 +215,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.concluded_roles
 
-          enrollments.should == [LtiOutbound::LTIRole::LEARNER]
+          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "does not return any course enrollments when the context is an account" do
@@ -284,7 +284,7 @@ describe Lti::LtiUserCreator do
 
         hash = {variable: '$Canvas.membership.concludedRoles'}
         variable_substitutor.substitute!(hash)
-        hash[:variable].should == [LtiOutbound::LTIRole::LEARNER,LtiOutbound::LTIRole::INSTRUCTOR].join(',')
+        hash[:variable].should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER,LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR].join(',')
       end
 
       it "adds roles" do

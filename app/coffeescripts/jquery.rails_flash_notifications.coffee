@@ -8,7 +8,6 @@ define [
   'vendor/jquery.cookie'
 ], (I18n, $, _, preventDefault) ->
 
-  $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")
   $screenreader_holder = $("#flash_screenreader_holder")
   $holder.on 'click', '.close_link', preventDefault(->)
@@ -17,12 +16,10 @@ define [
     return if $this.hasClass('no_close')
     $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
     $this.stop(true, true).remove()
-    if (bufferIndex = $this.data('buffer-index'))?
-      $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
   screenReaderFlashBox = (type, content) ->
     $screenreader_node = $("""
-      <span role="alert">#{content}</span>
+      <span>#{content}</span>
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
@@ -64,3 +61,12 @@ define [
 
   $.screenReaderFlashError = (content) ->
     screenReaderFlashBox('error', content)
+
+  renderServerNotifications = ->
+    if ENV.notices?
+      for notice in ENV.notices
+        flashBox(notice.type, notice.content)
+
+  $ ->
+    setTimeout(renderServerNotifications, 500)
+

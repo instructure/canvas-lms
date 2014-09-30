@@ -14,9 +14,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activesupport", "~> 3.2"
+  spec.add_dependency "activesupport", ">= 3.2", "< 4.2"
 
-  spec.add_dependency "i18n", "0.6.8"
+  spec.add_dependency "i18n", "0.6.9"
   spec.add_dependency "ruby_parser", "3.6.1"
   spec.add_dependency "ya2yaml", "0.30"
   spec.add_dependency "i18n_extraction"

@@ -30,7 +30,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
+  before_filter :require_quiz, :only => [:statistics, :statistics_cqs, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   after_filter :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -38,72 +38,132 @@ class Quizzes::QuizzesController < ApplicationController
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
   QUIZ_MAX_COMBINATION_COUNT = 200
 
+  QUIZ_TYPE_ASSIGNMENT = 'assignment'
+  QUIZ_TYPE_PRACTICE = 'practice_quiz'
+  QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey']
+
   def index
-    if authorized_action(@context, @current_user, :read)
-      # fabulous quizzes
-      if @context.feature_enabled?(:quiz_stats) &&
-         @context.feature_enabled?(:draft_state)
-        js_env(:PERMISSIONS => {
-          :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
-          :manage  => can_do(@context, @current_user, :manage_assignments)
-        },
-        :FLAGS => {
-          :question_banks => feature_enabled?(:question_banks),
-          :quiz_statistics => true,
-          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate),
-          :differentiated_assignments => @context.feature_enabled?(:differentiated_assignments)
-        })
+    return unless authorized_action(@context, @current_user, :read)
+    return index_ember if @context.feature_enabled?(:quiz_stats)
+    return unless tab_enabled?(@context.class::TAB_QUIZZES)
+    return index_legacy unless @context.feature_enabled?(:draft_state)
 
-        # headless prevents inception in submission preview
-        setup_headless if params[:headless]
+    can_manage = is_authorized_action?(@context, @current_user, :manage_assignments)
 
-        render action: "fabulous_quizzes"
+    scope = @context.quizzes.active.includes([ :assignment ])
 
-      else
-        return unless tab_enabled?(@context.class::TAB_QUIZZES)
-        @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || CanvasSort::Last, Canvas::ICU.collation_key(q.title || CanvasSort::First)]}
+    # students only get to see published quizzes, and they will fetch the
+    # overrides later using the API:
+    scope = scope.available unless can_manage
 
-        # draft state - only filter by available? for students
-        if @context.feature_enabled?(:draft_state)
-          unless is_authorized_action?(@context, @current_user, :manage_assignments)
-            @quizzes = @quizzes.select{|q| q.available? }
-          end
+    quizzes = scope.sort_by do |quiz|
+      due_date = quiz.assignment ? quiz.assignment.due_at : quiz.lock_at
+      [
+        due_date || CanvasSort::Last,
+        Canvas::ICU.collation_key(quiz.title || CanvasSort::First)
+      ]
+    end
 
-          assignment_quizzes = @quizzes.select{|q| q.quiz_type == 'assignment' }
-          open_quizzes       = @quizzes.select{|q| q.quiz_type == 'practice_quiz' }
-          surveys            = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
-
-          @assignment_json = quizzes_json(assignment_quizzes, @context, @current_user, session)
-          @open_json       = quizzes_json(open_quizzes, @context, @current_user, session)
-          @surveys_json    = quizzes_json(surveys, @context, @current_user, session)
-
-          @quiz_options = @quizzes.each_with_object({}) do |q, hash|
-            hash[q.id] = {
-              :can_update    => is_authorized_action?(q, @current_user, :update),
-              :can_unpublish => q.can_unpublish?
-            }
-          end
-
-        # legacy
-        else
-          @unpublished_quizzes = @quizzes.select{|q| !q.available?}
-          @quizzes = @quizzes.select{|q| q.available?}
-          @assignment_quizzes = @quizzes.select{|q| q.assignment_id}
-          @open_quizzes = @quizzes.select{|q| q.quiz_type == 'practice_quiz'}
-          @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
-        end
-
-        @submissions_hash = {}
-        @current_user && @current_user.quiz_submissions.where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s).includes(:quiz).each do |s|
-          if s.needs_grading?
-            Quizzes::SubmissionGrader.new(s).grade_submission(:finished_at => s.end_at)
-            s.reload
-          end
-          @submissions_hash[s.quiz_id] = s
-        end
-        log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    quiz_options = Rails.cache.fetch([
+      'quiz_user_permissions', @context.id, @current_user,
+      quizzes.map(&:id), # invalidate on add/delete of quizzes
+      quizzes.map(&:updated_at).sort.last # invalidate on modifications
+    ].cache_key) do
+      quizzes.each_with_object({}) do |quiz, quiz_user_permissions|
+        quiz_user_permissions[quiz.id] = {
+          can_update: can_manage,
+          can_unpublish: can_manage && quiz.can_unpublish?
+        }
       end
     end
+
+    assignment_quizzes = quizzes.select{ |q| q.quiz_type == QUIZ_TYPE_ASSIGNMENT }
+    open_quizzes       = quizzes.select{ |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
+    surveys            = quizzes.select{ |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
+    serializer_options = [@context, @current_user, session, {
+      permissions: quiz_options,
+      skip_date_overrides: true,
+      skip_lock_tests: true
+    }]
+
+    js_env({
+      :QUIZZES => {
+        assignment: quizzes_json(assignment_quizzes, *serializer_options),
+        open: quizzes_json(open_quizzes, *serializer_options),
+        surveys: quizzes_json(surveys, *serializer_options),
+        options: quiz_options
+      },
+      :URLS => {
+        new_quiz_url: context_url(@context, :new_context_quiz_url, :fresh => 1),
+        question_banks_url: context_url(@context, :context_question_banks_url),
+        assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context)
+      },
+      :PERMISSIONS => {
+        create: can_do(@context.quizzes.scoped.new, @current_user, :create),
+        manage: can_manage
+      },
+      :FLAGS => {
+        question_banks: feature_enabled?(:question_banks)
+      },
+      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+    })
+
+    # TODO: stop doing this here
+    if @current_user.present?
+      Quizzes::SubmissionManager.send_later_if_production(:grade_outstanding_submissions_in_course,
+        @current_user.id, @context.id, @context.class.to_s)
+    end
+
+    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+  end
+
+  def index_ember
+    js_env(:PERMISSIONS => {
+      :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
+      :manage  => can_do(@context, @current_user, :manage_assignments)
+    },
+    :FLAGS => {
+      :question_banks => feature_enabled?(:question_banks),
+      :quiz_statistics => true,
+      :quiz_moderate   => @context.feature_enabled?(:quiz_moderate),
+      :differentiated_assignments => @context.feature_enabled?(:differentiated_assignments)
+    })
+
+    # headless prevents inception in submission preview
+    setup_headless if params[:headless]
+
+    render action: "fabulous_quizzes"
+  end
+
+  # TODO: update non-DS specs to use the DS version and remove this entirely
+  # as it is no longer available in the UI
+  def index_legacy
+    @quizzes = @context.quizzes.active.include_assignment.sort_by do |quiz|
+      [
+        (quiz.assignment ? quiz.assignment.due_at : quiz.lock_at) || CanvasSort::Last,
+        Canvas::ICU.collation_key(quiz.title || CanvasSort::First)
+      ]
+    end
+
+    @unpublished_quizzes = @quizzes.select{|q| !q.available?}
+    @quizzes = @quizzes.select{|q| q.available?}
+    @assignment_quizzes = @quizzes.select{|q| q.assignment_id}
+    @open_quizzes = @quizzes.select{|q| q.quiz_type == 'practice_quiz'}
+    @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
+
+    # needed by _quiz_summary.html.erb
+    @submissions_hash = if @current_user.present?
+      @current_user
+        .quiz_submissions
+          .where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s)
+          .includes(:quiz)
+          .each_with_object({}) { |sub, user_subs| user_subs[sub.quiz_id] = sub }
+    else
+      {}
+    end
+
+    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    render action: "index_legacy"
   end
 
   def show
@@ -185,6 +245,9 @@ class Quizzes::QuizzesController < ApplicationController
              :CONTEXT_ACTION_SOURCE => :quizzes  }
       append_sis_data(hash)
       js_env(hash)
+
+      @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
+
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
@@ -465,6 +528,23 @@ class Quizzes::QuizzesController < ApplicationController
           }
         end
 
+    end
+  end
+
+  def statistics_cqs
+    if authorized_action(@quiz, @current_user, :read_statistics)
+      respond_to do |format|
+        format.html {
+          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+          add_crumb(t(:statistics_cqs_crumb, "Statistics CQS"), named_context_url(@context, :context_quiz_statistics_cqs_url, @quiz))
+
+          js_env({
+            quiz_url: api_v1_course_quiz_url(@context, @quiz),
+            quiz_statistics_url: api_v1_course_quiz_statistics_url(@context, @quiz),
+            quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
+          })
+        }
+      end
     end
   end
 

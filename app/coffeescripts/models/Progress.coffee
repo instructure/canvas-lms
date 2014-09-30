@@ -53,9 +53,10 @@ define ['Backbone', 'jquery'], ({Model}, $) ->
     #
     # @api private
 
-    onPoll: =>
+    onPoll: (response) =>
+      @pollDfd.notify(response)
       if @isPolling()
         @timeout = setTimeout(@poll, @get('timeout'))
       else
-        @pollDfd.resolve()
+        @pollDfd.resolve(response)
         @trigger 'complete'

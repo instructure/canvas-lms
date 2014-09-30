@@ -52,12 +52,20 @@ describe SisImportsApiController, type: :request do
     json.delete("updated_at")
     json.has_key?("ended_at").should be_true
     json.delete("ended_at")
+    if opts[:batch_mode_term_id]
+      json["batch_mode_term_id"].should_not be_nil
+    end
+    json.delete("batch_mode_term_id")
     batch = SisBatch.last
     json.should == {
           "data" => { "import_type"=>"instructure_csv"},
           "progress" => 0,
           "id" => batch.id,
-          "workflow_state"=>"created" }
+          "workflow_state"=>"created",
+          "batch_mode" => opts[:batch_mode] ? true : nil,
+          "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
+          "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
+          "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil}
     batch.process_without_send_later
     return batch
   end
@@ -84,7 +92,12 @@ describe SisImportsApiController, type: :request do
           "data" => { "import_type"=>"instructure_csv"},
           "progress" => 0,
           "id" => batch.id,
-          "workflow_state"=>"created" }
+          "workflow_state"=>"created",
+          "batch_mode" => nil,
+          "batch_mode_term_id" => nil,
+          "override_sis_stickiness" => nil,
+          "add_sis_stickiness" => nil,
+          "clear_sis_stickiness" => nil }
 
     SisBatch.count.should == @batch_count + 1
     batch.batch_mode.should be_false
@@ -118,7 +131,12 @@ describe SisImportsApiController, type: :request do
                                     "terms" => 0, }},
           "progress" => 100,
           "id" => batch.id,
-          "workflow_state"=>"imported" }
+          "workflow_state"=>"imported",
+          "batch_mode" => nil,
+          "batch_mode_term_id" => nil,
+          "override_sis_stickiness" => nil,
+          "add_sis_stickiness" => nil,
+          "clear_sis_stickiness" => nil }
   end
 
   it "should skip the job for skip_sis_jobs_account_ids" do
@@ -503,7 +521,12 @@ describe SisImportsApiController, type: :request do
                                                 "terms" => 0, }},
                       "progress" => 100,
                       "id" => batch.id,
-                      "workflow_state"=>"imported" }]
+                      "workflow_state"=>"imported",
+          "batch_mode" => nil,
+          "batch_mode_term_id" => nil,
+          "override_sis_stickiness" => nil,
+          "add_sis_stickiness" => nil,
+          "clear_sis_stickiness" => nil }]
     }
   end
 end

@@ -35,6 +35,24 @@
         <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
           <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
         </a>
+
+        <% if @assignment_menu_tools.present? %>
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
+          </a>
+          <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          <% @assignment_menu_tools.each do |tool_hash| %>
+            <li role="presentation">
+              <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&assignments[]=<%= @assignment.id %>" tabindex="-1" role="menuitem">
+                <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                <%= tool_hash[:title] %>
+              </a>
+            </li>
+          <% end %>
+          </ul>
+        <% end %>
       </div>
     </div>
   <% else %>

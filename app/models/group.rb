@@ -78,7 +78,6 @@ class Group < ActiveRecord::Base
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
-  after_save :close_memberships_if_deleted
   after_save :update_max_membership_from_group_category
 
   delegate :time_zone, :to => :context
@@ -242,12 +241,6 @@ class Group < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     self.save
-  end
-
-  def close_memberships_if_deleted
-    return unless self.deleted?
-    User.where(:id => group_memberships.pluck(:user_id)).update_all(:updated_at => Time.now.utc)
-    group_memberships.update_all(:workflow_state => 'deleted')
   end
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Group, :name, :id)

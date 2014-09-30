@@ -25,7 +25,6 @@ class NotificationPolicy < ActiveRecord::Base
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
   validates_presence_of :communication_channel_id, :frequency
-  validates_inclusion_of :broadcast, in: [true, false]
   validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
                                           Notification::FREQ_DAILY,
                                           Notification::FREQ_WEEKLY,
@@ -52,11 +51,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  def communication_preference
-    return nil unless broadcast
-    communication_channel || user.communication_channel
-  end
-  
   def self.spam_blocked_by(user)
     NotificationPolicy.where(:communication_channel_id => user.communication_channels.pluck(:id)).delete_all
     cc = user.communication_channel

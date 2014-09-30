@@ -1,15 +1,14 @@
 define [
   'require'
-  'Backbone'
+  'compiled/models/FilesystemObject'
   'underscore'
   'vendor/backbone-identity-map'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
-], (require, Backbone, _, identityMapMixin, PaginatedCollection, FilesCollection) ->
+], (require, FilesystemObject, _, identityMapMixin, PaginatedCollection, FilesCollection) ->
 
 
-
-  Folder = identityMapMixin class __Folder extends Backbone.Model
+  Folder = identityMapMixin class __Folder extends FilesystemObject
 
     defaults:
       'name' : ''
@@ -41,6 +40,8 @@ define [
         @folders = new FoldersCollection [], parentFolder: this
       unless @files
         @files = new FilesCollection [], parentFolder: this
+
+
 
     expand: (force=false, options={}) ->
       @isExpanded = true

@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
   before_filter :load_account, :load_user
-  before_filter Filters::AllowAppProfiling
+  before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
@@ -97,14 +97,18 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
+    return {} if api_request?
     # set some defaults
     unless @js_env
       @js_env = {
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
         :current_user_roles => @current_user.try(:roles),
-        :AUTHENTICITY_TOKEN => form_authenticity_token,
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+        :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
+        :SETTINGS => {
+          open_registration: @domain_root_account.try(:open_registration?)
+        }
       }
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
@@ -125,6 +129,18 @@ class ApplicationController < ActionController::Base
     @js_env
   end
   helper_method :js_env
+
+  def external_tools_display_hashes(type)
+    tools = ContextExternalTool.all_tools_for(@context, :type => type,
+      :root_account => @domain_root_account, :current_user => @current_user)
+    tools.map do |tool|
+      {
+          :title => tool.label_for(type),
+          :icon_url => tool.extension_setting(type, :icon_url),
+          :base_url => course_external_tool_path(@context, tool, :launch_type => type)
+      }
+    end
+  end
 
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?('k12')
@@ -435,7 +451,7 @@ class ApplicationController < ActionController::Base
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
-        @context = api_find(Group, params[:group_id])
+        @context = api_find(Group.active, params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user
@@ -453,25 +469,31 @@ class ApplicationController < ActionController::Base
         @context = @current_user
         @context_membership = @context
       end
-      if @context.is_a?(Account) && !@context.root_account?
-        account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
-        account_chain.slice!(0) # the first element is the current context
-        count = account_chain.length
-        account_chain.reverse.each_with_index do |a, idx|
-          if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-            add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
-          elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-            next
-          else
-            add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+
+      assign_localizer if @context.present?
+
+      unless api_request?
+        if @context.is_a?(Account) && !@context.root_account?
+          account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
+          account_chain.slice!(0) # the first element is the current context
+          count = account_chain.length
+          account_chain.reverse.each_with_index do |a, idx|
+            if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+              add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
+            elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+              next
+            else
+              add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+            end
           end
         end
-      end
-      set_badge_counts_for(@context, @current_user, @current_enrollment)
-      assign_localizer if @context.present?
-      if @context && @context.respond_to?(:short_name)
-        crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
-        add_crumb(@context.short_name, crumb_url)
+
+        if @context && @context.respond_to?(:short_name)
+          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
+          add_crumb(@context.short_name, crumb_url)
+        end
+
+        set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
   end
@@ -865,6 +887,7 @@ class ApplicationController < ActionController::Base
         @page_view.context = @context if !@page_view.context_id
         @page_view.account_id = @domain_root_account.id
         @page_view.store
+        RequestContextGenerator.store_page_view_meta(@page_view)
       end
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
@@ -947,18 +970,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def render_xhr_exception(error, message = nil, status = "500 Internal Server Error", status_code = 500)
+    message ||= "Unexpected error, ID: #{error.id rescue "unknown"}"
+    render status: status_code, json: {
+      errors: {
+        base: message
+      },
+      status: status
+    }
+  end
+
   def render_rescue_action(exception, error, status, status_code)
     clear_crumbs
     @headers = nil
     load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
-      render :status => status_code, :json => {
-        :errors => {
-          :base => "Unexpected error, ID: #{error.id rescue "unknown"}"
-        },
-        :status => status
-      }
+      render_xhr_exception(error, nil, status, status_code)
     else
       request.format = :html
       erbfile = "#{status.to_s[0,3]}_message.html.erb"
@@ -1059,21 +1087,21 @@ class ApplicationController < ActionController::Base
     if    protect_against_forgery? &&
           !request.get? &&
           !api_request?
-      if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
+      if cookies[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
   def form_authenticity_token
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(session)
+    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -1121,7 +1149,7 @@ class ApplicationController < ActionController::Base
     named_context_url(@context, :context_wiki_page_url, page_name)
   end
 
-  def content_tag_redirect(context, tag, error_redirect_symbol)
+  def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = { :module_item_id => tag.id }
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
@@ -1145,7 +1173,9 @@ class ApplicationController < ActionController::Base
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
         @resource_title = @assignment.title
+        @module_tag = @context.context_module_tags.not_deleted.find(params[:module_item_id]) if params[:module_item_id]
       else
+        @module_tag = @tag
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
@@ -1156,8 +1186,27 @@ class ApplicationController < ActionController::Base
         redirect_to named_context_url(context, error_redirect_symbol)
       else
         return unless require_user
-        @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
+
+        @lti_launch = Lti::Launch.new
+
+        success_url = case tag_type
+        when :assignments
+          named_context_url(@context, :context_assignments_url)
+        when :modules
+          named_context_url(@context, :context_context_modules_url)
+        else
+          named_context_url(@context, :context_url)
+        end
+        if tag.new_tab
+          @lti_launch.launch_type = 'window'
+          @return_url = success_url
+        else
+          @return_url = external_content_success_url('external_tool_redirect')
+          @redirect_return = true
+          js_env(:redirect_return_success_url => success_url,
+                 :redirect_return_cancel_url => success_url)
+        end
 
         opts = {
             launch_url: @resource_url,
@@ -1166,14 +1215,25 @@ class ApplicationController < ActionController::Base
             custom_substitutions: common_variable_substitutions
         }
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
-        if @assignment
-          @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
-        else
-          @tool_settings = adapter.generate_post_payload
+
+        if tag.try(:context_module)
+          add_crumb tag.context_module.name, context_url(@context, :context_context_modules_url)
         end
 
-        @tool_launch_type = 'window' if tag.new_tab
-        render :template => 'external_tools/tool_show'
+        if @assignment
+          add_crumb(@resource_title)
+          @prepend_template = 'assignments/description'
+          @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+        else
+          @lti_launch.params = adapter.generate_post_payload
+        end
+
+        @lti_launch.resource_url = @resource_url
+        @lti_launch.link_text = @resource_title
+        @lti_launch.analytics_id = @tool.tool_id
+
+        @append_template = 'context_modules/tool_sequence_footer'
+        render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['default']
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
@@ -1457,13 +1517,6 @@ class ApplicationController < ActionController::Base
     true
   end
 
-  def reset_session
-    # when doing login/logout via ajax, we need to have the new csrf token
-    # for subsequent requests.
-    @resend_csrf_token_if_json = true
-    super
-  end
-
   def destroy_session
     @pseudonym_session.destroy rescue true
     reset_session
@@ -1501,10 +1554,6 @@ class ApplicationController < ActionController::Base
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?
         json = "while(1);#{json}"
-      end
-
-      if @resend_csrf_token_if_json
-        response.headers['X-CSRF-Token'] = form_authenticity_token
       end
 
       # fix for some browsers not properly handling json responses to multipart

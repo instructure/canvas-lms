@@ -30,8 +30,8 @@ describe LtiOutbound::LTIUser do
   it_behaves_like 'it has a proc attribute setter and getter for', :concluded_roles
   it_behaves_like 'it has a proc attribute setter and getter for', :currently_active_in_course
 
-  let(:teacher_role) { LtiOutbound::LTIRole::INSTRUCTOR }
-  let(:learner_role) { LtiOutbound::LTIRole::LEARNER }
+  let(:teacher_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR }
+  let(:learner_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER }
 
   describe '#current_role_types' do
     it 'provides a string representation of current roles' do
@@ -39,17 +39,17 @@ describe LtiOutbound::LTIUser do
         user.current_roles = [teacher_role, learner_role]
       end
 
-      expect(subject.current_role_types).to eq("#{LtiOutbound::LTIRole::INSTRUCTOR},#{LtiOutbound::LTIRole::LEARNER}")
+      expect(subject.current_role_types).to eq("#{LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR},#{LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER}")
     end
 
     it 'defaults to NONE if no roles exist' do
-      expect(subject.current_role_types).to eq(LtiOutbound::LTIRole::NONE)
+      expect(subject.current_role_types).to eq(LtiOutbound::LTIRoles::System::NONE)
     end
 
     it 'defaults to NONE if roles are empty' do
       subject.current_roles = []
 
-      expect(subject.current_role_types).to eq(LtiOutbound::LTIRole::NONE)
+      expect(subject.current_role_types).to eq(LtiOutbound::LTIRoles::System::NONE)
     end
   end
 
@@ -59,17 +59,17 @@ describe LtiOutbound::LTIUser do
         user.concluded_roles = [teacher_role, learner_role]
       end
 
-      expect(subject.concluded_role_types).to eq("#{LtiOutbound::LTIRole::INSTRUCTOR},#{LtiOutbound::LTIRole::LEARNER}")
+      expect(subject.concluded_role_types).to eq("#{LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR},#{LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER}")
     end
 
     it 'defaults if no roles exist' do
-      expect(subject.concluded_role_types).to eq(LtiOutbound::LTIRole::NONE)
+      expect(subject.concluded_role_types).to eq(LtiOutbound::LTIRoles::System::NONE)
     end
 
     it 'defaults to NONE if roles are empty' do
       subject.concluded_roles = []
 
-      expect(subject.current_role_types).to eq(LtiOutbound::LTIRole::NONE)
+      expect(subject.current_role_types).to eq(LtiOutbound::LTIRoles::System::NONE)
     end
   end
 

@@ -14,9 +14,8 @@ define [
       order: queryParams.order || ''
 
     oldUrl = collection.url
-    newUrl = new URL(oldUrl)
-    params = deparam(newUrl.search)
-    newUrl.search = param _.extend(params, newParams)
-    newUrl = newUrl.toString()
+    [baseUrl, search] = oldUrl.split('?')
+    params = _.extend(deparam(search), newParams)
+    newUrl = baseUrl + '?' + param(params)
     collection.url = newUrl
     collection.reset() if newUrl isnt oldUrl and !collection.loadedAll

@@ -474,6 +474,9 @@ describe "Users API", type: :request do
               :password          => "password123",
               :sis_user_id       => "12345",
               :send_confirmation => 0
+            },
+            :communication_channel => {
+              :confirmation_url => true
             }
           }
         )
@@ -492,16 +495,17 @@ describe "Users API", type: :request do
         pseudonym.sis_user_id.should eql "12345"
 
         JSON.parse(response.body).should == {
-          "name"          => "Test User",
-          "short_name"    => "Test",
-          "sortable_name" => "User, T.",
-          "id"            => user.id,
-          "sis_user_id"   => "12345",
-          "sis_import_id" => user.pseudonym.sis_batch_id,
-          "login_id"      => "test@example.com",
-          "sis_login_id"  => "test@example.com",
-          "integration_id" => nil,
-          "locale"        => "en"
+          "name"             => "Test User",
+          "short_name"       => "Test",
+          "sortable_name"    => "User, T.",
+          "id"               => user.id,
+          "sis_user_id"      => "12345",
+          "sis_import_id"    => user.pseudonym.sis_batch_id,
+          "login_id"         => "test@example.com",
+          "sis_login_id"     => "test@example.com",
+          "integration_id"   => nil,
+          "locale"           => "en",
+          "confirmation_url" => user.communication_channels.email.first.confirmation_url
         }
       end
 
@@ -963,6 +967,27 @@ describe "Users API", type: :request do
         user
         raw_api_call(:delete, @path, @path_options)
         response.code.should eql '401'
+      end
+    end
+
+    context 'a student with no SIS ID' do
+      it 'should be able to delete itself' do
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
+        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param))
+        @student.reload.should be_deleted
+      end
+    end
+
+    context 'a student with SIS ID' do
+      before(:once) do
+        @student.pseudonym.update_attribute(:sis_user_id, '12345')
+      end
+
+      it 'should not be able to delete itself' do
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
+        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param),
+                                {}, {}, {expected_status: 401})
+        @student.reload.should_not be_deleted
       end
     end
   end

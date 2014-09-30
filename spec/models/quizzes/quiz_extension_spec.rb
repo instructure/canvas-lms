@@ -71,7 +71,6 @@ describe Quizzes::QuizExtension do
     end
 
     it "should build a list of extensions from given hash" do
-      manager  = Quizzes::SubmissionManager.new(@quiz)
       students = @course.students
       params = [
         {user_id: @user1.id, extra_attempts: 2},
@@ -79,7 +78,7 @@ describe Quizzes::QuizExtension do
       ]
 
       yielded = []
-      extensions = Quizzes::QuizExtension.build_extensions(students, manager, params) do |ext|
+      extensions = Quizzes::QuizExtension.build_extensions(students, [@quiz], params) do |ext|
         yielded << ext
       end
 

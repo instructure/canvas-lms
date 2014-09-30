@@ -1,10 +1,14 @@
 # Put this in config/application.rb
 require File.expand_path('../boot', __FILE__)
 
-require "active_record/railtie"
-require "action_controller/railtie"
-require "action_mailer/railtie"
-require "active_resource/railtie"
+unless CANVAS_RAILS3
+  require "rails/all"
+else
+  require "active_record/railtie"
+  require "action_controller/railtie"
+  require "action_mailer/railtie"
+  require "active_resource/railtie"
+end
 
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
@@ -38,7 +42,7 @@ module CanvasRails
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
-    log_level = ActiveSupport::BufferedLogger.const_get(log_config['log_level'].to_s.upcase)
+    log_level = (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger).const_get(log_config['log_level'].to_s.upcase)
     opts[:skip_thread_context] = true if log_config['log_context'] == false
     case log_config["logger"]
       when "syslog"
@@ -83,48 +87,49 @@ module CanvasRails
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
+      app.config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
+      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
+      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
+      app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end
-
-    config.middleware.insert_before('ActionDispatch::RequestId', "RequestContextGenerator")
-    config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
-    config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
-    config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 
-    # This patch is perfectly placed to go in as soon as the PostgreSQLAdapter
-    # is required for the first time, but before it's actually used.
-    #
-    # This patch won't be required in Rails >= 4.0.0, which supports params such as
-    # connect_timeout.
-    ActiveRecord::Base::ConnectionSpecification.class_eval do
-      def initialize_with_postgresql_patches(config, adapter_method)
-        initialize_without_postgresql_patches(config, adapter_method)
-        if adapter_method == "postgresql_connection" && !defined?(@@postgresql_patches_applied)
-          ActiveRecord::Base.class_eval do
-            def self.postgresql_connection(config) # :nodoc:
-              config = config.symbolize_keys
-              config[:user] ||= config.delete(:username) if config.key?(:username)
+    if CANVAS_RAILS3
+      # This patch is perfectly placed to go in as soon as the PostgreSQLAdapter
+      # is required for the first time, but before it's actually used.
+      #
+      # This patch won't be required in Rails >= 4.0.0, which supports params such as
+      # connect_timeout.
+      ActiveRecord::Base::ConnectionSpecification.class_eval do
+        def initialize_with_postgresql_patches(config, adapter_method)
+          initialize_without_postgresql_patches(config, adapter_method)
+          if adapter_method == "postgresql_connection" && !defined?(@@postgresql_patches_applied)
+            ActiveRecord::Base.class_eval do
+              def self.postgresql_connection(config) # :nodoc:
+                config = config.symbolize_keys
+                config[:user] ||= config.delete(:username) if config.key?(:username)
 
-              if config.key?(:database)
-                config[:dbname] = config[:database]
-              else
-                raise ArgumentError, "No database specified. Missing argument: database."
+                if config.key?(:database)
+                  config[:dbname] = config[:database]
+                else
+                  raise ArgumentError, "No database specified. Missing argument: database."
+                end
+                conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
+
+                # The postgres drivers don't allow the creation of an unconnected PGconn object,
+                # so just pass a nil connection object for the time being.
+                ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
               end
-              conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
-
-              # The postgres drivers don't allow the creation of an unconnected PGconn object,
-              # so just pass a nil connection object for the time being.
-              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
             end
+            @@postgresql_patches_applied = true
           end
-          @@postgresql_patches_applied = true
         end
+        alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
       end
-      alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
     end
 
     # We need to make sure that safe_yaml is loaded *after* the YAML engine
@@ -179,6 +184,12 @@ module CanvasRails
     else
       config.to_prepare do
         Canvas::Reloader.trap_signal
+      end
+    end
+
+    if defined?(Spring)
+      Spring.after_fork do
+        Canvas.reconnect_redis
       end
     end
 

@@ -1,0 +1,469 @@
+{
+  "quiz_statistics": [
+    {
+      "id": "249",
+      "url": "http://localhost:3000/api/v1/courses/1/quizzes/32/statistics",
+      "html_url": "http://localhost:3000/courses/1/quizzes/32/statistics",
+      "multiple_attempts_exist": false,
+      "generated_at": "2014-08-04T16:32:50Z",
+      "includes_all_versions": false,
+      "points_possible": 11,
+      "speed_grader_url": "http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=25",
+      "quiz_submissions_zip_url": "http://localhost:3000/courses/1/quizzes/32/submissions?zip=1",
+      "question_statistics": [
+        {
+          "id": "76",
+          "question_type": "multiple_choice_question",
+          "question_text": "<p>Hello from Multiple Choice! sos &lt;script&gt;alert(\"Multiple-Choice!\");&lt;/script&gt; eos</p>",
+          "position": 1,
+          "responses": 0,
+          "answers": [
+            {
+              "id": "2577",
+              "text": "A",
+              "correct": true,
+              "responses": 0
+            },
+            {
+              "id": "8039",
+              "text": "B <script>alert(\"B!\")</script>",
+              "correct": false,
+              "responses": 0
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 2
+            }
+          ],
+          "answered_student_count": 0,
+          "top_student_count": 0,
+          "middle_student_count": 0,
+          "bottom_student_count": 0,
+          "correct_student_count": 0,
+          "incorrect_student_count": 0,
+          "correct_student_ratio": 0,
+          "incorrect_student_ratio": 0,
+          "correct_top_student_count": 0,
+          "correct_middle_student_count": 0,
+          "correct_bottom_student_count": 0,
+          "variance": 0,
+          "stdev": 0,
+          "difficulty_index": 0,
+          "alpha": null,
+          "point_biserials": [
+            {
+              "answer_id": 2577,
+              "point_biserial": null,
+              "correct": true,
+              "distractor": false
+            },
+            {
+              "answer_id": 8039,
+              "point_biserial": null,
+              "correct": false,
+              "distractor": true
+            }
+          ]
+        },
+        {
+          "id": "77",
+          "question_type": "true_false_question",
+          "question_text": "<p>Hello from True/False! sos &lt;script&gt;alert(\"True/False!\");&lt;/script&gt; eos</p>",
+          "position": 2,
+          "responses": 0,
+          "answers": [
+            {
+              "id": "6254",
+              "text": "True",
+              "correct": true,
+              "responses": 0
+            },
+            {
+              "id": "7712",
+              "text": "False",
+              "correct": false,
+              "responses": 0
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 2
+            }
+          ],
+          "answered_student_count": 0,
+          "top_student_count": 0,
+          "middle_student_count": 0,
+          "bottom_student_count": 0,
+          "correct_student_count": 0,
+          "incorrect_student_count": 0,
+          "correct_student_ratio": 0,
+          "incorrect_student_ratio": 0,
+          "correct_top_student_count": 0,
+          "correct_middle_student_count": 0,
+          "correct_bottom_student_count": 0,
+          "variance": 0,
+          "stdev": 0,
+          "difficulty_index": 0,
+          "alpha": null,
+          "point_biserials": [
+            {
+              "answer_id": 6254,
+              "point_biserial": null,
+              "correct": true,
+              "distractor": false
+            },
+            {
+              "answer_id": 7712,
+              "point_biserial": null,
+              "correct": false,
+              "distractor": true
+            }
+          ]
+        },
+        {
+          "id": "78",
+          "question_type": "short_answer_question",
+          "question_text": "<p>Hello from FITB! sos &lt;script&gt;alert('FITB');&lt;/script&gt; eos</p>",
+          "position": 3,
+          "responses": 0,
+          "answers": [
+            {
+              "id": "5933",
+              "text": "Yes",
+              "correct": true,
+              "responses": 0
+            },
+            {
+              "id": "1160",
+              "text": "No",
+              "correct": true,
+              "responses": 0
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 2
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "id": "79",
+          "question_type": "fill_in_multiple_blanks_question",
+          "question_text": "<p>Hello from [FIMB]! sos &lt;script&gt;alert('FIMB');&lt;/script&gt; eos</p>\n<p>This image should show properly: <img src=\"http://placehold.it/120x100%22\" alt=\"\"></p>\n<p>While this should show as plain text: &lt;script&gt;alert(\"XSS-Quiz!\");&lt;/script&gt;</p>",
+          "position": 4,
+          "responses": 0,
+          "answered": 0,
+          "correct": 0,
+          "partially_correct": 0,
+          "incorrect": 2,
+          "answer_sets": [
+            {
+              "id": "bf0109538456c0c93d49334c032c4a0c",
+              "text": "FIMB",
+              "answers": [
+                {
+                  "id": "5886",
+                  "text": "Red",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "8195",
+                  "text": "Green",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "80",
+          "question_type": "multiple_answers_question",
+          "question_text": "<p>Hello from MA! sos &lt;script&gt;alert('MA');&lt;/script&gt; eos</p>",
+          "position": 5,
+          "responses": 0,
+          "correct": 0,
+          "partially_correct": 0,
+          "answers": [
+            {
+              "id": "8175",
+              "text": "A",
+              "correct": false,
+              "responses": 0
+            },
+            {
+              "id": "8480",
+              "text": "B",
+              "correct": true,
+              "responses": 0
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 2
+            }
+          ]
+        },
+        {
+          "id": "81",
+          "question_type": "multiple_dropdowns_question",
+          "question_text": "<p>Hello from MD! sos &lt;script&gt;alert('MD');&lt;/script&gt; eos . What would [color1] be? And [color2]?</p>",
+          "position": 6,
+          "responses": 0,
+          "answered": 0,
+          "correct": 0,
+          "partially_correct": 0,
+          "incorrect": 2,
+          "answer_sets": [
+            {
+              "id": "dddce03739867ad935a78cda255ec4dd",
+              "text": "color1",
+              "answers": [
+                {
+                  "id": "6447",
+                  "text": "red",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "1883",
+                  "text": "blue sos <script>alert('Blue!');</script> eos",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            },
+            {
+              "id": "2c442e61b76cc00acf08a1118eae7852",
+              "text": "color2",
+              "answers": [
+                {
+                  "id": "3767",
+                  "text": "yellow  sos <script>alert('yellow!');</script> eos",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "6473",
+                  "text": "purple",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "82",
+          "question_type": "matching_question",
+          "question_text": "<p>Hello from Matching! sos &lt;script&gt;alert('Matching');&lt;/script&gt; eos</p>",
+          "position": 7,
+          "correct": 0,
+          "partially_correct": 0,
+          "incorrect": 2,
+          "responses": 0,
+          "answered": 0,
+          "answer_sets": [
+            {
+              "id": "5836",
+              "text": "When?",
+              "correct": false,
+              "responses": 0,
+              "answers": [
+                {
+                  "id": "647",
+                  "text": "I don't know.",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "6758",
+                  "text": "Matching discrator! sos <script>alert('distractor!');</script> eos",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "9293",
+                  "text": "Now <script>alert('now!');</script>",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            },
+            {
+              "id": "7795",
+              "text": "Which <script>alert('which?');</script> ?",
+              "correct": false,
+              "responses": 0,
+              "answers": [
+                {
+                  "id": "647",
+                  "text": "I don't know.",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "6758",
+                  "text": "Matching discrator! sos <script>alert('distractor!');</script> eos",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "9293",
+                  "text": "Now <script>alert('now!');</script>",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "83",
+          "question_type": "numerical_question",
+          "question_text": "<p>Hello from Numerical! sos &lt;script&gt;alert('Numerical');&lt;/script&gt; eos</p>",
+          "position": 8,
+          "responses": 0,
+          "full_credit": 0,
+          "correct": 0,
+          "incorrect": 2,
+          "answers": [
+            {
+              "id": "2765",
+              "text": "42.00",
+              "correct": true,
+              "responses": 0,
+              "value": [
+                42,
+                42
+              ],
+              "margin": 0,
+              "is_range": false
+            },
+            {
+              "id": "4962",
+              "text": "0.00",
+              "correct": true,
+              "responses": 0,
+              "value": [
+                0,
+                0
+              ],
+              "margin": 0,
+              "is_range": false
+            },
+            {
+              "id": "none",
+              "text": "No Answer",
+              "correct": false,
+              "responses": 2
+            }
+          ]
+        },
+        {
+          "id": "84",
+          "question_type": "calculated_question",
+          "question_text": "<p>Hello from Formula! sos &lt;script&gt;alert('Formula');&lt;/script&gt; eos What is 5 plus [x]?</p>",
+          "position": 9,
+          "responses": 0,
+          "graded": 0,
+          "full_credit": 0,
+          "point_distribution": [
+            {
+              "score": 0,
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "85",
+          "question_type": "essay_question",
+          "question_text": "<p>Hello from Essay! sos &lt;script&gt;alert('Essay');&lt;/script&gt; eos</p>",
+          "position": 10,
+          "responses": 0,
+          "graded": 0,
+          "full_credit": 0,
+          "point_distribution": [
+            {
+              "score": 0,
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "86",
+          "question_type": "file_upload_question",
+          "question_text": "<p>Hello from FU! sos &lt;script&gt;alert('FU');&lt;/script&gt; eos</p>",
+          "position": 11,
+          "responses": 0,
+          "graded": 0,
+          "full_credit": 0,
+          "point_distribution": [
+            {
+              "score": 0,
+              "count": 2
+            }
+          ]
+        }
+      ],
+      "submission_statistics": {
+        "user_ids": [
+          2,
+          4
+        ],
+        "logged_out_users": [],
+        "scores": {
+          "0": 2
+        },
+        "score_average": 0,
+        "score_high": 0,
+        "score_low": 0,
+        "score_stdev": 0,
+        "correct_count_average": 0,
+        "incorrect_count_average": 9,
+        "duration_average": 23.5,
+        "unique_count": 2
+      },
+      "links": {
+        "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/32"
+      }
+    }
+  ]
+}

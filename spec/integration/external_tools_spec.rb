@@ -40,7 +40,7 @@ describe "External Tools" do
       form.at_css('input#launch_presentation_locale')['value'].should == 'en'
       form.at_css('input#oauth_callback')['value'].should == 'about:blank'
       form.at_css('input#oauth_signature_method')['value'].should == 'HMAC-SHA1'
-      form.at_css('input#launch_presentation_return_url')['value'].should == "http://www.example.com/courses/#{@course.id}/external_tools/#{@tool.id}/finished"
+      form.at_css('input#launch_presentation_return_url')['value'].should == "http://www.example.com/external_content/success/external_tool_redirect"
       form.at_css('input#lti_message_type')['value'].should == "basic-lti-launch-request"
       form.at_css('input#lti_version')['value'].should == "LTI-1p0"
       form.at_css('input#oauth_version')['value'].should == "1.0"

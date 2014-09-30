@@ -3,6 +3,12 @@ define [
   'jquery'
 ], (UploadQueue, $) ->
 
+  mockFileOptions: ->
+      file:
+        size: 1
+        name: 'foo'
+        type: 'bar'
+
   mockFileUploader = (file) ->
     {
       upload: ->
@@ -22,6 +28,7 @@ define [
       @queue = UploadQueue
 
     teardown: ->
+      @queue.flush()
       delete @queue
 
 
@@ -65,7 +72,28 @@ define [
     equal(@queue.length(), 1)
     @queue.enqueue {baz: 'zoo'}
     equal(@queue.length(), 2)
-    equal(@queue.dequeue().file, foo)
+    equal(@queue.dequeue().options, foo)
 
     @queue.attemptNextUpload = original
 
+  test 'getAllUploaders includes the current uploader', ->
+    original = @queue.attemptNextUpload
+    @queue.attemptNextUpload = mockAttemptNext
+    @queue.flush()
+
+    foo = {name:'foo'}
+    @queue.enqueue foo
+    equal(@queue.length(), 1)
+    @queue.enqueue {baz: 'zoo'}
+    equal(@queue.length(), 2)
+
+    equal @queue.length(), 2
+    sentinel = {name: 'sentinel'}
+    @queue.currentUploader = sentinel
+
+    all = @queue.getAllUploaders()
+    equal all.length, 3
+    equal all.indexOf(sentinel), 0
+
+    @queue.currentUploader = undefined
+    @queue.attemptNextUpload = original

@@ -5,9 +5,10 @@ define [
   'i18n!quiz'
   'jquery'
   '../shared/environment'
+  'compiled/behaviors/authenticity_token'
   'compiled/jquery.rails_flash_notifications'
   'compiled/bundles/submission_download'
-], (Ember, LegacySubmissions, isQuizLocked, I18n, $, env) ->
+], (Ember, LegacySubmissions, isQuizLocked, I18n, $, env, authenticity_token) ->
 
   QuizController = Ember.ObjectController.extend LegacySubmissions, Ember.Evented,
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
@@ -114,7 +115,7 @@ define [
     actions:
       takeQuiz: ->
         if @get 'takeQuizActive'
-          url = "#{@get 'takeQuizUrl'}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}"
+          url = "#{@get 'takeQuizUrl'}&authenticity_token=#{authenticity_token()}"
           $('<form></form>').
             prop('action', url).
             prop('method', 'POST').
@@ -154,7 +155,7 @@ define [
 
       preview: ->
         $('<form/>').
-          attr('action', "#{@get('previewUrl')}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}").
+          attr('action', "#{@get('previewUrl')}&authenticity_token=#{authenticity_token()}").
           attr('method', 'POST').
           appendTo('body').
           submit()

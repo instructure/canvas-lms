@@ -215,7 +215,7 @@
   # @API Days in gradebook history for this course
   # Returns a map of dates to grader/assignment groups
   #
-  # @argument course_id [Integer]
+  # @argument course_id [Required, Integer]
   #   The id of the contextual course for this API call
   #
   # @returns [Day]
@@ -229,10 +229,10 @@
   # More details can be obtained by selecting a grader and assignment and calling the
   # 'submissions' api endpoint for a given date.
   #
-  # @argument course_id [Integer]
+  # @argument course_id [Required, Integer]
   #   The id of the contextual course for this API call
   #
-  # @argument date [String]
+  # @argument date [Required, String]
   #   The date for which you would like to see detailed information
   #
   # @returns [Grader]
@@ -246,16 +246,16 @@
   # @API Lists submissions
   # Gives a nested list of submission versions
   #
-  # @argument course_id [Integer]
+  # @argument course_id [Required, Integer]
   #   The id of the contextual course for this API call
   #
-  # @argument date [String]
+  # @argument date [Required, String]
   #   The date for which you would like to see submissions
   #
-  # @argument grader_id [Integer]
+  # @argument grader_id [Required, Integer]
   #   The ID of the grader for which you want to see submissions
   #
-  # @argument assignment_id [Integer]
+  # @argument assignment_id [Required, Integer]
   #   The ID of the assignment for which you want to see submissions
   #
   # @returns [SubmissionHistory]
@@ -273,19 +273,19 @@
   # the +new_grade+ or +previous_grade+ keys, only the +grade+; same for
   # +graded_at+ and +grader+.
   #
-  # @argument course_id [Integer]
+  # @argument course_id [Required, Integer]
   #   The id of the contextual course for this API call
   #
-  # @argument assignment_id [Optional, Integer]
+  # @argument assignment_id [Integer]
   #   The ID of the assignment for which you want to see submissions. If
   #   absent, versions of submissions from any assignment in the course are
   #   included.
   #
-  # @argument user_id [Optional, Integer]
+  # @argument user_id [Integer]
   #   The ID of the user for which you want to see submissions. If absent,
   #   versions of submissions from any user in the course are included.
   #
-  # @argument ascending [Optional, Boolean]
+  # @argument ascending [Boolean]
   #   Returns submission versions in ascending date order (oldest first). If
   #   absent, returns submission versions in descending date order (newest
   #   first).

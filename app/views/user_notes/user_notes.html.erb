@@ -2,10 +2,6 @@
 <% @active_tab = "faculty-journal" %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
-<% content_for :page_header do %>
-    <h1><%= t :page_title, "Faculty Journal" %></h1>
-<% end %>
-
 <p><%= @is_course ? t(:details_this_course, "Last Faculty Journal entries for students currently enrolled in this course.") :
        t(:details_a_course, "Last Faculty Journal entries for students currently enrolled in a course.") %></p>
 

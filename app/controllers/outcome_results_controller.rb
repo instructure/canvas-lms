@@ -191,17 +191,17 @@ class OutcomeResultsController < ApplicationController
   #
   # Gets the outcome results for users and outcomes in the specified context.
   #
-  # @argument user_ids[] [Optional, Integer]
+  # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
   #   results. it is an error to specify an id for a user who is not a student in
   #   the context
   #
-  # @argument outcome_ids[] [Optional, Integer]
+  # @argument outcome_ids[] [Integer]
   #   If specified, only the outcomes whose ids are given will be included in the
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
+  # @argument include[] [String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #   "alignments" includes only the alignments referenced by the returned
   #   results.
@@ -226,22 +226,22 @@ class OutcomeResultsController < ApplicationController
   # Gets the outcome rollups for the users and outcomes in the specified
   # context.
   #
-  # @argument aggregate [Optional, String, "course"]
+  # @argument aggregate [String, "course"]
   #   If specified, instead of returning one rollup for each user, all the user
   #   rollups will be combined into one rollup for the course that will contain
   #   the average rollup score for each outcome.
   #
-  # @argument user_ids[] [Optional, Integer]
+  # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
   #   results or used in an aggregate result. it is an error to specify an id
   #   for a user who is not a student in the context
   #
-  # @argument outcome_ids[] [Optional, Integer]
+  # @argument outcome_ids[] [Integer]
   #   If specified, only the outcomes whose ids are given will be included in the
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
+  # @argument include[] [String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response

@@ -18,7 +18,7 @@
   <%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 </p>
 
-<% if avatar_enabled? %> 
+<% if avatar_enabled? %>
   <table border="0" style="border-collapse: collapse">
     <tr height="30px">
       <td></td>
@@ -35,7 +35,7 @@
           </tr>
           <tr>
             <td valign="top" align="left">
-              <a href="<%= content :link %>">
+              <a href="mailto:<%= author_email_address %>">
                 <%= author_email_address%>
               </a>
             </td>
@@ -49,8 +49,10 @@
   <p>
     <b><%= author_short_name%></b>
     <br/>
-    <a href="<%= content :link %>">
+    <a href="mailto:<%= author_email_address %>">
       <%= author_email_address%>
     </a>
   </p>
 <% end %>
+
+<p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %></p>

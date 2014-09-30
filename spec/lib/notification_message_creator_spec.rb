@@ -187,16 +187,23 @@ describe NotificationMessageCreator do
     it "should make a delayed message for each user policy with a delayed frequency" do
       notification_set
       NotificationPolicy.delete_all
-      3.times do |i|
+      nps = (1..3).map do |i|
         communication_channel_model(:path => "user#{i}@example.com").confirm!
-        %w(immediately never daily weekly).each do |frequency|
-          notification_policy_model(:notification => @notification,
-                                    :communication_channel => @communication_channel,
-                                    :frequency => frequency)
-        end
+        notification_policy_model(:notification => @notification,
+                                  :communication_channel => @communication_channel,
+                                  :frequency => 'immediately')
       end
-      
-      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 6
+
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'never'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
+
+      nps.each { |np| np.frequency = 'daily'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
+
+      nps.each { |np| np.frequency = 'weekly'; np.save! }
+      expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
 
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
@@ -418,6 +425,24 @@ describe NotificationMessageCreator do
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
       @cc.notification_policies.reload.should_not be_empty
       @cc.delayed_messages.reload.should_not be_empty
+
+    end
+
+    it "should find an already existing notification policy" do
+      notification_model(category: 'TestWeekly')
+      @shard1.activate do
+        @user = User.create!
+        @cc = @user.communication_channels.create!(path: "user@example.com")
+        @cc.confirm!
+        @cc.notification_policies.create!(
+          :notification => @notification,
+          :frequency => @notification.default_frequency
+        )
+      end
+      Message.any_instance.stubs(:get_template).returns('template')
+      @cc.notification_policies.reload.count.should == 1
+      NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
+      @cc.notification_policies.reload.count.should == 1
     end
   end
 end

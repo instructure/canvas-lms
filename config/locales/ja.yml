@@ -1,3 +1,5 @@
+# This YAML file is auto-generated from a Transifex import.
+# Do not edit it by hand, your changes will be overwritten.
 --- 
 ja: 
   EditAppointmentGroupDetails: 
@@ -102,8 +104,10 @@ ja:
         auth_base: "CAS URL"
         auth_type: タイプ
         login_handle_name: "ログイン ラベル"
+        unknown_user_url: "不明なユーザの URL"
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
       save_button: 認証設定の保存
+      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
     index: 
       add_auth_desc: "このアカウントに ID プロバイダーを追加:"
       canvas_login_tip: |-
@@ -122,7 +126,6 @@ ja:
       settings_description: "ユーザが外部の ID プロバイダー (IdP) を通して認証されるためには、ユーザが持っているログイン ID がこのアカウントにリンクされていて、かつ、IdP から返される一意の識別子と一致している必要があります。ユーザの現在のログイン情報を確認するには、ユーザのプロフィール ページにある \"Login Information\" セクションを参照します。(\"Users\" タブでそのユーザを検索すると見つかります。)"
       settings_title: 認証設定
       test_ldap_link: 認証テスト
-      title: 認証設定
     ldap_settings: 
       add_secondary_ldap_server_link: "セカンダリ LDAP サーバの追加"
       auth_type_label: タイプ
@@ -210,6 +213,7 @@ ja:
         login_handle_name: "ログイン ラベル"
         position: 職位
         requested_authn_context: 認証コンテキスト
+        unkown_user_url: "不明なユーザの URL"
       log_in_url: "ログオンの URL"
       log_out_url: "ログアウトの URL"
       login_attribute: ログイン属性
@@ -224,6 +228,7 @@ ja:
       save_button: 認証設定の保存
       start_debugging: デバッグを開始
       stop_debugging: デバッグを停止
+      unkown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
     saml_testing: 
       auth_request_to_idp: "IdP に送信された AuthnRequest"
       auth_response_from_idp: "IdP からの AuthnResponse"
@@ -439,6 +444,7 @@ ja:
           restore_course: コースを復元
         view_messages: お知らせの表示
       admin_tools_cumb: 管理ツール
+      admin_tools_title: 管理ツール
       auth_logging_content_pane: 
         auth_logging: "ユーザのログイン/ログアウト アクティビティ"
       auth_logging_search_results: 
@@ -491,8 +497,9 @@ ja:
         time: 時刻
         user: ユーザ
       course_search_form: 
+        course_id: "コース ID"
         labels: 
-          find_deleted_course: 削除されたコースを検索
+          find_deleted_course: "削除されたコースを ID で検索"
         select_default: コースの選択
         select_label: コースの選択
       course_search_results: 
@@ -550,7 +557,7 @@ ja:
         generate_activity_username: "*%{user}* のアクティビティを生成"
         message_date_from: 開始日付
         message_date_to: 終了日付
-        search: 検索
+        search: "メンバーを ID または名前で検索"
         search_people: メンバーの検索
     assignment_scheduling_csv_parameters: 
       account_reports: 
@@ -782,6 +789,8 @@ ja:
             field: "クイズ ID"
           section_id: 
             field: "セクション ID"
+    screenreader_heading: 
+      page_title: アカウント設定
     settings: 
       about_google_docs: |-
           Google ドキュメントのプレビューを使用すると、ユーザは
@@ -885,6 +894,7 @@ ja:
         help_link_subtext: サブテキスト
         help_link_text: リンクに表示するテキスト
         help_link_url: URL
+        login_handle_name: "ログイン ラベル"
         membership_type: さらに追加
         message: メッセージ
         mfa_settings: マルチファクタ認証
@@ -918,6 +928,7 @@ ja:
         add_admins: アカウント管理者の追加
         configure_report: 設定...
         run_report: レポートの実行
+      login_handle_name_placeholder: "例: ログイン、ユーザ名、受講生 ID"
       manual_quotas: 
         find_button: 検索
         manual_quotas_title: 手動で設定可能なクォータ
@@ -1060,7 +1071,6 @@ ja:
           デフォルトで、UI の変更内容はSIS インポートによる変更よりも優先されます。多数のフィールドを対象として SIS インポートを実行しても、管理者が UI を通して変更したフィールドがある場合、そのフィールドのデータは変更されません。このオプションを選択すると、この SIS インポートは UI の変更内容よりも優先されます。  
           詳細については、当該ドキュメントを参照してください。
       override_sis_stickiness_label: "UI の変更内容を上書き"
-      page_header: "SIS インポート"
       page_title: "SIS インポート"
       pending_batches_count: 
         one: "%{count} 個のバッチが処理を待機しています。"
@@ -1209,6 +1219,12 @@ ja:
         header: 
           one: "%{count} 個のエラーがあるため、この %{model} を保存できません"
           other: "%{count} 個のエラーがあるため、この %{model} を保存できません"
+  add_module_item: 
+    add_assignment_to: "課題を %{module} に追加"
+    add_file_to: "ファイルを %{module} に追加"
+    add_page_to: "ページを %{module} に追加"
+    add_quiz_to: "クイズを %{module} に追加"
+    add_topic_to: "ディスカッション トピックを %{module} に追加"
   ajax_errors: 
     error_heading: "Ajax エラー: %{status_code}"
     errors: 
@@ -1260,6 +1276,8 @@ ja:
       criteria_required: "トリガーは最低1 つ必要です"
       recipients_required: "受信者は最低1 名必要です"
       threshold_should_be_numeric: 正数である必要があります。
+  allow_lor_tools: "LOR 用に設定された外部ツールの表示および使用をユーザに許可します。"
+  allow_opt_out_of_inbox: "ユーザは、会話の受信箱の受信を拒否 (オプトアウト) できます。オプトアウトすると、すべての会話メッセージとお知らせが ASAP のお知らせとしてユーザのメインの電子メール アドレスに送信されます。また、受信箱では会話の受信箱の未読メッセージ バッジが非表示になり、会話のお知らせの基本設定が非表示になります。"
   analytics: 
     course: 
       analytics: 分析
@@ -1409,7 +1427,7 @@ ja:
     labels: 
       due: 期限
     name_is_required: 名前は必須項目です
-    percentage_points_possible: "パーセント方式の採点の場合は、配点を 0 より大きくする必要があります。"
+    points_possible_not_zero: "選択した採点タイプでは、配点には 0 よりも大きい数字を指定する必要があります"
     points_possible_number: 配点は数値で入力してください
     select_external_tool_dialog_title: 外部ツールの設定
     submission_action_take_quiz: "%{title} を受ける"
@@ -1526,6 +1544,7 @@ ja:
       group_weight: "合計の %{groupWeight}%"
       manage: 管理
       move: 移動先...
+      move_to_accessibility_warning: "警告: 課題およびグループの並べ替えのアクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
@@ -1774,7 +1793,7 @@ ja:
         pass_fail: 完了/未完了
         percent: 割合
         points: 点数
-      view_grading_levels: 採点レベルの表示
+      view_grading_scheme: 採点スキームの表示
     group_category_selector: 
       grade_group_students_individually: それぞれの受講生を個別に採点
       group_assignment_header: グループ課題
@@ -1877,6 +1896,7 @@ ja:
     non_number: 数字を使用する必要があります
     notices: 
       assignment_delete: この課題は削除されました
+      assignment_not_availible: "要求した課題は、コース セクションで利用できません。"
       created: 課題は正常に作成されました。
       updated: 課題は正常に更新されました。
     number_of_assignments: 
@@ -1950,6 +1970,7 @@ ja:
         add_rubric: 注釈の追加
         assign_rubric: 注釈の割り当て
         edit: 編集
+      manage: 管理
       messages: 
         locked: この課題は現在ロックされています。
       new_assignment: 新しい課題
@@ -2114,6 +2135,8 @@ ja:
           internet_check: "インターネット データベース"
           journal_check: ジャーナル、定期刊行物、出版物
           student_paper_check: 他の受講生の論文
+          submit_papers_to: リポジトリに含める
+          turnitin_repository: "Turnitin リポジトリ"
         originality_report_never: しない
         originality_report_visibility: 受講生が独創性レポートを閲覧できる時期
         originality_report_visible_after_due_date: 期日後
@@ -2157,6 +2180,7 @@ ja:
         wizard_box: "行う操作:"
   assignments_api: 
     invalid_date_time: "%{attribute} の日時が無効です"
+    invalid_submission_types: 無効な提出物タイプ
   attachment: 
     default_filename: ファイル
     errors: 
@@ -2207,6 +2231,18 @@ ja:
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
   bookmark_service: 
     default_title: タイトルなし
+  broccoli_cloud: 
+    hidden_title: 非表示です。未公開にするにはクリックします
+    label: 
+      hidden: 非表示です。未公開にするにはクリックします。
+      published: 公開されています。未公開にするにはクリックします。
+      restricted: 制限されています。未公開にするにはクリックします。
+      unpublished: 未公開です。公開するにはクリックします。
+    publish_error: "%{name} を公開するときにエラーが発生しました。変更内容は元に戻されました。"
+    published_title: 公開されています。未公開にするにはクリックします
+    restricted_title: 制限されています。未公開にするにはクリックします
+    unpublish_error: "%{name} を未公開にするときにエラーが発生しました。変更内容は元に戻されました。"
+    unpublished_title: 未公開です。公開するにはクリックします
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
     export_failed_no_id: コースをインポートする際にエラーが発生しました
@@ -2431,7 +2467,7 @@ ja:
         calendar_month: 月
         calendar_scheduler: スケジューラ
         calendar_week: 週
-        screenreader_recommend_agenda: "スクリーン リーダー ユーザ: イベントを参照するには、アジェンダを使用します"
+        improved_accessibility_recommend_agenda: "警告: アクセシビリティを高めるには、「アジェンダ ビュー」カレンダーを使用してください。"
       loading: 読み込み中
       my_appointment_groups: マイ予定グループ
     calendar_navigator: 
@@ -3057,16 +3093,20 @@ ja:
     index: 
       buttons: 
         create: コースのエクスポートの作成
-      content_exports: コースのエクスポート
+      content_exports: コンテンツのエクスポート
       export_type: エクスポートのタイプ
       labels: 
         course: コース
         quiz: クイズ
       links: 
         download: "%{date} からのコースをエクスポート:*ここをクリックしてダウンロード*"
+        download_file_export: "%{date} からのファイル エクスポート: *ダウンロードするにはここをクリックします*"
         download_qti: "%{date} 以降の QTI をエクスポート: *ここをクリックしてダウンロード*"
+        download_user_export: "%{date} からのユーザ データ エクスポート: *ダウンロードするにはここをクリックします*"
       message: 
         export_started: エクスポートの処理が開始されました。大きいコースの場合は時間がかかります。*他のページに移動して構いません*。エクスポートが完了すると電子メールが送信されます。
+      no_submissions: 現在、エクスポートする提出物はありません。
+      user_data_exports: "ユーザ データのエクスポート"
     labels: 
       new_export: "新しいエクスポート:"
     links: 
@@ -3129,6 +3169,7 @@ ja:
   content_migration: 
     bad_attachment: ファイルは正常にアップロードされませんでした。
     errors: 
+      cannot_shift_and_remove: "shift_dates と remove_dates を同時に指定することはできません"
       import_error: "インポートのエラー:"
     missing_content_links_message: "次の参照を解決できません:"
     missing_content_links_title: インポートしたコンテンツにリンク切れがあります
@@ -3213,6 +3254,7 @@ ja:
         beginning_change_to: 変更後
         beginning_date: 開始日
         checkbox_label: イベントと期日を調整
+        date_adjustment: 日付の調整
         ending_change_to: 変更後
         ending_date: 終了日
         new_end_date_label: 終了日の変更
@@ -3223,6 +3265,8 @@ ja:
         old_end_date_title: 終了日
         old_start_date_label: 開始日
         old_start_date_title: 開始日
+        remove_dates: 日付の削除
+        shift_dates: 日付の移動
         substitution: 置き換え
       day_substitution: 
         move_from: 移動元
@@ -3653,6 +3697,7 @@ ja:
         modules: 
           before_students_view: 受講生がこのモジュールを表示するためには
         new_tab: 新しいタブに読み込み
+        publish_final_grade: このモジュールの完了時に、受講生の最終的な成績を公開します
         require_sequential_progress: 受講生は、このモジュールの要件を順番に満たす必要があります
         sort_by: 並べ替え
         title: タイトル
@@ -3670,7 +3715,16 @@ ja:
       module: モジュール
       module_details: "モジュールは順番に表示されるので、%{name} の上にあるモジュールのみを前提条件として設定できます。"
       module_name: モジュール名
-      modules_keyboard_hint: "コース モジュールおよびモジュール アイテムの順序を変更するには、最初にスクリーン リーダーでカーソルをオフにします。JAWS で Insert + z を押します。Tab キーを押して最初のモジュールを選択します。上下矢印を押してモジュールまたはモジュール アイテムを選択します。スペース キーを押して、ドラッグを開始するモジュールまたはモジュール アイテムを選択します。次に、上下矢印キーを押して移動先を選択します。その後、スペース キーを再び押すと、選択したモジュールまたはモジュール アイテムが移動先の後ろにドロップされます。"
+      modules_keyboard_hint_updated: "警告: アクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
+      move_module: 
+        after: 後
+        before: 前
+        or: または
+        place: 場所
+      move_module_item: 
+        into: 内へ
+        or: または
+        place: 場所
       must_complete_prerequisites: "次のことを完了する必要があります:"
       no_preprequisites: 前提条件が定義されていません
       no_requirements: 要件が定義されていません
@@ -3744,12 +3798,15 @@ ja:
         text: 
           delete_module: 削除
           edit_module: 編集
+          move_module: 移動先...
         title: 
           delete_module: このモジュールを削除
           edit_module: 編集
+          move_module: このモジュールを移動
           student_progress: このモジュールに関する受講生の進捗の確認
       manager_module: モジュールの管理
       module_will_unlock_at: "*%{unlock_date}* にロック解除"
+      modules_keyboard_drag_and_drop: "警告: アクセシビリティを高めるには、メニューにある「移動先」ダイアログ オプションを使用してください。"
       progression_complete_count: "*%{count}* 件が完了"
       progression_started_count: "*%{count}* 件が進行中"
       reorder_modules: ドラッグでモジュールを並べ替え
@@ -3827,6 +3884,8 @@ ja:
         edit_item_details: アイテムの詳細情報を編集
         indent: インデント
         indent_item: インデント
+        move_item: このアイテムを移動
+        move_item_label: このアイテムを移動
         outdent: インデントを戻す
         outdent_item: インデントを戻す
         remove_item: 削除
@@ -3837,6 +3896,7 @@ ja:
       min_score: 
         fulfilled: "スコアは最低 %{score}"
         unfulfilled: "スコアは最低 %{score} でなければならない"
+      modules_item_move_to: 移動先...
       must_contribute: 
         fulfilled: ページのコンテンツに貢献
         unfulfilled: ページのコンテンツに貢献することが必要
@@ -4179,6 +4239,8 @@ ja:
       topic: 不明なトピック
       wiki_page: "不明な Wiki ページ"
   course_list: 
+    favorited_tooltip: "クリックしてコース メニューから削除します。"
+    nonfavorited_tooltip: "クリックしてコース メニューに追加します。"
     wrapper: 
       close_course_menu_title: 閉じる
       reset_course_menu: リセット
@@ -4325,10 +4387,12 @@ ja:
         show_more: "あと %{count} 件..."
         title: 
           ignore: この課題を無視
+          ignore_review: このレビューを無視
       need_grading_count: 
         one: "%{count} 個が未採点"
         other: "%{count} 個が未採点"
       no_peer_review_due_date: "期限: 期日なし"
+      peer_review_due_date: "期限: %{peer_review_due_at}"
       points_possible: "配点: %{points_possible}"
     canvasnet_instructor: 
       avatar_url: アバター
@@ -4346,7 +4410,6 @@ ja:
         confirm_delete: "このコースを削除してもよろしいですか?　削除すると、 受講生と講師はこのコースを利用できなくなります。コースをドロップダウン メニューから除外することが目的であれば、*コースの完了* を行ってください。"
         confirm_delete_addendum: "コースを完了する権限がない場合は、*コースの終了日の変更* を行うか、コースを完了するよう管理者に依頼してください。"
       headings: 
-        confirm: 操作の確認
         confirm_conclude: コース完了の確認
         confirm_delete: コース削除の確認
       titles: 
@@ -4482,6 +4545,10 @@ ja:
     group_list: 
       headings: 
         groups: "コース グループ"
+    import_in_progress_notice: 
+      course_import_notice: 
+        status_link: インポートの状況
+        text: "1 つ以上のアイテムを現在インポート中です。これらのアイテムは、利用可能になった後、以下のコースに表示されます。"
     index: 
       headings: 
         future_enrollments: 将来の登録
@@ -4550,6 +4617,7 @@ ja:
         name: 名前
         next: 次へ
         section: セクション
+        user_might_not_exist: "形式が正しい場合は、Canvas 管理者に連絡して、ユーザが Canvas アカウントを持っていることを確認してください。"
         user_role: "役割:"
         validating: 検証中...
         will_not_be_added: これらのユーザにはエラーがあるため、追加できません。正しい形式であることを確認してください。
@@ -4557,6 +4625,7 @@ ja:
         edit_sections_desc: "セクションはユーザの編成手段の 1 つです。セクションを利用するとで、1 つのコースで複数のクラスを教えることができ、コースの内容を 1 箇所にまとめることができます。以下では、ユーザを別のセクションに移動したり、セクションの登録を追加/削除できます。ユーザは常に 1 つ以上のセクションに含まれる必要があります。"
       index: 
         cannot_add_users: このコースは完了しているため、新しいユーザを追加できません
+        filter_field_description: メンバーの検索。フィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力内容に一致する名前のメンバーのみが表示されます。
         group_set: "グループ セット"
         people: メンバー
         role_to_search: 制限付きの役割検索
@@ -4610,6 +4679,7 @@ ja:
       alerts_title: アラート
       buttons: 
         add_section: セクションの追加
+        edit_section_name: セクション名の編集
         move_course: コースの移動
         update_course: コースの詳細情報を更新
       course_conclude_at_warning_message: "コースは現在午前 0 時に終了するように設定されています。つまり、その前日が、コースがアクティブである最後の日となります。"
@@ -4691,7 +4761,13 @@ ja:
           delete_section: セクションの削除
           edit_section: セクションの編集
       megabytes: メガバイト
-      navigation_keyboard_hint: "スクリーン リーダーを使用している場合、コース ナビゲーション リンクの順序を変更するには、スクリーン リーダーで仮想カーソルまたは仮想バッファをオフにします (JAWS では Ins + z キーを押します)。Ctrl + Home キーを押してページの上部に移動し、最初のコース ナビゲーション リンクの場所に達するまで Tab キーを押します。移動したいリンクが読み上げられるまで上下の方向キーを押し、目的のリンクで Space キーを押して、そのリンクを選択します。その後、上下の方向キーを押して移動先を選択します。最後に、Space キーを再び押すと、移動しているリンクが現在のリンクの直後に配置されます。終了したら、仮想バッファ/カーソルを再度有効化します。"
+      move_module: 
+        place: 場所
+      move_nav_item: 
+        after: 後
+        before: 前
+        or: または
+      nav_items_keyboard_drag_and_drop: "警告: アクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
       no_date: 日付が設定されていません
       no_language_preference: "設定なし (ユーザが設定可能、デフォルトは %{language})"
       none: なし
@@ -4845,8 +4921,8 @@ ja:
       new: 新規作成
       new_discussion_entries: "新しいディスカッション エントリ"
       new_discussions: 新しいディスカッション
-      num_assignments: "# 課題"
-      num_submissions: "# 提出物"
+      num_of_assignments: 課題数
+      num_of_submissions: 提出数
       page_title: コースの統計情報
       quiz: クイズ
       quiz_questions: クイズ問題
@@ -4872,11 +4948,17 @@ ja:
       rss_feed: "%{course} のフィード"
     unauthorized: 
       invalid_link: ご利用になった登録リンクは、有効でないようです。インストラクタまでお問い合せの上、コースに正しく登録されているかご確認ください。
+  create_item_base: 
+    there_was_an_error: "「%{title}」の保存中にエラーが発生しました。もう一度やり直してください。"
   create_module_item: 
     assignment_name: 課題名
   create_module_item_quiz: 
+    discussion_name: ディスカッション名
+    file_to_upload: アップロードするファイル
     graded_quiz: 採点済みのクイズ
     graded_survey: 採点済みのサーベイ
+    header_name: ヘッダ名
+    link_title: "リンク タイトル"
     page_name: ページ名
     practice_quiz: 練習クイズ
     quiz_name: クイズ名
@@ -5009,6 +5091,7 @@ ja:
     show_more_link: 
       show_less: 表示を減らす
       show_more: 表示を増やす
+  data_exports: データのエクスポート
   date: 
     abbr_day_names: 
       - 日
@@ -5383,6 +5466,8 @@ ja:
         one: "1 件の未読の返信があります。"
         other: "%{count} 件の未読の返信があります。"
         zero: 未読の返信はありません。
+    notices: 
+      discussion_not_availible: 要求したディスカッションへのアクセス権がありません。
     page_nav: 
       Page: ページ
       current_page: 現在
@@ -5390,6 +5475,7 @@ ja:
       last_page: 最後
     peer_reviews: 
       due_date: "期限: %{date}"
+      peer_review_alert: "%{person} のピア レビューに割り当てられました"
     points_possible_number: 配点は数値で入力してください
     reply_count_tooltip: 
       one: "1 件の返信があります。"
@@ -5587,6 +5673,8 @@ ja:
     screen_reader_tip: "スクリーン リーダーのユーザ: スクリーン リーダーを利用しているユーザがこのエディタを使用するには、詳細ビューに切り替えてから、LaTeX を直接入力するか、またはツールバーの LaTeX 入力支援機能を使用します。詳細ビューに切り替えるためのリンクは、このダイアログの末尾近くの編集フィールドの直前にあります。"
     search_flickr: "Flickr のクリエイティブ コモンズを検索する"
     switch_editor_html: "HTML エディタ"
+    switch_editor_rich_text: "リッチ コンテンツ エディタ"
+    switch_editor_visual: "リッチ コンテンツ エディタ"
     switch_to_mathjax: 基本ビューに切り替え
     switch_to_mathquill: 詳細ビューに切り替え
     tabs: 
@@ -5611,6 +5699,7 @@ ja:
       rte_help: "リッチ テキスト領域。ツールバーの場合は ALT + F10 を押してください。ヘルプの場合は ALT + F8 を押してください。"
   email: 
     default_from_name: "Instructure Canvas"
+  ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
   enrollment: 
     default_course_name: コース
     default_email: 電子メールなし
@@ -5978,6 +6067,7 @@ ja:
         truncated: 概要
       phrase_to_look_for: 検索する語句
       posts_added: 投稿が追加されました
+      remove_feed: "%{display_name} の削除"
   external_tools: 
     account_navigation_configured: アカウントのナビゲーションが構成されました
     app_full_view: 
@@ -5992,6 +6082,7 @@ ja:
     app_review_view: 
       posted_by_on: "*%{user.name}* が *%{created_at}* に投稿"
     app_saved_message: "%{app} が正常に保存されました。"
+    assignment_menu_configured: 課題メニューが設定されました
     buttons: 
       cancel: キャンセル
       delete: 削除
@@ -6005,6 +6096,7 @@ ja:
     dialog_title_add_tool: 新しいアプリの追加
     dialog_title_edit_tool: 外部ツールの編集
     dialog_title_rate_tool: このツールを評価してください
+    discussion_topic_menu_configured: "ディスカッション トピック メニューが設定されました"
     edit_view: 
       anonymous: 匿名
       by_url: "URL ごと"
@@ -6055,12 +6147,14 @@ ja:
       load_success_message: 別のページに移動していて構いません。
       load_success_title: ツールの使用が完了しました
     generic_error: 要求を処理する際にエラーが発生しました
+    global_navigation_configured: "グローバル ナビゲーションが設定されました"
     homework_submission_configured: 宿題の提出が構成されました
     index_view: 
       add_new_tool: 新しいアプリの追加
       all: すべて
       app_headder: 外部アプリ
       external_tools_note: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
+      external_tools_references: "Canvas との連携性に優れた *LTIツール* をご確認ください。**LTI ツールについての Canvas コミュニティのトピック** もご覧ください。"
       installed: インストール済み
       not_installed: 未インストール
       search_filter: 名前でフィルタ
@@ -6068,6 +6162,8 @@ ja:
       view_installed_tools: アプリ設定の表示
     migration_selection_configured: 移行の選択が構成されました
     missing_stars: スター評価を選択してください
+    module_menu_configured: "モジュール メニューが設定されました"
+    quiz_menu_configured: "クイズ メニューが設定されました"
     rate_tool_view: 
       rate_tool: このツールを評価してください
     remove_tool: このツールを削除してもよろしいですか?
@@ -6076,16 +6172,8 @@ ja:
     saving: 保存しています...
     shared_secret: 共有シークレット
     submit: 提出
-    tool_post_iframe: 
-      load_tool_button: "%{tool} の読み込み"
-      load_tool_new_tab_button: "%{tool} を新しいウィンドウに読み込む"
-      new_tab: このツールは、ブラウザの別ウィンドウに読み込む必要があります
-      new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
-      new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
-    tool_show: 
-      tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
-      tool_load_failure: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
     user_navigation_configured: ユーザのナビゲーションが構成されました
+    wiki_page_menu_configured: "Wiki ページ メニューが設定されました"
   facebook: 
     authorization_required: 認証されたユーザのみが、そのページにアクセスできます
     authorization_success: "正常に認証されました!これで Canvas と Facebook はフレンドです。"
@@ -6145,11 +6233,12 @@ ja:
       ? "on"
       : オン
       release_notes: "リリース ノート"
-      toggle_feature_details: 機能詳細の切り替え
+      toggle_feature_details_screenreader_info: "%{title} の機能詳細の切り替え"
     feature_flag_admin_view: 
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
   features: 
+    allow_opt_out_of_inbox: ユーザに受信箱のオプトアウトを許可
     better_file_browsing: 改善されたファイル参照機能
     differentiated_assignments: 分化課題
     draft_state: ドラフト状態
@@ -6159,11 +6248,13 @@ ja:
     draft_state_course_disable_warning: |-
         この機能をオフにすると、コースのすべての既存のオブジェクトが公開されます。処理を続行する前に、すべての
         ドラフト コンテンツを公開してすべてのユーザが利用できるようにする準備が整っていることを確認してください。
+    ember_modules: "Ember モジュール"
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
     high_contrast: "ハイ コントラスト スタイルを使用"
     html5_first_videos: "ビデオの再生に HTML5 を使用"
     k12: "K-12 固有の機能"
     learning_mastery_gradebook: 学習達成度の成績表
+    lor: "LOR 外部ツール"
     new_quiz_moderate: 新しいクイズ管理ページ
     new_quiz_statistics: 新しいクイズ統計ページ
     new_styles: 新しいスタイルの使用
@@ -6172,6 +6263,15 @@ ja:
     student_outcome_gradebook: 受講生の学習達成度の成績表
   file_browser_view: 
     folder_tree_instructions: "上および下方向キーを使用して、ツリー内をナビゲートします。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、画像を選択するには Enter キーを押します。"
+  file_rename_form: 
+    back: 戻る
+    change: 変更
+    change_name: 名前の変更
+    message: "「%{name}」という名前のアイテムは既にこの場所に存在しています。既存のファイルを置き換えますか?"
+    name: 名前
+    prompt: "「%{name}」を次に変更"
+    rename_title: コピー
+    replace: 置換
   filebrowserview: 
     course_files: "コース ファイル"
     group_files: "グループ ファイル"
@@ -6357,6 +6457,7 @@ ja:
     default_folder_name: フォルダ
     errors: 
       invalid_recursion: フォルダをそれ自体の親にすることはできません
+      invalid_root_folder_name: "ルート フォルダ名は変更できません"
     folder_created: "フォルダ \"%{name}\" が作成されました"
   folders: 
     event_updated: イベントは正常に更新されました。
@@ -6366,6 +6467,7 @@ ja:
     no_deleting_folders_with_content: 内容のあるフォルダは削除できません
     no_deleting_root: "ルート フォルダは削除できません"
     only_one_folder: "フォルダ パスおよびフォルダ ID を設定できません"
+  for: ための
   global_message_icons: 
     announcement: アナウンス
     calendar: カレンダー
@@ -6545,6 +6647,8 @@ ja:
       url: "URL の提出"
     total: 合計
     total_column_header: 
+      move_to_end: 末尾に移動
+      move_to_front: 先頭に移動
       options: オプション
       switch_to_percent: パーセントに切り替え
       switch_to_points: 点数に切り替え
@@ -6656,6 +6760,7 @@ ja:
       close_rubric: 注釈を閉じる
       close_score: 閉じる
       close_score_screenreader: スコアの詳細を閉じる
+      collapse: すべての学習達成成果グループを折りたたみます。
       collapse_title: 折りたたみ
       comment_count: 
         one: "%{count} 件のコメント"
@@ -6663,6 +6768,7 @@ ja:
       comment_count_screenreader: コメントを読む
       comments: コメント
       disabled_for_student_view: 「受講生をテスト」のスコアは成績統計に含まれません。
+      expand: すべての学習達成成果グループを展開します。
       expand_title: 展開
       faculty_journal: "%{user} についての講師日誌"
       for_course: "対象コース: "
@@ -6711,6 +6817,7 @@ ja:
         view_scoring_details: 採点の詳細を表示
       total: 合計
     gradebook2: 
+      accessibility_warning: "警告: 成績表のグリッド ビューにはアクセスできません。代わりにここをクリックして、個別ビューを使用してください。"
       arrange_columns_by_due_date: 期日で列を並べ替え
       arrange_columns_by_group: 課題グループで列を並べ替え
       download_scores: "スコア (.csv) のダウンロード"
@@ -6740,6 +6847,7 @@ ja:
         current: 現在
         student: 受講生
       page_title: 成績表の履歴
+      regraded: 再評価
       revert: この成績に戻す
       submission_count: 
         one: "%{count} 件の変更"
@@ -7244,7 +7352,6 @@ ja:
     member_tooltip_show: グループ名簿を表示
     membership_pending: 
       group_join_request: グループ参加リクエスト
-      group_join_request_acknowledged: リクエストありがとうございます。用意ができ次第、ご連絡いたします。
       group_join_request_info: このグループは、参加リクエストを受信しました。要求を受諾または拒否する旨の連絡が後日届きます。
     messages: 
       creating_group: グループを作成しています...
@@ -7319,6 +7426,7 @@ ja:
       assignment_details: 課題の詳細
       conversation_details: 会話の詳細
       discussion_details: ディスカッションの詳細
+      peer_review_details: "ピア レビュー詳細"
       x_more: "あと %{x} 件..."
       x_new_in_announcements: 
         one: "*%{count}* 個のアナウンス"
@@ -7332,6 +7440,9 @@ ja:
       x_new_in_discussions: 
         one: "*%{count}* 件のディスカッション"
         other: "*%{count}* 件のディスカッション"
+      x_new_in_peer_reviews: 
+        one: "*%{count}* 件のピア レビュー"
+        other: "*%{count}* 件のピア レビュー"
     local: ローカル
     select: 
       prompt: 選択してください
@@ -7340,7 +7451,7 @@ ja:
       submit: "%{model} を保存"
       update: "%{model} を更新"
   high_contrast_description: |-
-      ハイ コントラスト バージョンの Canvas ユーザ インターフェイスを使用する場合は、これを有効にします。
+      ハイ コントラスト バージョンの Canvas ユーザ インターフェイスを使用する場合は、これを有効にします。 
       視覚に障害のある方や、画面の文字が読みづらい方は、この機能を有効にすることをお勧めします。
   html5_first_videos_description: |-
       Canvas は、デフォルトでは Flash を優先的に使用してビデオの再生を試みます。HTML5 を優先して使用し、
@@ -7531,24 +7642,15 @@ ja:
   last_user_access_title: "最終ユーザ アクセス"
   layouts: 
     application: 
+      by_instructure: "By Instructure"
       group_switch: 切り替え
-      instructure_description: "Instructure は、オープン ソースのラーニング管理システム Canvas の製造元です"
+      javascript_required: "このサイトにアクセスするには、JavaScript を有効にする必要があります。"
       keyboard_navigation: 
         close: "このダイアログを閉じるには、カンマ キーを押してください"
       links: 
         close: 閉じる
         dashboard: "マイ ダッシュボード"
         skip_to_content: コンテンツまでスキップする
-      menu: 
-        assignments: 課題
-        assignments_needing_grading: 採点が必要
-        assignments_needing_submitting: 提出が必要
-        assignments_recently_graded: 最近採点した項目
-        calendar: カレンダー
-        grades: 成績
-      navigation: 
-        main: "メイン ナビゲーション"
-        user_menu: "ユーザ メニュー"
       open_source_learning_management_system: "オープン ソース LMS"
     facebook: 
       title: "Facebook ページ"
@@ -7565,8 +7667,8 @@ ja:
       default_page_title: "Canvas LMS"
     menu: 
       view_all_accounts: すべてのアカウントを表示
-      view_all_enrollments: すべてのコースを表示
       view_all_groups: すべてのグループを表示
+      view_all_or_customize: すべて表示またはカスタマイズ
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
   learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
@@ -8500,10 +8602,13 @@ ja:
         audio_comment: "このメッセージにはメディア コメントが含まれています。再生または返信するには、下のリンクをクリックしてください:"
         html: 
           attached_files: "添付ファイル:"
+          audio_comment: "このメッセージにはメディア コメントが含まれています。再生または返信するには、下のリンクをクリックしてください:"
           download: ダウンロード
+          reply_to_conversation_message: "この電子メールに直接返信して、このメッセージへの返信を Canvas に送信できます。"
           subject: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
           unknown_user: 不明なユーザ
           view_message: このメッセージを会話に表示
+        reply_to_conversation_message: "この電子メールに直接返信して、このメッセージへの返信を Canvas に送信できます。"
         subject: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
         unknown_user: 不明なユーザ
         view_message: このメッセージを会話に表示
@@ -9130,6 +9235,7 @@ ja:
         discussion_entry_reply_message: 以下のリンクを使用して会話に参加するか、またはこのメッセージに返信してコメントします。
         html: 
           body: "%{user} は、「%{course}」のスレッド「%{discussion_topic}」について、新しいコメントを投稿しました:"
+          discussion_entry_reply_message: 以下のリンクを使用して会話に参加するか、またはこのメッセージに返信してコメントします。
           link: 会話に参加するにはここをクリック
           subject: "「%{discussion_topic}」への新しいコメント: %{course}"
         subject: "%{discussion_topic} への新しいコメント: %{course}"
@@ -9261,38 +9367,6 @@ ja:
       twitter: 
         body_account: "Canvas アラート - 新しいグループ:%{group_name} 対象アカウント: %{account}"
         body_course: "Canvas アラート - 新しいグループ:%{group_name} 対象コース: %{course}"
-    new_teacher_registration: 
-      email: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-        html: 
-          body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-          details: 講師を表示するにはここをクリック
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-          subject: 新しい講師の登録
-        labels: 
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-        subject: 新しい講師の登録
-      facebook: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-        subject: 新しい講師の登録
-      sms: 
-        body: "たった今、%{user} さんが %{website} の講師として登録しました。"
-      summary: 
-        body: "たった今、%{user} さんが Canvas の講師として登録しました。"
-        labels: 
-          email: "電子メール アドレス"
-          phone: 電話
-          school_name: 学校名
-          school_position: 学校の場所
-        subject: 新しい講師の登録
-      twitter: 
-        body: "Canvas アラート - 新しい講師: %{user}、%{account}"
     new_user: 
       email: 
         body: "たった今、アカウント「%{account}」に対して、新しいユーザ「%{user}」が登録されました"
@@ -9732,7 +9806,6 @@ ja:
         published: 公開済み
     post_grades_dialog_title: "成績表を SIS に投稿"
     progression_module_collection: 
-      module_progress_for: "%h{student_link} のモジュールの進捗"
       module_progress_for_student: "%{student.name} のモジュールの進捗"
       no_modules_found: モジュールが見つかりませんでした
     progression_module_view: 
@@ -9745,6 +9818,10 @@ ja:
       no_students_found: 受講生が見つかりませんでした
       student_progress: 受講生の進捗
   modules_item_controller: 
+    max_score_complete: "*スコア* 以内のスコアです"
+    max_score_incomplete: "スコアは *スコア* 以内にしてください"
+    min_score_complete: "*スコア* 以上のスコアです"
+    min_score_incomplete: "スコアは *スコア* 以上にしてください"
     must_contribute_complete: ページのコンテンツに貢献
     must_contribute_incomplete: ページのコンテンツに貢献することが必要
     must_submit_complete: 課題を提出
@@ -9777,8 +9854,9 @@ ja:
   new_quiz_moderate_desc: ドラフト状態およびクイズの統計情報が許可/オンの場合、この設定によって、アカウントの新しいクイズ管理ページが有効になります。
   new_quiz_statistics_desc: ドラフト状態が許可/オンの場合、この設定によって、アカウントの新しいクイズの統計情報ページが有効になります。
   new_styles_description: |-
-      現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい
-      Canvas インターフェイスがリリースされたときに通知をご希望の場合は、これをオンにしてください。
+      現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイス
+      をご覧になりたい場合は、これをオンにしてください。新しいインターフェイスはまだ開発中であるため、
+      実際のユーザが使用する運用環境ではオンにしないでください。
   no_migration_file: コンテンツ移行にはファイルが必要です。
   not_a_number: 正の数字を使用する必要があります
   notification: 
@@ -9843,6 +9921,17 @@ ja:
     due_date_display: 期日
     files_description: コースに新しいファイルが追加されました
     files_display: ファイル
+    grading_description: |-
+        次の内容を含みます。
+        
+        * 入力または変更された課題/提出物の成績
+        * ミュート解除された課題の成績
+        * 変更された成績の重み付け
+        
+        
+        
+        お知らせに成績を表示する場合は、[成績変更に関するアラートには、スコアを記載してください] チェックボックスをオンにします。
+        オンにすると、使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
     grading_display: 採点
     grading_notify_include_grade: 成績変更に関するアラートには、スコアを記載してください。
     grading_policies_description: コースの採点方針の変更
@@ -9921,7 +10010,6 @@ ja:
       new_file_added: 新しいファイルが追加されました
       new_files_added: 新しいファイルが追加されました
       new_student_organized_group: 受講生が組織した新しいグループ
-      new_teacher_registration: 新しい講師の登録
       new_user: 新しいユーザ
       pseudonym_registration: ハンドルネームの登録
       report_generated: レポートが生成されました
@@ -9938,6 +10026,15 @@ ja:
       updated_wiki_page: "更新された Wiki ページ"
       web_conference_invitation: "Web 会議への招待"
     no_subject: 件名なし
+    other_description: |-
+        *インストラクタおよび管理者のみ:*
+        
+        * コース登録
+        * レポート生成
+        * コンテンツのエクスポート
+        * 移行レポート
+        * 新規アカウント ユーザ
+        * 新規受講生グループ
     other_display: 管理のお知らせ
     reminder_display: 事前通知
     student_appointment_description: |-
@@ -10467,9 +10564,6 @@ ja:
     respondus_soap_endpoint: 
       description: "Respondus QTI アップロード用 SOAP エンドポイント"
       name: "Respondus の SOAP エンドポイント"
-    respondus_soap_endpoint_settings: 
-      labels: 
-        enabled: "使用可能 (QTI コンバータも使用可能にしてください)"
     scribd: 
       description: "Scribd 文書のプレビュー"
       name: Scribd
@@ -10672,6 +10766,7 @@ ja:
         facebook_access: "Facebook へのアクセス"
         generate_access_token: "アクセス トークンの生成"
         google_docs_access: "Google ドキュメントへのアクセス"
+        inbox_opt_out: 会話の受信箱のオプトアウト
         linkedin_access: "LinkedIn へのアクセス"
         loading_images: 画像を読み込んでいます...
         login: ログイン
@@ -10694,6 +10789,7 @@ ja:
         change_password: パスワードの変更
         confirm_password: パスワードの確認
         default_email: デフォルトの電子メール
+        disable_inbox: "会話の受信箱の未読メッセージ バッジを無効にし、会話のすべてのメッセージおよびお知らせを ASAP の電子メールとして送信します。"
         expires_at: 有効期限
         headers: 
           approved_integrations: 承認済みの統合
@@ -11400,6 +11496,9 @@ ja:
     editor: 
       keyboard_shortcuts: 
         dialog_title: "キーボード ショートカット"
+        keybindings: 
+          open_dialog: "このヘルプ ダイアログを表示します"
+          open_toolbar: エディタのツールバーを表示します
     enter_answer_variable_above: "[ 上記に解答の変数を入力 ]"
     errors: 
       adding_questions_failed: 問題の追加に失敗しました。もう一度やり直してください
@@ -11697,7 +11796,7 @@ ja:
         hints: 
           group_pick_count: "これまでに %{pick_count} 件が選択されました"
         labels: 
-          add_questions_to_group: "クイズ グループに問題を追加"
+          add_questions_to_group: 問題グループに問題を追加
           group_name: グループ名
           group_pick_count: 選択
           group_points: 点数
@@ -11849,8 +11948,10 @@ ja:
         unnamed_quiz_results: "%{user} のクイズ結果"
         unnamed_survey_results: "%{user} のサーベイ結果"
       index: 
+        page_titles: クイズ
+      index_legacy: 
         buttons: 
-          publish_quizzes: クイズの公開
+          publish_quizzes: クイズを公開
         headers: 
           assignment_quizzes: 課題クイズ
           course_quizzes: "コース クイズ"
@@ -11859,15 +11960,15 @@ ja:
           surveys: サーベイ
           unpublished_quizzes: 未公開のクイズ
         labels: 
-          publish_multiple_quizzes: 現段階で公開するクイズを選択してください
+          publish_multiple_quizzes: 今回公開するクイズを選択します
         links: 
           create_new_quiz: 新しいクイズの作成
           manage_question_banks: 問題バンクの管理
           publish_multiple_quizzes: 複数のクイズの公開
-        no_quizzes: 利用できるクイズはありません
+        no_quizzes: 利用できるクイズがありません
         page_titles: クイズ
         titles: 
-          this_quiz_is_locked: このクイズは現在ロックされています。クリックすると詳細が表示されます。
+          this_quiz_is_locked: このクイズは現在ロックされています。詳細を見るにはクリックしてください。
       invalid_ip: 
         quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
         survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
@@ -12245,6 +12346,9 @@ ja:
         student_n: "受講生 %{student_counter}"
         survey_all_version_disclaimer: このレポートには、全ユーザの全試行に基づくサーベイ統計情報が示されています。
         survey_latest_version_disclaimer: このレポートには、それぞれのユーザの直近の試行に基づくサーベイ統計情報が示されています。
+      statistics_cqs: 
+        page_title: "統計 CQS"
+      statistics_cqs_crumb: "統計 CQS"
       statistics_crumb: 統計
       submission_version: 
         attempt_number: "試行回数 %{att_no}"
@@ -12424,12 +12528,42 @@ ja:
     upload_info: "以前にダウンロードした、その受講生からの提出ファイルに変更を加えた場合は、zip ファイルに圧縮しなおして、下のフォームと一緒にアップロードしてください。受講生には、提出用のコメント内に、修正済みのファイルが表示されます。"
     upload_warning: ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。
   react_files: 
-    aria_label: 
-      settings: 設定
+    cancel: キャンセル
+    confirm_delete: "%{name} を削除してもよろしいですか?"
+    confirm_delete_selected: "これらの %{count} 個のアイテムを削除してもよろしいですか?"
+    count_items_selected: "%{count} 個のアイテムが選択されました"
+    delete: 削除
+    deleted_items_successfully: "%{count} 個のアイテムが正常に削除されました"
+    download_zip: "ZIP をダウンロード"
+    edit_name: 名前の編集
     errors: 
       no_match: 
+        keywords: 別のキーワードを試してください。
+        spelled: すべての単語が正しく入力されていることを確認してください。
         suggestions: "提案:"
+        three_chars: "検索ボックスには 3 文字以上を入力してください。"
+        your_search: "「%{search_term}」での検索に一致するファイルはありませんでした。"
+    folder: フォルダ
+    labels: 
+      select: このアイテムを選択
+    loading_more_results: より多くの結果を読み込んでいます...
+    move: 移動
+    move_question: 
+      one: "これら %{count} 個のアイテムをどこに移動しますか?"
+      other: "これら %{count} 個のアイテムをどこに移動しますか?"
+    move_success: 
+      one: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
+      other: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
+    moving: 移動しています...
     name: 名前
+    progress_error: ダウンロードの準備中にエラーが発生しました。もう一度やり直してください。
+    progress_message: "ダウンロードの準備中: %{percent}% 完了"
+    restrict_access: アクセスを制限
+    search: ファイルの検索
+    settings: 設定
+    this_folder_is_empty: このフォルダは空です
+    title: 
+      limit_student_access: 受講生のアクセスを制限
     usage_details: "%{quota_used} / %{quota}"
   recent_student: 
     last_logged_in: "最終ログイン日時: %{last_login}"
@@ -12484,6 +12618,10 @@ ja:
         name: 名前
     welcome_to_canvas: "Canvas へようこそ!"
   reply_from_name: "%{name} (Canvas のお知らせから)"
+  respondus_soap_endpoint: 
+    plugin_settings: 
+      labels: 
+        enabled: "有効 (QTI コンバータも有効にする必要があります)"
   restrict_student_access: 
     aria_label: 
       availableFrom: 次から使用可能
@@ -12494,6 +12632,13 @@ ja:
     label: 
       availableFrom: 次から使用可能
       availableUntil: 次の日時まで
+    options_1: 
+      description: リンクしたときにのみ、受講生にこのフォルダ内のファイルの表示およびダウンロードを許可
+    options_2: 
+      description: 受講生の利用可能状況をスケジュール
+    title: 
+      default_title: ダイアログ
+      limit_student_access: 受講生のアクセスを制限
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   role_override: 
     permission: 
@@ -12911,12 +13056,16 @@ ja:
         one: "%{count} 人の参加者"
         other: "%{count} 人の参加者"
     current_enrollment: 
-      course_unpublished: このコースはまだ公開されていません
       enrolled_as_designer: 設計者として参加登録済み
       enrolled_as_observer: オブザーバとして参加登録済み
       enrolled_as_student: 受講生として参加登録済み
       enrolled_as_ta: "TA として参加登録済み"
       enrolled_as_teacher: 講師として参加登録済み
+      favorited_tooltip: "クリックしてコース メニューから削除します。"
+      nonfavorited_tooltip: "クリックしてコース メニューに追加します。"
+      not_favoritable_tooltip: "このコースは、現在コース メニューに追加できません。"
+      unpublished_course: 未公開
+      unpublished_course_tooltip: "このコースは公開されていません。受講生がアクセスするには、コース インストラクタに連絡してください。"
     custom_search_results: 
       links: 
         search_for_resources: "このページに関連のあるオープン リソースの検索"
@@ -13008,8 +13157,6 @@ ja:
       titles: 
         mastery_level: パーセントを超えた場合に熟達を設定
         select_and_add_criterion: 基準の選択と追加
-    flash_notice: 
-      close: 閉じる
     flash_notices: 
       close: 閉じる
     footer_links: 
@@ -13162,6 +13309,12 @@ ja:
       ta_title: "TA として招待されています。クリックしてコースを確認"
       teacher: "%{course} (講師として)"
       teacher_title: 講師として招待されています。クリックしてコースを確認
+    primary_header_navigation: 
+      menu: 
+        calendar: カレンダー
+        grades: 成績
+      navigation: 
+        main: "メイン ナビゲーション"
     profile: 
       add_link_field: 別のリンクを追加する
       bio: 略歴
@@ -13379,11 +13532,12 @@ ja:
     unauthorized_feed: 
       bad_params: アクセスしようとしたフィードのパラメータが無効です。
       feedback: "この URL が正常に機能するはずであると確信できる場合は、下のリンクをクリックして、このページにアクセスしたときの操作をお知らせください。調査いたします。"
-      headings: 
-        problem: フィードを読み込む際に問題が発生しました
       links: 
         feedback: 何をお探しであったかをお知らせください
       title: 無効なフィード
+    user_header_navigation: 
+      navigation: 
+        user_menu: "ユーザ メニュー"
     user_lists: 
       copy_and_paste_notice_just_email: "電子メール アドレスのリストをコピー アンド ペーストして、ユーザを追加します。"
       copy_and_paste_notice_with_login_handle: "ユーザのリストをコピー アンド ペーストします。電子メール アドレス、または %{login_handle_name} が使用できます。"
@@ -13729,6 +13883,8 @@ ja:
     finished_redirecting: 完了しました!ファイルにリダイレクトしています...
     gathering_files: "ファイルを収集しています (%{progress})..."
     gathering_files_progress: "ファイルを収集しています (%{progress})..."
+    notices: 
+      submission_not_availible: "要求した課題は、現在のコース セクションでは利用できません。過去に提出された提出物は、成績に反映されません。"
     resubmitted_to_turnitin: "turnitin に正常に再提出されました。"
     see_attached_files: 添付ファイルを参照してください
     show: 
@@ -13854,7 +14010,6 @@ ja:
       prompts: 
         delete: この期間を削除してもよろしいですか?
       titles: 
-        enrollment_terms: 登録期間
         term_details: 期間の詳細
       update_term: 期間の更新
     term: 
@@ -13918,6 +14073,151 @@ ja:
       times: "%{start_time} ～ %{end_time}"
     unknown_date: 不明な日付です
     with_ago: "%{time} 前"
+  time_zones: 
+    abu_dhabi: アブダビ
+    adelaide: アデレード
+    alaska: アラスカ
+    almaty: アルマトイ
+    american_samoa: アメリカ領サモア
+    amsterdam: アムステルダム
+    arizona: アリゾナ
+    astana: アスタナ
+    athens: アテネ
+    atlantic_time_canada: "大西洋標準時 (カナダ)"
+    auckland: オークランド
+    azores: アゾレス諸島
+    baghdad: バグダッド
+    baku: バクー
+    bangkok: バンコク
+    beijing: 北京
+    belgrade: ベオグラード
+    berlin: ベルリン
+    bern: ベルン
+    bogota: ボゴタ
+    brasilia: ブラジリア
+    bratislava: ブラチスラバ
+    brisbane: ブリスベン
+    brussels: ブリュッセル
+    bucharest: ブカレスト
+    budapest: ブダペスト
+    buenos_aires: ブエノスアイレス
+    cairo: カイロ
+    canberra: キャンベラ
+    cape_verde_is: カーボベルデ
+    caracas: カラカス
+    casablanca: カサブランカ
+    central_america: 中米
+    central_time_us_canada: "中部標準時 (アメリカおよびカナダ)"
+    chennai: チェンナイ
+    chihuahua: チワワ
+    chongqing: 重慶
+    copenhagen: コペンハーゲン
+    darwin: ダーウィン
+    dhaka: ダッカ
+    dublin: ダブリン
+    eastern_time_us_canada: "東部標準時 (アメリカおよびカナダ)"
+    edinburgh: エディンバラ
+    ekaterinburg: エカテリンブルグ
+    fiji: フィジー
+    georgetown: ジョージタウン
+    greenland: グリーンランド
+    guadalajara: グアダラハラ
+    guam: グアム
+    hanoi: ハノイ
+    harare: ハラレ
+    hawaii: ハワイ
+    helsinki: ヘルシンキ
+    hobart: ホバート
+    hong_kong: 香港
+    indiana_east: "インディアナ (東部)"
+    international_date_line_west: 国際日付変更線西
+    irkutsk: イルクーツク
+    islamabad: イスラマバード
+    istanbul: イスタンブル
+    jakarta: ジャカルタ
+    jerusalem: エルサレム
+    kabul: カブール
+    kamchatka: カムチャツカ
+    karachi: カラチ
+    kathmandu: カトマンズ
+    kolkata: コルカタ
+    krasnoyarsk: クラスノヤルスク
+    kuala_lumpur: クアラルンプール
+    kuwait: クウェート
+    kyiv: キエフ
+    la_paz: ラパス
+    lima: リマ
+    lisbon: リスボン
+    ljubljana: リュブリャナ
+    london: ロンドン
+    madrid: マドリード
+    magadan: マガダン
+    marshall_is: マーシャル諸島
+    mazatlan: マサトラン
+    melbourne: メルボルン
+    mexico_city: メキシコシティ
+    mid_atlantic: 中部大西洋岸
+    midway_island: ミッドウェー島
+    minsk: ミンスク
+    monrovia: モンロビア
+    monterrey: モンテレイ
+    moscow: モスクワ
+    mountain_time_us_canada: "山岳部標準時 (アメリカおよびカナダ)"
+    mumbai: ムンバイ
+    muscat: マスカット
+    nairobi: ナイロビ
+    new_caledonia: ニューカレドニア
+    new_delhi: ニューデリー
+    newfoundland: ニューファンドランド島
+    novosibirsk: ノヴォシビルスク
+    nukualofa: ヌクアロファ
+    osaka: 大阪
+    pacific_time_us_canada: "太平洋標準時 (アメリカおよびカナダ)"
+    paris: パリ
+    perth: パース
+    port_moresby: ポートモレスビー
+    prague: プラハ
+    pretoria: プレトリア
+    quito: キト
+    rangoon: ヤンゴン
+    riga: リガ
+    riyadh: リヤド
+    rome: ローマ
+    samoa: サモア
+    santiago: サンティアゴ
+    sapporo: 札幌
+    sarajevo: サラエヴォ
+    saskatchewan: サスカチュワン
+    seoul: ソウル
+    singapore: シンガポール
+    skopje: スコピエ
+    sofia: ソフィア
+    solomon_is: ソロモン諸島
+    sri_jayawardenepura: スリジャヤワルダナプラコッテ
+    st_petersburg: サンクトペテルブルク
+    stockholm: ストックホルム
+    sydney: シドニー
+    taipei: 台北
+    tallinn: タリン
+    tashkent: タシケント
+    tbilisi: トビリシ
+    tehran: テヘラン
+    tijuana: ティフアナ
+    tokelau_is: トケラウ
+    tokyo: 東京
+    ulaan_bataar: ウランバートル
+    urumqi: ウルムチ
+    utc: UTC
+    vienna: ウィーン
+    vilnius: ヴィリニュス
+    vladivostok: ウラジオストク
+    volgograd: ヴォルゴグラード
+    warsaw: ワルシャワ
+    wellington: ウェリントン
+    west_central_africa: アフリカ中西部
+    yakutsk: ヤクーツク
+    yerevan: エレバン
+    zagreb: ザグレブ
   tinymce: 
     insert_update_image_view: 
       alt_help_text: アクセシビリティを向上するための画像について説明します
@@ -13990,7 +14290,9 @@ ja:
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   unused_courses_title: 未使用のコース
   upload_button: 
-    files: ファイル
+    upload: アップロード
+  upload_progress_view: 
+    processing: 処理中
   user: 
     default_user_name: ユーザ
     errors: 
@@ -14006,6 +14308,7 @@ ja:
   user_date_range_search: 
     cant_be_blank: "Canvas ユーザ ID を空欄にはできません"
     cant_come_before_from: "'終了日付' を '開始日付' より前にすることはできません"
+    results_found: "%{length} 件の結果が見つかりました"
   user_lists: 
     add_n_users: 
       one: "問題ないので、この %{count} 人のユーザを追加"
@@ -14174,8 +14477,6 @@ ja:
         delete_user: "%{user_name} を削除"
       titles: 
         confirm_delete: ユーザの削除の確認
-        confirm_deletion_of_user: "%{user_name} の削除の確認"
-        delete_user: ユーザの削除
         really_delete_user: "本当に %{user_name} を削除"
     enrollment: 
       course_not_published: このコースはまだ公開されていません

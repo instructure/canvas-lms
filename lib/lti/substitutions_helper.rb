@@ -21,6 +21,23 @@
 
 module Lti
   class SubstitutionsHelper
+    LIS_ROLE_MAP = {
+        'user' => LtiOutbound::LTIRoles::System::USER,
+        'siteadmin' => LtiOutbound::LTIRoles::System::SYS_ADMIN,
+
+        'teacher' => LtiOutbound::LTIRoles::Institution::INSTRUCTOR,
+        'student' => LtiOutbound::LTIRoles::Institution::STUDENT,
+        'admin' => LtiOutbound::LTIRoles::Institution::ADMIN,
+        AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
+
+        StudentEnrollment => LtiOutbound::LTIRoles::Context::LEARNER,
+        TeacherEnrollment => LtiOutbound::LTIRoles::Context::INSTRUCTOR,
+        TaEnrollment => LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT,
+        DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
+        ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
+        StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
+    }
+
     def initialize(context, root_account, user)
       @context = context
       @root_account = root_account
@@ -43,6 +60,19 @@ module Lti
       enrollments.map { |enrollment| Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class] }.uniq
     end
 
+    def all_roles
+      if @user
+        context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
+        institution_roles = @user.roles.map { |role| LIS_ROLE_MAP[role] }
+        if Account.site_admin.account_users_for(@user).present?
+          institution_roles << LIS_ROLE_MAP['siteadmin']
+        end
+        (context_roles + institution_roles).uniq.sort.join(',')
+      else
+        [LtiOutbound::LTIRoles::System::NONE]
+      end
+    end
+
     def course_enrollments
       return [] unless @context.is_a?(Course)
       @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
@@ -60,7 +90,7 @@ module Lti
 
     def current_lis_roles
       enrollments = course_enrollments + account_enrollments
-      enrollments.size > 0 ? enrollments_to_lis_roles(enrollments).join(',') : LtiOutbound::LTIRole::NONE
+      enrollments.size > 0 ? enrollments_to_lis_roles(enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_course_enrollments
@@ -69,7 +99,7 @@ module Lti
     end
 
     def concluded_lis_roles
-      concluded_course_enrollments.size > 0 ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRole::NONE
+      concluded_course_enrollments.size > 0 ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
     end
 
     def current_canvas_roles

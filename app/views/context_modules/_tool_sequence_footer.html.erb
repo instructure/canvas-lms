@@ -1,0 +1,11 @@
+<% js_bundle 'module_sequence_footer' %>
+<% if @tag.context.is_a?(Assignment) && (can_do(@tag.context, @current_user, :grade) || can_do(@tag.context.context, @current_user, :manage_assignments)) %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-all">
+      <%= render :partial => 'assignments/external_grader_sidebar', :locals => { :assignment => @tag.context } %>
+    </div>
+  <% end %>
+<% end %>
+<% if @module_tag %>
+  <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @module_tag} %>
+<% end %>

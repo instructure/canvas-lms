@@ -52,7 +52,7 @@ module CC
     def add_module(cm)
       @root_item.item(:identifier=>CCHelper.create_key(cm)) do |module_node|
         module_node.title cm.name
-        cm.content_tags.active.each do |ct|
+        cm.content_tags.not_deleted.each do |ct|
           attributes = {:identifier=>CCHelper.create_key(ct)}
           unless ct.content_type == 'ContextModuleSubHeader'
             attributes[:identifierref] = CCHelper.create_key(ct.content)

@@ -806,16 +806,18 @@ define([
 
     parseInput: function($input, type) {
       if ($input.val() == "") { return; }
+      var val = $input.val().replace(/,/g, '');
       if (type == "int") {
-        var val = parseInt($input.val(), 10);
+        val = parseInt(val, 10);
         if (isNaN(val)) { val = 0; }
         $input.val(val);
       } else if (type == "float") {
-        var val = Math.round(parseFloat($input.val()) * 100.0) / 100.0;
+        val = Math.round(parseFloat(val) * 100.0) / 100.0;
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
       } else if (type == "float_long") {
-        var val = Math.round(parseFloat($input.val()) * 10000.0) / 10000.0;
+        console.log(val);
+        val = Math.round(parseFloat(val) * 10000.0) / 10000.0;
         if (isNaN(val)) { val = 0.0; }
         $input.val(val);
       }
@@ -2841,6 +2843,17 @@ define([
         $question.find(".question_points").text(questionData.points_possible);
         quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
         if ($teaser.hasClass('to_edit')) {
+          // we need to explicity set our quiz variables in the dom
+          // or this appears to be adding a new question instead of editing
+          var ques = $question.find(".question");
+          var link = $question.find("a.update_question_url");
+          var qId  = $question.find(".assessment_question_id")
+          var href = link.attr('href');
+
+          ques.attr("id", "question_" + question_data.id);
+          link.attr("href", href.replace(/ions\/.*/, "ions/" + question_data.id));
+          qId.html(question_data.id);
+
           $question.find(".edit_question_link").click();
         }
       }

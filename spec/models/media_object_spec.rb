@@ -152,13 +152,16 @@ describe MediaObject do
   end
 
   describe ".add_media_files" do
-    it "should work for user context" do
-      stub_kaltura
-      user
-      attachment_obj_with_context(@user, user: @user)
-      CanvasKaltura::ClientV3.any_instance.stubs(:startSession).returns(nil)
-      CanvasKaltura::ClientV3.any_instance.stubs(:bulkUploadAdd).returns({})
-      MediaObject.add_media_files(@attachment, false)
+    it "delegates to the KalturaMediaFileHandler to make a bulk upload to kaltura" do
+      kaltura_media_file_handler = mock('KalturaMediaFileHandler')
+      KalturaMediaFileHandler.expects(:new).returns(kaltura_media_file_handler)
+
+      attachments = [ Attachment.new ]
+      wait_for_completion = true
+
+      kaltura_media_file_handler.expects(:add_media_files).with(attachments, wait_for_completion).returns(:retval)
+
+      MediaObject.add_media_files(attachments, wait_for_completion).should == :retval
     end
   end
 end

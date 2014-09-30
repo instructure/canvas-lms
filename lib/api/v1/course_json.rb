@@ -69,7 +69,7 @@ module Api::V1
 
     def needs_grading_count(enrollments, course)
       if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
-        course.assignments.active.to_a.sum{|a| a.needs_grading_count_for_user(user)}
+        course.assignments.active.to_a.sum{|a| Assignments::NeedsGradingCountQuery.new(a, user).count }
       end
     end
 

@@ -26,6 +26,7 @@ module Api::V1::WikiPage
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true)
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS, :methods => WIKI_PAGE_JSON_METHODS)
+    hash['page_id'] = wiki_page.id
     hash['editing_roles'] ||= 'teachers'
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     if wiki_page.context.feature_enabled?(:draft_state)

@@ -88,6 +88,24 @@ define [
     view = editView()
     equal view.assignment.toView()['groupCategoryId'], null
 
+  test 'does not allow point valid of 0 or less if grading type is percentage', ->
+    view = editView()
+    data = points_possible: '0', grading_type: 'percent'
+    errors = view.validateBeforeSave(data, [])
+    equal errors['points_possible'][0]['message'], 'Points possible must be more than 0 for selected grading type'
+
+  test 'does not allow point valid of 0 or less if grading type is letter', ->
+    view = editView()
+    data = points_possible: '0', grading_type: 'letter_grade'
+    errors = view.validateBeforeSave(data, [])
+    equal errors['points_possible'][0]['message'], 'Points possible must be more than 0 for selected grading type'
+
+  test 'does not allow point valid of 0 or less if grading type is gpa scale', ->
+    view = editView()
+    data = points_possible: '0', grading_type: 'gpa_scale'
+    errors = view.validateBeforeSave(data, [])
+    equal errors['points_possible'][0]['message'], 'Points possible must be more than 0 for selected grading type'
+
     #fragile spec on Firefox, Safari
     #adds student group
     # view.$('#has_group_category').click()

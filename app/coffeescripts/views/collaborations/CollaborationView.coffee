@@ -44,7 +44,7 @@ define [
     #
     # Returns a jQuery object form.
     formTemplate: ({action, className, data}) ->
-      $form = $(editForm(extend(data, action: action, id: @id, token: ENV.AUTHENTICITY_TOKEN)))
+      $form = $(editForm(extend(data, action: action, id: @id)))
       #$form.attr('class', className)
 
     # Internal: Confirm deleting of a Google Docs collaboration.

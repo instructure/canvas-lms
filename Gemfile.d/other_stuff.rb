@@ -1,15 +1,27 @@
 
-gem 'rails', '3.2.19'
+if CANVAS_RAILS3
+  gem 'rails', '3.2.19'
+  gem 'rack', '1.4.5'
+  gem 'builder', '3.0.0'
+  gem 'tzinfo', '0.3.39'
+  gem 'encrypted_cookie_store-instructure', '1.1.6', :require => 'encrypted_cookie_store'
+else
+  gem 'rails', '4.1.5'
+  gem 'rack', '1.5.2'
+  gem 'builder', '3.1.4'
+  gem 'tzinfo', '1.1.0'
+  gem 'protected_attributes', '1.0.8'
+  gem 'rails-observers', '0.1.2'
+  gem 'activesupport-json_encoder', '1.1.0'
+end
 gem 'active_model_serializers', '0.9.0alpha1',
   :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.3.0'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
-gem 'encrypted_cookie_store-instructure', '1.1.6', :require => 'encrypted_cookie_store'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'rack', '1.4.5'
 gem 'routing_concerns', '0.1.0'
-gem 'switchman', '1.2.17'
+gem 'switchman', '1.2.18'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -18,7 +30,6 @@ gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
-gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.6'
   gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.15'
@@ -32,10 +43,11 @@ gem 'hairtrigger', '0.2.9'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
 gem 'hoe', '3.8.1'
-gem 'i18n', '0.6.8'
-gem 'i18nema', RUBY_VERSION >= '2.2' ? '0.0.8' : '0.0.7'
+gem 'i18n', '0.6.9'
+gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
+gem 'i18nema19', '0.0.8', :platform => :mri_19
 gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.4'
+gem 'ims-lti', '2.0.0.beta.6'
 gem 'jammit', '0.6.6'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
@@ -80,7 +92,6 @@ gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.7'
 
-gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.10.0'
 gem 'uuid', '2.3.2'
 

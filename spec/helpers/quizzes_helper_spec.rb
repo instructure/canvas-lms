@@ -262,6 +262,21 @@ describe QuizzesHelper do
       html.should =~ /aria\-label/
       html.should =~ /Fill in the blank/
     end
+    it 'should handle equation img tags in the question text' do
+      broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
+      @answer_list = [
+        { blank_id: 'kindof', answer: 'protein'},
+        {blank_id: 'role', answer: 'fixing'}
+      ]
+      html = fill_in_multiple_blanks_question(
+        question: {question_text: broken_question_text},
+        answer_list: @answer_list,
+        answers: @answers
+      )
+      html.should =~ /"readonly"/
+      html.should =~ /value='fixing'/
+      html.should =~ /value='protein'/
+    end
   end
 
   context "multiple_dropdowns_question" do

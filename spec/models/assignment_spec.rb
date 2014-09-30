@@ -234,61 +234,7 @@ describe Assignment do
     end
   end
 
-  context "needs_grading_count_for_user" do
-    it "should only count submissions in the user's visible section(s)" do
-      @section = @course.course_sections.create!(:name => 'section 2')
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-      @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
-
-      # enroll a section-limited TA
-      @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
-      ta_enrollment = @course.enroll_ta(@ta)
-      ta_enrollment.limit_privileges_to_course_section = true
-      ta_enrollment.workflow_state = 'active'
-      ta_enrollment.save!
-
-      # make a submission in each section
-      @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
-      @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
-      @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
-      @assignment.reload
-
-      # check the teacher sees both, the TA sees one
-      @assignment.needs_grading_count_for_user(@teacher).should eql(2)
-      @assignment.needs_grading_count_for_user(@ta).should eql(1)
-
-      # grade an assignment
-      @assignment.grade_student(@user1, :grade => "1")
-      @assignment.reload
-
-      # check that the numbers changed
-      @assignment.needs_grading_count_for_user(@teacher).should eql(1)
-      @assignment.needs_grading_count_for_user(@ta).should eql(0)
-
-      # test limited enrollment in multiple sections
-      @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
-                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
-      @assignment.reload
-      @assignment.needs_grading_count_for_user(@ta).should eql(1)
-    end
-  end
-
   context "differentiated_assignment visibility" do
-
-    def setup_DA
-      @course_section = @course.course_sections.create
-      @student1, @student2, @student3 = create_users(3, return_type: :record)
-      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
-      @course.enroll_student(@student2, :enrollment_state => 'active')
-      @section = @course.course_sections.create!(name: "test section")
-      @section2 = @course.course_sections.create!(name: "second test section")
-      student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
-      @course.reload
-    end
-
     describe "students_with_visibility" do
       before :once do
         setup_DA
@@ -341,9 +287,9 @@ describe Assignment do
       end
 
       context "differentiated_assignment on" do
-        context "observing only a section with visibility" do
+        context "observing only a section (with or without an override)" do
           before do
-            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           end
           it "should be visible" do
             @assignment.visible_to_observer?(@observer).should be_true
@@ -360,7 +306,7 @@ describe Assignment do
           end
         end
 
-        context "without a student or section with visibility" do
+        context "observing a student without visibility" do
           before do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
@@ -471,6 +417,27 @@ describe Assignment do
       @submission.score.should eql(0.0)
       @submission.grade.should eql('C')
       @submission.user_id.should eql(@user.id)
+    end
+
+    it "should properly calculate letter grades" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.points_possible = 10
+      grade = @assignment.score_to_grade(8.7)
+      grade.should eql("B+")
+    end
+
+    it "should properly allow decimal points in grading" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.points_possible = 10
+      grade = @assignment.score_to_grade(8.6999)
+      grade.should eql("B")
+    end
+
+    it "should properly compute pass/fail for nil" do
+      @assignment.grading_type = 'pass_fail'
+      @assignment.points_possible = 10
+      grade = @assignment.score_to_grade(nil)
+      grade.should eql("incomplete")
     end
 
     it "should preserve letter grades grades with nil points possible" do
@@ -997,6 +964,56 @@ describe Assignment do
       res.length.should >= 6
       ids = @late_submissions.map{|s| s.user_id}
     end
+
+    context "differentiated_assignments" do
+      before do
+        setup_DA
+        @submissions = []
+        [@student1, @student2].each do |u|
+          @submissions << @assignment.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+      end
+      context "feature on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+
+        it "should assign peer reviews only to students with visibility" do
+          @assignment.peer_review_count = 1
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(0)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should_not be_include(s)
+            res.map{|a| a.assessor_asset}.should_not be_include(s)
+          end
+
+          # once graded the student will have visibility
+          # and will therefore show up in the peer reviews
+          @assignment.grade_student(@student2, :grader => @teacher, :grade => '100')
+
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(@submissions.length)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should be_include(s)
+            res.map{|a| a.assessor_asset}.should be_include(s)
+          end
+        end
+
+      end
+
+      context "feature off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should assign peer reviews to any student with a submission" do
+          @assignment.peer_review_count = 1
+          res = @assignment.assign_peer_reviews
+          res.length.should eql(@submissions.length)
+          @submissions.each do |s|
+            res.map{|a| a.asset}.should be_include(s)
+            res.map{|a| a.assessor_asset}.should be_include(s)
+          end
+        end
+      end
+    end
+
+
   end
 
   context "grading scales" do
@@ -1837,6 +1854,39 @@ describe Assignment do
     end
   end
 
+  describe "sections_with_visibility" do
+   before(:once) do
+     course_with_teacher(:active_all => true)
+     @course.enable_feature!(:draft_state)
+     @section = @course.course_sections.create!
+     @student = student_in_section(@section, opts={})
+     @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
+
+     @assignment.only_visible_to_overrides = true
+     create_section_override_for_assignment(@assignment, course_section: @section)
+
+     @assignment2.only_visible_to_overrides = true
+
+     @assignment3.only_visible_to_overrides = false
+     create_section_override_for_assignment(@assignment3, course_section: @section)
+     [@assignment, @assignment2, @assignment3].each(&:save!)
+   end
+
+   it "returns active_course_sections with differentiated assignments off" do
+     @course.disable_feature!(:differentiated_assignments)
+     @assignment.sections_with_visibility(@teacher).should == @course.course_sections
+     @assignment2.sections_with_visibility(@teacher).should == @course.course_sections
+     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+   end
+
+   it "returns only sections with overrides with differentiated assignments on" do
+     @course.enable_feature!(:differentiated_assignments)
+     @assignment.sections_with_visibility(@teacher).should == [@section]
+     @assignment2.sections_with_visibility(@teacher).should == []
+     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+   end
+ end
+
   context "modules" do
     it "should be locked when part of a locked module" do
       ag = @course.assignment_groups.create!
@@ -2306,6 +2356,52 @@ describe Assignment do
       @comment = @submission.add_comment(:comment => 'comment')
       json = @assignment.speed_grader_json(@user)
       json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
+    end
+
+    context "students and active course sections" do
+      before(:once) do
+        @course = course(:active_course => true)
+        @teacher, @student1, @student2 = (1..3).map{User.create}
+        @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+        @course.enroll_teacher(@teacher)
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section1 = @course.course_sections.create!(name: "test section 1")
+        @section2 = @course.course_sections.create!(name: "test section 2")
+        student_in_section(@section1, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section1})
+      end
+
+      it "should include all students and sections with DA off" do
+        @course.disable_feature!(:differentiated_assignments)
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+      end
+
+      it "should include only students and sections with overrides when DA is on" do
+        @course.enable_feature!(:differentiated_assignments)
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_false
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_false
+      end
+
+      it "should include all students when is only_visible_to_overrides false" do
+        @course.enable_feature!(:differentiated_assignments)
+        @assignment.only_visible_to_overrides = false
+        @assignment.save!
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+      end
     end
 
     it "should return submission lateness" do
@@ -3017,3 +3113,14 @@ def zip_submissions
   zip
 end
 
+def setup_DA
+  @course_section = @course.course_sections.create
+  @student1, @student2, @student3 = create_users(3, return_type: :record)
+  @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+  @course.enroll_student(@student2, :enrollment_state => 'active')
+  @section = @course.course_sections.create!(name: "test section")
+  @section2 = @course.course_sections.create!(name: "second test section")
+  student_in_section(@section, user: @student1)
+  create_section_override_for_assignment(@assignment, {course_section: @section})
+  @course.reload
+end

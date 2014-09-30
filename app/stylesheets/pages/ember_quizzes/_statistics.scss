@@ -1,5 +1,5 @@
 $highlightColor: #349e67;
-$muteTextColor: #949494;
+$muteTextColor: ensure-contrast(#757575, #ffffff);
 
 #quiz-statistics {
   header {

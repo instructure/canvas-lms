@@ -27,6 +27,7 @@ module Lti
       @lti_launch.params = message.post_params
       @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
       @lti_launch.launch_type = message.launch_presentation_document_target
+      
       render template: 'lti/framed_launch'
     end
 
@@ -37,17 +38,19 @@ module Lti
         tool_proxy = resource_handler.tool_proxy
         #TODO create scoped method for query
         if ToolProxyBinding.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class).count(:all) > 0
-          message_service = IMS::LTI::Services::MessageService.new(tool_proxy.guid, tool_proxy.shared_secret)
           message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(
+            launch_url: message_handler.launch_path,
+            oauth_consumer_key: tool_proxy.guid,
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
             resource_link_id: Lti::Asset.opaque_identifier_for(@context),
             context_id: Lti::Asset.opaque_identifier_for(@context),
             tool_consumer_instance_guid: @context.root_account.lti_guid,
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
+          message.add_custom_params(custom_params(message_handler.parameters))
           @lti_launch = Launch.new
-          @lti_launch.resource_url = message_handler.launch_path
-          @lti_launch.params = message_service.signed_params(@lti_launch.resource_url, message)
+          @lti_launch.resource_url = message.launch_url
+          @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
           @lti_launch.link_text = message_handler.resource.name
           @lti_launch.launch_type = message.launch_presentation_document_target
 
@@ -59,6 +62,12 @@ module Lti
 
 
     private
+
+    def custom_params(parameters)
+      lookup_hash = common_variable_substitutions.inject({}) { |hash, (k,v)| hash[k.gsub(/\A\$/, '')] = v ; hash}
+      params = IMS::LTI::Models::Parameter.from_json(parameters || [])
+      IMS::LTI::Models::Parameter.process_params(params, lookup_hash)
+    end
 
     def tool_consumer_profile_url
       tp_id = SecureRandom.uuid

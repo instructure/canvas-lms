@@ -2,8 +2,7 @@ define [
   'react'
   'react-router'
   'compiled/react/shared/utils/withReactDOM'
-], (React, {Link}, withReactDOM) ->
-
+], (React, ReactRouter, withReactDOM) ->
   Breadcrumbs = React.createClass
 
     propTypes:
@@ -12,5 +11,5 @@ define [
     render: withReactDOM ->
       nav 'aria-label':'breadcrumbs', role:'navigation', className:'ef-breadcrumbs',
         @props.rootTillCurrentFolder.map (folder) =>
-          Link to: (if folder.urlPath() then 'folder' else 'rootFolder'), contextType: @props.contextType, contextId: @props.contextId, splat: folder.urlPath(), activeClassName: 'active',
+          ReactRouter.Link to: (if folder.urlPath() then 'folder' else 'rootFolder'), contextType: @props.contextType, contextId: @props.contextId, splat: folder.urlPath(), activeClassName: 'active',
             span className:'ellipsible', folder.get('name')

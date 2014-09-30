@@ -172,6 +172,8 @@ describe ContentMigration do
       rub2.data = data
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
+      ef1 = @copy_from.external_feeds.create! feed_type: 'rss/atom', feed_purpose: 'announcements', url: 'https://feed1.example.org', verbosity: 'full'
+      ef2 = @copy_from.external_feeds.create! feed_type: 'rss/atom', feed_purpose: 'announcements', url: 'https://feed2.example.org', verbosity: 'full'
       default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
@@ -197,6 +199,7 @@ describe ContentMigration do
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
+              :external_feeds => {mig_id(ef1) => "1", mig_id(ef2) => "0"}
       }
       @cm.save!
 
@@ -220,6 +223,9 @@ describe ContentMigration do
 
       @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should be_nil
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should be_nil
+
+      @copy_to.external_feeds.find_by_migration_id(mig_id(ef1)).should_not be_nil
+      @copy_to.external_feeds.find_by_migration_id(mig_id(ef2)).should be_nil
     end
 
     it "should re-copy deleted items" do
@@ -295,6 +301,7 @@ describe ContentMigration do
     end
 
     it "should copy course attributes" do
+      Account.default.allow_self_enrollment!
       #set all the possible values to non-default values
       @copy_from.start_at = 5.minutes.ago
       @copy_from.conclude_at = 1.month.from_now

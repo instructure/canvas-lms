@@ -77,7 +77,10 @@
         size: 10px
       line-height: 13px
     em
-      color: #bcbcbc
+      @if $use_high_contrast
+        color: #555
+      @else
+        color: #777
       padding-bottom: 2px
     .more_link
       padding-top: 6px
@@ -110,18 +113,24 @@
         b
           padding-right: 20px
       a.disable_item_link
-        opacity: 0.3
+        @if $use_high_contrast
+          color: #555
+        @else
+          color: #777  
         padding: 0
         position: absolute
         background-image: none
         right: 0
-        top: 0
+        top: 2px
         z-index: 2
         border-bottom: none
         box-shadow: none
       &:hover
         a.disable_item_link
-          opacity: 1
+          @if $use_high_contrast
+            color: #222
+          @else
+            color: #444
       .icon-peer-review:before
         position: absolute
         left: 0

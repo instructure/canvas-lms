@@ -51,8 +51,12 @@ class GradeCalculator
         for_user(@user_ids).
         select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)
+
     @user_ids.map do |user_id|
       user_submissions = submissions_by_user[user_id] || []
+      if differentiated_assignments_on?
+        user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
+      end
       current, current_groups = calculate_current_score(user_id, user_submissions)
       final, final_groups = calculate_final_score(user_id, user_submissions)
       [[current, current_groups], [final, final_groups]]
@@ -65,6 +69,10 @@ class GradeCalculator
   end
 
   private
+
+  def differentiated_assignments_on?
+    @differentiated_assignments_enabled ||= @course.feature_enabled?(:differentiated_assignments)
+  end
 
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
@@ -89,7 +97,7 @@ class GradeCalculator
   end
 
   def calculate_score(submissions, user_id, grade_updates, ignore_ungraded)
-    group_sums = create_group_sums(submissions, ignore_ungraded)
+    group_sums = create_group_sums(submissions, user_id, ignore_ungraded)
     info = calculate_total_from_group_scores(group_sums)
     grade_updates[user_id] = info[:grade]
     [info, group_sums.index_by { |s| s[:id] }]
@@ -105,8 +113,12 @@ class GradeCalculator
   #    :weight   => 50},
   #   ...]
   # each group
-  def create_group_sums(submissions, ignore_ungraded=true)
-    assignments_by_group_id = @assignments.group_by(&:assignment_group_id)
+  def create_group_sums(submissions, user_id, ignore_ungraded=true)
+    visible_assignments = @assignments
+    if differentiated_assignments_on?
+      visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+    end
+    assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[
       submissions.map { |s| [s.assignment_id, s] }
     ]
@@ -144,6 +156,18 @@ class GradeCalculator
         :grade    => ((score.to_f / possible * 100).round(2) if possible > 0),
       }
     end
+  end
+
+  def assignment_ids_visible_to_user(user_id)
+    @assignment_ids_visible_to_user ||= begin
+      if differentiated_assignments_on?
+        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: @user_ids)
+      else
+        assignment_ids = @assignments.map(&:id)
+        @user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
+      end
+    end
+    @assignment_ids_visible_to_user[user_id] || []
   end
 
   # see comments for dropAssignments in grade_calculator.coffee

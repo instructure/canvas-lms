@@ -125,6 +125,7 @@ define [
     # convert an event date and time to a string using the given date and time format specifiers
     tEventToString : (date = '', i18n_date_format = 'short', i18n_time_format = 'tiny') ->
       I18n.t 'time.event',
+        defaultValue: '%{date} at %{time}',
         date: I18n.l "date.formats.#{i18n_date_format}", date
         time: I18n.l "time.formats.#{i18n_time_format}", date
 
@@ -242,6 +243,19 @@ define [
     #
     eachProp: (context, options) ->
       (options.fn(property: prop, value: context[prop]) for prop of context).join ''
+
+    # runs block if the setting is set to the value
+    # usage:
+    # {{#ifSettingIs some_setting some_value}}
+    #   The setting is set to the thing!
+    # {{else}}
+    #   The setting is set to something else or doesn't exist
+    # {{/ifSettingIs}}
+    ifSettingIs: ->
+      [setting, value, {fn, inverse}] = arguments
+      settings = ENV.SETTINGS
+      return fn(this) if settings[setting] == value
+      inverse(this)
 
     # evaluates the block for each item in context and passes the result to $.toSentence
     toSentence: (context, options) ->
@@ -447,6 +461,7 @@ define [
     or: (args..., options) ->
       for arg in args when arg
         return arg
+
   }
 
   return Handlebars

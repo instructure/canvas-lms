@@ -223,7 +223,7 @@ class ContentMigrationsController < ApplicationController
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
-  # @argument migration_type [String]
+  # @argument migration_type [Required, String]
   #   The type of the migration. Use the
   #   {api:ContentMigrationsController#available_migrators Migrator} endpoint to
   #   see all available migrators. Default allowed values:
@@ -235,52 +235,52 @@ class ContentMigrationsController < ApplicationController
   #   to the content migration. See the {file:file_uploads.html File Upload
   #   Documentation} for details on the file upload workflow.
   #
-  # @argument pre_attachment[*] [Optional]
+  # @argument pre_attachment[*]
   #   Other file upload properties, See {file:file_uploads.html File Upload
   #   Documentation}
   #
-  # @argument settings[file_url] [string] (optional) A URL to download the file from. Must not require authentication.
+  # @argument settings[file_url] [string] A URL to download the file from. Must not require authentication.
   #
-  # @argument settings[source_course_id] [Optional, String]
+  # @argument settings[source_course_id] [String]
   #   The course to copy from for a course copy migration. (required if doing
   #   course copy)
   #
-  # @argument settings[folder_id] [Optional, String]
+  # @argument settings[folder_id] [String]
   #   The folder to unzip the .zip file into for a zip_file_import.
   #  (required if doing .zip file upload)
   #
-  # @argument settings[overwrite_quizzes] [Optional, Boolean]
+  # @argument settings[overwrite_quizzes] [Boolean]
   #   Whether to overwrite quizzes with the same identifiers between content
   #   packages.
   #
-  # @argument settings[question_bank_id] [Optional, Integer]
+  # @argument settings[question_bank_id] [Integer]
   #   The existing question bank ID to import questions into if not specified in
   #   the content package.
   #
-  # @argument settings[question_bank_name] [Optional, String]
+  # @argument settings[question_bank_name] [String]
   #   The question bank to import questions into if not specified in the content
   #   package, if both bank id and name are set, id will take precedence.
   #
-  # @argument date_shift_options[shift_dates] [Optional, Boolean]
+  # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course
   #
-  # @argument date_shift_options[old_start_date] [Optional, Date]
+  # @argument date_shift_options[old_start_date] [Date]
   #   The original start date of the source content/course
   #
-  # @argument date_shift_options[old_end_date] [Optional, Date]
+  # @argument date_shift_options[old_end_date] [Date]
   #   The original end date of the source content/course
   #
-  # @argument date_shift_options[new_start_date] [Optional, Date]
+  # @argument date_shift_options[new_start_date] [Date]
   #   The new start date for the content/course
   #
-  # @argument date_shift_options[new_end_date] [Optional, Date]
+  # @argument date_shift_options[new_end_date] [Date]
   #   The new end date for the source content/course
   #
-  # @argument date_shift_options[day_substitutions][X] [Optional, Integer]
+  # @argument date_shift_options[day_substitutions][X] [Integer]
   #   Move anything scheduled for day 'X' to the specified day. (0-Sunday,
   #   1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
   #
-  # @argument date_shift_options[remove_dates] [Optional, Boolean]
+  # @argument date_shift_options[remove_dates] [Boolean]
   #   Whether to remove dates in the copied course. Cannot be used
   #   in conjunction with *shift_dates*.
   #

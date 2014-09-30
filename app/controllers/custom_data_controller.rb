@@ -165,11 +165,11 @@ class CustomDataController < ApplicationController
   #     "value_at_conflict": "blonde"
   #   }
   #
-  # @argument ns [String]
+  # @argument ns [Required, String]
   #   The namespace under which to store the data.  This should be something other
   #   Canvas API apps aren't likely to use, such as a reverse DNS for your organization.
   #
-  # @argument data [JSON]
+  # @argument data [Required, JSON]
   #   The data you want to store for the user, at the specified scope.  If the data is
   #   composed of (possibly nested) JSON objects, scopes will be generated for the (nested)
   #   keys (see examples).
@@ -229,7 +229,7 @@ class CustomDataController < ApplicationController
   # Responds with status code 400 if the namespace parameter, +ns+, is missing or invalid,
   # or if the specified scope does not contain any data.
   #
-  # @argument ns [String]
+  # @argument ns [Required, String]
   #   The namespace from which to retrieve the data.  This should be something other
   #   Canvas API apps aren't likely to use, such as a reverse DNS for your organization.
   #
@@ -360,7 +360,7 @@ class CustomDataController < ApplicationController
   # Responds with status code 400 if the namespace parameter, +ns+, is missing or invalid,
   # or if the specified scope does not contain any data.
   #
-  # @argument ns [String]
+  # @argument ns [Required, String]
   #   The namespace from which to delete the data.  This should be something other
   #   Canvas API apps aren't likely to use, such as a reverse DNS for your organization.
   #

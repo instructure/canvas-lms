@@ -1,0 +1,90 @@
+/*
+@styleguide Canvas Colors - Legacy
+
+<h3 class="Colorguide-title"> Base Canvas Color Palette </h3>
+<div class="Colorguide-container Colorguide-container--primary-theme">
+  <div class="Colorguide-color Colorguide-color--primary">
+    <span class="Colorguide-var">$canvas-primary</span>
+    <span class="Colorguide-hex">#0aafff</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--secondary">
+    <span class="Colorguide-var">$canvas-secondary</span>
+    <span class="Colorguide-hex">#08c</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--success">
+    <span class="Colorguide-var ">$canvas-success</span>
+    <span class="Colorguide-hex">#33802a</span>
+  </div>
+
+  <div class="Colorguide-color Colorguide-color--neutral">
+    <span class="Colorguide-var">$canvas-neutral</span>
+    <span class="Colorguide-hex">#bbb</span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--action">
+    <span class="Colorguide-var">$canvas-action</span>
+    <span class="Colorguide-hex">#ba3fa5</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--danger">
+    <span class="Colorguide-var">$canvas-danger</span>
+    <span class="Colorguide-hex">#ad393a</span>
+  </div>
+
+  <div class="Colorguide-color Colorguide-color--alert">
+    <span class="Colorguide-var">$canvas-alert</span>
+    <span class="Colorguide-hex">#c38406</span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--light">
+    <span class="Colorguide-var">$canvas-light</span>
+    <span class="Colorguide-hex">#333333</span>
+  </div>    
+  <div class="Colorguide-color Colorguide-color--dark">
+    <span class="Colorguide-var">$canvas-dark</span>
+    <span class="Colorguide-hex">#5d6d78</span>
+  </div>
+</div>
+<h3 class="Colorguide-title"> High Contrast Color Palette </h3>
+<div class="Colorguide-container Colorguide-container--hc-theme">
+  <div class="Colorguide-color Colorguide-color--primary">
+    <span class="Colorguide-hex">#0073ac</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--secondary">
+    <span class="Colorguide-hex">#0074af</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--success">
+    <span class="Colorguide-hex">#33802a</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--neutral">
+    <span class="Colorguide-hex">#6d6d6d</span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--action">
+    <span class="Colorguide-hex">#a23891</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--danger">
+    <span class="Colorguide-hex">#ad393a</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--alert">
+    <span class="Colorguide-hex">#845a04</span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--light">
+    <span class="Colorguide-hex">#ffffff</span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--dark">
+    <span class="Colorguide-hex">#333333</span>
+  </div> 
+</div>
+        
+        $my-functional-variable-name--color: $canvas-primary;
+
+        .canvasblock__subtitle {
+          color: $my-functional-variable-name--color;
+        }
+
+<div class="styleguide-section__component-notes">
+  <h4 class="codeBlock__note-title">Notes</h4>
+  <p class="codeBlock__note-description">Use color variables when adding colors to your elements.</p>
+  <p class="codeBlock__note-description">Do not use hex codes in .scss or .sass files.</p>
+  <p class="codeBlock__note-description">If that color needs to be tweaked, use the scss functions for <pre><code>lighten($my-color, 10%)</code></pre> and <pre><code>darken($my-color, 10%)</code></pre></p>
+  <p class="codeBlock__note-description">High Contrast colors are automatically pulled in based on the canvas color variables.</p>
+</div>
+
+*/

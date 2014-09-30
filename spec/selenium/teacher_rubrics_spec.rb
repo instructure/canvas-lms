@@ -57,7 +57,7 @@ describe "course rubrics" do
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
       f('.rubric_total').should include_text "5"
 
-      f('.edit_rubric_link').click
+      f('#right-side .edit_rubric_link').click
       criterion_points = fj(".criterion_points:visible")
       replace_content(criterion_points, "10")
       criterion_points.send_keys(:return)
@@ -75,7 +75,7 @@ describe "course rubrics" do
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
-      2.times { |n| f('.edit_rubric_link').click }
+      2.times { |n| f('#right-side .edit_rubric_link').click }
       ff('.rubric .button-container').length.should == 1
     end
 
@@ -106,7 +106,7 @@ describe "course rubrics" do
       wait_for_ajaximations
       import_outcome
 
-      f('.edit_rubric_link').click
+      f('#right-side .edit_rubric_link').click
       wait_for_ajaximations
 
       links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")

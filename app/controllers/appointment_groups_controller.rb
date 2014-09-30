@@ -219,16 +219,16 @@ class AppointmentGroupsController < ApplicationController
   # Retrieve the list of appointment groups that can be reserved or managed by
   # the current user.
   #
-  # @argument scope [Optional, String, "reservable"|"manageable"]
+  # @argument scope [String, "reservable"|"manageable"]
   #   Defaults to "reservable"
   #
-  # @argument context_codes[] [Optional, String]
+  # @argument context_codes[] [String]
   #   Array of context codes used to limit returned results.
   #
-  # @argument include_past_appointments [Optional, Boolean]
+  # @argument include_past_appointments [Boolean]
   #   Defaults to false. If true, includes past appointment groups
   #
-  # @argument include[] [Optional, "appointments"|"child_events"|"participant_count"|"reserved_times"]
+  # @argument include[] ["appointments"|"child_events"|"participant_count"|"reserved_times"]
   #   Array of additional information to include.
   #
   #   "appointments":: calendar event time slots for this appointment group
@@ -281,50 +281,50 @@ class AppointmentGroupsController < ApplicationController
   # specified, the response will return a new_appointments array (same format
   # as appointments array, see "List appointment groups" action)
   #
-  # @argument appointment_group[context_codes][] [String]
+  # @argument appointment_group[context_codes][] [Required, String]
   #   Array of context codes (courses, e.g. course_1) this group should be
   #   linked to (1 or more). Users in the course(s) with appropriate permissions
   #   will be able to sign up for this appointment group.
   #
-  # @argument appointment_group[sub_context_codes][] [Optional, String]
+  # @argument appointment_group[sub_context_codes][] [String]
   #   Array of sub context codes (course sections or a single group category)
   #   this group should be linked to. Used to limit the appointment group to
   #   particular sections. If a group category is specified, students will sign
   #   up in groups and the participant_type will be "Group" instead of "User".
   #
-  # @argument appointment_group[title] [Optional, String]
+  # @argument appointment_group[title] [Required, String]
   #   Short title for the appointment group.
   #
-  # @argument appointment_group[description] [Optional, String]
+  # @argument appointment_group[description] [String]
   #   Longer text description of the appointment group.
   #
-  # @argument appointment_group[location_name] [Optional, String]
+  # @argument appointment_group[location_name] [String]
   #   Location name of the appointment group.
   #
-  # @argument appointment_group[location_address] [Optional, String]
+  # @argument appointment_group[location_address] [String]
   #   Location address.
   #
-  # @argument appointment_group[publish] [Optional, Boolean]
+  # @argument appointment_group[publish] [Boolean]
   #   Indicates whether this appointment group should be published (i.e. made
   #   available for signup). Once published, an appointment group cannot be
   #   unpublished. Defaults to false.
   #
-  # @argument appointment_group[participants_per_appointment] [Optional, Integer]
+  # @argument appointment_group[participants_per_appointment] [Integer]
   #   Maximum number of participants that may register for each time slot.
   #   Defaults to null (no limit).
   #
-  # @argument appointment_group[min_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[min_appointments_per_participant] [Integer]
   #   Minimum number of time slots a user must register for. If not set, users
   #   do not need to sign up for any time slots.
   #
-  # @argument appointment_group[max_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[max_appointments_per_participant] [Integer]
   #   Maximum number of time slots a user may register for.
   #
-  # @argument appointment_group[new_appointments][X][] [Optional]
+  # @argument appointment_group[new_appointments][X][]
   #   Nested array of start time/end time pairs indicating time slots for this
   #   appointment group. Refer to the example request.
   #
-  # @argument appointment_group[participant_visibility] [Optional, "private"|"protected"]
+  # @argument appointment_group[participant_visibility] ["private"|"protected"]
   #   "private":: participants cannot see who has signed up for a particular
   #               time slot
   #   "protected":: participants can see who has signed up.  Defaults to
@@ -367,7 +367,7 @@ class AppointmentGroupsController < ApplicationController
   #
   # Returns information for a single appointment group
   #
-  # @argument include[] [Optional, "child_events"|"appointments"]
+  # @argument include[] ["child_events"|"appointments"]
   #   Array of additional information to include. Ssee include[] argument of
   #   "List appointment groups" action.
   #
@@ -390,50 +390,50 @@ class AppointmentGroupsController < ApplicationController
   # the response will return a new_appointments array (same format as
   # appointments array, see "List appointment groups" action).
   #
-  # @argument appointment_group[context_codes][] [String]
+  # @argument appointment_group[context_codes][] [Required, String]
   #   Array of context codes (courses, e.g. course_1) this group should be
   #   linked to (1 or more). Users in the course(s) with appropriate permissions
   #   will be able to sign up for this appointment group.
   #
-  # @argument appointment_group[sub_context_codes][] [Optional, String]
+  # @argument appointment_group[sub_context_codes][] [String]
   #   Array of sub context codes (course sections or a single group category)
   #   this group should be linked to. Used to limit the appointment group to
   #   particular sections. If a group category is specified, students will sign
   #   up in groups and the participant_type will be "Group" instead of "User".
   #
-  # @argument appointment_group[title] [Optional, String]
+  # @argument appointment_group[title] [String]
   #   Short title for the appointment group.
   #
-  # @argument appointment_group[description] [Optional, String]
+  # @argument appointment_group[description] [String]
   #   Longer text description of the appointment group.
   #
-  # @argument appointment_group[location_name] [Optional, String]
+  # @argument appointment_group[location_name] [String]
   #   Location name of the appointment group.
   #
-  # @argument appointment_group[location_address] [Optional, String]
+  # @argument appointment_group[location_address] [String]
   #   Location address.
   #
-  # @argument appointment_group[publish] [Optional, Boolean]
+  # @argument appointment_group[publish] [Boolean]
   #   Indicates whether this appointment group should be published (i.e. made
   #   available for signup). Once published, an appointment group cannot be
   #   unpublished. Defaults to false.
   #
-  # @argument appointment_group[participants_per_appointment] [Optional, Integer]
+  # @argument appointment_group[participants_per_appointment] [Integer]
   #   Maximum number of participants that may register for each time slot.
   #   Defaults to null (no limit).
   #
-  # @argument appointment_group[min_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[min_appointments_per_participant] [Integer]
   #   Minimum number of time slots a user must register for. If not set, users
   #   do not need to sign up for any time slots.
   #
-  # @argument appointment_group[max_appointments_per_participant] [Optional, Integer]
+  # @argument appointment_group[max_appointments_per_participant] [Integer]
   #   Maximum number of time slots a user may register for.
   #
-  # @argument appointment_group[new_appointments][X][] [Optional]
+  # @argument appointment_group[new_appointments][X][]
   #   Nested array of start time/end time pairs indicating time slots for this
   #   appointment group. Refer to the example request.
   #
-  # @argument appointment_group[participant_visibility] [Optional, "private"|"protected"]
+  # @argument appointment_group[participant_visibility] ["private"|"protected"]
   #   "private":: participants cannot see who has signed up for a particular
   #               time slot
   #   "protected":: participants can see who has signed up. Defaults to "private".
@@ -463,7 +463,7 @@ class AppointmentGroupsController < ApplicationController
   # Delete an appointment group (and associated time slots and reservations) 
   # and return the deleted group
   #
-  # @argument cancel_reason [Optional, String]
+  # @argument cancel_reason [String]
   #   Reason for deleting/canceling the appointment group.
   #
   # @example_request
@@ -489,7 +489,7 @@ class AppointmentGroupsController < ApplicationController
   # Refer to the Users API for the response fields. Returns no results for
   # appointment groups with the "Group" participant_type.
   #
-  # @argument registration_status [Optional, "all"|"registered"|"registered"]
+  # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def users
     participants('User'){ |u| user_json(u, @current_user, session) }
@@ -501,7 +501,7 @@ class AppointmentGroupsController < ApplicationController
   # group. Refer to the Groups API for the response fields. Returns no results
   # for appointment groups with the "User" participant_type.
   #
-  # @argument registration_status [Optional, "all"|"registered"|"registered"]
+  # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def groups
     participants('Group'){ |g| group_json(g, @current_user, session) }

@@ -14,11 +14,12 @@ define [
     template: template
 
     els:
-      '.element_toggler': '$detailToggle'
+      '.element_toggler i': '$detailToggle'
 
     events:
       'click button':           'onToggleValue'
       'click .element_toggler': 'onToggleDetails'
+      'keyclick .element_toggler': 'onToggleDetails'
 
     onToggleValue: (e) ->
       @toggleValue($(e.currentTarget))

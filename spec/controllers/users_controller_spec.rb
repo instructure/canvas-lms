@@ -195,7 +195,16 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      assert_status(500)
+      assert_status(401)
+      @student.reload.workflow_state.should_not == 'deleted'
+    end
+
+    it "should fail when the user has a SIS ID and uses canvas authentication" do
+      user_with_pseudonym
+      course_with_student_logged_in user: @user
+      @student.pseudonym.update_attribute :sis_user_id, 'kzarn'
+      post 'destroy', id: @student.id
+      assert_status(401)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -386,38 +395,42 @@ describe UsersController do
         u.pseudonym.should be_password_auto_generated
       end
 
-      it "should ignore the password if self enrolling with an email pseudonym" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
+      context "self enrollment" do
+        before(:once) do
+          Account.default.allow_self_enrollment!
+          course(:active_all => true)
+          @course.update_attribute(:self_enrollment, true)
+        end
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
-        response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
-        u.should be_pre_registered
-        u.pseudonym.should be_password_auto_generated
-      end
+        it "should strip the self enrollment code before validation" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code + ' ', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
+          response.should be_success
+        end
 
-      it "should require a password if self enrolling with a non-email pseudonym" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
+        it "should ignore the password if self enrolling with an email pseudonym" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
+          response.should be_success
+          u = User.find_by_name 'Jacob Fugal'
+          u.should be_pre_registered
+          u.pseudonym.should be_password_auto_generated
+        end
 
-        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
-        assert_status(400)
-        json = JSON.parse(response.body)
-        json["errors"]["pseudonym"]["password"].should be_present
-        json["errors"]["pseudonym"]["password_confirmation"].should be_present
-      end
+        it "should require a password if self enrolling with a non-email pseudonym" do
+          post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+          assert_status(400)
+          json = JSON.parse(response.body)
+          json["errors"]["pseudonym"]["password"].should be_present
+          json["errors"]["pseudonym"]["password_confirmation"].should be_present
+        end
 
-      it "should auto-register the user if self enrolling" do
-        course(:active_all => true)
-        @course.update_attribute(:self_enrollment, true)
-
-        post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
-        response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
-        @course.students.should include(u)
-        u.should be_registered
-        u.pseudonym.should_not be_password_auto_generated
+        it "should auto-register the user if self enrolling" do
+          post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+          response.should be_success
+          u = User.find_by_name 'Jacob Fugal'
+          @course.students.should include(u)
+          u.should be_registered
+          u.pseudonym.should_not be_password_auto_generated
+        end
       end
 
       it "should validate the observee's credentials" do

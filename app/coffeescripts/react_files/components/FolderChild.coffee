@@ -9,7 +9,9 @@ define [
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
-], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
+  './PublishCloud'
+  '../utils/downloadStuffAsAZip'
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud, downloadStuffAsAZip) ->
 
 
   FolderChild = React.createClass
@@ -17,19 +19,18 @@ define [
     mixins: [BackboneMixin('model')],
 
     getInitialState: ->
-      editing: false
+      editing: @props.model.isNew()
 
-    componentWillMount: ->
-      if @props.model.isNew()
-        @startEditingName()
+    componentDidMount: ->
+      @focusNameInput() if @state.editing
 
-    startEditingName: preventDefault ->
-      @setState editing: true
-      setTimeout =>
-        @refs.newName.getDOMNode().focus()
+    startEditingName: ->
+      @setState editing: true, @focusNameInput
 
+    focusNameInput: ->
+      @refs.newName.getDOMNode().focus()
 
-    saveNameEdit: preventDefault ->
+    saveNameEdit: ->
       @props.model.save(name: @refs.newName.getDOMNode().value)
       @setState(editing: false)
 
@@ -40,16 +41,19 @@ define [
 
 
     render: withReactDOM ->
-      div className:'ef-item-row',
+      div className:"ef-item-row #{'ef-item-selected' if @props.isSelected}", onClick: @props.toggleSelected,
+        label className: 'screenreader-only',
+          input type: 'checkbox', defaultChecked: @props.isSelected, onChange: @props.toggleSelected,
+          I18n.t('labels.select', 'Select This Item')
         div className:'ef-name-col',
           if @state.editing
-            form className: 'ef-edit-name-form', onSubmit: @saveNameEdit,
+            form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),
               input({
                 type:'text',
                 ref:'newName',
                 className: 'input-block-level',
                 placeholder: I18n.t('name', 'Name'),
-                defaultValue: @props.model.get('name') || @props.model.get('display_name')
+                defaultValue: @props.model.displayName()
                 onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
               }),
               button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,
@@ -66,7 +70,7 @@ define [
                 i className:'icon-document'
               @props.model.get('display_name')
 
-        div className:'ef-date-created-col', onClick: @startEditing,
+        div className:'ef-date-created-col',
           FriendlyDatetime datetime: @props.model.get('created_at'),
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
@@ -76,12 +80,19 @@ define [
         div className:'ef-size-col',
           friendlyBytes(@props.model.get('size')),
         div( {className:'ef-links-col'},
-          span( {'data-module-type':'assignment', 'data-content-id':'6', 'data-id':'6', 'data-course-id':'4', 'data-module-id':'3', 'data-module-item-id':'3', 'data-published':'true', 'data-publishable':'true', 'data-unpublishable':'true', className:'publish-icon published publish-icon-published', role:'button', tabIndex:'0', 'aria-pressed':'true', title:'Published', 'aria-describedby':'ui-tooltip-1', 'aria-label':'Published. Click to unpublish.'}, i( {className:'icon-publish'}),
-            span( {className:'publish-text', tabIndex:'-1'}, ' Published'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.'),
-            span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.')
-          ),
+          PublishCloud(model: @props.model),
+
+          a (if @props.model instanceof Folder
+              href: '#'
+              onClick: preventDefault =>
+                downloadStuffAsAZip([@props.model], {
+                  contextType: @props.params.contextType
+                  contextId: @props.params.contextId
+                })
+            else
+              href: @props.model.get('url')
+            ),
+            i className:'icon-download'
 
           ItemCog(model: @props.model, startEditingName: @startEditingName)
         )

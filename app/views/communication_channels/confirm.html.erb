@@ -120,7 +120,7 @@ Which is you?", :count => @merge_opportunities.length %>
       <div class="control-group">
         <%= blabel :user, :time_zone, :en => "Time Zone", :class => 'control-label' %>
         <div class="controls">
-          <%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, {:default => @pseudonym.account.default_time_zone.name, :value => @user.time_zone} %>
+          <%= time_zone_select :user, :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => @pseudonym.account.default_time_zone %>
         </div>
       </div>
       <% if @pseudonym.account == Account.default %>

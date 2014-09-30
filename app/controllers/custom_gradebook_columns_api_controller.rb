@@ -53,7 +53,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # List all custom gradebook columns for a course
   #
-  # @param include_hidden [Boolean]
+  # @argument include_hidden [Boolean]
   #   Include hidden parameters (defaults to false)
   #
   # @returns [CustomColumn]
@@ -76,12 +76,12 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # Create a custom gradebook column
   #
-  # @argument column[title] [String]
-  # @argument column[position] [Int]
+  # @argument column[title] [Required, String]
+  # @argument column[position] [Integer]
   #   The position of the column relative to other custom columns
-  # @argument column[hidden] [Optional, Boolean]
+  # @argument column[hidden] [Boolean]
   #   Hidden columns are not displayed in the gradebook
-  # @argument column[teacher_notes] [Optional, Boolean]
+  # @argument column[teacher_notes] [Boolean]
   #   Set this if the column is created by a teacher.  The gradebook only
   #   supports one teacher_notes column.
   #

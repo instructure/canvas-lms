@@ -83,7 +83,7 @@ class GroupMembershipsController < ApplicationController
   #
   # List the members of a group.
   #
-  # @argument filter_states[] [Optional, String, "accepted"|"invited"|"requested"]
+  # @argument filter_states[] [String, "accepted"|"invited"|"requested"]
   #   Only list memberships with the given workflow_states. By default it will
   #   return all memberships.
   #
@@ -144,7 +144,7 @@ class GroupMembershipsController < ApplicationController
   #
   # Accept a membership request, or add/remove moderator rights.
   #
-  # @argument workflow_state [Optional, String, "accepted"]
+  # @argument workflow_state [String, "accepted"]
   #   Currently, the only allowed value is "accepted"
   #
   # @argument moderator

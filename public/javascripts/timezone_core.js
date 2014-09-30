@@ -44,6 +44,30 @@ define([
       var datetime = tz.parse(value);
       if (datetime == null) return null;
 
+      // some locales may not (according to bigeasy's localization files) use
+      // an am/pm distinction, but could then be incorrectly used with 12-hour
+      // format strings (e.g. %l:%M%P), whether by erroneous format strings in
+      // canvas' localization files or by unlocalized format strings. as a
+      // result, you might get 3am and 3pm both formatting to the same value.
+      // to prevent this, 12-hour indicators with an am/pm indicator should be
+      // promoted to the equivalent 24-hour indicator when the locale defines
+      // %P as an empty string.
+
+      // javascript doesn't have lookbehind, so do the fixing on the reversed
+      // string so we can use lookahead instead. the funky '(%%)*(?!%)' pattern
+      // in all the regexes is to make sure we match (once unreversed), e.g.,
+      // both %l and %%%l (literal-% + %l) but not %%l (literal-% + l).
+      format = format.split("").reverse().join("");
+      if (_tz(datetime, '%P') === '' &&
+          ((format.match(/[lI][-_]?%(%%)*(?!%)/) &&
+            format.match(/p%(%%)*(?!%)/i)) ||
+           format.match(/r[-_]?%(%%)*(?!%)/))) {
+        format = format.replace(/l(?=[-_]?%(%%)*(?!%))/, 'k');
+        format = format.replace(/I(?=[-_]?%(%%)*(?!%))/, 'H');
+        format = format.replace(/r(?=[-_]?%(%%)*(?!%))/, 'T');
+      }
+      format = format.split("").reverse().join("");
+
       // try and apply the format string to the datetime. if it succeeds, we'll
       // get a string; otherwise we'll get the (non-string) date back.
       var formatted = null;

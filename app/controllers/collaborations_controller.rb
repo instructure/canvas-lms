@@ -142,7 +142,9 @@ class CollaborationsController < ApplicationController
 
   # @API List members of a collaboration.
   #
-  # Examples
+  # List the collaborators of a given collaboration
+  #
+  # @example_request
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
   #

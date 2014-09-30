@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Canvas Quiz Statistics</title>
+
+    <!-- Canvas Normal Contrast CSS -->
+    <link
+      rel="stylesheet"
+      href="/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css" />
+    <link
+      rel="stylesheet"
+      href="/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css" />
+
+    <!-- App CSS -->
+    <link
+      rel="stylesheet"
+      href="/dist/canvas_quiz_statistics.css" />
+
+    <script src="/vendor/js/require.js"></script>
+    <style>
+      #header {
+        height: 70px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="header"></div>
+    <div id="main"></div>
+
+    <script>
+      requirejs.config({
+        baseUrl: '/src/js',
+        deps: [ 'main' ]
+      });
+
+      require([ 'boot' ], function(app) {
+        window.app = app;
+
+        app.mount(document.body.querySelector('#main'));
+      });
+    </script>
+
+    <script src="//localhost:9224/livereload.js"></script>
+ </body>
+</html>

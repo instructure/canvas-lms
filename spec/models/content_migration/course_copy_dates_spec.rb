@@ -9,7 +9,7 @@ describe ContentMigration do
         @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
         @new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
-        @copy_from.assert_assignment_group
+        @copy_from.require_assignment_group
         @copy_from.assignments.create!(:due_at => @old_start + 1.day,
                                        :unlock_at => @old_start + 2.days,
                                        :lock_at => @old_start + 3.days,
@@ -246,7 +246,7 @@ describe ContentMigration do
 
     it "should perform day substitutions" do
       pending unless Qti.qti_enabled?
-      @copy_from.assert_assignment_group
+      @copy_from.require_assignment_group
       today = Time.now.utc
       asmnt = @copy_from.assignments.build
       asmnt.due_at = today

@@ -287,8 +287,20 @@
 }
 
 .open-message {
+  color: #fff;
+  background: #DC3F3F;
+  border: 1px dashed #fff;
+  font-size: 12px;
+  padding: 2px;
   left: -9999px;
   position: absolute;
+  &:focus {
+    left: 50%;
+    top: 2px;
+    width: auto;
+    height: auto;
+    z-index: 1;
+  }
 }
 
 .message-detail.span8 {

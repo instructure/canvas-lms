@@ -26,3 +26,24 @@ require [
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource, @calendar)
   drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, @eventDataSource)
+
+  keyboardUser = true
+
+  $(".calendar-button").on 'mousedown', (e) =>
+    keyboardUser = false
+    $(e.target).find(".accessibility-warning").addClass("screenreader-only")
+
+  $(document).on 'keydown', (e) =>
+    if e.which == 9 #checking for tab press
+      keyboardUser = true
+
+  $(".calendar-button").on "focus", (e) =>
+    if keyboardUser
+      $(e.target).find(".accessibility-warning").removeClass("screenreader-only")
+
+  $(".calendar-button").on "focusout", (e) =>
+    $(e.target).find(".accessibility-warning").addClass("screenreader-only")
+
+
+
+  

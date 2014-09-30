@@ -10,13 +10,89 @@ define [
       38: 'UpArrow'
       40: 'DownArrow'
 
+    events:
+      'click .disable_nav_item_link': 'disableNavLink'
+      'click .move_nav_item_link'   : 'moveNavLink'
+      'click .enable_nav_item_link' : 'enableNavLink'
+
+
     els:
       '#nav_enabled_list' : '$enabled_list'
       '#nav_disabled_list' : '$disabled_list'
+      '#move_nav_item_form': '$move_dialog'
+      '.navitem' : '$navitems'
+      '#move_nav_item_name' : '$move_name'
+
+    disableNavLink: (e) ->
+      $targetItem = $(e.currentTarget).closest('.navitem')
+      @$disabled_list.append($targetItem)
+      $(e.currentTarget)
+        .attr('class', '')
+        .attr('class', 'icon-plus enable_nav_item_link')
+        .text("Enable")
+
+    enableNavLink: (e) ->
+      $targetItem = $(e.currentTarget).closest('.navitem')
+      @$enabled_list.append($targetItem)
+      $(e.currentTarget)
+        .attr('class', '')
+        .attr('class', 'icon-x disable_nav_item_link')
+        .text("Disable")
+
+    moveNavLink: (e) ->
+      dialog = @$move_dialog
+      which_list = $(e.currentTarget).closest '.nav_list'
+      which_item = $(e.currentTarget).closest '.navitem'
+      options = []
+      which_list.children('.navitem').each (key, item) ->
+        if $(item).attr('aria-label') is which_item.attr('aria-label')
+          return
+        options.push('<option value="' + $(item).attr('id') + '">' + $(item).attr('aria-label') + '</option>')
+      $select = @$move_dialog.children().find('#move_nav_item_select')
+      # Clear the options first
+      $select.empty()
+      $select.append(options.join(''))
+      # Set the name in the dialog
+      @$move_name.text which_item.attr('aria-label')
+      @$move_dialog.data 'current_item', which_item
+
+
+      @$move_dialog.dialog(
+        modal: true
+        width: 600
+        height: 300
+        close: ->
+          dialog.dialog('close')
+        )
+
+    moveSubmit: (e) ->
+      e.preventDefault()
+      current_item = $('#move_nav_item_form').data 'current_item'
+      before_or_after = $('[name="move_location"]:checked').val();
+      selected_item = $('#' + $('#move_nav_item_select').val());
+      if before_or_after is 'before'
+        selected_item.before current_item
+      if before_or_after is 'after'
+        selected_item.after current_item
+      $('#move_nav_item_form').dialog('close')
+      current_item.focus()
+
+    cancelMove: ->
+      $('#move_nav_item_form').dialog('close')
+
+    focusKeyboardHelp: (e) ->
+      $('.drag_and_drop_warning').removeClass('screenreader-only')
+
+    hideKeyboardHelp: (e) ->
+      $('.drag_and_drop_warning').addClass('screenreader-only')
 
     afterRender: ->
       @keyCodes = Object.freeze? @keyCodes
       $("li.navitem").on 'keydown', @onKeyDown
+      $('#move_nav_item_cancel_btn').on 'click', @cancelMove
+      @$move_dialog.on 'submit', @moveSubmit
+      $('#navigation_tab').on 'blur', @focusKeyboardHelp
+      $('.drag_and_drop_warning').on 'blur', @hideKeyboardHelp
 
     onKeyDown: (e) =>
       $target = $(e.target)

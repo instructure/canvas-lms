@@ -5,6 +5,7 @@ describe "self enrollment" do
 
   context "in a full course" do
     it "should not be allowed" do
+      Account.default.allow_self_enrollment!
       course(:active_all => true)
       @course.self_enrollment = true
       @course.self_enrollment_limit = 0
@@ -66,6 +67,7 @@ describe "self enrollment" do
 
   shared_examples_for "closed registration" do
     before do
+      Account.default.allow_self_enrollment!
       course(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)
