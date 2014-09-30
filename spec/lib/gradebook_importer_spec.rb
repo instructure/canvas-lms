@@ -295,7 +295,7 @@ describe GradebookImporter do
         ",#{@student.id},,10"
     )
     @gi.assignments.should == [@assignment1]
-    submission = @gi.students.first.read_attribute(:submissions).first
+    submission = @gi.students.first.gradebook_importer_submissions.first
     submission['original_grade'].should == '8'
     submission['grade'].should == '10'
     submission['assignment_id'].should == @assignment1.id

@@ -101,7 +101,7 @@ class GradebookImporter
       r
     end
     @students.each do |student|
-      student.read_attribute(:submissions).each do |submission|
+      student.gradebook_importer_submissions.each do |submission|
         submission['original_grade'] = original_submissions_by_student[student.id].try(:[], submission['assignment_id'].to_i)
       end
     end
@@ -112,14 +112,14 @@ class GradebookImporter
       @assignments.each_with_index do |assignment, idx|
         next if assignment.changed?
         indexes_to_delete << idx if @students.all? do |student|
-          submission = student.read_attribute(:submissions)[idx]
+          submission = student.gradebook_importer_submissions[idx]
           submission['original_grade'].to_s == submission['grade'] || (submission['original_grade'].blank? && submission['grade'].blank?)
         end
       end
       indexes_to_delete.reverse.each do |idx|
         @assignments.delete_at(idx)
         @students.each do |student|
-          student.read_attribute(:submissions).delete_at(idx)
+          student.gradebook_importer_submissions.delete_at(idx)
         end
       end
       @unchanged_assignments = !indexes_to_delete.empty?
@@ -215,7 +215,7 @@ class GradebookImporter
       }
       l << new_submission
     end
-    student.write_attribute(:submissions, l)
+    student.gradebook_importer_submissions = l
   end
 
   def as_json(options={})
@@ -248,7 +248,7 @@ class GradebookImporter
         :name => user.name,
         :previous_id => user.previous_id,
         :id => user.id,
-        :submissions => user.read_attribute(:submissions)
+        :submissions => user.gradebook_importer_submissions
       }
     end
 
