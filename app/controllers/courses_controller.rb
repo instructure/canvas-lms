@@ -1360,6 +1360,8 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
+      log_asset_access("home:#{@context.asset_string}", "home", "other")
+
       check_incomplete_registration
 
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")

@@ -321,6 +321,8 @@ class ExternalToolsController < ApplicationController
       selection_type = params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
       if find_tool(params[:id], selection_type)
 
+        log_asset_access(@tool, "external_tools", "external_tools")
+
         @return_url = external_content_success_url('external_tool_redirect')
         @redirect_return = true
 

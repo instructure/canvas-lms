@@ -467,6 +467,10 @@ class ContextExternalTool < ActiveRecord::Base
     scope.order(ContextExternalTool.best_unicode_collation_key('name'))
   end
 
+  def self.find_external_tool_by_id(id, context)
+    self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
+  end
+
   # Order of precedence: Basic LTI defines precedence as first
   # checking for a match on domain.  Subdomains count as a match
   # on less-specific domains, but the most-specific domain will

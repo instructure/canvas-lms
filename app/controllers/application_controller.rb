@@ -1180,6 +1180,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
+      log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
@@ -1200,6 +1201,7 @@ class ApplicationController < ActionController::Base
         redirect_to named_context_url(context, error_redirect_symbol)
       else
         return unless require_user
+        log_asset_access(@tool, "external_tools", "external_tools")
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
         @lti_launch = Lti::Launch.new

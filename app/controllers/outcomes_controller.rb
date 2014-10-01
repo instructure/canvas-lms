@@ -25,6 +25,8 @@ class OutcomesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_OUTCOMES)
+      log_asset_access("outcomes:#{@context.asset_string}", "outcomes", "other")
+
       @root_outcome_group = @context.root_outcome_group
       if common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil)
         common_core_group_id = common_core_group_id.to_i
@@ -53,6 +55,8 @@ class OutcomesController < ApplicationController
 
     @outcome = @context.linked_learning_outcomes.find(params[:id])
     if authorized_action(@context, @current_user, :manage_outcomes)
+      log_asset_access(@outcome, "outcomes", "outcomes")
+
       codes = [@context].map(&:asset_string)
       if @context.is_a?(Account)
         if @context == @outcome.context

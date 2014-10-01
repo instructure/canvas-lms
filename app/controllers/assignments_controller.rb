@@ -36,6 +36,8 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      log_asset_access("assignments:#{@context.asset_string}", 'assignments', 'other')
+
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple

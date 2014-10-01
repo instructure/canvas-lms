@@ -38,6 +38,7 @@ module Context
     CalendarEvent = ::CalendarEvent
     Collaboration = ::Collaboration
     ContentTag = ::ContentTag
+    ContextExternalTool = ::ContextExternalTool
     ContextModule = ::ContextModule
     DiscussionEntry = ::DiscussionEntry
     DiscussionTopic = ::DiscussionTopic
@@ -213,6 +214,8 @@ module Context
     res = nil
     if klass == WikiPage
       res = context.wiki.wiki_pages.where(id: id).first
+    elsif klass == ContextExternalTool
+      res = klass.find_external_tool_by_id(id, context)
     elsif (klass.column_names & ['context_id', 'context_type']).length == 2
       res = klass.where(context_id: context, context_type: context.class.to_s, id: id).first
     elsif klass == Attachment

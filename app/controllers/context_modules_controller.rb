@@ -37,6 +37,7 @@ class ContextModulesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
+      log_asset_access("modules:#{@context.asset_string}", "modules", "other")
       load_modules
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)

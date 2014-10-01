@@ -176,6 +176,7 @@ class WikiPagesController < ApplicationController
     end
 
     if authorized_action(@context.wiki, @current_user, :read)
+      log_asset_access("pages:#{@context.asset_string}", "pages", "other")
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       @padless = true
     end

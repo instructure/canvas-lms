@@ -128,6 +128,8 @@ class AssetUserAccess < ActiveRecord::Base
       asset.title
     elsif self.asset.is_a? Enrollment
       asset.user.name
+    elsif self.asset.respond_to?(:name) && !self.asset.name.nil?
+      asset.name
     else
       self.asset_code
     end
@@ -142,7 +144,8 @@ class AssetUserAccess < ActiveRecord::Base
       split = self.asset_code.split(/\:/)
       if split[1] == self.context_code
         # TODO: i18n
-        "#{self.context_type} #{split[0].titleize}"
+        title = split[0] == "topics" ? "Discussions" : split[0].titleize
+        "#{self.context_type} #{title}"
       else
         self.display_name
       end
@@ -159,7 +162,9 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset_class_name
-    self.asset.class.name.underscore if self.asset
+    name = self.asset.class.name.underscore if self.asset
+    name = "Quiz" if name == "Quizzes::Quiz"
+    name
   end
 
   def log( kontext, accessed )
