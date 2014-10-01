@@ -1294,6 +1294,22 @@ describe Course, "tabs_available" do
 
       expect(tabs).not_to be_include(t1.asset_string)
     end
+
+    it 'includes message handlers if opt[:include_external] is true' do
+      mock_tab = {
+        :id => '1234',
+        :label => 'my_label',
+        :css_class => '1234',
+        :href => :launch_path_helper,
+        :visibility => nil,
+        :external => true,
+        :hidden => false,
+        :args => [1, 2]
+      }
+      Lti::MessageHandler.stubs(:lti_apps_tabs).returns([mock_tab])
+      expect(@course.tabs_available(nil, :include_external => true)).to include(mock_tab)
+    end
+
   end
 
   context "observers" do

@@ -710,6 +710,22 @@ describe Account do
       expect(tab[:href]).to eq :account_external_tool_path
       expect(tab[:args]).to eq [@account.id, tool.id]
     end
+
+    it 'includes message handlers' do
+      mock_tab = {
+        :id => '1234',
+        :label => 'my_label',
+        :css_class => '1234',
+        :href => :launch_path_helper,
+        :visibility => nil,
+        :external => true,
+        :hidden => false,
+        :args => [1, 2]
+      }
+      Lti::MessageHandler.stubs(:lti_apps_tabs).returns([mock_tab])
+      expect(@account.tabs_available(nil)).to include(mock_tab)
+    end
+
   end
 
   describe "fast_all_users" do

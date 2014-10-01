@@ -5,7 +5,7 @@ module Lti
 
     let(:root_account) { mock('root account', lti_guid: 'my_guid') }
     let(:account) { mock('account', id: 3, root_account: root_account) }
-    let(:tcp_url) {'http://example.instructure.com/tcp/uuid'}
+    let(:tcp_url) { 'http://example.instructure.com/tcp/uuid' }
     subject { ToolConsumerProfileCreator.new(account, tcp_url) }
 
     describe '#create' do
@@ -47,18 +47,44 @@ module Lti
 
       it 'creates the registration service' do
         profile = subject.create
-        reg_srv = profile.service_offered.find {|srv| srv.id.include? 'ToolProxy.collection'}
-
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? 'ToolProxy.collection' }
         expect(reg_srv.id).to eq "#{tcp_url}#ToolProxy.collection"
-        expect(reg_srv.endpoint).to include "3/tool_proxy"
+        expect(reg_srv.endpoint).to include('3/tool_proxy')
         expect(reg_srv.type).to eq 'RestService'
         expect(reg_srv.format).to eq ["application/vnd.ims.lti.v2.toolproxy+json"]
-        expect(reg_srv.action).to include 'POST'
+        expect(reg_srv.action).to include('POST')
       end
 
-      it 'add the basic_launch capability' do
-        expect(subject.create.capability_offered).to include 'basic-lti-launch-request'
+      describe '#capabilities' do
+        it 'add the basic_launch capability' do
+          expect(subject.create.capability_offered).to include('basic-lti-launch-request')
+        end
+
+        it 'adds the Canvas.api.domain capability' do
+          expect(subject.create.capability_offered).to include('Canvas.api.domain')
+        end
+
+        it 'adds the LtiLink.custom.url capability' do
+          expect(subject.create.capability_offered).to include('LtiLink.custom.url')
+        end
+
+        it 'adds the ToolProxyBinding.custom.url capability' do
+          expect(subject.create.capability_offered).to include('ToolProxyBinding.custom.url')
+        end
+
+        it 'adds the ToolProxy.custom.url capability' do
+          expect(subject.create.capability_offered).to include('ToolProxy.custom.url')
+        end
+
+        it 'adds the Canvas.placements.account-nav capability' do
+          expect(subject.create.capability_offered).to include('Canvas.placements.account-nav')
+        end
+
+        it 'adds the Canvas.placements.course-nav capability' do
+          expect(subject.create.capability_offered).to include('Canvas.placements.course-nav')
+        end
       end
+
 
     end
   end

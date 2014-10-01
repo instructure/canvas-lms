@@ -2338,7 +2338,11 @@ class Course < ActiveRecord::Base
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
-      external_tabs = (opts[:include_external] && external_tool_tabs(opts)) || []
+      external_tabs = if opts[:include_external]
+                        external_tool_tabs(opts) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                      else
+                        []
+                      end
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab

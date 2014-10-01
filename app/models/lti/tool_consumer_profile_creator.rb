@@ -104,7 +104,14 @@ module Lti
     end
 
     def capabilities
-      %w( basic-lti-launch-request Canvas.api.domain LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
+      %w( basic-lti-launch-request
+          Canvas.api.domain
+          LtiLink.custom.url
+          ToolProxyBinding.custom.url
+          ToolProxy.custom.url
+          Canvas.placements.account-nav
+          Canvas.placements.course-nav
+        )
     end
 
   end

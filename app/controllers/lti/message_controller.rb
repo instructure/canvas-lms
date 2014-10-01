@@ -47,6 +47,7 @@ module Lti
             tool_consumer_instance_guid: @context.root_account.lti_guid,
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
+          @active_tab = message_handler.asset_string
           message.add_custom_params(custom_params(message_handler.parameters, tool_proxy, message.resource_link_id))
           @lti_launch = Launch.new
           @lti_launch.resource_url = message.launch_url

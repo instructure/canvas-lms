@@ -18,6 +18,9 @@
 
 module Lti
   class MessageHandler< ActiveRecord::Base
+
+    BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'
+
     attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource_handler, :links
     attr_readonly :created_at
 
@@ -37,6 +40,39 @@ module Lti
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)
       joins(:resource_handler).where('lti_resource_handlers.tool_proxy_id' => tool_proxies)
     }
+
+    scope :has_placements, lambda { |*placements|
+      where('EXISTS (
+              SELECT * FROM lti_resource_placements
+              WHERE lti_message_handlers.resource_handler_id = lti_resource_placements.resource_handler_id
+              AND lti_resource_placements.placement IN (?) )', placements)
+    }
+
+    def self.lti_apps_tabs(context, placements, opts)
+      apps = Lti::MessageHandler.for_context(context).
+        has_placements(*placements).
+        by_message_types(Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST).to_a
+
+      launch_path_helper = case context
+                             when Course
+                               :course_basic_lti_launch_request_path
+                             when Account
+                               :account_basic_lti_launch_request_path
+                           end
+
+      apps.sort_by(&:id).map do |app|
+        {
+          :id => app.asset_string,
+          :label => app.resource_handler.name,
+          :css_class => app.asset_string,
+          :href => launch_path_helper,
+          :visibility => nil,
+          :external => true,
+          :hidden => false,
+          :args => [context.id, app.id]
+        }
+      end
+    end
 
   end
 end

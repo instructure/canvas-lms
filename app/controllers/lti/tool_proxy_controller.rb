@@ -46,9 +46,23 @@ module Lti
         #TODO: setting the tool_proxy to active should be a initiated through the UI by an admin/teacher
         tool_proxy.update_attribute(:workflow_state, 'active')
 
+        #TODO: this needs to be moved to whatever changes the workflow state to active
+        invalidate_nav_tabs_cache(tool_proxy)
+
         render json: json, status: :created
       else
         render json: {error: 'unauthorized'}, status: :unauthorized
+      end
+    end
+
+
+    private
+
+    def invalidate_nav_tabs_cache(tool_proxy)
+      placements = Set.new
+      tool_proxy.resources.each {|rh| placements.merge(rh.placements.map(&:placement))}
+      if (placements & [ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION]).count > 0
+        Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
       end
     end
 
