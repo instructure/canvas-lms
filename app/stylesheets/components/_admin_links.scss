@@ -113,7 +113,8 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 }
 
 .al-trigger {
-  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
