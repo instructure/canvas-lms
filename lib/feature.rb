@@ -280,6 +280,16 @@ END
       applies_to: 'Course',
       state: 'allowed',
       development: true
+    },
+    'multiple_grading_periods' =>
+    {
+      display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
+      description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
+Enable multiple grading periods management in the account admin, and use in the Gradebook.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      development: true
     }
   )
 
