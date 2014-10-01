@@ -40,6 +40,14 @@ zh_Hant:
     no_file: 未給予結果檔案或授權
     no_permissions: 不允許使用者編輯全域結果
     no_perms: 不允許使用者編輯全域結果
+    plugin_settings: 
+      api_url_description: "(如 %{url})"
+      common_core_guid: "(如 %{guid})"
+      description: "您將需要存取[學術基準](%{url}) 帳戶。"
+      labels: 
+        api_key: "API 金鑰"
+        api_url: "API URL"
+        common_core_guid: "共同核心 GUID（可選）"
   account: 
     account_settings: 
       account_surveys: 帳戶調查
@@ -786,8 +794,6 @@ zh_Hant:
             field: "測驗 ID"
           section_id: 
             field: "章節 ID"
-    screenreader_heading: 
-      page_title: 帳戶設定
     settings: 
       about_google_docs: |-
           Google Docs Previews 允許使用者查看 Canvas 內的文件，而無需下載並打開相應的程式 (如 Word 或 Excel)。
@@ -847,6 +853,9 @@ zh_Hant:
       headers: 
         report_last_run: 上次執行
         report_name: 名稱
+      headings: 
+        sections: 報告
+        settings: 帳戶設定
       help_link_available_to_all_admins: 管理員
       help_link_available_to_all_students: 學生
       help_link_available_to_all_teachers: 教師
@@ -946,6 +955,7 @@ zh_Hant:
       open_registration_delegated_warning_message: "外部身份識別提供者已啟用，透過公開登記建立的使用者可能無法登入，除非外部身份識別提供者的登入表單有返回至 %{url} 的連結。"
       open_registration_delegated_warning_tooltip: 外部身份識別提供者已啟用
       open_report_description: 公開報告說明
+      page_header_title: 帳戶設定
       page_title: 帳戶設定
       quiz_ip_filters_delete: 移除篩選器
       quiz_ip_filters_help_message: |-
@@ -1216,10 +1226,10 @@ zh_Hant:
     error_heading: "Ajax 錯誤：%{status_code}"
     errors: 
       connection_lost: "至 %{host} 的連接失敗。請確保已連接至 Internet，然後再試一次。"
-      timeout: 您的要求有問題，可能是因為閒置了很長時間。請重新載入頁面，然後重試。
       unhandled: 哎呀！最後一個要求沒有成功。
     links: 
       details: 詳細資料…
+      login: 登入
     no_text: 無文字
   alerts: 
     alert: 
@@ -1704,6 +1714,7 @@ zh_Hant:
         not_published: 未發佈
         published: 已發佈
       manage_assignment: 管理任務
+      page_header_title: 新任務
       titles: 
         delete: 刪除
     edit_view: 
@@ -1881,7 +1892,6 @@ zh_Hant:
     non_number: 必須使用數字
     notices: 
       assignment_delete: 此任務已被刪除
-      assignment_not_availible: 您所請求的任務對於您的課程章節而言不可用。
       created: 任務已成功建立。
       updated: 任務已成功更新。
     number_of_assignments: 
@@ -2211,17 +2221,11 @@ zh_Hant:
   bookmark_service: 
     default_title: 無標題
   broccoli_cloud: 
-    hidden_title: 已隐藏。按一下以取消發佈
     label: 
-      hidden: 已隐藏。按一下以取消發佈。
-      published: 已發佈。按一下以取消發佈。
-      restricted: 已受限。按一下以取消發佈。
-      unpublished: 已取消發佈。按一下以發佈。
-    publish_error: "嘗試發佈 %{name} 時發生錯誤。更改已還原！"
-    published_title: 已發佈。按一下以取消發佈
-    restricted_title: 已受限。按一下以取消發佈
-    unpublish_error: "嘗試取消發佈 %{name} 時發生錯誤。更改已還原！"
-    unpublished_title: 已取消發佈。按一下以發佈
+      published: 已發佈
+      unpublished: 已解除發佈
+    published_title: 已發佈
+    unpublished_title: 已解除發佈
   bulk_course_migration: 
     export_failed: "從 Blackboard 匯出 bb_lcid %{id} 的課程時出現錯誤"
     export_failed_no_id: 匯入課程時出現錯誤
@@ -2762,6 +2766,7 @@ zh_Hant:
       feed_title: "課程月曆 Atom 摘要"
       links: 
         feed: 按一下此處以查看摘要
+      page_title_header: 月曆
       skip_to_calendar: 跳轉到月曆
       toggle_calendars: 切換月曆
       toggle_undated_items: 切換未注日期的項目
@@ -2997,6 +3002,7 @@ zh_Hant:
     inactive_error: 這次會議當前未處於活動狀態
     index: 
       concluded_conferences: 已結束的會議
+      conference_header: 會議
       new_conference: 新會議
       new_conferences: 新會議
       page_title: "Web 會議"
@@ -3248,7 +3254,6 @@ zh_Hant:
       question_bank: 
         aria_new_label: 建立新題庫
         create_new_question: "-- 建立新題庫 --"
-        question_bank_label: 題庫
         question_bank_placeholder: 『題庫名稱』
         question_bank_placeholder_aria: 『輸入新題庫名稱』
         question_bank_title: 新題庫名稱
@@ -3671,7 +3676,6 @@ zh_Hant:
       module: 模組
       module_details: "模組按順序顯示，所以只有那些 %{name} 以上的模組可以被設定為先決條件。"
       module_name: 模組名稱
-      modules_keyboard_hint_updated: 警告：為了提高可存取性，請使用功能表中的『移動到對話方塊』選項。
       move_module: 
         after: 之後
         before: 之前
@@ -3762,7 +3766,6 @@ zh_Hant:
           student_progress: 查看此模組的學生進度
       manager_module: 管理模組
       module_will_unlock_at: "將解除鎖定 *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: 警告：為了提高可存取性，請使用功能表中的『移動到對話方塊』選項。
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 進行中"
       reorder_modules: 拖曳以重新排序模組
@@ -3989,6 +3992,7 @@ zh_Hant:
       mark_as_read: 標記為已讀取
       mark_as_unread: 標記為wei讀取
       more_options: 更多選項
+      page_title_header: 交談
       reply: 回覆
       reply_all: 全部回覆
       search_by_user: 按使用者搜尋
@@ -4658,6 +4662,7 @@ zh_Hant:
         details: 課程詳細資料
         grade_publishing: 成績發佈
         move_course: 移動課程至另一個根帳戶
+        navigation: 課程導覽
         sections: 課程章節
       help: 
         edit_navigation: 拖放專案，以便在課程瀏覽中將其重新排序。
@@ -4723,7 +4728,6 @@ zh_Hant:
         after: 之後
         before: 之前
         or: 或者
-      nav_items_keyboard_drag_and_drop: 警告：為了提高可存取性，請使用功能表中的『移動到對話方塊』選項。
       no_date: 沒有設定日期
       no_language_preference: "未設定（使用者可設定，預設為 %{language}）"
       none: 無
@@ -4873,8 +4877,8 @@ zh_Hant:
       new: 新
       new_discussion_entries: 新討論條目
       new_discussions: 新討論
-      num_of_assignments: "# 任務"
-      num_of_submissions: "# 提交件"
+      number_of_assignments: "# 任務"
+      number_of_submissions: "# 提交件"
       page_title: 課程統計資料
       quiz: 測驗
       quiz_questions: 測驗問題
@@ -4999,6 +5003,8 @@ zh_Hant:
       student: 
         count: 錯誤的學生數
         ratio: 錯誤的學生比例
+  current_uploads: 
+    close: 關閉
   curve_grades_dialog: 
     average_score: 平均分數
     buttons: 
@@ -5355,6 +5361,7 @@ zh_Hant:
       include_replies_in_podcast_feed: 將回覆納入播客摘要
       only_visible_to_overrides_note: 注意：*僅*以下指定的章節可見此討論：
       options: 選項
+      page_header_title: 新討論
       points_possible: 可能的點
       post_at: 公佈於
       save: 儲存
@@ -5470,12 +5477,12 @@ zh_Hant:
       speed_grader: "Speed Grader"
       topic: 主題
       topic_locked: "在 *%{date}* 之前，使用者不會看到本主題。"
-      topic_locked_until: "此主題被鎖定，直至 %{time}"
       topic_not_visible: 使用者看不到此主題
       topic_podcast_feed_link: 主題播客摘要
       topic_subscribe: 訂閱
       topic_subscribe_tooltip: 您已取消訂閱，將不會收到關於新意見的通知
       topic_subscribed_tooltip: 您已訂閱，將會收到關於新意見的通知
+      topic_time_locked: "此主題被鎖定，直至 %{time}"
       topic_unsubscribe: 已訂閱
       unlock_topic: 開啟以征求意見
       unread: 未讀取
@@ -5880,6 +5887,7 @@ zh_Hant:
         eportfolio_name: 我的電子檔案袋
       headers: 
         add_eportfolio: 製作電子檔案袋
+        eportfolios: 電子檔案袋
         my_eportfolios: 我的電子檔案袋
         what: 電子檔案袋是什麼？
       labels: 
@@ -6173,6 +6181,7 @@ zh_Hant:
     allow_opt_out_of_inbox: 允許使用者選擇退出收件匣
     better_file_browsing: 更好的檔案瀏覽
     differentiated_assignments: 差異化任務
+    differentiated_assignments_account_disable_warning: "關閉該功能將影響現有的課程。有關停用該功能的幫助，請聯繫您的 Canvas Success 主管。"
     draft_state: 草稿狀態
     draft_state_account_disable_warning: "關閉該功能將影響現有的課程。有關停用該功能的幫助，請聯繫您的 Canvas Success 主管。"
     draft_state_course_disable_warning: 關閉該功能將發佈課程中的所有現有物件。請確保所有的草案內容已準備好發佈，並在繼續之前可提供給課程中的所有使用者。
@@ -6189,13 +6198,10 @@ zh_Hant:
     post_grades: "公佈成績至 SIS"
     student_groups: 新學生群組頁面
     student_outcome_gradebook: 學生學習精通成績冊
-  file_browser_view: 
-    folder_tree_instructions: "使用向上和向下方向鍵來瀏覽整個樹。按向右鍵展開資料夾，按向左鍵將其收起，按 Enter 選擇影像。"
   file_rename_form: 
     back: 返回
     change: 更改
     change_name: 更改名稱
-    message: "名為『%{name}』的項目已經存在於此位置。要取代現有檔案？"
     name: 名稱
     prompt: "更改『%{name}』為"
     rename_title: 複製
@@ -6213,12 +6219,6 @@ zh_Hant:
     buttons: 
       update_file: 更新檔案
     cancel: 取消
-    content_file: 
-      links: 
-        delete: 刪除此檔案
-        edit: 按一下以編輯，拖曳以移動到另一個資料夾
-        preview_file: 預覽此檔案
-        rename: 重命名此檔案
     content_folder: 
       titles: 
         edit_and_move_instructions: 按一下以編輯，拖曳以移動到另一個資料夾
@@ -6436,6 +6436,7 @@ zh_Hant:
     graded_by_me: "%{graded_time}，由我進行"
     graded_then_resubmitted: "評分，然後重新提交 (%{when})"
     gradee_index_of_total: "%{y} 的 %{gradee} %{x}"
+    grading_in_progress: 導師正在進行評分
     group: 群組
     hide_all_details_button: 隱藏所有詳細資料
     mute_assignment: 靜音任務
@@ -6619,17 +6620,8 @@ zh_Hant:
   gradebook_uploads_form: 
     buttons: 
       upload_data: 上傳資料
-    example_csv_file: "範例 CSV 檔案"
-    existing_assignment_example: "現有任務 (581)"
-    explanation_of_required_columns: 您必須具有*所有*這些欄，您只*需要*每行一個。
-    instructions: 
-      csv_download_and_upload: "如果有疑問，可以隨時*下載一個 CSV*，更改您想更改的成績，並重新上傳同一個檔案。"
     labels: 
       upload: "選擇 CSV 檔案以上傳："
-    leaving_id_will_match_better_can_add_new_assignment: "保持 ID 完好（在此情況下，為『(581)』部分）將有助於匹配的更好。您還可以新增聯機時建立的新任務。"
-    new_assignment_example: 新任務
-    optional_ignored: 可選的，忽略不計。
-    screenreader_csv_explainer: "我的 CSV 檔案中應該包含什麼內容？以下欄應該在您的上傳中：『學生』、『ID』和『現有任務 (#)』。學生應列有每一個學生的名稱，格式為姓、名。例如，『Smith, John』。現有任務欄應該指明括弧中的任務 ID 後面的任務名稱。例如，『第一章 工作表 (201)』。如果您使用 SIS，包括以下欄：『SIS 使用者 ID』和『SIS 登入 ID』。如果您想建立新任務，包括有任務名稱的標題欄。例如，『衍生品工作表』。以下欄是可選的：『章節』、『當前分數』、『最終分數』。"
     titles: 
       upload_form: "選擇 CSV 檔案以上傳"
     what_should_csv_look_like: "CSV 檔案應該是什麼樣的？"
@@ -6693,6 +6685,7 @@ zh_Hant:
       expand_title: 展開
       faculty_journal: "針對 %{user} 的教職員日誌"
       for_course: 對於課程，
+      grading_in_progress: 導師正在進行評分
       headers: 
         details: 詳細資料
         due: 截止日期
@@ -6748,6 +6741,7 @@ zh_Hant:
       include_ungraded: "將未評分視為 0"
       individual_view: 切換至個人檢視表
       learning_mastery: 學習精通
+      page_header_title: 成績冊
       post_grades: 公佈成績
       publish_to_sis: "發佈成績至 SIS"
       set_group_weights: 設定群組權重
@@ -7167,6 +7161,7 @@ zh_Hant:
         headings: 
           account_groups: 帳戶級別的學生群組
           course_groups: 學生群組
+          groups: 群組
         tabs: 
           everyone: 每個人
       group_category: 
@@ -7900,6 +7895,22 @@ zh_Hant:
       twitter: 
         body: "已為 %{student} 觸發了警示"
         body_student: 已為您觸發了警示
+    announcement_created_by_you: 
+      email: 
+        html: 
+          attached_file: 附加的檔案
+          download: 下載
+        labels: 
+          file_included: 檔案已包括
+      sms: 
+        details: "在 %{url} 上有更多資訊"
+    announcement_reply: 
+      email: 
+        discussion_entry_reply_message: 使用以下連結加入交談，或透過回覆此郵件進行註解。
+        html: 
+          discussion_entry_reply_message: 使用以下連結加入交談，或透過回覆此郵件進行註解。
+      sms: 
+        details: "在 %{url} 上有更多資訊"
     appointment_canceled_by_user: 
       email: 
         html: 
@@ -8483,6 +8494,30 @@ zh_Hant:
     content_locked_module: "此內容是模組 *%{module}* 的一部分，尚未被解除鎖定。"
     content_locked_until: "此內容被鎖定，直至 %{date}。"
     content_unpublished_module: 此內容是未公佈的模組的一部分，尚不可用。
+    conversation_created: 
+      email: 
+        attached_files: 附加的檔案：
+        audio_comment: 該訊息包括媒體註解。要收聽或回覆，請按一下以下連結：
+        html: 
+          attached_files: 附加的檔案：
+          audio_comment: 該訊息包括媒體註解。要收聽或回覆，請按一下以下連結：
+          download: 下載
+          reply_to_conversation_message: "您可以透過直接回复此電子邮件在 Canvas 中回覆此郵件。"
+          unknown_user: 未知使用者
+          view_message: 在交談中檢視此訊息
+        reply_to_conversation_message: "您可以透過直接回复此電子邮件在 Canvas 中回覆此郵件。"
+        unknown_user: 未知使用者
+        view_message: 在交談中檢視此訊息
+      facebook: 
+        link_text: 檢視訊息
+        unknown_user: 未知使用者
+      sms: 
+        more_info: "在 %{url} 上有更多資訊"
+        unknown_user: 未知使用者
+      summary: 
+        unknown_user: 未知使用者
+      twitter: 
+        tweet: "Canvas 警示 – 來自 %{user_name} 的訊息。"
     conversation_message: 
       email: 
         attached_files: 附加的檔案：
@@ -9689,7 +9724,6 @@ zh_Hant:
         published: 已發佈
     post_grades_dialog_title: "公佈成績至 SIS"
     progression_module_collection: 
-      module_progress_for: "%{student_link} 的模組進度"
       module_progress_for_student: "%{student.name} 的模組進度"
       no_modules_found: 找不到模組
     progression_module_view: 
@@ -9736,7 +9770,6 @@ zh_Hant:
   name: 學術基準匯入程式
   new_facebook_message: "您有一個來自 Canvas 的新郵件"
   new_quiz_moderate_desc: 當草稿狀態和測驗統計資料已允許/開啟，這將為一個帳戶啟用新測驗適度頁面。
-  new_quiz_statistics_desc: 當草稿狀態已允許/開啟，這將為一個帳戶啟用新測驗統計資料頁面。
   new_styles_description: "我們正在致力於一個至 Canvas 的 UI 改建。啟用該選項來選擇查看已更新、簡化的 Canvas 介面的外觀和感覺。這是一個正好在『進行中的工作』功能，尚不應該在生產中為實際使用者開啟。"
   no_migration_file: 內容遷移所需的檔案。
   not_a_number: 必須為正數
@@ -9748,7 +9781,6 @@ zh_Hant:
         
         任務提交/重新提交
     all_submissions_display: 所有提交件
-    announcement_description: 您的課程中的新宣告
     announcement_display: 宣告
     appointment_availability_description: |-
         *僅導師和管理員：*	
@@ -10158,14 +10190,6 @@ zh_Hant:
   plugins: 
     academic_benchmark_importer: 
       description: "這使得能夠將學術基準標準匯入 Canvas。"
-    academic_benchmark_settings: 
-      api_url_description: "(如 %{url})"
-      common_core_guid: "(如 %{guid})"
-      description: "您將需要存取[學術基準](%{url}) 帳戶。"
-      labels: 
-        api_key: "API 金鑰"
-        api_url: "API URL"
-        common_core_guid: "共同核心 GUID（可選）"
     account_reports: 
       description: 選擇帳戶報告
       name: 帳戶報告
@@ -10393,14 +10417,6 @@ zh_Hant:
     scribd: 
       description: "Scribd 文件預覽"
       name: Scribd
-    scribd_settings: 
-      description: |-
-          您將需要[註冊一個 Scribd API 帳戶](%{scribd_url})。
-          請記下您的 API 金鑰和 API 密碼。這些在您建立的個人檔案中的『設定 > API』中可見。
-      labels: 
-        api_key: "API 金鑰"
-        enable_html5_viewer: "啟用 HTML5 文件檢視器"
-        secret_key: "API 密碼"
     sessions: 
       description: 管理會話超時
       name: 會話
@@ -10469,7 +10485,6 @@ zh_Hant:
         poll_choice_belongs_to_poll: 該投票選擇不屬於現有投票。
         poll_is_published: 本次民意調查會議不公開收集意見。
         user_and_poll_session_uniqueness: 每個民意調查會議僅可提交一個選擇
-  post_grades_description: "Post Grades 允許教師將成績發佈至已啟用的 SIS 系統：Powerschool、Aspire (SIS2000)、JMC 以及任何其他啟用 SIF 的 SIS，該 SIS 接受 SIF 項目 GradingCategory、GradingAssignment、GradingAssignmentScore。"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: 完成先決條件
@@ -10796,12 +10811,14 @@ zh_Hant:
       max_attempts: 太多失敗的登入嘗試。請稍後再試或者聯繫您的系統管理員。
       no_matching_user: "Canvas 沒有下述使用者的帳戶：%{user}"
       user_deleted: 該使用者帳戶已被刪除。請與您的系統管理員連絡，以將帳戶重新啟動。
+    logout_confirm: 
+      cancel: 取消
     mobile_login: 
       back_to_login: 返回至登入
       buttons: 
         request_password: 要求密碼
       dont_know_password: 我不知道我的密碼
-      login: 登入
+      log_in: 登入
       login_handle: "請輸入您的 %{login_handle_name}，我們會向您傳送一個連結用於更改您的密碼。"
       password: 密碼
       sending: 正在傳送...
@@ -11818,6 +11835,12 @@ zh_Hant:
           minutes_to_add: 要新增的分鐘
           select_deselect_all: 全選/取消全選
           select_user: "選擇 %{user}"
+      move_handle: 
+        move_to: 移動到...
+      move_question: 
+        cancel: 取消
+        save: 儲存
+        saving: 正在儲存...
       multi_answer: 
         choose_answer: " "
       muted: 
@@ -12264,11 +12287,7 @@ zh_Hant:
         other: "%{count} 個月"
       notices: 
         extra_time: 已為您提供了關於此嘗試的額外時間
-        five_minutes_left: 剩五分鐘
         less_time: 您的用於此測驗的時間已減少。
-        one_minute_left: 剩一分鐘
-        thirty_minutes_left: 剩三十分鐘
-        twelve_hours_left: 剩十二小時
       question_answered: 已回答
       question_unanswered: 还没有回答
       saved_at: "測驗儲存於 %{t}"
@@ -12322,13 +12341,14 @@ zh_Hant:
     upload_info: 如果您更改了之前下載的學生提交檔案，僅需對其進行壓縮，並上傳壓縮檔案以及以下的表格。學生們將在針對其提交件的註解中看到修改後的檔案。
     upload_warning: 確保您沒有更改提交檔案的名稱，以便我們能夠識別它們。
   react_files: 
+    add_folder: 新增資料夾
     cancel: 取消
     confirm_delete: "是否確定要刪除 %{name}？"
     confirm_delete_selected: "是否確定要刪除這 %{count} 個項目？"
     count_items_selected: "%{count} 個項目已選定"
+    created_at_short: 已建立
     delete: " "
     deleted_items_successfully: "%{count} 個項目已成功刪除"
-    download_zip: 下載壓縮檔案
     edit_name: 編輯名稱
     errors: 
       no_match: 
@@ -12337,6 +12357,7 @@ zh_Hant:
         suggestions: 建議：
         three_chars: "在搜尋方塊中至少輸入 3 個字母。"
         your_search: "您的搜尋『%{search_term}』沒有找到相符的檔案。"
+    files: 檔案
     folder: 資料夾
     labels: 
       select: 選擇此項目
@@ -12353,12 +12374,12 @@ zh_Hant:
     progress_error: 嘗試準備下載時發生錯誤，請再試一次。
     progress_message: "準備下載：%{percent}% 完成"
     restrict_access: 限制存取
-    search: 搜尋檔案
+    search_for_files: 搜尋檔案
+    select_all: 全選
     settings: 設定
     this_folder_is_empty: 此資料夾是空的
-    title: 
-      limit_student_access: 限制學生存取
     usage_details: "%{quota} 中的 %{quota_used}"
+    view: 檢視
   recent_student: 
     last_logged_in: "上次登入於 %{last_login}"
   recently_deleted_courses_title: 最近刪除的課程
@@ -12418,21 +12439,24 @@ zh_Hant:
         enabled: "已啟用(還必須啟用 QTI 轉換器)"
   restrict_student_access: 
     aria_label: 
-      availableFrom: 自…可用
+      availableFrom: 自
       availableUntil: 直到
     button_text: 
       cancel: 取消
       update: 更新
     label: 
-      availableFrom: 自…可用
+      availableFrom: 自
       availableUntil: 直到
-    options_1: 
-      description: 當我連結到學生時，僅允許學生檢視或下載此資料夾中的檔案
+    options: 
+      publish: 
+        description: 發佈
+      unpublish: 
+        description: 解除發佈
     options_2: 
       description: 排程學生可用性
     title: 
       default_title: 對話方塊
-      limit_student_access: 限制學生存取
+      limit_student_access: 權限
   retrieve_timeout: 無法抓取設定，伺服器回應超時
   role_override: 
     permission: 
@@ -12546,6 +12570,7 @@ zh_Hant:
     roles_override_index: 
       account_roles: 帳戶角色
       course_roles: 課程角色
+      page_header_title: 帳戶權限
   roster: 
     delete_confirm: 是否確定要移除此使用者？
     error_sending_invitations: 傳送邀請時發生錯誤。請再試一次。
@@ -12612,8 +12637,6 @@ zh_Hant:
         are_you_sure_delete: 是否確定要刪除此評估準則？目前，任何與此評估準則相關的課程仍然可以存取它，但新課程無法使用它。
         are_you_sure_remove: 是否確定要從您的清單中移除此評估準則？
       remove_rubric: 從我的清單中移除此評估準則
-  scribd: 
-    upgrade_flash: "您好，您有一個舊版本的 Adobe Flash Player。要使用 iPaper (以及網路上的許多其他東西)，您需要%{link_tag}獲取最新的 Flash 播放機%{end_link}。"
   search: 
     course_sections: 課程章節
     enrollments_observers: 觀察者
@@ -12839,6 +12862,9 @@ zh_Hant:
       links: 
         add_rubric: 新增題目
         assign_rubric: 指派題目
+    canvas-user-nav: 
+      navigation: 
+        user_menu: 使用者功能表
     conference: 
       buttons: 
         delete: 刪除會議
@@ -13089,6 +13115,8 @@ zh_Hant:
       teacher: "%{course}，作為教師。"
       teacher_title: 受邀作為一個教師，按一下以查看課程
     primary_header_navigation: 
+      links: 
+        inbox: 收件匣
       menu: 
         calendar: 月曆
         grades: 成績
@@ -13657,8 +13685,6 @@ zh_Hant:
     finished_redirecting: 已完成！重定向到檔案...
     gathering_files: "正在收集檔案(%{progress})..."
     gathering_files_progress: "正在收集檔案(%{progress})..."
-    notices: 
-      submission_not_availible: 您所要求的任務不再對您的課程章節有效。先前的提交件將不計入總成績。
     resubmitted_to_turnitin: 已成功重新提交至Turnitin。
     see_attached_files: 見所附檔案
     show: 
@@ -14064,8 +14090,6 @@ zh_Hant:
   unused_courses_title: 未使用的課程
   upload_button: 
     upload: " "
-  upload_progress_view: 
-    processing: 處理中
   user: 
     default_user_name: 使用者
     errors: 
@@ -14183,6 +14207,7 @@ zh_Hant:
         current_courses: 當前課程
         last_entry: 上一個教職員日誌條目
         student: 學生
+      journal_header: 教職員日誌
       page_title: 教職員日誌
   user_profile: 
     profile_title_too_long: 標題太長
