@@ -87,6 +87,22 @@ Rails.application.config.to_prepare do
       shard = Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
       shard || self.database_server.delayed_jobs_shard(self)
     end
+
+    delegate :in_current_region?, to: :database_server
+
+    scope :in_current_region, -> do
+      @scope ||=
+        if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
+          scoped
+        else
+          servers = DatabaseServer.all.select(&:in_current_region?).map(&:id)
+          if Shard.default.database_server.in_current_region?
+            where("database_server_id IN (?) OR database_server_id IS NULL", servers)
+          else
+            where(database_server_id: servers)
+          end
+        end
+    end
   end
 
   Switchman::DatabaseServer.class_eval do
@@ -98,6 +114,13 @@ Rails.application.config.to_prepare do
       dj_shard ||= shard if shard.default?
       dj_shard ||= Shard.default.delayed_jobs_shard
       dj_shard
+    end
+
+    def in_current_region?
+      unless instance_variable_defined?(:@in_current_region)
+        @in_current_region = !config[:region] || !ApplicationController.region || config[:region] == ApplicationController.region
+      end
+      @in_current_region
     end
   end
 

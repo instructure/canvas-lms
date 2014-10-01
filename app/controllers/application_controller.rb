@@ -1805,4 +1805,8 @@ class ApplicationController < ActionController::Base
       return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
     end
   end
+
+  def self.region
+    nil
+  end
 end
