@@ -31,12 +31,12 @@ define [
 
     render: withReactDOM ->
       div {className: 'ef-file-preview-footer grid-row'},
-        div {className: 'col-xs-1', onClick: @scrollLeft},
+        div {className: 'col-xs-1 ef-file-align-center', onClick: @scrollLeft},
           div {className: 'ef-file-preview-footer-arrow'},
             i {className: 'icon-arrow-open-left'}
-        div {className: 'col-xs-10'},
+        div {className: 'col-xs-10 ef-file-preview-list-container ef-file-align-center'},
           ul {className: 'ef-file-preview-footer-list'},
             @thumbnails()
-        div {className: 'col-xs-1', onClick: @scrollRight},
+        div {className: 'col-xs-1 ef-file-align-center', onClick: @scrollRight},
           div {className: 'ef-file-preview-footer-arrow'},
             i {className: 'icon-arrow-open-right'}

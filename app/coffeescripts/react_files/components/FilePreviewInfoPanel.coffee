@@ -19,7 +19,7 @@ define [
       getFileStatus(@props.displayedItem)
 
     render: withReactDOM ->
-      div {className: 'col-xs-4 full-height ef-file-preview-information'},
+      div {className: 'ef-file-preview-information-container'},
         table {className: 'ef-file-preview-infotable'},
           tbody {},
             tr {},
@@ -52,9 +52,8 @@ define [
                 th {scope: 'row'},
                   I18n.t('file_preview_infotable_modifiedby', 'Modified By')
                 td {},
-                  img {className: 'avatar', src: @props.displayedItem?.get('user').avatar_image_url }
-                    a {href: @props.displayedItem?.get('user').html_url},
-                      @props.displayedItem?.get('user').display_name
+                  a {href: @props.displayedItem?.get('user').html_url},
+                    @props.displayedItem?.get('user').display_name
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_datecreated', 'Date Created')

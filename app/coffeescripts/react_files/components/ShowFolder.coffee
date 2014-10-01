@@ -15,6 +15,7 @@ define [
   './UploadDropZone'
 ], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone) ->
 
+
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
   ShowFolder = React.createClass

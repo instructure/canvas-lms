@@ -5,6 +5,7 @@
 
 $ef-thumbnail-size: 36px;
 
+
 @mixin hideForPhone {
   @media (max-width:800px){
     display: none;
