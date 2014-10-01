@@ -98,6 +98,8 @@ define [
       @launchParams = _.pick(options, 'context', 'user') if options.remoteLaunch
 
       @render()
+      @appendAddAttachmentTemplate()
+
       super
       @initializeForm()
       @resizeBody()
@@ -242,7 +244,7 @@ define [
         contextView.render()
 
       @$fullDialog.on 'click', '.message-body', @handleBodyClick
-      @$fullDialog.on 'click', '.attach-file', preventDefault =>
+      @$fullDialog.on 'click', '.attach-file', =>
         @addAttachment()
       @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
         @removeAttachment($(e.currentTarget))
@@ -333,12 +335,19 @@ define [
       ($attachments.length * $attachments.outerWidth()) > @$attachmentsPane.width()
 
     addAttachment: ->
+      # when you click on the "label" that references the input it automatically open the file input
+      # we're exploiting this to get around the fact that IE won't let you submit the form when you try to
+      # "click" it through the javascript
+
+      $('#file_input').attr('id', _.uniqueId('file_input'))
+      @appendAddAttachmentTemplate()
+      @updateAttachmentOverflow()
+      @focusAddAttachment()
+
+    appendAddAttachmentTemplate: ->
       $attachment = $(addAttachmentTemplate())
       @$attachments.append($attachment)
       $attachment.hide()
-      $attachment.find('input').click()
-      @updateAttachmentOverflow()
-      @focusAddAttachment()
 
     setAttachmentClip: ($attachment) ->
       $name = $attachment.find( $('.attachment-name') )
