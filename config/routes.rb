@@ -711,7 +711,7 @@ CanvasRails::Application.routes.draw do
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'ember_app', format: false
   get "files/search", controller: 'files', action: 'ember_app', format: false
-  post 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
+  get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/preflight' => 'files#preflight', as: :file_preflight
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
