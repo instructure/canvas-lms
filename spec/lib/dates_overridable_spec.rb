@@ -114,7 +114,7 @@ shared_examples_for "an object whose dates are overridable" do
       end
     end
 
-    context "as an observer" do
+    context "as an observer with students" do
       before do
         course_with_student({:course => course, :active_all => true})
         course_with_observer({:course => course, :active_all => true})
@@ -131,6 +131,22 @@ shared_examples_for "an object whose dates are overridable" do
         course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => student2.id})
         override.delete
         expect(overridable.all_dates_visible_to(@observer).size).to eq 2
+      end
+    end
+
+    context "as an observer without students" do
+      before do
+        course_with_observer({:course => course, :active_all => true})
+        course.enroll_user(@observer, "ObserverEnrollment")
+        override.delete
+      end
+      it "returns a date with DA off" do
+        course.disable_feature!(:differentiated_assignments)
+        expect(overridable.all_dates_visible_to(@observer).size).to eq 1
+      end
+      it "returns a date with DA on" do
+        course.enable_feature!(:differentiated_assignments)
+        expect(overridable.all_dates_visible_to(@observer).size).to eq 1
       end
     end
 
