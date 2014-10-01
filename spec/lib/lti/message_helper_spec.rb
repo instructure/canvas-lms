@@ -48,6 +48,11 @@ module Lti
         subject.common_variable_substitutions['$Canvas.api.domain'].call.should == 'localhost'
       end
 
+      it 'has substitution for $Canvas.api.baseUrl' do
+        subject.stubs(:request).returns(mock(host: 'localhost', scheme: 'https'))
+        subject.common_variable_substitutions['$Canvas.api.baseUrl'].call.should == 'https://localhost'
+      end
+
       it 'has substitution for $Canvas.xapi.url' do
         subject.stubs(:lti_xapi_url).returns('/xapi')
         subject.common_variable_substitutions['$Canvas.xapi.url'].call.should == '/xapi'

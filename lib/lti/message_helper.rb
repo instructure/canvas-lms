@@ -28,6 +28,7 @@ module Lti
 
       substitutions = {
           '$Canvas.api.domain' => -> { HostUrl.context_host(@domain_root_account, request.host) },
+          '$Canvas.api.baseUrl' => -> { "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"},
           '$Canvas.xapi.url' => -> { lti_xapi_url(@tool) },
           '$Canvas.account.id' => account.id,
           '$Canvas.account.name' => account.name,
