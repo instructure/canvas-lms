@@ -107,7 +107,7 @@
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
 
-        <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %>
+        <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn',role: "button", :id => 'preview_quiz_button' do %>
           <%= t('links.preview', "Preview") %>
         <% end %>
       </div>
@@ -115,8 +115,8 @@
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
         <% if can_do(@quiz, @current_user, :update) %>
-        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button'>
-          <i class="icon-edit"><span class="screenreader-only"><%= admin_edit_title %></span></i> <%= admin_edit_title %>
+        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button' role='button'>
+          <i class="icon-edit"></i> <%= admin_edit_title %>
         </a>
         <% end %>
 
