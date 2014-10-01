@@ -142,5 +142,15 @@ describe ContentMigration do
           {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
       ]
     end
+
+    it "should not double-escape retrieval urls" do
+      url = "http://www.example.com?url=http%3A%2F%2Fwww.anotherurl.com"
+
+      @copy_from.syllabus_body = "<p><iframe src=\"/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape(url)}\" width=\"320\" height=\"240\" style=\"width: 553px; height: 335px;\"></iframe></p>"
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("/courses/#{@copy_from.id}/", "/courses/#{@copy_to.id}/")
+    end
   end
 end
