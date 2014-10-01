@@ -1,3 +1,5 @@
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+
 describe "drag and drop reordering" do
   include_examples "quizzes selenium tests"
 

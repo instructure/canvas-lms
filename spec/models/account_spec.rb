@@ -166,9 +166,9 @@ describe Account do
       end
 
       it "should list associated courses by term" do
-        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T001").first})).map(&:sis_source_id).sort.should == ["C001S"]
-        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T002").first})).map(&:sis_source_id).sort.should == []
-        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T003").first})).map(&:sis_source_id).sort.should == ["C005S", "C006S", "C007S", "C008S", "C009S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T001").first}).map(&:sis_source_id).sort.should == ["C001S"]
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T002").first}).map(&:sis_source_id).sort.should == []
+        @account.courses_name_like("search", {:term => EnrollmentTerm.where(sis_source_id: "T003").first}).map(&:sis_source_id).sort.should == ["C005S", "C006S", "C007S", "C008S", "C009S"]
       end
 
       it "should list associated nonenrollmentless courses" do
