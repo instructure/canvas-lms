@@ -90,17 +90,21 @@ Rails.application.config.to_prepare do
 
     delegate :in_current_region?, to: :database_server
 
+    scope :in_region, ->(region) do
+      servers = DatabaseServer.all.select { |db| db.config[:region] == region }.map(&:id)
+      if Shard.default.database_server.config[:region] == region
+        where("database_server_id IN (?) OR database_server_id IS NULL", servers)
+      else
+        where(database_server_id: servers)
+      end
+    end
+
     scope :in_current_region, -> do
-      @scope ||=
+      @current_region_scope ||=
         if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
           scoped
         else
-          servers = DatabaseServer.all.select(&:in_current_region?).map(&:id)
-          if Shard.default.database_server.in_current_region?
-            where("database_server_id IN (?) OR database_server_id IS NULL", servers)
-          else
-            where(database_server_id: servers)
-          end
+          in_region(ApplicationController.region)
         end
     end
   end
