@@ -90,18 +90,33 @@ describe LtiApiController, type: :integration do
 
   it "should register callbacks" do
     enable_cache do
+      token1 = Lti::LogoutService.create_token(@tool, @pseudonym)
+      make_call('path' => api_path(token1, 'http://logout.notify.example.com/123'))
+      token2 = Lti::LogoutService.create_token(@tool, @pseudonym)
+      make_call('path' => api_path(token2, 'http://logout.notify.example.com/456'))
+      Lti::LogoutService.get_logout_callbacks(@pseudonym).values.should =~ [
+          'http://logout.notify.example.com/123',
+          'http://logout.notify.example.com/456'
+      ]
+    end
+  end
+
+  it "should reject reused tokens" do
+    enable_cache do
       token = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token, 'http://logout.notify.example.com/123'))
+      response.should be_success
       make_call('path' => api_path(token, 'http://logout.notify.example.com/456'))
-      Lti::LogoutService.get_logout_callbacks(@pseudonym).should =~ [
-          'http://logout.notify.example.com/123', 'http://logout.notify.example.com/456']
+      response.status.should eql 401
+      response.body.should =~ /Logout service token has already been used/
     end
   end
 
   it "should call registered callbacks when the user logs out" do
     enable_cache do
       login_as 'parajsa', 'password1'
-      Lti::LogoutService.register_logout_callback(@pseudonym, 'http://logout.notify.example.com/789')
+      token = Lti::LogoutService::Token.create(@tool, @pseudonym)
+      Lti::LogoutService.register_logout_callback(token, 'http://logout.notify.example.com/789')
       Net::HTTP.expects(:get).with(URI('http://logout.notify.example.com/789'))
       delete '/logout'
       run_jobs

@@ -75,7 +75,7 @@ class LtiApiController < ApplicationController
   def logout_service
     token = Lti::LogoutService::Token.parse_and_validate(params[:token])
     verify_oauth(token.tool)
-    Lti::LogoutService.register_logout_callback(token.pseudonym, params[:callback])
+    Lti::LogoutService.register_logout_callback(token, params[:callback])
     return render :text => '', :status => 200
   rescue BasicLTI::BasicOutcomes::Unauthorized => e
     return render :text => e, :status => 401
