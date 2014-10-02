@@ -3,9 +3,11 @@ requirejs.config({
     '*': {
       // needed by a loader plugin, can't scope the mapping
       'timezone_core': 'canvas/timezone_core',
+      'compiled': 'canvas/compiled'
     },
 
     'canvas/jquery.instructure_date_and_time': {
+      'compiled/behaviors/authenticity_token': 'canvas/compiled/behaviors/authenticity_token',
       'jquery': 'canvas/vendor/jquery-1.7.2',
       'jqueryui': 'canvas/vendor/jqueryui',
       'timezone': 'canvas/timezone',
