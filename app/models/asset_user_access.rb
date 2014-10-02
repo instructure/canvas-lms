@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -174,6 +174,7 @@ class AssetUserAccess < ActiveRecord::Base
     self.context = kontext
     self.summarized_at = nil
     self.last_access = Time.now.utc
+    self.display_name = self.asset_display_name
     log_action(accessed[:level])
     save
   end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,6 +31,13 @@ describe AssetUserAccess do
 
   it "should update existing records that have bad display names" do
     @asset.display_name.should == "My Assignment"
+  end
+
+  it "should update existing records that have changed display names" do
+    @assignment.title = 'My changed Assignment'
+    @assignment.save!
+    @asset.log @course, { :level => 'view' }
+    @asset.display_name.should == 'My changed Assignment'
   end
 
   describe "for_user" do
