@@ -1049,10 +1049,21 @@ define([
 
     next: function(){
       this.skipRelativeToCurrentIndex(1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
     },
 
     prev: function(){
       this.skipRelativeToCurrentIndex(-1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
+    },
+
+    getStudentNameAndGrade: function(){
+      var hideStudentNames = utils.shouldHideStudentNames();
+      var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
+      var submissionStatus = classNameBasedOnStudent(EG.currentStudent);
+      return studentName + " " + submissionStatus.formatted;
     },
 
     resizeFullHeight: function(){
@@ -1737,13 +1748,17 @@ define([
         $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
         if(className.raw == "graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("<i class='icon-check'></i>");
           $status.addClass("graded");
           $statusIcon.text("").append("<i class='icon-check'></i>");
+          $("#aria_name_alert").text(studentInfo);
         }else if(className.raw == "not_graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("&#9679;");
           $status.removeClass("graded");
           $statusIcon.text("").append("&#9679;");
+          $("#aria_name_alert").text(studentInfo);
         }else{
           $status.removeClass("graded");
         }
