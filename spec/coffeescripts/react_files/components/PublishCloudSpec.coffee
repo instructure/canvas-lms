@@ -12,7 +12,9 @@ define [
     setup: ->
       @model = new FilesystemObject(locked: true, hidden: false, id: 42)
       @model.url = -> "/api/v1/folders/#{@id}"
-      props = model: @model
+      props = 
+        model: @model
+        userCanManageFilesForContext: true
 
       @publishCloud = React.renderComponent(PublishCloud(props), $('#fixtures')[0])
 
@@ -31,12 +33,30 @@ define [
     ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
     React.renderComponent.restore()
 
+  module 'PublishCloud Student View',
+    setup: ->
+      @model = new FilesystemObject(locked: false, hidden: true, lock_at: '123', unlock_at: '123', id: 42)
+      @model.url = -> "/api/v1/folders/#{@id}"
+      props = 
+        model: @model
+        userCanManageFilesForContext: false
+
+      @publishCloud = React.renderComponent(PublishCloud(props), $('#fixtures')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+
+  test 'should display a non clickable restricted dates icon', ->
+    equal @publishCloud.refs.publishCloud.props.onClick, undefined, 'does not have a click event'
+    equal @publishCloud.refs.publishCloud.props.title, "Available from Jan 1, 1970 at 12:00am until Jan 1, 1970 at 12:00am", "has a available from hoverover"
+
   # Unit Tests
 
   module 'PublishCloud#togglePublishedState',
     setup: ->
       props =
         model: new FilesystemObject(hidden: false, id: 42)
+        userCanManageFilesForContext: true
 
       @publishCloud = React.renderComponent(PublishCloud(props), $('#fixtures')[0])
 
@@ -64,7 +84,9 @@ define [
 
   test "sets published initial state based on params model hidden property", ->
     model = new FilesystemObject(locked: false, id: 42)
-    props = model: model
+    props = 
+      model: model
+      userCanManageFilesForContext: true
 
     @publishCloud = React.renderComponent(PublishCloud(props), $('#fixtures')[0])
     equal @publishCloud.state.published, !model.get('locked'), "not locked is published"

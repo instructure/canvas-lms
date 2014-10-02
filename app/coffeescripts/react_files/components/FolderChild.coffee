@@ -135,6 +135,5 @@ define [
           friendlyBytes(@props.model.get('size'))
 
         div className: 'ef-links-col', role: 'gridcell',
-          if @props.userCanManageFilesForContext
-            PublishCloud(model: @props.model, ref: 'publishButton')
+          PublishCloud(model: @props.model, ref: 'publishButton', userCanManageFilesForContext: @props.userCanManageFilesForContext)
           ItemCog(model: @props.model, startEditingName: @startEditingName, userCanManageFilesForContext: @props.userCanManageFilesForContext)
