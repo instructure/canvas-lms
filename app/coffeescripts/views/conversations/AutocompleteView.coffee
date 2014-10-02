@@ -113,6 +113,8 @@ define [
       super
       # After battling chrome, firefox, and IE this seems to be the best place to
       # inject some hackery to prevent focus/blur issues
+      @parentContexts = []
+      @currentContext = null
       $(document).on("mousedown", @_onDocumentMouseDown.bind(this))
 
       @render() # to initialize els

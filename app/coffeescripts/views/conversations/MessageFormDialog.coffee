@@ -121,6 +121,9 @@ define [
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
+
+      @launchParams = null
+
       @trigger('close')
       if @returnFocusTo
         @returnFocusTo.focus()
