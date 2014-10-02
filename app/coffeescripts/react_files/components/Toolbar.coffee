@@ -1,5 +1,4 @@
 define [
-  'underscore'
   'i18n!react_files'
   'react'
   'react-router'
@@ -7,11 +6,12 @@ define [
   './UploadButton'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
+  '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm, $) ->
+], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -20,7 +20,6 @@ define [
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
       contextType: customPropTypes.contextType.isRequired
       contextId: customPropTypes.contextId.isRequired
-
 
     onSubmitSearch: (event) ->
       event.preventDefault()
@@ -42,15 +41,6 @@ define [
         $.screenReaderFlashMessage(I18n.t('count_items_selected', '%{count} items selected', {
           count: @props.selectedItems.length
         }))
-
-    deleteSelectedItems: ->
-      count = @props.selectedItems.length
-      message = I18n.t('confirm_delete_selected', 'Are you sure you want to delete these %{count} items?', {count})
-      return unless confirm message
-      promises = @props.selectedItems.map (item) -> item.destroy()
-      $.when(promises...).then ->
-        $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
-      @props.clearSelectedItems()
 
     getPreviewQuery: ->
       return unless @props.selectedItems.length
@@ -74,9 +64,8 @@ define [
 
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
-    # dialog window. This allows us to do react things inside of this all ready rendered
+    # dialog window. This allows us to do react things inside of this already rendered
     # jQueryUI widget
-
     openRestrictedDialog: ->
       $dialog = $('<div>').dialog
         title: I18n.t("title.permissions", "Editing permissions for %{count} items", {count: @props.selectedItems.length})
@@ -170,7 +159,7 @@ define [
             button {
               disabled: !showingButtons
               className: 'ui-button btn-delete'
-              onClick: @deleteSelectedItems
+              onClick: => deleteStuff(@props.selectedItems)
               title: I18n.t('delete', 'Delete')
               'aria-label': I18n.t('delete', 'Delete')
               'data-tooltip': ''

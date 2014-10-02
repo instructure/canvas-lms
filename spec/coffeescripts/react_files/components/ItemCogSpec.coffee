@@ -11,9 +11,11 @@ define [
     setup: ->
 
       @sampleProps = (canManageFiles = false) ->
-        model: new Folder(id: 999)
-        startEditingName: -> debugger
-        userCanManageFilesForContext: canManageFiles
+        return {
+          model: new Folder(id: 999)
+          startEditingName: -> debugger
+          userCanManageFilesForContext: canManageFiles
+        }
 
       @buttonsEnabled = (itemCog, config) ->
         valid = true
@@ -51,7 +53,7 @@ define [
     Simulate.click(@itemCog.refs.deleteLink.getDOMNode())
 
     ok window.confirm.calledOnce, 'confirms before deleting'
-    ok $.ajax.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE'}), 'sends DELETE to right url'
+    ok $.ajax.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url'
 
     window.confirm.restore()
     $.ajax.restore()
