@@ -124,6 +124,6 @@ define [
           # Makes sure other items has something before sending it to the preview.
           if otherItems?.length
             if @props.query.only_preview
-              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params, appElement: document.getElementById('content'), otherItemsString: @props.query.only_preview}
+              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params, otherItemsString: @props.query.only_preview}
             else
-              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params, appElement: document.getElementById('content')}
+              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params }

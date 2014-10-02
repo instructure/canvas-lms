@@ -1,12 +1,13 @@
 define [
   'react'
   'react-router'
+  'react-modal'
   'compiled/react_files/components/FilePreview'
   'compiled/models/Folder'
   'compiled/models/File'
   'compiled/collections/FilesCollection'
   'compiled/react_files/components/FolderChild'
-], (React, Router, FilePreview, Folder, File, FilesCollection, FolderChild) ->
+], (React, Router, Modal, FilePreview, Folder, File, FilesCollection, FolderChild) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -44,17 +45,15 @@ define [
       @currentFolder.add(@file2)
       @currentFolder.add(@file3)
 
+      Modal.setAppElement($('#fixtures').get(0))
+
+
+
       properties =
         initialItem: @file2
         otherItems: @currentFolder
         params: {splat: "test/test/test/"}
         appElement: $('#fixtures').get(0)
-        # onResolvePath: ->
-        # currentFolder: @currentFolder
-        # query: {preview: '2'}
-        # toggleItemSelected: ->
-        # selectedItems: []
-        # areAllItemsSelected: -> false
 
 
       @filePreview = React.renderComponent(FilePreview(properties), $('#fixtures')[0])

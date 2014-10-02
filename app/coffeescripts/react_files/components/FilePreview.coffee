@@ -2,13 +2,15 @@ define [
   'underscore',
   'react'
   'react-router',
-  'bower/react-modal/dist/react-modal'
+  'react-modal'
+  '../modules/customPropTypes'
   'i18n!file_preview'
   './FriendlyDatetime'
-  'compiled/models/Folder',
+  'compiled/util/friendlyBytes'
+  'compiled/models/Folder'
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
-], (_, React, ReactRouter, ReactModal, I18n, FriendlyDatetime, Folder, withReactDOM, collectionHandler) ->
+], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, withReactDOM, collectionHandler) ->
   FilePreview = React.createClass
 
 
@@ -17,8 +19,8 @@ define [
     mixins: [React.addons.PureRenderMixin]
 
     propTypes:
-      initialItem: React.PropTypes.object
-      otherItems: React.PropTypes.array
+      initialItem: customPropTypes.filesystemObject
+      otherItems: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
       otherItemsString: React.PropTypes.string
 
     getInitialState: ->
@@ -26,11 +28,7 @@ define [
       showFooter: false
       showFooterBtn: true
       displayedItem: @props.initialItem
-      user: @props.initialItem.get 'user'
       otherItemsIsBackBoneCollection: @props.otherItems instanceof Backbone.Collection
-
-    componentWillMount: ->
-      ReactModal.setAppElement(@props.appElement)
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
@@ -41,7 +39,6 @@ define [
     componentWillReceiveProps: (newProps) ->
       @setState(
         displayedItem: newProps.initialItem
-        user: newProps.initialItem.get 'user'
         otherItemPreviewString: @setUpOtherItemsQuery(newProps.otherItems)
       )
 
@@ -59,13 +56,13 @@ define [
       @setState({showFooter: !@state.showFooter});
 
     handleKeyboardNavigation: (event) ->
-      return null unless (event.keyCode is 37 or event.keyCode is 39)
+      return null unless (event.keyCode is $.ui.keyCode.LEFT or event.keyCode is $.ui.keyCode.RIGHT)
       # left arrow
-      if (event.keyCode is 37)
+      if (event.keyCode is $.ui.keyCode.LEFT)
         nextItem = collectionHandler.getPreviousInRelationTo(@props.otherItems, @state.displayedItem)
 
       # right arrow
-      if (event.keyCode is 39)
+      if (event.keyCode is $.ui.keyCode.RIGHT)
         nextItem = collectionHandler.getNextInRelationTo(@props.otherItems, @state.displayedItem)
 
       if (@props.otherItemsString)
@@ -103,17 +100,10 @@ define [
       goToItem = if @state.otherItemsIsBackBoneCollection then @props.otherItems.at(goToItemIndex) else @props.otherItems[goToItemIndex]
       if (@props.otherItemsString)
         @props.params.only_preview = @props.otherItemsString
-      switch direction
-        when 'left'
-          div {className: 'col-xs-1 full-height'},
-            ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: {preview: goToItem.id}, className: 'ef-file-preview-arrow-link'}, @props.params),
-              div {className: 'ef-file-preview-arrow'},
-                i {className: 'icon-arrow-open-left'}
-        when 'right'
-          div {className: 'col-xs-1 full-height'},
-            ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: {preview: goToItem.id}, className: 'ef-file-preview-arrow-link'}, @props.params),
-              div {className: 'ef-file-preview-arrow'},
-                i {className: 'icon-arrow-open-right'}
+      div {className: 'col-xs-1 full-height'},
+        ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: {preview: goToItem.id}, className: 'ef-file-preview-arrow-link'}, @props.params),
+          div {className: 'ef-file-preview-arrow'},
+            i {className: "icon-arrow-open-#{direction}"}
 
 
     scrollLeft: (event) ->
@@ -183,19 +173,20 @@ define [
                             th {scope: 'row'},
                               I18n.t('file_preview_infotable_size', 'Size')
                             td {},
-                              @state.displayedItem.get('size') + ' Kb'
+                              friendlyBytes @state.displayedItem.get('size')
                           tr {},
                             th {scope: 'row'},
                               I18n.t('file_preview_infotable_datemodified', 'Date Modified')
                             td {},
                               FriendlyDatetime datetime: @state.displayedItem.get('updated_at')
-                          tr {},
-                            th {scope: 'row'},
-                              I18n.t('file_preview_infotable_modifiedby', 'Modified By')
-                            td {},
-                              img {className: 'avatar', src: @state.user?.avatar_image_url }
-                                a {href: @state.user?.html_url},
-                                  @state.user?.display_name
+                          if @state.displayedItem.get('user')
+                            tr {},
+                              th {scope: 'row'},
+                                I18n.t('file_preview_infotable_modifiedby', 'Modified By')
+                              td {},
+                                img {className: 'avatar', src: @state.displayedItem.get('user').avatar_image_url }
+                                  a {href: @state.displayedItem.get('user').html_url},
+                                    @state.displayedItem.get('user').display_name
                           tr {},
                             th {scope: 'row'},
                               I18n.t('file_preview_infotable_datecreated', 'Date Created')
