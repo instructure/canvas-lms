@@ -606,6 +606,7 @@ div#content
         left: 0
   .flag_question
     :background url(/images/answers_sprite.png) -48px top
+    @if $use_high_contrast { background: url(/images/answers_sprite_hc.png) -48px top }
     :cursor pointer
     :position absolute
     :left -30px
@@ -885,12 +886,15 @@ ul#question_list
       color: #595959
       margin-right: 4px
     &.answered a
-      color: #a1bfe0
+      color: darken($canvas-primary, 15)
     &.answered.current_question a
       color: #396eb2
     &.marked
-      :font-weight bold
+      font-weight: bold
       background: url(/images/flagged_question.png) 3px 7px no-repeat
+      @if $use_high_contrast
+        @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px)
+
     &.current_question
       :color $right_side_text_color !important
       :font-weight bold
@@ -1247,6 +1251,7 @@ ul#quiz_versions
 // review page.
 .answer_arrow
   background-image: url(/images/answers_sprite.png)
+  @if $use_high_contrast { background: url(/images/answers_sprite_hc.png)}
   background-repeat: repeat-x
   display: inline-block
   font-size: 12px
@@ -1265,6 +1270,7 @@ ul#quiz_versions
   &.incorrect:before, &.incorrect:after,
   &.info:before, &.info:after
     background-image: url(/images/answers_sprite.png)
+    @if $use_high_contrast { background: url(/images/answers_sprite_hc.png)}
     background-repeat: no-repeat
     content: ' '
     height: 27px
