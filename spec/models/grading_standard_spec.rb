@@ -222,4 +222,45 @@ describe GradingStandard do
       @course.root_account.grading_standards.count.should == 1
     end
   end
+
+  describe "assessed_assignment?" do
+    before(:once) do
+      student_in_course active_all: true
+      @gs = grading_standard_for @course, title: "gs"
+    end
+
+    context "without assignment link" do
+      it "should be false" do
+        @gs.should_not be_assessed_assignment
+      end
+    end
+
+    context "with assignment link" do
+      before(:once) do
+        @assignment = @course.assignments.create!(:title => "hi",
+          :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
+      end
+
+      context "without submissions" do
+        it "should be false" do
+          @gs.should_not be_assessed_assignment
+        end
+      end
+
+      context "with submissions" do
+        before(:once) do
+          @submission = @assignment.submit_homework(@student, :body => "done!")
+        end
+
+        it "should be false if no submissions are graded" do
+          @gs.should_not be_assessed_assignment
+        end
+
+        it "should be true if a graded submission exists" do
+          @submission.grade_it!
+          @gs.should be_assessed_assignment
+        end
+      end
+    end
+  end
 end
