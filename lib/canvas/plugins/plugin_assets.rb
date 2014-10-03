@@ -1,7 +1,7 @@
 # pull in the bundles from the various plugins' config/assets.yml extension
 # files and combine them under a plugins.<plugin> dictionary. so e.g. the
-# stylesheets bundles from vendor/plugins/myplugin/config/assets.yml will
-# be added under
+# stylesheets bundles from {gems,vendor}/plugins/myplugin/config/assets.yml
+# will be added under
 #
 # plugins:
 #   myplugin:
@@ -33,8 +33,8 @@ class PluginAssets
 
   def initialize( options = {} )
     @anchors = { 'stylesheets' => {} }
-    @asset_matcher = options[:asset_matcher] || 'vendor/plugins/*/config/assets.yml'
-    @plugin_matcher = options[:plugin_matcher] || %r{^vendor/plugins/(.*)/config/assets\.yml$}
+    @asset_matcher = options[:asset_matcher] || '{gems,vendor}/plugins/*/config/assets.yml'
+    @plugin_matcher = options[:plugin_matcher] || %r{^(?:gems|vendor)/plugins/(.*)/config/assets\.yml$}
   end
 
   # this is the yaml that can be dropped into the top of assets.yml

@@ -1,7 +1,7 @@
 full_path_glob = '(/*full_path)'
 
 # allow plugins to prepend routes
-Dir["vendor/plugins/*/config/pre_routes.rb"].each { |pre_routes|
+Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
   load pre_routes
 }
 

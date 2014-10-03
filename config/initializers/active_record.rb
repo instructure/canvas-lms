@@ -52,6 +52,7 @@ class ActiveRecord::Base
     @from_files ||= Dir[
       "#{Rails.root}/app/models/**/*.rb",
       "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
     ].sort.collect { |file|
       model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
       next unless model < ActiveRecord::Base
@@ -1394,6 +1395,7 @@ class ActiveRecord::Migrator
 end
 
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def add_index_with_length_raise(table_name, column_name, options = {})
     unless options[:name].to_s =~ /^temp_/

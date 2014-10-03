@@ -9,9 +9,9 @@ def maintain_plugin_symlinks(local_path, plugin_path=nil)
   end
 
   # create new ones
-  Dir.glob("vendor/plugins/*/#{plugin_path}").each do |plugin_dir|
+  Dir.glob("{gems,vendor}/plugins/*/#{plugin_path}").each do |plugin_dir|
     FileUtils.makedirs("#{local_path}/plugins") unless File.exists?("#{local_path}/plugins")
-    plugin = plugin_dir.gsub(%r{^vendor/plugins/(.*)/#{plugin_path}$}, '\1')
+    plugin = plugin_dir.gsub(%r{^(?:gems|vendor)/plugins/(.*)/#{plugin_path}$}, '\1')
     source = "#{local_path}/plugins/#{plugin}"
     target = "#{local_path.gsub(%r{[^/]+}, '..')}/../#{plugin_dir}"
     unless File.symlink?(source) && File.readlink(source) == target
