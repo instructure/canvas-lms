@@ -78,11 +78,13 @@ shared_examples_for 'a locked api item' do
 
       pre_module = @course.context_modules.create!(:name => 'pre_module')
       external_url_tag = pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+      external_url_tag.publish! if external_url_tag.unpublished?
       pre_module.completion_requirements = { external_url_tag.id => { :type => 'must_view' } }
       pre_module.save!
 
       locked_module = @course.context_modules.create!(:name => 'locked_module', :require_sequential_progress => true)
-      locked_module.add_item(:id => locked_item.id, :type => item_type)
+      item_tag = locked_module.add_item(:id => locked_item.id, :type => item_type)
+      item_tag.publish! if item_tag.unpublished?
       locked_module.prerequisites = "module_#{pre_module.id}"
       locked_module.save!
 
