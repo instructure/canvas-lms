@@ -9,6 +9,9 @@ define [
   '../modules/customPropTypes'
 ], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM, customPropTypes) ->
 
+  MAX_CRUMB_WIDTH = 500
+  MIN_CRUMB_WIDTH = 40
+
   Breadcrumbs = React.createClass
     displayName: 'Breadcrumbs'
 
@@ -17,8 +20,7 @@ define [
 
     getInitialState: ->
       {
-        minCrumbWidth: 40
-        maxCrumbWidth: 500
+        maxCrumbWidth: MAX_CRUMB_WIDTH
         availableWidth: 200000
       }
 
@@ -53,7 +55,7 @@ define [
     startRecalculating: (newAvailableWidth) ->
       @setState({
         availableWidth: newAvailableWidth
-        maxCrumbWidth: 500
+        maxCrumbWidth: MAX_CRUMB_WIDTH
       }, @checkIfCrumbsFit)
 
     componentWillReceiveProps: -> setTimeout(@startRecalculating)
@@ -61,8 +63,8 @@ define [
     checkIfCrumbsFit: ->
       return unless @state.heightOfOneBreadcrumb
       breadcrumbHeight = $(@refs.breadcrumbs.getDOMNode()).height()
-      if (breadcrumbHeight > @state.heightOfOneBreadcrumb) and (@state.maxCrumbWidth > @state.minCrumbWidth)
-        maxCrumbWidth = Math.max(@state.minCrumbWidth, @state.maxCrumbWidth - 20)
+      if (breadcrumbHeight > @state.heightOfOneBreadcrumb) and (@state.maxCrumbWidth > MIN_CRUMB_WIDTH)
+        maxCrumbWidth = Math.max(MIN_CRUMB_WIDTH, @state.maxCrumbWidth - 20)
         @setState({maxCrumbWidth}, @checkIfCrumbsFit)
 
     renderSingleCrumb: (folder, isLastCrumb, isRootCrumb) ->
@@ -73,7 +75,7 @@ define [
           to: (if isRootCrumb then 'rootFolder' else 'folder')
           splat: (folder.urlPath() unless isRootCrumb)
           # only add title tooltips if there's a chance they could be ellipsized
-          title: (name if @state.maxCrumbWidth < 500)
+          title: (name if @state.maxCrumbWidth < MAX_CRUMB_WIDTH)
         },
           span {
             className: 'ellipsis'
@@ -100,13 +102,13 @@ define [
       else
         return [] unless @props.rootTillCurrentFolder?.length
         [foldersInMiddle..., lastFolder] = @props.rootTillCurrentFolder
-        if @state.maxCrumbWidth > @state.minCrumbWidth
+        if @state.maxCrumbWidth > MIN_CRUMB_WIDTH
           @props.rootTillCurrentFolder.map (folder, i) =>
-            @renderSingleCrumb(folder, folder isnt lastFolder, i is 0)
+            @renderSingleCrumb(folder, folder is lastFolder, i is 0)
         else
           [
             BreadcrumbCollapsedContainer({foldersToContain: foldersInMiddle}),
-            @renderSingleCrumb(lastFolder, false)
+            @renderSingleCrumb(lastFolder, true)
           ]
 
     render: withReactDOM ->
