@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,15 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/groups/index" do
+describe "/courses/index" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:categories] = []
-    assigns[:students] = [@user]
-    assigns[:memberships] = []
-    assigns[:groups] = []
-    render "groups/index"
+    assigns[:current_enrollments] = [@enrollment]
+    assigns[:past_enrollments] = []
+    assigns[:future_enrollments] = []
+    render "courses/index"
     response.should_not be_nil
   end
 
@@ -35,12 +34,11 @@ describe "/groups/index" do
     course_with_student
     group_with_user(:user => @user, :group_context => @course)
     view_context
-    assigns[:categories] = []
-    assigns[:students] = [@user]
-    assigns[:memberships] = []
-    assigns[:groups] = [@group]
-    render "groups/index"
+    assigns[:current_enrollments] = [@enrollment]
+    assigns[:past_enrollments] = []
+    assigns[:future_enrollments] = []
+    render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
-    doc.at_css('ul.context_list li:first span.subtitle').text.should == @course.name
+    doc.at_css('#my_groups_table tr:first span.subtitle').text.should == @course.name
   end
 end
