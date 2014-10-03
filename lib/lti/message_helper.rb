@@ -67,6 +67,8 @@ module Lti
                 '$Person.email.primary' => @current_user.email,
                 '$Person.address.timezone' => Time.zone.tzinfo.name,
                 '$User.image' => -> { @current_user.avatar_url },
+                '$User.id' => @current_user.id,
+                '$User.username' => pseudonym ? pseudonym.unique_id : nil,
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
                 '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,

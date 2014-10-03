@@ -167,6 +167,11 @@ module Lti
           subject.common_variable_substitutions['$Canvas.user.id'].should == 456
         end
 
+        it 'has substitution for $User.id' do
+          user.stubs(:id).returns(456)
+          subject.common_variable_substitutions['$User.id'].should == 456
+        end
+
         context '$Canvas.user.prefersHighContrast' do
           it 'substitutes as true' do
             user.stubs(:prefers_high_contrast?).returns(true)
@@ -194,6 +199,11 @@ module Lti
           it 'has substitution for $Canvas.user.loginId' do
             pseudonym.unique_id = 'username'
             subject.common_variable_substitutions['$Canvas.user.loginId'].should == 'username'
+          end
+
+          it 'has substitution for $User.username' do
+            pseudonym.unique_id = 'username'
+            subject.common_variable_substitutions['$User.username'].should == 'username'
           end
         end
       end
