@@ -54,13 +54,22 @@ define [
 
     getPreviewQuery: ->
       return unless @props.selectedItems.length
-      if @props.selectedItems.length is 1
-        {preview: @props.selectedItems[0].id}
+      retObj =
+        preview: @props.selectedItems[0].id
+      unless @props.selectedItems.length is 1
+        retObj.only_preview = @props.selectedItems.map((item) -> item.id).join(',')
+      if @props.query?.search_term
+        retObj.search_term = @props.query.search_term
+      retObj
+
+    getPreviewRoute: ->
+      if @props.query?.search_term
+        'search'
+      else if @props.currentFolder?.urlPath()
+        'folder'
       else
-        {
-          preview: @props.selectedItems[0].id
-          only_preview: @props.selectedItems.map((item) -> item.id).join(',')
-        }
+        'rootFolder'
+
 
 
     # Function Summary
@@ -110,7 +119,7 @@ define [
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
           Router.Link  {
-              to: (if @props.currentFolder?.urlPath() then 'folder' else 'rootFolder'),
+              to: @getPreviewRoute()
               query: @getPreviewQuery()
               splat: @props.currentFolder?.urlPath()
               className: 'ui-button btn-view'

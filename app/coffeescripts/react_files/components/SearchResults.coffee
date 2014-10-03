@@ -11,7 +11,8 @@ define [
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
+  './FilePreview'
+], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreview) ->
 
 
   SearchResults = React.createClass
@@ -78,3 +79,30 @@ define [
               li {}, I18n.t('errors.no_match.spelled', 'Make sure all words are spelled correctly.')
               li {}, I18n.t('errors.no_match.keywords', 'Try different keywords.')
               li {}, I18n.t('errors.no_match.three_chars', 'Enter at least 3 letters in the search box.')
+
+        # Prepare and render the FilePreview if needed.
+        # As long as ?preview is present in the url.
+        if @props.query.preview? and @state.collection.length
+          # Sets up our collection that we will be using.
+          onlyIdsToPreview = @props.query.only_preview?.split(',')
+          otherItems = if onlyIdsToPreview # expects this to be [1,2,34,9] (ids of files to preview)
+            @state.collection.models.filter (file) ->
+              file.id in onlyIdsToPreview
+          else
+            @state.collection.models
+          # If preview contains data (i.e. ?preview=4)
+          if @props.query.preview
+            # We go back to the folder to pull this data.
+            initialItem = _.find @state.collection.models, (file) =>
+              file.id is @props.query.preview
+          # If preview doesn't contain data (i.e. ?preview)
+          # we'll just use the first one in our otherItems collection.
+          else
+            # Because otherItems may (or may not be) a Backbone collection (FilesCollection) we change up our method.
+            initialItem = if otherItems instanceof Backbone.Collection then otherItems.first() else _.first(otherItems)
+          # Makes sure other items has something before sending it to the preview.
+          if otherItems?.length
+            if @props.query.only_preview
+              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params, otherItemsString: @props.query.only_preview, search_term: @props.query.search_term}
+            else
+              FilePreview {initialItem: initialItem, otherItems: otherItems, params: @props.params, search_term: @props.query.search_term}

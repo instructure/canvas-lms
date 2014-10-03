@@ -22,6 +22,7 @@ define [
       initialItem: customPropTypes.filesystemObject
       otherItems: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
       otherItemsString: React.PropTypes.string
+      search_term: React.PropTypes.string
 
     getInitialState: ->
       showInfoPanel: false
@@ -47,6 +48,24 @@ define [
         item.id
       ).join(',')
 
+    getRouteIdentifier: ->
+      if @props.search_term
+        'search'
+      else if @props.currentFolder?.urlPath()
+        'folder'
+      else
+        'rootFolder'
+
+    getArrowQuery: (id) ->
+      retObj = {}
+      if id
+        retObj.preview = id
+      if (@props.search_term)
+        retObj.search_term = @props.search_term
+      if (@props.otherItemsString)
+        retObj.only_preview = @props.otherItemsString
+      retObj
+
     openInfoPanel: (event) ->
       event.preventDefault()
       @setState({showInfoPanel: !@state.showInfoPanel});
@@ -65,10 +84,7 @@ define [
       if (event.keyCode is $.ui.keyCode.RIGHT)
         nextItem = collectionHandler.getNextInRelationTo(@props.otherItems, @state.displayedItem)
 
-      if (@props.otherItemsString)
-        ReactRouter.transitionTo((if @props.params.splat then 'folder' else 'rootFolder'), @props.params, {preview: nextItem.id, only_preview: @props.otherItemsString})
-      else
-        ReactRouter.transitionTo((if @props.params.splat then 'folder' else 'rootFolder'), @props.params, {preview: nextItem.id})
+      ReactRouter.transitionTo(@getRouteIdentifier(), @props.params, @getArrowQuery(nextItem.id))
 
     getStatusMessage: ->
       'A nice status message ;) ' #TODO: Actually do this..
@@ -101,7 +117,11 @@ define [
       if (@props.otherItemsString)
         @props.params.only_preview = @props.otherItemsString
       div {className: 'col-xs-1 full-height'},
-        ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: {preview: goToItem.id}, className: 'ef-file-preview-arrow-link'}, @props.params),
+        ReactRouter.Link {
+          to: @getRouteIdentifier(),
+          query: @getArrowQuery(goToItem.id),
+          className: 'ef-file-preview-arrow-link'
+        },
           div {className: 'ef-file-preview-arrow'},
             i {className: "icon-arrow-open-#{direction}"}
 
@@ -121,7 +141,7 @@ define [
         }, 300, 'easeOutQuad')
 
     closeModal: ->
-      ReactRouter.transitionTo((if @props.params.splat then 'folder' else 'rootFolder'), @props.params)
+      ReactRouter.transitionTo(@getRouteIdentifier(), @props.params, @getArrowQuery())
 
 
 
@@ -142,7 +162,7 @@ define [
                   a {className: 'ef-file-preview-header-info ef-file-preview-button', href: '#', onClick: @openInfoPanel},
                     i {className: 'icon-info'}
                     I18n.t('file_preview_headerbutton_info', ' Info')
-                  ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: '', className: 'ef-file-preview-header-close ef-file-preview-button'}, @props.params),
+                  ReactRouter.Link {to: @getRouteIdentifier(), query: @getArrowQuery(), className: 'ef-file-preview-header-close ef-file-preview-button'},
                     i {className: 'icon-end'}
                     I18n.t('file_preview_headerbutton_close', ' Close')
             div {className: 'ef-file-preview-preview grid-row middle-xs'},
