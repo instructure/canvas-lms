@@ -322,16 +322,6 @@ describe Quizzes::Quiz do
     q.assignment_id.should be_nil
   end
 
-  it "should not create the assignment if unpublished and draft_states are not enabled" do
-    @course.root_account.disable_feature!(:draft_state)
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
-    q.save!
-    q.should_not be_available
-    q.assignment_id.should be_nil
-    q.assignment_group_id.should eql(g.id)
-  end
-
   context "when draft_states are enabled" do
     before :once do
       @course.root_account.enable_feature!(:draft_state)

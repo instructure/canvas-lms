@@ -179,16 +179,6 @@ describe WikiPagesController do
       assigns[:page].should_not be_new_record
       assigns[:page].title.should eql("Some Great Page")
     end
-
-    it "should set a page named 'Front Page' as the front page if there isn't one already and draft state is disabled" do
-      account_model
-      @account.disable_feature! :draft_state
-      course_with_teacher_logged_in(:account => @account, :active_all => true)
-      post 'create', :course_id => @course.id, :wiki_page => {:title => "Front Page"}
-      @course.reload
-      @course.wiki.should have_front_page
-      @course.wiki.front_page.id.should == assigns[:page].id
-    end
   end
 
   describe "PUT 'update'" do

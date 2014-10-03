@@ -79,13 +79,5 @@ describe "/shared/_select_content_dialog" do
     page = Nokogiri(response.body)
     page.at_css(%Q{#discussion_topics_select .new input[name="published"][value="false"]}).should_not be_nil
   end
-
-  it "should create new topics in published state if draft state is disabled" do
-    course_with_teacher(active_all: true, draft_state: false)
-    view_context
-    render partial: 'shared/select_content_dialog'
-    page = Nokogiri(response.body)
-    page.at_css(%Q{#discussion_topics_select .new input[name="published"]}).should be_nil
-  end
 end
 

@@ -240,14 +240,6 @@ describe Assignment do
         setup_DA
       end
 
-      context "draft state off" do
-        before {@course.disable_feature!(:draft_state)}
-        it "should return all active assignments" do
-          @assignment.students_with_visibility.include?(@student1).should be_true
-          @assignment.students_with_visibility.include?(@student2).should be_true
-        end
-      end
-
       context "draft state on" do
         before {@course.enable_feature!(:draft_state)}
         context "differentiated_assignment on" do

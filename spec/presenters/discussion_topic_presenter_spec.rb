@@ -190,10 +190,6 @@ describe DiscussionTopicPresenter do
         presenter.allows_speed_grader?.should == true
       end
 
-      it "returns true when draft state disabled" do
-        topic.context.root_account.disable_feature!(:draft_state)
-        presenter.allows_speed_grader?.should == true
-      end
     end
   end
 

@@ -73,16 +73,6 @@ describe AssignmentGroup do
       end
     end
 
-    context "with both differentiated assignments and draft state off" do
-      it "should return all active assignments" do
-        @c.disable_feature! :differentiated_assignments
-        @c.disable_feature! :draft_state
-        @ag.active_assignments.count.should == 3
-        @ag.visible_assignments(@u).count.should == 3
-        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
-      end
-    end
-
     context "logged out users" do
       it "should return assignments for logged out users so that invited users can see them before accepting a course invite" do
         @ag.visible_assignments(nil).count.should == 3

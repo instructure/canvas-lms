@@ -272,12 +272,6 @@ describe AssignmentsController do
       a.discussion_topic.user_id.should eql(@teacher.id)
     end
 
-    it "should default to published if draft state is disabled" do
-      Account.default.disable_feature!(:draft_state)
-      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
-      assigns[:assignment].should be_published
-    end
-
     it "should default to unpublished if draft state is enabled" do
       Account.default.enable_feature!(:draft_state)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}

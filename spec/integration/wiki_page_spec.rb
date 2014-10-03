@@ -140,32 +140,6 @@ describe WikiPagesController do
       end
     end
 
-    context "draft state disabled" do
-      before do
-        @course.root_account.disable_feature!(:draft_state)
-      end
-
-      it "should forward /pages to /wiki" do
-        get @base_url + "pages"
-        response.should redirect_to(course_wiki_pages_url(@course))
-      end
-
-      it "should forward /pages/name to /wiki/name" do
-        get @base_url + "pages/a-page"
-        response.should redirect_to(course_wiki_page_url(@course, "a-page"))
-      end
-
-      it "should forward /pages/name/edit to /wiki/name#edit" do
-        get @base_url + "pages/a-page/edit"
-        response.should redirect_to(course_wiki_page_url(@course, "a-page", anchor: "edit"))
-      end
-
-      it "should forward /pages/name/revisions to /wiki/name/revisions" do
-        get @base_url + "pages/a-page/revisions"
-        response.should redirect_to(course_wiki_page_wiki_page_revisions_url(@course, "a-page"))
-      end
-    end
-
   end
 
 end
