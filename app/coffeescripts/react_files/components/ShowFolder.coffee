@@ -20,11 +20,9 @@ define [
   ShowFolder = React.createClass
     displayName: 'ShowFolder'
 
-
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
     , 0
-
 
     registerListeners: (props) ->
       return unless props.currentFolder
@@ -57,6 +55,11 @@ define [
           updateAPIQuerySortParams(collection, @props.query)
           # TODO: use scroll position to only fetch the pages we need
           getAllPages(collection, @debouncedForceUpdate)
+      , (jqXHR) =>
+        try
+          parsedResponse = $.parseJSON(jqXHR.responseText)
+        if parsedResponse
+          @setState errorMessages: parsedResponse.errors
 
     componentWillMount: ->
       @registerListeners(@props)
@@ -77,6 +80,10 @@ define [
         updateAPIQuerySortParams(collection, newProps.query)
 
     render: withReactDOM ->
+      if @state?.errorMessages
+        return div {},
+          @state.errorMessages.map (error) ->
+            div className: 'muted', error.message
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
       div role: 'grid',
         UploadDropZone(currentFolder: @props.currentFolder)
