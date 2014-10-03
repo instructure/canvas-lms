@@ -319,28 +319,28 @@ class FilesController < ApplicationController
   end
 
   def ember_app
-    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
-    @body_classes << 'full-width padless-content'
-    js_bundle :react_files
-    jammit_css :ember_files
-
-    @contexts = [@context]
-    get_all_pertinent_contexts(include_groups: true) if @context == @current_user
-    files_contexts = @contexts.map do |context|
-      {
-        asset_string: context.asset_string,
-        name: context == @current_user ? t('my_files', 'My Files') : context.name,
-        permissions: {
-          manage_files: context.grants_right?(@current_user, session, :manage_files),
+    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+    if tab_enabled?(@context.class::TAB_FILES)
+      @contexts = [@context]
+      get_all_pertinent_contexts(include_groups: true) if @context == @current_user
+      files_contexts = @contexts.map do |context|
+        {
+          asset_string: context.asset_string,
+          name: context == @current_user ? t('my_files', 'My Files') : context.name,
+          permissions: {
+            manage_files: context.grants_right?(@current_user, session, :manage_files),
+          }
         }
-      }
+      end
+
+      @page_title = t('files_page_title', 'Files')
+      @body_classes << 'full-width padless-content'
+      js_bundle :react_files
+      jammit_css :ember_files
+      js_env :FILES_CONTEXTS => files_contexts
+
+      render :text => "".html_safe, :layout => true
     end
-
-    @page_title = t('files_page_title', 'Files')
-
-    js_env :FILES_CONTEXTS => files_contexts
-
-    render :text => "".html_safe, :layout => true
   end
 
 
