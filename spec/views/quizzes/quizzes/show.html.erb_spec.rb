@@ -20,6 +20,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/show" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :each do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context
@@ -60,18 +68,7 @@ describe "/quizzes/quizzes/show" do
     response.should_not have_tag ".unpublished_warning"
   end
 
-  it "warns students if quiz is unpublished" do
-    course_with_student_logged_in(:active_all => true)
-    quiz = @course.quizzes.create!
-    assigns[:quiz] = quiz
-    view_context
-    render "quizzes/quizzes/show"
-    response.should have_tag ".unpublished_warning"
-  end
-
-  it "should show header bar and publish button if draft state enabled" do
-    Account.default.enable_feature!(:draft_state)
-
+  it "should show header bar and publish button" do
     course_with_teacher_logged_in(:active_all => true)
     assigns[:quiz] = @course.quizzes.create!
 
@@ -82,10 +79,8 @@ describe "/quizzes/quizzes/show" do
     response.should have_tag "#quiz-publish-link"
   end
 
-  it "should show unpublished quiz changes to instructors with draft state" do
+  it "should show unpublished quiz changes to instructors" do
     course_with_teacher_logged_in(:active_all => true)
-    Account.default.enable_feature!(:draft_state)
-
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
     @quiz.save!

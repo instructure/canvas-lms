@@ -1,6 +1,10 @@
 require_relative "helpers/quiz_questions_common"
 
 describe "One Question at a Time Quizzes" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quiz question selenium tests"
 
   context "as a teacher" do

@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   module Helpers
     def create_question(type, factory_options = {}, quiz=@quiz)
       factory = method(:"#{type}_question_data")
@@ -48,76 +52,87 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     def api_index(data = {}, options = {})
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:get,
-        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions",
-        { :controller => 'quizzes/quiz_submission_questions',
-          :action => 'index',
-          :format => 'json',
-          :quiz_submission_id => @quiz_submission.id.to_s
-        }, data)
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'index',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s }
+      if options[:raw]
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+
     end
 
     def api_show(data = {}, options = {})
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:get,
-        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}",
-        { :controller => 'quizzes/quiz_submission_questions',
-          :action => 'show',
-          :format => 'json',
-          :quiz_submission_id => @quiz_submission.id.to_s,
-          :id => @question[:id].to_s
-        }, data)
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'show',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s,
+                 :id => @question[:id].to_s }
+      if options[:raw]
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
     end
 
     def api_answer(data = {}, options = {})
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'answer',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s }
       data = {
         validation_token: @quiz_submission.validation_token,
         attempt: @quiz_submission.attempt
       }.merge(data)
 
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:post,
-        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions",
-        { :controller => 'quizzes/quiz_submission_questions',
-          :action => 'answer',
-          :format => 'json',
-          :quiz_submission_id => @quiz_submission.id.to_s
-        }, data)
+      if options[:raw]
+        raw_api_call(:post, url, params, data)
+      else
+        api_call(:post, url, params, data)
+      end
     end
 
     def api_flag(data = {}, options = {})
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'flag',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s,
+                 :id => @question[:id].to_s }
       data = {
         validation_token: @quiz_submission.validation_token,
         attempt: @quiz_submission.attempt
       }.merge(data)
 
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:put,
-        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag",
-        { :controller => 'quizzes/quiz_submission_questions',
-          :action => 'flag',
-          :format => 'json',
-          :quiz_submission_id => @quiz_submission.id.to_s,
-          :id => @question[:id].to_s
-        }, data)
+      if options[:raw]
+        raw_api_call(:put, url, params, data)
+      else
+        api_call(:put, url, params, data)
+      end
     end
 
     def api_unflag(data = {}, options = {})
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'unflag',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s,
+                 :id => @question[:id].to_s }
       data = {
         validation_token: @quiz_submission.validation_token,
         attempt: @quiz_submission.attempt
       }.merge(data)
 
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:put,
-        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag",
-        { :controller => 'quizzes/quiz_submission_questions',
-          :action => 'unflag',
-          :format => 'json',
-          :quiz_submission_id => @quiz_submission.id.to_s,
-          :id => @question[:id].to_s
-        }, data)
+      if options[:raw]
+        raw_api_call(:put, url, params, data)
+      else
+        api_call(:put, url, params, data)
+      end
     end
   end
 

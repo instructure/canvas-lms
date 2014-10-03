@@ -24,90 +24,48 @@ describe QuizzesHelper do
   include QuizzesHelper
   include ERB::Util
 
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "#needs_unpublished_warning" do
     before :once do
       course_with_teacher
     end
 
-    context "with draft state enabled" do
-      before :once do
-        @course.account.enable_feature!(:draft_state)
-      end
+    it "is false if quiz not manageable" do
+      quiz = Quizzes::Quiz.new(:context => @course)
 
-      it "is false if quiz not manageable" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-
-        def can_publish(quiz); false; end
-        needs_unpublished_warning?(quiz, User.new).should be_false
-      end
-
-      it "is false if quiz is available with no unpublished changes" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'available'
-        quiz.last_edited_at = 10.minutes.ago
-        quiz.published_at   = Time.now
-
-        def can_publish(quiz); true; end
-        needs_unpublished_warning?(quiz, User.new).should be_false
-      end
-
-      it "is true if quiz is not available" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'created'
-
-        def can_publish(quiz); true; end
-        needs_unpublished_warning?(quiz, User.new).should be_true
-      end
-
-      it "is true if quiz has unpublished changes" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'available'
-        quiz.last_edited_at = Time.now
-        quiz.published_at   = 10.minutes.ago
-
-        def can_publish(quiz); true; end
-        needs_unpublished_warning?(quiz, User.new).should be_true
-      end
+      def can_publish(quiz); false; end
+      needs_unpublished_warning?(quiz, User.new).should be_false
     end
 
-    context "with draft state disabled" do
+    it "is false if quiz is available with no unpublished changes" do
+      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz.workflow_state = 'available'
+      quiz.last_edited_at = 10.minutes.ago
+      quiz.published_at   = Time.now
 
-      it "is false if quiz is not readable" do
-        quiz = Quizzes::Quiz.new(:context => @course)
+      def can_publish(quiz); true; end
+      needs_unpublished_warning?(quiz, User.new).should be_false
+    end
 
-        def can_read(quiz); false; end
-        needs_unpublished_warning?(quiz, User.new).should be_false
-      end
+    it "is true if quiz is not available" do
+      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz.workflow_state = 'created'
 
-      it "is false if quiz is available with no unpublished changes" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'available'
-        quiz.last_edited_at = 10.minutes.ago
-        quiz.published_at   = Time.now
+      def can_publish(quiz); true; end
+      needs_unpublished_warning?(quiz, User.new).should be_true
+    end
 
-        def can_publish(quiz); true; end
-        needs_unpublished_warning?(quiz, User.new).should be_false
-      end
+    it "is true if quiz has unpublished changes" do
+      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz.workflow_state = 'available'
+      quiz.last_edited_at = Time.now
+      quiz.published_at   = 10.minutes.ago
 
-      it "is true if quiz is not available" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'created'
-
-        def can_read(quiz); true; end
-        def can_publish(quiz); false; end
-        needs_unpublished_warning?(quiz, User.new).should be_true
-      end
-
-      it "is true if quiz has unpublished changes" do
-        quiz = Quizzes::Quiz.new(:context => @course)
-        quiz.workflow_state = 'available'
-        quiz.last_edited_at = Time.now
-        quiz.published_at   = 10.minutes.ago
-
-        def can_read(quiz); true; end
-        def can_publish(quiz); true; end
-        needs_unpublished_warning?(quiz, User.new).should be_true
-      end
+      def can_publish(quiz); true; end
+      needs_unpublished_warning?(quiz, User.new).should be_true
     end
   end
 

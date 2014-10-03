@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question creation with attempts" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quizzes selenium tests"
 
   before (:each) do
@@ -55,7 +59,7 @@ describe "quizzes question creation with attempts" do
     expect_new_page_load {
       f('.save_quiz_button').click
       wait_for_ajaximations
-      keep_trying_until { f('.admin-links').should be_displayed }
+      keep_trying_until { f('.header-bar-right').should be_displayed }
     }
 
     Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i

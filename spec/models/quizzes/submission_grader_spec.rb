@@ -20,6 +20,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::SubmissionGrader do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context 'with course and quiz' do
   before(:once) do
     course

@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "drag and drop reordering" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quizzes selenium tests"
 
   before (:each) do

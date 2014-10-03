@@ -4,6 +4,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 class Quizzes::SubmissionGrader; end
 
 describe Quizzes::QuizRegrader::Answer do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   let(:points) { 15 }
 

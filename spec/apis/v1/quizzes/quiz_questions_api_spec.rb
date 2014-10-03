@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizQuestionsController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context 'as a teacher' do
     before :once do
       @course = course

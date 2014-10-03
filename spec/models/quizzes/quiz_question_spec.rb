@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   it "should deserialize its json data" do
     answers = [{'id' => 1}, {'id' => 2}]

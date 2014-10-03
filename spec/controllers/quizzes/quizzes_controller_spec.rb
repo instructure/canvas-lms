@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizzesController do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   def course_quiz(active=false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
@@ -71,6 +75,7 @@ describe Quizzes::QuizzesController do
   end
 
   before :once do
+    Account.default.enable_feature! :draft_state
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @student2 = @student
@@ -91,30 +96,6 @@ describe Quizzes::QuizzesController do
       flash[:notice].should match(/That page has been disabled/)
     end
 
-    it "should assign variables" do
-      user_session(@teacher)
-      get 'index', :course_id => @course.id
-      assigns[:quizzes].should_not be_nil
-      assigns[:unpublished_quizzes].should_not be_nil
-      assigns[:submissions_hash].should_not be_nil
-    end
-
-    it "should retrieve quizzes" do
-      user_session(@teacher)
-      course_quiz(!!:active)
-
-      get 'index', :course_id => @course.id
-      assigns[:quizzes].should_not be_nil
-      assigns[:quizzes].should_not be_empty
-      assigns[:quizzes][0].should eql(@quiz)
-    end
-  end
-
-  describe "GET 'index' with draft state enabled" do
-    before :once do
-      Account.default.enable_feature! :draft_state
-    end
-
     it "should assign JS variables" do
       user_session(@teacher)
       get 'index', :course_id => @course.id
@@ -133,7 +114,7 @@ describe Quizzes::QuizzesController do
 
       controller.js_env[:QUIZZES][:assignment].length.should eql 1
       controller.js_env[:QUIZZES][:assignment].map do |quiz|
-        quiz[:published].should be_true
+        quiz[:published].should be_truthy
       end
     end
 
@@ -168,7 +149,6 @@ describe Quizzes::QuizzesController do
   describe "GET 'index' with quiz stats enabled" do
     before :each do
       a = Account.default
-      a.enable_feature! :draft_state
       a.enable_feature! :quiz_stats
       a.save!
     end
@@ -294,8 +274,8 @@ describe Quizzes::QuizzesController do
       user_session(@student)
       course_quiz !!:active
       get 'show', :course_id => @course.id, :id => @quiz.id, :persist_headless => 1
-      controller.session[:headless_quiz].should be_true
-      assigns[:headers].should be_false
+      controller.session[:headless_quiz].should be_truthy
+      assigns[:headers].should be_falsey
     end
 
     it "should not render headers if session[:headless_quiz] is set" do
@@ -303,7 +283,7 @@ describe Quizzes::QuizzesController do
       course_quiz !!:active
       controller.session[:headless_quiz] = true
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:headers].should be_false
+      assigns[:headers].should be_falsey
     end
 
     it "assigns js_env for attachments if submission is present" do
@@ -335,7 +315,6 @@ describe Quizzes::QuizzesController do
     it "doesn't show unpublished quizzes to students with draft state" do
       user_session(@student)
       course_quiz(active=true)
-      Account.default.enable_feature!(:draft_state)
       @quiz.unpublish!
       get 'show', course_id: @course.id, id: @quiz.id
       response.should_not be_success
@@ -397,7 +376,6 @@ describe Quizzes::QuizzesController do
   describe "GET 'show' with quiz stats enabled" do
     before :once do
       a = Account.default
-      a.enable_feature! :draft_state
       a.enable_feature! :quiz_stats
       a.save!
 
@@ -605,7 +583,6 @@ describe Quizzes::QuizzesController do
   describe "GET 'moderate' with quiz stats enabled" do
     before :each do
       a = Account.default
-      a.enable_feature! :draft_state
       a.enable_feature! :quiz_stats
       a.save!
 
@@ -624,7 +601,6 @@ describe Quizzes::QuizzesController do
   describe "GET 'moderate' with new quiz moderate enabled" do
     before :each do
       a = Account.default
-      a.enable_feature! :draft_state
       a.enable_feature! :quiz_stats
       a.enable_feature! :quiz_moderate
       a.save!
@@ -895,14 +871,14 @@ describe Quizzes::QuizzesController do
       context "when the passed in question ID is in the submission" do
         it "returns true" do
           submission.stubs(:has_question?).with(1).returns(true)
-          controller.send(:valid_question?, submission, 1).should be_true
+          controller.send(:valid_question?, submission, 1).should be_truthy
         end
       end
 
       context "when the question ID isn't part of the submission" do
         it "returns false" do
           submission.stubs(:has_question?).with(1).returns(false)
-          controller.send(:valid_question?, submission, 1).should be_false
+          controller.send(:valid_question?, submission, 1).should be_falsey
         end
       end
     end
@@ -1084,13 +1060,16 @@ describe Quizzes::QuizzesController do
       # aka should handle the case where the quiz's assignment is nil/not present.
       user_session(@teacher)
       course_quiz
-      @quiz.update_attributes(quiz_type: 'ungraded_survey')
+      @quiz.update_attributes(quiz_type: 'survey')
       # make sure the assignment doesn't exist
-      @quiz.assignment = nil if @quiz.context.feature_enabled?(:draft_state)
+      @quiz.assignment = nil
       @quiz.assignment.should_not be_present
+      @quiz.publish!
+
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}
       response.should be_redirect
+
       @quiz.reload.quiz_type.should == 'assignment'
       @quiz.should be_available
       @quiz.assignment.should be_present
@@ -1298,7 +1277,6 @@ describe Quizzes::QuizzesController do
   describe "GET 'statistics' with new quiz stats enabled" do
     before :each do
       a = Account.default
-      a.enable_feature! :draft_state
       a.enable_feature! :quiz_stats
       a.save!
 
@@ -1376,10 +1354,10 @@ describe Quizzes::QuizzesController do
       @quiz = @course.quizzes.build(:title => "New quiz!")
       @quiz.save!
 
-      @quiz.published?.should be_false
+      @quiz.published?.should be_falsey
       post 'publish', :course_id => @course.id, :quizzes => [@quiz.id]
 
-      @quiz.reload.published?.should be_true
+      @quiz.reload.published?.should be_truthy
     end
   end
 
@@ -1438,10 +1416,10 @@ describe Quizzes::QuizzesController do
       @quiz = @course.quizzes.build(:title => "New quiz!")
       @quiz.publish!
 
-      @quiz.published?.should be_true
+      @quiz.published?.should be_truthy
       post 'unpublish', :course_id => @course.id, :quizzes => [@quiz.id]
 
-      @quiz.reload.published?.should be_false
+      @quiz.reload.published?.should be_falsey
     end
   end
 
@@ -1488,7 +1466,6 @@ describe Quizzes::QuizzesController do
     before do
       course_with_teacher(active_all: true)
       @student1, @student2 = n_students_in_course(2,:active_all => true, :course => @course)
-      @course.enable_feature!(:draft_state)
       @course.enable_feature!(:differentiated_assignments)
       @course_section = @course.course_sections.create!
       course_quiz(active = true)

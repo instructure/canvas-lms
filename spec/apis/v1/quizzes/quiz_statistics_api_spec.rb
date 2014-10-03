@@ -2,16 +2,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizStatisticsController, type: :request do
-  def api_index(options={}, params={})
-    helper = method(options[:raw] ? :raw_api_call : :api_call)
-    helper.call(:get,
-      "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics", {
-        controller: 'quizzes/quiz_statistics',
-        action: 'index',
-        format: 'json',
-        course_id: @course.id.to_s,
-        quiz_id: @quiz.id.to_s
-      }, params, { 'Accept' => 'application/vnd.api+json' })
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  def api_index(options={}, data={})
+    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
+    params = { controller: 'quizzes/quiz_statistics',
+               action: 'index',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
+    headers = { 'Accept' => 'application/vnd.api+json' }
+
+    if options[:raw]
+      raw_api_call(:get, url, params, data, headers)
+    else
+      api_call(:get, url, params, data, headers)
+    end
   end
 
   before :once do

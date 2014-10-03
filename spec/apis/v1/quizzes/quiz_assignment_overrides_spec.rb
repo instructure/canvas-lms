@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizAssignmentOverridesController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe '[GET] /courses/:course_id/quizzes/assignment_overrides' do
     before do
       course_with_teacher(:active_all => true)

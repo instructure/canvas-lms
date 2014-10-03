@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizGroup do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   describe "saving a group" do
     it "should mark its quiz as having unpublished changes when updated" do

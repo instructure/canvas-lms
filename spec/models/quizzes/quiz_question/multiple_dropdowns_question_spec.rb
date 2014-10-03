@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::MultipleDropdownsQuestion do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let(:question_data) do
     {
       :id => "1",

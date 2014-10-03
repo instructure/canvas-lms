@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quizzes selenium tests"
 
   def prepare_quiz
@@ -59,45 +63,6 @@ describe "quizzes" do
     context "resume functionality" do
       def update_quiz_lock(lock_at, unlock_at)
         @quiz.update_attributes(:lock_at => lock_at, :unlock_at => unlock_at)
-      end
-
-      # This feature doesn't exist for draft state yet
-      describe "on main page" do
-        def validate_description_text(does_contain_text, text)
-          description = f('.description')
-          if does_contain_text
-            description.should include_text(text)
-          else
-            description.should_not include_text(text)
-          end
-        end
-
-        it "should show the resume quiz link if quiz is unlocked" do
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should include_text('Resume Quiz')
-        end
-
-        it "should show the resume quiz link if quiz unlock_at date is < now" do
-          update_quiz_lock(nil, 10.minutes.ago)
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should include_text('Resume Quiz')
-        end
-
-        it "should not show the resume link if the quiz is locked" do
-          update_quiz_lock(5.minutes.ago, nil)
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should_not include_text('Resume Quiz')
-        end
-
-        it "should grade any submission that needs grading (in the background)" do
-          Account.default.enable_feature!(:draft_state)
-
-          @qsub.end_at = 5.minutes.ago
-          @qsub.save!
-          get "/courses/#{@course.id}/quizzes"
-          @qsub.reload
-          @qsub.needs_grading?.should be_false
-        end
       end
 
       describe "on individual quiz page" do

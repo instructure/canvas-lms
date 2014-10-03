@@ -4,6 +4,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 require 'csv'
 
 describe Quizzes::QuizStatistics::StudentAnalysis do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let(:report_type) { 'student_analysis' }
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course }

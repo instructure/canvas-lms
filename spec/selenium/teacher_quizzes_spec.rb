@@ -2,6 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
 
@@ -17,14 +21,14 @@ describe "quizzes" do
     it "should show a summary of due dates if there are multiple" do
       create_quiz_with_default_due_dates
       get "/courses/#{@course.id}/quizzes"
-      f('.quiz_list .description').should_not include_text "Multiple Dates"
+      f('.item-group-container .date-available').should_not include_text "Multiple Dates"
       add_due_date_override(@quiz)
 
       get "/courses/#{@course.id}/quizzes"
-      f('.quiz_list .description').should include_text "Multiple Dates"
-      driver.mouse.move_to f('.quiz_list .description a')
+      f('.item-group-container .date-available').should include_text "Multiple Dates"
+      driver.mouse.move_to f('.item-group-container .date-available')
       wait_for_ajaximations
-      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip = fj('.ui-tooltip:visible')
       tooltip.should include_text 'New Section'
       tooltip.should include_text 'Everyone else'
     end

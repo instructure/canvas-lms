@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes regressions" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
 
@@ -31,19 +35,6 @@ describe "quizzes regressions" do
     cal = f('#ui-datepicker-div')
     cal.should be_displayed
     cal.style('z-index').should > f('#main').style('z-index')
-  end
-
-  it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
-    5.times { @course.quizzes.create!(:title => "My Quiz") }
-    get "/courses/#{@course.id}/quizzes"
-    publish_multiple = f('.publish_multiple_quizzes_link')
-    cancel = f('#publish_multiple_quizzes_dialog .cancel_button')
-
-    5.times do
-      publish_multiple.click
-      ffj('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
-      cancel.click
-    end
   end
 
   it "should flag a quiz question while taking a quiz as a teacher" do

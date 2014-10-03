@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Quizzes::QuizSubmissionsController do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   before do
     course_with_student_logged_in(:active_all => true)
     quiz_model(:course => @course)

@@ -19,6 +19,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizExtensionsController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course
     @quiz = @course.quizzes.create!(:title => 'quiz')
     @quiz.published_at = Time.now

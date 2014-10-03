@@ -20,11 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizzesApiController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context 'locked api item' do
     let(:item_type) { 'quiz' }
 
     let(:locked_item) do
-      @course.quizzes.create!(:title => 'Locked Quiz')
+      quiz = @course.quizzes.create!(:title => 'Locked Quiz')
+      quiz.publish!
+      quiz
     end
 
     def api_get_json

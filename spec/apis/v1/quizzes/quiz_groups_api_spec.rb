@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizGroupsController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     teacher_in_course(:active_all => true)
     @quiz = @course.quizzes.create! :title => 'title'
     @bank = @course.assessment_question_banks.create! :title => 'Test Bank'

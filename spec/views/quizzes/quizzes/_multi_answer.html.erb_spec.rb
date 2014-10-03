@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_multi_answer" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context

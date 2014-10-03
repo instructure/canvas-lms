@@ -1,6 +1,9 @@
 require File.expand_path File.dirname(__FILE__) + '/../../spec_helper.rb'
 
 describe Quizzes::QuizSubmissionZipper do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
 
   let(:attachments) do
     [

@@ -19,18 +19,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "GET /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [index]" do
-    def api_index(options={}, params={})
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions",
-        { controller: "quizzes/outstanding_quiz_submissions",
-          action: "index",
-          format: "json",
-          course_id: @course.id,
-          quiz_id: @quiz.id },
-        params, { 'Accept' => 'application/vnd.api+json' })
+    def api_index(options={}, data={})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions"
+      params =  { controller: "quizzes/outstanding_quiz_submissions",
+                  action: "index",
+                  format: "json",
+                  course_id: @course.id,
+                  quiz_id: @quiz.id }
+      headers = { 'Accept' => 'application/vnd.api+json' }
+      if options[:raw]
+        raw_api_call(:get, url, params, data, headers)
+      else
+        api_call(:get, url, params, data, headers)
+      end
       JSON.parse(response.body)
     end
+
     before :once do
       course
       @user = student_in_course.user
@@ -60,16 +69,21 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
   end
 
   describe "POST /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [grade]" do
-    def api_grade(options={}, params={})
-      helper = method(options[:raw] ? :raw_api_call : :api_call)
-      helper.call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions",
-        { controller: "quizzes/outstanding_quiz_submissions",
-          action: "grade",
-          format: "json",
-          course_id: @course.id,
-          quiz_id: @quiz.id },
-        params, { 'Accept' => 'application/vnd.api+json' })
+    def api_grade(options={}, data={})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions"
+      params = { controller: "quizzes/outstanding_quiz_submissions",
+                 action: "grade",
+                 format: "json",
+                 course_id: @course.id,
+                 quiz_id: @quiz.id }
+      headers = { 'Accept' => 'application/vnd.api+json' }
+      if options[:raw]
+        raw_api_call(:post, url, params, data, headers)
+      else
+        api_call(:post, url, params, data, headers)
+      end
     end
+
     before :once do
       course
       @quiz = @course.quizzes.create!(:title => "Outstanding")
@@ -100,6 +114,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
         api_grade({raw: true},{quiz_submission_ids: [@submission.id]})
         assert_status 204
       end
+
       it 'should continue w/o error when given already graded ids' do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         @submission.needs_grading?.should == false

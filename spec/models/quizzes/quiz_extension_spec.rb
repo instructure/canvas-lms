@@ -18,6 +18,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizExtension do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "#quiz_submission" do
     it "should be initialized" do
       qs = Quizzes::QuizSubmission.new

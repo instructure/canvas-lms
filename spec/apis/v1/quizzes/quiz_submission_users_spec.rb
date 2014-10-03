@@ -19,6 +19,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz
 
 describe Quizzes::QuizSubmissionUsersController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course_with_teacher(active_all: true)
   end
 

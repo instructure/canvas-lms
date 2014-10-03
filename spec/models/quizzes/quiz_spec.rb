@@ -21,8 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state
 
 describe Quizzes::Quiz do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course
-    @course.root_account.disable_feature!(:draft_state)
   end
 
   describe ".mark_quiz_edited" do
@@ -32,11 +35,11 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create! :title => "hello"
         quiz.published_at = Time.now
         quiz.publish!
-        quiz.unpublished_changes?.should be_false
+        quiz.unpublished_changes?.should be_falsey
       end
 
       Quizzes::Quiz.mark_quiz_edited(quiz.id)
-      quiz.reload.unpublished_changes?.should be_true
+      quiz.reload.unpublished_changes?.should be_truthy
     end
   end
 
@@ -47,11 +50,11 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create! :title => "hello"
         quiz.published_at = Time.now
         quiz.publish!
-        quiz.unpublished_changes?.should be_false
+        quiz.unpublished_changes?.should be_falsey
       end
 
       quiz.mark_edited!
-      quiz.reload.unpublished_changes?.should be_true
+      quiz.reload.unpublished_changes?.should be_truthy
     end
   end
 
@@ -100,26 +103,11 @@ describe Quizzes::Quiz do
       quiz.stubs(:has_student_submissions?).returns false
 
       quiz.unpublish!
-      quiz.published?.should be_false
+      quiz.published?.should be_falsey
     end
   end
 
   it_should_behave_like 'Canvas::DraftStateValidations'
-
-  it "should flag as edited if shuffle answers changes to off" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    q.quiz_questions.create!
-    q.save!
-    q.publish!
-
-    # no initial changes
-    q.unpublished_changes?.should be_false
-
-    # no need to force republish turning it on
-    q.shuffle_answers = true
-    q.save!
-    q.unpublished_changes?.should be_false
-  end
 
   it "should infer the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,
@@ -317,49 +305,43 @@ describe Quizzes::Quiz do
     q.assignment_id.should be_nil
   end
 
-  context "when draft_states are enabled" do
-    before :once do
-      @course.root_account.enable_feature!(:draft_state)
-    end
+  it "should always have an assignment" do
+    g = @course.assignment_groups.create!(:name => "new group")
+    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+    q.save!
+    q.should_not be_available
+    q.assignment_id.should_not be_nil
+    q.assignment_group_id.should eql(g.id)
+  end
 
-    it "should always have an assignment" do
-      g = @course.assignment_groups.create!(:name => "new group")
-      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
-      q.save!
-      q.should_not be_available
-      q.assignment_id.should_not be_nil
-      q.assignment_group_id.should eql(g.id)
-    end
+  it "should update assignment published?" do
+    g = @course.assignment_groups.create!(:name => "new group")
+    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+    q.save!
+    q.should_not be_available
+    q.assignment_id.should_not be_nil
+    q.assignment.published?.should be false
+    q.assignment_group_id.should eql(g.id)
+    q.publish!
+    q.assignment.published?.should be true
+  end
 
-    it "should update assignment published?" do
-      g = @course.assignment_groups.create!(:name => "new group")
-      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
-      q.save!
-      q.should_not be_available
-      q.assignment_id.should_not be_nil
-      q.assignment.published?.should be false
-      q.assignment_group_id.should eql(g.id)
-      q.publish!
-      q.assignment.published?.should be true
-    end
+  it "should send a message when quiz is published" do
+    Notification.create!(:name => 'Assignment Created')
+    @course.offer
 
-    it "should send a message when quiz is published" do
-      Notification.create!(:name => 'Assignment Created')
-      @course.offer
+    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+    q.save!
+    q.should_not be_available
 
-      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
-      q.save!
-      q.should_not be_available
+    q.assignment_id.should_not be_nil
+    q.assignment.published?.should be false
+    q.assignment.expects(:save_without_broadcasting!).never
 
-      q.assignment_id.should_not be_nil
-      q.assignment.published?.should be false
-      q.assignment.expects(:save_without_broadcasting!).never
+    q.publish!
 
-      q.publish!
-
-      q.assignment.published?.should be true
-      q.assignment.messages_sent.should include('Assignment Created')
-    end
+    q.assignment.published?.should be true
+    q.assignment.messages_sent.should include('Assignment Created')
   end
 
   it "should create the assignment if created in published state" do
@@ -661,7 +643,7 @@ describe Quizzes::Quiz do
       is_shuffled2 = (original != selected2)
 
       # it's possible but unlikely that shuffled version is same as original
-      (is_shuffled1 || is_shuffled2).should be_true
+      (is_shuffled1 || is_shuffled2).should be_truthy
     end
   end
 
@@ -742,9 +724,9 @@ describe Quizzes::Quiz do
       submission = @quiz.generate_submission(@user)
       submission.quiz_data.length.should == 3
       texts = submission.quiz_data.map{|q|q[:question_text]}
-      texts.member?('gq1').should be_true
-      texts.member?('gq2').should be_true
-      texts.member?('qq1').should be_true
+      texts.member?('gq1').should be_truthy
+      texts.member?('gq2').should be_truthy
+      texts.member?('qq1').should be_truthy
     end
 
     it "should get the correct points possible" do
@@ -764,9 +746,9 @@ describe Quizzes::Quiz do
       submission = @quiz.generate_submission(@user)
       submission.quiz_data.length.should == 3
       texts = submission.quiz_data.map{|q|q[:question_text]}
-      texts.member?('gq1').should be_true
-      texts.member?('gq2').should be_true
-      texts.member?('qq1').should be_true
+      texts.member?('gq1').should be_truthy
+      texts.member?('gq2').should be_truthy
+      texts.member?('qq1').should be_truthy
     end
 
   end
@@ -780,18 +762,18 @@ describe Quizzes::Quiz do
     Canvas::Plugin.all_for_tag(:lockdown_browser).each { |p| p.settings[:enabled] = false }
 
     # nothing should be restricted
-    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_falsey
     [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
-        each { |qs| qs[0].send(qs[1]).should be_false }
+        each { |qs| qs[0].send(qs[1]).should be_falsey }
 
     # register a plugin
     Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
         :settings => {:enabled => false}})
 
     # nothing should change yet
-    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_falsey
     [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
-        each { |qs| qs[0].send(qs[1]).should be_false }
+        each { |qs| qs[0].send(qs[1]).should be_falsey }
 
     # now actually enable the plugin
     setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
@@ -799,15 +781,15 @@ describe Quizzes::Quiz do
     setting.save!
 
     # now the restrictions should take effect
-    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_true
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_truthy
     [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| q.send(s).should be_false }
+        each { |s| q.send(s).should be_falsey }
     [:require_lockdown_browser, :require_lockdown_browser?].
-        each { |s| q1.send(s).should be_true }
+        each { |s| q1.send(s).should be_truthy }
     [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| q1.send(s).should be_false }
+        each { |s| q1.send(s).should be_falsey }
     [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| q2.send(s).should be_true }
+        each { |s| q2.send(s).should be_truthy }
   end
 
   it 'should not report LDB to be required for viewing results if LDB is not required to take the quiz' do
@@ -815,10 +797,10 @@ describe Quizzes::Quiz do
 
     q = @course.quizzes.build
     q.require_lockdown_browser_for_results = true
-    q.require_lockdown_browser_for_results.should be_false
+    q.require_lockdown_browser_for_results.should be_falsey
     q.require_lockdown_browser = true
     q.require_lockdown_browser_for_results = true
-    q.require_lockdown_browser_for_results.should be_true
+    q.require_lockdown_browser_for_results.should be_truthy
   end
 
   describe "non_shuffled_questions" do
@@ -886,8 +868,8 @@ describe Quizzes::Quiz do
   end
 
   describe "shuffleable_question_type?" do
-    specify { Quizzes::Quiz.shuffleable_question_type?("true_false_question").should be_false }
-    specify { Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question").should be_true }
+    specify { Quizzes::Quiz.shuffleable_question_type?("true_false_question").should be_falsey }
+    specify { Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question").should be_truthy }
   end
 
   describe '#has_student_submissions?' do
@@ -902,24 +884,24 @@ describe Quizzes::Quiz do
     end
 
     it 'returns true if the submission is not settings_only and its user is part of this course' do
-      @submission.settings_only?.should be_false
-      @quiz.context.students.include?(@user).should be_true
-      @quiz.has_student_submissions?.should be_true
+      @submission.settings_only?.should be_falsey
+      @quiz.context.students.include?(@user).should be_truthy
+      @quiz.has_student_submissions?.should be_truthy
     end
 
     it 'is false if the submission is settings_only' do
       @submission.update_attribute(:workflow_state, 'settings_only')
-      @quiz.has_student_submissions?.should be_false
+      @quiz.has_student_submissions?.should be_falsey
     end
 
     it 'is false if there are no submissions' do
       @quiz.quiz_submissions.scoped.delete_all
-      @quiz.has_student_submissions?.should be_false
+      @quiz.has_student_submissions?.should be_falsey
     end
 
     it 'is true if only one submission of many matches the conditions' do
       Quizzes::QuizSubmission.create!(:quiz => @quiz, :user => User.create!)
-      @quiz.has_student_submissions?.should be_true
+      @quiz.has_student_submissions?.should be_truthy
     end
   end
 
@@ -1054,16 +1036,16 @@ describe Quizzes::Quiz do
       it "should not save an invalid quiz_type" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.quiz_type = "totally_invalid_quiz_type"
-        quiz.save.should be_false
+        quiz.save.should be_falsey
         quiz.errors["invalid_quiz_type"].should be_present
       end
 
       it "should not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
         quiz.workflow_state = 'created'
-        quiz.save(:validate => false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_truthy  # save without validation
         quiz.reload
-        quiz.save.should be_true
+        quiz.save.should be_truthy
         quiz.errors.should be_blank
         quiz.quiz_type.should == 'invalid'
       end
@@ -1073,16 +1055,16 @@ describe Quizzes::Quiz do
       it "should not save an invalid ip_filter" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.ip_filter = "999.999.1942.489"
-        quiz.save.should be_false
+        quiz.save.should be_falsey
         quiz.errors["invalid_ip_filter"].should be_present
       end
 
       it "should not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
         quiz.workflow_state = 'created'
-        quiz.save(:validate => false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_truthy  # save without validation
         quiz.reload
-        quiz.save.should be_true
+        quiz.save.should be_truthy
         quiz.errors.should be_blank
         quiz.ip_filter.should == '123.fourfivesix'
       end
@@ -1114,16 +1096,16 @@ describe Quizzes::Quiz do
       it "should not save an invalid hide_results" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.hide_results = "totally_invalid_value"
-        quiz.save.should be_false
+        quiz.save.should be_falsey
         quiz.errors["invalid_hide_results"].should be_present
       end
 
       it "should not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
         quiz.workflow_state = 'created'
-        quiz.save(:validate => false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_truthy  # save without validation
         quiz.reload
-        quiz.save.should be_true
+        quiz.save.should be_truthy
         quiz.errors.should be_blank
         quiz.hide_results.should == 'invalid'
       end
@@ -1136,21 +1118,21 @@ describe Quizzes::Quiz do
 
     it "returns false unless there is quiz data for a quiz" do
       quiz.stubs(:quiz_data).returns nil
-      quiz.has_file_upload_question?.should be_false
+      quiz.has_file_upload_question?.should be_falsey
     end
 
     it "returns true when there is a file upload question" do
       quiz.stubs(:quiz_data).returns [
         {question_type: 'file_upload_question'}
       ]
-      quiz.has_file_upload_question?.should be_true
+      quiz.has_file_upload_question?.should be_truthy
     end
 
     it "returns false when there isn't a file upload question" do
       quiz.stubs(:quiz_data).returns [
         {question_type: 'multiple_choice_question'}
       ]
-      quiz.has_file_upload_question?.should be_false
+      quiz.has_file_upload_question?.should be_falsey
     end
   end
 
@@ -1208,30 +1190,24 @@ describe Quizzes::Quiz do
     subject { @course.quizzes.create!(title: 'Test Quiz') }
 
     it 'should be true if publish! was manually called' do
-      subject.needs_republish?.should be_false
+      subject.needs_republish?.should be_falsey
 
       # intercepting the call to save! and running our expectations there
       # because by the time it's saved, #needs_republish? will be reset
       subject.expects(:save!).with { |*args|
-        subject.needs_republish?.should be_true
+        subject.needs_republish?.should be_truthy
         true
       }
 
       subject.publish!
     end
 
-    context 'with draft-state' do
-      before do
-        subject.context.root_account.enable_feature!(:draft_state)
-      end
-
-      it 'should be true if the workflow_state has changed' do
-        subject.workflow_state = 'deleted'
-        subject.save!
-        subject.reload
-        subject.workflow_state = 'available'
-        subject.needs_republish?.should be_true
-      end
+    it 'should be true if the workflow_state has changed' do
+      subject.workflow_state = 'deleted'
+      subject.save!
+      subject.reload
+      subject.workflow_state = 'available'
+      subject.needs_republish?.should be_truthy
     end
   end
 
@@ -1348,25 +1324,23 @@ describe Quizzes::Quiz do
   describe "#destroy" do
     it "should logical delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions? => true)
       quiz.publish!
       quiz.assignment.stubs(:has_student_submissions? => true)
 
       quiz.destroy
-      quiz.deleted?.should be_true
+      quiz.deleted?.should be_truthy
     end
 
     it "should logical delete the published quiz's associated assignment" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions?).returns true
       quiz.publish!
       assignment = quiz.assignment
       assignment.stubs(:has_student_submissions?).returns true
 
       quiz.destroy
-      assignment.deleted?.should be_true
+      assignment.deleted?.should be_truthy
     end
     it 'should raise an error on validation error' do
       quiz = Quizzes::Quiz.new
@@ -1374,18 +1348,13 @@ describe Quizzes::Quiz do
     end
   end
 
-  context "draft_state" do
-
-    it "updates the assignment's workflow state" do
-      @course.root_account.enable_feature!(:draft_state)
-      @quiz = @course.quizzes.create!(title: 'Test Quiz')
-      @quiz.publish!
-      @quiz.unpublish!
-      @quiz.assignment.should_not be_published
-      @quiz.publish!
-      @quiz.assignment.should be_published
-    end
-
+  it "updates the assignment's workflow state" do
+    @quiz = @course.quizzes.create!(title: 'Test Quiz')
+    @quiz.publish!
+    @quiz.unpublish!
+    @quiz.assignment.should_not be_published
+    @quiz.publish!
+    @quiz.assignment.should be_published
   end
 
   describe "#restrict_answers_for_concluded_course?" do
@@ -1448,7 +1417,7 @@ describe Quizzes::Quiz do
 
       submission = quiz.generate_submission(@user)
 
-      quiz.show_correct_answers?(@user, submission).should be_false
+      quiz.show_correct_answers?(@user, submission).should be_falsey
     end
 
     it "shows the correct answers immediately" do
@@ -1461,7 +1430,7 @@ describe Quizzes::Quiz do
 
       submission = quiz.generate_submission(@user)
 
-      quiz.show_correct_answers?(@user, submission).should be_true
+      quiz.show_correct_answers?(@user, submission).should be_truthy
     end
 
     it "shows the correct answers after a certain date" do
@@ -1475,13 +1444,13 @@ describe Quizzes::Quiz do
 
       submission = quiz.generate_submission(@user)
 
-      quiz.show_correct_answers?(@user, submission).should be_false
+      quiz.show_correct_answers?(@user, submission).should be_falsey
 
       quiz.show_correct_answers_at = 2.minutes.ago
       quiz.save!
       quiz.reload
 
-      quiz.show_correct_answers?(@user, submission).should be_true
+      quiz.show_correct_answers?(@user, submission).should be_truthy
     end
 
     it "hides the correct answers after a certain date" do
@@ -1494,13 +1463,13 @@ describe Quizzes::Quiz do
 
       submission = quiz.generate_submission(@user)
 
-      quiz.show_correct_answers?(@user, submission).should be_true
+      quiz.show_correct_answers?(@user, submission).should be_truthy
 
       quiz.hide_correct_answers_at = 2.minutes.ago
       quiz.save!
       quiz.reload
 
-      quiz.show_correct_answers?(@user, submission).should be_false
+      quiz.show_correct_answers?(@user, submission).should be_falsey
     end
 
     it "nullifies related fields when turned off" do
@@ -1543,15 +1512,14 @@ describe Quizzes::Quiz do
 
       submission = quiz.generate_submission(@user)
 
-      quiz.show_correct_answers?(@user, submission).should be_false
+      quiz.show_correct_answers?(@user, submission).should be_falsey
 
       quiz.update_attributes({ one_time_results: true })
-      quiz.show_correct_answers?(@user, submission).should be_true
+      quiz.show_correct_answers?(@user, submission).should be_truthy
     end
   end
 
   context "permissions" do
-
     before :once do
       @course.workflow_state = 'available'
       @course.save!
@@ -1560,76 +1528,37 @@ describe Quizzes::Quiz do
       teacher_in_course(course: @course, active_all: true)
     end
 
-    describe "read" do
+    it "doesn't let student read/submit quizzes that are unpublished" do
+      @quiz.unpublish!.reload
+      @quiz.grants_right?(@student, :read).should == false
+      @quiz.grants_right?(@student, :submit).should == false
+      @quiz.grants_right?(@teacher, :read).should == true
+    end
 
-      context "draft state enabled" do
-
-        before :once do
-          @course.account.enable_feature!(:draft_state)
-        end
-
-        it "doesn't let student read/submit quizzes that are unpublished" do
-          @quiz.unpublish!.reload
-          @quiz.grants_right?(@student, :read).should == false
-          @quiz.grants_right?(@student, :submit).should == false
-          @quiz.grants_right?(@teacher, :read).should == true
-        end
-
-        it "does let students read/submit quizzes that are published" do
-          @quiz.publish!
-          @quiz.grants_right?(@student, :read).should == true
-          @quiz.grants_right?(@student, :submit).should == true
-          @quiz.grants_right?(@teacher, :read).should == true
-        end
-
-      end
-
-      context "draft state not enabled" do
-
-        it "always lets students view the quiz, even if not available" do
-          @quiz.workflow_state = 'edited'
-          @quiz.save!
-          @quiz.grants_right?(@student, :read).should == true
-          @quiz.workflow_state = 'available'
-          @quiz.save!
-          @quiz.grants_right?(@student, :read).should == true
-        end
-
-        it "only allows submitting for available assignments" do
-          @quiz.workflow_state = 'edited'
-          @quiz.save!
-          @quiz.grants_right?(@student, :submit).should == false
-          @quiz.workflow_state = 'available'
-          @quiz.save!
-          @quiz.grants_right?(@student, :submit).should == true
-        end
-      end
+    it "does let students read/submit quizzes that are published" do
+      @quiz.publish!
+      @quiz.grants_right?(@student, :read).should == true
+      @quiz.grants_right?(@student, :submit).should == true
+      @quiz.grants_right?(@teacher, :read).should == true
     end
   end
 
   describe "#available?" do
-
     before :once do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
     end
 
-    context "draft state enabled" do
-      before do
-        @course.account.enable_feature!(:draft_state)
-      end
-
-      it "returns true if quiz is published" do
-        @quiz.publish!
-        @quiz.should be_available
-        @quiz.unpublish!
-        @quiz.should_not be_available
-      end
+    it "returns true if quiz is published" do
+      @quiz.publish!
+      @quiz.should be_available
+      @quiz.unpublish!
+      @quiz.should_not be_available
     end
   end
 
   describe "restore" do
     before do
-      course(draft_state: true)
+      course
     end
 
     it "should restore to published state if there are student submissions" do
@@ -1737,11 +1666,13 @@ describe Quizzes::Quiz do
         create_section_override_for_assignment(@assignment, {course_section: @section})
         @course.reload
       end
+
       context 'DA feature on' do
         before { @course.enable_feature!(:differentiated_assignments) }
+
         context 'student with override' do
           it 'should show the quiz if there is an override' do
-            @quiz.visible_to_user?(@student1).should be_true
+            @quiz.visible_to_user?(@student1).should be_truthy
           end
           it "should grant submit rights" do
             @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
@@ -1751,14 +1682,15 @@ describe Quizzes::Quiz do
             @course.unstub(:grants_right?)
           end
         end
+
         context 'student without override' do
           it 'should hide the quiz there is no override' do
-            @quiz.visible_to_user?(@student2).should be_false
+            @quiz.visible_to_user?(@student2).should be_falsey
           end
           it 'should show the quiz if it is not only visible to overrides' do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
-            @quiz.visible_to_user?(@student2).should be_true
+            @quiz.visible_to_user?(@student2).should be_truthy
           end
           it 'should not grant submit rights' do
             @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
@@ -1767,70 +1699,80 @@ describe Quizzes::Quiz do
             @quiz.grants_right?(@student2, :submit).should == false
           end
         end
+
         context 'observer' do
           before do
             @observer = User.create
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
           end
+
           context 'with students' do
             it 'should show the quiz if there is an override' do
               @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
             it 'should hide the quiz there is no override' do
               @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              @quiz.visible_to_user?(@observer).should be_false
+              @quiz.visible_to_user?(@observer).should be_falsey
             end
             it 'should show the quiz if it is not only visible to overrides' do
               @quiz.only_visible_to_overrides = false
               @quiz.save!
               @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
           end
-          context 'without sutdents' do
+
+          context 'without students' do
             it 'should show the quiz if there is an override' do
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
             it 'should show the quiz even if there is no override' do
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
           end
         end
+
         context 'teacher' do
           it 'should show the quiz' do
-            @quiz.visible_to_user?(@teacher).should be_true
+            @quiz.visible_to_user?(@teacher).should be_truthy
           end
         end
       end
+
       context 'DA feature off' do
         before {@course.disable_feature!(:differentiated_assignments)}
+
         context 'student' do
           it 'should show the quiz even if there is no override' do
-            @quiz.visible_to_user?(@student1).should be_true
-            @quiz.visible_to_user?(@student2).should be_true
+            @quiz.visible_to_user?(@student1).should be_truthy
+            @quiz.visible_to_user?(@student2).should be_truthy
           end
         end
+
         context 'observer' do
           before do
             @observer = User.create
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
           end
+
           context 'with students' do
             it 'should show the quiz even if there is no override' do
               @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
           end
-          context 'without sutdents' do
+
+          context 'without students' do
             it 'should show the quiz' do
-              @quiz.visible_to_user?(@observer).should be_true
+              @quiz.visible_to_user?(@observer).should be_truthy
             end
           end
         end
+
         context 'teacher' do
           it 'should show the quiz' do
-            @quiz.visible_to_user?(@teacher).should be_true
+            @quiz.visible_to_user?(@teacher).should be_truthy
           end
         end
       end

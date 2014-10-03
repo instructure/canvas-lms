@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes students" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quizzes selenium tests"
 
   context "as a teacher " do

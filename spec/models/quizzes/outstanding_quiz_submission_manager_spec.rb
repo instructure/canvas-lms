@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::OutstandingQuizSubmissionManager do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "outstanding submissions by quiz" do
     before do
       course

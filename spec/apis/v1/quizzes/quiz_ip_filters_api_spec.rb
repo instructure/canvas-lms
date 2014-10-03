@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizIpFiltersController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course_with_teacher :active_all => true
 
     @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
@@ -28,13 +32,16 @@ describe Quizzes::QuizIpFiltersController, type: :request do
 
   context 'index' do
     def get_index(raw = false, data = {})
-      helper = method(raw ? :raw_api_call : :api_call)
-      helper.call(:get,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/ip_filters",
-        { :controller => 'quizzes/quiz_ip_filters', :action => 'index', :format => 'json',
-          :course_id => @course.id.to_s,
-          :quiz_id => @quiz.id.to_s
-        }, data)
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/ip_filters"
+      params = { :controller => 'quizzes/quiz_ip_filters', :action => 'index',
+                 :format => 'json', :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s }
+
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
     end
 
     it 'should return an empty list' do

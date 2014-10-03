@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/new" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   def course_quiz(active=false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
@@ -42,6 +46,7 @@ describe "/quizzes/quizzes/new" do
 
   context "with course and quiz" do
     before :each do
+      Account.default.enable_feature!(:draft_state)
       course_with_teacher_logged_in(:active_all => true)
       @quiz = course_quiz
       assigns[:quiz] = @quiz
@@ -58,18 +63,6 @@ describe "/quizzes/quizzes/new" do
       (Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT+1).times { quiz_question }
       render 'quizzes/quizzes/new'
       response.inspect.should include('NOTE: Question details not available when more than')
-    end
-  end
-
-  context "draft state" do
-    before :each do
-      Account.default.enable_feature!(:draft_state)
-
-      course_with_teacher_logged_in(:active_all => true)
-      @quiz = course_quiz
-      assigns[:quiz] = @quiz
-      assigns[:js_env] = {quiz_max_combination_count: 200}
-      view_context
     end
 
     it 'has a published inditactor when the quiz is published' do

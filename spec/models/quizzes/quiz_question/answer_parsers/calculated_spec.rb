@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context "#parse" do
     let(:raw_answers) do
       [

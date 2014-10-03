@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionEvent do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   def build_event(submission_data, quiz_data)
     described_class.build_from_submission_data(submission_data, quiz_data)
   end

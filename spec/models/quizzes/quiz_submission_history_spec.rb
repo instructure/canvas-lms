@@ -20,6 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionHistory do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
 
   context "submissions with history" do
     before :once do

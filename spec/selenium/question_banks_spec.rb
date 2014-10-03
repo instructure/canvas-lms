@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "question bank" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "in-process server selenium tests"
 
   it "deleting AJAX-loaded questions should work" do
