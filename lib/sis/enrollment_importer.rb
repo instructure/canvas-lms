@@ -210,7 +210,7 @@ module SIS
 
             enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_name => custom_role.try(:name)).first
             unless enrollment
-              enrollment = Enrollment.new
+              enrollment = Enrollment.typed_enrollment(type).new
               enrollment.root_account = @root_account
             end
             enrollment.user = user
