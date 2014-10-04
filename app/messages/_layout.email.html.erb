@@ -60,5 +60,19 @@
     </tr>
   </table>
 </center>
+<% if content(:footer_link) %>
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "EmailMessage",
+    "action": {
+      "@type": "ViewAction",
+      "url": "<%= content(:link) %>",
+      "name": "View in Canvas"
+    },
+    "description": "View this event in Canvas"
+  }
+  </script>
+<% end %>
 </body>
 </html>
