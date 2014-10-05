@@ -3,7 +3,8 @@ define [
   '../mixins/BackboneMixin'
   'compiled/models/Folder'
   '../modules/customPropTypes'
-], (React, BackboneMixin, Folder, customPropTypes) ->
+  'compiled/util/mimeClass'
+], (React, BackboneMixin, Folder, customPropTypes, mimeClass) ->
 
   DOM = React.DOM
 
@@ -17,12 +18,14 @@ define [
     mixins: [BackboneMixin('model')],
 
     render: ->
-      @transferPropsTo if @props.model instanceof Folder
-          DOM.i className: 'icon-folder media-object ef-big-icon FilesystemObjectThumbnail'
-        else if @props.model.get('thumbnail_url')
+      @transferPropsTo if @props.model.get('thumbnail_url')
           DOM.span
             className: 'media-object ef-thumbnail FilesystemObjectThumbnail'
             style:
               backgroundImage: "url('#{ @props.model.get('thumbnail_url') }')"
         else
-          DOM.i className:'icon-document media-object ef-big-icon FilesystemObjectThumbnail'
+          className = if @props.model instanceof Folder
+            'folder'
+          else
+            mimeClass(@props.model.get('content-type'))
+          DOM.i className:'media-object ef-big-icon FilesystemObjectThumbnail mimeClass-' + className
