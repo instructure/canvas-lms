@@ -35,6 +35,14 @@ ko:
     no_file: "성과 파일이나 주어진 기관이 없음"
     no_permissions: "사용자가 전체 성과를 편집하도록 허용되지 않음"
     no_perms: "사용자가 전체 성과를 편집하도록 허용되지 않음"
+    plugin_settings: 
+      api_url_description: "(예: %{url})"
+      common_core_guid: "(예: %{guid})"
+      description: "[Academic Benchmark](%{url}) 계정이 필요합니다."
+      labels: 
+        api_key: "API 키"
+        api_url: "API URL"
+        common_core_guid: "공통 핵심 GUID (선택 사항)"
   account: 
     account_settings: 
       delicious: Delicious
@@ -713,6 +721,9 @@ ko:
       headers: 
         report_last_run: "마지막 실행"
         report_name: 이름
+      headings: 
+        sections: 보고서
+        settings: "계정 설정"
       help_link_available_to_all_admins: 관리자
       help_link_available_to_all_students: 학생
       help_link_available_to_all_teachers: 교사
@@ -803,6 +814,7 @@ ko:
         subject: 주제
       open_registration_delegated_warning_message: "외부 ID 공급자를 사용하는 경우에 개방형 등록을 통해서 생성된 사용자는 외부 공급자의 로그인 양식에 %{url}을(를) 가리키는 링크가 없으면 로그인을 할 수 없습니다."
       open_registration_delegated_warning_tooltip: "외부 ID 공급자를 사용"
+      page_header_title: "계정 설정"
       page_title: "계정 설정"
       quiz_ip_filters_help_message: |-
           퀴즈 IP 필터는 퀴즈에 대한 액세스를 특정 IP 범위의 컴퓨터로 제한하는 방법입니다.
@@ -1037,10 +1049,10 @@ ko:
     error_heading: "Ajax 오류: %{status_code}"
     errors: 
       connection_lost: "%{host}와의 연결이 끊어졌습니다. 인터넷에 연결되어 있는지 확인하고 다시 시도하시기 바랍니다."
-      timeout: "오랫동안 사용하지 않아서 요청에 문제가 발생했습니다. 페이지를 다시 로드하고 다시 시도하시기 바랍니다."
       unhandled: "마지막 요청이 동작하지 않았습니다."
     links: 
       details: "세부 정보"
+      login: 로그인
     no_text: "텍스트 없음"
   alerts: 
     alert: 
@@ -1505,6 +1517,7 @@ ko:
       buttons: 
         not_published: "게시 안 됨"
         published: 게시됨
+      page_header_title: "새 과제"
       titles: 
         delete: 삭제
     edit_view: 
@@ -1967,6 +1980,12 @@ ko:
     no_manifest: "이 Blackboard .zip은 루트 디렉토리에 imsmanifest.xml 파일이 없습니다."
   bookmark_service: 
     default_title: "제목 없음"
+  broccoli_cloud: 
+    label: 
+      published: 게시됨
+      unpublished: "게시 안 됨"
+    published_title: 게시됨
+    unpublished_title: "게시 안 됨"
   bulk_course_migration: 
     export_failed: "Blackboard에서 bb_lcid가 %{id}인 과목을 내보내는 중에 오류가 발생했습니다."
     export_failed_no_id: "과목을 가져오는 중 오류 발생"
@@ -2495,6 +2514,7 @@ ko:
       feed_title: "과목 달력 Atom 피드"
       links: 
         feed: "피드를 보려면 여기를 클릭"
+      page_title_header: 달력
       skip_to_calendar: "달력으로 건너뛰기"
       toggle_calendars: "달력 토글"
       toggle_undated_items: "날짜 없는 항목 토글"
@@ -2748,6 +2768,7 @@ ko:
     inactive_error: "활성된 회의가 아님"
     index: 
       concluded_conferences: "종결된 회의"
+      conference_header: 회의
       new_conference: "새 회의"
       new_conferences: "새 회의"
       page_title: "웹 회의"
@@ -2987,7 +3008,6 @@ ko:
       question_bank: 
         aria_new_label: "새 문제 은행 만들기"
         create_new_question: "-- 새 문제 은행 만들기 --"
-        question_bank_label: "문제 은행"
         question_bank_placeholder: "\"문제 은행 이름\""
         question_bank_placeholder_aria: "\"새 문제 은행 이름을 입력하십시오\""
         question_bank_title: "새 문제 은행 이름"
@@ -3459,6 +3479,7 @@ ko:
         text: 
           delete_module: 삭제
           edit_module: 편집
+          move_module: "다음으로 이동..."
         title: 
           delete_module: "이 모듈 삭제"
           edit_module: 편집
@@ -3681,6 +3702,7 @@ ko:
       mark_as_read: "읽음으로 표시"
       mark_as_unread: "읽지 않음으로 표시"
       more_options: "기타 옵션"
+      page_title_header: 대화
       reply: "답변 작성..."
       reply_all: "전체 회신"
       search_by_user: "사용자 검색"
@@ -4257,6 +4279,7 @@ ko:
         details: "과목 세부 정보"
         grade_publishing: "평점 게시"
         move_course: "과목을 다른 루트 계정으로 이동"
+        navigation: "과목 탐색"
         sections: "과목 섹션"
       help: 
         edit_navigation: "과목 탐색에 순서를 다시 매기려면 항목을 끌어다 놓으십시오."
@@ -4570,6 +4593,8 @@ ko:
       student: 
         count: "오답 학생 수"
         ratio: "오답 학생 비율"
+  current_uploads: 
+    close: 닫기
   curve_grades_dialog: 
     average_score: "평균 점수"
     buttons: 
@@ -4878,6 +4903,7 @@ ko:
       enable_podcast_feed: "Podcast 피드 사용"
       include_replies_in_podcast_feed: "Podcast 피드에 답변 포함"
       options: 옵션
+      page_header_title: "새 토론"
       points_possible: "가능한 점수"
       post_at: "게시 시각"
       save: 저장
@@ -5360,6 +5386,7 @@ ko:
         eportfolio_name: "내 포트폴리오"
       headers: 
         add_eportfolio: "ePortfolio 만들기"
+        eportfolios: ePortfolios
         my_eportfolios: "내 ePortfolios"
         what: "ePortfolio가 무엇입니까?"
       labels: 
@@ -5662,12 +5689,6 @@ ko:
     buttons: 
       update_file: "파일 업데이트"
     cancel: 취소
-    content_file: 
-      links: 
-        delete: "이 파일 삭제"
-        edit: "편집하려면 클릭, 다른 폴더로 이동하려면 끌기"
-        preview_file: "이 파일 미리 보기"
-        rename: "이 파일 이름 바꾸기"
     content_folder: 
       titles: 
         edit_and_move_instructions: "편집하려면 클릭, 다른 폴더로 이동하려면 끌기"
@@ -5882,6 +5903,7 @@ ko:
     graded_by_me: "%{graded_time}에 내가 평가"
     graded_then_resubmitted: "평가된 후 다시 제출됨 (%{when})"
     gradee_index_of_total: "%{gradee} %{x} / %{y}"
+    grading_in_progress: "교사가 평가 작업 중임"
     group: 그룹
     mute_assignment: "과제 평점 비공개"
     new_assessment: "[새 과제]"
@@ -6035,16 +6057,8 @@ ko:
   gradebook_uploads_form: 
     buttons: 
       upload_data: "데이터 업로드"
-    example_csv_file: "예제 CSV 파일"
-    existing_assignment_example: "기존 과제 (581)"
-    explanation_of_required_columns: "이 열을 *모두* 가져야 하고 행 당 하나가 *필요*합니다."
-    instructions: 
-      csv_download_and_upload: "불확실한 경우에는 언제든지 CSV를 다운로드해서 원하는 평점을 바꾸고 같은 파일을 다시 업로드할 수 있습니다."
     labels: 
       upload: "업로드할 CSV 파일 선택:"
-    leaving_id_will_match_better_can_add_new_assignment: "ID를 그대로 두면(이 경우에는 \"(581)\" 부분) 일치가 잘되도록 합니다. 곧바로 만드는 새 과제를 추가할 수도 있습니다."
-    new_assignment_example: "새 과제"
-    optional_ignored: "선택사항 - 무시했습니다."
     titles: 
       upload_form: "업로드할 CSV 파일 선택"
     what_should_csv_look_like: "CSV 파일은 어떻게 보입니까?"
@@ -6103,6 +6117,7 @@ ko:
       comments: 의견
       faculty_journal: "%{user}의 교원 일지"
       for_course: "과목에 대해"
+      grading_in_progress: "교사가 평가 작업 중임"
       headers: 
         details: "세부 정보"
         due: 기한
@@ -6151,6 +6166,7 @@ ko:
       filter_by_student: "학생 이름이나 보조 ID로 학생 필터링"
       grades: 평점
       hide_student_names: "학생 이름 숨기기"
+      page_header_title: "평점 기록부"
       publish_to_sis: "SIS에 평점 게시"
       set_group_weights: "그룹 가중치 설정"
       show_attendance_columns: "출석 열 표시"
@@ -6563,6 +6579,7 @@ ko:
         headings: 
           account_groups: "계정 수준 학생 그룹"
           course_groups: "학생 그룹"
+          groups: 그룹
         tabs: 
           everyone: 모두
       group_category: 
@@ -7234,6 +7251,18 @@ ko:
       twitter: 
         body: "%{student}에게 알림을 보냄"
         body_student: "귀하에게 알림을 보냄"
+    announcement_created_by_you: 
+      email: 
+        html: 
+          attached_file: "첨부 파일"
+          download: 다운로드
+        labels: 
+          file_included: "포함된 파일"
+      sms: 
+        details: "자세한 정보는 %{url}에서 확인"
+    announcement_reply: 
+      sms: 
+        details: "자세한 정보는 %{url}에서 확인"
     appointment_canceled_by_user: 
       email: 
         html: 
@@ -7826,12 +7855,33 @@ ko:
     content_locked_module: "이 내용은 *%{module}*의 일부로 잠금이 해제되지 않았습니다."
     content_locked_until: "이 내용은 %{date}까지 잠겨있습니다."
     content_unpublished_module: "이 내용은 게시 안 된 모듈의 일부로서 아직 사용할 수 없습니다."
+    conversation_created: 
+      email: 
+        attached_files: "첨부 파일:"
+        audio_comment: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
+        html: 
+          attached_files: "첨부 파일:"
+          audio_comment: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
+          download: 다운로드
+          unknown_user: "알 수 없는 사용자"
+        unknown_user: "알 수 없는 사용자"
+      facebook: 
+        link_text: "메시지 보기"
+        unknown_user: "알 수 없는 사용자"
+      sms: 
+        more_info: "자세한 정보는 %{url}에서 확인"
+        unknown_user: "알 수 없는 사용자"
+      summary: 
+        unknown_user: "알 수 없는 사용자"
+      twitter: 
+        tweet: "Canvas 알림 - %{user_name}에게 메시지가 왔습니다."
     conversation_message: 
       email: 
         attached_files: "첨부 파일:"
         audio_comment: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
         html: 
           attached_files: "첨부 파일:"
+          audio_comment: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
           download: 다운로드
           subject: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
           unknown_user: "알 수 없는 사용자"
@@ -9025,7 +9075,6 @@ ko:
         
         과제 제출/다시 제출
     all_submissions_display: "모든 제출물"
-    announcement_description: "과목에 새 공지가 있음"
     announcement_display: 공지
     appointment_availability_description: |-
         *강사와 관리자에게만 해당:*
@@ -9436,14 +9485,6 @@ ko:
   plugins: 
     academic_benchmark_importer: 
       description: "이를 사용하면 Academic Benchmark 표준을 Canvas로 가져올 수 있습니다."
-    academic_benchmark_settings: 
-      api_url_description: "(예: %{url})"
-      common_core_guid: "(예: %{guid})"
-      description: "[Academic Benchmark](%{url}) 계정이 필요합니다."
-      labels: 
-        api_key: "API 키"
-        api_url: "API URL"
-        common_core_guid: "공통 핵심 GUID (선택 사항)"
     account_reports: 
       description: "계정 보고서 선택"
       name: "계정 보고서"
@@ -9673,15 +9714,6 @@ ko:
     scribd: 
       description: "Scribd 문서 미리 보기"
       name: Scribd
-    scribd_settings: 
-      description: |-
-          [Scribd API 계정을 등록](%{scribd_url})해야 합니다.
-          API 키와 API 시크릿을 기록해 두십시오.  이 값은
-          프로필을 생성한 후에 "Settings -> API"에서 얻을 수 있습니다.
-      labels: 
-        api_key: "API 키"
-        enable_html5_viewer: "HTML5 문서 뷰어 사용"
-        secret_key: "API 시크릿"
     sessions: 
       description: "세션 시간 만료 관리"
       name: 세션
@@ -10070,12 +10102,14 @@ ko:
       max_attempts: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
       no_matching_user: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
       user_deleted: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
+    logout_confirm: 
+      cancel: 취소
     mobile_login: 
       back_to_login: "로그인으로 돌아가기"
       buttons: 
         request_password: "암호 요청"
       dont_know_password: "암호를 잊어버렸습니다."
-      login: 로그인
+      log_in: 로그인
       login_handle: "%{login_handle_name}을(를) 입력하면 암호를 변경할 수 있는 링크를 보냅니다."
       password: 암호
       sending: "전송 중..."
@@ -10972,6 +11006,12 @@ ko:
           minutes_to_add: "추가할 시간(분)"
           select_deselect_all: "모두 선택/해제"
           select_user: "%{user} 선택"
+      move_handle: 
+        move_to: "다음으로 이동..."
+      move_question: 
+        cancel: 취소
+        save: 저장
+        saving: "저장 중..."
       multi_answer: 
         choose_answer: 선택
       muted: 
@@ -11366,11 +11406,7 @@ ko:
         other: "%{count}개월"
       notices: 
         extra_time: "이 시도에 대해 추가 시간이 주어짐"
-        five_minutes_left: "5분 남음"
         less_time: "이 퀴즈에 대한 시간이 줄어들었습니다."
-        one_minute_left: "1분 남음"
-        thirty_minutes_left: "30분 남음"
-        twelve_hours_left: "12시간 남음"
       question_answered: 답변함
       question_unanswered: "아직 답변하지 않음"
       saved_at: "%{t}에 저장됨"
@@ -11420,10 +11456,16 @@ ko:
     upload_info: "이전에 다운로드한 학생의 제출물 파일을 바꿨다면 다시 압축해서 아래 양식에 압축 파일을 업로드하십시오. 학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다."
     upload_warning: "파일의 이름을 인식할 수 있도록 제출물 파일의 이름을 변경하지 마십시오."
   react_files: 
+    add_folder: "폴더 추가"
+    cancel: 취소
+    created_at_short: 생성
     errors: 
       no_match: 
         suggestions: "제안:"
+    files: 파일
     name: 이름
+    select_all: "모두 선택"
+    view: 보기
   recent_student: 
     last_logged_in: "%{last_login}에 마지막으로 로그인"
   recipient_input: 
@@ -11477,14 +11519,21 @@ ko:
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
   restrict_student_access: 
     aria_label: 
-      availableFrom: "다음부터 사용 가능"
+      availableFrom: 시작
       availableUntil: "다음 시간까지"
     button_text: 
       cancel: 취소
       update: 업데이트
     label: 
-      availableFrom: "다음부터 사용 가능"
+      availableFrom: 시작
       availableUntil: "다음 시간까지"
+    options: 
+      publish: 
+        description: 게시
+      unpublish: 
+        description: "게시 취소"
+    title: 
+      limit_student_access: 권한
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
   role_override: 
     permission: 
@@ -11586,6 +11635,8 @@ ko:
         enable_and_lock: "사용 및 잠금"
         use_default: "기본값 사용"
     permissions: 권한
+    roles_override_index: 
+      page_header_title: "계정 권한"
   roster: 
     delete_confirm: "이 사용자를 제거하시겠습니까?"
     error_sending_invitations: "초대를 보내는 데 오류가 발생했습니다. 다시 시도하시기 바랍니다."
@@ -11653,8 +11704,6 @@ ko:
         are_you_sure_delete: "이 루브릭을 삭제하시겠습니까? 현재 이 루브릭과 연결된 과목에서는 계속 액세스할 수 있지만 새 과목은 사용할 수 없게 됩니다."
         are_you_sure_remove: "목록에서 이 루브릭을 제거하시겠습니까?"
       remove_rubric: "목록에서 이 루브릭 제거"
-  scribd: 
-    upgrade_flash: "Adobe Flash Player가 오래된 버전입니다. iPaper (및 웹상에 있는 여러가지)를 사용하려면 %{link_tag}최신 Flash 플레이어%{end_link}를 받으십시오."
   search: 
     course_sections: "과목 섹션"
     enrollments_observers: 감독자
@@ -12122,6 +12171,11 @@ ko:
       ta_title: "조교로 초대됨 - 과목을 보려면 클릭"
       teacher: "%{course} 교사입니다."
       teacher_title: "교사로 초대됨 - 과목을 보려면 클릭"
+    primary_header_navigation: 
+      links: 
+        inbox: "받은 편지함"
+      menu: 
+        calendar: 달력
     profile: 
       add_link_field: "다른 링크 추가"
       bio: 약력
@@ -12975,6 +13029,7 @@ ko:
         current_courses: "현재 과목"
         last_entry: "마지막 교원 일지 항목"
         student: 학생
+      journal_header: "교원 일지"
       page_title: "교원 일지"
   user_profile: 
     profile_title_too_long: "제목이 너무 김"
