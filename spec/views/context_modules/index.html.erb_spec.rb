@@ -20,11 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/context_modules/index" do
+  before :each do
+    assigns[:body_classes] = []
+    assigns[:menu_tools] = Hash.new([])
+    assigns[:collapsed_modules] = []
+  end
+
   it "should render" do
     course
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
-    assigns[:collapsed_modules] = []
     render 'context_modules/index'
     response.should_not be_nil
   end
@@ -33,9 +38,9 @@ describe "/context_modules/index" do
     course
     context_module = @course.context_modules.create!
     content_tag = context_module.add_item :type => 'context_module_sub_header'
+    content_tag.publish! if content_tag.unpublished?
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
-    assigns[:collapsed_modules] = []
     render 'context_modules/index'
     response.should_not be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
@@ -54,7 +59,6 @@ describe "/context_modules/index" do
 
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
-    assigns[:collapsed_modules] = []
     render 'context_modules/index'
 
     response.should_not be_nil
@@ -69,7 +73,6 @@ describe "/context_modules/index" do
     content_tag.destroy
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
-    assigns[:collapsed_modules] = []
     render 'context_modules/index'
     response.should_not be_nil
     page = Nokogiri('<document>' + response.body + '</document>')

@@ -1303,6 +1303,7 @@ describe Assignment do
 
   context "quizzes" do
     before :once do
+      @course.enable_feature!(:draft_state)
       assignment_model(:submission_types => "online_quiz", :course => @course)
     end
 
@@ -1333,8 +1334,9 @@ describe Assignment do
       @a.reload
       @a.submission_types.should eql('online_quiz')
       @quiz = @a.quiz
+      @quiz.unpublish!
       @quiz.should_not be_nil
-      @quiz.state.should eql(:created)
+      @quiz.state.should eql(:unpublished)
       @quiz.assignment_id.should eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
@@ -1343,7 +1345,7 @@ describe Assignment do
       @quiz.state.should eql(:deleted)
       @a.reload
       @a.quiz.should be_nil
-      @a.state.should eql(:published)
+      @a.state.should eql(:unpublished)
     end
 
     it "should not delete the quiz if non-empty when unlinked" do
@@ -1364,7 +1366,7 @@ describe Assignment do
       @a.state.should eql(:published)
       @quiz = Quizzes::Quiz.find(@quiz.id)
       @quiz.assignment_id.should eql(nil)
-      @quiz.state.should eql(:created)
+      @quiz.state.should eql(:available)
     end
 
     it "should grab the original quiz if unlinked and relinked" do
@@ -1382,11 +1384,10 @@ describe Assignment do
       @a.quiz.should eql(@quiz)
       @a.state.should eql(:published)
       @quiz.reload
-      @quiz.state.should eql(:created)
+      @quiz.state.should eql(:available)
     end
 
     it "updates the draft state of its associated quiz" do
-      Account.default.enable_feature!(:draft_state)
       @a.reload
       @a.publish
       @a.save!
@@ -2948,13 +2949,6 @@ describe Assignment do
   end
 
   describe "#restore" do
-    it "should restore assignments with draft state disabled" do
-      assignment_model course: @course
-      @a.destroy
-      @a.restore
-      @a.reload.should be_published
-    end
-
     it "should restore to unpublished if draft state w/ no submissions" do
       @course.enable_feature!(:draft_state)
       assignment_model course: @course

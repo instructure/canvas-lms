@@ -119,11 +119,6 @@ describe Quizzes::Quiz do
     q.shuffle_answers = true
     q.save!
     q.unpublished_changes?.should be_false
-
-    # turning it back off forces a republish
-    q.shuffle_answers = false
-    q.save!
-    q.unpublished_changes?.should be_true
   end
 
   it "should infer the times if none given" do
@@ -370,22 +365,6 @@ describe Quizzes::Quiz do
   it "should create the assignment if created in published state" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
-    q.workflow_state = 'available'
-    q.save!
-    q.should be_available
-    q.assignment_id.should_not be_nil
-    q.assignment_group_id.should eql(g.id)
-    q.assignment.assignment_group_id.should eql(g.id)
-  end
-
-  it "should create the assignment if published after being created when draft_state not enabled" do
-    @course.root_account.disable_feature!(:draft_state)
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
-    q.save!
-    q.should_not be_available
-    q.assignment_id.should be_nil
-    q.assignment_group_id.should eql(g.id)
     q.workflow_state = 'available'
     q.save!
     q.should be_available
@@ -1643,15 +1622,6 @@ describe Quizzes::Quiz do
         @quiz.publish!
         @quiz.should be_available
         @quiz.unpublish!
-        @quiz.should_not be_available
-      end
-    end
-
-    context "draft state disabled" do
-      it "returns true when workflow_state is 'available'" do
-        @quiz.workflow_state = 'available'
-        @quiz.should be_available
-        @quiz.workflow_state = 'deleted'
         @quiz.should_not be_available
       end
     end

@@ -97,8 +97,7 @@ describe Course do
 
     # assignment tests
     course.reload
-    length = course.root_account.feature_enabled?(:draft_state) ? 5 : 4
-    course.assignments.length.should eql(length)
+    course.assignments.length.should == 4
     course.assignments.map(&:migration_id).sort.should eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
     # assignment with due date
     assignment = course.assignments.where(migration_id: "1865116014002").first
