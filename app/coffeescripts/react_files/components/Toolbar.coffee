@@ -118,6 +118,7 @@ define [
 
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
+
           Router.Link  {
               to: @getPreviewRoute()
               query: @getPreviewQuery()

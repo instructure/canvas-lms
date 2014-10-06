@@ -11,8 +11,8 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
 ], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, withReactDOM, collectionHandler) ->
-  FilePreview = React.createClass
 
+  FilePreview = React.createClass
 
     displayName: 'FilePreview'
 
@@ -38,10 +38,29 @@ define [
       $('.ReactModal__Overlay').off 'keydown', @handleKeyboardNavigation
 
     componentWillReceiveProps: (newProps) ->
-      @setState(
+      @setState({
         displayedItem: newProps.initialItem
         otherItemPreviewString: @setUpOtherItemsQuery(newProps.otherItems)
-      )
+      }, @scrollFooterToItem)
+
+
+    scrollFooterToItem: ->
+      # Determine if the footer is open.
+      if @state.showFooter
+
+        $active = $('.ef-file-preview-footer-active')
+        $footerList = $('.ef-file-preview-footer-list')
+        footerOffset = $footerList.offset();
+        activeOffset = $active.offset();
+
+        # Check if the displayed item thumbnail is hidden to right
+        if (activeOffset.left > (footerOffset.left + $footerList.width()))
+          $footerList.scrollTo $active
+          # @scrollRight()
+        # Hidden to the left
+        if (activeOffset.left < footerOffset.left )
+          $footerList.scrollTo $active
+          # @scrollLeft()
 
     setUpOtherItemsQuery: (otherItems) ->
       otherItems.map((item) ->
@@ -83,7 +102,6 @@ define [
       # right arrow
       if (event.keyCode is $.ui.keyCode.RIGHT)
         nextItem = collectionHandler.getNextInRelationTo(@props.otherItems, @state.displayedItem)
-
       ReactRouter.transitionTo(@getRouteIdentifier(), @props.params, @getArrowQuery(nextItem.id))
 
     getStatusMessage: ->
@@ -120,6 +138,7 @@ define [
         ReactRouter.Link {
           to: @getRouteIdentifier(),
           query: @getArrowQuery(goToItem.id),
+          splat: @props.params.splat,
           className: 'ef-file-preview-arrow-link'
         },
           div {className: 'ef-file-preview-arrow'},
@@ -162,7 +181,7 @@ define [
                   a {className: 'ef-file-preview-header-info ef-file-preview-button', href: '#', onClick: @openInfoPanel},
                     i {className: 'icon-info'}
                     I18n.t('file_preview_headerbutton_info', ' Info')
-                  ReactRouter.Link {to: @getRouteIdentifier(), query: @getArrowQuery(), className: 'ef-file-preview-header-close ef-file-preview-button'},
+                  ReactRouter.Link {to: @getRouteIdentifier(), query: @getArrowQuery(), splat: @props.params.splat, className: 'ef-file-preview-header-close ef-file-preview-button'},
                     i {className: 'icon-end'}
                     I18n.t('file_preview_headerbutton_close', ' Close')
             div {className: 'ef-file-preview-preview grid-row middle-xs'},
@@ -229,7 +248,7 @@ define [
                     @props.otherItems.map (file) =>
                       li {className: 'ef-file-preview-footer-list-item', key: file.id},
                         figure {className: 'ef-file-preview-footer-item'},
-                          ReactRouter.Link _.defaults({to: (if @props.params.splat then 'folder' else 'rootFolder'), query: {preview: file.id}, className: ''}, @props.params),
+                          ReactRouter.Link {to: @getRouteIdentifier(), splat: @props.params.splat, query: @getArrowQuery(file.id)},
                           div {
                             className: if file.displayName() is @state.displayedItem.displayName() then 'ef-file-preview-footer-image ef-file-preview-footer-active' else 'ef-file-preview-footer-image'
                             style: {'background-image': 'url(' + file.get('thumbnail_url') + ')'}
