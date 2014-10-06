@@ -202,8 +202,7 @@ $ef-thumbnail-size: 36px;
   padding-right: 5px;
 }
 .upload-progress-view {
-  padding-top: 25px;
-  clear: both;
+  display: flex;
 }
 .upload-progress-view__label {
   margin-left: 5px;
@@ -211,7 +210,10 @@ $ef-thumbnail-size: 36px;
   width: 49%;
   color: ensure-contrast(#000, $canvas-secondary);
   font-size: 0.95em;
-  float: left;
+}
+.upload-progress-view__button{
+  padding-bottom: 5px;
+  color: black;
 }
 .progress-bar__bar-container {
   height: 9px;
@@ -219,7 +221,6 @@ $ef-thumbnail-size: 36px;
   margin-bottom: 12px;
   border: solid $canvas-primary 1px;
   border-radius: 20px;
-  float: right;
   margin-top: 10px;
 
   &.almost-done {
@@ -240,7 +241,7 @@ $ef-thumbnail-size: 36px;
 .current_uploads {
   border-radius: 10px;
   border: dashed $canvas-neutral 2px;
-  padding: 10px 10px 40px 10px;
+  padding: 10px 10px 10px 10px;
 }
 .current_uploads__uploaders {
   padding-left: 20px;
