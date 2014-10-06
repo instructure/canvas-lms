@@ -149,27 +149,34 @@ describe PseudonymSessionsController do
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
 
-        # pretend we lost the cache somehow
-        Canvas.redis.del("cas_session:ST-abcd")
-        expect(Canvas.redis.get("cas_session:ST-abcd")).to eq nil
-
-        back_channel = open_session
-        # it starts out as a clone of the current session
-        back_channel.reset!
-
-        # single-sign-out from CAS server has no effect now
-        back_channel.post cas_logout_url, :logoutRequest => <<-SAML
+        # single-sign-out from CAS server cannot find key but should store the session is expired
+        post cas_logout_url, :logoutRequest => <<-SAML
 <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
 <saml:NameID></saml:NameID>
 <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
 </samlp:LogoutRequest>
         SAML
-        expect(back_channel.response.status.to_i).to eq 404
+        expect(response.status.to_i).to eq 200
 
-        # this should refresh it
+        # This should log them out.
         get dashboard_url
-        expect(response).to be_success
+        redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+      end
+
+      it "should do a single sign out when key is lost" do
+        user = user_with_pseudonym({:active_all => true})
+
+        stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
+
+        get login_url
+        redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+
+        get cas_login_url :ticket => 'ST-abcd'
+        expect(response).to redirect_to(dashboard_url(:login_success => 1))
+        expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
+
+        back_channel = open_session
 
         # unrelated logout should have no effect
         back_channel.post cas_logout_url :garbage => 1
@@ -178,30 +185,28 @@ describe PseudonymSessionsController do
         back_channel.post cas_logout_url :logoutRequest => "garbage"
         expect(back_channel.response.status.to_i).to eq 404
 
-        back_channel.post cas_logout_url :logoutRequest => <<-SAML
-<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
-<saml:NameID></saml:NameID>
-<samlp:SessionIndex>ST-abc</samlp:SessionIndex>
-</samlp:LogoutRequest>
-        SAML
-        expect(back_channel.response.status.to_i).to eq 404
-
         # still logged in
         get dashboard_url
         expect(response).to be_success
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
 
-        # this time it works
-        back_channel.post cas_logout_url :logoutRequest => <<-SAML
+        # pretend we lost the cache somehow
+        Canvas.redis.del("cas_session:ST-abcd")
+        expect(Canvas.redis.get("cas_session:ST-abcd")).to eq nil
+
+        # it starts out as a clone of the current session
+        back_channel.reset!
+
+        # single-sign-out from CAS server cannot find key but should store the session is expired
+        back_channel.post cas_logout_url, :logoutRequest => <<-SAML
 <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
 <saml:NameID></saml:NameID>
 <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
 </samlp:LogoutRequest>
         SAML
-        expect(back_channel.response).to be_success
-        expect(Canvas.redis.get("cas_session:ST-abcd")).to eq nil
+        expect(back_channel.response.status.to_i).to eq 404
 
-        # logged out!
+        # This should log them out.
         get dashboard_url
         redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
       end

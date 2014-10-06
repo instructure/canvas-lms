@@ -304,7 +304,7 @@ class PseudonymSessionsController < ApplicationController
       params['logoutRequest'] =~ %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(.*)</samlp:SessionIndex>}m
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      return render :text => "OK", :status => :ok if Pseudonym.release_cas_ticket($1)
+      return render :text => "OK", :status => :ok if Pseudonym.expire_cas_ticket($1)
     end
     render :text => "NO SESSION FOUND", :status => :not_found
   end
