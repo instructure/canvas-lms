@@ -10,12 +10,12 @@ describe 'ruby_version_compat' do
         sio = StringIO.new("".force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
         imio.write_message("\u3042\r\u3044\n\u3046\r\n\u3048").should == 23
-        sio.string.should == "\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n".force_encoding('binary')
+        sio.string.force_encoding('binary').should == "\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n".force_encoding('binary')
 
         sio = StringIO.new("".force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
         imio.write_message("\u3042\r").should == 8
-        sio.string.should == "\u3042\r\n.\r\n".force_encoding('binary')
+        sio.string.force_encoding('binary').should == "\u3042\r\n.\r\n".force_encoding('binary')
       end
 
       output.should == ['', '']
