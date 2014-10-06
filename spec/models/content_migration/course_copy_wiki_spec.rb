@@ -26,8 +26,8 @@ describe ContentMigration do
       main_page.save!
       @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
       run_course_copy
-      @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
-      @copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
+      @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>}
+      @copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body.should == %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>}
     end
 
     context "wiki front page" do

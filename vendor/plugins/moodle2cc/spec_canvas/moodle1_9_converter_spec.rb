@@ -107,7 +107,7 @@ describe Moodle::Converter do
       page.url.should == 'my-wiki-my-wiki'
       html = Nokogiri::HTML(page.body)
       href = html.search('a').first.attributes['href'].value
-      href.should == "/courses/#{@course.id}/wiki/my-wiki-link"
+      href.should == "/courses/#{@course.id}/#{@course.wiki.path}/my-wiki-link"
 
       page = wiki.wiki_pages.find_by_title 'link'
       page.should_not be_nil

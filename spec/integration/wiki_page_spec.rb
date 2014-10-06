@@ -23,8 +23,14 @@ describe WikiPagesController do
     course_with_teacher_logged_in(:active_all => true)
   end
 
+  def create_page(attrs)
+    page = @course.wiki.wiki_pages.create!(attrs)
+    page.publish! if page.unpublished?
+    page
+  end
+
   it "should not render wiki page body at all if it was deleted" do
-    @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
+    @wiki_page = create_page :title => "Some random wiki page",
                                                 :body => "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
@@ -45,57 +51,18 @@ describe WikiPagesController do
       html.css('#breadcrumbs a').each do |link|
         href = link.attr('href')
         next if href == "/"
-        href.should =~ %r{^/groups/#{@group.id}}
+        href.should =~ %r{/groups/#{@group.id}}
       end
     end
 
-    test_page("/groups/#{@group.id}/wiki/hello")
-    test_page("/groups/#{@group.id}/wiki/hello/revisions")
-  end
-
-  it "should permit the student to view the page history if they have permissions" do
-    @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
-                                                :body => "this is the content of the wikipage body asdfasdf",
-                                                :editing_roles => "teachers,students"
-    student = user()
-    enrollment = @course.enroll_student(student)
-    enrollment.accept!
-    @course.reload
-    user_session(student)
-    get course_wiki_page_url(@course, @wiki_page)
-    html = Nokogiri::HTML(response.body)
-    html.css("#page_history").should_not be_empty
-
-    @wiki_page.editing_roles = "teachers"
-    @wiki_page.save
-    get course_wiki_page_url(@course, @wiki_page)
-    html = Nokogiri::HTML(response.body)
-    html.css("#page_history").should be_empty
-  end
-
-  it "should cache the user_content call on the wiki_page body and clear on wiki_page update" do
-    enable_cache do
-      course_with_teacher_logged_in(:active_all => true)
-      @wiki_page = @course.wiki.wiki_pages.create :title => 'hello', :body => 'This is a wiki page.'
-
-      get course_wiki_page_url(@course, @wiki_page)
-
-      data = Rails.cache.read("views/#{["wiki_page_body_render", @wiki_page].cache_key}/en")
-      data.should_not be_nil
-
-      new_body = "all aboard the lollertrain woo woo"
-      @wiki_page.body = new_body
-      @wiki_page.save!
-
-      get course_wiki_page_url(@course, @wiki_page)
-      response.body.should include(new_body)
-    end
+    test_page("/groups/#{@group.id}/#{@group.wiki.path}/hello")
+    test_page("/groups/#{@group.id}/#{@group.wiki.path}/hello/revisions")
   end
 
   context "draft state forwarding" do
     before do
       @front = @course.wiki.front_page
-      @wiki_page = @course.wiki.wiki_pages.create :title => "a-page", :body => "body"
+      @wiki_page = create_page :title => "a-page", :body => "body"
       @base_url = "/courses/#{@course.id}/"
       @course.reload
     end

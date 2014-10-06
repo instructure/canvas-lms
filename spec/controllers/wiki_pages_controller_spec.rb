@@ -20,140 +20,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe WikiPagesController do
   describe "GET 'index'" do
-    it "should redirect on index request" do
-      course_with_teacher(:active_all => true)
+    it "should redirect with draft state enabled" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.enable_feature!(:draft_state)
       get 'index', :course_id => @course.id
       response.should be_redirect
+      response.location.should match(%r{/courses/#{@course.id}/pages})
     end
-
-    it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
-      @course.update_attribute(:tab_configuration, [{'id'=>2,'hidden'=>true}])
-      get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
-    end
-
-    it "pages index should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
-      @course.update_attribute(:tab_configuration, [{'id'=>2,'hidden'=>true}])
-      get 'pages_index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
-    end
-
-
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      get 'show', :course_id => @course.id, :id => 'front-page'
-      assert_unauthorized
-    end
-
-    it "should assign values" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'show', :course_id => @course.id, :id => 'front-page'
-      response.should be_success
-      assigns[:wiki].should_not be_nil
-      assigns[:page].should_not be_nil
-    end
-
-    it "should create entities if not already existing" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'show', :course_id => @course.id, :id => 'front-page'
-      response.should be_success
-      assigns[:wiki].should_not be_nil
-      assigns[:page].should_not be_nil
-      assigns[:page].title.should eql("Front Page")
-    end
-
-    it "should retrieve existing entities" do
-      course_with_teacher_logged_in(:active_all => true)
-      page = @course.wiki.front_page
-      page.save!
-      get 'show', :course_id => @course.id, :id => 'front-page'
-      response.should be_success
-      assigns[:wiki].should_not be_nil
-      assigns[:wiki].should eql(page.wiki)
-      assigns[:page].should_not be_nil
-      assigns[:page].title.should eql("Front Page")
-      assigns[:page].should eql(page)
-    end
-
   end
 
   describe "GET 'show'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
+    it "should redirect with draft state enabled" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.enable_feature!(:draft_state)
       get 'show', :course_id => @course.id, :id => "some-page"
-      assert_unauthorized
-    end
-
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'show', :course_id => @course.id, :id => "some-page"
-      response.should be_success
-      assigns[:wiki].should_not be_nil
-      assigns[:page].should_not be_nil
-      assigns[:page].title.should eql("Some Page")
-    end
-
-    it "should allow students when allowed" do
-      course_with_teacher_logged_in(:active_all => true)
-      post 'create', :course_id => @course.id, :wiki_page => {:title => "Some Secret Page"}
       response.should be_redirect
-      page = assigns[:page]
-      page.should_not be_nil
-      page.should_not be_new_record
-      page.title.should == "Some Secret Page"
-      student = user()
-      enrollment = @course.enroll_student(student)
-      enrollment.accept!
-      @course.reload
-      user_session(student)
-      get 'show', :course_id => @course.id, :id => page.wiki_id
-      response.should be_success
-      assigns[:wiki].should_not be_nil
-      assigns[:page].should_not be_nil
-      assigns[:page].title.should eql("Some Secret Page")
-    end
-
-    it "should not allow students when not allowed" do
-      course_with_teacher_logged_in(:active_all => true)
-      post 'create', :course_id => @course.id, :wiki_page => {:title => "Some Secret Page"}
-      response.should be_redirect
-      page = assigns[:page]
-      page.should_not be_nil
-      page.should_not be_new_record
-      page.title.should == "Some Secret Page"
-      page.workflow_state = 'unpublished'
-      page.save
-      page.reload
-      student = user()
-      enrollment = @course.enroll_student(student)
-      enrollment.accept!
-      @course.reload
-      user_session(student)
-      get 'show', :course_id => @course.id, :id => page.wiki_id
-      assert_unauthorized
+      response.location.should match(%r{/courses/#{@course.id}/pages})
     end
   end
-
-  # describe "GET 'revisions'" do
-  #   it "should require authorization" do
-  #     course_with_teacher(:active_all => true)
-  #     get 'show', :course_id => @course.id, :id => "some-page"
-  #     assert_unauthorized
-  #   end
-  #   
-  #   it "should assign variables" do
-  #     course_with_teacher_logged_in(:active_all => true)
-  #     get 'revisions', :course_id => @course.id, :id => "some-page", :format => 'html'
-  #     response.should be_success
-  #     assigns[:wiki].should_not be_nil
-  #     assigns[:page].should_not be_nil
-  #     assigns[:page].title.should eql("some_page")
-  #   end
-  # end
 
   describe "POST 'create'" do
     it "should require authorization" do
