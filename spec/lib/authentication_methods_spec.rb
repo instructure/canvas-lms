@@ -41,12 +41,34 @@ describe AuthenticationMethods do
         expect(controller.redirects).to eq ['cas_login_url']
       end
 
+      it "should destroy session when the cas ticket is expired" do
+        user_with_pseudonym
+        pseudonym_session = stub(:record => @pseudonym)
+        PseudonymSession.stubs(:find).returns(pseudonym_session)
+
+        cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
+
+        request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
+                      :format => stub(:json? => false))
+        controller = RSpec::MockController.new(domain_root_account, request)
+        controller.expects(:destroy_session).once
+        controller.expects(:redirect_to_login).once
+        controller.session[:cas_session] = cas_ticket
+
+        @pseudonym.expects(:cas_ticket_expired?).with(cas_ticket).once.returns(true)
+        controller.stubs(:load_pseudonym_from_access_token)
+        controller.stubs(:api_request?).returns(false)
+
+        expect(controller.send(:load_user)).to be_nil
+        expect(controller.instance_variable_get(:@current_user)).to be_nil
+        expect(controller.instance_variable_get(:@current_pseudonym)).to be_nil
+      end
+
       it 'can be overriden by passing the canvas_login parameter' do
         controller = RSpec::MockController.new(domain_root_account, request, :canvas_login => true)
         expect(controller.initiate_delegated_login).to be_falsey
         expect(controller.redirects).to eq []
       end
-
 
       context "cas_client" do
         let(:controller) { RSpec::MockController.new(domain_root_account, request, :canvas_login => true) }

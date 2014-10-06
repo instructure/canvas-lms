@@ -744,6 +744,35 @@ describe PseudonymSessionsController do
       PseudonymSessionsController.any_instance.stubs(:cas_client).returns(cas_client) if use_mock
     end
 
+    it "should logout with specific cas ticket" do
+      account = account_with_cas
+      user_with_pseudonym(active_all: true, account: account)
+
+      cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
+      request_text = <<-REQUEST_TEXT
+        <samlp:LogoutRequest
+          xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+          xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+          ID="42"
+          Version="2.0"
+          IssueInstant="#{Time.zone.now.in_time_zone}">
+          <saml:NameID>@NOT_USED@</saml:NameID>
+          <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
+        </samlp:LogoutRequest>
+      REQUEST_TEXT
+      request_text.strip!
+
+      controller.request.env['canvas.domain_root_account'] = account
+      session[:cas_session] = cas_ticket
+      @pseudonym.claim_cas_ticket(cas_ticket)
+
+      post :cas_logout, logoutRequest: request_text
+      expect(response.status).to eq 200
+
+      post :cas_logout, logoutRequest: request_text
+      expect(response.status).to eq 404
+    end
+
     it "should accept extra attributes" do
       account = account_with_cas
       user_with_pseudonym(active_all: true, account: account)
