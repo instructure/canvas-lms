@@ -9,19 +9,34 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  it "should allow creating" do
+  it "should allow creating through index" do
+    @course.enable_feature!(:draft_state)
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
-    click_option('#right-side select.assignment_groups_select', 'Assignments')
-    f('#right-side .add_assignment_link').click
-    f('#assignment_title').send_keys('test1')
+    f('.add_assignment').click
+    f('.create_assignment_dialog input[name="name"]').send_keys('test1')
     f('.ui-datepicker-trigger').click
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
-    replace_content(f('#assignment_points_possible'), '5')
-    click_option('.assignment_submission_types', 'External Tool')
-    expect_new_page_load { f('.more_options_link').click }
+    replace_content(f('.create_assignment_dialog input[name="points_possible"]'), '5')
+    click_option('.create_assignment_dialog select[name="submission_types"]', 'External Tool')
+    f('.create_assignment').click
+    wait_for_ajaximations
+
+    a = @course.assignments(true).last
+    expect(a).to be_present
+    expect(a.submission_types).to eq 'external_tool'
+  end
+
+  it "should allow creating through the 'More Options' link" do
+    @course.enable_feature!(:draft_state)
+    get "/courses/#{@course.id}/assignments"
+
+    #create assignment
+    f('.add_assignment').click
+    expect_new_page_load { f('.more_options').click }
+    f('#assignment_name').send_keys('test1')
     click_option('#assignment_submission_type', 'External Tool')
     f('#assignment_external_tool_tag_attributes_url').click
     keep_trying_until do
