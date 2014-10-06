@@ -1211,6 +1211,16 @@ describe DiscussionTopicsController, type: :request do
       @entry.message.should == @message
     end
 
+    it "should not allow creating an entry under a topic that is closed for comments" do
+      @course.enable_feature!(:draft_state)
+      @topic.lock!
+      api_call(
+          :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+          { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+            :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
+          { :message => @message }, {}, :expected_status => 401)
+    end
+
     it "should return json representation of the new entry" do
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",

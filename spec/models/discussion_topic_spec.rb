@@ -826,6 +826,8 @@ describe DiscussionTopic do
       @entry = @topic.reply_from(:user => @teacher, :text => "entry")
       @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply")
+
+      @topic.reload
       @topic.posters.should include(@student)
     end
 
@@ -834,6 +836,8 @@ describe DiscussionTopic do
       @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply 1")
       @entry.reply_from(:user => @student, :html => "reply 2")
+
+      @topic.reload
       @topic.posters.should include(@teacher)
       @topic.posters.should include(@student)
       @topic.posters.size.should == 2
