@@ -1548,3 +1548,29 @@ module UnscopeCallbacks
 end
 
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
+
+if CANVAS_RAILS3
+  [ActiveRecord::DynamicFinderMatch, ActiveRecord::DynamicScopeMatch].each do |klass|
+    klass.class_eval do
+      class << self
+        def match_with_discard(method)
+          result = match_without_discard(method)
+          return nil if result && (result.is_a?(ActiveRecord::DynamicScopeMatch) || result.finder != :first || result.instantiator? || result.bang?)
+          result
+        end
+        alias_method_chain :match, :discard
+      end
+    end
+  end
+else
+  ActiveRecord::DynamicMatchers::Method.class_eval do
+    class << self
+      def match_with_discard(model, name)
+        result = match_without_discard(model, name)
+        return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
+        result
+      end
+      alias_method_chain :match, :discard
+    end
+  end
+end
