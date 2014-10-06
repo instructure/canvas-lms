@@ -23,15 +23,24 @@ describe "Module Items API", type: :request do
 
     @module1 = @course.context_modules.create!(:name => "module1")
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
+    @assignment.publish! if @assignment.unpublished?
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
+
     @quiz = @course.quizzes.create!(:title => "score 10")
     @quiz.publish!
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
+
     @topic = @course.discussion_topics.create!(:message => 'pls contribute')
+    @topic.publish! if @topic.unpublished?
     @topic_tag = @module1.add_item(:id => @topic.id, :type => 'discussion_topic')
+
     @subheader_tag = @module1.add_item(:type => 'context_module_sub_header', :title => 'external resources')
+    @subheader_tag.publish! if @subheader_tag.unpublished?
+
     @external_url_tag = @module1.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
                                           :title => 'pls view', :indent => 1)
+    @external_url_tag.publish! if @external_url_tag.unpublished?
+
     @module1.completion_requirements = {
         @assignment_tag.id => { :type => 'must_submit' },
         @quiz_tag.id => { :type => 'min_score', :min_score => 10 },
