@@ -256,6 +256,27 @@ describe ContentMigration do
             @copy_to.conclude_at.utc.should == Time.parse('2012-12-15 08:00:00 UTC')
           end
         end
+
+        context "with UTC date_shift parameters" do
+          let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
+          let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+          let(:old_start_date) { '2012-09-01T08:00:00Z' }
+          let(:old_end_date)   { '2012-09-15T08:00:00Z' }
+          let(:new_start_date) { '2012-12-01T08:00:00Z' }
+          let(:new_end_date)   { '2012-12-15T08:00:00Z' }
+
+          it "using an explicit time zone" do
+            new_date.should == copy_assignment(:time_zone => local_time_zone)
+            @copy_to.start_at.utc.should == Time.parse('2012-12-01 08:00:00 UTC')
+            @copy_to.conclude_at.utc.should == Time.parse('2012-12-15 08:00:00 UTC')
+          end
+
+          it "using the account time zone" do
+            new_date.should == copy_assignment(:account_time_zone => local_time_zone)
+            @copy_to.start_at.utc.should == Time.parse('2012-12-01 08:00:00 UTC')
+            @copy_to.conclude_at.utc.should == Time.parse('2012-12-15 08:00:00 UTC')
+          end
+        end
       end
     end
 

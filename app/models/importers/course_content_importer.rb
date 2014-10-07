@@ -291,20 +291,11 @@ module Importers
       result[:new_start_date] = Date.parse(options[:new_start_date]) rescue course.real_start_date
       result[:new_end_date] = Date.parse(options[:new_end_date]) rescue course.real_end_date
       result[:day_substitutions] = options[:day_substitutions]
-      result[:time_zone] = options[:time_zone]
+      result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
-
-      result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue course.real_start_date
-      result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue course.real_end_date
-      Time.use_zone(result[:time_zone] || Time.zone) do
-        # convert times
-        [:default_start_at, :default_conclude_at].each do |k|
-          old_time = result[k]
-          new_time = Time.utc(old_time.year, old_time.month, old_time.day, (old_time.hour rescue 0), (old_time.min rescue 0)).in_time_zone
-          new_time -= new_time.utc_offset
-          result[k] = new_time
-        end
-      end
+      time_zone = result[:time_zone] || Time.zone
+      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue course.real_start_date
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue course.real_end_date
       result
     end
 
