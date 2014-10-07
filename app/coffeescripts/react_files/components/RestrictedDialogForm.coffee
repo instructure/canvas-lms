@@ -31,7 +31,7 @@ define [
           'unpublished'
         else if initialState.hidden
           'link_only'
-        else if initialState.lock_at
+        else if initialState.lock_at || initialState.unlock_at
           'date_range'
         else
           'published'
@@ -165,7 +165,7 @@ define [
             style: 
               display: (if @state.selectedOption is 'date_range' then 'block' else 'none')
           },
-            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableFrom', 'From')
+            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableFrom', 'Lock From')
               div className: 'controls dateSelectInputContainer',
                 input
                   ref: 'unlock_at'
@@ -174,7 +174,7 @@ define [
                   type: 'text',
                   'aria-label': I18n.t('aria_label.availableFrom', 'From')
             div className: 'control-group',
-              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableUntil', 'Until')
+              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableUntil', 'Lock Until')
                 div className: 'controls dateSelectInputContainer',
                 input
                   ref: 'lock_at'
