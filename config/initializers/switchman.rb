@@ -91,7 +91,7 @@ Rails.application.config.to_prepare do
     delegate :in_current_region?, to: :database_server
 
     scope :in_region, ->(region) do
-      servers = DatabaseServer.all.select { |db| db.config[:region] == region }.map(&:id)
+      servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
       if Shard.default.database_server.config[:region] == region
         where("database_server_id IN (?) OR database_server_id IS NULL", servers)
       else
@@ -118,6 +118,14 @@ Rails.application.config.to_prepare do
       dj_shard ||= shard if shard.default?
       dj_shard ||= Shard.default.delayed_jobs_shard
       dj_shard
+    end
+
+    def self.regions
+      @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
+    end
+
+    def in_region?(region)
+      !config[:region] || config[:region] == region
     end
 
     def in_current_region?
