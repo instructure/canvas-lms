@@ -32,7 +32,7 @@ CanvasRails::Application.routes.draw do
   match 'register/:nonce' => 'communication_channels#confirm', as: :registration_confirmation, via: [:get, :post]
   # deprecated
   get 'pseudonyms/:id/register/:nonce' => 'communication_channels#confirm', as: :registration_confirmation_deprecated
-  get 'confirmations/:user_id/re_send(/:id)' => 'communication_channels#re_send_confirmation', as: :re_send_confirmation, id: nil
+  post 'confirmations/:user_id/re_send(/:id)' => 'communication_channels#re_send_confirmation', as: :re_send_confirmation, id: nil
   get 'forgot_password' => 'pseudonyms#forgot_password', as: :forgot_password
   get 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#confirm_change_password', as: :confirm_change_password
   post 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#change_password', as: :change_password
