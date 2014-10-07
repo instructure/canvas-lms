@@ -12,6 +12,7 @@ define [
       @options = fileOptions
       @folder = folder
       @progress = 0
+      @_xhr = new XMLHttpRequest 
 
     onProgress: (percentComplete, file) ->
       #noop will be set up a level
@@ -50,11 +51,11 @@ define [
 
     #actual upload based on kickoff / preflight
     _actualUpload: () ->
-      xhr = new XMLHttpRequest
-      xhr.upload.addEventListener('progress', @trackProgress, false)
-      xhr.onload = @onUploadPosted
-      xhr.open 'POST', @uploadData.upload_url, true
-      xhr.send @createFormData()
+      @_xhr = new XMLHttpRequest
+      @_xhr.upload.addEventListener('progress', @trackProgress, false)
+      @_xhr.onload = @onUploadPosted
+      @_xhr.open 'POST', @uploadData.upload_url, true
+      @_xhr.send @createFormData()
 
     # when using s3 uploads you now need to manually hit the success_url
     # when using local uploads you have already been auto-redirected (even
@@ -75,3 +76,6 @@ define [
 
     getFileName: ->
       @options.name || @file.name
+
+    abort: ->
+      @_xhr.abort()

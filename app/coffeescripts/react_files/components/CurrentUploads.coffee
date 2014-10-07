@@ -39,7 +39,7 @@ define [
 
     buildProgressViews: ->
       progressBars = @state.currentUploads.map (uploader) ->
-        UploadProgress uploader: uploader, key: uploader.getFileName()
+        UploadProgress uploader: uploader, key: uploader.getFileName(), removeUploader: UploadQueue.remove
       div className: 'current_uploads__uploaders',
         progressBars
 

@@ -10,6 +10,7 @@ define [
     displayName: 'UploadProgress'
 
     propTypes:
+      removeUploader: React.PropTypes.func.isRequired
       uploader: React.PropTypes.shape({
         getFileName: React.PropTypes.func.isRequired
         roundProgress: React.PropTypes.func.inRequired
@@ -22,7 +23,8 @@ define [
 
     handleCancelUpload: (event) ->
       event.preventDefault()
-      alert('Cancel this upload: Completed in 16087')
+      @props.uploader.abort()
+      @props.removeUploader(@props.uploader)
 
     render: withReactDOM ->
       progress = @props.uploader.roundProgress()
