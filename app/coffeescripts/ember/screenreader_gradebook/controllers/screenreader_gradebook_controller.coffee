@@ -111,7 +111,8 @@ define [
 
     showDownloadSubmissionsButton: (->
       @get('selectedAssignment.has_submitted_submissions') and
-      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url']) != []
+      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url', 'online_quiz']) != [] and
+      !@get('selectedAssignment.hide_download_submissions_button')
     ).property('selectedAssignment')
 
     hideStudentNames: false
