@@ -341,6 +341,17 @@ describe NotificationMessageCreator do
       @notification_policy.save!
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
     end
+
+    it "should not use retired channels for summary messages" do
+      notification_set
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      @communication_channel.retire!
+
+      expect {
+        NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      }.to change(DelayedMessage, :count).by 0
+    end
  end
   
   context "localization" do
