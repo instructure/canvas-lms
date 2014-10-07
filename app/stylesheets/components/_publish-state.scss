@@ -79,6 +79,13 @@ The publish button has two states on click (publish and published) and a hover s
   box-shadow: none;
 }
 
+.btn-published.disabled,
+.btn-published.disabled:hover,
+.btn-unpublish.disabled,
+.btn-unpublish.disabled:hover {
+  @if $use_high_contrast { opacity: 1; }
+}
+
 .publish-icon {
   display: inline-block;  
   color: $ic-base-color-icon-disabled;
