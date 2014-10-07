@@ -43,7 +43,7 @@ class GradebookImporter
     @contents = contents
 
     if @context.feature_enabled?(:differentiated_assignments)
-      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id)
+      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @context.all_students.pluck(:id))
     end
   end
 

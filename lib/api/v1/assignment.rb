@@ -197,7 +197,7 @@ module Api::V1::Assignment
       hash['unpublishable'] = assignment.can_unpublish?
     end
 
-    if assignment.context.feature_enabled?(:differentiated_assignments)
+    if opts[:differentiated_assignments_enabled] || (opts[:differentiated_assignments_enabled] != false && assignment.context.feature_enabled?(:differentiated_assignments))
       hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
 
       if opts[:include_visibility]

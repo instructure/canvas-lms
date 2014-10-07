@@ -1130,12 +1130,6 @@ describe Course, "gradebook_to_csv" do
     def setup_DA
       @course_section = @course.course_sections.create
       @student1, @student2, @student3 = create_users(3, return_type: :record)
-      @student1.name = "Bob"
-      @student1.save
-      @student2.name = "Lyra"
-      @student2.save
-      @student3.name = "Serena"
-      @student3.save
       @assignment = @course.assignments.create!(title: "a1", only_visible_to_overrides: true)
       @course.enroll_student(@student3, :enrollment_state => 'active')
       @section = @course.course_sections.create!(name: "section1")
@@ -1166,8 +1160,8 @@ describe Course, "gradebook_to_csv" do
       rows[3][3].should == "N/A"
       rows[3][4].should == "3"
 
-      rows[4][3].should == nil
-      rows[4][4].should == nil
+      rows[4][3].should == "N/A"
+      rows[4][4].should == "N/A"
     end
   end
 end

@@ -57,6 +57,25 @@ describe AssignmentGroupsController do
       assigns[:groups].should_not be_empty
       assigns[:groups][1].should eql(@group)
     end
+
+    context "differentiated assignments" do
+      before do
+        user_session(@teacher)
+        course_group
+        @group = course_group
+        @course.enable_feature!(:differentiated_assignments)
+        @assignment = @course.assignments.create!(title: "assignment",
+                                                 assignment_group: @group,
+                                                 only_visible_to_overrides: true,
+                                                 workflow_state: 'published')
+      end
+      it "should not check visibilities on individual assignemnts" do
+        # ensures that check is not an N+1 from the gradebook
+        Assignment.any_instance.expects(:students_with_visibility).never
+        get 'index', :course_id => @course.id, :include => ["assignments","assignment_visibility"], :format => :json
+        response.should be_success
+      end
+    end
   end
 
   describe "POST 'reorder'" do

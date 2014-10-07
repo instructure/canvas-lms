@@ -113,6 +113,12 @@ class AssignmentGroupsController < ApplicationController
 
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
 
+        da_enabled = @context.feature_enabled?(:differentiated_assignments)
+        include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+        if include_visibility && da_enabled
+          assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: all_visible_assignments.map(&:id))
+        end
+
         # because of a bug with including content_tags, we are preloading here rather than in
         # visible_assignments with multiple associations referencing content_tags table and therefore
         # aliased table names the conditons on has_many :context_module_tags will break
@@ -147,7 +153,9 @@ class AssignmentGroupsController < ApplicationController
                                   stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
                                   preloaded_user_content_attachments: user_content_attachments,
-                                  assignments: assignments_by_group[g.id]
+                                  assignments: assignments_by_group[g.id],
+                                  assignment_visibilities: assignment_visibilities,
+                                  differentiated_assignments_enabled: da_enabled
                                   )
           }
           render :json => json
