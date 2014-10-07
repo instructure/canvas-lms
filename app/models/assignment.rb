@@ -602,8 +602,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def visible_to_observer?(user)
+    return true if !differentiated_assignments_applies?
     return false unless context.user_has_been_observer?(user)
-    return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
 
     visible_student_ids = students_with_visibility.pluck(:id)
 
@@ -611,7 +611,7 @@ class Assignment < ActiveRecord::Base
 
     # observers can be students as well, so their own assignments must be included
     if user.student_enrollments.where(course_id: self.context_id).any?
-      observed_student_ids << user.id
+      observed_students_ids << user.id
     end
 
     # if the observer doesn't have students, show them published assignments
