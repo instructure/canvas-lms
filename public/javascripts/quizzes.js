@@ -1602,6 +1602,7 @@ define([
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
+            da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED,
             success: function(){
               missingDateView.$dialog.dialog('close').remove();
               missingDateView.remove();
@@ -3861,8 +3862,8 @@ define([
       if (isShowingResults()) {
         $('.show_quiz_results_options').show();
         // CA options:
-        // 
-        // What we'd like to do is show/hide the date-pickers based on the 
+        //
+        // What we'd like to do is show/hide the date-pickers based on the
         // "Let Students See The Correct Answers" option, and disable them
         // if we're showing results just once ("Only Once After Each Attempt"):
         correctAnswerVisibility.showDatePickers(correctAnswerVisibility.isOn());

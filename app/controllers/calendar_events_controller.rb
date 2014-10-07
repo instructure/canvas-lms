@@ -49,6 +49,7 @@ class CalendarEventsController < ApplicationController
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     @editing = true
+    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
     authorized_action(@event, @current_user, :create)
   end
 
@@ -76,6 +77,7 @@ class CalendarEventsController < ApplicationController
       @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     end
     @editing = true
+    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
     if authorized_action(@event, @current_user, :update_content)
       render :action => 'new'
     end

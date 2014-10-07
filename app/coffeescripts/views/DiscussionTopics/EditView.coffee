@@ -207,6 +207,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
+          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success: =>
             missingDateDialog.$dialog.dialog('close').remove()
             @model.get('assignment')?.setNullDates()
