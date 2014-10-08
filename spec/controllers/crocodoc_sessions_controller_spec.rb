@@ -39,7 +39,7 @@ describe CrocodocSessionsController do
     user_session(@student)
   end
 
-  context "without crocodoc" do
+  context "with crocodoc" do
     before do
       @attachment.submit_to_crocodoc
     end
@@ -53,6 +53,12 @@ describe CrocodocSessionsController do
       user_session(@teacher)
       get :show, blob: @blob, hmac: @hmac
       assert_status(401)
+    end
+
+    it "fails gracefulishly when crocodoc times out" do
+      Crocodoc::API.any_instance.stubs(:session).raises(Timeout::Error)
+      get :show, blob: @blob, hmac: @hmac
+      assert_status(503)
     end
   end
 
