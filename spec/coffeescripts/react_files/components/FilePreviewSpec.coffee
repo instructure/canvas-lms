@@ -22,38 +22,39 @@ define [
 
 
       # Initialize a few things to view in the preview.
-      @currentFolder = new FilesCollection()
-
+      @filesCollection = new FilesCollection()
       @file1 = new File({
-        cid: '1'
+        id: '1'
+        cid: 'c1'
         name:'Test File.file1'
         'content-type': 'unknown/unknown'
         }, {preflightUrl: ''})
       @file2 = new File({
-        cid: '2'
+        id: '2'
+        cid: 'c2'
         name:'Test File.file2'
         'content-type': 'unknown/unknown'
         }, {preflightUrl: ''})
       @file3 = new File({
-        cid: '3'
+        id: '3'
+        cid: 'c3'
         name:'Test File.file3'
         'content-type': 'image/png',
         'url': 'test/test/test.png'
         }, {preflightUrl: ''})
 
-      @currentFolder.add(@file1)
-      @currentFolder.add(@file2)
-      @currentFolder.add(@file3)
+      @filesCollection.add(@file1)
+      @filesCollection.add(@file2)
+      @filesCollection.add(@file3)
+      @currentFolder = new Folder(files: @filesCollection)
 
       Modal.setAppElement($('#fixtures').get(0))
 
-
-
       properties =
-        initialItem: @file2
-        otherItems: @currentFolder
+        currentFolder: @currentFolder
         params: {splat: "test/test/test/"}
         appElement: $('#fixtures').get(0)
+        query: {preview: "1"}
 
 
       @filePreview = React.renderComponent(FilePreview(properties), $('#fixtures')[0])

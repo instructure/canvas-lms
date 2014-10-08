@@ -112,25 +112,7 @@ define [
         # Prepare and render the FilePreview if needed.
         # As long as ?preview is present in the url.
         if @props.query.preview?
-          # Sets up our collection that we will be using.
-          onlyIdsToPreview = @props.query.only_preview?.split(',')
-          otherItems = if onlyIdsToPreview # expects this to be [1,2,34,9] (ids of files to preview)
-            @props.currentFolder.files.filter (file) ->
-              file.id in onlyIdsToPreview
-          else
-            @props.currentFolder.files
-          # If preview contains data (i.e. ?preview=4)
-          if @props.query.preview
-            # We go back to the folder to pull this data.
-            initialItem = @props.currentFolder.files.get(@props.query.preview)
-          # If preview doesn't contain data (i.e. ?preview)
-          # we'll just use the first one in our otherItems collection.
-          else
-            # Because otherItems may (or may not be) a Backbone collection (FilesCollection) we change up our method.
-            initialItem = if otherItems instanceof Backbone.Collection then otherItems.first() else _.first(otherItems)
-          # Makes sure other items has something before sending it to the preview.
-          if otherItems?.length
-            if @props.query.only_preview
-              FilePreview {initialItem: initialItem, otherItems: otherItems, currentFolder: @props.currentFolder, params: @props.params, otherItemsString: @props.query.only_preview}
-            else
-              FilePreview {initialItem: initialItem, otherItems: otherItems, currentFolder: @props.currentFolder, params: @props.params }
+          FilePreview
+            currentFolder: @props.currentFolder
+            params: @props.params
+            query: @props.query
