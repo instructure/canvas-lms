@@ -112,6 +112,7 @@ class AssignmentGroupsController < ApplicationController
         assignment_includes.concat([:assignment_overrides]) if params[:include].include?("all_dates")
 
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
+        .with_student_submission_count
 
         da_enabled = @context.feature_enabled?(:differentiated_assignments)
         include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)

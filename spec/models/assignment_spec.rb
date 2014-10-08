@@ -79,6 +79,7 @@ describe Assignment do
     it "does not allow itself to be unpublished if it has student submissions" do
       @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
       expect(@assignment).not_to be_can_unpublish
+
       @assignment.unpublish
       expect(@assignment).not_to be_valid
       expect(@assignment.errors['workflow_state']).to eq ["Can't unpublish if there are student submissions"]

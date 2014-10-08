@@ -1868,7 +1868,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.submissions.having_submission.where("user_id IS NOT NULL").exists?
+    if attribute_present? :student_submission_count
+      student_submission_count.to_i > 0
+    else
+      submissions.having_submission.where("user_id IS NOT NULL").exists?
+    end
+  end
+
+  def self.with_student_submission_count
+    joins("LEFT OUTER JOIN submissions s ON
+           s.assignment_id = assignments.id AND
+           s.submission_type IS NOT NULL AND
+           s.user_id IS NOT NULL")
+    .group("assignments.id")
+    .select("assignments.*, count(s.id) AS student_submission_count")
   end
 
   def can_unpublish?
