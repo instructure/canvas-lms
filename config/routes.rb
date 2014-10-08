@@ -68,6 +68,7 @@ CanvasRails::Application.routes.draw do
       get 'preview' => 'files#show', preview: '1'
       post 'inline_view' => 'files#show', inline: '1'
       get 'contents' => 'files#attachment_content', as: :attachment_content
+      get 'file_preview' => 'file_previews#show'
       collection do
         get "folder#{full_path_glob}" => 'files#ember_app', format: false
         get "search" => 'files#ember_app', format: false
