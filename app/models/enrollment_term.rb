@@ -21,7 +21,7 @@ class EnrollmentTerm < ActiveRecord::Base
   
   include Workflow
 
-  attr_accessible :name, :start_at, :end_at, :ignore_term_date_restrictions
+  attr_accessible :name, :start_at, :end_at
   belongs_to :root_account, :class_name => 'Account'
   has_many :enrollment_dates_overrides
   has_many :courses
@@ -30,7 +30,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :root_account_id, :name, :term_code, :sis_source_id, :sis_batch_id, :start_at, :end_at, :accepting_enrollments, :can_manually_enroll, :created_at,
-    :updated_at, :workflow_state, :ignore_term_date_restrictions
+    :updated_at, :workflow_state
   ]
   EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
 
@@ -121,7 +121,6 @@ class EnrollmentTerm < ActiveRecord::Base
   end
   
   def enrollment_dates_for(enrollment)
-    return [nil, nil] if ignore_term_date_restrictions
     # detect will cause the whole collection to load; that's fine, it's a small collection, and
     # we'll probably call enrollment_dates_for multiple times in a single request, so we want
     # it cached, rather than using .scoped which would force a re-query every time
