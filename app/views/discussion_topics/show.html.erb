@@ -77,7 +77,13 @@
             <div class="admin-links">
               <a class="al-trigger btn" href="#">
                 <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-                <span class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></span>
+                <span class="screenreader-only">
+                   <% if @topic.is_a?(Announcement) %>
+                    <%= t :manage_announcement, 'Manage Announcement' %>
+                   <% else %>
+                    <%= t :manage_discussion, 'Manage Discussion' %>
+                   <% end %>
+                  </span>
               </a>
               <ul class="al-options">
                 <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
