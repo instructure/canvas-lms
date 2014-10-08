@@ -123,7 +123,7 @@ define [
 
     checkScroll: =>
       return if @collection.fetchingPage or @collection.fetchingNextPage or not @$el.length
-      elementBottom = @$scrollableElement.position().top +
+      elementBottom = (@$scrollableElement.position()?.top || 0) +
         @$scrollableElement.height() -
         @heightContainer.position().top
       distanceToBottom = elementBottom -
