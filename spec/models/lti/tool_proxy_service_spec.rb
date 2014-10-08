@@ -88,7 +88,7 @@ module Lti
         tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
         resource_handler = tool_proxy.resources.find{|r| r.resource_type_code == 'instructure.com:default'}
 
-        resource_handler.name.should == 'Default'
+        resource_handler.name.should == 'Acme Assessments'
         resource_handler.message_handlers.size.should == 1
         mh = resource_handler.message_handlers.first
         mh.message_type.should == 'basic-lti-launch-request'
