@@ -125,7 +125,9 @@ class EnrollmentTerm < ActiveRecord::Base
     # we'll probably call enrollment_dates_for multiple times in a single request, so we want
     # it cached, rather than using .scoped which would force a re-query every time
     override = enrollment_dates_overrides.detect { |override| override.enrollment_type == enrollment.type.to_s}
-    [ override.try(:start_at) || start_at, override.try(:end_at) || end_at ]
+
+    # ignore the start dates as admin
+    [ override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at ]
   end
   
   alias_method :destroy!, :destroy

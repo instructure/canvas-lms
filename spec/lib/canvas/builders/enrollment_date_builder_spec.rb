@@ -70,7 +70,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       end
 
       it "for teacher" do
-        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at], [@term.start_at, @term.end_at]]
+        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at], [nil, @term.end_at]]
       end
 
       it "for teacher with no term dates" do
@@ -100,7 +100,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       end
 
       it "for teacher" do
-        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [@term.start_at, @term.end_at]]
+        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil, @term.end_at]]
       end
 
       it "for teacher with no term dates" do
@@ -125,7 +125,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       end
 
       it "for teacher" do
-        test_builder @teacher_enrollment, [[@term.start_at, @term.end_at]]
+        test_builder @teacher_enrollment, [[nil, @term.end_at]]
       end
 
       it "for student" do
