@@ -150,7 +150,7 @@ define [
       else if @model.isDiscussionTopic()
         data.menu_tools = ENV.discussion_topic_menu_tools
         _.each data.menu_tools, (tool) =>
-          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic_id")}"
+          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic")?.id}"
       else
         data.menu_tools = ENV.assignment_menu_tools
         _.each data.menu_tools, (tool) =>
