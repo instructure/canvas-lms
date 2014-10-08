@@ -1378,7 +1378,7 @@ describe "matching question reordering" do
 
     @course = course
     @migration = ContentMigration.create(:context => @course)
-    @migration.migration_type = "canvas_cartridge_importer"
+    @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
     enable_cache do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)

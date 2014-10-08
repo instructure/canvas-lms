@@ -25,7 +25,7 @@ module Importers
     # in particular, strip out all of the embedded questions and add explicitly to assessment_questions
     def self.preprocess_migration_data(data)
       new_aqs = []
-      title_map = {}
+      assmnt_map = {}
 
       references = []
       # turn all quiz questions to question references
@@ -37,11 +37,11 @@ module Importers
             next unless q['questions']
             q['questions'].each do |ref|
               preprocess_quiz_question(ref, new_aqs, references)
-              title_map[ref['migration_id']] = assmnt['title']
+              assmnt_map[ref['migration_id']] = [assmnt['migration_id'], assmnt['title']]
             end
           else
             preprocess_quiz_question(q, new_aqs, references)
-            title_map[q['migration_id']] = assmnt['title']
+            assmnt_map[q['migration_id']] = [assmnt['migration_id'], assmnt['title']]
           end
         end
       end
@@ -56,7 +56,12 @@ module Importers
 
       # also default question bank name to quiz name
       data['assessment_questions']['assessment_questions'].each do |aq|
-        aq['question_bank_name'] = title_map[aq['migration_id']] if aq['question_bank_name'].blank?
+        if aq['question_bank_id'].blank? && aq['question_bank_migration_id'].blank?
+          assmnt_mig_id, assmnt_title = assmnt_map[aq['migration_id']]
+          aq['question_bank_name'] ||= assmnt_title
+          aq['question_bank_migration_id'] = CC::CCHelper.create_key("#{assmnt_mig_id}_#{aq['question_bank_name']}_question_bank")
+          aq['is_quiz_question_bank'] = true
+        end
       end
 
       dedup_assessment_questions(data['assessment_questions']['assessment_questions'], references)
@@ -79,7 +84,8 @@ module Importers
       # it used to skip these in the importer, instead let's remove them outright
       aq_dups = []
       qq_keys = ['position', 'points_possible']
-      keys_to_ignore = qq_keys + ['assessment_question_migration_id', 'migration_id', 'question_bank_id', 'question_bank_name']
+      keys_to_ignore = qq_keys + ['assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
+                                  'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 
       questions.each_with_index do |quiz_question, qq_index|
         aq_mig_id = quiz_question['assessment_question_migration_id']

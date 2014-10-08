@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
 describe "Converting Blackboard Vista qti" do
 
+  KEYS_TO_IGNORE = ['is_quiz_question_bank', 'question_bank_migration_id']
+
   before(:all) do
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
@@ -64,7 +66,7 @@ describe "Converting Blackboard Vista qti" do
 
   it "should convert multiple choice" do
     hash = get_question("ID_4609865476341")
-    expect(hash).to eq VistaExpected::MULTIPLE_CHOICE
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::MULTIPLE_CHOICE
   end
 
   it "should not fail with missing response identifier" do
@@ -77,7 +79,7 @@ describe "Converting Blackboard Vista qti" do
     manifest_node=get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>vista_question_dir).with_indifferent_access
     hash[:answers].each { |a| a.delete(:id) }
-    expect(hash).to eq VistaExpected::TRUE_FALSE2
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::TRUE_FALSE2
   end
   
   it "should convert image reference" do 
@@ -94,22 +96,22 @@ describe "Converting Blackboard Vista qti" do
 
   it "should convert true/false questions" do
     hash = get_question("ID_4609865577341")
-    expect(hash).to eq VistaExpected::TRUE_FALSE
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::TRUE_FALSE
   end
   
   it "should convert multiple choice questions with multiple correct answers (multiple answer)" do
     hash = get_question("ID_4609865392341")
-    expect(hash).to eq VistaExpected::MULTIPLE_ANSWER
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::MULTIPLE_ANSWER
   end
 
   it "should convert essay questions" do
     hash = get_question("ID_4609842537341")
-    expect(hash).to eq VistaExpected::ESSAY
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::ESSAY
   end
 
   it "should convert short answer questions" do
     hash = get_question("ID_4609865550341")
-    expect(hash).to eq VistaExpected::SHORT_ANSWER
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::SHORT_ANSWER
   end
 
   it "should convert matching questions" do
@@ -124,7 +126,7 @@ describe "Converting Blackboard Vista qti" do
     # compare everything else without the ids
     hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
     hash[:matches].each { |m| m.delete(:match_id) }
-    expect(hash).to eq VistaExpected::MATCHING
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::MATCHING
   end
 
   it "should convert the assessments into quizzes" do
@@ -133,27 +135,27 @@ describe "Converting Blackboard Vista qti" do
 
   it "should convert simple calculated questions" do
     hash = get_question("ID_4609842344341")
-    expect(hash).to eq VistaExpected::CALCULATED_SIMPLE
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::CALCULATED_SIMPLE
   end
 
   it "should convert complex calculated questions" do
     hash = get_question("ID_4609823478341")
-    expect(hash).to eq VistaExpected::CALCULATED_COMPLEX
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::CALCULATED_COMPLEX
   end
 
   it "should convert combination to multiple choice" do
     hash = get_question("ID_4609885376341")
-    expect(hash).to eq VistaExpected::COMBINATION
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::COMBINATION
   end
   
   it "should convert fill in multiple blanks questions" do
     hash = get_question("ID_4609842630341")
-    expect(hash).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
   end
 
   it "should mark jumbled sentence as not supported" do
     hash = get_question("ID_4609842882341")
-    expect(hash).to eq VistaExpected::JUMBLED_SENTENCE
+    expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::JUMBLED_SENTENCE
   end
 
   it "should correctly reference associated files" do
@@ -184,7 +186,6 @@ module VistaExpected
   # the multiple choice example minus the ids for the answers because those are random.
   MULTIPLE_CHOICE = {:points_possible=>1,
                      :question_bank_name=>"Export Test",
-                     :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                      :question_text=>"The answer is nose.<br>",
                      :question_type=>"multiple_choice_question",
                      :answers=>
@@ -200,7 +201,6 @@ module VistaExpected
   TRUE_FALSE = {:correct_comments=>"",
                 :points_possible=>1,
                 :question_bank_name=>"Export Test",
-                :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                 :question_name=>"True/False",
                 :question_text=>"I am wearing a black hat.<br>",
                 :incorrect_comments=>"",
@@ -226,7 +226,6 @@ module VistaExpected
                      :correct_comments=>"",
                      :points_possible=>1,
                      :question_bank_name=>"Export Test",
-                     :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                      :question_name=>"Multiple Answer",
                      :answers=>
                              [{:migration_id=>"MC0",
@@ -258,7 +257,6 @@ module VistaExpected
            :example_solution=>"Nobody.",
            :points_possible=>1,
            :question_bank_name=>"Export Test",
-           :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
            :question_name=>"Essay Question"}.with_indifferent_access
 
   # removed ids on the answers
@@ -271,14 +269,12 @@ module VistaExpected
                   :correct_comments=>"",
                   :points_possible=>1,
                   :question_bank_name=>"Export Test",
-                  :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                   :question_name=>"Short Answer"}.with_indifferent_access
 
   # removed ids on the answers
   MATCHING = {:correct_comments=>"",
               :points_possible=>1,
               :question_bank_name=>"Export Test",
-              :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
               :question_name=>"Matching",
               :question_text=>"Match these.<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>",
               :answers=>
@@ -364,7 +360,6 @@ module VistaExpected
                                 {:weight=>100, :answer=>10, :variables=>[{:value=>0, :name=>"x"}]},
                                 {:weight=>100, :answer=>18, :variables=>[{:value=>-8, :name=>"x"}]}],
                        :question_bank_name=>"Export Test",
-                       :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                        :points_possible=>100,
                        :question_name=>"Calculated Question 2",
                        :question_text=>"What is 10 - [x]?",
@@ -468,7 +463,6 @@ module VistaExpected
                                  {:scale=>0, :min=>20, :max=>120, :name=>"n"}],
                         :correct_comments=>"",
                         :question_bank_name=>"Export Test",
-                        :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                         :points_possible=>100,
                         :question_name=>"Calculated Question ",
                         :formulas=>[],
@@ -482,7 +476,6 @@ module VistaExpected
                  :answers=>[{:weight=>100, :text=>"B, C", :migration_id=>"MC0"}],
                  :points_possible=>1,
                  :question_bank_name=>"defaultWebctCategory",
-                 :question_bank_migration_id => "i813b3667731b3c61c09ae932568aacde",
                  :question_name=>"Combination",
                  :question_text=>"This should just be a multiple answer. B and C are correct<br>\nA. wrong 1<br>\nB. right 1<br>\nC. right 2<br>\nD. wrong 2<br>\nE. wrong 3<br>",
                  :incorrect_comments=>"",
@@ -497,7 +490,6 @@ module VistaExpected
                              :correct_comments=>"",
                              :points_possible=>1,
                              :question_bank_name=>"Export Test",
-                             :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                              :question_name=>"Fill in the blank",
                              :question_text=>"I'm just a [poor] boy from a poor [family]",
                              :incorrect_comments=>""}.with_indifferent_access
@@ -511,7 +503,6 @@ module VistaExpected
                       :unsupported=>true,
                       :points_possible=>1,
                       :question_bank_name=>"Export Test",
-                      :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                       :question_name=>"Jumbled Sentence"}.with_indifferent_access
 end
 end

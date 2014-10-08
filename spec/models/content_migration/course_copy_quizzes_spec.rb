@@ -4,8 +4,11 @@ describe ContentMigration do
   context "course copy quizzes" do
     include_examples "course copy"
 
-    it "should copy a quiz when assignment is selected" do
+    before :each do
       skip unless Qti.qti_enabled?
+    end
+
+    it "should copy a quiz when assignment is selected" do
       @quiz = @copy_from.quizzes.create!
       @quiz.did_edit
       @quiz.offer!
@@ -23,7 +26,6 @@ describe ContentMigration do
     end
 
     it "should create a new assignment and module item if copying a new quiz (even if the assignment migration_id matches)" do
-      skip unless Qti.qti_enabled?
       quiz = @copy_from.quizzes.create!(:title => "new quiz")
       quiz2 = @copy_to.quizzes.create!(:title => "already existing quiz")
 
@@ -47,7 +49,6 @@ describe ContentMigration do
     end
 
     it "should not duplicate quizzes and associated items if overwrite_quizzes is true" do
-      skip unless Qti.qti_enabled?
       # overwrite_quizzes should now default to true for course copy and canvas import
 
       quiz = @copy_from.quizzes.create!(:title => "published quiz")
@@ -97,7 +98,6 @@ describe ContentMigration do
     end
 
     it "should duplicate quizzes and associated items if overwrite_quizzes is false" do
-      skip unless Qti.qti_enabled?
       quiz = @copy_from.quizzes.create!(:title => "published quiz")
       quiz2 = @copy_from.quizzes.create!(:title => "unpublished quiz")
       quiz.did_edit
@@ -131,7 +131,6 @@ describe ContentMigration do
     end
 
     it "should have correct question count on copied surveys and practive quizzes" do
-      skip unless Qti.qti_enabled?
       sp = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
       data = {
                           :question_type => "multiple_choice_question",
@@ -160,7 +159,6 @@ describe ContentMigration do
     end
 
     it "should not mix up quiz questions and assessment questions with the same ids" do
-      skip unless Qti.qti_enabled?
       quiz1 = @copy_from.quizzes.create!(:title => "quiz 1")
       quiz2 = @copy_from.quizzes.create!(:title => "quiz 1")
 
@@ -175,8 +173,6 @@ describe ContentMigration do
     end
 
     it "should generate numeric ids for answers" do
-      skip unless Qti.qti_enabled?
-
       q = @copy_from.quizzes.create!(:title => "test quiz")
       mc = q.quiz_questions.create!
       mc.write_attribute(:question_data, {
@@ -219,7 +215,6 @@ describe ContentMigration do
     end
 
     it "should copy quizzes as published if they were published before" do
-      skip unless Qti.qti_enabled?
       g = @copy_from.assignment_groups.create!(:name => "new group")
       asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)
       asmnt_pub = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
@@ -248,7 +243,6 @@ describe ContentMigration do
     end
 
     it "should export quizzes with groups that point to external banks" do
-      skip unless Qti.qti_enabled?
       course_with_teacher(:user => @user)
       different_course = @course
       different_account = Account.create!
@@ -282,7 +276,6 @@ describe ContentMigration do
     end
 
     it "should omit deleted questions in banks" do
-      skip unless Qti.qti_enabled?
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       q1 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
       q2 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
@@ -299,7 +292,6 @@ describe ContentMigration do
     end
 
     it "should not copy plain text question comments as html" do
-      skip unless Qti.qti_enabled?
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       q = bank1.assessment_questions.create!(:question_data => {
           "question_type" => "multiple_choice_question", 'name' => 'test question',
@@ -321,7 +313,6 @@ describe ContentMigration do
     end
 
     it "should not copy deleted assignment attached to quizzes" do
-      skip unless Qti.qti_enabled?
       g = @copy_from.assignment_groups.create!(:name => "new group")
       quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
       quiz.workflow_state = 'available'
@@ -342,7 +333,6 @@ describe ContentMigration do
     end
 
     it "should copy all quiz attributes" do
-      skip unless Qti.qti_enabled?
       q = @copy_from.quizzes.create!(
               :title => 'quiz',
               :description => "<p>description eh</p>",
@@ -381,7 +371,6 @@ describe ContentMigration do
     end
 
     it "should leave file references in AQ context as-is on copy" do
-      skip unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       @attachment = attachment_with_context(@copy_from)
       @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
@@ -406,7 +395,6 @@ describe ContentMigration do
     end
 
     it "should correctly copy quiz question html file references" do
-      skip unless Qti.qti_enabled?
       root = Folder.root_folders(@copy_from).first
       folder = root.sub_folders.create!(:context => @copy_from, :name => 'folder 1')
       att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => root, :context => @copy_from)
@@ -451,7 +439,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should copy all html fields in assessment questions" do
-      skip unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:correct_comments_html => "<strong>correct</strong>",
                           :question_type => "multiple_choice_question",
@@ -500,7 +487,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should copy file_upload_questions" do
-      skip unless Qti.qti_enabled?
       bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:question_type => "file_upload_question",
               :points_possible => 10,
@@ -533,7 +519,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should leave text answers as text" do
-      skip unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {
                           :question_type => "multiple_choice_question",
@@ -558,8 +543,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should retain imported quiz questions in their original assessment question banks" do
-      skip unless Qti.qti_enabled?
-
       data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah'}
 
       aqb = @copy_from.assessment_question_banks.create!(:title => "oh noes")
@@ -582,8 +565,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should copy the assignment group in selective copy" do
-      skip unless Qti.qti_enabled?
-
       group = @copy_from.assignment_groups.create!(:name => "new group")
       quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
       quiz.publish!
@@ -594,8 +575,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should not copy the assignment group in selective export" do
-      skip unless Qti.qti_enabled?
-
       group = @copy_from.assignment_groups.create!(:name => "new group")
       quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
       quiz.publish!
@@ -608,6 +587,41 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       dest_quiz = @copy_to.quizzes.where(migration_id:  mig_id(quiz)).first
       expect(dest_quiz.assignment_group.migration_id).not_to eql decoy_assignment_group
       expect(decoy_assignment_group.reload.name).not_to eql group.name
+    end
+
+    it "should not combine when copying question banks with the same title" do
+      data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah'}
+
+      bank1 = @copy_from.assessment_question_banks.create!(:title => "oh noes i have the same title")
+      bank2 = @copy_from.assessment_question_banks.create!(:title => "oh noes i have the same title")
+
+      bank1.assessment_questions.create!(:question_data => data)
+      bank2.assessment_questions.create!(:question_data => data)
+
+      quiz = @copy_from.quizzes.create!(:title => "ruhroh")
+
+      group1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 1, :question_points => 5.0)
+      group1.assessment_question_bank = bank1
+      group1.save
+      group2 = quiz.quiz_groups.create!(:name => "group2", :pick_count => 1, :question_points => 2.0)
+      group2.assessment_question_bank = bank2
+      group2.save
+
+      run_course_copy
+
+      bank1_copy = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank1)).first
+      bank2_copy = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank2)).first
+
+      expect(bank1_copy).to_not be_nil
+      expect(bank2_copy).to_not be_nil
+
+      quiz_copy = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      expect(quiz_copy.quiz_groups.count).to eq 2
+      group1_copy = quiz_copy.quiz_groups.where(:migration_id => mig_id(group1)).first
+      group2_copy = quiz_copy.quiz_groups.where(:migration_id => mig_id(group2)).first
+
+      expect(group1_copy.assessment_question_bank_id).to eq bank1_copy.id
+      expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
   end
 end
