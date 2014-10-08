@@ -1184,7 +1184,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def crocodocable?
-    Canvas::Crocodoc.config &&
+    Canvas::Crocodoc.enabled? &&
       CrocodocDocument::MIME_TYPES.include?(content_type)
   end
 

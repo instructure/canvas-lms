@@ -500,8 +500,12 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
-      attachments = attachment_associations.map(&:attachment)
-      attachments.each do |a|
+      attachments.includes(:crocodoc_document).each do |a|
+        if Canvas::Crocodoc.enabled? && a.crocodocable?
+          # indicates a crocodoc preview is coming
+          a.crocodoc_document || a.create_crocodoc_document
+        end
+
         a.send_later_enqueue_args :submit_to_canvadocs, {
           :n_strand     => 'canvadocs',
           :max_attempts => 1,

@@ -1291,6 +1291,7 @@ class Assignment < ActiveRecord::Base
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
                                                json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
+                                               json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
                                          end

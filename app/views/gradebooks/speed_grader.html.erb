@@ -58,9 +58,13 @@
 <div id="full_width_container" style="display:none;">
   <div id="left_side" class="full_height">
     <div id="left_side_inner">
-      <div id="no_annotation_warning" class="alert">
-        <a id="hide_no_annotation_warning" href="#" class="close">×</a>
+      <div id="no_annotation_warning" class="alert speedgrader_alert">
+        <a class="dismiss_alert close" href="#">×</a>
         <%= t :no_annotation, "Annotations are not available for this document" %>
+      </div>
+      <div id="crocodoc_pending" class="alert speedgrader_alert">
+        <a class="dismiss_alert close" href="#">×</a>
+        <%= t :crocodoc_pending, "Crocodoc is still processing this document." %>
       </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">

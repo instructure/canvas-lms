@@ -1002,9 +1002,9 @@ define([
       header.init();
       initKeyCodes();
 
-      $('#hide_no_annotation_warning').click(function(e){
+      $('.dismiss_alert').click(function(e){
         e.preventDefault();
-        $no_annotation_warning.hide();
+        $(this).closest(".alert").hide();
       });
 
       $window.bind('hashchange', EG.handleFragmentChange);
@@ -1427,7 +1427,7 @@ define([
     loadAttachmentInline: function(attachment){
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
-      $no_annotation_warning.hide();
+      $(".speedgrader_alert").hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -1448,6 +1448,12 @@ define([
             }
           };
         }
+
+        if (attachment &&
+            attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+          $("#crocodoc_pending").show();
+        }
+
         if (attachment && attachment.crocodoc_url) {
           var crocodocStart = new Date()
           ,   sessionLimit = 60 * 60 * 1000
