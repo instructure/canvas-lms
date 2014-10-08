@@ -154,6 +154,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method 'use_new_styles?'
 
+  def multiple_grading_periods?
+    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+  end
+  helper_method 'multiple_grading_periods?'
+
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #

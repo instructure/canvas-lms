@@ -1558,6 +1558,17 @@ CanvasRails::Application.routes.draw do
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
 
+    scope(controller: :grading_periods) do
+      %w(course account).each do |context|
+        content_prefix = "#{context.pluralize}/:#{context}_id"
+        prefix = "#{content_prefix}/grading_periods"
+        get prefix, action: :index, as: "#{context}_grading_periods"
+        get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
+        post prefix, action: :create, as: "#{context}_grading_period_create"
+        put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
+        delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
+      end
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
