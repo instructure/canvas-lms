@@ -1378,6 +1378,10 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/quiz_extensions', action: :create
     end
 
+    scope(controller: "quizzes/quiz_submission_events") do
+      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'course_quiz_submission_events'
+    end
+
     scope(controller: 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', action: :index, as: 'quiz_submission_questions'
       post '/quiz_submissions/:quiz_submission_id/questions', action: :answer, as: 'quiz_submission_question_answer'

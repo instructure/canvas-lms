@@ -99,7 +99,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   set_policy do
     given { |user| user && user.id == self.user_id }
-    can :read
+    can :read and can :record_events
 
     given { |user| user && user.id == self.user_id && self.untaken? }
     can :update
