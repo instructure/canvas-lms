@@ -63,7 +63,7 @@ module Lti
     def all_roles
       if @user
         context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles.map { |role| LIS_ROLE_MAP[role] }
+        institution_roles = @user.roles(@root_account).map { |role| LIS_ROLE_MAP[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << LIS_ROLE_MAP['siteadmin']
         end

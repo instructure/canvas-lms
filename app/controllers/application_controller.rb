@@ -104,7 +104,7 @@ class ApplicationController < ActionController::Base
       @js_env = {
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
-        :current_user_roles => @current_user.try(:roles),
+        :current_user_roles => @current_user.try(:roles, @domain_root_account),
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
         :SETTINGS => {

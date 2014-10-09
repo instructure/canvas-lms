@@ -830,6 +830,7 @@ class Account < ActiveRecord::Base
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
     Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
+      next unless user.associated_shards.include?(Shard.current)
       AccountUser.includes(:account).joins(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
   end

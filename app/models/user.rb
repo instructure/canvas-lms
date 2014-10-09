@@ -2109,13 +2109,14 @@ class User < ActiveRecord::Base
     roles.last
   end
 
-  def roles
+  def roles(root_account)
     return @roles if @roles
-    res = ['user']
-    res << 'student' if self.cached_current_enrollments.any?(&:student?)
-    res << 'teacher' if self.cached_current_enrollments.any?(&:admin?)
-    res << 'admin' unless self.all_accounts.empty?
-    @roles = res
+    @roles = ['user']
+    enrollment_types = root_account.enrollments.where(type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'], user_id: self, workflow_state: 'active').uniq.pluck(:type)
+    @roles << 'student' if enrollment_types.include?('StudentEnrollment')
+    @roles << 'teacher' unless (enrollment_types & ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).empty?
+    @roles << 'admin' unless root_account.all_account_users_for(self).empty?
+    @roles
   end
 
   def eportfolios_enabled?
