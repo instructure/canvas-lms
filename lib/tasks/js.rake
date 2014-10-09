@@ -213,6 +213,12 @@ namespace :js do
     end
 
     threads << Thread.new do
+      puts "--> Compiling React JSX"
+      jsx_time = Benchmark.realtime { Rake::Task['js:jsx'].invoke }
+      puts "--> Compiling React JSX finished in #{jsx_time}"
+    end
+
+    threads << Thread.new do
       puts "--> Pre-compiling handlebars templates"
       handlebars_time = Benchmark.realtime { Rake::Task['jst:compile'].invoke }
       puts "--> Pre-compiling handlebars templates finished in #{handlebars_time}"
@@ -255,6 +261,8 @@ namespace :js do
       puts "--> Compiling CoffeeScript finished in #{coffee_time}"
     end
 
+
+
     threads.each(&:join)
   end
 
@@ -281,6 +289,17 @@ namespace :js do
       raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
     puts "--> Compressed JavaScript in #{optimize_time}"
+  end
+
+  desc "Compile React JSX to JS"
+  task :jsx do
+    source = Rails.root + 'app/jsx'
+    dest = Rails.root + 'public/javascripts/jsx'
+    if Rails.env == 'production'
+      `node_modules/.bin/jsx -x jsx --harmony #{source} #{dest}`
+    else
+      `node_modules/.bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest}`
+    end
   end
 
   desc "creates ember app bundles"

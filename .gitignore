@@ -34,6 +34,7 @@ Gemfile.lock4
 /public/doc/api/
 /public/javascripts/compiled/
 /public/javascripts/jst/
+/public/javascripts/jsx/
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets_compiled/
