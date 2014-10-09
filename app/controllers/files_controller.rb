@@ -462,11 +462,12 @@ class FilesController < ApplicationController
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
-      @attachment = @context.attachments.find(params[:id])
+      @attachment = @context.attachments.where(:id => params[:id]).first
     else
-      @attachment = Attachment.find(params[:id])
+      @attachment = Attachment.where(:id => params[:id]).first
       @skip_crumb = true unless @context
     end
+
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
@@ -571,7 +572,10 @@ class FilesController < ApplicationController
 
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
-    raise ActiveRecord::RecordNotFound if !@attachment
+    unless @attachment
+      return render :template => 'shared/errors/file_not_found', :status => :bad_request
+    end
+
     params[:id] = @attachment.id
 
     params[:download] = '1'

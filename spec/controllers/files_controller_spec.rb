@@ -445,14 +445,11 @@ describe FilesController do
       test_path("course files/a/b/c%20dude/d/e/f.gif")
     end
 
-    it "should fail if the file path doesn't match" do
-      assert_page_not_found do
-        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      end
-
-      assert_page_not_found do
-        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      end
+    it "should render unauthorized access page if the file path doesn't match" do
+      get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      expect(response).to render_template("shared/errors/file_not_found")
+      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      expect(response).to render_template("shared/errors/file_not_found")
     end
 
     it "should ignore bad file_ids" do
