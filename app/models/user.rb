@@ -1573,7 +1573,9 @@ class User < ActiveRecord::Base
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
           relation = association(actual_association).scoped
+          shards = in_region_associated_shards
           relation.with_each_shard do |scope|
+            next unless shards.include?(Shard.current)
 
             # Limit favorite courses based on current shard.
             if association == :favorite_courses
@@ -1647,14 +1649,15 @@ class User < ActiveRecord::Base
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
     enrollments = self.shard.activate do
-      res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
-        res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
-        if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.where(uuid: opts[:include_enrollment_uuid], workflow_state: "invited").first
-          res << pending_enrollment
-          res.uniq!
-        end
-        res
+      res = Rails.cache.fetch([self, 'current_enrollments3', opts[:include_future] ].cache_key) do
+        scope = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments)
+        scope.shard(in_region_associated_shards).to_a
       end
+      if opts[:include_enrollment_uuid] && !res.find { |e| e.uuid == opts[:include_enrollment_uuid] } &&
+          (pending_enrollment = Enrollment.where(uuid: opts[:include_enrollment_uuid], workflow_state: "invited").first)
+        res << pending_enrollment
+      end
+      res
     end + temporary_invitations
     if opts[:preload_courses]
       ActiveRecord::Associations::Preloader.new(enrollments, :course).run
@@ -1673,7 +1676,7 @@ class User < ActiveRecord::Base
   def cached_current_group_memberships
     self.shard.activate do
       @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
-        self.current_group_memberships.with_each_shard
+        self.current_group_memberships.shard(self.in_region_associated_shards).to_a
       end
     end
   end
@@ -2505,10 +2508,14 @@ class User < ActiveRecord::Base
     [Shard.default]
   end
 
+  def in_region_associated_shards
+    associated_shards.select { |shard| shard.in_current_region? || shard.default? }
+  end
+
   def all_accounts
     @all_accounts ||= shard.activate do
       Rails.cache.fetch(['all_accounts', self].cache_key) do
-        self.accounts.active.with_each_shard
+        self.accounts.active.shard(in_region_associated_shards).to_a
       end
     end
   end
