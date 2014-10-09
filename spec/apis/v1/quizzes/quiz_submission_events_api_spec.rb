@@ -24,28 +24,26 @@ describe Quizzes::QuizSubmissionEventsController, type: :request do
       api_call(:post, url, params, data, headers)
     end
   end
+
   events_data = [{
-      "created_at" => Time.now.iso8601,
-      "event_type" => "question_answered",
-      "data" => {"question_id"=>1, "answer"=>"1"}
-    },{
-      "created_at" => Time.now.iso8601,
-      "event_type" => "question_answered",
-      "data" => {"question_id"=>2, "answer"=>"2"}
+    "created_at" => Time.now.iso8601,
+    "event_type" => "question_answered",
+    "event_data" => {"question_id"=>1, "answer"=>"1"}
+  }, {
+    "created_at" => Time.now.iso8601,
+    "event_type" => "question_flagged",
+    "event_data" => {"question_id"=>2, "flagged"=>true}
   }]
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submission_event [create]' do
-
     before :once do
       course_with_teacher :active_all => true
-
-      teacher = @teacher
 
       simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T},
         :user => @user,
         :course => @course
 
-      @user = teacher
+      @user = @teacher
     end
 
     it 'should deny unauthorized access' do
@@ -56,6 +54,7 @@ describe Quizzes::QuizSubmissionEventsController, type: :request do
       api_create({raw: true}, {})
       assert_status(401)
     end
+
     it "should respond with no_content success" do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
@@ -63,12 +62,22 @@ describe Quizzes::QuizSubmissionEventsController, type: :request do
     end
 
     it 'should store the passed values into the DB table' do
+      scope = Quizzes::QuizSubmissionEvent
+
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
-      expect(Quizzes::QuizSubmissionEvent.all.size).to eq 0
-      api_create({raw:true}, {"quiz_submission_events" => events_data })
-      expect(Quizzes::QuizSubmissionEvent.all.size).to eq events_data.size
-    end
 
+      expect(scope.count).to eq 0
+      api_create({raw:true}, {"quiz_submission_events" => events_data })
+      expect(scope.count).to eq 2
+
+      scope.where(event_type: 'question_answered').first.tap do |event|
+        expect(event.event_type).to eq('question_answered')
+        expect(event.event_data.as_json).to eq({
+          question_id: '1',
+          answer: '1'
+        }.as_json)
+      end
+    end
   end
 end

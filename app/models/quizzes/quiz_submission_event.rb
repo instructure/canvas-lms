@@ -29,37 +29,40 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     # The quiz submission attempt in which the event was recorded.
     :attempt,
 
-    # @property [AnswerRecord[]]
-    #
-    # Set of answers to all quiz questions at the time the event was
-    # recorded. See the relevant object for what's inside the :answer
-    # field.
-    :answers,
-
     # @property [String] event_type
     #
     # The "action" this event describes. Right now the only supported event
-    # is EVT_ANSWERED.
+    # is EVT_QUESTION_ANSWERED.
     :event_type,
 
-    # @property [Hash|String|Nil] data
+    # @property [Hash|String|Nil] event_data
     #
     # The extra serialized data for this event.
-    :data,
+    :event_data,
 
     # @property [Integer] attempt
     #
     # The quiz submission attempt in which the event was recorded.
-    :created_at
+    :created_at,
+
+    # @property [AnswerRecord[]]
+    # @alias event_data
+    #
+    # Set of answers to all quiz questions at the time the event was
+    # recorded. See the relevant object for what's inside the :answer
+    # field.
+    # 
+    # This is present only for EVT_QUESTION_ANSWERED events.
+    :answers,
   ]
 
   # An event describing the student choosing an answer to a question.
-  EVT_ANSWERED = 'answered'.freeze
+  EVT_QUESTION_ANSWERED = 'answered'.freeze
   RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
 
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
 
-  serialize :answers, JSON
+  serialize :event_data, JSON
 
   scope :predecessor_of, ->(event) {
     where('quiz_submission_id=:id AND attempt=:attempt AND created_at < :created_at', {
@@ -82,6 +85,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   end
 
   after_initialize :set_defaults
+  alias_attribute :answers, :event_data
 
   class << self
     # Main API for building a new event.
@@ -98,7 +102,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
       self.new.tap do |event|
         event.attempt = submission_data['attempt']
         event.event_type = infer_event_type(submission_data)
-        event.answers = extract_answers(submission_data, quiz_data)
+        event.event_data = extract_answers(submission_data, quiz_data)
         event.created_at = Time.now
       end
     end
@@ -106,7 +110,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     def infer_event_type(submission_data)
       # TODO: tell the difference between auto-submitted backups and backups
       # submitted when students changed an answer
-      EVT_ANSWERED
+      EVT_QUESTION_ANSWERED
     end
 
     def extract_answers(submission_data, quiz_data)
@@ -141,7 +145,6 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   end
 
   def set_defaults
-    self.answers ||= []
     self.created_at ||= Time.now
   end
 
@@ -177,7 +180,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   # If this returns true, you can safely skip storing this event.
   def empty?
     case self.event_type
-    when EVT_ANSWERED
+    when EVT_QUESTION_ANSWERED
       self.answers.blank?
     else
       false
@@ -190,8 +193,8 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     return false if self.event_type != rhs.event_type
 
     case self.event_type
-    when EVT_ANSWERED
-      answers.length == rhs.answers.length &&
+    when EVT_QUESTION_ANSWERED
+      Array(answers).length == Array(rhs.answers).length &&
       answers.to_json == rhs.answers.to_json
     else
       super(rhs)

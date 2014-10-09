@@ -57,15 +57,27 @@ module Quizzes::QuizAuditing
       end
 
       if @options[:optimize]
-        quiz_submission_events = events.group_by(&:quiz_submission_id)
-        quiz_submission_events.each do |_id, set|
-          set.sort_by!(&:created_at)
-          set.each_with_index do |event, index|
-            event.optimize_answers(set[index-1]) if index > 0
-          end
-        end
+        answered_event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
 
-        events.reject!(&:empty?)
+        # an optimizer pass:
+        pass = -> {
+          quiz_submission_events = events.group_by(&:quiz_submission_id)
+          quiz_submission_events.each do |_id, set|
+            set.sort_by!(&:created_at)
+            set.each_with_index do |event, index|
+              event.optimize_answers(set[index-1]) if index > 0
+            end
+          end
+        }
+
+        pass.call()
+
+        # perform as many passes as needed to get rid of any redundancy in the
+        # event stream:
+        while events.any?(&:empty?)
+          events.reject!(&:empty?)
+          pass.call()
+        end
       end
 
       events.sort_by { |e| [ e.quiz_submission_id, e.created_at ] }

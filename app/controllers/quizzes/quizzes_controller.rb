@@ -801,6 +801,10 @@ class Quizzes::QuizzesController < ApplicationController
       redirect_to course_quiz_url(@context, @quiz) and return
     end
 
+    js_env({
+      :QUIZ_SUBMISSION_EVENTS_URL => api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
+    })
+
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
     render :action => 'take_quiz'
   end

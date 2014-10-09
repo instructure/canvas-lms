@@ -24,6 +24,7 @@ define([
   'underscore',
   'compiled/views/quizzes/LDBLoginPopup',
   'worker!compiled/workers/quizzes/quiz_taking_police',
+  'compiled/quizzes/log_auditing',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
@@ -35,7 +36,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _, LDBLoginPopup, QuizTakingPolice) {
+], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _, LDBLoginPopup, QuizTakingPolice, QuizLogAuditing) {
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
@@ -749,5 +750,7 @@ define([
         $timer.text($timeRunningTimeRemaining.text());
       }
     });
+
+    QuizLogAuditing.start();
   });
 });

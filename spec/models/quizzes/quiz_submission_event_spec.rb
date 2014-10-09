@@ -97,7 +97,7 @@ describe Quizzes::QuizSubmissionEvent do
 
   describe '#self.infer_event_type' do
     it do
-      expect(described_class.infer_event_type({})).to eq Quizzes::QuizSubmissionEvent::EVT_ANSWERED
+      expect(described_class.infer_event_type({})).to eq Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
     end
   end
 
@@ -236,9 +236,9 @@ describe Quizzes::QuizSubmissionEvent do
   end
 
   describe '#empty?' do
-    context Quizzes::QuizSubmissionEvent::EVT_ANSWERED do
+    context Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED do
       before do
-        subject.event_type = Quizzes::QuizSubmissionEvent::EVT_ANSWERED
+        subject.event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
       end
 
       it 'should be true if it has no answer records' do
@@ -273,10 +273,10 @@ describe Quizzes::QuizSubmissionEvent do
       expect(one).not_to eq two
     end
 
-    context Quizzes::QuizSubmissionEvent::EVT_ANSWERED do
+    context Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED do
       before do
-        one.event_type = Quizzes::QuizSubmissionEvent::EVT_ANSWERED
-        two.event_type = Quizzes::QuizSubmissionEvent::EVT_ANSWERED
+        one.event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
+        two.event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
       end
 
       it 'should be true if both events have no answers' do

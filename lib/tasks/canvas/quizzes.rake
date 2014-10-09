@@ -21,11 +21,11 @@ namespace :canvas do
         events.each do |event|
           model.connection.execute <<-SQL
             INSERT INTO quiz_submission_events
-              (attempt, answers, created_at, event_type, quiz_submission_id)
+              (attempt, event_data, created_at, event_type, quiz_submission_id)
               VALUES
               (
                 #{event.attempt},
-                '#{event.answers.to_json}',
+                '#{event.event_data.to_json}',
                 '#{event.created_at}',
                 '#{event.event_type}',
                 #{event.quiz_submission_id}

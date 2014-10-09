@@ -32,8 +32,8 @@
 #           "example": "question_answered",
 #           "type": "string"
 #         },
-#         "data": {
-#           "description": "the event data",
+#         "event_data": {
+#           "description": "custom contextual data for the specific event type",
 #           "example": {"answer": "42"},
 #           "type": "object"
 #         }
@@ -63,11 +63,11 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
   #      {
   #       "created_at": "2014-10-08T19:29:58Z",
   #       "event_type": "question_answered",
-  #       "data" : {"answer": "42"}
+  #       "event_data" : {"answer": "42"}
   #      }, {
   #       "created_at": "2014-10-08T19:30:17Z",
-  #       "event_type": "question_answered",
-  #       "data" : {"answer": "43"}
+  #       "event_type": "question_flagged",
+  #       "event_data" : { "question_id": "1", "flagged": true }
   #     }
   #   ]
   #  }
@@ -77,8 +77,9 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
       params["quiz_submission_events"].each do |datum|
         Quizzes::QuizSubmissionEvent.create do |event|
           event.quiz_submission_id = @quiz_submission.id
-          event.created_at = datum["created_at"]
           event.event_type = datum["event_type"]
+          event.event_data = datum["event_data"]
+          event.created_at = datum["created_at"]
           event.attempt = @quiz_submission.attempt
         end
       end
