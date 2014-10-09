@@ -736,17 +736,13 @@ class Account < ActiveRecord::Base
     state :deleted
   end
 
-  def self.all_site_admin_account_users_copies
-    [Setting.get('all_site_admin_account_users_copies', 1).to_i, 1].max
-  end
-
   def account_users_for(user)
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
         @account_users_cache[user.global_id] ||= begin
-          all_site_admin_account_users_hash = Rails.cache.fetch("all_site_admin_account_users2:#{rand(Account.all_site_admin_account_users_copies)}") do
+          all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users2") do
             # this is a plain ruby hash to keep the cached portion as small as possible
             self.account_users.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.membership_type]; result }
           end
