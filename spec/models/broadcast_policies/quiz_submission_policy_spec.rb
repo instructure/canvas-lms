@@ -94,7 +94,7 @@ module BroadcastPolicies
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
       specify { wont_send_when { submission.stubs(:pending_review?).returns false }}
-      specify { wont_send_when { submission.stubs(:user_has_visibility).returns false }}
+      specify { wont_send_when { QuizSubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false) }}
     end
 
 
@@ -118,7 +118,7 @@ module BroadcastPolicies
       specify { wont_send_when { course.stubs(:available?).returns false} }
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
-      specify { wont_send_when { submission.stubs(:user_has_visibility).returns false }}
+      specify { wont_send_when { QuizSubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false) }}
 
       specify do
         wont_send_when do
