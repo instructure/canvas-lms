@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Canvas::Migration::Helpers::SelectiveContentFormatter do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context "overview json data" do
     before do
       @migration = mock()

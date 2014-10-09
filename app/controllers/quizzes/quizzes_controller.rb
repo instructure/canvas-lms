@@ -57,7 +57,6 @@ class Quizzes::QuizzesController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_QUIZZES)
-    return index_legacy unless @context.feature_enabled?(:draft_state)
 
     can_manage = is_authorized_action?(@context, @current_user, :manage_assignments)
 
@@ -129,37 +128,6 @@ class Quizzes::QuizzesController < ApplicationController
     end
 
     log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
-  end
-
-  # TODO: update non-DS specs to use the DS version and remove this entirely
-  # as it is no longer available in the UI
-  def index_legacy
-    @quizzes = @context.quizzes.active.include_assignment.sort_by do |quiz|
-      [
-        (quiz.assignment ? quiz.assignment.due_at : quiz.lock_at) || CanvasSort::Last,
-        Canvas::ICU.collation_key(quiz.title || CanvasSort::First)
-      ]
-    end
-
-    @unpublished_quizzes = @quizzes.select{|q| !q.available?}
-    @quizzes = @quizzes.select{|q| q.available?}
-    @assignment_quizzes = @quizzes.select{|q| q.assignment_id}
-    @open_quizzes = @quizzes.select{|q| q.quiz_type == 'practice_quiz'}
-    @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
-
-    # needed by _quiz_summary.html.erb
-    @submissions_hash = if @current_user.present?
-      @current_user
-        .quiz_submissions
-          .where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s)
-          .includes(:quiz)
-          .each_with_object({}) { |sub, user_subs| user_subs[sub.quiz_id] = sub }
-    else
-      {}
-    end
-
-    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
-    render action: "index_legacy"
   end
 
   def show
@@ -385,9 +353,6 @@ class Quizzes::QuizzesController < ApplicationController
       respond_to do |format|
         @quiz.transaction do
           overrides = delete_override_params
-          if !@context.feature_enabled?(:draft_state) && params[:activate]
-            @quiz.with_versioning(true) { @quiz.publish! }
-          end
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
           params[:quiz][:notify_of_update] = false
 
@@ -397,7 +362,7 @@ class Quizzes::QuizzesController < ApplicationController
             old_assignment.id = @quiz.assignment.id
           end
 
-          auto_publish = @context.feature_enabled?(:draft_state) && @quiz.published?
+          auto_publish = @quiz.published?
           @quiz.with_versioning(auto_publish) do
             params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
             # using attributes= here so we don't need to make an extra

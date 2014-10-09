@@ -27,7 +27,6 @@
 
 <h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>
 
-<% if @context.feature_enabled?(:draft_state) %>
 <div class="header-bar" id="quiz_edit_header">
   <div class="header-bar-right">
     <div class="header-group-left">
@@ -36,16 +35,14 @@
       </span>
 
       <% if @quiz.published? %>
-        <% quiz_draft_state_title = t('buttons.published', "Published") %>
         <span id='quiz-draft-state' class='published-status published'>
-          <i class="icon-publish"><span class="screenreader-only"><%= quiz_draft_state_title %></span></i>
-          <%= quiz_draft_state_title %>
+          <i class="icon-publish"><span class="screenreader-only"><%= t('buttons.published', "Published") %></span></i>
+          <%= t('buttons.published', "Published") %>
         </span>
       <% else %>
-        <% quiz_draft_state_title = t('buttons.not_published', "Not Published") %>
         <span id='quiz-draft-state' class='published-status unpublished'>
-          <i class="icon-unpublished"><span class="screenreader-only"><%= quiz_draft_state_title %></span></i>
-          <%= quiz_draft_state_title %>
+          <i class="icon-unpublished"><span class="screenreader-only"><%= t('buttons.not_published', "Not Published") %></span></i>
+          <%= t('buttons.not_published', "Not Published") %>
         </span>
       <% end %>
     </div>
@@ -79,7 +76,6 @@
     </div>
   </div>
 </div>
-<% end %>
 
 <div id="quiz_edit_wrapper">
   <div class="form">
@@ -96,52 +92,10 @@
     </div>
   <% end %>
 
-  <% if @context.feature_enabled?(:draft_state) %>
   <div class="title">
     <label for="quiz_title" class="screenreader-only"><%= t('quiz_title', 'Quiz Title') %></label>
     <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
   </div>
-  <% else %>
-  <div class="row-fluid">
-    <div class="span6">
-    <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
-    </div>
-    <div class="span6">
-      <div class="admin-link-hover-area">
-        <div class="admin-links">
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="manage-toolbar" href="#">
-            <i class="icon-settings"></i>
-            <i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only"><%= admin_manage_title %></span>
-          </a>
-          <ul id="manage-toolbar" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-            <% if @assignment %>
-              <li role="presentation">
-                <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
-                  <i class="icon-rubric"><span class="screenreader-only"><%= admin_show_rubric_title %></span></i>
-                  <%= admin_show_rubric_title %>
-                </a>
-              </li>
-              <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
-            <% end %>
-
-            <li role="presentation">
-              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
-                <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i>
-                <%= admin_delete_title %>
-              </a>
-            </li>
-
-          </ul>
-        </div>
-        <div id="quiz_display_points_possible">
-          <%= t(:points_possible, "Points %{n}", :n => raw("<span style=\"margin-left:5px\" class=\"points_possible\">#{@quiz.points_possible}</span>")) %>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <% end %>
 
   <div style="display: none;" id="quiz_urls">
     <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
@@ -462,7 +416,6 @@
 
   </div>
 
-  <% if @context.feature_enabled?(:draft_state) %>
   <div class="form-actions" id="quiz_edit_actions">
     <div class="row-fluid">
       <div class="span6 notify">
@@ -479,23 +432,6 @@
       </div>
     </div>
   </div>
-
-  <% else %>
-  <div class="form-actions">
-    <div class="row-fluid">
-      <div class="span6" style="text-align:left; line-height:28px;">
-        <label for="quiz_notify_of_update" class="checkbox">
-          <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" />
-          <%= t('labels.quiz_notify', 'Notify users this quiz has changed') %>
-        </label>
-      </div>
-      <div class="span6">
-        <%= link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :style => 'width:50px', :id => 'cancel_button' do %><%= t('links.cancel', "Cancel") %><% end %>
-        <button type="submit" class="save_quiz_button btn btn-primary" style="width:90px"><%= t('buttons.save', "Save") %></button>
-      </div>
-    </div>
-  </div>
-  <% end %>
 </div>
 
 <div class="question_generated" style="display: none;">

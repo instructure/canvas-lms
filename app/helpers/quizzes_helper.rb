@@ -20,15 +20,9 @@ module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
   def needs_unpublished_warning?(quiz=@quiz, user=@current_user)
-    if quiz.feature_enabled?(:draft_state)
-      return false unless can_publish(quiz)
-      show_unpublished_changes = true
-    else
-      return false unless can_read(quiz)
-      show_unpublished_changes = can_publish(quiz)
-    end
+    return false unless can_publish(quiz)
 
-    !quiz.available? || (show_unpublished_changes && quiz.unpublished_changes?)
+    !quiz.available? || quiz.unpublished_changes?
   end
 
   def can_read(quiz, user=@current_user)
@@ -46,15 +40,7 @@ module QuizzesHelper
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
   end
 
-  def unpublished_changes_warning
-    I18n.t(
-      '*You have made unpublished changes to this quiz.* '+
-      'These changes will not appear for students until you publish or ' +
-      'republish the quiz.',
-      :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
-  end
-
-  def draft_state_unsaved_changes_warning
+  def unsaved_changes_warning
     I18n.t(
       '*You have made changes to the questions in this quiz.* '+
       'These changes will not appear for students until you ' +
@@ -63,19 +49,11 @@ module QuizzesHelper
   end
 
   def quiz_published_state_warning(quiz=@quiz)
-    if !quiz.available?
-      unpublished_quiz_warning
-    else
-      if quiz.feature_enabled? :draft_state
-        draft_state_unsaved_changes_warning
-      else
-        unpublished_changes_warning
-      end
-    end
+    !quiz.available? ? unpublished_quiz_warning : unsaved_changes_warning
   end
 
   def display_save_button?(quiz=@quiz)
-    quiz.available? && quiz.feature_enabled?(:draft_state) && can_publish(quiz)
+    quiz.available? && can_publish(quiz)
   end
 
   def render_score(score, precision=2)
