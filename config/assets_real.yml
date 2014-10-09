@@ -16,8 +16,8 @@ compress_assets: off
 
 
 stylesheets:
-  ember_files:
-    - public/stylesheets/compiled/pages/ember_files.css
+  react_files:
+    - public/stylesheets/compiled/pages/react_files/compiler-react_files.css
   instructure_eportfolio:
     - public/stylesheets/compiled/pages/instructure_eportfolio.css
   course_show:

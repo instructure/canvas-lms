@@ -1,0 +1,202 @@
+// Make sure that ReactModal gets above everything else
+.ReactModal__Overlay {
+  z-index: 100;
+}
+
+.ef-file-preview-overlay {
+  position: fixed;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
+
+}
+
+.ef-file-preview-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%
+}
+
+.ef-file-preview-header {
+  // position: relative;
+  // top: 0;
+  // left: 0;
+  // right: 0;
+  //height: 70px;
+  flex: 0 0 70px;
+  background-color: #000;
+  opacity: 1;
+  border-bottom: 1px solid #666;
+}
+
+.ef-file-preview-preview {
+  flex: 1;
+  display: flex;
+  &.full-height {
+    flex: 0 0 400px;
+  }
+  // height: 100vh;
+  // position: absolute;
+  // top: 70px;
+  // left: 0;
+  // right: 0;
+  // height: 100%;
+  // width: 100%;
+}
+
+.ef-file-preview-arrow-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 100px;
+}
+
+.ef-file-preview-arrow-link {
+  background-color: #000;
+  border: 1px solid #666;
+  text-align: center;
+  height: 100px;
+  padding-top: 65px;
+}
+
+.ef-file-preview-arrow {
+
+
+  // background-color: #000;
+  // height: 100px;
+  // width: 50px;
+  // i {
+  //   margin-top: 45px;
+  //   margin-left: 13px;
+  // }
+}
+
+.ef-file-preview-header-buttons {
+  padding: 8px 16px;
+}
+
+.ef-file-preview-button {
+  color: rgba($canvas-light, 0.8);
+  font-weight: bold;
+  margin-left: 16px;
+  cursor: pointer;
+  &:hover, &:focus { color: $canvas-light; }
+  @if $use_high_contrast == false {
+    &:hover, &:focus { text-decoration: none; }
+  }
+}
+
+.ef-file-preview-header-filename-container {
+  padding: 8px 16px;
+}
+
+.ef-file-preview-header-filename {
+  color: $canvas-light;
+  margin: 0;
+}
+
+
+.ef-file-preview-information {
+  // width: 46%;
+  background-color: #333;
+  align-self: flex-start;
+  // position: absolute;
+  // right: 0;
+  // float: right;
+  // top: 70px;
+  // bottom: 0;
+}
+
+.ef-file-preview-infotable {
+  th {
+    color: gray;
+  }
+  td {
+    color: white;
+  }
+}
+
+.ef-file-preview-toggle {
+  color: #666;
+  font-weight: bold;
+  background-color: #000;
+  // width: 100px;
+  // margin-left: 25px;
+  text-align: center;
+  border-top: 1px solid #666;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+  // position: absolute;
+  // bottom: 10px;
+}
+
+.ef-file-preview-footer {
+  // width: 100%;
+  // height: 20%;
+  // position: absolute;
+  // bottom: 0;
+  background-color: black;
+
+}
+
+.ef-file-preview-footer-item
+{
+  width: 100px;
+  height: 100px;
+  // float: right;
+  color: white;
+  display: inline-block;
+}
+
+.ef-file-preview-frame {
+  width: 50%;
+  height: 500px;
+}
+
+.ef-file-preview-item {
+  //background-color: red;
+  align-items: center;
+}
+
+.ef-file-preview-toggle-row {
+  flex: 0 0 70px;
+}
+
+.ef-file-preview-footer-list {
+  list-style-type: none;
+  white-space: nowrap;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.ef-file-preview-footer-list-item {
+  display: inline;
+}
+
+.ef-file-preview-footer-arrow {
+  margin-top: 35%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ef-file-preview-footer-active {
+  border: solid $canvas-primary 2px;
+}
+
+.ef-file-preview-footer-image {
+  width: 100px;
+  height: 100px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.ef-file-preview-not-available {
+  color: #fff;
+  background-color: #000;
+  padding: 200px;
+}

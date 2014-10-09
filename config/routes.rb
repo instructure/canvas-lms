@@ -70,12 +70,12 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#ember_app', format: false
-        get "search" => 'files#ember_app', format: false
+        get "folder#{full_path_glob}" => 'files#react_files', format: false
+        get "search" => 'files#react_files', format: false
         get :quota
         post :reorder
       end
-      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ #needs to stay below ember_app route
+      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ #needs to stay below react_files route
     end
   end
 
@@ -710,8 +710,8 @@ CanvasRails::Application.routes.draw do
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   post 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', as: :switch_calendar
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'ember_app', format: false
-  get "files/search", controller: 'files', action: 'ember_app', format: false
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
+  get "files/search", controller: 'files', action: 'react_files', format: false
   get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   get 'files/preflight' => 'files#preflight', as: :file_preflight

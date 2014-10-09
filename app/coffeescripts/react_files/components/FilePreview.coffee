@@ -8,12 +8,13 @@ define [
   './FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
+  'compiled/fn/preventDefault'
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
   './FilePreviewFooter'
   './FilePreviewInfoPanel',
   '../modules/filesEnv'
-], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel, filesEnv) ->
+], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel, filesEnv) ->
 
   FilePreview = React.createClass
 
@@ -78,7 +79,10 @@ define [
       # we'll just use the first one in our otherItems collection.
       else
         # Because otherItems may (or may not be) a Backbone collection (FilesCollection) we change up our method.
-        initialItem = if otherItems instanceof Backbone.Collection then otherItems.first() else _.first(otherItems)
+        initialItem = if otherItems instanceof Backbone.Collection
+          otherItems.first()
+        else
+          _.first(otherItems)
 
       {initialItem, otherItems}
 
@@ -133,13 +137,6 @@ define [
 
       obj
 
-    openInfoPanel: (event) ->
-      event.preventDefault()
-      @setState({showInfoPanel: !@state.showInfoPanel});
-
-    toggleFooter: (event) ->
-      event.preventDefault()
-      @setState({showFooter: !@state.showFooter});
 
     handleKeyboardNavigation: (event) ->
       return null unless (event.keyCode is $.ui.keyCode.LEFT or event.keyCode is $.ui.keyCode.RIGHT)
@@ -170,7 +167,10 @@ define [
           goToItemIndex = curItemIndex + 1
           if goToItemIndex > @state.otherItems.length - 1
             goToItemIndex = 0
-      goToItem = if @state.otherItemsIsBackBoneCollection then @state.otherItems.at(goToItemIndex) else @state.otherItems[goToItemIndex]
+      goToItem = if @state.otherItemsIsBackBoneCollection
+        @state.otherItems.at(goToItemIndex)
+      else
+        @state.otherItems[goToItemIndex]
       if (@state.otherItemsString)
         @props.params.only_preview = @state.otherItemsString
       div {className: 'col-xs-1 full-height'},
@@ -199,6 +199,12 @@ define [
     closeModal: ->
       @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
 
+    toggle: (key) ->
+      newState = {}
+      newState[key] = !@state[key]
+      return =>
+        @setState(newState)
+
     render: withReactDOM ->
       ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
@@ -210,10 +216,16 @@ define [
                     @state.initialItem?.displayName()
               div {className: 'col-xs end-xs'},
                 div {className: 'ef-file-preview-header-buttons'},
-                  a {className: 'ef-file-preview-header-download ef-file-preview-button', href: @state.displayedItem?.get('url')},
+                  a {
+                    className: 'ef-file-preview-header-download ef-file-preview-button'
+                    href: @state.displayedItem?.get('url')
+                  },
                     i {className: 'icon-download'} #Replace with actual icon
                     I18n.t('file_preview_headerbutton_download', ' Download')
-                  a {className: 'ef-file-preview-header-info ef-file-preview-button', href: '#', onClick: @openInfoPanel},
+                  button {
+                    className: 'btn-link ef-file-preview-header-info ef-file-preview-button'
+                    onClick: @toggle('showInfoPanel')
+                  },
                     i {className: 'icon-info'}
                     I18n.t('file_preview_headerbutton_info', ' Info')
                   ReactRouter.Link {to: @getRouteIdentifier(), query: @getNavigationParams(except: 'only_preview'), params: @props.params, className: 'ef-file-preview-header-close ef-file-preview-button'},
@@ -222,7 +234,7 @@ define [
             div {className: 'ef-file-preview-preview grid-row middle-xs'},
               # We need to render out the left/right arrows
               @renderArrowLink('left') if @state.otherItems?.length > 0
-              if @state.displayedItem?
+              if @state.displayedItem
                 iframe {
                   src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
                   className: 'ef-file-preview-frame'
@@ -234,7 +246,11 @@ define [
                   getStatusMessage: @getStatusMessage
             div {className: 'ef-file-preview-toggle-row grid-row middle-xs'},
               if @state.showFooterBtn
-                a {className: 'ef-file-preview-toggle col-xs-1 off-xs-1', href: '#', onClick: @toggleFooter, role: 'button', style: {bottom: '21%'} if @state.showFooter},
+                button {
+                  className: 'btn-link ef-file-preview-toggle col-xs-1 off-xs-1'
+                  onClick: @toggle('showFooter')
+                  style: {bottom: '21%'} if @state.showFooter
+                },
                   if @state.showFooter
                     I18n.t('file_preview_hide', 'Hide')
                   else
