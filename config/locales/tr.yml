@@ -691,7 +691,7 @@ tr:
       account_reports: 
         default: 
           description: 
-            text: "Bu raporda, belirli dönemde tüm öğrenciler için öğrenci final notu görülmektedir. Sonuç csv dosyasında her kayıt için bir satır bulunmaktadır ve ders not defterinde görülen güncel ve final notu gösterilecektir."
+            text: "Bu raporda, belirli dönemde tüm öğrenciler için öğrenci final notu görülmektedir. Oluşturulan csv dosyasında her kayıt için bir satır bulunmaktadır ve ders not defterinde görülen güncel ve final notu gösterilecektir."
     group_type: grup
     include_deleted_parameter: 
       account_reports: 
@@ -754,6 +754,11 @@ tr:
         sis_export: 
           description: 
             text: "Bu rapor, ilgili kategorilerindeki Canvas ön hazırlığı ile ilgili gerekli tüm bilgileri dışa aktaracak."
+    public_courses_csv_description: 
+      account_reports: 
+        default: 
+          public_courses: 
+            text: "Bu raporda, belirli bir dönemde herekse açık silinmemiş tüm dersler gösterilmektedir. Oluşturulan csv dosyasında her ders için bir satırda ders kimliği , ders öbs numarası, dersin kısa ismi, ders ismi ve dersin başlama bitiş tarihleri yer almaktadır."
     quota_integer_required: "Bir tamsayı değeri gerekiyor"
     quota_must_be_positive: "Değer pozitif olmalıdır"
     quota_not_updated: "Kota güncellenmedi"
@@ -868,6 +873,8 @@ tr:
       help_link_available_to_all_teachers: Öğretmenler
       help_link_available_to_all_users: Kullanıcılar
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Eğer yardım diyaloğu içinde kendi kampus destek web sayfanıza bağlantı vermek istiyorsanız bu işlemi burada yapabilirsiniz."
+      interpolate_account_domain: "Kullanıcının kök hesabı alan adını değiştireceğiniz \"{{ACCOUNT_DOMAIN}}\" i girin."
+      interpolate_user_id: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
       ip_filter_filter_label: Filtre
       ip_filter_name_label: Ad
       labels: 
@@ -877,6 +884,7 @@ tr:
         allow_invitation_previews: "Davetleri Görüntüle"
         allow_sending_scores_in_emails: "Öğrenciler puanlarını eposta bildirimi olarak alabilirler"
         allow_sis_import: "ÖBS İçe Aktarımları"
+        author_email_in_notifications: "Kullanıcı etkileşim Bildirimleri için gönderenin eposta adresini göster"
         canvas_authentication: "Canvas Kimlik Doğrulaması"
         default_language: "Varsayılan Dil"
         default_time_zone: "Varsayılan Zaman Dilimi"
@@ -897,6 +905,7 @@ tr:
         help_link_subtext: Alt-metin
         help_link_text: "Link için görüntülenecek metin"
         help_link_url: URL
+        login_handle_name: "Oturum Açma Etiketi"
         membership_type: "Daha Fazla Ekle"
         message: Mesaj
         mfa_settings: "Çoklu Kimlik Doğrulama"
@@ -958,6 +967,7 @@ tr:
         subject: Konu
       open_registration_delegated_warning_message: "Dışardan bir kimlik sağlayıcı kullanılıyor ve  dışardan kimlik sağlayıcının giriş formunun %{url} ye tekrar bağlantısı olmadıkça kendileri hesap oluşturan katılımcılar giriş yapamayabilir."
       open_registration_delegated_warning_tooltip: "Harici Kimlik Sağlayıcı Etkin"
+      open_report_description: "Açık Rapor Açıklaması"
       page_header_title: "Hesap Ayarları"
       page_title: "Hesap Ayarları"
       quiz_ip_filters_delete: "Filtreyi Kaldır"
@@ -1079,6 +1089,10 @@ tr:
         other: "İşlenmeyi bekleyen %{count} toplu işlem."
       pending_batches_title: "Bekleyen Toplu İşlemler"
       process_data_button: "İşlem Verisi"
+      select_file_instructions: |-
+          İçeri aktarmak istediğiniz zip dosyasını seçin.
+          Bu zip dosyalarının oluşturulması ile ilgili açıklama için [lütfen bu
+          belgeye bakın](%{url}).
       sis_import_crumb: "ÖBS İçe Aktarımı"
       started_at_message: "Başladı: %{started_at}"
       title: "ÖBS İçe Aktarımı"
@@ -1229,6 +1243,7 @@ tr:
     error_heading: "Ajax Hatası: %{status_code}"
     errors: 
       connection_lost: "%{host} sunucusuna bağlantı kayboldu. İnternet'e bağlı olduğunuzdan emin olun ve tekrar deneyin."
+      logged_out: "Şu anda oturumunuz açık değil. Muhtemelen uzun süre hiçbir şey yapmadınız."
       unhandled: "Oops! Son istek çalıştırılamadı."
     links: 
       details: ayrıntılar...
@@ -1276,6 +1291,8 @@ tr:
       criteria_required: "En az bir tetikleyici gereklidir"
       recipients_required: "En az bir alıcı gereklidir"
       threshold_should_be_numeric: "Pozitif bir sayı olmalıdır"
+  allow_lor_tools: "Kullanıcılar LOR için yapılandırılmış harici araçları görüp kullanabilsinler."
+  allow_opt_out_of_inbox: "Kullanıcıların Karşılıklı Konuşma Gelen Kutusun'dan çıkmalarına izin ver. Bu duurmda tüm karşılıklı konuşma mesajları ve bildirimler ACİL bildirimler olarak kullanıcının birincil eposta adresine gönderilecek; Gelen Kutusunda okunmamış mesaj rozeti ve Karşılıklı Konuşma bildirim tercihleri gizlenecektir."
   analytics: 
     course: 
       analytics: Analiz
@@ -1426,6 +1443,7 @@ tr:
     labels: 
       due: Bitiş
     name_is_required: "İsim zorunludur!"
+    points_possible_not_zero: "Seçili notlandırma türü için olası puanlar 0'dan fazla olmalıdır"
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     select_external_tool_dialog_title: "Harici Araçları Ayarla"
     submission_action_take_quiz: "%{title} al"
@@ -1542,6 +1560,7 @@ tr:
       group_weight: "Toplamın %{groupWeight}% o si"
       manage: Yönet
       move: "Şuraya Taşı..."
+      move_to_accessibility_warning: "Uyarı: Ödevleri ve grupları yeniden sıralamada daha gelişmiş erişim için lütfen menüde bulunan Diyaloğa Taşı seçeneğini kullanın."
     assignment_group_selector: 
       assignment_group: "Ödev Grubu"
       assignment_group_options: 
@@ -1724,6 +1743,7 @@ tr:
       description: Açıklama
       freeze_properties: "Kopyalandığında ödev ayarlarını kitlitle"
       notify_content_change: "Bu içerik değişiminden kullanıcıları bilgilendir"
+      only_visible_to_overrides_note: "Not: Bu ödev *yalnızca* aşağıda belirtilmiş bölüm(ler)de görülebilir:"
       points_possible: Puanlar
       post_to_sis: "ÖBS'ye gönder"
       warnings: 
@@ -1793,6 +1813,7 @@ tr:
         points: Puanlar
       view_grading_scheme: "Notlandırma Şemasını Gör"
     group_category_selector: 
+      differentiated_groups_warning: "Sınıflandırılmış grup ödevleri beklenmeyen sonuçlara yol çabilir. "
       grade_group_students_individually: "Her öğrenciye aynı değerlendirme notu ata"
       group_assignment_header: "Grup Ödevi"
       group_category_locked_explanation: "Öğrenciler bu ödev için gönderimde bulunduklarından grup ayarları değiştirilemez."
@@ -2130,6 +2151,8 @@ tr:
           internet_check: "İnternet Veritabanı"
           journal_check: "Dergiler, Makaleler ve Yayınlar"
           student_paper_check: "Başka Öğrenci Kağıtları"
+          submit_papers_to: "Depoyu Dahilinde"
+          turnitin_repository: "Turnitin Deposu"
         originality_report_never: Asla
         originality_report_visibility: "Öğrenciler Orjinal Raporu Görebilsin"
         originality_report_visible_after_due_date: "Bitiş tarihinden sonra"
@@ -2221,7 +2244,9 @@ tr:
   bookmark_service: 
     default_title: "Başlık Yok"
   broccoli_cloud: 
+    hidden_title: "Gizli. Bir bağlantı mevcut"
     label: 
+      hidden: "Gizli. Bir bağlantı mevcut"
       published: Yayınlandı
       unpublished: Yayınlanmadı
     published_title: Yayınlandı
@@ -3246,6 +3271,7 @@ tr:
         old_start_date_label: "Başlama tarihi"
         old_start_date_title: "Başlama tarihi"
         remove_dates: "Tarihleri sil"
+        shift_dates: "Çalışma günleri"
         substitution: Altyazı
       day_substitution: 
         move_from: "Şuraya taşı"
@@ -4233,6 +4259,7 @@ tr:
       published: Yayınlandı
       reset_from: "Şuradan Ayarla"
       reset_to: "Şuraya Ayarla"
+      restored: "Geri yüklendi"
       unconcluded: Sonlandırılmamış
       updated: Güncellendi
     field_label: 
@@ -4359,6 +4386,7 @@ tr:
         show_more: "%{count} daha fazla..."
         title: 
           ignore: "Bu ödevi yok say"
+          ignore_review: "Bu incelemeyi yok say"
       need_grading_count: 
         one: "1 ödevin notlandırılması gerek"
         other: "%{count} ödevin notlandırılması gerek"
@@ -4645,6 +4673,7 @@ tr:
       alerts_title: Uyarılar
       buttons: 
         add_section: "Bölüm Ekle"
+        edit_section_name: "Bölüm adını düzenle"
         move_course: "Dersi Taşı"
         update_course: "Ders Detaylarını Güncelle"
       course_open_enrollment: "Bu derse herkesin kayıt olması etkinleştirildi. Öğrencilerle *%{url}* bağlantısını paylaşırsanız kendileri kaydolabilirler. Alternatif olarak *%{url2}* adresinde hesap oluşturup şu giriş kodunu kullanabilirler: *%{code}*"
