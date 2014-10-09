@@ -344,7 +344,7 @@ class ContextModule < ActiveRecord::Base
     if params[:type] == "wiki_page" || params[:type] == "page"
       item = opts[:wiki_page] || self.context.wiki.wiki_pages.where(id: params[:id]).first
     elsif params[:type] == "attachment" || params[:type] == "file"
-      item = opts[:attachment] || self.context.attachments.active.find_by_id(params[:id])
+      item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
     elsif params[:type] == "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
     elsif params[:type] == "discussion_topic" || params[:type] == "discussion"

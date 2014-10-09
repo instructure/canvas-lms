@@ -1337,4 +1337,13 @@ describe Attachment do
     end
   end
 
+  it "should be able to add a hidden attachment as a context module item" do
+    course
+    att = attachment_model(context: @course, uploaded_data: default_uploaded_data)
+    att.hidden = true
+    att.save!
+    mod = @course.context_modules.create!(:name => "some module")
+    tag1 = mod.add_item(:id => att.id, :type => 'attachment')
+    tag1.should_not be_nil
+  end
 end
