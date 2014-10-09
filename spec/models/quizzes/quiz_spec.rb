@@ -65,16 +65,6 @@ describe Quizzes::Quiz do
       quiz.publish!
       expect(quiz.workflow_state).to eq 'available'
     end
-
-    it "regenerates quiz data when quiz published at date changes with draft state off" do
-      quiz = @course.quizzes.build :title => "hello"
-      quiz.workflow_state = 'available'
-      quiz.save!
-
-      quiz.expects(:generate_quiz_data).once
-      quiz.publish!
-      expect(quiz.workflow_state).to eq 'available'
-    end
   end
 
   describe "#unpublish!" do
@@ -1183,31 +1173,6 @@ describe Quizzes::Quiz do
       expect(@quiz).not_to be_published
       @quiz.workflow_state = 'deleted'
       expect(@quiz).not_to be_published
-    end
-  end
-
-  describe '#needs_republish?' do
-    subject { @course.quizzes.create!(title: 'Test Quiz') }
-
-    it 'should be true if publish! was manually called' do
-      expect(subject.needs_republish?).to be_falsey
-
-      # intercepting the call to save! and running our expectations there
-      # because by the time it's saved, #needs_republish? will be reset
-      subject.expects(:save!).with { |*args|
-        expect(subject.needs_republish?).to be_truthy
-        true
-      }
-
-      subject.publish!
-    end
-
-    it 'should be true if the workflow_state has changed' do
-      subject.workflow_state = 'deleted'
-      subject.save!
-      subject.reload
-      subject.workflow_state = 'available'
-      expect(subject.needs_republish?).to be_truthy
     end
   end
 

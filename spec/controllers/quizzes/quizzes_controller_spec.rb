@@ -69,7 +69,6 @@ describe Quizzes::QuizzesController do
   end
 
   before :once do
-    Account.default.enable_feature! :draft_state
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @student2 = @student

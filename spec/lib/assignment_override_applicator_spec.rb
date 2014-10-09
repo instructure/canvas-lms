@@ -41,6 +41,10 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "assignment_overridden_for" do
+    before :once do
+      Account.default.enable_feature!(:draft_state)
+    end
+
     before :each do
       student_in_course
       @assignment = create_assignment(:course => @course)
