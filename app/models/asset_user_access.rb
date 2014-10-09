@@ -35,7 +35,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.display_name ||= asset_display_name
+    self.display_name = asset_display_name
   end
 
   def category=(val)
@@ -235,7 +235,6 @@ class AssetUserAccess < ActiveRecord::Base
     self.membership_type ||= accessed[:membership_type]
     self.context = get_correct_context(kontext)
     self.last_access = Time.now.utc
-    self.display_name = self.asset_display_name
     log_action(accessed[:level])
     save
   end
