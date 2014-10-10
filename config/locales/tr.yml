@@ -1915,6 +1915,7 @@ tr:
     non_number: "Sayı kullanmalısınız"
     notices: 
       assignment_delete: "Bu Ödev silindi"
+      assignment_not_available: "İstekte bulunduğunuz ödev dersinizin bölümünde kullanılamaz"
       created: "Ödev başarıyla oluşturuldu."
       updated: "Ödev başarıyla güncellendi."
     number_of_assignments: 
@@ -1969,6 +1970,8 @@ tr:
       redirect_message: |-
           Ödev bir web bağlantısı ve şimdi bu sayfaya yönlendiriliyorsunuz.
           [Ödeve gitmek için Buraya tıklayın](%{url})
+    remove_never_drop_rule: "Asla bırakma kuralını kaldır"
+    remove_unsaved_never_drop_rule: "Kaydedilmemiş asla bırakma kuralını kaldır"
     rules_text: 
       one: "1 Kural"
       other: "%{count} Kural"
@@ -2250,6 +2253,9 @@ tr:
       published: Yayınlandı
       unpublished: Yayınlanmadı
     published_title: Yayınlandı
+    restricted_title: "%{from_date} tarihinden %{until_date} tarihine kadar geçerli"
+    title: 
+      permissions: "%{name} için izinler düzenleniyor"
     unpublished_title: Yayınlanmadı
   bulk_course_migration: 
     export_failed: "Blackboard'dan bb_lcid %{id}'li dersin dışarı aktarmasında hata oluştu"
@@ -2475,6 +2481,7 @@ tr:
         calendar_month: Ay
         calendar_scheduler: Zamanlayıcı
         calendar_week: Hafta
+        improved_accessibility_recommend_agenda: "Uyarı: Daha gelişmiş erişilebilirllik için lütfen \"Gündem görünümü\" Takvimini kullanın."
       loading: Yükleniyor
       my_appointment_groups: "Randevu Gruplarım"
     calendar_navigator: 
@@ -3097,6 +3104,7 @@ tr:
     buttons: 
       process: "Veriyi İşle"
     errors: 
+      couldnt_create: "İçerik dışa aktarımı oluşturulamadı."
       error: "İçeriğinizi aktarırken bir hata oluştu. Lütfen sistem yöneticisini bilgilendirin ve aşağıdaki aktarma kimliğini verin: \"%{code}\""
       not_found: "Dışa aktarım mevcut değil"
     index: 
@@ -3109,7 +3117,9 @@ tr:
         quiz: "Kısa Sınav"
       links: 
         download: "%{date}: tarininde Ders Aktarımı *İndirmek için tıklayın*"
+        download_file_export: "%{date} tarihinden Dışarı Dosya Aktarımı: *İndirmek için buraya tıklayın*"
         download_qti: "%{date}: tarihinde QTI Aktarımı *İndirmek için tıklayın*"
+        download_user_export: "%{date} tarihinden Dışarı Kullanıcı Verisi Aktarımı: *İndirmek için buraya tıklayın*"
       message: 
         export_started: "Aktarma işlemi başladı. Büyük dersler için bu biraz zaman alabilir. *Sayfayı terkedebilirsiniz* aktarım tamamlandığında bilgilendirme epostası alacaksınız."
       user_data_exports: "Kullanıcı Verisi Aktarımları"
