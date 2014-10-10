@@ -103,13 +103,3 @@ define [
   # test 'pressing the right arrow should navigate to the first item if you are at the end.', ->
   #   ok false
 
-  test 'an image should be previewed if the content type matches', ->
-    @filePreview.setState(displayedItem: @file3)
-    ok $('.ef-file-preview-image').length, 'The image was not displayed'
-
-  test 'files that are not images should display a message indicating they are not able to be viewed currently', ->
-    # TODO: Remove this test when the rest of the preview stuff is enabled.
-    @filePreview.setState(displayedItem: @file1)
-    ok $('.ef-file-preview-not-available').length, 'The not available message was not shown.'
-
-

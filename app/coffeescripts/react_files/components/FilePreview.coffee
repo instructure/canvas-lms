@@ -11,8 +11,9 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
   './FilePreviewFooter'
-  './FilePreviewInfoPanel'
-], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel) ->
+  './FilePreviewInfoPanel',
+  '../modules/filesEnv'
+], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel, filesEnv) ->
 
   FilePreview = React.createClass
 
@@ -155,16 +156,6 @@ define [
     getStatusMessage: ->
       'A nice status message ;) ' #TODO: Actually do this..
 
-    renderPreview: ->
-      fileNameParts = @state.displayedItem?.displayName().split('.')
-      fileExt = fileNameParts[fileNameParts.length - 1].toUpperCase()
-      contentType = @state.displayedItem?.get('content-type')
-      div {className: if @state.showInfoPanel then 'ef-file-preview-item full-height col-xs-6' else 'ef-file-preview-item full-height col-xs-10'},
-      if contentType.substring(0, contentType.indexOf('/')) is 'image'
-        img {className: 'ef-file-preview-image' ,src: @state.displayedItem?.get('url')}
-      else
-        h1 {className: 'ef-file-preview-not-available'},
-          "Previewing a #{fileExt} file is not yet available."
 
     renderArrowLink: (direction) ->
       # TODO: Refactor this to use the collectionHandler
@@ -231,7 +222,11 @@ define [
             div {className: 'ef-file-preview-preview grid-row middle-xs'},
               # We need to render out the left/right arrows
               @renderArrowLink('left') if @state.otherItems?.length > 0
-              @renderPreview() if @state.displayedItem?
+              if @state.displayedItem?
+                iframe {
+                  src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
+                  className: 'ef-file-preview-frame'
+                }
               @renderArrowLink('right') if @state.otherItems?.length > 0
               if @state.showInfoPanel
                 FilePreviewInfoPanel
