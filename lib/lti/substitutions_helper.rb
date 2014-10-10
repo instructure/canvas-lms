@@ -74,7 +74,7 @@ module Lti
     end
 
     def course_enrollments
-      return [] unless @context.is_a?(Course)
+      return [] unless @context.is_a?(Course) && @user
       @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
     end
 
@@ -95,7 +95,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @context.is_a?(Course) ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
+          @context.is_a?(Course) && @user ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles
@@ -107,7 +107,7 @@ module Lti
     end
 
     def enrollment_state
-      enrollments = @context.enrollments.where(user_id: @user.id)
+      enrollments = @user ? @context.enrollments.where(user_id: @user.id) : []
       return '' if enrollments.size == 0
       enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end

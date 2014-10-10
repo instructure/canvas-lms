@@ -134,6 +134,11 @@ module Lti
         expect(helper.course_enrollments).to eq []
       end
 
+      it 'returns an empty array if the user is nil' do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.course_enrollments).to eq []
+      end
+
       it 'returns the active enrollments in a course for a user' do
         set_up_persistance!
 
@@ -194,6 +199,11 @@ module Lti
     describe '#concluded_course_enrollments' do
       it 'returns an empty array if the context is not a course' do
         helper = SubstitutionsHelper.new(account, root_account, user)
+        expect(helper.concluded_course_enrollments).to eq []
+      end
+
+      it 'returns an empty array if the user is not set' do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
         expect(helper.concluded_course_enrollments).to eq []
       end
 

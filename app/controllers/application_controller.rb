@@ -1200,7 +1200,6 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        return unless require_user
         log_asset_access(@tool, "external_tools", "external_tools")
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -1237,6 +1236,7 @@ class ApplicationController < ActionController::Base
         end
 
         if @assignment
+          return unless require_user
           add_crumb(@resource_title)
           @prepend_template = 'assignments/description'
           @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
