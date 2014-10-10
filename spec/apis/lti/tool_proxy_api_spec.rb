@@ -74,11 +74,10 @@ module Lti
             json[:format] = 'json'
             json[:account_id] = @course.account.id
             rh = json['tool_profile']['resource_handler'].first
-            rh[:ext_placements] = ['Canvas.placements.course-nav']
+            rh[:ext_placements] = ['Canvas.placements.courseNavigation']
             headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
             response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", json.to_json, headers
             expect(response).to eq 201
-
 
             expect(nav_cache.cache_key).to_not eq cache_key
           end

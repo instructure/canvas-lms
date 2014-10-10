@@ -76,12 +76,12 @@ module Lti
           expect(subject.create.capability_offered).to include('ToolProxy.custom.url')
         end
 
-        it 'adds the Canvas.placements.account-nav capability' do
-          expect(subject.create.capability_offered).to include('Canvas.placements.account-nav')
+        it 'adds the Canvas.placements.accountNavigation capability' do
+          expect(subject.create.capability_offered).to include 'Canvas.placements.accountNavigation'
         end
 
-        it 'adds the Canvas.placements.course-nav capability' do
-          expect(subject.create.capability_offered).to include('Canvas.placements.course-nav')
+        it 'adds the Canvas.placements.courseNavigation capability' do
+          expect(subject.create.capability_offered).to include 'Canvas.placements.courseNavigation'
         end
       end
 

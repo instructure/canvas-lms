@@ -20,7 +20,7 @@ module Lti
     def self.bookmarked_collection(context, placements)
       external_tools_scope = ContextExternalTool.all_tools_for(context).placements(*placements)
       external_tools_collection = BookmarkedCollection.wrap(ExternalToolBookmarker, external_tools_scope)
-      message_handler_scope = MessageHandler.for_context(context).by_message_types('basic-lti-launch-request')
+      message_handler_scope = MessageHandler.for_context(context).by_message_types('basic-lti-launch-request').has_placements(*placements)
       message_handler_collection = BookmarkedCollection.wrap(MessageHandlerBookmarker, message_handler_scope)
       BookmarkedCollection.merge(
         ['external_tools', external_tools_collection],
@@ -43,7 +43,6 @@ module Lti
     private
 
     def self.lti1_launch_definition(tool, placements)
-      placement = 'resource_selection'
       definition = {
         definition_type: tool.class.name,
         definition_id: tool.id,
@@ -54,9 +53,9 @@ module Lti
       placements.each do |p|
         if tool.has_placement?(p)
           definition[:placements][p.to_sym] = {
-            message_type: tool.extension_setting(placement, :message_type) || tool.extension_default_value(placement, :message_type),
-            url: tool.extension_setting(placement, :url) || tool.extension_default_value(placement, :url),
-            title: tool.label_for(placement, I18n.locale || I18n.default_locale.to_s),
+            message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
+            url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url),
+            title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
           if p.to_sym == :resource_selection
             definition[:placements][:resource_selection][:selection_width] = tool.extension_setting(:resource_selection, :selection_width) || 500
@@ -73,15 +72,24 @@ module Lti
         definition_id: message_handler.id,
         name: message_handler.resource_handler.name,
         domain: URI(message_handler.launch_path).host,
-        placements: {
-          module_item: {
-            message_type: message_handler.message_type,
-            url: message_handler.launch_path,
-            title: message_handler.resource_handler.name,
-          }
-        }
+        placements: self.lti2_placements(message_handler, placements)
       }
     end
+
+    def self.lti2_placements(message_handler, placements)
+      resource_placements = message_handler.resource_handler.placements.pluck(:placement)
+      valid_placements = resource_placements.present? ? resource_placements & placements : ResourcePlacement::DEFAULT_PLACEMENTS
+      valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
+    end
+
+    def self.lti2_placement(message_handler)
+      {
+        message_type: message_handler.message_type,
+        url: message_handler.launch_path,
+        title: message_handler.resource_handler.name
+      }
+    end
+
 
     module MessageHandlerBookmarker
       def self.bookmark_for(message_handler)

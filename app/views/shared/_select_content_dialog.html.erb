@@ -1,6 +1,7 @@
 <% js_bundle :select_content_dialog %>
 <% jammit_css :select_content_dialog %>
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
+<% lti_app_placements ||= [] %>
 <% cache([@context, 'select_context_content_dialog', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
@@ -82,7 +83,7 @@
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
-        <a href="<%= context_url(@context, controller:'lti/lti_apps', action:'launch_definitions', placements: %w{module_item resource_selection} , :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, controller:'lti/lti_apps', action:'launch_definitions', :placements => lti_app_placements, :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <table>
           <tr>
             <td colspan="2">

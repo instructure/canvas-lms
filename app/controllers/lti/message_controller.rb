@@ -51,6 +51,7 @@ module Lti
             roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).all_roles('lis2'),
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
+          message.user_id = Lti::Asset.opaque_identifier_for(@current_user) if @current_user
           @active_tab = message_handler.asset_string
           @lti_launch = Launch.new
           @lti_launch.resource_url = message.launch_url
@@ -149,10 +150,10 @@ module Lti
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
-      if parameters && (parameters.map { |p| p['variable'] }.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
-        link = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: @context, resource_link_id: resource_link_id)
-        binding = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: @context, resource_link_id: nil)
-        proxy = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: nil, resource_link_id: nil)
+      if parameters && (parameters.map {|p| p['variable']}.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
+        link = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: resource_link_id).first_or_create
+        binding = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: nil).first_or_create
+        proxy = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first_or_create
         {
           'LtiLink.custom.url' => show_lti_tool_settings_url(link.id),
           'ToolProxyBinding.custom.url' => show_lti_tool_settings_url(binding.id),

@@ -107,6 +107,15 @@ $(function() {
       }
     }).triggerHandler('resize');
   }
+
+  if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
+    $('#module_sequence_footer').moduleSequenceFooter({
+      assetType: 'Lti',
+      assetID: ENV.LTI.SEQUENCE.ASSET_ID,
+      courseID: ENV.LTI.SEQUENCE.COURSE_ID
+    });
+  }
+
 });
 
 window.addEventListener('message', function(e) {
@@ -133,15 +142,6 @@ window.addEventListener('message', function(e) {
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
   }
-
-    if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
-      $('#module_sequence_footer').moduleSequenceFooter({
-          assetType: 'Lti',
-          assetID: ENV.LTI.SEQUENCE.ASSET_ID,
-          courseID: ENV.LTI.SEQUENCE.COURSE_ID
-      });
-    }
-
 });
 
 var beforeUnloadHandler;

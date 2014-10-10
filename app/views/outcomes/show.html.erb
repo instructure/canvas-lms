@@ -13,7 +13,7 @@
   <% if @context.is_a?(Course) %>
     <a href="<%= context_url(@context, :context_outcome_reorder_alignments_url, @outcome.id) %>" class="reorder_alignments_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_outcome_align_url, @outcome.id) %>" class="align_url">&nbsp;</a>
-    <%= render :partial => "shared/select_content_dialog" %>
+    <%= render :partial => "shared/select_content_dialog", locals: {lti_app_placements: [ Lti::ResourcePlacement::LINK_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION ]} %>
   <% end %>
 </div>
 <%= t(:no_aligned_items, "No aligned items") if @alignments.empty? %>

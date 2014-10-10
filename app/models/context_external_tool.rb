@@ -93,7 +93,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    if type.to_s == 'module_item'
+    if Lti::ResourcePlacement::DEFAULT_PLACEMENTS.include? type.to_s
       !!(self.selectable && (self.domain || self.url))
     else
       self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
@@ -531,15 +531,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :placements, lambda { |*placements|
     if placements.present?
-      placements = placements.map(&:to_sym)
-      module_item_sql = if placements.include? :module_item
+      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::DEFAULT_PLACEMENTS).present?
                           "(context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                         else
                           ''
                         end
-      where(module_item_sql + 'EXISTS (
+      where(default_placement_sql + 'EXISTS (
               SELECT * FROM context_external_tool_placements
               WHERE context_external_tools.id = context_external_tool_placements.context_external_tool_id
               AND context_external_tool_placements.placement_type IN (?) )', placements || [])

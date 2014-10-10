@@ -319,11 +319,12 @@ $(document).ready(function() {
       var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
       $dialog.find("iframe").attr('src', url);
     } else {
-        var module_item_placement = $tool.data('tool').placements.module_item;
-      $("#external_tool_create_url").val(module_item_placement.url || '');
+      var placements = $tool.data('tool').placements
+      var placement = placements.assignment_selection || placements.link_selection
+      $("#external_tool_create_url").val(placement.url || '');
       $("#context_external_tools_select .domain_message").showIf($tool.data('tool').domain)
         .find(".domain").text($tool.data('tool').domain);
-      $("#external_tool_create_title").val(module_item_placement.title);
+      $("#external_tool_create_title").val(placement.title);
     }
   });
   var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();

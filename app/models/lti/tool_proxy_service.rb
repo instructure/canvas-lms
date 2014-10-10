@@ -123,11 +123,15 @@ module Lti
     end
 
     def create_placements(rh, resource_handler)
-      rh.ext_placements.each do |p|
-        if placement = ResourcePlacement::PLACEMENT_LOOKUP[p]
-          resource_handler.placements.create(placement: placement)
+      if rh.ext_placements
+        rh.ext_placements.each do |p|
+          if placement = ResourcePlacement::PLACEMENT_LOOKUP[p]
+            resource_handler.placements.create(placement: placement)
+          end
         end
-      end if rh.ext_placements
+      else
+        ResourcePlacement::DEFAULT_PLACEMENTS.each {|p| resource_handler.placements.create(placement: p)}
+      end
     end
 
     private
