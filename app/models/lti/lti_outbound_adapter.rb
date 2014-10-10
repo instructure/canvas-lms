@@ -39,7 +39,7 @@ module Lti
       variable_substitutor = LtiOutbound::VariableSubstitutor.new
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert if @user
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 

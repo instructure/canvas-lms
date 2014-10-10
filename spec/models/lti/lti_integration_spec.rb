@@ -82,8 +82,6 @@ describe "LTI integration tests" do
     pseudonym.sis_user_id = 'sis id!'
     pseudonym.save!
 
-    Time.zone.tzinfo.stubs(:name).returns('my/zone')
-
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, canvas_user, canvas_course)
     adapter.prepare_tool_launch(return_url, custom_substitutions: {'$Canvas.api.domain' => root_account.domain})
     post_payload = adapter.generate_post_payload
@@ -107,10 +105,6 @@ describe "LTI integration tests" do
     expect(post_payload['custom_variable_canvas_membership_concluded_roles']).to eq '$Canvas.membership.concludedRoles'
     expect(post_payload['custom_variable_canvas_user_id']).to eq '$Canvas.user.id'
     expect(post_payload['custom_variable_canvas_user_login_id']).to eq '$Canvas.user.loginId'
-    expect(post_payload['custom_variable_person_address_timezone']).to eq 'my/zone'
-    expect(post_payload['custom_variable_person_name_family']).to eq canvas_user.last_name
-    expect(post_payload['custom_variable_person_name_full']).to eq canvas_user.name
-    expect(post_payload['custom_variable_person_name_given']).to eq canvas_user.first_name
     expect(post_payload['launch_presentation_document_target']).to eq 'iframe'
     expect(post_payload['launch_presentation_locale']).to eq 'en'
     expect(post_payload['launch_presentation_return_url']).to eq '/return/url'
@@ -134,6 +128,22 @@ describe "LTI integration tests" do
     expect(post_payload['tool_consumer_instance_name']).to eq root_account.name
     expect(post_payload['user_id']).to eq canvas_tool.opaque_identifier_for(canvas_user)
     expect(post_payload['user_image']).to eq canvas_user.avatar_url
+  end
+
+  it "generates userless post payload" do
+    adapter = Lti::LtiOutboundAdapter.new(canvas_tool, nil, canvas_course)
+    adapter.prepare_tool_launch(return_url)
+    post_payload = adapter.generate_post_payload
+
+    expect(post_payload['lis_person_contact_email_primary']).to eq nil
+    expect(post_payload['lis_person_name_family']).to eq nil
+    expect(post_payload['lis_person_name_full']).to eq nil
+    expect(post_payload['lis_person_name_given']).to eq nil
+    expect(post_payload['lis_person_sourcedid']).to eq nil
+    expect(post_payload['roles']).to eq 'urn:lti:sysrole:ims/lis/None'
+    expect(post_payload['ext_roles']).to eq "urn:lti:sysrole:ims/lis/None"
+    expect(post_payload['user_id']).to eq nil
+    expect(post_payload['user_image']).to eq nil
   end
 
   describe "legacy integration tests" do
