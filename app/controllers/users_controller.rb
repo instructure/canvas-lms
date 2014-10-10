@@ -1352,14 +1352,13 @@ class UsersController < ApplicationController
   def merge
     @user_about_to_go_away = User.find(params[:user_id])
 
-    if params[:new_user_id] && @true_user = User.where(id: params[:new_user_id]).first
-      if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
-        @user_that_will_still_be_around = @true_user
-      else
-        @user_that_will_still_be_around = nil
-      end
+    @true_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
+    @true_user ||= @current_user
+
+    if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
+      @user_that_will_still_be_around = @true_user
     else
-      @user_that_will_still_be_around = @current_user
+      @user_that_will_still_be_around = nil
     end
 
     if @user_about_to_go_away && @user_that_will_still_be_around
