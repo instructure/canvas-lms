@@ -2,7 +2,7 @@
   {{#t "module_progress_for_student"}}Module Progress for {{student.name}}{{/t}}
 </h2>
 <h2 class="student-header" aria-hidden="true">
-  {{#t "module_progress_for"}}Module Progress for {{student_link}}{{/t}}
+  {{#t "module_progress_for"}}Module Progress for <a href='{{studentUrl}}'>{{student.name}}</a>{{/t}}
 </h2>
 <div class="module-progressions">
   {{#if collection.length}}
