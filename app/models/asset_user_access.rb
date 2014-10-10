@@ -124,6 +124,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset_display_name
+    return nil unless asset
     if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
     elsif self.asset.is_a? Enrollment
@@ -156,6 +157,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset
+    return nil unless asset_code
     asset_code, general = self.asset_code.split(":").reverse
     asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
