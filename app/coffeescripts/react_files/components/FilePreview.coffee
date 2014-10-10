@@ -150,10 +150,6 @@ define [
 
       @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(id: nextItem.id))
 
-    getStatusMessage: ->
-      'A nice status message ;) ' #TODO: Actually do this..
-
-
     renderArrowLink: (direction) ->
       # TODO: Refactor this to use the collectionHandler
       # Get the current position in the collection
@@ -243,7 +239,6 @@ define [
               if @state.showInfoPanel
                 FilePreviewInfoPanel
                   displayedItem: @state.displayedItem
-                  getStatusMessage: @getStatusMessage
             div {className: 'ef-file-preview-toggle-row grid-row middle-xs'},
               if @state.showFooterBtn
                 button {
