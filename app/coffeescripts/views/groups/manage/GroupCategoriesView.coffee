@@ -123,6 +123,7 @@ define [
         @reorder()
         @refreshTabs()
         @$tabs.tabs active: @tabOffsetOfModel(cat)
+        cat.set "create_group_count", null
       @createView.model = cat
       @createView.open()
 
