@@ -1014,7 +1014,7 @@ describe "context_modules" do
       @quiz = @course.quizzes.create!(:title => "score 10")
       @quiz.publish!
       @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
-      @wiki_page = @course.wiki.front_page
+      @wiki_page = @course.wiki.wiki_pages.create!(:title => 'title', :body => '')
       @wiki_page.workflow_state = 'active'; @wiki_page.save!
       @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
       @subheader_tag = @module1.add_item(:type => 'context_module_sub_header', :title => 'subheader')

@@ -618,8 +618,8 @@ describe "Canvas Cartridge importing" do
     migration_id = CC::CCHelper.create_key(page)
     meta_fields = {:identifier => migration_id}
     meta_fields[:editing_roles] = page.editing_roles
-    meta_fields[:hide_from_students] = page.hide_from_students
     meta_fields[:notify_of_update] = page.notify_of_update
+    meta_fields[:workflow_state] = page.workflow_state
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     #convert to json
     doc = Nokogiri::HTML(exported_html)
@@ -634,7 +634,6 @@ describe "Canvas Cartridge importing" do
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
-    expect(page_2.hide_from_students).to eq page.hide_from_students
     expect(page_2.notify_of_update).to eq page.notify_of_update
     expect(page_2.body).to eq (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
     expect(page_2.unpublished?).to eq true

@@ -21,6 +21,7 @@ describe ContentMigration do
       # simulating what happens when the user clicks "link to new page" and enters a title that isn't
       # urlified the same way by the client vs. the server.  this doesn't break navigation because
       # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
+      @copy_from.wiki.set_front_page_url!('front-page')
       main_page = @copy_from.wiki.front_page
       main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
       main_page.save!
@@ -75,19 +76,6 @@ describe ContentMigration do
         run_course_copy
 
         expect(@copy_to.wiki.has_no_front_page).to eq true
-      end
-
-      it "should set retain default behavior if front page is missing and draft state is not enabled" do
-        @copy_to.wiki.front_page.save!
-
-        @copy_from.default_view = 'wiki'
-        @copy_from.save!
-        @copy_from.wiki.set_front_page_url!('haha not here')
-
-        run_course_copy
-
-        expect(@copy_to.wiki.has_front_page?).to eq true
-        expect(@copy_to.wiki.get_front_page_url).to eq 'front-page'
       end
 
       it "should set default view to feed if wiki front page is missing and draft state is enabled" do

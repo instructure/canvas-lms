@@ -18,7 +18,7 @@
 
 class WikiPage < ActiveRecord::Base
   attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
-  attr_readonly :wiki_id, :hide_from_students
+  attr_readonly :wiki_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Workflow
@@ -34,7 +34,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing, :hide_from_students,
+    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing,
     :editing_roles, :view_count, :revised_at, :could_be_locked, :cloned_item_id, :wiki_page_comments_count
   ]
 
@@ -49,7 +49,7 @@ class WikiPage < ActiveRecord::Base
   after_save :touch_wiki_context
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
 
   def touch_wiki_context
     self.wiki.touch_context if self.wiki && self.wiki.context
@@ -57,7 +57,7 @@ class WikiPage < ActiveRecord::Base
 
   def validate_front_page_visibility
     if !published? && self.is_front_page?
-      self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
+      self.errors.add(:published, t(:cannot_unpublish_front_page, "cannot unpublish front page"))
     end
   end
 
@@ -83,27 +83,6 @@ class WikiPage < ActiveRecord::Base
 
       self.title = new_title
     end
-  end
-
-  def normalize_hide_from_students
-    workflow_state = self.read_attribute('workflow_state')
-    hide_from_students = self.read_attribute('hide_from_students')
-    if !workflow_state.nil? && !hide_from_students.nil?
-      self.workflow_state = 'unpublished' if hide_from_students && workflow_state == 'active'
-      self.write_attribute('hide_from_students', nil)
-    end
-  end
-  after_find :normalize_hide_from_students
-  private :normalize_hide_from_students
-
-  def hide_from_students
-    self.workflow_state == 'unpublished'
-  end
-
-  def hide_from_students=(v)
-    self.workflow_state = 'unpublished' if v && self.workflow_state == 'active'
-    self.workflow_state = 'active' if !v && self.workflow_state = 'unpublished'
-    hide_from_students
   end
 
   def self.title_order_by_clause
@@ -188,7 +167,7 @@ class WikiPage < ActiveRecord::Base
   alias_method :published?, :active?
 
   def restore
-    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
+    self.workflow_state = 'unpublished'
     self.save
   end
 
@@ -221,8 +200,8 @@ class WikiPage < ActiveRecord::Base
 
   scope :not_deleted, -> { where("wiki_pages.workflow_state<>'deleted'") }
 
-  scope :published, -> { where("wiki_pages.workflow_state='active' AND (wiki_pages.hide_from_students=? OR wiki_pages.hide_from_students IS NULL)", false) }
-  scope :unpublished, -> { where("wiki_pages.workflow_state='unpublished' OR (wiki_pages.hide_from_students=? AND wiki_pages.workflow_state<>'deleted')", true) }
+  scope :published, -> { where("wiki_pages.workflow_state='active'", false) }
+  scope :unpublished, -> { where("wiki_pages.workflow_state='unpublished'", true) }
 
   # needed for ensure_unique_url
   def not_deleted
@@ -245,20 +224,14 @@ class WikiPage < ActiveRecord::Base
 
   def is_front_page?
     return false if self.deleted?
-    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.feature_enabled?(:draft_state)
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page?
   end
 
   def set_as_front_page!
-    can_set_front_page = true
     if self.unpublished?
       self.errors.add(:front_page, t(:cannot_set_unpublished_front_page, 'could not set as front page because it is unpublished'))
-      can_set_front_page = false
+      return false
     end
-    if self.hide_from_students
-      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, 'could not set as front page because it is hidden'))
-      can_set_front_page = false
-    end
-    return false unless can_set_front_page
 
     self.wiki.set_front_page_url!(self.url)
   end
@@ -417,7 +390,7 @@ class WikiPage < ActiveRecord::Base
 
   def initialize_wiki_page(user)
     is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && context.feature_enabled?(:draft_state) && !context.is_a?(Group)
+    if is_privileged_user && !context.is_a?(Group)
       self.workflow_state = 'unpublished'
     else
       self.workflow_state = 'active'

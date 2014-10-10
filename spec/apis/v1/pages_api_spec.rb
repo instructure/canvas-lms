@@ -32,6 +32,7 @@ describe "Pages API", type: :request do
 
     let(:locked_item) do
       wiki = @course.wiki
+      wiki.set_front_page_url!('front-page')
       front_page = wiki.front_page
       front_page.workflow_state = 'active'
       front_page.save!
@@ -53,6 +54,7 @@ describe "Pages API", type: :request do
     course
     @course.offer!
     @wiki = @course.wiki
+    @wiki.set_front_page_url!('front-page')
     @front_page = @wiki.front_page
     @front_page.workflow_state = 'active'
     @front_page.save!
@@ -405,7 +407,7 @@ describe "Pages API", type: :request do
                  :controller=>"wiki_pages_api", :action=>"revert", :format=>"json", :course_id=>@course.to_param,
                  :url=>@vpage.url, :revision_id=>'3')
         @vpage.reload
-        expect(@vpage.hide_from_students).to be_truthy
+
         expect(@vpage.editing_roles).to eq 'teachers,students,public'
         expect(@vpage.title).to eq 'version test page'  # <- reverted
         expect(@vpage.body).to eq 'revised by ta'       # <- reverted
@@ -468,18 +470,6 @@ describe "Pages API", type: :request do
         expect(wiki.get_front_page_url).to eq page.url
 
         expect(json['front_page']).to eq true
-      end
-
-      it "should not set hidden page as front page" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
-                { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
-                { :wiki_page => { :title => 'hidden page', :hide_from_students => true,
-                                   :body => 'Information wants to be free', :front_page => true }}, {},
-                {:expected_status => 400})
-
-        wiki = @course.wiki
-        wiki.reload
-        expect(wiki.get_front_page_url).to eq Wiki::DEFAULT_FRONT_PAGE_URL
       end
 
       it "should create a new page in published state" do
@@ -549,7 +539,7 @@ describe "Pages API", type: :request do
         @hidden_page.reload
         expect(@hidden_page.title).to eq 'No Longer Hidden Page'
         expect(@hidden_page.body).to eq 'Information wants to be free'
-        expect(@hidden_page.user_id).to eq @teacher.id        
+        expect(@hidden_page.user_id).to eq @teacher.id
       end
 
       it "should update front_page" do
@@ -573,10 +563,11 @@ describe "Pages API", type: :request do
         wiki = @course.wiki
         expect(wiki.unset_front_page!).to eq true
 
+
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @hidden_page.url },
-                 { :wiki_page => { :title => 'No Longer Hidden Page', :hide_from_students => false,
+                 { :wiki_page => { :title => 'No Longer Hidden Page',
                                    :body => 'Information wants to be free', :front_page => true, :published => true}})
         no_longer_hidden_page = @hidden_page
         no_longer_hidden_page.reload
@@ -599,8 +590,7 @@ describe "Pages API", type: :request do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{front_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => front_page.url },
-                 { :wiki_page => { :title => 'No Longer Front Page', :hide_from_students => false,
-                                   :body => 'Information wants to be free', :front_page => false }})
+                 { :wiki_page => { :title => 'No Longer Front Page', :body => 'Information wants to be free', :front_page => false }})
 
         front_page.reload
         expect(front_page.is_front_page?).to be_falsey
@@ -687,7 +677,6 @@ describe "Pages API", type: :request do
 
             @test_page.reload
             expect(@test_page).to be_unpublished
-            expect(@test_page.hide_from_students).to be_truthy
           end
 
           it 'should ignore hide_from_students' do
@@ -701,7 +690,6 @@ describe "Pages API", type: :request do
 
             @test_page.reload
             expect(@test_page).to be_active
-            expect(@test_page.hide_from_students).to be_falsey
           end
         end
       end
@@ -903,7 +891,7 @@ describe "Pages API", type: :request do
       expect(json.size).to eq 1
       urls += json.collect{ |page| page['url'] }
 
-      expect(urls).to eq @wiki.wiki_pages.select{ |p| !p.hide_from_students }.sort_by(&:id).collect(&:url)
+      expect(urls).to eq @wiki.wiki_pages.select{ |p| p.published? }.sort_by(&:id).collect(&:url)
     end
     
     it "should refuse to show a hidden page" do
@@ -924,6 +912,7 @@ describe "Pages API", type: :request do
       other_course = course
       other_course.offer!
       other_wiki = other_course.wiki
+      other_wiki.set_front_page_url!('front-page')
       other_page = other_wiki.front_page
       other_page.workflow_state = 'active'
       other_page.save!
@@ -942,6 +931,7 @@ describe "Pages API", type: :request do
       other_course.is_public = true
       other_course.offer!
       other_wiki = other_course.wiki
+      other_wiki.set_front_page_url!('front-page')
       other_page = other_wiki.front_page
       other_page.workflow_state = 'active'
       other_page.save!
@@ -1023,7 +1013,7 @@ describe "Pages API", type: :request do
 
         @editable_page.reload
         expect(@editable_page).to be_active
-        expect(@editable_page.hide_from_students).to be_falsey
+        expect(@editable_page.published?).to be_truthy
         expect(@editable_page.title).to eq 'Editable Page'
         expect(@editable_page.user_id).not_to eq @student.id
         expect(@editable_page.editing_roles).to eq 'students'
@@ -1097,12 +1087,10 @@ describe "Pages API", type: :request do
         @vpage.workflow_state = 'unpublished'
         @vpage.save! # rev 1
 
-        @vpage.hide_from_students = true
         @vpage.workflow_state = 'active'
         @vpage.body = 'published but hidden'
         @vpage.save! # rev 2
 
-        @vpage.hide_from_students = false
         @vpage.body = 'now visible to students'
         @vpage.save! # rev 3
       end
@@ -1196,7 +1184,6 @@ describe "Pages API", type: :request do
                    :controller=>"wiki_pages_api", :action=>"revert", :format=>"json", :course_id=>@course.to_param,
                    :url=>@vpage.url, :revision_id=>'2')
           @vpage.reload
-          expect(@vpage.hide_from_students).to be_falsey  # permissions aren't (conceptually) versioned
           expect(@vpage.body).to eq 'published but hidden'
         end
       end

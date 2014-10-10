@@ -1,14 +1,10 @@
 <% skip_front_page ||= false; page_link ||= nil; wiki_page = page_link; hidden ||= false %>
 <% if !wiki_page %>
-  <li class="ellipsis" style="<%= 'display: none;' if hidden %>"><%= link_to t('#wiki_pages.front_page', "Front Page"), context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url) %></li>
+  <li class="ellipsis" style="<%= 'display: none;' if hidden %>"><%= link_to t('#wiki_pages.front_page', "Front Page"), polymorphic_url([@context, @context.wiki.front_page]) %></li>
 <% elsif skip_front_page && wiki_page.is_front_page? %>
 <% else %>
   <% if can_do(@context, @current_user, :manage_content) || wiki_page.published? %>
-  <li class="ellipsis" style="<%= 'display: none;' if hidden %><%= 'font-weight: bold;' if @page && wiki_page == @page %><%= 'font-style: italic;' unless wiki_page.published? %>" title="<%= t(:link_hidden_from_students_warning, "Students won't see this link") unless wiki_page.published? %>"><%= link_to wiki_page.title,  context_url(
-            @context, 
-            :context_wiki_page_url,
-            wiki_page.url
-      ) rescue "" %>
+  <li class="ellipsis" style="<%= 'display: none;' if hidden %><%= 'font-weight: bold;' if @page && wiki_page == @page %><%= 'font-style: italic;' unless wiki_page.published? %>" title="<%= t(:link_hidden_from_students_warning, "Students won't see this link") unless wiki_page.published? %>"><%= link_to wiki_page.title, polymorphic_url([@context, wiki_page]) rescue "" %>
   </li>
   <% end %>
 <% end %>

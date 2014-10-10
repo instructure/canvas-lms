@@ -184,7 +184,7 @@
 <% end %>
 
 <% if @context.feature_enabled?(:draft_state)
-     has_front_page = @context.wiki && @context.wiki.has_front_page? %>
+     has_front_page = @context.wiki && @context.wiki.front_page %>
   <% content_for :right_side do %>
     <div id="edit_course_home_content" style="display: none;">
       <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
@@ -196,9 +196,9 @@
           <label class="radio"><input type="radio" name="course[default_view]" value="wiki" <%= 'checked' if has_front_page && @context.default_view == 'wiki' %><%= 'disabled' unless has_front_page %>>
             <span class="<%= 'ui-state-disabled' unless has_front_page %>"><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></span></label>
           <% if has_front_page %>
-            <small>&emsp;<%= @context.wiki.front_page.title %>&emsp;[ <%= link_to t('change_home_page', 'Change'), context_url(@context, :context_pages_url) %> ]</small>
+            <small>&emsp;<%= @context.wiki.front_page.title %>&emsp;[ <%= link_to t('change_home_page', 'Change'), polymorphic_url([@context, :wiki_pages]) %> ]</small>
           <% else %>
-            <small>&emsp;[ <%= link_to t('front_page_not_set', 'Front page must be set first'), context_url(@context, :context_pages_url) %> ]</small>
+            <small>&emsp;[ <%= link_to t('front_page_not_set', 'Front page must be set first'), polymorphic_url([@context, :wiki_pages]) %> ]</small>
           <% end %>
         </div>
         <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="modules" <%= 'checked' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></label></div>

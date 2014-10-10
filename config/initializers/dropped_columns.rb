@@ -48,7 +48,8 @@ class ActiveRecord::Base
     'quizzes' => %w(root_quiz_id),
     'stream_items' => %w{context_code item_asset_string},
     'stream_item_instances' => %w(context_code),
-    'submissions' => %w(changed_since_publish late)
+    'submissions' => %w(changed_since_publish late),
+    'wiki_pages' => %w(hide_from_students)
   }.freeze
 
   def self.columns_with_remove_dropped_columns

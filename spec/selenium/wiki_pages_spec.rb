@@ -12,8 +12,8 @@ describe "Navigating to wiki pages" do
 
     it "navigates to the wiki pages edit page from the show page" do
       wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
-      edit_url = course_edit_named_page_url(@course, wikiPage)
-      get course_named_page_path(@course, wikiPage)
+      edit_url = edit_course_wiki_page_url(@course, wikiPage)
+      get course_wiki_page_path(@course, wikiPage)
 
       f(".edit-wiki").click
 
@@ -50,6 +50,7 @@ describe "Navigating to wiki pages" do
       @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
       @tool.save!
 
+      @course.wiki.set_front_page_url!('front-page')
       @wiki_page = @course.wiki.front_page
       @wiki_page.workflow_state = 'active'; @wiki_page.save!
     end

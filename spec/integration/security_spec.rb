@@ -876,6 +876,7 @@ describe "security" do
 
       it 'read_course_content' do
         @course.assignments.create!
+        @course.wiki.set_front_page_url!("front-page")
         @course.wiki.front_page.save!
         @course.quizzes.create!
         @course.attachments.create!(:uploaded_data => default_uploaded_data)
@@ -890,9 +891,7 @@ describe "security" do
         assert_status(401)
 
         get "/courses/#{@course.id}/wiki"
-        expect(response).to be_redirect
-        follow_redirect!
-        expect(response).to be_redirect
+        assert_status(401)
 
         get "/courses/#{@course.id}/quizzes"
         assert_status(401)
@@ -941,9 +940,6 @@ describe "security" do
         expect(response).to be_success
 
         get "/courses/#{@course.id}/wiki"
-        expect(response).to be_redirect
-
-        follow_redirect!
         expect(response).to be_success
 
         get "/courses/#{@course.id}/quizzes"

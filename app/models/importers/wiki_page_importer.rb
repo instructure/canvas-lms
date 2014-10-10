@@ -43,13 +43,14 @@ module Importers
         item.url = hash[:url_name].to_url
         item.only_when_blank = true
       end
-      if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
+      if hash[:root_folder].present? && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
         front_page = context.wiki.front_page
-        if front_page.id
+        if front_page && front_page.id
           hash[:root_folder] = false
         else
-          # If there is no id there isn't a front page yet
-          item = front_page
+          item.url ||= Wiki::DEFAULT_FRONT_PAGE_URL
+          item.title ||= item.url.titleize
+          item.set_as_front_page!
         end
       end
       hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?

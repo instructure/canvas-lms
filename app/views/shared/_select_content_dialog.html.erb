@@ -138,9 +138,8 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :page_name, "Page Name" %>
           <input type="text" name="wiki_page[title]" class="item_title" aria-label="<%= before_label :page_name, "Page Name" %>"/>
-          <a href="<%= context_url(@context, :context_wiki_pages_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
+          <a href="<%= polymorphic_url([:api_v1, @context, :wiki_pages]) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <% end %>

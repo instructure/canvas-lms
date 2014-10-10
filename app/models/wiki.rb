@@ -41,7 +41,7 @@ class Wiki < ActiveRecord::Base
 
   def set_has_no_front_page_default
     if self.has_no_front_page.nil? && self.id && context
-      self.has_no_front_page = true if context.feature_enabled?(:draft_state)
+      self.has_no_front_page = true
     end
   end
   private :set_has_no_front_page_default
@@ -102,8 +102,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def get_front_page_url
-    return nil unless self.has_front_page? || !context.feature_enabled?(:draft_state)
-    self.front_page_url || DEFAULT_FRONT_PAGE_URL
+    self.front_page_url if self.has_front_page?
   end
 
   def unset_front_page!

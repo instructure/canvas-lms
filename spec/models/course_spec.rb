@@ -450,6 +450,7 @@ describe Course do
       @course.discussion_topics.create!
       @course.quizzes.create!
       @course.assignments.create!
+      @course.wiki.set_front_page_url!('front-page')
       @course.wiki.front_page.save!
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'

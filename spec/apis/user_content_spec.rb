@@ -235,7 +235,7 @@ describe UserContent, type: :request do
   end
 
   it "should not choke on funny email addresses" do
-    @wiki_page = @course.wiki.front_page
+    @wiki_page = @course.wiki.wiki_pages.build(:title => "title")
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
@@ -247,7 +247,7 @@ describe UserContent, type: :request do
   context "data api endpoints" do
     context "course context" do
       it "should process links to each type of object" do
-        @wiki_page = @course.wiki.front_page
+        @wiki_page = @course.wiki.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
         <p>
           <a href='/courses/#{@course.id}/assignments'>assignments index</a>
@@ -294,7 +294,7 @@ describe UserContent, type: :request do
     context "group context" do
       it "should process links to each type of object" do
         group_with_user(:active_all => true)
-        @wiki_page = @group.wiki.front_page
+        @wiki_page = @group.wiki.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
         <p>
           <a href='/groups/#{@group.id}/wiki'>wiki index</a>

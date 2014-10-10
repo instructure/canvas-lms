@@ -20,23 +20,23 @@
     <%= t('click_links', %{Click any page to insert a link to that page.}) %>
     <div id="pages_accordion" role="tabpanel">
       <% if @context.respond_to?(:wiki) %>
-      <a href="<%= context_url(@context, :context_wiki_page_url, '{{ page_url }}') %>" id="wiki_sidebar_wiki_url" style="display: none;">&nbsp;</a>
+      <a href="<%= polymorphic_url([@context, :wiki_page], id: '{{ page_url }}') %>" id="wiki_sidebar_wiki_url" style="display: none;">&nbsp;</a>
       <div>
         <div class="header" aria-controls="pages_tab_panel" role="tab"><a href="#"><%= t('links_to.wiki_pages', %{Wiki Pages}) %></a></div>
         <div id="pages_tab_panel" role="tabpanel">
             <ul class="wiki_pages page_list">
               <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
                 <% if can_do(@wiki, @current_user, :manage) || wiki_page.published? %>
-                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, polymorphic_path([@context, :named_page], wiki_page_id: wiki_page), :role => "button"%></li>
+                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, polymorphic_path([@context, wiki_page]), :role => "button"%></li>
                 <% end %>
               <% end %>
             </ul>
-            <%= link_to t('links.new_page', "Link to a New Page"), context_url(@context, :new_context_wiki_page_url), :id => 'new_page_link', :class => "add" %>
+            <%= link_to t('links.new_page', "Link to a New Page"), polymorphic_url([@context, :wiki_page], action: :new), :id => 'new_page_link', :class => "add" %>
             <form id="new_page_drop_down" style="display:none; margin: 5px;">
               <div class="row-fluid">
                 <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
                 <input type="text" name="new_page_name" id="new_page_name" class="span12">
-                <input type="hidden" name="new_page_url_prefix" value="<%= polymorphic_path([@context, :pages]) %>" id="new_page_url_prefix" />
+                <input type="hidden" name="new_page_url_prefix" value="<%= polymorphic_path([@context, :wiki_pages]) %>" id="new_page_url_prefix" />
                 <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
               </div>
             </form>
@@ -119,7 +119,7 @@
                 <li title="<%= t('insert.assignments_page', %{Click to insert a link to the assignments page}) %>"><%= link_to t('links.assignments_page', "Assignment List"), context_url(@context, :context_assignments_url)%></li>
               <% end %>
               <% if @context.respond_to?(:wiki) %>
-                <li title="<%= t('insert.wiki_pages_index', %{Click to insert a link to the wiki}) %>"><%= link_to t('links.wiki_pages_index', "Wiki Home"), context_url(@context, :context_wiki_pages_url)%></li>
+                <li title="<%= t('insert.wiki_pages_index', %{Click to insert a link to the wiki}) %>"><%= link_to t('links.wiki_pages_index', "Wiki Home"), polymorphic_url([@context, :wiki_pages]) %></li>
               <% end %>
               <% if @context.respond_to?(:discussion_topics) %>
                 <li title="<%= t('insert.discussions_page', %{Click to insert a link to the discussions page}) %>"><%= link_to t('links.discussions_page', "Discussions Index"), context_url(@context, :context_discussion_topics_url)%></li>

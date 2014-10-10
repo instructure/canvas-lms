@@ -1142,7 +1142,6 @@ class ApplicationController < ActionController::Base
     @wiki.check_has_front_page
 
     @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    @page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       @page_name += ".#{params[:format]}"
       params[:format] = 'html'
@@ -1160,17 +1159,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def context_wiki_page_url
-    page_name = @page.url
-    named_context_url(@context, :context_wiki_page_url, page_name)
-  end
-
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = { :module_item_id => tag.id }
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
-      redirect_to named_context_url(context, :context_named_page_url, tag.content.url, url_params)
+      redirect_to polymorphic_url([context, tag.content], url_params)
     elsif tag.content_type == 'Attachment'
       redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
     elsif tag.content_type_quiz?
@@ -1779,7 +1773,7 @@ class ApplicationController < ActionController::Base
     hash = {}
 
     hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
-    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
+    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :wiki_pages])
     if opts[:course_home]
       hash[:COURSE_HOME] = true
       hash[:COURSE_TITLE] = @context.name
@@ -1788,9 +1782,9 @@ class ApplicationController < ActionController::Base
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
-      hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
+      hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
+      hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
+      hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
 
       if @context.is_a?(Course) && @context.grants_right?(@current_user, :read)
         hash[:COURSE_ID] = @context.id

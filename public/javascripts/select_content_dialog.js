@@ -201,15 +201,19 @@ $(document).ready(function() {
           var callback = function(data) {
             var obj;
 
-            // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` root object
-            if (item_data['item[type]'] === 'discussion_topic') {
+            // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` or 'wiki_page' root object
+            if (item_data['item[type]'] === 'discussion_topic' || item_data['item[type]'] === 'wiki_page') {
               obj = data;
             } else {
               obj = data[item_data['item[type]']]; // e.g. data['wiki_page'] for wiki pages
             }
 
             $("#select_context_content_dialog").loadingImage('remove');
-            item_data['item[id]'] = obj.id;
+            if (item_data['item[type]'] === 'wiki_page') {
+              item_data['item[id]'] = obj.page_id;
+            } else {
+              item_data['item[id]'] = obj.id;
+            }
             if (item_data['item[type]'] === 'attachment') {
               // some browsers return a fake path in the file input value, so use the name returned by the server
               item_data['item[title]'] = obj.display_name;

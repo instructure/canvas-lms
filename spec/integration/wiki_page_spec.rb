@@ -61,7 +61,6 @@ describe WikiPagesController do
 
   context "draft state forwarding" do
     before do
-      @front = @course.wiki.front_page
       @wiki_page = create_page :title => "a-page", :body => "body"
       @base_url = "/courses/#{@course.id}/"
       @course.reload
@@ -76,34 +75,34 @@ describe WikiPagesController do
         @course.wiki.has_no_front_page = true
         @course.wiki.save!
         get @base_url + "wiki"
-        expect(response).to redirect_to(course_pages_url(@course))
+        expect(response).to redirect_to(course_wiki_pages_url(@course))
       end
 
-      it "should forward /wiki to /pages/front-page" do
-        @front.save!
-        @front.set_as_front_page!
+      it "should render /wiki as the front page if there is one" do
+        @wiki_page.set_as_front_page!
         get @base_url + "wiki"
-        expect(response).to redirect_to(course_named_page_url(@course, "front-page"))
+        expect(response).to be_success
+        expect(assigns[:page]).to eq @wiki_page
       end
 
       it "should forward /wiki/name to /pages/name" do
         get @base_url + "wiki/a-page"
-        expect(response).to redirect_to(course_named_page_url(@course, "a-page"))
+        expect(response).to redirect_to(course_wiki_page_url(@course, "a-page"))
       end
 
       it "should forward module_item_id parameter" do
         get @base_url + "wiki/a-page?module_item_id=123"
-        expect(response).to redirect_to(course_named_page_url(@course, "a-page") + "?module_item_id=123")
+        expect(response).to redirect_to(course_wiki_page_url(@course, "a-page") + "?module_item_id=123")
       end
 
       it "should forward /wiki/name/revisions to /pages/name/revisions" do
         get @base_url + "wiki/a-page/revisions"
-        expect(response).to redirect_to(course_named_page_revisions_url(@course, "a-page"))
+        expect(response).to redirect_to(course_wiki_page_revisions_url(@course, "a-page"))
       end
 
       it "should forward /wiki/name/revisions/revision to /pages/name/revisions" do
         get @base_url + "wiki/a-page/revisions/42"
-        expect(response).to redirect_to(course_named_page_revisions_url(@course, "a-page"))
+        expect(response).to redirect_to(course_wiki_page_revisions_url(@course, "a-page"))
       end
     end
 

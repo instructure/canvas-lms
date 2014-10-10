@@ -117,43 +117,15 @@ CanvasRails::Application.routes.draw do
     resources :discussion_entries
   end
 
-  concern :wikis do
-    ####
-    ## Leaving these routes here for when we need them later :)
-    ##
-    ## Aside from the /wiki route itself, all new routes will be /pages. The /wiki route will be reused to redirect
-    ## the user to the wiki front page, if configured, or the wiki page list otherwise.
-    ####
-    # get 'wiki' => 'wiki_pages#front_page'
-
-    ####
-    ## Placing these routes above the /wiki routes below will cause the helper functions to generate urls and paths
-    ## pointing to /pages rather than the legacy /wiki.
-    ####
-    # resources :wiki_pages, path: :pages do
-    #   get 'revisions/latest' => 'wiki_page_revisions#latest_version_number', as: :latest_version_number
-    #   resources :wiki_page_revisions, as: "revisions"
-    # end
-    #
-    ####
-    ## We'll just do specific routes below until we can swap /pages and /wiki completely.
-    ####
-    get 'pages' => 'wiki_pages#pages_index'
-    get 'pages/:wiki_page_id' => 'wiki_pages#show_page', wiki_page_id: /[^\/]+/, as: :named_page
-    get 'pages/:wiki_page_id/edit' => 'wiki_pages#edit_page', wiki_page_id: /[^\/]+/, as: :edit_named_page
-    get 'pages/:wiki_page_id/revisions' => 'wiki_pages#page_revisions', wiki_page_id: /[^\/]+/, as: :named_page_revisions
-
-    resources :wiki_pages, path: :wiki do
-      get 'revisions/latest' => 'wiki_page_revisions#latest_version_number', as: :latest_version_number
-      resources :wiki_page_revisions, path: :revisions
+  concern :pages do
+    resources :wiki_pages, path: :pages, except: [:update, :destroy] do
+      get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
-    ####
-    ## This will cause the helper functions to generate /pages urls, but will still allow /wiki routes to work properly
-    ####
-    #get 'pages/:id' => 'wiki_pages#show', id: /[^\/]+/, as: :named_wiki_page
-
-    get 'wiki/:id' => 'wiki_pages#show', as: :named_wiki_page, id: /[^\/]+/
+    get 'wiki' => 'wiki_pages#front_page', as: :wiki
+    get 'wiki/:id' => 'wiki_pages#show_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
   end
 
   concern :conferences do
@@ -293,7 +265,7 @@ CanvasRails::Application.routes.draw do
 
     concerns :files, :file_images, :relative_files, :folders
     concerns :groups
-    concerns :wikis
+    concerns :pages
     concerns :conferences
     concerns :question_banks
 
@@ -480,7 +452,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    concerns :wikis
+    concerns :pages
     concerns :conferences
     concerns :media
 

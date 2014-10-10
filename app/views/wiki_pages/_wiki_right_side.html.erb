@@ -69,10 +69,7 @@
   <% if can_do(@page, @current_user, :update_content)%>
     <%= link_to ('<i class="icon-edit"></i>').html_safe + " " + t('links.edit_page', "Edit this Page"), "#edit", :class => "edit_link btn button-sidebar-wide" %>
   <% end %>
-  <% if can_do(@page, @current_user, :delete) && !@page.new_record? && !@page.is_front_page? && !@page.deleted? %>
-    <%= link_to ('<i class="icon-trash"></i>').html_safe + " " + t('links.delete_page', "Delete this Page"), context_url(@context, :context_wiki_page_url, @page.url), :method => :delete, :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :class => "btn button-sidebar-wide" %>
-  <% end %>
-  <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="wiki_page_url" style="display: none;">&nbsp;</a>
+  <a href="<%= polymorphic_url([@context, @page]) %>" class="wiki_page_url" style="display: none;">&nbsp;</a>
   <% if can_do(@wiki, @current_user, :create_page) %>
     <div id="wiki_page_new">
       <a class="new btn button-sidebar-wide element_toggler" aria-controls="add_wiki_page_form" href="#"><i class="icon-add"></i> <%= t 'links.create_page', 'Create a New Page' %></a>
@@ -97,7 +94,7 @@
         <li>
           <a id="wiki_page_rename_link" class="icon-note-dark element_toggler" aria-controls="wiki_page_rename_section" href="#"><%= t 'links.rename_page', 'Rename this page' %></a>
           <div id="wiki_page_rename_section" style="display:none;">
-            <%= form_for(@page, :url => context_url(@context, :context_wiki_page_url, @page), :html => {:id => 'rename_wiki_page_form'}) do |f| -%>
+            <%= form_for(@page, :url => polymorphic_url([@context, @page]), :html => {:id => 'rename_wiki_page_form'}) do |f| -%>
               <div class="input-append">
                 <%= f.text_field :title, :style => "width: 157px;", :placeholder => t(:title, "New page title"), :maxlength => "255" %>
                 <button class="btn" type="submit"><%= t 'buttons.rename', 'Rename' %></button>
@@ -107,7 +104,7 @@
         </li>
         <% unless @page.new_record? || !can_do(@page, @current_user, :delete) %>
           <li>
-            <%= link_to t('links.delete_page', 'Delete this Page'), context_url(@context, :context_wiki_page_url, @page), :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :method => :delete, :id => "wiki_page_delete", :class => "icon-trash" %>
+            <%= link_to t('links.delete_page', 'Delete this Page'), polymorphic_url([@context, @page]), :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :method => :delete, :id => "wiki_page_delete", :class => "icon-trash" %>
           </li>
         <% end %>
       <% end %>

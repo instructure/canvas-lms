@@ -91,8 +91,7 @@ describe ContextModule do
       @page = @course.wiki.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
-        put "/courses/#{@course.id}/wiki/#{@page.url}", :wiki_page => { :body => 'i agree', :title => 'talk page' }
-        expect(response).to be_redirect
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", :wiki_page => { :body => 'i agree', :title => 'talk page' }
       end
     end
 

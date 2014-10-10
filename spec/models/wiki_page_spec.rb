@@ -57,6 +57,7 @@ describe WikiPage do
 
   it "should validate that the front page is always visible" do
     course_with_teacher(:active_all => true)
+    @course.wiki.set_front_page_url!('front-page')
     front_page = @course.wiki.front_page
     front_page.save!
     front_page.workflow_state = 'unpublished'
@@ -76,6 +77,7 @@ describe WikiPage do
 
   it "shouldn't allow the front page to be unpublished" do
     course_with_teacher(active_all: true, draft_state: true)
+    @course.wiki.set_front_page_url!('front-page')
     front_page = @course.wiki.front_page
     expect(front_page).not_to be_can_unpublish
     # the data model doesn't actually disallow this (yet)
@@ -222,7 +224,8 @@ describe WikiPage do
       end
 
       it 'should set the front page body' do
-        front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        @course.wiki.set_front_page_url!('front-page')
+        front_page = @course.wiki.front_page
         expect(front_page.body).to be_nil
         front_page.initialize_wiki_page(@teacher)
         expect(front_page.body).not_to be_empty
@@ -235,7 +238,8 @@ describe WikiPage do
         end
 
         it 'should publish the front page' do
-          front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+          @course.wiki.set_front_page_url!('front-page')
+          front_page = @course.wiki.front_page
           front_page.initialize_wiki_page(@teacher)
           expect(front_page).to be_published
         end
@@ -248,7 +252,8 @@ describe WikiPage do
       end
 
       it 'should set the front page body' do
-        front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        @group.wiki.set_front_page_url!('front-page')
+        front_page = @group.wiki.front_page
         expect(front_page.body).to be_nil
         front_page.initialize_wiki_page(@user)
         expect(front_page.body).not_to be_empty
