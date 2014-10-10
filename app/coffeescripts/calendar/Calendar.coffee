@@ -55,7 +55,7 @@ define [
       data = @dataFromDocumentHash()
       if not data.view_start and @options?.viewStart
         data.view_start = @options.viewStart
-        @updateFragment data
+        @updateFragment data, replaceState: true
       if data.view_start
         date = $.fullCalendar.parseISO8601(data.view_start)
       else
@@ -373,6 +373,9 @@ define [
       (new EditEventDetailsDialog(event)).show()
 
     updateFragment: (opts) ->
+      replaceState = !!opts.replaceState
+      opts = _.omit(opts, 'replaceState')
+
       data = @dataFromDocumentHash()
       changed = false
       for k, v of opts
@@ -381,7 +384,13 @@ define [
           data[k] = v
         else
           delete data[k]
-      location.href = "#" + $.param(data) if changed
+
+      if changed
+        fragment = "#" + $.param(data)
+        if replaceState || location.hash == ""
+          history.replaceState(null, "", fragment)
+        else
+          location.href = fragment
 
     viewDisplay: (view) =>
       @setDateTitle(view.title)
@@ -559,7 +568,11 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: d.toISOString()
+      d.setHours(0, 0, 0, 0)
+      @updateFragment
+        view_start: d.toISOString()
+        replaceState: true
+
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->
@@ -570,7 +583,10 @@ define [
         $.fudgeDateForProfileTimezone(new Date)
 
     setCurrentView: (view) ->
-      @updateFragment view_name: view
+      @updateFragment
+        view_name: view
+        replaceState: !_.has(@dataFromDocumentHash(), 'view_name') # use replaceState if view_name wasn't set before
+
       @currentView = view
       userSettings.set('calendar_view', view)
 
