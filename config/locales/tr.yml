@@ -4197,6 +4197,8 @@ tr:
       unpublished: Yayınlanmamış
       unpublished_with_message: "Yayınlanmadı: %{message}"
     missing_name: "İsimsiz Ders"
+    student_summary: 
+      not_sorted: "Öğrenci özet tablosu sıralanamadı "
     student_view_student_name: "Test Öğrenci"
     wiki_permissions: 
       all: Herkes
@@ -4250,6 +4252,8 @@ tr:
       topic: "Bilinmeyen konu"
       wiki_page: "Bilinmeyen wiki sayfası"
   course_list: 
+    favorited_tooltip: "Dersler menüsünden çıkarmak için tıklayınız."
+    nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
     wrapper: 
       close_course_menu_title: kapat
       reset_course_menu: Sıfırla
@@ -4401,6 +4405,7 @@ tr:
         one: "1 ödevin notlandırılması gerek"
         other: "%{count} ödevin notlandırılması gerek"
       no_peer_review_due_date: "bitiş: Bitiş Tarihi Yok"
+      peer_review_due_date: "neden: %{peer_review_due_at}"
       points_possible: "%{points_possible} üzerinden"
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4686,6 +4691,7 @@ tr:
         edit_section_name: "Bölüm adını düzenle"
         move_course: "Dersi Taşı"
         update_course: "Ders Detaylarını Güncelle"
+      course_conclude_at_warning_title: "Kurs Geceyarısı Sona Erecek"
       course_open_enrollment: "Bu derse herkesin kayıt olması etkinleştirildi. Öğrencilerle *%{url}* bağlantısını paylaşırsanız kendileri kaydolabilirler. Alternatif olarak *%{url2}* adresinde hesap oluşturup şu giriş kodunu kullanabilirler: *%{code}*"
       course_open_enrollment_without_code: "Bu derste açık kayıt olma etkindir. Öğrencilerle şu URL'yi paylaşırsanız kendi kendilerine derse kayıt olabilirler: *%{url}*"
       course_overrides_term: "Herhangi bir dönem hazır ayarının üzerine yazılacaktır."
@@ -5052,6 +5058,7 @@ tr:
         ratio: "Yanlış Öğrenci Oranı"
   current_uploads: 
     close: kapat
+    drag_files_here: "Klasörler ve dosyaları buraya sürükle "
   curve_grades_dialog: 
     average_score: "Ortalama Puan"
     buttons: 
@@ -12994,6 +13001,8 @@ tr:
       enrolled_as_student: "Öğrenci olarak kayıtlı"
       enrolled_as_ta: "Asistan Öğretmen olarak kaydedildi"
       enrolled_as_teacher: "Öğretmen olarak kayıtlı"
+      favorited_tooltip: "Dersler menüsünden çıkarmak için tıklayınız."
+      nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
       unpublished_course: yayınlanmadı
     custom_search_results: 
       links: 
