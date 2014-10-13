@@ -10,7 +10,7 @@ describe "AddManageRubricsPermission" do
     AddManageStorageQuotasPermission.up
     
     new_permissions = @account.role_overrides.where(:permission => 'manage_storage_quotas') 
-    new_permissions.where(:enrollment_type => 'CanManageAccountStuff').map(&:enabled).should == [true]
-    new_permissions.where(:enrollment_type => 'TotallyCannot').map(&:enabled).should == [false]
+    expect(new_permissions.where(:enrollment_type => 'CanManageAccountStuff').map(&:enabled)).to eq [true]
+    expect(new_permissions.where(:enrollment_type => 'TotallyCannot').map(&:enabled)).to eq [false]
   end
 end

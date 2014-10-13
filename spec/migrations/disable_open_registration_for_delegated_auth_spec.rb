@@ -35,16 +35,16 @@ describe 'DisableOpenRegistrationForDelegatedAuth' do
         # apply
         account.write_attribute(:settings, { :open_registration => true })
         account.save!
-        account.open_registration?.should be_true
+        expect(account.open_registration?).to be_truthy
       end
 
       DisableOpenRegistrationForDelegatedAuth.up
 
       @all_accounts.each(&:reload)
-      @cas_account.open_registration?.should be_false
-      @saml_account.open_registration?.should be_false
-      @ldap_account.open_registration?.should be_true
-      @normal_account.open_registration?.should be_true
+      expect(@cas_account.open_registration?).to be_falsey
+      expect(@saml_account.open_registration?).to be_falsey
+      expect(@ldap_account.open_registration?).to be_truthy
+      expect(@normal_account.open_registration?).to be_truthy
     end
   end
 end

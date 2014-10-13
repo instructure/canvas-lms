@@ -56,9 +56,9 @@ describe 'FixUserConversationsCountsForAll' do
 
       FixUserConversationsCountsForAll.up
 
-      u1.reload.unread_conversations_count.should == 2
-      u2.reload.unread_conversations_count.should == 1
-      u3.reload.unread_conversations_count.should == 3
+      expect(u1.reload.unread_conversations_count).to eq 2
+      expect(u2.reload.unread_conversations_count).to eq 1
+      expect(u3.reload.unread_conversations_count).to eq 3
     end
 
     it "should not count deleted entries" do
@@ -92,8 +92,8 @@ describe 'FixUserConversationsCountsForAll' do
 
       FixUserConversationsCountsForAll.up
 
-      u1.reload.unread_conversations_count.should == 2
-      u2.reload.unread_conversations_count.should == 0
+      expect(u1.reload.unread_conversations_count).to eq 2
+      expect(u2.reload.unread_conversations_count).to eq 0
     end
   end
 end

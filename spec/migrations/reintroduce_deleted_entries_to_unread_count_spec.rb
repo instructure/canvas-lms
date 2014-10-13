@@ -39,16 +39,16 @@ describe 'DataFixup::ReintroduceDeletedEntriesToUnreadCount' do
 
     # run the previous migration, which deletes read status for deleted messages
     DataFixup::ExcludeDeletedEntriesFromUnreadCount.run
-    @topic.unread_count(@student2).should == 2
-    DiscussionEntryParticipant.find_by_user_id_and_discussion_entry_id(@student2.id, @entry2.id).should be_nil
+    expect(@topic.unread_count(@student2)).to eq 2
+    expect(DiscussionEntryParticipant.find_by_user_id_and_discussion_entry_id(@student2.id, @entry2.id)).to be_nil
 
     # now the new migration, which marks existing deleted entries as read for all
     DataFixup::ReintroduceDeletedEntriesToUnreadCount.run
-    @topic.unread_count(@student2).should == 2
-    DiscussionEntryParticipant.find_by_user_id_and_discussion_entry_id(@student2.id, @entry2.id).should be_present
-    @topic.unread_count(@teacher).should == 0
-    @topic2.unread_count(@teacher).should == 0
-    @topic.unread_count(@student1).should == 1
-    @topic2.unread_count(@student1).should == 0
+    expect(@topic.unread_count(@student2)).to eq 2
+    expect(DiscussionEntryParticipant.find_by_user_id_and_discussion_entry_id(@student2.id, @entry2.id)).to be_present
+    expect(@topic.unread_count(@teacher)).to eq 0
+    expect(@topic2.unread_count(@teacher)).to eq 0
+    expect(@topic.unread_count(@student1)).to eq 1
+    expect(@topic2.unread_count(@student1)).to eq 0
   end
 end
