@@ -127,6 +127,7 @@ class ApplicationController < ActionController::Base
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
     @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
+    @js_env[:TOURS] = tours_to_run
     @js_env
   end
   helper_method :js_env
