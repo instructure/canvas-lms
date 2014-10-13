@@ -9,16 +9,16 @@ describe 'ruby_version_compat' do
         # this file is marked utf-8 for one of the specs below, so we need to force these string literals to be binary
         sio = StringIO.new("".force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
-        imio.write_message("\u3042\r\u3044\n\u3046\r\n\u3048").should == 23
-        sio.string.force_encoding('binary').should == "\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n".force_encoding('binary')
+        expect(imio.write_message("\u3042\r\u3044\n\u3046\r\n\u3048")).to eq 23
+        expect(sio.string.force_encoding('binary')).to eq "\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n".force_encoding('binary')
 
         sio = StringIO.new("".force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
-        imio.write_message("\u3042\r").should == 8
-        sio.string.force_encoding('binary').should == "\u3042\r\n.\r\n".force_encoding('binary')
+        expect(imio.write_message("\u3042\r")).to eq 8
+        expect(sio.string.force_encoding('binary')).to eq "\u3042\r\n.\r\n".force_encoding('binary')
       end
 
-      output.should == ['', '']
+      expect(output).to eq ['', '']
     end
   end
 
@@ -30,7 +30,7 @@ describe 'ruby_version_compat' do
       controller.stubs(:params).returns({ :upload => { :file1 => testfile } })
       controller.stubs(:request).returns(mock(:path => "/upload"))
       expect { controller.force_utf8_params() }.to_not raise_error
-      testfile.original_filename.should be_nil
+      expect(testfile.original_filename).to be_nil
     end
   end
 
@@ -38,23 +38,23 @@ describe 'ruby_version_compat' do
     it "should be silent and escape properly with the regexp utf-8 monkey patch" do
       stdout, stderr = capture_io do
         escaped = ERB::Util.html_escape("åß∂åß∂<>")
-        escaped.encoding.should == Encoding::UTF_8
-        escaped.should == "åß∂åß∂&lt;&gt;"
+        expect(escaped.encoding).to eq Encoding::UTF_8
+        expect(escaped).to eq "åß∂åß∂&lt;&gt;"
       end
-      stdout.should == ''
-      stderr.should == ''
+      expect(stdout).to eq ''
+      expect(stderr).to eq ''
     end
   end
 
   describe "ActiveSupport::Inflector#transliterate" do
     it "should be silent and return equivalent strings" do
       stdout, stderr = capture_io do
-        ActiveSupport::Inflector.transliterate("a string").should == "a string"
+        expect(ActiveSupport::Inflector.transliterate("a string")).to eq "a string"
         complex = ERB::Util.html_escape("test ßå")
-        ActiveSupport::Inflector.transliterate(complex).should == "test ssa"
+        expect(ActiveSupport::Inflector.transliterate(complex)).to eq "test ssa"
       end
-      stdout.should == ''
-      stderr.should == ''
+      expect(stdout).to eq ''
+      expect(stderr).to eq ''
     end
   end
 
@@ -79,8 +79,8 @@ describe 'ruby_version_compat' do
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
       AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
       text = aq.reload.question_data['answers'][0]['valid_ascii']
-      text.should == "text"
-      text.encoding.should == Encoding::UTF_8
+      expect(text).to eq "text"
+      expect(text.encoding).to eq Encoding::UTF_8
     end
 
     it "should not strip columns not on the list" do

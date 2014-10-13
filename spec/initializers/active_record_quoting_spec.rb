@@ -54,9 +54,9 @@ module ActiveRecord
             end
 
             it 'aborts quoting non-Numerics' do
-              lambda{ @conn.quote(:symbol, @col) }.should raise_exception(ActiveRecord::StatementInvalid)
-              lambda{ @conn.quote(ActiveRecord::Base, @col) }.should raise_exception(ActiveRecord::StatementInvalid)
-              lambda{ @conn.quote(Object.new, @col) }.should raise_exception(ActiveRecord::StatementInvalid)
+              expect{ @conn.quote(:symbol, @col) }.to raise_exception(ActiveRecord::StatementInvalid)
+              expect{ @conn.quote(ActiveRecord::Base, @col) }.to raise_exception(ActiveRecord::StatementInvalid)
+              expect{ @conn.quote(Object.new, @col) }.to raise_exception(ActiveRecord::StatementInvalid)
             end
           end
 
