@@ -36,12 +36,12 @@ describe QuestionBanksController do
       @bank3 = @course.account.assessment_question_banks.create!
       @bank3.destroy
       res = get 'index', controller: :question_banks, inherited: '1',course_id: @course.id, format: 'json'
-      response.should be_success
+      expect(response).to be_success
       json = json_parse(response.body)
-      json.size.should == 2
-      json.detect { |bank|
+      expect(json.size).to eq 2
+      expect(json.detect { |bank|
         bank["assessment_question_bank"]["id"] == @bank3.id
-      }.should be_nil
+      }).to be_nil
     end
   end
 
@@ -52,20 +52,20 @@ describe QuestionBanksController do
 
     it "should copy questions" do
       post 'move_questions', :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 }
-      response.should be_success
+      expect(response).to be_success
 
       @bank1.reload
-      @bank1.assessment_questions.count.should == 2
-      @bank2.assessment_questions.count.should == 2
+      expect(@bank1.assessment_questions.count).to eq 2
+      expect(@bank2.assessment_questions.count).to eq 2
     end
 
     it "should move questions" do
       post 'move_questions', :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1', :questions => { @question1.id => 1, @question2.id => 1 }
-      response.should be_success
+      expect(response).to be_success
 
       @bank1.reload
-      @bank1.assessment_questions.count.should == 0
-      @bank2.assessment_questions.count.should == 2
+      expect(@bank1.assessment_questions.count).to eq 0
+      expect(@bank2.assessment_questions.count).to eq 2
     end
   end
 
@@ -82,8 +82,8 @@ describe QuestionBanksController do
     it "bookmarks" do
       post 'bookmark', :course_id => @course.id,
                        :question_bank_id => @bank.id
-      response.should be_success
-      @teacher.reload.assessment_question_banks.should include @bank
+      expect(response).to be_success
+      expect(@teacher.reload.assessment_question_banks).to include @bank
     end
 
     it "unbookmarks" do
@@ -96,8 +96,8 @@ describe QuestionBanksController do
       post 'bookmark', :course_id => @course.id,
                        :question_bank_id => @bank.id,
                        :unbookmark => 1
-      response.should be_success
-      @teacher.reload.assessment_question_banks.should_not include @bank
+      expect(response).to be_success
+      expect(@teacher.reload.assessment_question_banks).not_to include @bank
     end
   end
 end

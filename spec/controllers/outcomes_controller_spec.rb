@@ -50,14 +50,14 @@ describe OutcomesController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>15,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
     
     it "should assign variables" do
       user_session(@student)
       get 'index', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
@@ -71,7 +71,7 @@ describe OutcomesController do
       account_outcome
       Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
       get 'index', :account_id => @account.id
-      assigns[:js_env][:COMMON_CORE_GROUP_ID].should == @outcome_group.id
+      expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
     end
   end
 
@@ -93,14 +93,14 @@ describe OutcomesController do
       user_session(@teacher)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
       get 'show', :account_id => @account.id, :id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should include tags from courses when viewed in the account" do
@@ -113,7 +113,7 @@ describe OutcomesController do
       user_session(@admin)
       get 'show', :account_id => @account.id, :id => @outcome.id
 
-      assigns[:alignments].any?{ |a| a.id == alignment.id }.should be_true
+      expect(assigns[:alignments].any?{ |a| a.id == alignment.id }).to be_truthy
     end
 
     it "should not allow access to individual outcomes for large_roster courses" do
@@ -123,7 +123,7 @@ describe OutcomesController do
       @course.save!
 
       get 'show', :course_id => @course.id, :id => @outcome.id
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
 
@@ -138,7 +138,7 @@ describe OutcomesController do
       user_session(@student)
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
@@ -154,9 +154,9 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', :account_id => @account.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
     end
 
     it "should list account outcomes for a subaccount context" do
@@ -165,9 +165,9 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', :account_id => sub_account_1.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
     end
 
     it "should list account outcomes for a course context" do
@@ -175,9 +175,9 @@ describe OutcomesController do
 
       user_session(@teacher)
       get 'list', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
     end
   end
 end

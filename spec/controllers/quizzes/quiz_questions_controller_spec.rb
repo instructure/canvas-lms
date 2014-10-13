@@ -70,10 +70,10 @@ describe Quizzes::QuizQuestionsController do
           }
         }
       }
-      assigns[:question].should_not be_nil
-      assigns[:question].question_data.should_not be_nil
-      assigns[:question].question_data[:answers].length.should eql(2)
-      assigns[:quiz].should eql(@quiz)
+      expect(assigns[:question]).not_to be_nil
+      expect(assigns[:question].question_data).not_to be_nil
+      expect(assigns[:question].question_data[:answers].length).to eql(2)
+      expect(assigns[:quiz]).to eql(@quiz)
     end
     it "should preserve ids, if provided, on create" do
       user_session(@teacher)
@@ -97,14 +97,14 @@ describe Quizzes::QuizQuestionsController do
           }
         ]
       }
-      assigns[:question].should_not be_nil
-      assigns[:question].question_data.should_not be_nil
+      expect(assigns[:question]).not_to be_nil
+      expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
 
-      data.length.should eql(3)
-      data[0][:id].should eql(123456)
-      data[1][:id].should eql(654321)
-      data[2][:id].should_not eql(654321)
+      expect(data.length).to eql(3)
+      expect(data[0][:id]).to eql(123456)
+      expect(data[1][:id]).to eql(654321)
+      expect(data[2][:id]).not_to eql(654321)
     end
 
     it 'bounces data thats too long' do
@@ -116,7 +116,7 @@ describe Quizzes::QuizQuestionsController do
       xhr :post, 'create', course_id: @course.id, quiz_id: @quiz, question: {
         question_text: long_data
       }
-      response.body.should =~ /max length is 16384/
+      expect(response.body).to match /max length is 16384/
     end
   end
 
@@ -147,10 +147,10 @@ describe Quizzes::QuizQuestionsController do
           }
         }
       }
-      assigns[:question].should_not be_nil
-      assigns[:question].question_data.should_not be_nil
-      assigns[:question].question_data[:answers].length.should eql(3)
-      assigns[:quiz].should eql(@quiz)
+      expect(assigns[:question]).not_to be_nil
+      expect(assigns[:question].question_data).not_to be_nil
+      expect(assigns[:question].question_data[:answers].length).to eql(3)
+      expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "should preserve ids, if provided, on update" do
@@ -175,13 +175,13 @@ describe Quizzes::QuizQuestionsController do
           }
         }
       }
-      assigns[:question].should_not be_nil
-      assigns[:question].question_data.should_not be_nil
+      expect(assigns[:question]).not_to be_nil
+      expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
-      data.length.should eql(3)
-      data[0][:id].should eql(123456)
-      data[1][:id].should eql(654321)
-      data[2][:id].should_not eql(654321)
+      expect(data.length).to eql(3)
+      expect(data[0][:id]).to eql(123456)
+      expect(data[1][:id]).to eql(654321)
+      expect(data[2][:id]).not_to eql(654321)
     end
 
     it 'bounces data thats too long' do
@@ -193,7 +193,7 @@ describe Quizzes::QuizQuestionsController do
       xhr :put, 'update', course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
         question_text: long_data
       }
-      response.body.should =~ /max length is 16384/
+      expect(response.body).to match /max length is 16384/
     end
   end
 end

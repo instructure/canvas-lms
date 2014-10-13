@@ -38,7 +38,7 @@ describe AuditorApiController do
       audits_controller.check_configured
 
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).returns(true)
-      audits_controller.check_configured.should be_nil
+      expect(audits_controller.check_configured).to be_nil
     end
   end
 
@@ -49,22 +49,22 @@ describe AuditorApiController do
 
       # No params
       audits_controller.stubs(:params).returns({})
-      audits_controller.query_options.should == {}
+      expect(audits_controller.query_options).to eq({})
 
       # Unrelated params
       params = { course_id: 42 }
       audits_controller.stubs(:params).returns(params)
-      audits_controller.query_options.should == {}
+      expect(audits_controller.query_options).to eq({})
 
       # Start time
       params = { start_time: start_time.iso8601 }
       audits_controller.stubs(:params).returns(params)
-      audits_controller.query_options.should == { oldest: start_time }
+      expect(audits_controller.query_options).to eq({ oldest: start_time })
 
       # End time
       params = { end_time: end_time.iso8601 }
       audits_controller.stubs(:params).returns(params)
-      audits_controller.query_options.should == { newest: end_time }
+      expect(audits_controller.query_options).to eq({ newest: end_time })
 
       # Start and end times
       params = {
@@ -72,10 +72,10 @@ describe AuditorApiController do
         end_time: end_time.iso8601
       }
       audits_controller.stubs(:params).returns(params)
-      audits_controller.query_options.should == {
+      expect(audits_controller.query_options).to eq({
         oldest: start_time,
         newest: end_time
-      }
+      })
     end
   end
 end

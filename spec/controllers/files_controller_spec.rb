@@ -81,31 +81,31 @@ describe FilesController do
     it "should assign variables for course quota" do
       user_session(@teacher)
       get 'quota', :course_id => @course.id
-      assigns[:quota].should_not be_nil
-      response.should be_success
+      expect(assigns[:quota]).not_to be_nil
+      expect(response).to be_success
     end
 
     it "should assign variables for user quota" do
       user_session(@student)
       get 'quota', :user_id => @student.id
-      assigns[:quota].should_not be_nil
-      response.should be_success
+      expect(assigns[:quota]).not_to be_nil
+      expect(response).to be_success
     end
 
     it "should assign variables for group quota" do
       user_session(@teacher)
       group_model(:context => @course)
       get 'quota', :group_id => @group.id
-      assigns[:quota].should_not be_nil
-      response.should be_success
+      expect(assigns[:quota]).not_to be_nil
+      expect(response).to be_success
     end
 
     it "should allow changing group quota" do
       user_session(@teacher)
       group_model(:context => @course, :storage_quota => 500.megabytes)
       get 'quota', :group_id => @group.id
-      assigns[:quota].should == 500.megabytes
-      response.should be_success
+      expect(assigns[:quota]).to eq 500.megabytes
+      expect(response).to be_success
     end
   end
 
@@ -119,16 +119,16 @@ describe FilesController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>11,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
       user_session(@teacher)
       get 'index', :course_id => @course.id
-      response.should be_success
-      assigns[:contexts].should_not be_nil
-      assigns[:contexts][0].should eql(@course)
+      expect(response).to be_success
+      expect(assigns[:contexts]).not_to be_nil
+      expect(assigns[:contexts][0]).to eql(@course)
     end
 
     it "should return data for sub_folder if specified" do
@@ -136,32 +136,32 @@ describe FilesController do
       f1 = course_folder
       a1 = folder_file
       get 'index', :course_id => @course.id, :format => 'json'
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_nil
-      data['contexts'].length.should eql(1)
-      data['contexts'][0]['course']['id'].should eql(@course.id)
+      expect(data).not_to be_nil
+      expect(data['contexts'].length).to eql(1)
+      expect(data['contexts'][0]['course']['id']).to eql(@course.id)
 
       f2 = course_folder
       a2 = folder_file
       get 'index', :course_id => @course.id, :folder_id => f2.id, :format => 'json'
-      response.should be_success
-      assigns[:current_folder].should eql(f2)
-      assigns[:current_attachments].should_not be_nil
-      assigns[:current_attachments].should_not be_empty
-      assigns[:current_attachments][0].should eql(a2)
+      expect(response).to be_success
+      expect(assigns[:current_folder]).to eql(f2)
+      expect(assigns[:current_attachments]).not_to be_nil
+      expect(assigns[:current_attachments]).not_to be_empty
+      expect(assigns[:current_attachments][0]).to eql(a2)
     end
 
     it "should work for a user context, too" do
       user_session(@student)
       get 'index', :user_id => @student.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should work for a group context, too" do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     describe 'across shards' do
@@ -179,12 +179,12 @@ describe FilesController do
 
       it "authorizes users on a remote shard" do
         get 'index', :user_id => @user.global_id
-        response.should be_success
+        expect(response).to be_success
       end
 
       it "authorizes users on a remote shard for JSON data" do
         get 'index', :user_id => @user.global_id, :format => :json
-        response.should be_success
+        expect(response).to be_success
       end
     end
   end
@@ -201,15 +201,15 @@ describe FilesController do
     it "should assign variables" do
       user_session(@teacher)
       get 'show', :course_id => @course.id, :id => @file.id
-      response.should be_success
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].should eql(@file)
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment]).to eql(@file)
     end
 
     it "should redirect for download" do
       user_session(@teacher)
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should force download when download_frd is set" do
@@ -231,62 +231,62 @@ describe FilesController do
       # first verifier
       user_session(user1)
       get 'show', :user_id => user1.id, :id => file1.id, :ts => ts1, :sf_verifier => sf_verifier1
-      response.should be_success
+      expect(response).to be_success
 
-      session[:file_access_user_id].should == user1.id
-      session[:file_access_expiration].should_not be_nil
-      session[:permissions_key].should_not be_nil
+      expect(session[:file_access_user_id]).to eq user1.id
+      expect(session[:file_access_expiration]).not_to be_nil
+      expect(session[:permissions_key]).not_to be_nil
       permissions_key = session[:permissions_key]
 
       # second verifier, should update session
       get 'show', :user_id => user2.id, :id => @file.id, :ts => ts2, :sf_verifier => sf_verifier2
-      response.should be_success
+      expect(response).to be_success
 
-      session[:file_access_user_id].should == user2.id
-      session[:file_access_expiration].should_not be_nil
-      session[:permissions_key].should_not == permissions_key
+      expect(session[:file_access_user_id]).to eq user2.id
+      expect(session[:file_access_expiration]).not_to be_nil
+      expect(session[:permissions_key]).not_to eq permissions_key
       permissions_key = session[:permissions_key]
 
       # repeat access, even without verifier, should extend expiration (though
       # we can't assert that, because milliseconds) and thus change
       # permissions_key
       get 'show', :user_id => user2.id, :id => @file.id
-      response.should be_success
+      expect(response).to be_success
 
-      session[:permissions_key].should_not == permissions_key
+      expect(session[:permissions_key]).not_to eq permissions_key
     end
 
     it "should set cache headers for non text files" do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
-      response.header["Cache-Control"].should include "private, max-age"
-      response.header["Cache-Control"].should_not include "no-cache"
-      response.header["Cache-Control"].should_not include "no-store"
-      response.header["Cache-Control"].should_not include "max-age=0"
-      response.header["Cache-Control"].should_not include "must-revalidate"
-      response.header.should include("Expires")
-      response.header.should_not include("Pragma")
+      expect(response.header["Cache-Control"]).to include "private, max-age"
+      expect(response.header["Cache-Control"]).not_to include "no-cache"
+      expect(response.header["Cache-Control"]).not_to include "no-store"
+      expect(response.header["Cache-Control"]).not_to include "max-age=0"
+      expect(response.header["Cache-Control"]).not_to include "must-revalidate"
+      expect(response.header).to include("Expires")
+      expect(response.header).not_to include("Pragma")
     end
 
     it "should not set cache headers for text files" do
       @file.content_type = "text/html"
       @file.save
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
-      response.header["Cache-Control"].should_not include "private, max-age"
-      response.header["Cache-Control"].should include "no-cache"
-      response.header["Cache-Control"].should include "no-store"
-      response.header["Cache-Control"].should include "max-age=0"
-      response.header["Cache-Control"].should include "must-revalidate"
-      response.header.should_not include("Expires")
-      response.header.should include("Pragma")
+      expect(response.header["Cache-Control"]).not_to include "private, max-age"
+      expect(response.header["Cache-Control"]).to include "no-cache"
+      expect(response.header["Cache-Control"]).to include "no-store"
+      expect(response.header["Cache-Control"]).to include "max-age=0"
+      expect(response.header["Cache-Control"]).to include "must-revalidate"
+      expect(response.header).not_to include("Expires")
+      expect(response.header).to include("Pragma")
     end
 
     it "should allow concluded teachers to read and download files" do
       user_session(@teacher)
       @enrollment.conclude
       get 'show', :course_id => @course.id, :id => @file.id
-      response.should be_success
+      expect(response).to be_success
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     describe "as a student" do
@@ -297,35 +297,35 @@ describe FilesController do
       it "should allow concluded students to read and download files" do
         @enrollment.conclude
         get 'show', :course_id => @course.id, :id => @file.id
-        response.should be_success
+        expect(response).to be_success
         get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-        response.should be_redirect
+        expect(response).to be_redirect
       end
 
       it "should mark files as viewed for module progressions if the file is previewed inline" do
         file_in_a_module
         get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
-        json_parse.should == {'ok' => true}
+        expect(json_parse).to eq({'ok' => true})
         @module.reload
-        @module.evaluate_for(@student).state.should eql(:completed)
-        @file.reload.last_inline_view.should > 1.minute.ago
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should mark files as viewed for module progressions if the file is downloaded" do
         file_in_a_module
         get 'show', :course_id => @course.id, :id => @file.id, :download => 1
         @module.reload
-        @module.evaluate_for(@student).state.should eql(:completed)
-        @file.reload.last_inline_view.should be_nil
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@file.reload.last_inline_view).to be_nil
       end
 
       it "should mark files as viewed for module progressions if the file is previewed inline" do
         file_in_a_module
         get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
-        json_parse.should == {'ok' => true}
+        expect(json_parse).to eq({'ok' => true})
         @module.reload
-        @module.evaluate_for(@student).state.should eql(:completed)
-        @file.reload.last_inline_view.should > 1.minute.ago
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
@@ -333,8 +333,8 @@ describe FilesController do
         Attachment.any_instance.stubs(:canvadocable?).returns true
         get 'show', :course_id => @course.id, :id => @file.id, :format => :json
         @module.reload
-        @module.evaluate_for(@student).state.should eql(:completed)
-        @file.reload.last_inline_view.should > 1.minute.ago
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -344,9 +344,9 @@ describe FilesController do
         owned_file.save
         owned_file.destroy
         get 'show', :course_id => @course.id, :id => owned_file.id
-        response.should be_redirect
-        flash[:notice].should match(/has been deleted/)
-        URI.parse(response['Location']).path.should == "/courses/#{@course.id}/files"
+        expect(response).to be_redirect
+        expect(flash[:notice]).to match(/has been deleted/)
+        expect(URI.parse(response['Location']).path).to eq "/courses/#{@course.id}/files"
       end
 
       it 'displays a new file without incident' do
@@ -355,8 +355,8 @@ describe FilesController do
         new_file.save
 
         get 'show', :course_id => @course.id, :id => new_file.id
-        response.should be_success
-        assigns(:attachment).should == new_file
+        expect(response).to be_success
+        expect(assigns(:attachment)).to eq new_file
       end
 
       it "doesnt leak the name of unowned deleted files" do
@@ -381,7 +381,7 @@ describe FilesController do
         file = @quiz.statistics_csv('student_analysis').csv_attachment
         get 'show', :quiz_statistics_id => file.reload.context.id,
           :file_id => file.id, :download => '1', :verifier => file.uuid
-        response.should be_redirect
+        expect(response).to be_redirect
       end
 
       it "should record the inline view when a teacher previews a student's submission" do
@@ -389,8 +389,8 @@ describe FilesController do
         attachment_model :context => @student
         @assignment.submit_homework @student, :attachments => [@attachment]
         get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
-        response.should be_success
-        @attachment.reload.last_inline_view.should > 1.minute.ago
+        expect(response).to be_success
+        expect(@attachment.reload.last_inline_view).to be > 1.minute.ago
       end
     end
 
@@ -403,14 +403,14 @@ describe FilesController do
 
       it "is included if :download is allowed" do
         get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
-        json_parse['attachment']['canvadoc_session_url'].should be_present
+        expect(json_parse['attachment']['canvadoc_session_url']).to be_present
       end
 
       it "is not included if locked" do
         @file.lock_at = 1.month.ago
         @file.save!
         get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
-        json_parse['attachment']['canvadoc_session_url'].should be_nil
+        expect(json_parse['attachment']['canvadoc_session_url']).to be_nil
       end
     end
   end
@@ -427,16 +427,16 @@ describe FilesController do
 
     it "should find files by relative path" do
       get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
-      response.should be_redirect
+      expect(response).to be_redirect
       get "show_relative", :course_id => @course.id, :file_path => @file.full_path
-      response.should be_redirect
+      expect(response).to be_redirect
 
       def test_path(path)
         file_with_path(path)
         get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
-        response.should be_redirect
+        expect(response).to be_redirect
         get "show_relative", :course_id => @course.id, :file_path => @file.full_path
-        response.should be_redirect
+        expect(response).to be_redirect
       end
 
       test_path("course files/unfiled/test1.txt")
@@ -456,9 +456,9 @@ describe FilesController do
 
     it "should ignore bad file_ids" do
       get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
-      response.should be_redirect
+      expect(response).to be_redirect
       get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
 
@@ -471,7 +471,7 @@ describe FilesController do
     it "should assign variables" do
       user_session(@teacher)
       get 'new', :course_id => @course.id
-      assigns[:attachment].should_not be_nil
+      expect(assigns[:attachment]).not_to be_nil
     end
   end
 
@@ -484,9 +484,9 @@ describe FilesController do
     it "should create file" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}
-      response.should be_redirect
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].display_name.should eql("bob")
+      expect(response).to be_redirect
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].display_name).to eql("bob")
     end
   end
 
@@ -503,10 +503,10 @@ describe FilesController do
     it "should update file" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:display_name => "new name", :uploaded_data => nil}
-      response.should be_redirect
-      assigns[:attachment].should eql(@file)
-      assigns[:attachment].display_name.should eql("new name")
-      assigns[:attachment].user_id.should be_nil
+      expect(response).to be_redirect
+      expect(assigns[:attachment]).to eql(@file)
+      expect(assigns[:attachment].display_name).to eql("new name")
+      expect(assigns[:attachment].user_id).to be_nil
     end
 
     it "should move file into a folder" do
@@ -514,10 +514,10 @@ describe FilesController do
       course_folder
 
       put 'update', :course_id => @course.id, :id => @file.id, :attachment => { :folder_id => @folder.id }, :format => 'json'
-      response.should be_success
+      expect(response).to be_success
 
       @file.reload
-      @file.folder.should eql(@folder)
+      expect(@file.folder).to eql(@folder)
     end
 
     it "should replace content and update user_id" do
@@ -525,11 +525,11 @@ describe FilesController do
       course_file
       new_content = default_uploaded_data
       put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:uploaded_data => new_content}
-      response.should be_redirect
-      assigns[:attachment].should eql(@file)
+      expect(response).to be_redirect
+      expect(assigns[:attachment]).to eql(@file)
       @file.reload
-      @file.size.should eql new_content.size
-      @file.user.should eql @teacher
+      expect(@file.size).to eql new_content.size
+      expect(@file.user).to eql @teacher
     end
   end
 
@@ -545,9 +545,9 @@ describe FilesController do
     it "should delete file" do
       user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @file.id
-      response.should be_redirect
-      assigns[:attachment].should eql(@file)
-      assigns[:attachment].file_state.should == 'deleted'
+      expect(response).to be_redirect
+      expect(assigns[:attachment]).to eql(@file)
+      expect(assigns[:attachment].file_state).to eq 'deleted'
     end
   end
 
@@ -560,7 +560,7 @@ describe FilesController do
 
     it "should require a pseudonym" do
       post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
-      response.should redirect_to login_url
+      expect(response).to redirect_to login_url
     end
 
     it "should create file placeholder (in local mode)" do
@@ -570,16 +570,16 @@ describe FilesController do
         :context_code => @course.asset_string,
         :filename => "bob.txt"
       }}
-      response.should be_success
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].id.should_not be_nil
-      assigns[:attachment][:user_id].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
+      expect(assigns[:attachment][:user_id]).not_to be_nil
       json = json_parse
-      json.should_not be_nil
-      json['id'].should eql(assigns[:attachment].id)
-      json['upload_url'].should_not be_nil
-      json['upload_params'].should_not be_nil
-      json['upload_params'].should_not be_empty
+      expect(json).not_to be_nil
+      expect(json['id']).to eql(assigns[:attachment].id)
+      expect(json['upload_url']).not_to be_nil
+      expect(json['upload_params']).not_to be_nil
+      expect(json['upload_params']).not_to be_empty
     end
 
     it "should create file placeholder (in s3 mode)" do
@@ -589,16 +589,16 @@ describe FilesController do
         :context_code => @course.asset_string,
         :filename => "bob.txt"
       }}
-      response.should be_success
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].id.should_not be_nil
-      assigns[:attachment][:user_id].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
+      expect(assigns[:attachment][:user_id]).not_to be_nil
       json = json_parse
-      json.should_not be_nil
-      json['id'].should eql(assigns[:attachment].id)
-      json['upload_url'].should_not be_nil
-      json['upload_params'].should be_present
-      json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
+      expect(json).not_to be_nil
+      expect(json['id']).to eql(assigns[:attachment].id)
+      expect(json['upload_url']).not_to be_nil
+      expect(json['upload_params']).to be_present
+      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
     end
 
     it "should not allow going over quota for file uploads" do
@@ -609,8 +609,8 @@ describe FilesController do
         :context_code => @student.asset_string,
         :filename => "bob.txt"
       }}
-      response.should be_redirect
-      assigns[:quota_used].should > assigns[:quota]
+      expect(response).to be_redirect
+      expect(assigns[:quota_used]).to be > assigns[:quota]
     end
 
     it "should allow going over quota for homework submissions" do
@@ -624,15 +624,15 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }, :format => :json}
-      response.should be_success
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].id.should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
       json = json_parse
-      json.should_not be_nil
-      json['id'].should eql(assigns[:attachment].id)
-      json['upload_url'].should_not be_nil
-      json['upload_params'].should be_present
-      json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
+      expect(json).not_to be_nil
+      expect(json['id']).to eql(assigns[:attachment].id)
+      expect(json['upload_url']).not_to be_nil
+      expect(json['upload_params']).to be_present
+      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
     end
 
     it "should associate assignment submission for a group assignment with the group" do
@@ -653,10 +653,10 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }}
-      response.should be_success
+      expect(response).to be_success
 
-      assigns[:attachment].should_not be_nil
-      assigns[:attachment].context.should == group
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].context).to eq group
     end
 
     context "sharding" do
@@ -672,16 +672,16 @@ describe FilesController do
             :context_code => @course.asset_string,
             :filename => "bob.txt"
         }}
-        response.should be_success
-        assigns[:attachment].should_not be_nil
-        assigns[:attachment].id.should_not be_nil
-        assigns[:attachment].shard.should == @shard1
+        expect(response).to be_success
+        expect(assigns[:attachment]).not_to be_nil
+        expect(assigns[:attachment].id).not_to be_nil
+        expect(assigns[:attachment].shard).to eq @shard1
         json = json_parse
-        json.should_not be_nil
-        json['id'].should eql(assigns[:attachment].id)
-        json['upload_url'].should_not be_nil
-        json['upload_params'].should_not be_nil
-        json['upload_params'].should_not be_empty
+        expect(json).not_to be_nil
+        expect(json['id']).to eql(assigns[:attachment].id)
+        expect(json['upload_url']).not_to be_nil
+        expect(json['upload_params']).not_to be_nil
+        expect(json['upload_params']).not_to be_empty
       end
     end
   end
@@ -703,11 +703,11 @@ describe FilesController do
     it "should accept the upload data if the policy and attachment are acceptable" do
       params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
       post "api_create", params[:upload_params].merge(:file => @content)
-      response.should be_redirect
+      expect(response).to be_redirect
       @attachment.reload
       # the file is not available until the third api call is completed
-      @attachment.file_state.should == 'deleted'
-      @attachment.open.read.should == File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
+      expect(@attachment.file_state).to eq 'deleted'
+      expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
     end
 
     it "should reject a blank policy" do
@@ -751,9 +751,9 @@ describe FilesController do
 
       it "should give a download url" do
         get "public_url", :id => @attachment.id
-        response.should be_success
+        expect(response).to be_success
         data = json_parse
-        data.should == { "public_url" => @attachment.authenticated_s3_url }
+        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url })
       end
     end
 
@@ -769,9 +769,9 @@ describe FilesController do
 
       it "should allow a teacher to download a student's submission" do
         get "public_url", :id => @attachment.id, :submission_id => @submission.id
-        response.should be_success
+        expect(response).to be_success
         data = json_parse
-        data.should == { "public_url" => @attachment.authenticated_s3_url }
+        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url })
       end
 
       it "should verify that the requested file belongs to the submission" do

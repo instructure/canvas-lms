@@ -38,9 +38,9 @@ describe GradebookUploadsController do
     file.close
     data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
     post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
-    response.should be_success
+    expect(response).to be_success
     upload = assigns[:uploaded_gradebook]
-    upload.should_not be_nil
+    expect(upload).not_to be_nil
   end
 
   def setup_DA
@@ -81,7 +81,7 @@ describe GradebookUploadsController do
       file.close
       data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
       post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should accept a valid csv upload" do
@@ -112,8 +112,8 @@ describe GradebookUploadsController do
     it "should update grades and save new versions" do
       @assignment.reload
       @assignment2.reload
-      @assignment.submissions.first.grade.should == '10'
-      @assignment2.submissions.first.grade.should == '8'
+      expect(@assignment.submissions.first.grade).to eq '10'
+      expect(@assignment2.submissions.first.grade).to eq '8'
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2"]
@@ -127,16 +127,16 @@ describe GradebookUploadsController do
 
       a_sub = @assignment.reload.submissions.first
       a2_sub = @assignment2.reload.submissions.first
-      a_sub.grade.should == '5'
-      a_sub.graded_at.should_not be_nil
-      a_sub.grader_id.should_not be_nil
-      a_sub.version_number.should == 2
-      a2_sub.grade.should == '7'
-      a2_sub.graded_at.should_not be_nil
-      a2_sub.grader_id.should_not be_nil
-      a2_sub.version_number.should == 2
+      expect(a_sub.grade).to eq '5'
+      expect(a_sub.graded_at).not_to be_nil
+      expect(a_sub.grader_id).not_to be_nil
+      expect(a_sub.version_number).to eq 2
+      expect(a2_sub.grade).to eq '7'
+      expect(a2_sub.graded_at).not_to be_nil
+      expect(a2_sub.grader_id).not_to be_nil
+      expect(a2_sub.version_number).to eq 2
 
-      response.should redirect_to(course_gradebook_url(@course))
+      expect(response).to redirect_to(course_gradebook_url(@course))
     end
 
     it "should create new assignments" do
@@ -151,10 +151,10 @@ describe GradebookUploadsController do
       post 'update', :course_id => @course.id, :json_data_to_submit => @gi.to_json
 
       a = @course.assignments.where(title: "Third Assignment").first
-      a.should_not be_nil
-      a.title.should == "Third Assignment"
-      a.points_possible.should == 15
-      a.submissions.first.grade.should == '10'
+      expect(a).not_to be_nil
+      expect(a.title).to eq "Third Assignment"
+      expect(a.points_possible).to eq 15
+      expect(a.submissions.first.grade).to eq '10'
     end
 
     it "should allow entering a percentage for a score" do
@@ -183,8 +183,8 @@ describe GradebookUploadsController do
       JSON
       post 'update', :course_id => @course.id, :json_data_to_submit => uploaded_json
       @submission = @assignment.reload.submissions.where(user_id: @student).first
-      @submission.grade.should == "40%"
-      @submission.score.should == 4
+      expect(@submission.grade).to eq "40%"
+      expect(@submission.score).to eq 4
     end
 
     context "differentiated assignments" do
@@ -242,12 +242,12 @@ describe GradebookUploadsController do
 
         a1_sub1 = @assignment.reload.submissions.where(user_id: @student1).first
         a1_sub2 = @assignment.reload.submissions.where(user_id: @student2).first
-        a1_sub1.grade.should == '7'
-        a1_sub2.should == nil
+        expect(a1_sub1.grade).to eq '7'
+        expect(a1_sub2).to eq nil
         a2_sub1 = @assignment2.reload.submissions.where(user_id: @student1).first
         a2_sub2 = @assignment2.reload.submissions.where(user_id: @student2).first
-        a2_sub1.should == nil
-        a2_sub2.grade.should == '9'
+        expect(a2_sub1).to eq nil
+        expect(a2_sub2.grade).to eq '9'
       end
     end
   end

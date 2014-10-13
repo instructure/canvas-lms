@@ -23,13 +23,13 @@ describe Filters::AllowAppProfiling, type: :none do
     let_once(:target_user) { site_admin_user() }
 
     it "should be disabled at first" do
-      Filters::AllowAppProfiling.allow?({}, {}, target_user).should == false
+      expect(Filters::AllowAppProfiling.allow?({}, {}, target_user)).to eq false
     end
 
     it "should allow enabling, and remember that in session store" do
       session = {}
-      Filters::AllowAppProfiling.allow?({ pp: 'enable' }, session, target_user).should == true
-      Filters::AllowAppProfiling.allow?({}, session, target_user).should == true
+      expect(Filters::AllowAppProfiling.allow?({ pp: 'enable' }, session, target_user)).to eq true
+      expect(Filters::AllowAppProfiling.allow?({}, session, target_user)).to eq true
     end
   end
 
@@ -37,10 +37,10 @@ describe Filters::AllowAppProfiling, type: :none do
     let(:target_user) { account_admin_user() }
 
     it "should not be allowed" do
-      Filters::AllowAppProfiling.allow?({}, {}, target_user).should == false
-      Filters::AllowAppProfiling.allow?({}, {}, nil).should == false
-      Filters::AllowAppProfiling.allow?({ pp: 'enable' }, {}, target_user).should == false
-      Filters::AllowAppProfiling.allow?({ pp: 'enable' }, {}, nil).should == false
+      expect(Filters::AllowAppProfiling.allow?({}, {}, target_user)).to eq false
+      expect(Filters::AllowAppProfiling.allow?({}, {}, nil)).to eq false
+      expect(Filters::AllowAppProfiling.allow?({ pp: 'enable' }, {}, target_user)).to eq false
+      expect(Filters::AllowAppProfiling.allow?({ pp: 'enable' }, {}, nil)).to eq false
     end
   end
 end

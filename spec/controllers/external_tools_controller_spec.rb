@@ -65,23 +65,23 @@ describe ExternalToolsController do
 
         get :show, :course_id => @course.id, id: @tool.id
 
-        response.should be_success
+        expect(response).to be_success
         lti_launch = assigns[:lti_launch]
-        lti_launch.link_text.should == 'bob'
-        lti_launch.resource_url.should == 'http://www.example.com/basic_lti'
-        lti_launch.launch_type.should be_nil
-        lti_launch.params['lti_message_type'].should == 'ContentItemSelectionResponse'
-        lti_launch.params['lti_version'].should == 'LTI-1p0'
-        lti_launch.params['context_id'].should == 'ABC123'
-        lti_launch.params['resource_link_id'].should == 'ABC123'
-        lti_launch.params['context_title'].should == 'a course'
-        lti_launch.params['roles'].should == 'Instructor'
-        lti_launch.params['tool_consumer_instance_guid'].should == 'root-account-guid'
-        lti_launch.params['tool_consumer_instance_name'].should == 'root account'
-        lti_launch.params['tool_consumer_instance_contact_email'].should == 'some_address'
-        lti_launch.params['launch_presentation_return_url'].should start_with 'http'
-        lti_launch.params['launch_presentation_locale'].should == 'en'
-        lti_launch.params['launch_presentation_document_target'].should == 'iframe'
+        expect(lti_launch.link_text).to eq 'bob'
+        expect(lti_launch.resource_url).to eq 'http://www.example.com/basic_lti'
+        expect(lti_launch.launch_type).to be_nil
+        expect(lti_launch.params['lti_message_type']).to eq 'ContentItemSelectionResponse'
+        expect(lti_launch.params['lti_version']).to eq 'LTI-1p0'
+        expect(lti_launch.params['context_id']).to eq 'ABC123'
+        expect(lti_launch.params['resource_link_id']).to eq 'ABC123'
+        expect(lti_launch.params['context_title']).to eq 'a course'
+        expect(lti_launch.params['roles']).to eq 'Instructor'
+        expect(lti_launch.params['tool_consumer_instance_guid']).to eq 'root-account-guid'
+        expect(lti_launch.params['tool_consumer_instance_name']).to eq 'root account'
+        expect(lti_launch.params['tool_consumer_instance_contact_email']).to eq 'some_address'
+        expect(lti_launch.params['launch_presentation_return_url']).to start_with 'http'
+        expect(lti_launch.params['launch_presentation_locale']).to eq 'en'
+        expect(lti_launch.params['launch_presentation_document_target']).to eq 'iframe'
       end
 
       it "sends content item json for a course" do
@@ -90,13 +90,13 @@ describe ExternalToolsController do
         content_item = JSON.parse(assigns[:lti_launch].params['content_items'])
         placement = content_item['@graph'].first
 
-        content_item['@context'].should == 'http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement'
-        content_item['@graph'].size.should == 1
-        placement['@type'].should == 'ContentItemPlacement'
-        placement['placementOf']['@type'].should == 'FileItem'
-        placement['placementOf']['@id'].should == "#{api_v1_course_content_exports_url(@course)}?export_type=common_cartridge"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
-        placement['placementOf']['title'].should == 'a course'
+        expect(content_item['@context']).to eq 'http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement'
+        expect(content_item['@graph'].size).to eq 1
+        expect(placement['@type']).to eq 'ContentItemPlacement'
+        expect(placement['placementOf']['@type']).to eq 'FileItem'
+        expect(placement['placementOf']['@id']).to eq "#{api_v1_course_content_exports_url(@course)}?export_type=common_cartridge"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.course'
+        expect(placement['placementOf']['title']).to eq 'a course'
       end
 
       it "sends content item json for an assignment" do
@@ -107,10 +107,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.assignment'
-        placement['placementOf']['title'].should == 'an assignment'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.assignment'
+        expect(placement['placementOf']['title']).to eq 'an assignment'
       end
 
       it "sends content item json for a discussion topic" do
@@ -121,10 +121,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bdiscussion_topics%5D%5B%5D=#{topic.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.discussion_topic'
-        placement['placementOf']['title'].should == 'blah'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bdiscussion_topics%5D%5B%5D=#{topic.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.discussion_topic'
+        expect(placement['placementOf']['title']).to eq 'blah'
       end
 
       it "sends content item json for a quiz" do
@@ -135,10 +135,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bquizzes%5D%5B%5D=#{quiz.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
-        placement['placementOf']['title'].should == 'a quiz'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bquizzes%5D%5B%5D=#{quiz.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.quiz'
+        expect(placement['placementOf']['title']).to eq 'a quiz'
       end
 
       it "sends content item json for a module" do
@@ -149,10 +149,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bmodules%5D%5B%5D=#{context_module.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.module'
-        placement['placementOf']['title'].should == 'a module'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bmodules%5D%5B%5D=#{context_module.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.module'
+        expect(placement['placementOf']['title']).to eq 'a module'
       end
 
       it "sends content item json for a module item" do
@@ -166,10 +166,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bmodule_items%5D%5B%5D=#{tag.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.quiz'
-        placement['placementOf']['title'].should == 'a quiz'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bmodule_items%5D%5B%5D=#{tag.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.quiz'
+        expect(placement['placementOf']['title']).to eq 'a quiz'
       end
 
       it "sends content item json for a page" do
@@ -180,10 +180,10 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include "select%5Bpages%5D%5B%5D=#{page.id}"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.page'
-        placement['placementOf']['title'].should == 'a page'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include "select%5Bpages%5D%5B%5D=#{page.id}"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.page'
+        expect(placement['placementOf']['title']).to eq 'a page'
       end
 
       it "sends content item json for selected content" do
@@ -193,13 +193,13 @@ describe ExternalToolsController do
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
-        migration_url.should start_with api_v1_course_content_exports_url(@course)
-        params.should include 'export_type=common_cartridge'
-        params.should include "select%5Bpages%5D%5B%5D=1"
-        params.should include "select%5Bpages%5D%5B%5D=6"
-        params.should include "select%5Bassignments%5D%5B%5D=6"
-        placement['placementOf']['mediaType'].should == 'application/vnd.instructure.api.content-exports.course'
-        placement['placementOf']['title'].should == 'a course'
+        expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
+        expect(params).to include 'export_type=common_cartridge'
+        expect(params).to include "select%5Bpages%5D%5B%5D=1"
+        expect(params).to include "select%5Bpages%5D%5B%5D=6"
+        expect(params).to include "select%5Bassignments%5D%5B%5D=6"
+        expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.course'
+        expect(placement['placementOf']['title']).to eq 'a course'
       end
     end
   end
@@ -218,25 +218,25 @@ describe ExternalToolsController do
       tool.url = "http://www.example.com/basic_lti"
       tool.save!
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params.should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params).not_to be_nil
     end
 
     it "should find tools matching by domain" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params.should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params).not_to be_nil
     end
 
     it "should redirect if no matching tools are found" do
       user_session(@teacher)
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com"
-      response.should be_redirect
-      flash[:error].should == "Couldn't find valid settings for this link"
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "Couldn't find valid settings for this link"
     end
   end
 
@@ -252,7 +252,7 @@ describe ExternalToolsController do
       user_session(@student)
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should redirect if no matching tools are found" do
@@ -262,17 +262,17 @@ describe ExternalToolsController do
       # this tool exists, but isn't properly configured
       tool.save!
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_redirect
-      flash[:error].should == "Couldn't find valid settings for this tool"
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "Couldn't find valid settings for this tool"
     end
 
     it "should find a valid tool if one exists" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'active'
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'active'
     end
 
     it "should set html selection if specified" do
@@ -280,9 +280,9 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       html = "<img src='/blank.png'/>"
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params['text'].should == CGI::escape(html)
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params['text']).to eq CGI::escape(html)
     end
 
     it "should find account-level tools" do
@@ -291,8 +291,8 @@ describe ExternalToolsController do
 
       tool = new_valid_tool(Account.default)
       get 'resource_selection', :account_id => Account.default.id, :external_tool_id => tool.id
-      response.should be_success
-      assigns[:tool].should == tool
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
     end
 
     it "should be accessible even after course is soft-concluded" do
@@ -303,9 +303,9 @@ describe ExternalToolsController do
 
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
 
     it "should be accessible even after course is hard-concluded" do
@@ -314,9 +314,9 @@ describe ExternalToolsController do
 
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
 
     it "should be accessible even after enrollment is concluded and include a parameter indicating inactive state" do
@@ -324,13 +324,13 @@ describe ExternalToolsController do
       e = @student.enrollments.first
       e.conclude
       e.reload
-      e.workflow_state.should == 'completed'
+      expect(e.workflow_state).to eq 'completed'
 
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
-      response.should be_success
-      assigns[:tool].should == tool
-      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
+      expect(response).to be_success
+      expect(assigns[:tool]).to eq tool
+      expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
   end
 
@@ -343,12 +343,12 @@ describe ExternalToolsController do
     it "should accept basic configurations" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
-      response.should be_success
-      assigns[:tool].should_not be_nil
-      assigns[:tool].name.should == "tool name"
-      assigns[:tool].url.should == "http://example.com"
-      assigns[:tool].consumer_key.should == "key"
-      assigns[:tool].shared_secret.should == "secret"
+      expect(response).to be_success
+      expect(assigns[:tool]).not_to be_nil
+      expect(assigns[:tool].name).to eq "tool name"
+      expect(assigns[:tool].url).to eq "http://example.com"
+      expect(assigns[:tool].consumer_key).to eq "key"
+      expect(assigns[:tool].shared_secret).to eq "secret"
     end
 
     it "should fail on basic xml with no url or domain set" do
@@ -374,7 +374,7 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>  
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-      response.should_not be_success
+      expect(response).not_to be_success
     end
 
     it "should handle advanced xml configurations" do
@@ -409,16 +409,16 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>  
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-      response.should be_success
-      assigns[:tool].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml
-      assigns[:tool].name.should == "tool name"
-      assigns[:tool].description.should == "Description"
-      assigns[:tool].url.should == "http://example.com/other_url"
-      assigns[:tool].consumer_key.should == "key"
-      assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].not_selectable.should be_truthy
-      assigns[:tool].has_placement?(:editor_button).should be_true
+      expect(assigns[:tool].name).to eq "tool name"
+      expect(assigns[:tool].description).to eq "Description"
+      expect(assigns[:tool].url).to eq "http://example.com/other_url"
+      expect(assigns[:tool].consumer_key).to eq "key"
+      expect(assigns[:tool].shared_secret).to eq "secret"
+      expect(assigns[:tool].not_selectable).to be_truthy
+      expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
     end
 
     it "should handle advanced xml configurations with no url or domain set" do
@@ -451,16 +451,16 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>  
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-      response.should be_success
-      assigns[:tool].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml
-      assigns[:tool].name.should == "tool name"
-      assigns[:tool].description.should == "Description"
-      assigns[:tool].url.should be_nil
-      assigns[:tool].domain.should be_nil
-      assigns[:tool].consumer_key.should == "key"
-      assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].has_placement?(:editor_button).should be_true
+      expect(assigns[:tool].name).to eq "tool name"
+      expect(assigns[:tool].description).to eq "Description"
+      expect(assigns[:tool].url).to be_nil
+      expect(assigns[:tool].domain).to be_nil
+      expect(assigns[:tool].consumer_key).to eq "key"
+      expect(assigns[:tool].shared_secret).to eq "secret"
+      expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
     end
 
     it "should handle advanced xml configurations by URL retrieval" do
@@ -496,15 +496,15 @@ describe ExternalToolsController do
       obj = OpenStruct.new({:body => xml})
       Net::HTTP.any_instance.stubs(:request).returns(obj)
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
-      response.should be_success
-      assigns[:tool].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml
-      assigns[:tool].name.should == "tool name"
-      assigns[:tool].description.should == "Description"
-      assigns[:tool].url.should == "http://example.com/other_url"
-      assigns[:tool].consumer_key.should == "key"
-      assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].has_placement?(:editor_button).should be_true
+      expect(assigns[:tool].name).to eq "tool name"
+      expect(assigns[:tool].description).to eq "Description"
+      expect(assigns[:tool].url).to eq "http://example.com/other_url"
+      expect(assigns[:tool].consumer_key).to eq "key"
+      expect(assigns[:tool].shared_secret).to eq "secret"
+      expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
     end
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do
@@ -512,10 +512,10 @@ describe ExternalToolsController do
       user_session(@teacher)
       xml = "bob"
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
-      response.should_not be_success
-      assigns[:tool].should be_new_record
+      expect(response).not_to be_success
+      expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
-      json['errors']['config_url'][0]['message'].should == I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
+      expect(json['errors']['config_url'][0]['message']).to eq I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
     end
 
     context "navigation tabs caching" do
@@ -545,8 +545,8 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
           XML
           post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-          response.should be_success
-          nav_cache.cache_key.should == cache_key
+          expect(response).to be_success
+          expect(nav_cache.cache_key).to eq cache_key
         end
       end
 
@@ -579,8 +579,8 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
           XML
           post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-          response.should be_success
-          Lti::NavigationCache.new(@course.root_account).cache_key.should_not == cache_key
+          expect(response).to be_success
+          expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
       end
 
@@ -613,8 +613,8 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
           XML
           post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-          response.should be_success
-          Lti::NavigationCache.new(@course.root_account).cache_key.should_not == cache_key
+          expect(response).to be_success
+          expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
       end
 
@@ -647,8 +647,8 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
           XML
           post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-          response.should be_success
-          Lti::NavigationCache.new(@course.root_account).cache_key.should_not == cache_key
+          expect(response).to be_success
+          expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
       end
     end

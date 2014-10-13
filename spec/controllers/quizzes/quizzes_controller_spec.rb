@@ -92,17 +92,17 @@ describe Quizzes::QuizzesController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>4,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign JS variables" do
       user_session(@teacher)
       get 'index', :course_id => @course.id
-      controller.js_env[:QUIZZES][:assignment].should_not be_nil
-      controller.js_env[:QUIZZES][:open].should_not be_nil
-      controller.js_env[:QUIZZES][:surveys].should_not be_nil
-      controller.js_env[:QUIZZES][:options].should_not be_nil
+      expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+      expect(controller.js_env[:QUIZZES][:open]).not_to be_nil
+      expect(controller.js_env[:QUIZZES][:surveys]).not_to be_nil
+      expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
     end
 
     it "should filter out unpublished quizzes for student" do
@@ -112,9 +112,9 @@ describe Quizzes::QuizzesController do
 
       get 'index', :course_id => @course.id
 
-      controller.js_env[:QUIZZES][:assignment].length.should eql 1
+      expect(controller.js_env[:QUIZZES][:assignment].length).to eql 1
       controller.js_env[:QUIZZES][:assignment].map do |quiz|
-        quiz[:published].should be_truthy
+        expect(quiz[:published]).to be_truthy
       end
     end
 
@@ -139,10 +139,10 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       course_quiz(active = true)
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql false
+      expect(a.feature_enabled?(:quiz_stats)).to eql false
       get 'index', :course_id => @course.id
       assert_response(:success)
-      response.should render_template('index')
+      expect(response).to render_template('index')
     end
   end
 
@@ -157,10 +157,10 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       course_quiz(active = true)
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'index', :course_id => @course.id
       assert_response(:success)
-      response.should render_template('fabulous_quizzes')
+      expect(response).to render_template('fabulous_quizzes')
     end
   end
 
@@ -173,24 +173,24 @@ describe Quizzes::QuizzesController do
     it "should assign variables" do
       user_session(@teacher)
       get 'new', :course_id => @course.id
-      assigns[:quiz].should_not be_nil
+      expect(assigns[:quiz]).not_to be_nil
       q = assigns[:quiz]
     end
 
     it "subsequent requests should return the same quiz unless ?fresh=1" do
       user_session(@teacher)
       get 'new', :course_id => @course.id
-      assigns[:quiz].should_not be_nil
+      expect(assigns[:quiz]).not_to be_nil
       q = assigns[:quiz]
 
       get 'new', :course_id => @course.id
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should_not eql(q)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).not_to eql(q)
 
       get 'new', :course_id => @course.id, :fresh => 1
       # Quizzes::Quiz.where(id: q).first.should be_deleted
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should_not eql(q)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).not_to eql(q)
     end
   end
 
@@ -199,7 +199,7 @@ describe Quizzes::QuizzesController do
     it "should require authorization" do
       get 'edit', :course_id => @course.id, :id => @quiz.id
       assert_unauthorized
-      assigns[:quiz].should_not be_nil
+      expect(assigns[:quiz]).not_to be_nil
     end
 
     it "should assign variables" do
@@ -208,10 +208,10 @@ describe Quizzes::QuizzesController do
       q = @quiz.quiz_questions.create!
       regrade.quiz_question_regrades.create!(:quiz_question_id => q.id,:regrade_option => 'no_regrade')
       get 'edit', :course_id => @course.id, :id => @quiz.id
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:js_env][:REGRADE_OPTIONS].should == {q.id => 'no_regrade' }
-      response.should render_template("new")
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:js_env][:REGRADE_OPTIONS]).to eq({q.id => 'no_regrade' })
+      expect(response).to render_template("new")
     end
   end
 
@@ -220,19 +220,19 @@ describe Quizzes::QuizzesController do
       course_quiz
       get 'show', :course_id => @course.id, :id => @quiz.id
       assert_unauthorized
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "should assign variables" do
       user_session(@teacher)
       course_quiz
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:question_count].should eql(@quiz.question_count)
-      assigns[:just_graded].should eql(false)
-      assigns[:stored_params].should_not be_nil
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:question_count]).to eql(@quiz.question_count)
+      expect(assigns[:just_graded]).to eql(false)
+      expect(assigns[:stored_params]).not_to be_nil
     end
 
     it "should set the submission count variables" do
@@ -251,31 +251,31 @@ describe Quizzes::QuizzesController do
 
       user_session @teacher
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:submitted_student_count].should == 2
-      assigns[:any_submissions_pending_review].should == true
+      expect(assigns[:submitted_student_count]).to eq 2
+      expect(assigns[:any_submissions_pending_review]).to eq true
 
       controller.js_env.clear
 
       user_session @ta1
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:submitted_student_count].should == 1
-      assigns[:any_submissions_pending_review].should == false
+      expect(assigns[:submitted_student_count]).to eq 1
+      expect(assigns[:any_submissions_pending_review]).to eq false
     end
 
     it "should allow forcing authentication on public quiz pages" do
       @course.update_attribute :is_public, true
       course_quiz !!:active
       get 'show', :course_id => @course.id, :id => @quiz.id, :force_user => 1
-      response.should be_redirect
-      response.location.should match /login/
+      expect(response).to be_redirect
+      expect(response.location).to match /login/
     end
 
     it "should set session[headless_quiz] if persist_headless param is sent" do
       user_session(@student)
       course_quiz !!:active
       get 'show', :course_id => @course.id, :id => @quiz.id, :persist_headless => 1
-      controller.session[:headless_quiz].should be_truthy
-      assigns[:headers].should be_falsey
+      expect(controller.session[:headless_quiz]).to be_truthy
+      expect(assigns[:headers]).to be_falsey
     end
 
     it "should not render headers if session[:headless_quiz] is set" do
@@ -283,7 +283,7 @@ describe Quizzes::QuizzesController do
       course_quiz !!:active
       controller.session[:headless_quiz] = true
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:headers].should be_falsey
+      expect(assigns[:headers]).to be_falsey
     end
 
     it "assigns js_env for attachments if submission is present" do
@@ -296,8 +296,8 @@ describe Quizzes::QuizzesController do
       attachment = submission.attachments.first
 
       attach = assigns[:js_env][:ATTACHMENTS][attachment.id]
-      attach[:id].should == attachment.id
-      attach[:display_name].should == attachment.display_name
+      expect(attach[:id]).to eq attachment.id
+      expect(attach[:display_name]).to eq attachment.display_name
     end
 
     it "assigns js_env for versions if submission is present" do
@@ -309,7 +309,7 @@ describe Quizzes::QuizzesController do
       get 'show', :course_id => @course.id, :id => @quiz.id
 
       path = "courses/#{@course.id}/quizzes/#{@quiz.id}/submission_versions"
-      assigns[:js_env][:SUBMISSION_VERSIONS_URL].should include(path)
+      expect(assigns[:js_env][:SUBMISSION_VERSIONS_URL]).to include(path)
     end
 
     it "doesn't show unpublished quizzes to students with draft state" do
@@ -317,7 +317,7 @@ describe Quizzes::QuizzesController do
       course_quiz(active=true)
       @quiz.unpublish!
       get 'show', course_id: @course.id, id: @quiz.id
-      response.should_not be_success
+      expect(response).not_to be_success
     end
 
     it 'logs a single asset access entry with an action level of "view"' do
@@ -326,10 +326,10 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       course_quiz
       get 'show', :course_id => @course.id, :id => @quiz.id
-      assigns[:access].should_not be_nil
-      assigns[:accessed_asset].should_not be_nil
-      assigns[:accessed_asset][:level].should == 'view'
-      assigns[:access].view_score.should == 1
+      expect(assigns[:access]).not_to be_nil
+      expect(assigns[:accessed_asset]).not_to be_nil
+      expect(assigns[:accessed_asset][:level]).to eq 'view'
+      expect(assigns[:access].view_score).to eq 1
     end
 
     it "locks results if there is a submission and one_time_results is on" do
@@ -347,8 +347,8 @@ describe Quizzes::QuizzesController do
 
       get 'show', course_id: @course.id, id: @quiz.id
 
-      response.should be_success
-      submission.reload.has_seen_results.should == true
+      expect(response).to be_success
+      expect(submission.reload.has_seen_results).to eq true
     end
 
     it "does not attempt to lock results if there is a settings only submission" do
@@ -368,8 +368,8 @@ describe Quizzes::QuizzesController do
 
       get 'show', course_id: @course.id, id: @quiz.id
 
-      response.should be_success
-      submission.reload.has_seen_results.should be_nil
+      expect(response).to be_success
+      expect(submission.reload.has_seen_results).to be_nil
     end
   end
 
@@ -388,21 +388,21 @@ describe Quizzes::QuizzesController do
 
     it "should redirect to ember quiz stats app" do
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'show', :course_id => @course.id, :id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_url(@quiz.id)
     end
 
     it "should redirect to ember quiz stats app with headless if given" do
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'show', :course_id => @course.id, :id => @quiz.id, :headless => 1
       assert_redirected_to ember_urls.course_quiz_url(@quiz.id, headless: 1)
     end
 
     it "should redirect to preview ember quiz stats app" do
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'show', :course_id => @course.id, :id => @quiz.id, :preview => 1
       assert_redirected_to ember_urls.course_quiz_preview_url(@quiz.id)
     end
@@ -423,14 +423,14 @@ describe Quizzes::QuizzesController do
       @sub2 = @quiz.generate_submission(@user2)
       user_session @teacher
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions_from_users][@sub1.user_id].should == @sub1
-      assigns[:submissions_from_users][@sub2.user_id].should == @sub2
-      assigns[:submitted_students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
+      expect(assigns[:submissions_from_users][@sub1.user_id]).to eq @sub1
+      expect(assigns[:submissions_from_users][@sub2.user_id]).to eq @sub2
+      expect(assigns[:submitted_students].sort_by(&:id)).to eq [@user1, @user2].sort_by(&:id)
 
       user_session @ta1
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions_from_users][@sub1.user_id].should == @sub1
-      assigns[:submitted_students].should == [@user1]
+      expect(assigns[:submissions_from_users][@sub1.user_id]).to eq @sub1
+      expect(assigns[:submitted_students]).to eq [@user1]
     end
 
     it "should include survey results from logged out users in a public course" do
@@ -447,8 +447,8 @@ describe Quizzes::QuizzesController do
 
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
 
-      assigns[:submissions_from_logged_out].should == [@quiz_submission]
-      assigns[:submissions_from_users].should == {}
+      expect(assigns[:submissions_from_logged_out]).to eq [@quiz_submission]
+      expect(assigns[:submissions_from_users]).to eq({})
     end
 
     it "should include survey results from a logged-in user in a public course" do
@@ -479,8 +479,8 @@ describe Quizzes::QuizzesController do
 
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
 
-      assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
-      assigns[:submitted_students].should == [@user1]
+      expect(assigns[:submissions_from_users][@quiz_submission.user_id]).to eq @quiz_submission
+      expect(assigns[:submitted_students]).to eq [@user1]
     end
 
     it "should not include teacher previews" do
@@ -494,9 +494,9 @@ describe Quizzes::QuizzesController do
 
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => quiz.id
 
-      assigns[:submissions_from_users].should be_empty
-      assigns[:submissions_from_logged_out].should be_empty
-      assigns[:submitted_students].should be_empty
+      expect(assigns[:submissions_from_users]).to be_empty
+      expect(assigns[:submissions_from_logged_out]).to be_empty
+      expect(assigns[:submitted_students]).to be_empty
     end
 
     context "differentiated_assignments" do
@@ -527,15 +527,15 @@ describe Quizzes::QuizzesController do
 
         get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
 
-        assigns[:submissions_from_users][@quiz_submission.user_id].should == nil
-        assigns[:submitted_students].should == []
+        expect(assigns[:submissions_from_users][@quiz_submission.user_id]).to eq nil
+        expect(assigns[:submitted_students]).to eq []
 
         create_section_override_for_quiz(@quiz, {course_section: @user1.enrollments.first.course_section})
 
         get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
 
-        assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
-        assigns[:submitted_students].should == [@user1]
+        expect(assigns[:submissions_from_users][@quiz_submission.user_id]).to eq @quiz_submission
+        expect(assigns[:submitted_students]).to eq [@user1]
       end
     end
   end
@@ -551,9 +551,9 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       @sub = @quiz.generate_submission(@student)
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:quiz].should == @quiz
-      assigns[:students].should include @student
-      assigns[:submissions].should == [@sub]
+      expect(assigns[:quiz]).to eq @quiz
+      expect(assigns[:students]).to include @student
+      expect(assigns[:submissions]).to eq [@sub]
     end
 
     it "should respect section privilege limitations" do
@@ -570,13 +570,13 @@ describe Quizzes::QuizzesController do
 
       user_session @teacher
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
-      assigns[:submissions].sort_by(&:id).should == [@sub1, @sub2].sort_by(&:id)
+      expect(assigns[:students].sort_by(&:id)).to eq [@user1, @user2].sort_by(&:id)
+      expect(assigns[:submissions].sort_by(&:id)).to eq [@sub1, @sub2].sort_by(&:id)
 
       user_session @ta1
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:students].should == [@user1]
-      assigns[:submissions].should == [@sub1]
+      expect(assigns[:students]).to eq [@user1]
+      expect(assigns[:submissions]).to eq [@sub1]
     end
   end
 
@@ -592,7 +592,7 @@ describe Quizzes::QuizzesController do
 
     it "should not redirect to ember moderate app" do
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
       assert_response :success
     end
@@ -611,7 +611,7 @@ describe Quizzes::QuizzesController do
 
     it "should redirect to ember moderate app" do
       a = Account.default
-      a.feature_enabled?(:quiz_moderate).should eql true
+      expect(a.feature_enabled?(:quiz_moderate)).to eql true
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_moderate_url(@quiz.id)
     end
@@ -629,7 +629,7 @@ describe Quizzes::QuizzesController do
       user_session(@student)
       course_quiz(true)
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
 
     context 'asset access logging' do
@@ -645,18 +645,18 @@ describe Quizzes::QuizzesController do
 
       it 'should log a single entry with an action level of "participate"' do
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-        assigns[:access].should_not be_nil
-        assigns[:accessed_asset].should_not be_nil
-        assigns[:accessed_asset][:level].should == 'participate'
-        assigns[:access].participate_score.should == 1
+        expect(assigns[:access]).not_to be_nil
+        expect(assigns[:accessed_asset]).not_to be_nil
+        expect(assigns[:accessed_asset][:level]).to eq 'participate'
+        expect(assigns[:access].participate_score).to eq 1
       end
 
       it 'should not log entries when resuming the quiz' do
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-        assigns[:access].should_not be_nil
-        assigns[:accessed_asset].should_not be_nil
-        assigns[:accessed_asset][:level].should == 'participate'
-        assigns[:access].participate_score.should == 1
+        expect(assigns[:access]).not_to be_nil
+        expect(assigns[:accessed_asset]).not_to be_nil
+        expect(assigns[:accessed_asset][:level]).to eq 'participate'
+        expect(assigns[:access].participate_score).to eq 1
 
         # Since the second request we will make is handled by the same controller
         # instance, @accessed_asset must be reset otherwise
@@ -665,7 +665,7 @@ describe Quizzes::QuizzesController do
         controller.js_env.clear
 
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-        assigns[:access].participate_score.should == 1
+        expect(assigns[:access].participate_score).to eq 1
       end
     end
 
@@ -682,29 +682,29 @@ describe Quizzes::QuizzesController do
 
       it "should render verification page if password required" do
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-        response.should render_template('access_code')
+        expect(response).to render_template('access_code')
       end
 
       it "shouldn't let you in on a bad access code" do
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'wrongpass'
-        response.should_not be_redirect
-        response.should render_template('access_code')
+        expect(response).not_to be_redirect
+        expect(response).to render_template('access_code')
       end
 
       it "should send you to take with the right access code" do
         post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
-        response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+        expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
       end
 
       it "should not ask for the access code again if you reload the quiz" do
         get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
-        response.should_not be_redirect
-        response.should_not render_template('access_code')
+        expect(response).not_to be_redirect
+        expect(response).not_to render_template('access_code')
 
         controller.js_env.clear
 
         get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-        response.should_not render_template('access_code')
+        expect(response).not_to render_template('access_code')
       end
     end
 
@@ -714,8 +714,8 @@ describe Quizzes::QuizzesController do
       @quiz.locked = true
       @quiz.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('show')
-      assigns[:locked].should_not be_nil
+      expect(response).to render_template('show')
+      expect(assigns[:locked]).not_to be_nil
     end
 
     it "should let them take the quiz if it's locked but unlocked by an override" do
@@ -733,7 +733,7 @@ describe Quizzes::QuizzesController do
       override_student.user = @user
       override_student.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
 
     it "should let them take the quiz if it's locked but they've been explicitly unlocked" do
@@ -745,7 +745,7 @@ describe Quizzes::QuizzesController do
       @sub.manually_unlocked = true
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
 
     it "should use default duration if no extensions specified" do
@@ -754,10 +754,10 @@ describe Quizzes::QuizzesController do
       @quiz.time_limit = 60
       @quiz.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
-      assigns[:submission].should_not be_nil
-      assigns[:submission].user.should eql(@student)
-      (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(60.minutes.to_i)
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].user).to eql(@student)
+      expect((assigns[:submission].end_at - assigns[:submission].started_at).to_i).to eql(60.minutes.to_i)
     end
 
     it "should give user more time if specified" do
@@ -769,10 +769,10 @@ describe Quizzes::QuizzesController do
       @sub.extra_time = 30
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
-      assigns[:submission].should_not be_nil
-      assigns[:submission].user.should eql(@student)
-      (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(90.minutes.to_i)
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].user).to eql(@student)
+      expect((assigns[:submission].end_at - assigns[:submission].started_at).to_i).to eql(90.minutes.to_i)
     end
 
     it "should render ip_filter page if ip_filter doesn't match" do
@@ -781,7 +781,7 @@ describe Quizzes::QuizzesController do
       @quiz.ip_filter = '123.123.123.123'
       @quiz.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('invalid_ip')
+      expect(response).to render_template('invalid_ip')
     end
 
     it "should let the user take the quiz if the ip_filter matches" do
@@ -791,7 +791,7 @@ describe Quizzes::QuizzesController do
       @quiz.save!
       request.env['REMOTE_ADDR'] = '123.123.123.123'
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
 
     it "should work without a user for non-graded quizzes in public courses" do
@@ -799,7 +799,7 @@ describe Quizzes::QuizzesController do
       course_quiz :active
       @quiz.update_attribute :quiz_type, 'practice_quiz'
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
   end
 
@@ -816,7 +816,7 @@ describe Quizzes::QuizzesController do
     it "should render the quiz page if the user hasn't started the quiz" do
       user_session(@student)
       get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('show')
+      expect(response).to render_template('show')
     end
 
     it "should render ip_filter page if the ip_filter stops matching" do
@@ -826,7 +826,7 @@ describe Quizzes::QuizzesController do
       @quiz.generate_submission(@student)
 
       get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('invalid_ip')
+      expect(response).to render_template('invalid_ip')
     end
 
     it "should allow taking the quiz" do
@@ -834,9 +834,9 @@ describe Quizzes::QuizzesController do
       @quiz.generate_submission(@student)
 
       get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
-      assigns[:submission].should_not be_nil
-      assigns[:submission].user.should eql(@student)
+      expect(response).to render_template('take_quiz')
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].user).to eql(@student)
     end
 
     context "when the ID of a question is passed in" do
@@ -852,7 +852,7 @@ describe Quizzes::QuizzesController do
         it "renders take_quiz" do
           Quizzes::QuizzesController.any_instance.stubs(:valid_question?).returns(true)
           get 'show', :course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'
-          response.should render_template('take_quiz')
+          expect(response).to render_template('take_quiz')
         end
       end
 
@@ -860,7 +860,7 @@ describe Quizzes::QuizzesController do
         it "redirects to the main quiz page" do
           Quizzes::QuizzesController.any_instance.stubs(:valid_question?).returns(false)
           get 'show', :course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'
-          response.should redirect_to course_quiz_url(@course, @quiz)
+          expect(response).to redirect_to course_quiz_url(@course, @quiz)
         end
       end
     end
@@ -871,14 +871,14 @@ describe Quizzes::QuizzesController do
       context "when the passed in question ID is in the submission" do
         it "returns true" do
           submission.stubs(:has_question?).with(1).returns(true)
-          controller.send(:valid_question?, submission, 1).should be_truthy
+          expect(controller.send(:valid_question?, submission, 1)).to be_truthy
         end
       end
 
       context "when the question ID isn't part of the submission" do
         it "returns false" do
           submission.stubs(:has_question?).with(1).returns(false)
-          controller.send(:valid_question?, submission, 1).should be_falsey
+          expect(controller.send(:valid_question?, submission, 1)).to be_falsey
         end
       end
     end
@@ -897,8 +897,8 @@ describe Quizzes::QuizzesController do
     it "should redirect if there are no submissions for the user" do
       user_session(@student)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_redirect
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
+      expect(response).to be_redirect
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
     end
 
     it "should assign variables" do
@@ -906,13 +906,13 @@ describe Quizzes::QuizzesController do
       @submission = @quiz.generate_submission(@student)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id
 
-      response.should be_success
-      assigns[:user].should_not be_nil
-      assigns[:user].should eql(@student)
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:submission].should_not be_nil
-      assigns[:submission].should eql(@submission)
+      expect(response).to be_success
+      expect(assigns[:user]).not_to be_nil
+      expect(assigns[:user]).to eql(@student)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission]).to eql(@submission)
     end
 
     it "should find the observed submissions" do
@@ -923,13 +923,13 @@ describe Quizzes::QuizzesController do
       user_session(@observer)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id
 
-      response.should be_success
-      assigns[:user].should_not be_nil
-      assigns[:user].should eql(@student)
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:submission].should_not be_nil
-      assigns[:submission].should eql(@submission)
+      expect(response).to be_success
+      expect(assigns[:user]).not_to be_nil
+      expect(assigns[:user]).to eql(@student)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission]).to eql(@submission)
     end
 
     it "should not allow viewing other submissions if not a teacher" do
@@ -937,7 +937,7 @@ describe Quizzes::QuizzesController do
       s = @quiz.generate_submission(@student2)
       @submission = @quiz.generate_submission(@student)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student2.id
-      response.should_not be_success
+      expect(response).not_to be_success
     end
 
     it "should allow viewing other submissions if a teacher" do
@@ -946,13 +946,13 @@ describe Quizzes::QuizzesController do
       @submission = @quiz.generate_submission(@teacher)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id
 
-      response.should be_success
-      assigns[:user].should_not be_nil
-      assigns[:user].should eql(@student)
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:submission].should_not be_nil
-      assigns[:submission].should eql(s)
+      expect(response).to be_success
+      expect(assigns[:user]).not_to be_nil
+      expect(assigns[:user]).to eql(@student)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission]).to eql(s)
     end
 
     it "should not allow student viewing if the assignment is muted" do
@@ -962,15 +962,15 @@ describe Quizzes::QuizzesController do
       @quiz.published_at = Time.now
       @quiz.save
 
-      @quiz.assignment.should_not be_nil
+      expect(@quiz.assignment).not_to be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(@student2)
       @submission = @quiz.generate_submission(@student)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student2.id
 
-      response.should be_redirect
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
-      flash[:notice].should match(/You cannot view the quiz history while the quiz is muted/)
+      expect(response).to be_redirect
+      expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
+      expect(flash[:notice]).to match(/You cannot view the quiz history while the quiz is muted/)
     end
 
     it "should allow teacher viewing if the assignment is muted" do
@@ -981,13 +981,13 @@ describe Quizzes::QuizzesController do
       @quiz.published_at = Time.now
       @quiz.save
 
-      @quiz.assignment.should_not be_nil
+      expect(@quiz.assignment).not_to be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(@student)
       @submission = @quiz.generate_submission(@teacher)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id
 
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
@@ -1006,9 +1006,9 @@ describe Quizzes::QuizzesController do
     it "should create quiz" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :quiz => {:title => "some quiz"}
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].title.should eql("some quiz")
-      response.should be_success
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz].title).to eql("some quiz")
+      expect(response).to be_success
     end
 
     it "creates quizzes with overrides" do
@@ -1025,11 +1025,11 @@ describe Quizzes::QuizzesController do
             :due_at => section_due_date,
           }]
         }
-      response.should be_success
+      expect(response).to be_success
       quiz = assigns[:quiz].overridden_for(@teacher)
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @teacher)
-      overrides.length.should == 1
-      overrides.first[:due_at].iso8601.should == section_due_date
+      expect(overrides.length).to eq 1
+      expect(overrides.first[:due_at].iso8601).to eq section_due_date
     end
   end
 
@@ -1051,9 +1051,9 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       course_quiz
       post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:quiz].title.should eql("some quiz")
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:quiz].title).to eql("some quiz")
     end
 
     it "should be able to change ungraded survey to quiz without error" do
@@ -1063,32 +1063,32 @@ describe Quizzes::QuizzesController do
       @quiz.update_attributes(quiz_type: 'survey')
       # make sure the assignment doesn't exist
       @quiz.assignment = nil
-      @quiz.assignment.should_not be_present
+      expect(@quiz.assignment).not_to be_present
       @quiz.publish!
 
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}
-      response.should be_redirect
+      expect(response).to be_redirect
 
-      @quiz.reload.quiz_type.should == 'assignment'
-      @quiz.should be_available
-      @quiz.assignment.should be_present
+      expect(@quiz.reload.quiz_type).to eq 'assignment'
+      expect(@quiz).to be_available
+      expect(@quiz.assignment).to be_present
     end
 
     it "should lock and unlock without removing assignment" do
       user_session(@teacher)
       a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
-      a.points_possible.should eql(5.0)
-      a.submission_types.should_not eql("online_quiz")
+      expect(a.points_possible).to eql(5.0)
+      expect(a.submission_types).not_to eql("online_quiz")
       @quiz = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
       @quiz.workflow_state = 'available'
       @quiz.save
       post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {"locked" => "true"}
       @quiz.reload
-      @quiz.assignment.should_not be_nil
+      expect(@quiz.assignment).not_to be_nil
       post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {"locked" => "false"}
       @quiz.reload
-      @quiz.assignment.should_not be_nil
+      expect(@quiz.assignment).not_to be_nil
     end
 
     it "updates overrides for a quiz" do
@@ -1113,7 +1113,7 @@ describe Quizzes::QuizzesController do
         }
       quiz = quiz.reload.overridden_for(@teacher)
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @teacher)
-      overrides.length.should == 1
+      expect(overrides.length).to eq 1
     end
 
     it "deletes overrides for a quiz if assignment_overrides params is 'false'" do
@@ -1135,7 +1135,7 @@ describe Quizzes::QuizzesController do
           :due_at => course_due_date,
           :assignment_overrides => "false"
         }
-      quiz.reload.assignment_overrides.active.should be_empty
+      expect(quiz.reload.assignment_overrides.active).to be_empty
     end
 
     it 'updates the quiz with the correct times for fancy midnight' do
@@ -1151,9 +1151,9 @@ describe Quizzes::QuizzesController do
           :unlock_at => time
         }
       quiz.reload
-      quiz.due_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
-      quiz.lock_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
-      quiz.unlock_at.to_i.should == time.to_i
+      expect(quiz.due_at.to_i).to eq CanvasTime.fancy_midnight(time).to_i
+      expect(quiz.lock_at.to_i).to eq CanvasTime.fancy_midnight(time).to_i
+      expect(quiz.unlock_at.to_i).to eq time.to_i
     end
 
     context 'notifications' do
@@ -1195,7 +1195,7 @@ describe Quizzes::QuizzesController do
             }],
             :notify_of_update => true
           }
-        @student.messages.detect{|m| m.notification_id == @notification.id}.should_not be_nil
+        expect(@student.messages.detect{|m| m.notification_id == @notification.id}).not_to be_nil
       end
 
       it "should send due date changed if notify_of_update is not set" do
@@ -1213,7 +1213,7 @@ describe Quizzes::QuizzesController do
             }]
           }
 
-        @student.messages.detect{ |m| m.notification_id == @notification.id }.should_not be_nil
+        expect(@student.messages.detect{ |m| m.notification_id == @notification.id }).not_to be_nil
       end
     end
   end
@@ -1224,8 +1224,8 @@ describe Quizzes::QuizzesController do
       course_quiz
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('statistics')
+      expect(response).to be_success
+      expect(response).to render_template('statistics')
     end
 
     context "logged out submissions" do
@@ -1257,9 +1257,9 @@ describe Quizzes::QuizzesController do
 
 
         get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
-        response.should be_success
-        response.body.should match /Logged Out User/
-        response.should render_template('statistics')
+        expect(response).to be_success
+        expect(response.body).to match /Logged Out User/
+        expect(response).to render_template('statistics')
       end
     end
 
@@ -1269,8 +1269,8 @@ describe Quizzes::QuizzesController do
       @course.save!
       course_quiz
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('statistics')
+      expect(response).to be_success
+      expect(response).to render_template('statistics')
     end
   end
 
@@ -1286,7 +1286,7 @@ describe Quizzes::QuizzesController do
 
     it "should redirect to ember quiz stats app" do
       a = Account.default
-      a.feature_enabled?(:quiz_stats).should eql true
+      expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       assert_redirected_to ember_urls.course_quiz_statistics_url(@quiz.id)
     end
@@ -1298,14 +1298,14 @@ describe Quizzes::QuizzesController do
     it "should allow concluded teachers to see a read-only view of a quiz" do
       user_session(@teacher)
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('read_only')
+      expect(response).to be_success
+      expect(response).to render_template('read_only')
 
       @enrollment.conclude
       controller.js_env.clear
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('read_only')
+      expect(response).to be_success
+      expect(response).to render_template('read_only')
     end
 
     it "should not allow students to see a read-only view of a quiz" do
@@ -1336,9 +1336,9 @@ describe Quizzes::QuizzesController do
     it "should delete quizzes" do
       user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @quiz.id
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:quiz].should be_deleted
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:quiz]).to be_deleted
     end
   end
 
@@ -1354,10 +1354,10 @@ describe Quizzes::QuizzesController do
       @quiz = @course.quizzes.build(:title => "New quiz!")
       @quiz.save!
 
-      @quiz.published?.should be_falsey
+      expect(@quiz.published?).to be_falsey
       post 'publish', :course_id => @course.id, :quizzes => [@quiz.id]
 
-      @quiz.reload.published?.should be_truthy
+      expect(@quiz.reload.published?).to be_truthy
     end
   end
 
@@ -1367,8 +1367,8 @@ describe Quizzes::QuizzesController do
 
     it "renders nothing if there's no submission for current user" do
       get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
-      response.should be_success
-      response.body.strip.should be_empty
+      expect(response).to be_success
+      expect(response.body.strip).to be_empty
     end
 
     it "renders submission html if there is a submission" do
@@ -1376,8 +1376,8 @@ describe Quizzes::QuizzesController do
       sub.mark_completed
       sub.save!
       get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
-      response.should be_success
-      response.should render_template("quizzes/submission_html")
+      expect(response).to be_success
+      expect(response).to render_template("quizzes/submission_html")
     end
   end
 
@@ -1397,10 +1397,10 @@ describe Quizzes::QuizzesController do
       submission.save!
 
       get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
-      response.should be_success
+      expect(response).to be_success
 
-      response.should render_template("quizzes/submission_html")
-      submission.reload.has_seen_results.should == true
+      expect(response).to render_template("quizzes/submission_html")
+      expect(submission.reload.has_seen_results).to eq true
     end
   end
 
@@ -1416,10 +1416,10 @@ describe Quizzes::QuizzesController do
       @quiz = @course.quizzes.build(:title => "New quiz!")
       @quiz.publish!
 
-      @quiz.published?.should be_truthy
+      expect(@quiz.published?).to be_truthy
       post 'unpublish', :course_id => @course.id, :quizzes => [@quiz.id]
 
-      @quiz.reload.published?.should be_falsey
+      expect(@quiz.reload.published?).to be_falsey
     end
   end
 
@@ -1429,8 +1429,8 @@ describe Quizzes::QuizzesController do
     it "requires authorization" do
       get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
       assert_unauthorized
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "assigns variables" do
@@ -1438,10 +1438,10 @@ describe Quizzes::QuizzesController do
       submission = @quiz.generate_submission @teacher
       create_attachment_for_file_upload_submission!(submission)
       get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:submission].should_not be_nil
-      assigns[:versions].should_not be_nil
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz]).to eql(@quiz)
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:versions]).not_to be_nil
     end
 
     it "should render nothing if quiz is muted" do
@@ -1457,8 +1457,8 @@ describe Quizzes::QuizzesController do
       @quiz.assignment = assignment
 
       get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.body.should match(/^\s?$/)
+      expect(response).to be_success
+      expect(response.body).to match(/^\s?$/)
     end
   end
 
@@ -1478,25 +1478,25 @@ describe Quizzes::QuizzesController do
       it 'shows the quiz to students with visibility' do
         user_session(@student1)
         get 'index', :course_id => @course.id
-        controller.js_env[:QUIZZES][:assignment].count.should == 1
+        expect(controller.js_env[:QUIZZES][:assignment].count).to eq 1
       end
       it 'hides the quiz to students with visibility' do
         user_session(@student2)
         get 'index', :course_id => @course.id
-        controller.js_env[:QUIZZES][:assignment].should == []
+        expect(controller.js_env[:QUIZZES][:assignment]).to eq []
       end
     end
     context 'show' do
       it 'shows the page to students with visibility' do
         user_session(@student1)
         get 'show', :course_id => @course.id, :id => @quiz.id
-        response.should_not be_redirect
+        expect(response).not_to be_redirect
       end
       it 'redirect for students without visibility' do
         user_session(@student2)
         get 'show', :course_id => @course.id, :id => @quiz.id
-        response.should be_redirect
-        flash[:error].should match(/You do not have access to the requested quiz/)
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/You do not have access to the requested quiz/)
       end
     end
   end

@@ -132,28 +132,28 @@ describe ApplicationController do
     it "should set items" do
       HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
       controller.js_env :FOO => 'bar'
-      controller.js_env[:FOO].should == 'bar'
-      controller.js_env[:files_domain].should == 'files.example.com'
+      expect(controller.js_env[:FOO]).to eq 'bar'
+      expect(controller.js_env[:files_domain]).to eq 'files.example.com'
     end
 
     it "should auto-set timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
-      @controller.js_env[:LOCALE].should == 'fr-FR'
-      @controller.js_env[:TIMEZONE].should == 'America/Juneau'
+      expect(@controller.js_env[:LOCALE]).to eq 'fr-FR'
+      expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
       controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: ""))
       controller.js_env({})
-      controller.js_env[:CONTEXT_TIMEZONE].should == 'America/Denver'
+      expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end
 
     it "should allow multiple items" do
       controller.js_env :A => 'a', :B => 'b'
-      controller.js_env[:A].should == 'a'
-      controller.js_env[:B].should == 'b'
+      expect(controller.js_env[:A]).to eq 'a'
+      expect(controller.js_env[:B]).to eq 'b'
     end
 
     it "should not allow overwriting a key" do
@@ -165,7 +165,7 @@ describe ApplicationController do
       root_account = stub(global_id: 1, open_registration?: true)
       HostUrl.stubs(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
-      controller.js_env[:SETTINGS][:open_registration].should be_truthy
+      expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
     context "sharding" do
@@ -173,7 +173,7 @@ describe ApplicationController do
 
       it "should set the global id for the domain_root_account" do
         controller.instance_variable_set(:@domain_root_account, Account.default)
-        controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID].should == Account.default.global_id
+        expect(controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID]).to eq Account.default.global_id
       end
     end
   end
@@ -185,47 +185,47 @@ describe ApplicationController do
     end
 
     it "should build from a simple path" do
-      controller.send(:clean_return_to, "/calendar").should == "https://canvas.example.com/calendar"
+      expect(controller.send(:clean_return_to, "/calendar")).to eq "https://canvas.example.com/calendar"
     end
 
     it "should build from a full url" do
       # ... but always use the request host/protocol, not the given
-      controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test").should == "https://canvas.example.com/a/b?a=1&b=2#test"
+      expect(controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test")).to eq "https://canvas.example.com/a/b?a=1&b=2#test"
     end
 
     it "should reject disallowed paths" do
-      controller.send(:clean_return_to, "ftp://example.com/javascript:hai").should be_nil
+      expect(controller.send(:clean_return_to, "ftp://example.com/javascript:hai")).to be_nil
     end
   end
 
   describe "#reject!" do
     it "sets the message and status in the error json" do
       expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|
-        e.message.should == 'test message'
-        e.error_json[:message].should == 'test message'
-        e.error_json[:status].should == 'not_found'
-        e.response_status.should == 404
+        expect(e.message).to eq 'test message'
+        expect(e.error_json[:message]).to eq 'test message'
+        expect(e.error_json[:status]).to eq 'not_found'
+        expect(e.response_status).to eq 404
       end)
     end
 
     it "defaults status to 'bad_request'" do
       expect { controller.reject!('test message') }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'bad_request'
-        e.response_status.should == 400
+        expect(e.error_json[:status]).to eq 'bad_request'
+        expect(e.response_status).to eq 400
       end)
     end
 
     it "accepts numeric status codes" do
       expect { controller.reject!('test message', 403) }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'forbidden'
-        e.response_status.should == 403
+        expect(e.error_json[:status]).to eq 'forbidden'
+        expect(e.response_status).to eq 403
       end)
     end
 
     it "accepts symbolic status codes" do
       expect { controller.reject!('test message', :service_unavailable) }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'service_unavailable'
-        e.response_status.should == 503
+        expect(e.error_json[:status]).to eq 'service_unavailable'
+        expect(e.response_status).to eq 503
       end)
     end
   end
@@ -257,21 +257,21 @@ describe ApplicationController do
       HostUrl.expects(:file_host_with_shard).with(42, '').returns(['myfiles', Shard.default])
       controller.instance_variable_set(:@domain_root_account, 42)
       url = controller.send(:safe_domain_file_url, @attachment)
-      url.should match /myfiles/
+      expect(url).to match /myfiles/
     end
 
     it "should include :download=>1 in inline urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       controller.stubs(:named_context_url).returns('')
       url = controller.send(:safe_domain_file_url, @attachment)
-      url.should match(/[\?&]download=1(&|$)/)
+      expect(url).to match(/[\?&]download=1(&|$)/)
     end
 
     it "should not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       controller.stubs(:named_context_url).returns('')
       url = controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
-      url.should_not match(/[\?&]download=1(&|$)/)
+      expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
     it "should include download_frd=1 and not include inline=1 in url when specified as for download" do
@@ -295,7 +295,7 @@ describe ApplicationController do
       controller.stubs(:params).returns({:user_id => 'sis_user_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @user
+      expect(controller.instance_variable_get(:@context)).to eq @user
     end
 
     it "should find course section with api_find for api requests" do
@@ -307,7 +307,7 @@ describe ApplicationController do
       controller.stubs(:params).returns({:course_section_id => 'sis_section_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @section
+      expect(controller.instance_variable_get(:@context)).to eq @section
     end
 
     # this test is supposed to represent calling I18n.t before a context is set
@@ -324,7 +324,7 @@ describe ApplicationController do
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers
-      I18n.locale.to_s.should == "es"
+      expect(I18n.locale.to_s).to eq "es"
       course_model(:locale => "ru")
       controller.stubs(:named_context_url).with(@course, :context_url).returns('')
       controller.stubs(:params).returns({:course_id => @course.id})
@@ -332,9 +332,9 @@ describe ApplicationController do
       controller.stubs(:session).returns({})
       controller.stubs(:js_env).returns({})
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @course
+      expect(controller.instance_variable_get(:@context)).to eq @course
       I18n.set_locale_with_localizer # this is what t() triggers
-      I18n.locale.to_s.should == "ru"
+      expect(I18n.locale.to_s).to eq "ru"
     end
   end
 
@@ -382,8 +382,8 @@ describe WikiPagesController do
 
       get 'pages_index', :course_id => @course.id
 
-      controller.js_env.should include(:WIKI_RIGHTS)
-      controller.js_env[:WIKI_RIGHTS].should == Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
+      expect(controller.js_env).to include(:WIKI_RIGHTS)
+      expect(controller.js_env[:WIKI_RIGHTS]).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
     end
   end
 end

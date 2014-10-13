@@ -29,8 +29,8 @@ describe WikiPageRevisionsController do
     it "should redirect with draft state enabled" do
       get 'index', :course_id => @course.id, :wiki_page_id => @page.id
 
-      response.should be_redirect
-      response.location.should match(%r{/courses/#{@course.id}/pages/#{@page.url}/revisions})
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/#{@course.id}/pages/#{@page.url}/revisions})
     end
   end
 
@@ -38,8 +38,8 @@ describe WikiPageRevisionsController do
     it "should redirect with draft state enabled" do
       get 'show', :course_id => @course.id, :wiki_page_id => @page.id, :id => 'latest'
 
-      response.should be_redirect
-      response.location.should match(%r{/courses/#{@course.id}/pages/#{@page.url}/revisions})
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/#{@course.id}/pages/#{@page.url}/revisions})
     end
   end
 
@@ -50,8 +50,8 @@ describe WikiPageRevisionsController do
 
       @version = @page.reload.versions.first
       put 'update', :course_id => @course.id, :wiki_page_id => @page.id, :id => @version.id
-      response.should be_redirect
-      response.location.should match(%r{/courses/#{@course.id}/wiki})
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/#{@course.id}/wiki})
     end
 
     it "should redirect to the right group wiki page" do
@@ -63,8 +63,8 @@ describe WikiPageRevisionsController do
 
       @version = @page.reload.versions.first
       put 'update', :group_id => @group.id, :wiki_page_id => @page.id, :id => @version.id
-      response.should be_redirect
-      response.location.should match(%r{/groups/#{@group.id}/wiki})
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/groups/#{@group.id}/wiki})
     end
   end
 end

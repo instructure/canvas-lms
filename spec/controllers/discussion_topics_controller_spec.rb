@@ -67,13 +67,13 @@ describe DiscussionTopicsController do
         :message => "some message"
       )
       get 'show', :course_id => @course.id, :id => @announcement.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should not display announcements in private courses to users who aren't logged in" do
       announcement = @course.announcements.create!(title: 'Test announcement', message: 'Message')
       get('show', course_id: @course.id, id: announcement.id)
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     context "discussion topic with assignment with overrides" do
@@ -90,26 +90,26 @@ describe DiscussionTopicsController do
       it "doesn't show overrides to students" do
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
-        response.should be_success
-        response.body.should_not match 'discussion-topic-due-dates'
+        expect(response).to be_success
+        expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment)
-        response.body.should match "due #{due_date}"
+        expect(response.body).to match "due #{due_date}"
       end
 
       it "doesn't show overrides for observers" do
         user_session(@observer)
         get 'show', :course_id => @course.id, :id => @topic.id
-        response.should be_success
-        response.body.should_not match 'discussion-topic-due-dates'
+        expect(response).to be_success
+        expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment.overridden_for(@observer))
-        response.body.should match "due #{due_date}"
+        expect(response.body).to match "due #{due_date}"
       end
 
       it "does show overrides to teachers" do
         user_session(@teacher)
         get 'show', :course_id => @course.id, :id => @topic.id
-        response.should be_success
-        response.body.should match 'discussion-topic-due-dates'
+        expect(response).to be_success
+        expect(response.body).to match 'discussion-topic-due-dates'
       end
 
     end
@@ -119,18 +119,18 @@ describe DiscussionTopicsController do
       course_topic
       topic_entry
       @topic.reload
-      @topic.discussion_entries.should_not be_empty
+      expect(@topic.discussion_entries).not_to be_empty
       get 'show', :course_id => @course.id, :id => @topic.id
-      response.should be_success
-      assigns[:topic].should_not be_nil
-      assigns[:topic].should eql(@topic)
+      expect(response).to be_success
+      expect(assigns[:topic]).not_to be_nil
+      expect(assigns[:topic]).to eql(@topic)
     end
 
     it "should display speedgrader when not for a large course" do
       user_session(@teacher)
       course_topic(:with_assignment => true)
       get 'show', :course_id => @course.id, :id => @topic.id
-      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_true
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
     end
 
     it "should hide speedgrader when for a large course" do
@@ -138,7 +138,7 @@ describe DiscussionTopicsController do
       course_topic(:with_assignment => true)
       Course.any_instance.stubs(:large_roster?).returns(true)
       get 'show', :course_id => @course.id, :id => @topic.id
-      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_nil
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
     end
 
     it "should setup speedgrader template for variable substitution" do
@@ -150,16 +150,16 @@ describe DiscussionTopicsController do
       # making sure that we get back the expected format for this url template
       template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
       url = template.gsub(/%22:student_id%22/, '123')
-      url.should match "%7B%22student_id%22:123%7D"
+      expect(url).to match "%7B%22student_id%22:123%7D"
     end
 
     it "should mark as read when viewed" do
       user_session(@student)
       course_topic(:skip_set_user => true)
 
-      @topic.read_state(@student).should == 'unread'
+      expect(@topic.read_state(@student)).to eq 'unread'
       get 'show', :course_id => @course.id, :id => @topic.id
-      @topic.reload.read_state(@student).should == 'read'
+      expect(@topic.reload.read_state(@student)).to eq 'read'
     end
 
     it "should allow concluded teachers to see discussions" do
@@ -167,9 +167,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', :course_id => @course.id, :id => @topic.id
-      response.should be_success
+      expect(response).to be_success
       get 'index', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should allow concluded students to see discussions" do
@@ -177,9 +177,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', :course_id => @course.id, :id => @topic.id
-      response.should be_success
+      expect(response).to be_success
       get 'index', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should assign groups from the topic's category if the topic is a group discussion" do
@@ -196,7 +196,7 @@ describe DiscussionTopicsController do
       @topic.save!
 
       get 'show', :course_id => @course.id, :id => @topic.id
-      assigns[:groups].size.should eql(2)
+      expect(assigns[:groups].size).to eql(2)
     end
 
     context "posting first to view setting" do
@@ -215,35 +215,35 @@ describe DiscussionTopicsController do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@teacher)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_false
+        expect(assigns[:initial_post_required]).to be_falsey
       end
 
       it "shouldn't allow student who hasn't posted to see" do
         @topic.reply_from(:user => @teacher, :text => 'hai')
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_true
+        expect(assigns[:initial_post_required]).to be_truthy
       end
 
       it "shouldn't allow student's observer who hasn't posted to see" do
         @topic.reply_from(:user => @teacher, :text => 'hai')
         user_session(@observer)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_true
+        expect(assigns[:initial_post_required]).to be_truthy
       end
 
       it "should allow student who has posted to see" do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_false
+        expect(assigns[:initial_post_required]).to be_falsey
       end
 
       it "should allow student's observer who has posted to see" do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@observer)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_false
+        expect(assigns[:initial_post_required]).to be_falsey
       end
 
     end
@@ -257,23 +257,23 @@ describe DiscussionTopicsController do
 
     it "should require authorization" do
       get 'public_feed', :format => 'atom', :feed_code => @course.feed_code + 'x'
-      assigns[:problem].should eql("The verification code is invalid.")
+      expect(assigns[:problem]).to eql("The verification code is invalid.")
     end
 
     it "should include absolute path for rel='self' link" do
       get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
+      expect(feed).not_to be_nil
+      expect(feed.links.first.rel).to match(/self/)
+      expect(feed.links.first.href).to match(/http:\/\//)
     end
 
     it "should include an author for each entry" do
       get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
+      expect(feed).not_to be_nil
+      expect(feed.entries).not_to be_empty
+      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
   end
 
@@ -293,32 +293,32 @@ describe DiscussionTopicsController do
     describe 'the new topic' do
       let(:topic) { assigns[:topic] }
 
-      specify { topic.should be_a DiscussionTopic }
-      specify { topic.user.should == @user }
-      specify { topic.current_user.should == @user }
-      specify { topic.delayed_post_at.should be_nil }
-      specify { topic.lock_at.should be_nil }
-      specify { topic.workflow_state.should == 'active' }
-      specify { topic.id.should_not be_nil }
-      specify { topic.title.should == 'Topic Title' }
-      specify { topic.is_announcement.should be_false }
-      specify { topic.discussion_type.should == 'side_comment' }
-      specify { topic.message.should == 'Message' }
-      specify { topic.threaded.should be_false }
+      specify { expect(topic).to be_a DiscussionTopic }
+      specify { expect(topic.user).to eq @user }
+      specify { expect(topic.current_user).to eq @user }
+      specify { expect(topic.delayed_post_at).to be_nil }
+      specify { expect(topic.lock_at).to be_nil }
+      specify { expect(topic.workflow_state).to eq 'active' }
+      specify { expect(topic.id).not_to be_nil }
+      specify { expect(topic.title).to eq 'Topic Title' }
+      specify { expect(topic.is_announcement).to be_falsey }
+      specify { expect(topic.discussion_type).to eq 'side_comment' }
+      specify { expect(topic.message).to eq 'Message' }
+      specify { expect(topic.threaded).to be_falsey }
     end
 
     it 'logs an asset access record for the discussion topic' do
       accessed_asset = assigns[:accessed_asset]
-      accessed_asset[:category].should == 'topics'
-      accessed_asset[:level].should == 'participate'
+      expect(accessed_asset[:category]).to eq 'topics'
+      expect(accessed_asset[:level]).to eq 'participate'
     end
 
     it 'registers a page view' do
       page_view = assigns[:page_view]
-      page_view.should_not be_nil
-      page_view.http_method.should == 'post'
-      page_view.url.should =~ %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
-      page_view.participated.should be_true
+      expect(page_view).not_to be_nil
+      expect(page_view.http_method).to eq 'post'
+      expect(page_view.url).to match %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
+      expect(page_view.participated).to be_truthy
     end
 
   end
@@ -337,8 +337,8 @@ describe DiscussionTopicsController do
           title: 'Updated Topic', format: 'json',
           lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           locked: false)
-      @topic.reload.should_not be_locked
-      @topic.lock_at.should_not be_nil
+      expect(@topic.reload).not_to be_locked
+      expect(@topic.lock_at).not_to be_nil
     end
 
     it "should not clear delayed_post_at if published is not changed" do
@@ -348,8 +348,8 @@ describe DiscussionTopicsController do
           title: 'Updated Topic', format: 'json',
           lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           published: false)
-      @topic.reload.should_not be_published
-      @topic.delayed_post_at.should_not be_nil
+      expect(@topic.reload).not_to be_published
+      expect(@topic.delayed_post_at).not_to be_nil
     end
 
     it "should unlock discussions with a lock_at attribute if lock state changes" do
@@ -359,8 +359,8 @@ describe DiscussionTopicsController do
           lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           locked: false)
 
-      @topic.reload.should_not be_locked
-      @topic.lock_at.should be_nil
+      expect(@topic.reload).not_to be_locked
+      expect(@topic.lock_at).to be_nil
     end
 
     it "should still update a topic if it is a group discussion (that has submission replies)" do
@@ -381,26 +381,26 @@ describe DiscussionTopicsController do
       subtopic.ensure_submission(@student)
       subtopic.reply_from(:user => @student, :text => 'hai')
 
-      subtopic.can_unpublish?.should == false
+      expect(subtopic.can_unpublish?).to eq false
 
       put(:update, group_id: group.id, topic_id: subtopic.id,
           title: 'Updated Topic', format: 'json', locked: true)
 
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
       put(:update, course_id: @course.id, topic_id: @topic.id,
           title: 'Updated topic', format: 'json', delayed_post_at: Time.zone.now + 5.days)
-      @topic.reload.should be_post_delayed
+      expect(@topic.reload).to be_post_delayed
     end
 
     it "should not clear lock_at if lock state hasn't changed" do
       put('update', course_id: @course.id, topic_id: @topic.id,
           title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
           locked: true)
-      @topic.reload.should be_locked
-      @topic.lock_at.should_not be_nil
+      expect(@topic.reload).to be_locked
+      expect(@topic.lock_at).not_to be_nil
     end
 
     it "should set draft state on discussions with delayed_post_at" do
@@ -409,7 +409,7 @@ describe DiscussionTopicsController do
           lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           published: false)
 
-      @topic.reload.should_not be_published
+      expect(@topic.reload).not_to be_published
     end
 
     it "should delete attachments" do
@@ -420,10 +420,10 @@ describe DiscussionTopicsController do
       @topic.unlock!
       put('update', course_id: @course.id, topic_id: @topic.id,
           format: 'json', remove_attachment: '1')
-      response.should be_success
+      expect(response).to be_success
 
-      @topic.reload.attachment.should be_nil
-      attachment.reload.should be_deleted
+      expect(@topic.reload.attachment).to be_nil
+      expect(attachment.reload).to be_deleted
     end
   end
 
@@ -436,12 +436,12 @@ describe DiscussionTopicsController do
       course_topic
 
       topics = 3.times.map { course_topic(pinned: true) }
-      topics.map(&:position).should == [1, 2, 3]
+      expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', :course_id => @course.id, :order => "#{t2.id},#{t1.id}", :format => 'json'
-      response.should be_success
+      expect(response).to be_success
       topics.each &:reload
-      topics.map(&:position).should == [2, 1, 3]
+      expect(topics.map(&:position)).to eq [2, 1, 3]
     end
   end
 end
