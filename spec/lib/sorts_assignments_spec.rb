@@ -27,7 +27,7 @@ describe SortsAssignments do
   describe "past" do
 
     it "returns an array of assignments that are due before now" do
-      SortsAssignments.past(assignments).should =~ [ due_yesterday ]
+      expect(SortsAssignments.past(assignments)).to match_array [ due_yesterday ]
     end
 
   end
@@ -35,7 +35,7 @@ describe SortsAssignments do
   describe "undated" do
 
     it "returns an array of assignments without a due date" do
-      SortsAssignments.undated(assignments).should =~ [ no_due_date ]
+      expect(SortsAssignments.undated(assignments)).to match_array [ no_due_date ]
     end
 
   end
@@ -43,7 +43,7 @@ describe SortsAssignments do
   describe "future" do
 
     it "returns an array of assignments due in the future (>= Time.now)" do
-      SortsAssignments.future(assignments).should =~
+      expect(SortsAssignments.future(assignments)).to match_array(
       [
         no_due_date,
         due_today,
@@ -51,6 +51,7 @@ describe SortsAssignments do
         due_in_one_week,
         due_in_two_weeks
       ]
+      )
     end
 
   end
@@ -59,29 +60,31 @@ describe SortsAssignments do
 
     it "returns an array of assignments due between right now and 1 week " +
       "from now" do
-      SortsAssignments.upcoming(assignments).should =~
+      expect(SortsAssignments.upcoming(assignments)).to match_array(
       [
         due_today,
         due_tomorrow,
         due_in_one_week
       ]
+      )
     end
   end
 
   describe "up_to" do
 
     it "gives all the assignments due before the given time" do
-      SortsAssignments.up_to(assignments, 2.weeks.from_now).should =~
+      expect(SortsAssignments.up_to(assignments, 2.weeks.from_now)).to match_array(
         [
           due_yesterday,
           due_today,
           due_tomorrow,
           due_in_one_week
         ]
+      )
     end
 
     it "does not include assignments due exactly at the given time" do
-      SortsAssignments.up_to(assignments, 2.weeks.from_now).should_not(
+      expect(SortsAssignments.up_to(assignments, 2.weeks.from_now)).not_to(
         include( due_in_two_weeks )
       )
     end
@@ -91,17 +94,18 @@ describe SortsAssignments do
   describe "down_to" do
 
     it "returns all assignments after the given time" do
-      SortsAssignments.down_to(assignments, 1.days.ago ).should =~
+      expect(SortsAssignments.down_to(assignments, 1.days.ago )).to match_array(
         [
           due_today,
           due_tomorrow,
           due_in_one_week,
           due_in_two_weeks
         ]
+      )
     end
 
     it "does not include assignments with a due_at equal to the given time" do
-      SortsAssignments.down_to(assignments, 1.days.ago).should_not include(
+      expect(SortsAssignments.down_to(assignments, 1.days.ago)).not_to include(
         due_yesterday
       )
     end
@@ -133,21 +137,21 @@ describe SortsAssignments do
     it "only includes assignments that current user has permission to view" do
       assignment3.expects(:grants_right?).with(user,session,:grade).
         returns false
-      SortsAssignments.ungraded_for_user_and_session(assignments,user,session).
-        should =~[ assignment1, assignment2 ]
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+        to match_array [ assignment1, assignment2 ]
     end
 
     it "only includes assignments that are expecting a submission" do
       assignment3.expects(:expects_submission?).returns false
-      SortsAssignments.ungraded_for_user_and_session(assignments,user,session).
-        should =~[ assignment1, assignment2 ]
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+        to match_array [ assignment1, assignment2 ]
     end
 
     it "only includes assignments that have a grading_count_for_user > 0" do
       Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment2, user).returns(bad_count_query)
       Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment3, user).returns(zero_count_query)
-      SortsAssignments.ungraded_for_user_and_session(assignments,user,session).
-        should =~ [ assignment1 ]
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+        to match_array [ assignment1 ]
     end
 
   end
@@ -167,8 +171,8 @@ describe SortsAssignments do
     }
 
     it "raises an IndexError if a required field is not passed" do
-      lambda { SortsAssignments.by_due_date({}) }.
-        should raise_error IndexError
+      expect { SortsAssignments.by_due_date({}) }.
+        to raise_error IndexError
     end
 
     describe "the Struct returned" do
@@ -183,32 +187,35 @@ describe SortsAssignments do
       end
 
       it "stores the past assignments" do
-        sorted_assignments.past.should == SortsAssignments.past(assignments)
+        expect(sorted_assignments.past).to eq SortsAssignments.past(assignments)
       end
 
       it "stores the undated assignments" do
-        sorted_assignments.undated.should ==
+        expect(sorted_assignments.undated).to eq(
           SortsAssignments.undated(assignments)
+        )
       end
 
       it "stores the ungraded assignments" do
-        sorted_assignments.ungraded.should ==
+        expect(sorted_assignments.ungraded).to eq(
           SortsAssignments.ungraded_for_user_and_session(
             assignments,user,session
+        )
         )
       end
 
       it "stores the upcoming assignments" do
-        sorted_assignments.upcoming.should ==
+        expect(sorted_assignments.upcoming).to eq(
           SortsAssignments.upcoming(assignments,1.week.from_now)
+        )
       end
 
       it "stores the future events" do
-        sorted_assignments.future.should == SortsAssignments.future(assignments)
+        expect(sorted_assignments.future).to eq SortsAssignments.future(assignments)
       end
 
       it "returns the overdue assignments" do
-        sorted_assignments.overdue.should == SortsAssignments.overdue(assignments, user, session, submissions)
+        expect(sorted_assignments.overdue).to eq SortsAssignments.overdue(assignments, user, session, submissions)
       end
 
     end
@@ -226,15 +233,15 @@ describe SortsAssignments do
     it "returns assignments that don't have a matching submission in the "+
       "passed submissions collection" do
       submission1.stubs(:assignment_id => nil )
-      SortsAssignments.without_graded_submission(assignments,submissions).
-        should =~ [ due_yesterday ]
+      expect(SortsAssignments.without_graded_submission(assignments,submissions)).
+        to match_array [ due_yesterday ]
     end
 
     it "returns assignments that have a matching submission in the collection "+
       "but the submission is without a graded submission." do
       submission1.expects(:without_graded_submission?).returns true
-      SortsAssignments.without_graded_submission(assignments,submissions).
-        should =~ [ due_yesterday ]
+      expect(SortsAssignments.without_graded_submission(assignments,submissions)).
+        to match_array [ due_yesterday ]
     end
 
   end
@@ -254,8 +261,8 @@ describe SortsAssignments do
       "don't grant rights to user" do
       due_yesterday.expects(:expects_submission?).returns true
       due_yesterday.expects(:grants_right?).with(user,session,:submit).returns true
-      SortsAssignments.user_allowed_to_submit(assignments,user,session).
-        should =~ [ due_yesterday ]
+      expect(SortsAssignments.user_allowed_to_submit(assignments,user,session)).
+        to match_array [ due_yesterday ]
     end
 
   end
@@ -270,7 +277,7 @@ describe SortsAssignments do
       SortsAssignments.stubs(:past).returns [ due_yesterday ]
       SortsAssignments.stubs(:user_allowed_to_submit).returns [ due_yesterday ]
       SortsAssignments.stubs(:without_graded_submission).returns [ due_yesterday ]
-      SortsAssignments.overdue(assignments,user,session,submissions).should == [due_yesterday]
+      expect(SortsAssignments.overdue(assignments,user,session,submissions)).to eq [due_yesterday]
     end
 
   end

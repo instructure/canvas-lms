@@ -29,7 +29,7 @@ describe ContentNotices do
   describe "content_notices" do
     it "should return [] if no notices are active" do
       enable_cache do
-        Thing.new.content_notices('user').should eql([])
+        expect(Thing.new.content_notices('user')).to eql([])
       end
     end
 
@@ -38,11 +38,11 @@ describe ContentNotices do
         thing = Thing.new
         thing.add_content_notice :foo
         notices = thing.content_notices('user')
-        notices.size.should eql(1)
-        notices[0].tag.should eql(:foo)
-        notices[0].text.should eql('foo!')
+        expect(notices.size).to eql(1)
+        expect(notices[0].tag).to eql(:foo)
+        expect(notices[0].text).to eql('foo!')
         thing.remove_content_notice :foo
-        thing.content_notices('user').should be_empty
+        expect(thing.content_notices('user')).to be_empty
       end
     end
 
@@ -51,8 +51,8 @@ describe ContentNotices do
         thing = Thing.new
         thing.add_content_notice :foo
         thing.add_content_notice :bar
-        thing.content_notices('alice').map(&:tag).should eql([:foo])
-        thing.content_notices('bob').map(&:tag).should eql([:foo, :bar])
+        expect(thing.content_notices('alice').map(&:tag)).to eql([:foo])
+        expect(thing.content_notices('bob').map(&:tag)).to eql([:foo, :bar])
       end
     end
 
@@ -60,9 +60,9 @@ describe ContentNotices do
       enable_cache do
         thing = Thing.new
         thing.add_content_notice :foo, 1.hour
-        thing.content_notices('user').map(&:tag).should eql([:foo])
+        expect(thing.content_notices('user').map(&:tag)).to eql([:foo])
         Timecop.freeze(2.hours.from_now) do
-          thing.content_notices('user').should be_empty
+          expect(thing.content_notices('user')).to be_empty
         end
       end
     end

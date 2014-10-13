@@ -48,7 +48,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should list top-level items" do
-      @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+      expect(@formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
                                              {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2, :sub_items_url=>"https://example.com?type=assignments"},
@@ -60,16 +60,16 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should rename deprecated hash keys" do
-      @formatter.get_content_list('quizzes').length.should == 1
-      @formatter.get_content_list('context_modules').length.should == 1
-      @formatter.get_content_list('wiki_pages').length.should == 1
-      @formatter.get_content_list('context_external_tools').length.should == 1
-      @formatter.get_content_list('learning_outcomes').length.should == 1
-      @formatter.get_content_list('attachments').length.should == 1
+      expect(@formatter.get_content_list('quizzes').length).to eq 1
+      expect(@formatter.get_content_list('context_modules').length).to eq 1
+      expect(@formatter.get_content_list('wiki_pages').length).to eq 1
+      expect(@formatter.get_content_list('context_external_tools').length).to eq 1
+      expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
+      expect(@formatter.get_content_list('attachments').length).to eq 1
     end
 
     it "should group assignments into assignment groups" do
-      @formatter.get_content_list('assignments').should == [
+      expect(@formatter.get_content_list('assignments')).to eq [
               {:type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
                  "sub_items" => [{:type => "assignments", :property => "copy[assignments][id_a2]", :title => "a2", :migration_id => "a2"}]
               },
@@ -86,7 +86,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                 'a4' => {'path_name' => 'a/b/c/a4.html', 'file_name' => 'a4.html', 'migration_id' => 'a4'},
                                                 'a5' => {'path_name' => 'a5.html', 'file_name' => 'a5.html', 'migration_id' => 'a5'},
                                       }}.to_json)
-      @formatter.get_content_list('attachments').should == [{:type => "folders",
+      expect(@formatter.get_content_list('attachments')).to eq [{:type => "folders",
                                                              :property => "copy[folders][id_0cc175b9c0f1b6a831c399e269772661]",
                                                              :title => "a",
                                                              :migration_id => "0cc175b9c0f1b6a831c399e269772661",
@@ -135,10 +135,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                               {'title' => 'a1', 'migration_id' => 'a1'},
                                               {'title' => 'a2', 'migration_id' => 'a1', 'type' => 'announcement'},
                                           ]}.to_json)
-      @formatter.get_content_list('discussion_topics').count.should == 1
-      @formatter.get_content_list('discussion_topics').first[:title].should == 'a1'
-      @formatter.get_content_list('announcements').count.should == 1
-      @formatter.get_content_list('announcements').first[:title].should == 'a2'
+      expect(@formatter.get_content_list('discussion_topics').count).to eq 1
+      expect(@formatter.get_content_list('discussion_topics').first[:title]).to eq 'a1'
+      expect(@formatter.get_content_list('announcements').count).to eq 1
+      expect(@formatter.get_content_list('announcements').first[:title]).to eq 'a2'
     end
 
   end
@@ -161,7 +161,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "should list top-level items" do
       #groups should not show up even though there are some
-      @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+      expect(@formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
@@ -171,11 +171,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should list individual types" do
-      @formatter.get_content_list('wiki_pages').length.should == 1
-      @formatter.get_content_list('context_modules').length.should == 1
-      @formatter.get_content_list('attachments').length.should == 1
-      @formatter.get_content_list('discussion_topics').length.should == 1
-      @formatter.get_content_list('announcements').length.should == 1
+      expect(@formatter.get_content_list('wiki_pages').length).to eq 1
+      expect(@formatter.get_content_list('context_modules').length).to eq 1
+      expect(@formatter.get_content_list('attachments').length).to eq 1
+      expect(@formatter.get_content_list('discussion_topics').length).to eq 1
+      expect(@formatter.get_content_list('announcements').length).to eq 1
     end
 
     context "deleted objects" do
@@ -192,20 +192,20 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       end
 
       it "should ignore in top-level list" do
-        @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+        expect(@formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"}]
       end
 
       it "should ignore in specific item request" do
-        @formatter.get_content_list('wiki_pages').length.should == 0
-        @formatter.get_content_list('context_modules').length.should == 0
-        @formatter.get_content_list('attachments').length.should == 0
-        @formatter.get_content_list('discussion_topics').length.should == 0
-        @formatter.get_content_list('announcements').length.should == 0
-        @formatter.get_content_list('assignments').length.should == 0
-        @formatter.get_content_list('quizzes').length.should == 0
-        @formatter.get_content_list('calendar_events').length.should == 0
-        @formatter.get_content_list('rubrics').length.should == 0
+        expect(@formatter.get_content_list('wiki_pages').length).to eq 0
+        expect(@formatter.get_content_list('context_modules').length).to eq 0
+        expect(@formatter.get_content_list('attachments').length).to eq 0
+        expect(@formatter.get_content_list('discussion_topics').length).to eq 0
+        expect(@formatter.get_content_list('announcements').length).to eq 0
+        expect(@formatter.get_content_list('assignments').length).to eq 0
+        expect(@formatter.get_content_list('quizzes').length).to eq 0
+        expect(@formatter.get_content_list('calendar_events').length).to eq 0
+        expect(@formatter.get_content_list('rubrics').length).to eq 0
       end
     end
 
@@ -222,15 +222,15 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @course.reload
 
       res = @formatter.get_content_list('attachments')
-      res.length.should == 4
-      res[0][:title].should == 'course files'
-      res[0][:sub_items][0][:title].should == 'a5.html'
-      res[1][:title].should == 'course files/a'
-      res[1][:sub_items].map{|item| item[:title]}.sort.should == ['a1.html', 'a2.html']
-      res[2][:title].should == 'course files/a/b'
-      res[2][:sub_items][0][:title].should == 'a3.html'
-      res[3][:title].should == 'course files/a/b/c'
-      res[3][:sub_items][0][:title].should == 'a4.html'
+      expect(res.length).to eq 4
+      expect(res[0][:title]).to eq 'course files'
+      expect(res[0][:sub_items][0][:title]).to eq 'a5.html'
+      expect(res[1][:title]).to eq 'course files/a'
+      expect(res[1][:sub_items].map{|item| item[:title]}.sort).to eq ['a1.html', 'a2.html']
+      expect(res[2][:title]).to eq 'course files/a/b'
+      expect(res[2][:sub_items][0][:title]).to eq 'a3.html'
+      expect(res[3][:title]).to eq 'course files/a/b/c'
+      expect(res[3][:sub_items][0][:title]).to eq 'a4.html'
     end
 
   end

@@ -28,13 +28,13 @@ shared_examples_for "a differentiable_object" do
       context "only_visible_to_overrides is true" do
         it "returns true" do
           differentiable.update_attribute "only_visible_to_overrides",true
-          differentiable.differentiated_assignments_applies?.should be_true
+          expect(differentiable.differentiated_assignments_applies?).to be_truthy
         end
       end
       context "only_visible_to_overrides is false" do
         it "returns false" do
           differentiable.update_attribute "only_visible_to_overrides",false
-          differentiable.differentiated_assignments_applies?.should be_false
+          expect(differentiable.differentiated_assignments_applies?).to be_falsey
         end
       end
     end
@@ -43,13 +43,13 @@ shared_examples_for "a differentiable_object" do
       context "only_visible_to_overrides is true" do
         it "returns false" do
           differentiable.update_attribute "only_visible_to_overrides",true
-          differentiable.differentiated_assignments_applies?.should be_false
+          expect(differentiable.differentiated_assignments_applies?).to be_falsey
         end
       end
       context "only_visible_to_overrides is false" do
         it "returns false" do
           differentiable.update_attribute "only_visible_to_overrides",false
-          differentiable.differentiated_assignments_applies?.should be_false
+          expect(differentiable.differentiated_assignments_applies?).to be_falsey
         end
       end
     end
@@ -62,11 +62,11 @@ shared_examples_for "a differentiable_object" do
         before {student_in_course(:course => @course)}
         it "with a visibility it should be true" do
           differentiable_view.stubs(:where).returns([:a_record])
-          differentiable.visible_to_user?(@user).should be_true
+          expect(differentiable.visible_to_user?(@user)).to be_truthy
         end
         it "without a visibility should be false" do
           differentiable_view.stubs(:where).returns([])
-          differentiable.visible_to_user?(@user).should be_false
+          expect(differentiable.visible_to_user?(@user)).to be_falsey
         end
       end
       context "observer" do
@@ -86,7 +86,7 @@ shared_examples_for "a differentiable_object" do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           end
           it "should be visible" do
-            differentiable.visible_to_user?(@observer).should be_true
+            expect(differentiable.visible_to_user?(@observer)).to be_truthy
           end
         end
 
@@ -96,7 +96,7 @@ shared_examples_for "a differentiable_object" do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
           end
           it "should be visible" do
-            differentiable.visible_to_user?(@observer).should be_true
+            expect(differentiable.visible_to_user?(@observer)).to be_truthy
           end
         end
 
@@ -106,7 +106,7 @@ shared_examples_for "a differentiable_object" do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
           end
           it "should not be visible" do
-            differentiable.visible_to_user?(@observer).should be_false
+            expect(differentiable.visible_to_user?(@observer)).to be_falsey
           end
         end
 
@@ -116,7 +116,7 @@ shared_examples_for "a differentiable_object" do
             @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
           end
           it "should be visible" do
-            differentiable.visible_to_user?(@observer).should be_true
+            expect(differentiable.visible_to_user?(@observer)).to be_truthy
           end
         end
 
@@ -126,14 +126,14 @@ shared_examples_for "a differentiable_object" do
             @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
           end
           it "should not be visible" do
-            differentiable.visible_to_user?(@observer).should be_false
+            expect(differentiable.visible_to_user?(@observer)).to be_falsey
           end
         end
       end
       context "teacher" do
         it "should be visible" do
           teacher_in_course(active_all: true, course: @course)
-          differentiable.visible_to_user?(@user).should be_true
+          expect(differentiable.visible_to_user?(@user)).to be_truthy
         end
       end
     end
@@ -143,7 +143,7 @@ shared_examples_for "a differentiable_object" do
         it "should immediately return true" do
           DifferentiableAssignment.expects(:filter).never
           student_in_course(active_all: true, course: @course)
-          differentiable.visible_to_user?(@student).should be_true
+          expect(differentiable.visible_to_user?(@student)).to be_truthy
         end
       end
       context "observer" do
@@ -153,14 +153,14 @@ shared_examples_for "a differentiable_object" do
           @observer = User.create(name: "observer")
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @user.id)
-          differentiable.visible_to_user?(@observer_enrollment.user).should be_true
+          expect(differentiable.visible_to_user?(@observer_enrollment.user)).to be_truthy
         end
       end
       context "teacher" do
         it "should immediately return true" do
           DifferentiableAssignment.expects(:filter).never
           teacher_in_course(active_all: true, course: @course)
-          differentiable.visible_to_user?(@user).should be_true
+          expect(differentiable.visible_to_user?(@user)).to be_truthy
         end
       end
     end
@@ -173,7 +173,7 @@ shared_examples_for "a differentiable_object" do
     end
     it "should filter for students" do
       student_in_course(:course => course)
-      call_filter.should == :filtered
+      expect(call_filter).to eq :filtered
     end
     context "observer" do
       before do
@@ -182,23 +182,23 @@ shared_examples_for "a differentiable_object" do
       end
       it "should not filter when no observed students" do
         @user = @observer_enrollment.user
-        call_filter.should == :not_filtered
+        expect(call_filter).to eq :not_filtered
       end
       it "should filter with observed students" do
         student_in_course(:course => course)
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
         @user = @observer_enrollment.user
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
-        call_filter.should == :filtered
+        expect(call_filter).to eq :filtered
       end
     end
     it "should not filter for the teacher" do
       teacher_in_course(:course => course)
-      call_filter.should == :not_filtered
+      expect(call_filter).to eq :not_filtered
     end
     it "should not filter if no user" do
       @user = nil
-      call_filter.should == :not_filtered
+      expect(call_filter).to eq :not_filtered
     end
   end
 end

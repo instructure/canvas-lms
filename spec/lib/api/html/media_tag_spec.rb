@@ -34,15 +34,15 @@ module Api
           let(:a_tag){ stub(name: 'a') }
 
           it "is true with a media_comment id" do
-            media_tag(a_tag, 'id', 'media_comment_123').has_media_comment?.should be(true)
+            expect(media_tag(a_tag, 'id', 'media_comment_123').has_media_comment?).to be(true)
           end
 
           it "is false for blank ids" do
-            media_tag(a_tag, 'id', nil).has_media_comment?.should be(false)
+            expect(media_tag(a_tag, 'id', nil).has_media_comment?).to be(false)
           end
 
           it "is false for non-media-comment ids" do
-            media_tag(a_tag, 'id', 'not-real-id').has_media_comment?.should be(false)
+            expect(media_tag(a_tag, 'id', 'not-real-id').has_media_comment?).to be(false)
           end
         end
 
@@ -50,12 +50,12 @@ module Api
           let(:tag){ stub(name: 'video') }
 
           it "is true with a data-media_comment id" do
-            media_tag(tag, 'data-media_comment_id', '123').has_media_comment?.should be(true)
+            expect(media_tag(tag, 'data-media_comment_id', '123').has_media_comment?).to be(true)
           end
 
           it "is false for blank ids" do
-            media_tag(tag, 'data-media_comment_id', '').has_media_comment?.should be(false)
-            media_tag(tag, 'data-media_comment_id', nil).has_media_comment?.should be(false)
+            expect(media_tag(tag, 'data-media_comment_id', '').has_media_comment?).to be(false)
+            expect(media_tag(tag, 'data-media_comment_id', nil).has_media_comment?).to be(false)
           end
         end
       end

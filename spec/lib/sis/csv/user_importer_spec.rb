@@ -33,32 +33,32 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Uno")
-    user.short_name.should eql("User Uno")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Uno")
+    expect(user.short_name).to eql("User Uno")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user1')
+    expect(pseudonym.unique_id).to eql('user1')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user@example.com")
+    expect(cc.path).to eql("user@example.com")
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno 2,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Uno 2")
-    user.short_name.should eql("User Uno 2")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Uno 2")
+    expect(user.short_name).to eql("User Uno 2")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user1')
+    expect(pseudonym.unique_id).to eql('user1')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
 
     user.name = "My Awesome Name"
     user.save
@@ -68,9 +68,9 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno 2,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("My Awesome Name")
-    user.short_name.should eql("My Awesome Name")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("My Awesome Name")
+    expect(user.short_name).to eql("My Awesome Name")
   end
 
   it "should create new users with display name" do
@@ -79,17 +79,17 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,The Uno,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Uno")
-    user.short_name.should eql("The Uno")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Uno")
+    expect(user.short_name).to eql("The Uno")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user1')
+    expect(pseudonym.unique_id).to eql('user1')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user@example.com")
+    expect(cc.path).to eql("user@example.com")
 
     # Field order shouldn't matter
     process_csv_data_cleanly(
@@ -97,17 +97,17 @@ describe SIS::CSV::UserImporter do
         "user_2,user2,User,Dos,user2@example.com,active,The Dos"
     )
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Dos")
-    user.short_name.should eql("The Dos")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Dos")
+    expect(user.short_name).to eql("The Dos")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user2')
+    expect(pseudonym.unique_id).to eql('user2')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user2@example.com")
+    expect(cc.path).to eql("user2@example.com")
   end
 
   it "should create new users with full name" do
@@ -116,16 +116,16 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Uno,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Uno")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Uno")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user1')
+    expect(pseudonym.unique_id).to eql('user1')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user@example.com")
+    expect(cc.path).to eql("user@example.com")
 
     # Field order shouldn't matter
     process_csv_data_cleanly(
@@ -133,16 +133,16 @@ describe SIS::CSV::UserImporter do
         "user_2,user2,user2@example.com,active,User Dos"
     )
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Dos")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Dos")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user2')
+    expect(pseudonym.unique_id).to eql('user2')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user2@example.com")
+    expect(cc.path).to eql("user2@example.com")
   end
 
   it "should create new users with sortable name" do
@@ -151,17 +151,17 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,\"One, User\",user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Uno")
-    user.sortable_name.should eql("One, User")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Uno")
+    expect(user.sortable_name).to eql("One, User")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user1')
+    expect(pseudonym.unique_id).to eql('user1')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user@example.com")
+    expect(cc.path).to eql("user@example.com")
 
     # Field order shouldn't matter
     process_csv_data_cleanly(
@@ -169,17 +169,17 @@ describe SIS::CSV::UserImporter do
         "user_2,user2,User,Dos,user2@example.com,active,\"Two, User\""
     )
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.account.should eql(@account)
-    user.name.should eql("User Dos")
-    user.sortable_name.should eql("Two, User")
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Dos")
+    expect(user.sortable_name).to eql("Two, User")
 
-    user.pseudonyms.count.should eql(1)
+    expect(user.pseudonyms.count).to eql(1)
     pseudonym = user.pseudonyms.first
-    pseudonym.unique_id.should eql('user2')
+    expect(pseudonym.unique_id).to eql('user2')
 
-    user.communication_channels.count.should eql(1)
+    expect(user.communication_channels.count).to eql(1)
     cc = user.communication_channels.first
-    cc.path.should eql("user2@example.com")
+    expect(cc.path).to eql("user2@example.com")
   end
 
   it "should preserve first name/last name split" do
@@ -188,10 +188,10 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,badpassword,John,St. Clair,user@example.com,active,"
     )
     user = Pseudonym.by_unique_id('user1').first.user
-    user.name.should == 'John St. Clair'
-    user.sortable_name.should == 'St. Clair, John'
-    user.first_name.should == 'John'
-    user.last_name.should == 'St. Clair'
+    expect(user.name).to eq 'John St. Clair'
+    expect(user.sortable_name).to eq 'St. Clair, John'
+    expect(user.first_name).to eq 'John'
+    expect(user.last_name).to eq 'St. Clair'
   end
 
   it "should tolerate blank first and last names" do
@@ -200,14 +200,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,,,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.name.should eql(" ")
+    expect(user.name).to eql(" ")
 
     process_csv_data_cleanly(
         "user_id,login_id,email,status",
         "user_2,user2,user2@example.com,active"
     )
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.name.should eql(" ")
+    expect(user.name).to eql(" ")
   end
 
   it "should ignore first and last names if full name is provided" do
@@ -216,16 +216,16 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,,,User One,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.name.should eql("User One")
-    user.sortable_name.should eql("One, User")
+    expect(user.name).to eql("User One")
+    expect(user.sortable_name).to eql("One, User")
 
     process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,full_name,email,status",
         "user_2,user2,User,Dos,User Two,user2@example.com,active"
     )
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.name.should eql("User Two")
-    user.sortable_name.should eql("Two, User")
+    expect(user.name).to eql("User Two")
+    expect(user.sortable_name).to eql("Two, User")
   end
 
   it "should set passwords and not overwrite current passwords" do
@@ -236,7 +236,7 @@ describe SIS::CSV::UserImporter do
     )
     user1 = CommunicationChannel.by_path('user@example.com').first.user
     p = user1.pseudonyms.first
-    p.valid_arbitrary_credentials?('badpassword').should be_true
+    expect(p.valid_arbitrary_credentials?('badpassword')).to be_truthy
 
     p.password = 'lessbadpassword'
     p.password_confirmation = 'lessbadpassword'
@@ -244,14 +244,14 @@ describe SIS::CSV::UserImporter do
 
     user2 = CommunicationChannel.by_path('user2@example.com').first.user
     p = user2.pseudonyms.first
-    p.valid_arbitrary_credentials?('password').should be_true
+    expect(p.valid_arbitrary_credentials?('password')).to be_truthy
 
     p.password = 'newpassword'
     p.password_confirmation = 'newpassword'
     p.save
 
-    p.valid_arbitrary_credentials?('password').should be_false
-    p.valid_arbitrary_credentials?('newpassword').should be_true
+    expect(p.valid_arbitrary_credentials?('password')).to be_falsey
+    expect(p.valid_arbitrary_credentials?('newpassword')).to be_truthy
 
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
@@ -261,21 +261,21 @@ describe SIS::CSV::UserImporter do
 
     user1.reload
     p = user1.pseudonyms.first
-    p.valid_arbitrary_credentials?('badpassword').should be_false
-    p.valid_arbitrary_credentials?('badpassword2').should be_false
-    p.valid_arbitrary_credentials?('lessbadpassword').should be_true
+    expect(p.valid_arbitrary_credentials?('badpassword')).to be_falsey
+    expect(p.valid_arbitrary_credentials?('badpassword2')).to be_falsey
+    expect(p.valid_arbitrary_credentials?('lessbadpassword')).to be_truthy
 
     user2.reload
     p = user2.pseudonyms.first
-    p.valid_arbitrary_credentials?('password').should be_false
-    p.valid_arbitrary_credentials?('changedpassword').should be_false
-    p.valid_arbitrary_credentials?('newpassword').should be_true
-    p.valid_ssha?('changedpassword').should be_true
+    expect(p.valid_arbitrary_credentials?('password')).to be_falsey
+    expect(p.valid_arbitrary_credentials?('changedpassword')).to be_falsey
+    expect(p.valid_arbitrary_credentials?('newpassword')).to be_truthy
+    expect(p.valid_ssha?('changedpassword')).to be_truthy
   end
 
   it "should allow setting and resetting of passwords" do
-    CommunicationChannel.by_path("user1@example.com").first.should be_nil
-    CommunicationChannel.by_path("user2@example.com").first.should be_nil
+    expect(CommunicationChannel.by_path("user1@example.com").first).to be_nil
+    expect(CommunicationChannel.by_path("user2@example.com").first).to be_nil
 
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
@@ -287,20 +287,20 @@ describe SIS::CSV::UserImporter do
     user2_persistence_token = nil
     CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
       user1_persistence_token = p.persistence_token
-      p.valid_arbitrary_credentials?('password1').should be_true
-      p.valid_arbitrary_credentials?('password2').should be_false
-      p.valid_arbitrary_credentials?('password3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(p.valid_arbitrary_credentials?('password1')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('password2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
     end
 
     user2_sis_ssha = nil
     CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
       user2_persistence_token = p.persistence_token
       user2_sis_ssha = p.sis_ssha
-      p.valid_arbitrary_credentials?('encpass1').should be_true
-      p.valid_arbitrary_credentials?('encpass2').should be_false
-      p.valid_arbitrary_credentials?('encpass3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(p.valid_arbitrary_credentials?('encpass1')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('encpass2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('encpass3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
     end
 
     # passwords haven't changed, neither should persistence tokens
@@ -311,19 +311,19 @@ describe SIS::CSV::UserImporter do
     )
 
     CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
-      user1_persistence_token.should == p.persistence_token
-      p.valid_arbitrary_credentials?('password1').should be_true
-      p.valid_arbitrary_credentials?('password2').should be_false
-      p.valid_arbitrary_credentials?('password3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(user1_persistence_token).to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('password1')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('password2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
     end
 
     CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
-      user2_persistence_token.should == p.persistence_token
-      p.valid_arbitrary_credentials?('encpass1').should be_true
-      p.valid_arbitrary_credentials?('encpass2').should be_false
-      p.valid_arbitrary_credentials?('encpass3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(user2_persistence_token).to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('encpass1')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('encpass2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('encpass3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
     end
 
     # passwords change, persistence token should change
@@ -334,11 +334,11 @@ describe SIS::CSV::UserImporter do
     )
 
     CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
-      user1_persistence_token.should_not == p.persistence_token
-      p.valid_arbitrary_credentials?('password1').should be_false
-      p.valid_arbitrary_credentials?('password2').should be_true
-      p.valid_arbitrary_credentials?('password3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(user1_persistence_token).not_to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('password1')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password2')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('password3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
 
       p.password_confirmation = p.password = 'password4'
       p.save
@@ -346,11 +346,11 @@ describe SIS::CSV::UserImporter do
     end
 
     CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
-      user2_persistence_token.should_not == p.persistence_token
-      p.valid_arbitrary_credentials?('encpass1').should be_false
-      p.valid_arbitrary_credentials?('encpass2').should be_true
-      p.valid_arbitrary_credentials?('encpass3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_false
+      expect(user2_persistence_token).not_to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('encpass1')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('encpass2')).to be_truthy
+      expect(p.valid_arbitrary_credentials?('encpass3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_falsey
 
       p.password_confirmation = p.password = 'password4'
       p.save
@@ -365,19 +365,19 @@ describe SIS::CSV::UserImporter do
     )
 
     CommunicationChannel.by_path('user1@example.com').first.user.pseudonyms.first.tap do |p|
-      user1_persistence_token.should == p.persistence_token
-      p.valid_arbitrary_credentials?('password1').should be_false
-      p.valid_arbitrary_credentials?('password2').should be_false
-      p.valid_arbitrary_credentials?('password3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_true
+      expect(user1_persistence_token).to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('password1')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_truthy
     end
 
     CommunicationChannel.by_path('user2@example.com').first.user.pseudonyms.first.tap do |p|
-      user2_persistence_token.should == p.persistence_token
-      p.valid_arbitrary_credentials?('encpass1').should be_false
-      p.valid_arbitrary_credentials?('encpass2').should be_false
-      p.valid_arbitrary_credentials?('encpass3').should be_false
-      p.valid_arbitrary_credentials?('password4').should be_true
+      expect(user2_persistence_token).to eq p.persistence_token
+      expect(p.valid_arbitrary_credentials?('encpass1')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('encpass2')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('encpass3')).to be_falsey
+      expect(p.valid_arbitrary_credentials?('password4')).to be_truthy
     end
 
   end
@@ -389,11 +389,11 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "U1,@,User,Uno,user@example.com,active"
     )
-    CommunicationChannel.by_path('user@example.com').first.should be_nil
+    expect(CommunicationChannel.by_path('user@example.com').first).to be_nil
 
-    importer.errors.map(&:last).should == []
-    importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is invalid"]
-    [User.count, Pseudonym.count].should == [before_user_count, before_pseudo_count]
+    expect(importer.errors.map(&:last)).to eq []
+    expect(importer.warnings.map(&:last)).to eq ["Failed saving user. Internal error: unique_id is invalid"]
+    expect([User.count, Pseudonym.count]).to eq [before_user_count, before_pseudo_count]
   end
 
   it "should not allow a secondary user account with the same login id." do
@@ -403,19 +403,19 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.pseudonyms.count.should == 1
-    user.pseudonyms.by_unique_id('user1').first.sis_user_id.should == 'user_1'
+    expect(user.pseudonyms.count).to eq 1
+    expect(user.pseudonyms.by_unique_id('user1').first.sis_user_id).to eq 'user_1'
 
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_2,user1,User,Uno,user@example.com,active"
     )
-    importer.errors.should == []
-    importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(importer.errors).to eq []
+    expect(importer.warnings.map{|r|r.last}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.pseudonyms.count.should == 1
-    user.pseudonyms.by_unique_id('user1').first.sis_user_id.should == 'user_1'
-    Pseudonym.count.should == (p_count + 1)
+    expect(user.pseudonyms.count).to eq 1
+    expect(user.pseudonyms.by_unique_id('user1').first.sis_user_id).to eq 'user_1'
+    expect(Pseudonym.count).to eq(p_count + 1)
   end
 
   it "should not allow a secondary user account to change its login id to some other registered login id" do
@@ -430,10 +430,10 @@ describe SIS::CSV::UserImporter do
       "user_2,user1,User,Dos,user2@example.com,active",
       "user_1,user3,User,Uno,user1@example.com,active"
     )
-    importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
-    importer.errors.should == []
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id.should == "user3"
-    Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id.should == "user2"
+    expect(importer.warnings.map{|r|r.last}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(importer.errors).to eq []
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id).to eq "user3"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user2"
   end
 
   it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
@@ -448,8 +448,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user3,User,Uno,user1@example.com,active",
       "user_2,user1,User,Dos,user2@example.com,active"
     )
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id.should == "user3"
-    Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id.should == "user1"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id).to eq "user3"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user1"
   end
 
   it "should allow a user to update information" do
@@ -463,7 +463,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user2,User,Uno-Dos,user1@example.com,active"
     )
 
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.last_name.should == "Uno-Dos"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.last_name).to eq "Uno-Dos"
   end
 
   it "should allow a user to update display name specifically" do
@@ -477,7 +477,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,The Uno-Dos,user1@example.com,active"
     )
 
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.short_name.should == "The Uno-Dos"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.short_name).to eq "The Uno-Dos"
   end
 
   it "should allow a user to update full name name specifically" do
@@ -491,7 +491,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Dos,user1@example.com,active"
     )
 
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.name.should == "User Dos"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.name).to eq "User Dos"
   end
 
   it "should allow a user to update sortable name specifically" do
@@ -505,7 +505,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,\"Two, User\",user1@example.com,active"
     )
 
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name.should == "Two, User"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name).to eq "Two, User"
   end
 
   it "should allow a user to update emails specifically" do
@@ -517,7 +517,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active"
       )
 
-      Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email.should == "user1@example.com"
+      expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
 
       Time.stubs(:now).returns(now)
       process_csv_data_cleanly(
@@ -525,7 +525,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user2@example.com,active"
       )
 
-      Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email.should == "user2@example.com"
+      expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user2@example.com"
     end
   end
 
@@ -535,14 +535,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Uno,user1@example.com,active"
     )
 
-    Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name.should == "Uno, User"
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.sortable_name).to eq "Uno, User"
 
     process_csv_data_cleanly(
         "user_id,login_id,full_name,email,status",
         "user_1,user1,User Dos,user1@example.com,active"
     )
 
-    Pseudonym.where(account_id:@account, sis_user_id: "user_1").first.user.sortable_name.should == "Dos, User"
+    expect(Pseudonym.where(account_id:@account, sis_user_id: "user_1").first.user.sortable_name).to eq "Dos, User"
   end
 
   it "should add two users with different user_ids, login_ids, but the same email" do
@@ -556,12 +556,12 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,User,Dos,user@example.com,active"
     )
     user2 = Pseudonym.by_unique_id('user2').first.user
-    user1.should_not == user2
-    user2.last_name.should == "Dos"
-    user2.pseudonyms.count.should == 1
-    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+    expect(user1).not_to eq user2
+    expect(user2.last_name).to eq "Dos"
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
+    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).not_to be_nil
   end
 
   it "should not notify about a merge opportunity to an SIS user in the same account" do
@@ -573,15 +573,15 @@ describe SIS::CSV::UserImporter do
     )
     user1 = Pseudonym.by_unique_id('user1').first.user
     user2 = Pseudonym.by_unique_id('user2').first.user
-    user1.should_not == user2
-    user1.last_name.should == "Uno"
-    user2.last_name.should == "Dos"
-    user1.pseudonyms.count.should == 1
-    user2.pseudonyms.count.should == 1
-    user1.pseudonyms.first.communication_channel_id.should_not be_nil
-    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+    expect(user1).not_to eq user2
+    expect(user1.last_name).to eq "Uno"
+    expect(user2.last_name).to eq "Dos"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user1.pseudonyms.first.communication_channel_id).not_to be_nil
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
+    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
   end
 
   it "should not notify about merge opportunities for users that have no means of logging in" do
@@ -593,15 +593,15 @@ describe SIS::CSV::UserImporter do
     )
     user1 = Pseudonym.by_unique_id('user1').first.user
     user2 = Pseudonym.by_unique_id('user2').first.user
-    user1.should_not == user2
-    user1.last_name.should == "Uno"
-    user2.last_name.should == "Dos"
-    user1.pseudonyms.count.should == 1
-    user2.pseudonyms.count.should == 1
-    user1.pseudonyms.first.communication_channel_id.should_not be_nil
-    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+    expect(user1).not_to eq user2
+    expect(user1.last_name).to eq "Uno"
+    expect(user2.last_name).to eq "Dos"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user1.pseudonyms.first.communication_channel_id).not_to be_nil
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
+    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
   end
 
   it "should not have problems updating a user to a conflicting email" do
@@ -613,24 +613,24 @@ describe SIS::CSV::UserImporter do
     )
     user1 = Pseudonym.by_unique_id('user1').first.user
     user2 = Pseudonym.by_unique_id('user2').first.user
-    user1.should_not == user2
-    user1.last_name.should == "Uno"
-    user2.last_name.should == "Dos"
-    user1.pseudonyms.count.should == 1
-    user2.pseudonyms.count.should == 1
-    user1.pseudonyms.first.communication_channel_id.should_not be_nil
-    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+    expect(user1).not_to eq user2
+    expect(user1.last_name).to eq "Uno"
+    expect(user2.last_name).to eq "Dos"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user1.pseudonyms.first.communication_channel_id).not_to be_nil
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_2,user2,User,Dos,user1@example.com,active"
     )
     user2.reload
-    user2.communication_channels.length.should == 1
-    user2.email_channel.should be_active
-    user2.email.should == 'user1@example.com'
+    expect(user2.communication_channels.length).to eq 1
+    expect(user2.email_channel).to be_active
+    expect(user2.email).to eq 'user1@example.com'
 
-    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
+    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
   end
 
   it "should not have a problem adding an existing e-mail that differs in case" do
@@ -646,10 +646,10 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,jt@instructure.com,active"
     )
     user1.reload
-    user1.communication_channels.count.should == 2
-    user1.communication_channels.active.count.should == 1
-    user1.email_channel.should be_active
-    user1.email.should == 'jt@instructure.com'
+    expect(user1.communication_channels.count).to eq 2
+    expect(user1.communication_channels.active.count).to eq 1
+    expect(user1.email_channel).to be_active
+    expect(user1.email).to eq 'jt@instructure.com'
   end
 
   it "should re-activate retired e-mails" do
@@ -664,8 +664,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user1.reload
-    user1.email_channel.should be_active
-    user1.communication_channels.length.should == 1
+    expect(user1.email_channel).to be_active
+    expect(user1.communication_channels.length).to eq 1
   end
 
   it "should send merge opportunity notifications when reactivating an email" do
@@ -679,14 +679,14 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,User,Dos,user1@example.com,deleted"
     )
     user2 = Pseudonym.by_unique_id('user2').first.user
-    user1.should_not == user2
-    user1.last_name.should == "Uno"
-    user2.last_name.should == "Dos"
-    user1.pseudonyms.count.should == 1
-    user2.pseudonyms.count.should == 1
-    user2.pseudonyms.first.communication_channel_id.should_not be_nil
-    user1.email_channel.should_not == user2.email_channel
-    Message.count.should == 0
+    expect(user1).not_to eq user2
+    expect(user1.last_name).to eq "Uno"
+    expect(user2.last_name).to eq "Dos"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
+    expect(user1.email_channel).not_to eq user2.email_channel
+    expect(Message.count).to eq 0
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -694,7 +694,7 @@ describe SIS::CSV::UserImporter do
     )
     user2.reload
 
-    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
+    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).not_to be_nil
   end
 
   it "should not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
@@ -708,11 +708,11 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user1 = Pseudonym.by_unique_id('user1').first.user
-    [u1, u2].should_not be_include(user1)
-    user1.communication_channels.length.should == 1
-    user1.email.should == 'user1@example.com'
-    [cc1, cc2].should_not be_include(user1.email_channel)
-    Message.where(:communication_channel_id => user1.email_channel, :notification_id => notification).first.should be_nil
+    expect([u1, u2]).not_to be_include(user1)
+    expect(user1.communication_channels.length).to eq 1
+    expect(user1.email).to eq 'user1@example.com'
+    expect([cc1, cc2]).not_to be_include(user1.email_channel)
+    expect(Message.where(:communication_channel_id => user1.email_channel, :notification_id => notification).first).to be_nil
   end
 
   it "should create everything in the deleted state when deleted initially" do
@@ -721,10 +721,10 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,deleted"
     )
     p = Pseudonym.by_unique_id('user1').first
-    p.should be_deleted
+    expect(p).to be_deleted
     u = p.user
-    u.communication_channels.length.should == 1
-    u.communication_channels.first.should be_retired
+    expect(u.communication_channels.length).to eq 1
+    expect(u.communication_channels.first).to be_retired
   end
 
   it "should not add a user with the same login id as another user" do
@@ -733,10 +733,10 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user1,User,Dos,user2@example.com,active"
     )
-    importer.errors.should == []
-    importer.warnings.map{|x| x[1]}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
-    Pseudonym.by_unique_id('user1').first.should_not be_nil
-    Pseudonym.by_unique_id('user2').first.should be_nil
+    expect(importer.errors).to eq []
+    expect(importer.warnings.map{|x| x[1]}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
+    expect(Pseudonym.by_unique_id('user2').first).to be_nil
   end
 
   it "should not present an error for the same login_id with different case for same user" do
@@ -745,7 +745,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_1,USer1,User,Uno,user1@example.com,active"
     )
-    Pseudonym.where(sis_user_id: 'user_1').first.unique_id.should == 'USer1'
+    expect(Pseudonym.where(sis_user_id: 'user_1').first.unique_id).to eq 'USer1'
   end
 
   it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
@@ -753,19 +753,19 @@ describe SIS::CSV::UserImporter do
     u.register!
     p_count = Pseudonym.count
     p = u.pseudonyms.create!(:unique_id => "user2", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
-    Pseudonym.by_unique_id('user1').first.should be_nil
-    Pseudonym.by_unique_id('user2').first.should_not be_nil
-    p.sis_user_id.should be_nil
+    expect(Pseudonym.by_unique_id('user1').first).to be_nil
+    expect(Pseudonym.by_unique_id('user2').first).not_to be_nil
+    expect(p.sis_user_id).to be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active"
     )
     p.reload
-    Pseudonym.by_unique_id('user1').first.should_not be_nil
-    Pseudonym.by_unique_id('user2').first.should_not be_nil
-    Pseudonym.count.should == (p_count + 2)
-    p.sis_user_id.should == "user_2"
+    expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
+    expect(Pseudonym.by_unique_id('user2').first).not_to be_nil
+    expect(Pseudonym.count).to eq(p_count + 2)
+    expect(p.sis_user_id).to eq "user_2"
   end
 
   it "should use an existing pseudonym if it wasn't imported from sis and has the same email address" do
@@ -773,21 +773,21 @@ describe SIS::CSV::UserImporter do
     u.register!
     p_count = Pseudonym.count
     p = u.pseudonyms.create!(:unique_id => "user2@example.com", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
-    Pseudonym.by_unique_id('user1').first.should be_nil
-    Pseudonym.by_unique_id('user2').first.should be_nil
-    Pseudonym.by_unique_id('user2@example.com').first.should_not be_nil
-    p.sis_user_id.should be_nil
+    expect(Pseudonym.by_unique_id('user1').first).to be_nil
+    expect(Pseudonym.by_unique_id('user2').first).to be_nil
+    expect(Pseudonym.by_unique_id('user2@example.com').first).not_to be_nil
+    expect(p.sis_user_id).to be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active"
     )
     p.reload
-    Pseudonym.by_unique_id('user1').first.should_not be_nil
-    Pseudonym.by_unique_id('user2').first.should_not be_nil
-    Pseudonym.by_unique_id('user2@example.com').first.should be_nil
-    Pseudonym.count.should == (p_count + 2)
-    p.sis_user_id.should == "user_2"
+    expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
+    expect(Pseudonym.by_unique_id('user2').first).not_to be_nil
+    expect(Pseudonym.by_unique_id('user2@example.com').first).to be_nil
+    expect(Pseudonym.count).to eq(p_count + 2)
+    expect(p.sis_user_id).to eq "user_2"
   end
 
   it "should strip white space on fields" do
@@ -797,19 +797,19 @@ describe SIS::CSV::UserImporter do
       "   user_2,   user2,   User,   Dos,   The Dos,\"   Dos, User\",   user2@example.com,  active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    user.should_not be_nil
-    user.name.should == "User Uno"
-    user.sortable_name.should == "Uno, User"
-    user.short_name.should == "The Uno"
+    expect(user).not_to be_nil
+    expect(user.name).to eq "User Uno"
+    expect(user.sortable_name).to eq "Uno, User"
+    expect(user.short_name).to eq "The Uno"
     p = user.pseudonyms.first
-    p.unique_id.should == "user1"
+    expect(p.unique_id).to eq "user1"
     user = CommunicationChannel.by_path('user2@example.com').first.user
-    user.should_not be_nil
-    user.name.should == "User Dos"
-    user.sortable_name.should == "Dos, User"
-    user.short_name.should == "The Dos"
+    expect(user).not_to be_nil
+    expect(user.name).to eq "User Dos"
+    expect(user.sortable_name).to eq "Dos, User"
+    expect(user.short_name).to eq "The Dos"
     p = user.pseudonyms.first
-    p.unique_id.should == "user2"
+    expect(p.unique_id).to eq "user2"
   end
 
   it "should use an existing communication channel" do
@@ -819,12 +819,12 @@ describe SIS::CSV::UserImporter do
     )
     p = Pseudonym.by_unique_id('user1').first
     user1 = p.user
-    user1.last_name.should == "Uno"
-    user1.pseudonyms.count.should == 1
-    p.communication_channel_id.should_not be_nil
-    user1.communication_channels.count.should == 1
-    user1.communication_channels.first.path.should == 'user1@example.com'
-    p.sis_communication_channel_id.should == p.communication_channel_id
+    expect(user1.last_name).to eq "Uno"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(p.communication_channel_id).not_to be_nil
+    expect(user1.communication_channels.count).to eq 1
+    expect(user1.communication_channels.first.path).to eq 'user1@example.com'
+    expect(p.sis_communication_channel_id).to eq p.communication_channel_id
     user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
 
     # change to user2@example.com; because user1@example.com was sis created, it should disappear
@@ -834,13 +834,13 @@ describe SIS::CSV::UserImporter do
     )
     p.reload
     user1.reload
-    user1.pseudonyms.count.should == 1
-    user1.communication_channels.count.should == 2
-    user1.communication_channels.unretired.count.should == 1
-    p.communication_channel_id.should_not be_nil
-    user1.communication_channels.unretired.first.path.should == 'user2@example.com'
-    p.sis_communication_channel_id.should == p.communication_channel_id
-    p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user1.communication_channels.count).to eq 2
+    expect(user1.communication_channels.unretired.count).to eq 1
+    expect(p.communication_channel_id).not_to be_nil
+    expect(user1.communication_channels.unretired.first.path).to eq 'user2@example.com'
+    expect(p.sis_communication_channel_id).to eq p.communication_channel_id
+    expect(p.communication_channel_id).to eq user1.communication_channels.unretired.first.id
   end
 
   it "should work when a communication channel already exists, but there's no sis_communication_channel" do
@@ -850,11 +850,11 @@ describe SIS::CSV::UserImporter do
     )
     p = Pseudonym.by_unique_id('user1').first
     user1 = p.user
-    user1.last_name.should == "Uno"
-    user1.pseudonyms.count.should == 1
-    p.communication_channel_id.should be_nil
-    user1.communication_channels.count.should == 0
-    p.sis_communication_channel_id.should be_nil
+    expect(user1.last_name).to eq "Uno"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(p.communication_channel_id).to be_nil
+    expect(user1.communication_channels.count).to eq 0
+    expect(p.sis_communication_channel_id).to be_nil
     user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
 
     importer = process_csv_data_cleanly(
@@ -863,13 +863,13 @@ describe SIS::CSV::UserImporter do
     )
     p.reload
     user1.reload
-    user1.pseudonyms.count.should == 1
-    user1.communication_channels.count.should == 1
-    user1.communication_channels.unretired.count.should == 1
-    p.communication_channel_id.should_not be_nil
-    user1.communication_channels.unretired.first.path.should == 'user2@example.com'
-    p.sis_communication_channel_id.should == p.communication_channel_id
-    p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user1.communication_channels.count).to eq 1
+    expect(user1.communication_channels.unretired.count).to eq 1
+    expect(p.communication_channel_id).not_to be_nil
+    expect(user1.communication_channels.unretired.first.path).to eq 'user2@example.com'
+    expect(p.sis_communication_channel_id).to eq p.communication_channel_id
+    expect(p.communication_channel_id).to eq user1.communication_channels.unretired.first.id
   end
 
   it "should handle stickiness" do
@@ -885,18 +885,18 @@ describe SIS::CSV::UserImporter do
       "user_1,user3,User,Uno,,active"
     )
     p.reload
-    p.unique_id.should == 'user5'
-    Pseudonym.by_unique_id('user1').first.should be_nil
-    Pseudonym.by_unique_id('user3').first.should be_nil
+    expect(p.unique_id).to eq 'user5'
+    expect(Pseudonym.by_unique_id('user1').first).to be_nil
+    expect(Pseudonym.by_unique_id('user3').first).to be_nil
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user3,User,Uno,,active",
       {:override_sis_stickiness => true}
     )
     p.reload
-    p.unique_id.should == 'user3'
-    Pseudonym.by_unique_id('user1').first.should be_nil
-    Pseudonym.by_unique_id('user5').first.should be_nil
+    expect(p.unique_id).to eq 'user3'
+    expect(Pseudonym.by_unique_id('user1').first).to be_nil
+    expect(Pseudonym.by_unique_id('user5').first).to be_nil
   end
 
   it "should handle display name stickiness" do
@@ -912,14 +912,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,The Uno-Dos,,active"
     )
     user.reload
-    user.short_name.should == 'The Amazing Uno'
+    expect(user.short_name).to eq 'The Amazing Uno'
     process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,short_name,email,status",
         "user_1,user1,User,Uno,The Uno-Dos,,active",
         {:override_sis_stickiness => true}
     )
     user.reload
-    user.short_name.should == 'The Uno-Dos'
+    expect(user.short_name).to eq 'The Uno-Dos'
   end
 
   it "should handle full name stickiness" do
@@ -935,14 +935,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User Uno,,active"
     )
     user.reload
-    user.name.should == 'The Amazing Uno'
+    expect(user.name).to eq 'The Amazing Uno'
     process_csv_data_cleanly(
         "user_id,login_id,full_name,email,status",
         "user_1,user1,User Uno,,active",
         {:override_sis_stickiness => true}
     )
     user.reload
-    user.name.should == 'User Uno'
+    expect(user.name).to eq 'User Uno'
   end
 
   it "should handle sortable name stickiness" do
@@ -958,14 +958,14 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,\"Two, User\",,active"
     )
     user.reload
-    user.sortable_name.should == 'Uno, The Amazing'
+    expect(user.sortable_name).to eq 'Uno, The Amazing'
     process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,sortable_name,email,status",
         "user_1,user1,User,Uno,\"Two, User\",,active",
         {:override_sis_stickiness => true}
     )
     user.reload
-    user.sortable_name.should == 'Two, User'
+    expect(user.sortable_name).to eq 'Two, User'
   end
 
   it 'should leave users around always' do
@@ -976,10 +976,10 @@ describe SIS::CSV::UserImporter do
     )
     user1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
     user2 = @account.pseudonyms.where(sis_user_id: 'user_2').first
-    user1.workflow_state.should == 'active'
-    user2.workflow_state.should == 'deleted'
-    user1.user.workflow_state.should == 'registered'
-    user2.user.workflow_state.should == 'registered'
+    expect(user1.workflow_state).to eq 'active'
+    expect(user2.workflow_state).to eq 'deleted'
+    expect(user1.user.workflow_state).to eq 'registered'
+    expect(user2.user.workflow_state).to eq 'registered'
   end
 
   it 'should remove enrollments when a user is deleted' do
@@ -1003,45 +1003,45 @@ describe SIS::CSV::UserImporter do
       "test_1,user_1,teacher,,active,,,",
       ",user_1,student,S002,active,,,"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_truthy
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_truthy
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_truthy
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_truthy
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_falsey
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_falsey
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_falsey
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_falsey
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
       "test_1,user_1,teacher,,active,,,",
       ",user_1,student,S002,active,,,"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_truthy
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_truthy
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_true
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_true
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_truthy
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_truthy
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted"
     )
-    @account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno").should be_false
-    @account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno").should be_false
+    expect(@account.courses.where(sis_source_id: "test_1").first.teachers.map(&:name).include?("User Uno")).to be_falsey
+    expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_falsey
   end
 
   context 'account associations' do
@@ -1063,15 +1063,15 @@ describe SIS::CSV::UserImporter do
       )
       user1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
       user2 = @account.pseudonyms.where(sis_user_id: 'user_2').first
-      user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
-      user2.user.user_account_associations.should be_empty
+      expect(user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }).to eq [[@account.id, 0]]
+      expect(user2.user.user_account_associations).to be_empty
 
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,deleted"
       )
       user1.reload
-      user1.user.user_account_associations.should be_empty
+      expect(user1.user.user_account_associations).to be_empty
     end
 
     it 'should work when a user gets undeleted' do
@@ -1080,21 +1080,21 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active"
       )
       user = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+      expect(user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }).to eq [[@account.id, 0]]
 
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,deleted"
       )
       user = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      user.user.user_account_associations.should be_empty
+      expect(user.user.user_account_associations).to be_empty
 
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
       user = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+      expect(user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }).to eq [[@account.id, 0]]
     end
 
     it 'should delete user enrollments for the current account when deleted, and update appropriate account associations' do
@@ -1114,13 +1114,13 @@ describe SIS::CSV::UserImporter do
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,")
-      @account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,"
       )
       @pseudo1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      @pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
+      expect(@pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
 
       @account = @account2
       process_csv_data_cleanly(
@@ -1136,46 +1136,46 @@ describe SIS::CSV::UserImporter do
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,")
-      @account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,"
       )
       @pseudo2 = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+      expect(@pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       UserMerge.from(@pseudo1.user).into(@pseudo2.user)
       @user = @account1.pseudonyms.where(sis_user_id: 'user_1').first.user
-      @account2.pseudonyms.where(sis_user_id: 'user_1').first.user.should == @user
+      expect(@account2.pseudonyms.where(sis_user_id: 'user_1').first.user).to eq @user
 
-      @user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account1.id, @account2.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+      expect(@user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account1.id, @account2.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       @account = @account1
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,deleted")
       @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
-        pseudo.workflow_state.should == 'deleted'
-        pseudo.user.workflow_state.should == 'registered'
+        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+        expect(pseudo.workflow_state).to eq 'deleted'
+        expect(pseudo.user.workflow_state).to eq 'registered'
       end
       @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
-        pseudo.workflow_state.should == 'active'
-        pseudo.user.workflow_state.should == 'registered'
+        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+        expect(pseudo.workflow_state).to eq 'active'
+        expect(pseudo.user.workflow_state).to eq 'registered'
       end
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active")
       @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
-        pseudo.workflow_state.should == 'active'
-        pseudo.user.workflow_state.should == 'registered'
+        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
+        expect(pseudo.workflow_state).to eq 'active'
+        expect(pseudo.user.workflow_state).to eq 'registered'
       end
       @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
-        pseudo.workflow_state.should == 'active'
-        pseudo.user.workflow_state.should == 'registered'
+        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
+        expect(pseudo.workflow_state).to eq 'active'
+        expect(pseudo.user.workflow_state).to eq 'registered'
       end
     end
   end
@@ -1186,8 +1186,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user_1 = Pseudonym.by_unique_id('user1').first.user
-    user_1.email.should == 'user1@example.com'
-    user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
+    expect(user_1.email).to eq 'user1@example.com'
+    expect(user_1.pseudonym.sis_communication_channel).to eq user_1.email_channel
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active",
@@ -1195,10 +1195,10 @@ describe SIS::CSV::UserImporter do
     )
     user_1 = Pseudonym.by_unique_id('user1').first.user
     user_2 = Pseudonym.by_unique_id('user2').first.user
-    user_1.email.should == 'user1@example.com'
-    user_2.email.should == 'user2@example.com'
-    user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
-    user_2.pseudonym.sis_communication_channel.should == user_2.email_channel
+    expect(user_1.email).to eq 'user1@example.com'
+    expect(user_2.email).to eq 'user2@example.com'
+    expect(user_1.pseudonym.sis_communication_channel).to eq user_1.email_channel
+    expect(user_2.pseudonym.sis_communication_channel).to eq user_2.email_channel
   end
 
   it "should not resurrect a non SIS user" do
@@ -1209,8 +1209,8 @@ describe SIS::CSV::UserImporter do
       "user_1,#{@pseudonym.unique_id},User,Uno,#{@pseudonym.unique_id},active"
     )
     user_1 = Pseudonym.where(sis_user_id: 'user_1').first.user
-    user_1.should_not == @non_sis_user
-    user_1.pseudonym.should_not == @pseudonym
+    expect(user_1).not_to eq @non_sis_user
+    expect(user_1.pseudonym).not_to eq @pseudonym
   end
 
   it "should not resurrect a non SIS pseudonym" do
@@ -1221,8 +1221,8 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user_1 = Pseudonym.where(sis_user_id: 'user_1').first.user
-    user_1.should_not == @non_sis_user
-    user_1.pseudonym.should_not == @pseudonym
+    expect(user_1).not_to eq @non_sis_user
+    expect(user_1.pseudonym).not_to eq @pseudonym
   end
 
   it "should error nicely when resurrecting an SIS user that conflicts with an active user" do
@@ -1236,8 +1236,8 @@ describe SIS::CSV::UserImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
     )
-    importer.errors.should == []
-    importer.warnings.length.should == 1
-    importer.warnings.last.last.should == "user #{@non_sis_user.id} has already claimed user_1's requested login information, skipping"
+    expect(importer.errors).to eq []
+    expect(importer.warnings.length).to eq 1
+    expect(importer.warnings.last.last).to eq "user #{@non_sis_user.id} has already claimed user_1's requested login information, skipping"
   end
 end

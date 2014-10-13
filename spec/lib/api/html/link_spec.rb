@@ -23,7 +23,7 @@ module Api
       describe '#to_corrected_s' do
 
         it 'returns the raw string if it isnt a link' do
-          Link.new("nonsense-data").to_corrected_s.should == "nonsense-data"
+          expect(Link.new("nonsense-data").to_corrected_s).to eq "nonsense-data"
         end
 
         context "for user context attachment links" do
@@ -33,12 +33,12 @@ module Api
 
           it 'returns the raw string for a user content link' do
             raw_link = "/users/1/files/1/download?verifier=123"
-            Link.new(raw_link).to_corrected_s.should == raw_link
+            expect(Link.new(raw_link).to_corrected_s).to eq raw_link
           end
 
           it 'returns the raw string for a user content link even with a host' do
             raw_link = "http://something.instructure.com/files/1/download?verifier=123"
-            Link.new(raw_link).to_corrected_s.should == raw_link
+            expect(Link.new(raw_link).to_corrected_s).to eq raw_link
           end
         end
 
@@ -46,7 +46,7 @@ module Api
           course_attachment = stub(context_type: "Course", context_id: 1)
           Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
           raw_link = "/files/1/download?verifier=123"
-          Link.new(raw_link).to_corrected_s.should == "/courses/1/files/1/download?"
+          expect(Link.new(raw_link).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
       end
     end

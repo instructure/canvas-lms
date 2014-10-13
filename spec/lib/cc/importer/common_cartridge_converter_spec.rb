@@ -29,167 +29,167 @@ describe "Standard Common Cartridge importing" do
   end
 
   it "should import webcontent" do
-    @course.attachments.count.should == 10
+    expect(@course.attachments.count).to eq 10
     atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
     atts.each do |mig_id|
-      @course.attachments.where(migration_id: mig_id).should be_exists
+      expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
   end
   
   it "should import discussion topics" do
-    @course.discussion_topics.count.should == 2
+    expect(@course.discussion_topics.count).to eq 2
     file1_id = @course.attachments.where(migration_id: "I_media_R").first.id
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
     
     dt =  @course.discussion_topics.where(migration_id: "I_00006_R").first
-    dt.message.should match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
+    expect(dt.message).to match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
     dt.attachment_id = file2_id
     
     dt =  @course.discussion_topics.where(migration_id: "I_00009_R").first
-    dt.message.should == %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
+    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
   it "should import modules from organization" do
-    @course.context_modules.count.should == 3
-    @course.context_modules.map(&:position).should eql [1, 2, 3]
+    expect(@course.context_modules.count).to eq 3
+    expect(@course.context_modules.map(&:position)).to eql [1, 2, 3]
 
     mod1 = @course.context_modules.where(migration_id:"I_00000").first
-    mod1.name.should == "Your Mom, Research, & You"
+    expect(mod1.name).to eq "Your Mom, Research, & You"
     tag = mod1.content_tags[0]
-    tag.content_type.should == 'Attachment'
-    tag.content_id.should == @course.attachments.where(migration_id: "I_00001_R").first.id
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_id).to eq @course.attachments.where(migration_id: "I_00001_R").first.id
+    expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    tag.content_type.should == 'ContextModuleSubHeader'
-    tag.title.should == "Study Guide"
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'ContextModuleSubHeader'
+    expect(tag.title).to eq "Study Guide"
+    expect(tag.indent).to eq 0
     index = 2
     if Qti.qti_enabled?
       tag = mod1.content_tags[index]
-      tag.title.should == "Pretest"
-      tag.content_type.should == 'Quizzes::Quiz'
-      tag.content_id.should == @course.quizzes.where(migration_id: "I_00003_R").first.id
-      tag.indent.should == 1
+      expect(tag.title).to eq "Pretest"
+      expect(tag.content_type).to eq 'Quizzes::Quiz'
+      expect(tag.content_id).to eq @course.quizzes.where(migration_id: "I_00003_R").first.id
+      expect(tag.indent).to eq 1
       index += 1
     end
     tag = mod1.content_tags[index]
-    tag.content_type.should == 'ExternalUrl'
-    tag.title.should == "Wikipedia - Your Mom"
-    tag.url.should == "http://en.wikipedia.org/wiki/Maternal_insult"
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'ExternalUrl'
+    expect(tag.title).to eq "Wikipedia - Your Mom"
+    expect(tag.url).to eq "http://en.wikipedia.org/wiki/Maternal_insult"
+    expect(tag.indent).to eq 0
     
     mod1 = @course.context_modules.where(migration_id: "m2").first
-    mod1.name.should == "Attachment module"
-    mod1.content_tags.count.should == 5
+    expect(mod1.name).to eq "Attachment module"
+    expect(mod1.content_tags.count).to eq 5
     tag = mod1.content_tags[0]
-    tag.content_type.should == 'Attachment'
-    tag.content_id.should == @course.attachments.where(migration_id: "f3").first.id
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_id).to eq @course.attachments.where(migration_id: "f3").first.id
+    expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    tag.content_type.should == 'ContextModuleSubHeader'
-    tag.title.should == "Sub-Folder"
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'ContextModuleSubHeader'
+    expect(tag.title).to eq "Sub-Folder"
+    expect(tag.indent).to eq 0
       tag = mod1.content_tags[2]
-      tag.content_type.should == 'Attachment'
-      tag.content_id.should == @course.attachments.where(migration_id: "f4").first.id
-      tag.indent.should == 1
+      expect(tag.content_type).to eq 'Attachment'
+      expect(tag.content_id).to eq @course.attachments.where(migration_id: "f4").first.id
+      expect(tag.indent).to eq 1
       tag = mod1.content_tags[3]
-      tag.content_type.should == 'ContextModuleSubHeader'
-      tag.title.should == "Sub-Folder 2"
-      tag.indent.should == 1
+      expect(tag.content_type).to eq 'ContextModuleSubHeader'
+      expect(tag.title).to eq "Sub-Folder 2"
+      expect(tag.indent).to eq 1
         tag = mod1.content_tags[4]
-        tag.content_type.should == 'Attachment'
-        tag.content_id.should == @course.attachments.where(migration_id: "f5").first.id
-        tag.indent.should == 2
+        expect(tag.content_type).to eq 'Attachment'
+        expect(tag.content_id).to eq @course.attachments.where(migration_id: "f5").first.id
+        expect(tag.indent).to eq 2
     
     mod1 = @course.context_modules.where(migration_id: "m3").first
-    mod1.name.should == "Misc Module"
-    mod1.content_tags.count.should == 4
+    expect(mod1.name).to eq "Misc Module"
+    expect(mod1.content_tags.count).to eq 4
     tag = mod1.content_tags[0]
-    tag.content_type.should == 'ExternalUrl'
-    tag.title.should == "Wikipedia - Sigmund Freud"
-    tag.url.should == "http://en.wikipedia.org/wiki/Sigmund_Freud"
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'ExternalUrl'
+    expect(tag.title).to eq "Wikipedia - Sigmund Freud"
+    expect(tag.url).to eq "http://en.wikipedia.org/wiki/Sigmund_Freud"
+    expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    tag.content_type.should == 'DiscussionTopic'
-    tag.title.should == "Talk about the issues"
-    tag.content_id.should == @course.discussion_topics.where(migration_id: "I_00009_R").first.id
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'DiscussionTopic'
+    expect(tag.title).to eq "Talk about the issues"
+    expect(tag.content_id).to eq @course.discussion_topics.where(migration_id: "I_00009_R").first.id
+    expect(tag.indent).to eq 0
     tag = mod1.content_tags[2]
-    tag.content_type.should == 'ContextExternalTool'
-    tag.title.should == "BLTI Test"
-    tag.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'ContextExternalTool'
+    expect(tag.title).to eq "BLTI Test"
+    expect(tag.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
+    expect(tag.indent).to eq 0
     tag = mod1.content_tags[3]
-    tag.content_type.should == 'Assignment'
-    tag.title.should == "BLTI Assignment Test"
-    tag.content_id.should == @course.assignments.where(migration_id: "I_00011_R").first.id
-    tag.indent.should == 0
+    expect(tag.content_type).to eq 'Assignment'
+    expect(tag.title).to eq "BLTI Assignment Test"
+    expect(tag.content_id).to eq @course.assignments.where(migration_id: "I_00011_R").first.id
+    expect(tag.indent).to eq 0
   end
 
   it "should import external tools" do
-    @course.context_external_tools.count.should == 2
+    expect(@course.context_external_tools.count).to eq 2
     et = @course.context_external_tools.where(migration_id: "I_00010_R").first
-    et.name.should == "BLTI Test"
-    et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool.php'
-    et.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
-    et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}].map(&:with_indifferent_access)
-    @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
+    expect(et.name).to eq "BLTI Test"
+    expect(et.url).to eq 'http://www.imsglobal.org/developers/BLTI/tool.php'
+    expect(et.settings[:custom_fields]).to eq({"key1"=>"value1", "key2"=>"value2"})
+    expect(et.settings[:vendor_extensions]).to eq [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}].map(&:with_indifferent_access)
+    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
 
     et = @course.context_external_tools.where(migration_id: "I_00011_R").first
-    et.name.should == "BLTI Assignment Test"
-    et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool2.php'
-    et.settings[:custom_fields].should == {}
-    et.settings[:vendor_extensions].should == [].map(&:with_indifferent_access)
-    @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
+    expect(et.name).to eq "BLTI Assignment Test"
+    expect(et.url).to eq 'http://www.imsglobal.org/developers/BLTI/tool2.php'
+    expect(et.settings[:custom_fields]).to eq({})
+    expect(et.settings[:vendor_extensions]).to eq [].map(&:with_indifferent_access)
+    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
 
     # That second tool had the assignment flag set, so an assignment for it should have been created
     asmnt = @course.assignments.where(migration_id: "I_00011_R").first
-    asmnt.should_not be_nil
-    asmnt.points_possible.should == 15.5
-    asmnt.external_tool_tag.url.should == et.url
-    asmnt.external_tool_tag.content_type.should == 'ContextExternalTool'
+    expect(asmnt).not_to be_nil
+    expect(asmnt.points_possible).to eq 15.5
+    expect(asmnt.external_tool_tag.url).to eq et.url
+    expect(asmnt.external_tool_tag.content_type).to eq 'ContextExternalTool'
   end
 
   it "should import assessment data" do
     if Qti.qti_enabled?
       quiz = @course.quizzes.where(migration_id: "I_00003_R").first
-      quiz.active_quiz_questions.size.should == 11
-      quiz.title.should == "Pretest"
-      quiz.quiz_type.should == 'assignment'
-      quiz.allowed_attempts.should == 2
-      quiz.time_limit.should == 120
+      expect(quiz.active_quiz_questions.size).to eq 11
+      expect(quiz.title).to eq "Pretest"
+      expect(quiz.quiz_type).to eq 'assignment'
+      expect(quiz.allowed_attempts).to eq 2
+      expect(quiz.time_limit).to eq 120
 
       question = quiz.active_quiz_questions.first
-      question.question_data[:points_possible].should == 2
+      expect(question.question_data[:points_possible]).to eq 2
 
       bank = @course.assessment_question_banks.where(migration_id: "I_00004_R_QDB_1").first
-      bank.assessment_questions.count.should == 11
-      bank.title.should == "QDB_1"
+      expect(bank.assessment_questions.count).to eq 11
+      expect(bank.title).to eq "QDB_1"
     else
-      pending("Can't import assessment data with python QTI tool.")
+      skip("Can't import assessment data with python QTI tool.")
     end
   end
 
   it "should import assessment data into an active question bank" do
     if Qti.qti_enabled?
       bank = @course.assessment_question_banks.where(migration_id: "I_00004_R_QDB_1").first
-      bank.assessment_questions.count.should == 11
+      expect(bank.assessment_questions.count).to eq 11
       bank.destroy
       bank.reload
-      bank.workflow_state.should == "deleted"
+      expect(bank.workflow_state).to eq "deleted"
 
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       bank = @course.assessment_question_banks.active.where(migration_id: "I_00004_R_QDB_1").first
-      bank.should_not be_nil
+      expect(bank).not_to be_nil
 
-      bank.assessment_questions.count.should == 11
+      expect(bank.assessment_questions.count).to eq 11
     else
-      pending("Can't import assessment data with python QTI tool.")
+      skip("Can't import assessment data with python QTI tool.")
     end
   end
 
@@ -197,11 +197,11 @@ describe "Standard Common Cartridge importing" do
     if Qti.qti_enabled?
       q = @course.assessment_questions.where(migration_id: "I_00003_R_QUE_104045").first
 
-      q.question_data[:question_text].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
-      q.question_data[:answers].first[:html].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
-      q.question_data[:answers].first[:comments_html].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
+      expect(q.question_data[:question_text]).to match %r{/assessment_questions/#{q.id}/files/\d+/}
+      expect(q.question_data[:answers].first[:html]).to match %r{/assessment_questions/#{q.id}/files/\d+/}
+      expect(q.question_data[:answers].first[:comments_html]).to match %r{/assessment_questions/#{q.id}/files/\d+/}
     else
-      pending("Can't import assessment data with python QTI tool.")
+      skip("Can't import assessment data with python QTI tool.")
     end
   end
   
@@ -214,26 +214,26 @@ describe "Standard Common Cartridge importing" do
     end
     
     it "should import webcontent" do
-      @course.attachments.count.should == 20
-      @course.attachments.active.count.should == 10
+      expect(@course.attachments.count).to eq 20
+      expect(@course.attachments.active.count).to eq 10
       mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
-        atts.length.should == 2
-        atts.any?{|a|a.file_state = 'deleted'}.should == true
-        atts.any?{|a|a.file_state = 'available'}.should == true
+        expect(atts.length).to eq 2
+        expect(atts.any?{|a|a.file_state = 'deleted'}).to eq true
+        expect(atts.any?{|a|a.file_state = 'available'}).to eq true
       end
     end
     
     it "should point to new attachment from module" do
-      @course.context_modules.count.should == 3
+      expect(@course.context_modules.count).to eq 3
 
       mod1 = @course.context_modules.where(migration_id: "I_00000").first
-      mod1.content_tags.active.count.should == (Qti.qti_enabled? ? 5 : 4)
-      mod1.name.should == "Your Mom, Research, & You"
+      expect(mod1.content_tags.active.count).to eq(Qti.qti_enabled? ? 5 : 4)
+      expect(mod1.name).to eq "Your Mom, Research, & You"
       tag = mod1.content_tags.active[0]
-      tag.content_type.should == 'Attachment'
-      tag.content_id.should == @course.attachments.active.where(migration_id: "I_00001_R").first.id
+      expect(tag.content_type).to eq 'Attachment'
+      expect(tag.content_id).to eq @course.attachments.active.where(migration_id: "I_00001_R").first.id
     end
   end
 
@@ -273,14 +273,14 @@ describe "Standard Common Cartridge importing" do
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
-      @course.attachments.count.should == 5
-      @course.context_external_tools.count.should == 1
-      @course.context_external_tools.first.migration_id.should == "I_00011_R"
-      @course.context_modules.count.should == 1
-      @course.context_modules.first.migration_id.should == 'I_00000'
-      @course.wiki.wiki_pages.count.should == 0
-      @course.discussion_topics.count.should == 1
-      @course.discussion_topics.first.migration_id.should == 'I_00006_R'
+      expect(@course.attachments.count).to eq 5
+      expect(@course.context_external_tools.count).to eq 1
+      expect(@course.context_external_tools.first.migration_id).to eq "I_00011_R"
+      expect(@course.context_modules.count).to eq 1
+      expect(@course.context_modules.first.migration_id).to eq 'I_00000'
+      expect(@course.wiki.wiki_pages.count).to eq 0
+      expect(@course.discussion_topics.count).to eq 1
+      expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
     end
 
     it "should not import all attachments if :files does not exist" do
@@ -291,7 +291,7 @@ describe "Standard Common Cartridge importing" do
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
-      @course.attachments.count.should == 0
+      expect(@course.attachments.count).to eq 0
     end
 
     it "should import discussion_topics with 'announcement' type if announcements are selected" do
@@ -304,7 +304,7 @@ describe "Standard Common Cartridge importing" do
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
-      @course.announcements.count.should == 1
+      expect(@course.announcements.count).to eq 1
     end
   end
 
@@ -372,8 +372,8 @@ describe "Standard Common Cartridge importing" do
       Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       mods = @course.context_modules.to_a
-      mods.map(&:position).should eql [1, 2, 3, 4]
-      mods.map(&:name).should eql %w(monkeys ponies monsters last)
+      expect(mods.map(&:position)).to eql [1, 2, 3, 4]
+      expect(mods.map(&:name)).to eql %w(monkeys ponies monsters last)
     end
 
     it "should fix position conflicts for assignment groups" do
@@ -399,8 +399,8 @@ describe "Standard Common Cartridge importing" do
       Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       ags = @course.assignment_groups.to_a
-      ags.map(&:position).should eql [1, 2, 3, 4]
-      ags.map(&:name).should eql %w(monkeys ponies monsters last)
+      expect(ags.map(&:position)).to eql [1, 2, 3, 4]
+      expect(ags.map(&:name)).to eql %w(monkeys ponies monsters last)
     end
   end
 
@@ -470,38 +470,38 @@ describe "More Standard Common Cartridge importing" do
     Importers::ContextModuleImporter.process_migration({'modules' =>hash}, @migration)
     @copy_to.save!
 
-    @copy_to.context_modules.count.should == 3
+    expect(@copy_to.context_modules.count).to eq 3
 
     mod1 = @copy_to.context_modules.where(migration_id: "m1").first
-    mod1.name.should == "some module"
-    mod1.content_tags.count.should == 1
-    mod1.position.should == 1
+    expect(mod1.name).to eq "some module"
+    expect(mod1.content_tags.count).to eq 1
+    expect(mod1.position).to eq 1
     tag = mod1.content_tags.last
-    tag.content_id.should == w1.id
-    tag.content_type.should == 'Attachment'
-    tag.indent.should == 0
+    expect(tag.content_id).to eq w1.id
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.indent).to eq 0
 
     mod2 = @copy_to.context_modules.where(migration_id: "misc_module_top_level_items").first
-    mod2.name.should == "Misc Module"
-    mod2.content_tags.count.should == 3
-    mod2.position.should == 2
+    expect(mod2.name).to eq "Misc Module"
+    expect(mod2.content_tags.count).to eq 3
+    expect(mod2.position).to eq 2
     tag = mod2.content_tags.first
-    tag.content_id.should == f3.id
-    tag.content_type.should == 'Attachment'
-    tag.indent.should == 0
+    expect(tag.content_id).to eq f3.id
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.indent).to eq 0
     tag = mod2.content_tags[1]
-    tag.content_id.should == f4.id
-    tag.content_type.should == 'Attachment'
-    tag.indent.should == 0
+    expect(tag.content_id).to eq f4.id
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.indent).to eq 0
     tag = mod2.content_tags[2]
-    tag.content_id.should == f5.id
-    tag.content_type.should == 'Attachment'
-    tag.indent.should == 0
+    expect(tag.content_id).to eq f5.id
+    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.indent).to eq 0
 
     mod3 = @copy_to.context_modules.where(migration_id: "m2").first
-    mod3.name.should == "next module"
-    mod3.content_tags.count.should == 0
-    mod3.position.should == 3
+    expect(mod3.name).to eq "next module"
+    expect(mod3.content_tags.count).to eq 0
+    expect(mod3.position).to eq 3
   end
 
   it "should handle back-slashed paths" do
@@ -523,10 +523,10 @@ describe "More Standard Common Cartridge importing" do
     doc = Nokogiri::XML(resources)
     @converter.unzipped_file_path = 'testing/'
     @converter.get_all_resources(doc)
-    @converter.resources['a1'][:href].should == 'a1/a1.html'
-    @converter.resources['w1'][:files].first[:href].should == 'w1/w1.html'
-    @converter.resources['w1'][:files][1][:href].should == 'w1/w2.html'
-    @converter.resources['q1'][:files].first[:href].should == 'q1/q1.xml'
+    expect(@converter.resources['a1'][:href]).to eq 'a1/a1.html'
+    expect(@converter.resources['w1'][:files].first[:href]).to eq 'w1/w1.html'
+    expect(@converter.resources['w1'][:files][1][:href]).to eq 'w1/w2.html'
+    expect(@converter.resources['q1'][:files].first[:href]).to eq 'q1/q1.xml'
   end
 end
 
@@ -534,7 +534,7 @@ describe "non-ASCII attachment names" do
   it "should not fail to create all_files.zip" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path)
-    lambda { @converter.export }.should_not raise_error
+    expect { @converter.export }.not_to raise_error
     contents = ["course_settings/assignment_groups.xml",
                 "course_settings/canvas_export.txt",
                 "course_settings/course_settings.xml",
@@ -544,11 +544,11 @@ describe "non-ASCII attachment names" do
                 "molé.txt",
                 "xyz.txt"
                 ]
-    @converter.course[:file_map].values.map { |v| v[:path_name] }.sort.should == contents.sort
+    expect(@converter.course[:file_map].values.map { |v| v[:path_name] }.sort).to eq contents.sort
 
     Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)
-      (contents - zipcontents).should eql []
+      expect(contents - zipcontents).to eql []
     end
   end
 end
@@ -582,23 +582,23 @@ describe "LTI tool combination" do
   end
 
   it "should combine lti tools in cc packages when possible" do
-    @course.context_external_tools.count.should == 2
-    @course.context_external_tools.map(&:migration_id).sort.should == ["TOOL_1", "TOOL_3"]
+    expect(@course.context_external_tools.count).to eq 2
+    expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["TOOL_1", "TOOL_3"]
 
     combined_tool = @course.context_external_tools.where(migration_id: "TOOL_1").first
-    combined_tool.domain.should == "www.example.com"
+    expect(combined_tool.domain).to eq "www.example.com"
     other_tool = @course.context_external_tools.where(migration_id: "TOOL_3").first
-    @course.context_module_tags.count.should == 5
+    expect(@course.context_module_tags.count).to eq 5
 
     combined_tags = @course.context_module_tags.select{|ct| ct.url.start_with?("https://www.example.com")}
-    combined_tags.count.should == 4
+    expect(combined_tags.count).to eq 4
     combined_tags.each do |tag|
-      tag.content.should == combined_tool
+      expect(tag.content).to eq combined_tool
     end
 
     other_tag = (@course.context_module_tags.to_a - combined_tags).first
-    other_tag.url.start_with?("https://www.differentdomainexample.com").should be_true
-    other_tag.content.should == other_tool
+    expect(other_tag.url.start_with?("https://www.differentdomainexample.com")).to be_truthy
+    expect(other_tag.content).to eq other_tool
   end
 end
 
@@ -629,21 +629,21 @@ describe "cc assignment extensions" do
   end
 
   it "should parse canvas data from cc extension" do
-    @migration.migration_issues.count.should == 0
+    expect(@migration.migration_issues.count).to eq 0
 
     att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
 
-    @course.assignments.count.should == 2
+    expect(@course.assignments.count).to eq 2
     assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
-    assignment1.grading_type.should == 'pass_fail'
-    assignment1.points_possible.should == 20
-    assignment1.description.should include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
-    assignment1.submission_types.should == "online_text_entry,online_url,media_recording,online_upload" # overridden
+    expect(assignment1.grading_type).to eq 'pass_fail'
+    expect(assignment1.points_possible).to eq 20
+    expect(assignment1.description).to include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
+    expect(assignment1.submission_types).to eq "online_text_entry,online_url,media_recording,online_upload" # overridden
 
     assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
-    assignment2.grading_type.should == 'points'
-    assignment2.points_possible.should == 21
-    assignment2.description.should include('hi, the canvas meta stuff does not have submission types')
-    assignment2.submission_types.should == "online_upload,online_text_entry,online_url"
+    expect(assignment2.grading_type).to eq 'points'
+    expect(assignment2.points_possible).to eq 21
+    expect(assignment2.description).to include('hi, the canvas meta stuff does not have submission types')
+    expect(assignment2.submission_types).to eq "online_upload,online_text_entry,online_url"
   end
 end

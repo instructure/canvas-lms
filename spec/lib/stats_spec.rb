@@ -22,37 +22,37 @@ require 'lib/stats'
 describe Stats do
   context Stats::Counter do
     def check_stats_with_matchers(c, empty, size, max, min, sum, mean, var, stddev, histogram)
-      c.empty?.should empty
-      c.size.should size
-      c.count.should size
-      c.max.should max
-      c.min.should min
-      c.sum.should sum
-      c.total.should sum
-      c.mean.should mean
-      c.avg.should mean
-      c.var.should var
-      c.variance.should var
-      c.stddev.should stddev
-      c.standard_deviation.should stddev
-      c.histogram.should histogram
+      expect(c.empty?).to empty
+      expect(c.size).to size
+      expect(c.count).to size
+      expect(c.max).to max
+      expect(c.min).to min
+      expect(c.sum).to sum
+      expect(c.total).to sum
+      expect(c.mean).to mean
+      expect(c.avg).to mean
+      expect(c.var).to var
+      expect(c.variance).to var
+      expect(c.stddev).to stddev
+      expect(c.standard_deviation).to stddev
+      expect(c.histogram).to histogram
     end
 
     def check_stats(c, size, max, min, sum, mean, var, histogram)
       check_stats_with_matchers c,
-                                (size > 0 ? be_false : be_true),
+                                (size > 0 ? be_falsey : be_truthy),
                                 eql(size),
                                 eql(max),
                                 eql(min),
                                 eql(sum),
-                                be_close(mean, 0.0000000001),
-                                be_close(var, 0.0000000001),
-                                be_close(Math::sqrt(var), 0.0000000001),
+                                be_within(0.0000000001).of(mean),
+                                be_within(0.0000000001).of(var),
+                                be_within(0.0000000001).of(Math::sqrt(var)),
                                 eql(histogram)
     end
 
     it "should be able to initialize with an array" do
-      lambda{Stats::Counter.new([1,2,4,6,9])}.should_not raise_error
+      expect{Stats::Counter.new([1,2,4,6,9])}.not_to raise_error
     end
     
     it "should return some basic statistics" do
@@ -71,7 +71,7 @@ describe Stats do
     it "should determine standard deviation" do
       c = Stats::Counter.new([9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4])
       stddev = c.stddev
-      ('%.2f' % stddev).should == '2.98'
+      expect('%.2f' % stddev).to eq '2.98'
 
       c = Stats::Counter.new([0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 
                               0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 
@@ -81,16 +81,16 @@ describe Stats do
                               0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 
                               0.30000000000000004, 0.30000000000000004])
       stddev = c.stddev
-      ('%.2f' % stddev).should == '0.00'
+      expect('%.2f' % stddev).to eq '0.00'
 
       c = Stats::Counter.new
-      c.stddev.should be_nil
+      expect(c.stddev).to be_nil
     end
 
     it "should return the right things with no values" do
       c = Stats::Counter.new
       check_stats_with_matchers c,
-                                be_true,
+                                be_truthy,
                                 eql(0),
                                 be_nil,
                                 be_nil,
@@ -113,55 +113,55 @@ describe Stats do
       c << 4
       c.push 5
       c.each { |item| test << item }
-      test.should == [1,2,3,1,2,3,4,5]
+      expect(test).to eq [1,2,3,1,2,3,4,5]
     end
     
     it "should put negative numbers in the proper bin in histograms" do
       c = Stats::Counter.new([-1, -0.5, 0, 0.5, 1])
       h = c.histogram
-      h.should == {:bin_width => 1.0, :bin_base => 0.0, :data =>{-1.0=>2, 0.0=>2, 1.0=>1 }}
+      expect(h).to eq({:bin_width => 1.0, :bin_base => 0.0, :data =>{-1.0=>2, 0.0=>2, 1.0=>1 }})
     end
     
     it "should work with strange bin widths in histogram" do
       c = Stats::Counter.new([-7,-3,0,1,2,3,4,5,6])
       h = c.histogram(bin_width = 2.5, bin_base = 0.0)
-      h.should == {:bin_width=>2.5, :bin_base=>0.0, :data=>{0.0=>3, -5.0=>1, 5.0=>2, -7.5=>1, 2.5=>2}}
+      expect(h).to eq({:bin_width=>2.5, :bin_base=>0.0, :data=>{0.0=>3, -5.0=>1, 5.0=>2, -7.5=>1, 2.5=>2}})
     end
     
     it "should work with strange bin bases in histogram" do
       c = Stats::Counter.new([-7,-3,0,1,2,3,4,5,6])
       h = c.histogram(bin_width = 2.5, bin_base = 1.5)
-      h.should == {:bin_width=>2.5, :bin_base=>1.5, :data=>{1.5=>2, 4.0=>3, -3.5=>1, -8.5=>1, -1.0=>2}}
+      expect(h).to eq({:bin_width=>2.5, :bin_base=>1.5, :data=>{1.5=>2, 4.0=>3, -3.5=>1, -8.5=>1, -1.0=>2}})
     end
     
     it "should return quarties properly" do
       c = Stats::Counter.new([6,4,2,-7,0,1,3,5,-3,20])
       q = c.quartiles
-      q.should == [-0.75, 2.5, 5.25]
+      expect(q).to eq [-0.75, 2.5, 5.25]
     end
     
     it "should return nils for quartiles when there is no data" do
       c = Stats::Counter.new([])
       q = c.quartiles
-      q.should == [nil, nil, nil]
+      expect(q).to eq [nil, nil, nil]
     end
     
     it "should return a single number for quartiles if that is the only thing in the data" do
       c = Stats::Counter.new([5])
       q = c.quartiles
-      q.should == [5, 5, 5]
+      expect(q).to eq [5, 5, 5]
     end
     
     it "should return properly for a dataset of length 3" do
        c = Stats::Counter.new([1,2,10])
        q = c.quartiles
-       q.should == [1, 2, 10]
+       expect(q).to eq [1, 2, 10]
     end
 
     it "should return properly for a dataset of length 2" do
        c = Stats::Counter.new([1,10])
        q = c.quartiles
-       q.should == [1, 5.5, 10]
+       expect(q).to eq [1, 5.5, 10]
     end
     
     

@@ -35,13 +35,14 @@ describe SIS::CSV::GroupImporter do
       "G003,A001,,available",
       "G004,A004,Group 4,available",
       ",A001,G1,available")
-    importer.errors.should == []
-    importer.warnings.map(&:last).should ==
+    expect(importer.errors).to eq []
+    expect(importer.warnings.map(&:last)).to eq(
       ["Improper status \"blerged\" for group G002, skipping",
        "No name given for group G003, skipping",
        "Parent account didn't exist for A004",
        "No group_id given for a group"]
-    Group.count.should == before_count + 1
+    )
+    expect(Group.count).to eq before_count + 1
   end
 
   it "should create groups" do
@@ -53,10 +54,10 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1,available",
       "G002,A002,Group 2,deleted")
     groups = Group.order(:id).all
-    groups.map(&:account_id).should == [@account.id, @sub.id]
-    groups.map(&:sis_source_id).should == %w(G001 G002)
-    groups.map(&:name).should == ["Group 1", "Group 2"]
-    groups.map(&:workflow_state).should == %w(available deleted)
+    expect(groups.map(&:account_id)).to eq [@account.id, @sub.id]
+    expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
+    expect(groups.map(&:name)).to eq ["Group 1", "Group 2"]
+    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
   end
 
   it "should create groups with no account id column" do
@@ -65,10 +66,10 @@ describe SIS::CSV::GroupImporter do
       "group_id,name,status",
       "G001,Group 1,available")
     groups = Group.order(:id).all
-    groups.map(&:account_id).should == [@account.id]
-    groups.map(&:sis_source_id).should == %w(G001)
-    groups.map(&:name).should == ["Group 1"]
-    groups.map(&:workflow_state).should == %w(available)
+    expect(groups.map(&:account_id)).to eq [@account.id]
+    expect(groups.map(&:sis_source_id)).to eq %w(G001)
+    expect(groups.map(&:name)).to eq ["Group 1"]
+    expect(groups.map(&:workflow_state)).to eq %w(available)
   end
 
   it "should update group attributes" do
@@ -78,7 +79,7 @@ describe SIS::CSV::GroupImporter do
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
       "G002,,Group 2,available")
-    Group.count.should == 2
+    expect(Group.count).to eq 2
     Group.where(sis_source_id: 'G001').first.update_attribute(:name, 'Group 1-1')
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
@@ -86,10 +87,10 @@ describe SIS::CSV::GroupImporter do
       "G002,A002,Group 2-b,deleted")
     # group 1's name won't change because it was manually changed
     groups = Group.order(:id).all
-    groups.map(&:name).should == ["Group 1-1", "Group 2-b"]
-    groups.map(&:root_account).should == [@account, @account]
-    groups.map(&:workflow_state).should == %w(available deleted)
-    groups.map(&:account).should == [@account, @sub]
+    expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
+    expect(groups.map(&:root_account)).to eq [@account, @account]
+    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
+    expect(groups.map(&:account)).to eq [@account, @sub]
   end
 
 end

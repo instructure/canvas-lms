@@ -21,13 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe "MessageableUser" do
   describe ".build_select" do
     it "should ignore common_course_column without common_role_column" do
-      MessageableUser.build_select(:common_course_column => 'ignored_column').
-        should match(/NULL AS common_courses/)
+      expect(MessageableUser.build_select(:common_course_column => 'ignored_column')).
+        to match(/NULL AS common_courses/)
     end
 
     it "should require common_course_column with common_role_column" do
-      lambda{ MessageableUser.build_select(:common_role_column => 'role_column') }.
-        should raise_error(ArgumentError)
+      expect{ MessageableUser.build_select(:common_role_column => 'role_column') }.
+        to raise_error(ArgumentError)
     end
 
     it "should combine common_course_column and common_role_column in common_courses" do
@@ -39,8 +39,8 @@ describe "MessageableUser" do
         where(:id => @student).
         group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
         first
-      messageable_user.send(:read_attribute, :common_courses).
-        should == "course_column:role_column"
+      expect(messageable_user.send(:read_attribute, :common_courses)).
+        to eq "course_column:role_column"
     end
 
     it "should combine multiple (course,role) pairs in common_courses" do
@@ -54,8 +54,8 @@ describe "MessageableUser" do
         where(:id => @ta.id).
         group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
         first
-      messageable_user.send(:read_attribute, :common_courses).split(/,/).sort.
-        should == ["course:StudentEnrollment", "course:TaEnrollment"]
+      expect(messageable_user.send(:read_attribute, :common_courses).split(/,/).sort).
+        to eq ["course:StudentEnrollment", "course:TaEnrollment"]
     end
 
     it "should combine multiple common_group_column values in common_groups" do
@@ -67,8 +67,8 @@ describe "MessageableUser" do
         where(:id => @user).
         group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
         first
-      messageable_user.send(:read_attribute, :common_groups).split(/,/).map(&:to_i).sort.
-        should == [group1.id, group2.id].sort
+      expect(messageable_user.send(:read_attribute, :common_groups).split(/,/).map(&:to_i).sort).
+        to eq [group1.id, group2.id].sort
     end
   end
 
@@ -78,81 +78,81 @@ describe "MessageableUser" do
     end
 
     it "should group by id" do
-      group_scope(MessageableUser.prepped()).
-        should match(MessageableUser::COLUMNS.first)
+      expect(group_scope(MessageableUser.prepped())).
+        to match(MessageableUser::COLUMNS.first)
     end
 
     it "should include column-based common_course_column in group by" do
-      group_scope(MessageableUser.prepped(:common_course_column => 'course_column')).
-        should match('course_column')
+      expect(group_scope(MessageableUser.prepped(:common_course_column => 'course_column'))).
+        to match('course_column')
     end
 
     it "should include column-based common_group_column in group by" do
-      group_scope(MessageableUser.prepped(:common_group_column => 'group_column')).
-        should match('group_column')
+      expect(group_scope(MessageableUser.prepped(:common_group_column => 'group_column'))).
+        to match('group_column')
     end
 
     it "should not include literal common_course_column value in group by" do
-      group_scope(MessageableUser.prepped(:common_course_column => 5)).
-        should_not match('5')
+      expect(group_scope(MessageableUser.prepped(:common_course_column => 5))).
+        not_to match('5')
     end
 
     it "should not include literal common_group_column value in group by" do
-      group_scope(MessageableUser.prepped(:common_group_column => 5)).
-        should_not match('5')
+      expect(group_scope(MessageableUser.prepped(:common_group_column => 5))).
+        not_to match('5')
     end
 
     it "should order by sortable_name before id" do
       user1 = user(:active_all => 1, :name => 'Yellow Bob')
       user2 = user(:active_all => 1, :name => 'Zebra Alice')
-      MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
+      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "should ignore case when ordering by sortable_name" do
       user1 = user(:active_all => 1, :name => 'bob')
       user2 = user(:active_all => 1, :name => 'ALICE')
-      MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
+      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "should order by id as tiebreaker" do
       user1 = user(:active_all => 1, :name => 'Alice')
       user2 = user(:active_all => 1, :name => 'Alice')
-      MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user1.id
+      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user1.id
     end
 
     it "should exclude creation_pending students with strict_checks true" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped(:strict_checks => true).where(id: @user).length.should == 0
+      expect(MessageableUser.prepped(:strict_checks => true).where(id: @user).length).to eq 0
     end
 
     it "should include creation_pending students with strict_checks false" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped(:strict_checks => false).where(id: @user).length.should == 1
+      expect(MessageableUser.prepped(:strict_checks => false).where(id: @user).length).to eq 1
     end
 
     it "should exclude deleted students with include_deleted true but strict_checks true" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => true, :include_deleted => true).where(id: @user).length.should == 0
+      expect(MessageableUser.prepped(:strict_checks => true, :include_deleted => true).where(id: @user).length).to eq 0
     end
 
     it "should exclude deleted students with with strict_checks false but include_deleted false" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => false, :include_deleted => false).where(id: @user).length.should == 0
+      expect(MessageableUser.prepped(:strict_checks => false, :include_deleted => false).where(id: @user).length).to eq 0
     end
 
     it "should include deleted students with strict_checks false and include_deleted true" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => false, :include_deleted => true).where(id: @user).length.should == 1
+      expect(MessageableUser.prepped(:strict_checks => false, :include_deleted => true).where(id: @user).length).to eq 1
     end
 
     it "should default strict_checks to true" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped().where(id: @user).length.should == 0
+      expect(MessageableUser.prepped().where(id: @user).length).to eq 0
     end
 
     it "should default include_delete to false" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => false).where(id: @user).length.should == 0
+      expect(MessageableUser.prepped(:strict_checks => false).where(id: @user).length).to eq 0
     end
   end
 
@@ -162,13 +162,13 @@ describe "MessageableUser" do
     end
 
     it "should be empty with no common_courses selected" do
-      MessageableUser.prepped().where(id: @user).first.common_courses.
-        should == {}
+      expect(MessageableUser.prepped().where(id: @user).first.common_courses).
+        to eq({})
     end
 
     it "should populate from non-null common_courses" do
       user = MessageableUser.prepped(:common_course_column => 1, :common_role_column => "'StudentEnrollment'").where(id: @user).first
-      user.common_courses.should == {1 => ['StudentEnrollment']}
+      expect(user.common_courses).to eq({1 => ['StudentEnrollment']})
     end
 
     describe "sharding" do
@@ -178,7 +178,7 @@ describe "MessageableUser" do
         user = MessageableUser.prepped(:common_course_column => Shard.relative_id_for(1, @shard2, Shard.current), :common_role_column => "'StudentEnrollment'").where(id: @user).first
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            user.common_courses.should == {Shard.relative_id_for(1, @shard2, Shard.current) => ['StudentEnrollment']}
+            expect(user.common_courses).to eq({Shard.relative_id_for(1, @shard2, Shard.current) => ['StudentEnrollment']})
           end
         end
       end
@@ -187,7 +187,7 @@ describe "MessageableUser" do
         user = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'StudentEnrollment'").where(id: @user).first
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            user.common_courses.should == {0 => ['StudentEnrollment']}
+            expect(user.common_courses).to eq({0 => ['StudentEnrollment']})
           end
         end
       end
@@ -200,13 +200,13 @@ describe "MessageableUser" do
     end
 
     it "should be empty with no common_groups selected" do
-      MessageableUser.prepped().where(id: @user).first.common_groups.
-        should == {}
+      expect(MessageableUser.prepped().where(id: @user).first.common_groups).
+        to eq({})
     end
 
     it "should populate from non-null common_groups with 'Member' roles" do
       user = MessageableUser.prepped(:common_group_column => 1).where(id: @user).first
-      user.common_groups.should == {1 => ['Member']}
+      expect(user.common_groups).to eq({1 => ['Member']})
     end
 
     describe "sharding" do
@@ -216,7 +216,7 @@ describe "MessageableUser" do
         user = MessageableUser.prepped(:common_group_column => Shard.relative_id_for(1, @shard2, Shard.current)).where(id: @user).first
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            user.common_groups.should == {Shard.relative_id_for(1, @shard2, Shard.current) => ['Member']}
+            expect(user.common_groups).to eq({Shard.relative_id_for(1, @shard2, Shard.current) => ['Member']})
           end
         end
       end
@@ -234,8 +234,8 @@ describe "MessageableUser" do
       user1 = MessageableUser.prepped(:common_course_column => 1, :common_role_column => "'StudentEnrollment'").where(id: @user).first
       user2 = MessageableUser.prepped(:common_course_column => 2, :common_role_column => "'StudentEnrollment'").where(id: @user).first
       user1.include_common_contexts_from(user2)
-      user1.common_courses[1].should include('StudentEnrollment')
-      user1.common_courses[2].should include('StudentEnrollment')
+      expect(user1.common_courses[1]).to include('StudentEnrollment')
+      expect(user1.common_courses[2]).to include('StudentEnrollment')
     end
 
     it "should stack coinciding ids" do
@@ -244,8 +244,8 @@ describe "MessageableUser" do
       user1 = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'StudentEnrollment'").where(id: @user).first
       user2 = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'TeacherEnrollment'").where(id: @user).first
       user1.include_common_contexts_from(user2)
-      user1.common_courses[0].should include('StudentEnrollment')
-      user1.common_courses[0].should include('TeacherEnrollment')
+      expect(user1.common_courses[0]).to include('StudentEnrollment')
+      expect(user1.common_courses[0]).to include('TeacherEnrollment')
     end
   end
 end

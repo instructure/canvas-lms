@@ -31,11 +31,11 @@ describe SIS::CSV::TermImporter do
       "T002,Winter10,inactive,,",
       "T003,,active,,"
     )
-    EnrollmentTerm.count.should == before_count + 1
+    expect(EnrollmentTerm.count).to eq before_count + 1
 
-    importer.errors.should == []
+    expect(importer.errors).to eq []
     warnings = importer.warnings.map { |r| r.last }
-    warnings.should == ["No term_id given for a term",
+    expect(warnings).to eq ["No term_id given for a term",
                       "Improper status \"inactive\" for term T002",
                       "No name given for term T003"]
   end
@@ -48,22 +48,22 @@ describe SIS::CSV::TermImporter do
       "T002,Winter12,active,2012-13-05 00:00:00,2012-14-14 00:00:00",
       "T003,Winter13,active,,"
     )
-    EnrollmentTerm.count.should == before_count + 3
+    expect(EnrollmentTerm.count).to eq before_count + 3
 
     t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
-    t1.should_not be_nil
-    t1.name.should == 'Winter11'
-    t1.start_at.to_s(:db).should == '2011-01-05 00:00:00'
-    t1.end_at.to_s(:db).should == '2011-04-14 00:00:00'
+    expect(t1).not_to be_nil
+    expect(t1.name).to eq 'Winter11'
+    expect(t1.start_at.to_s(:db)).to eq '2011-01-05 00:00:00'
+    expect(t1.end_at.to_s(:db)).to eq '2011-04-14 00:00:00'
 
     t2 = @account.enrollment_terms.where(sis_source_id: 'T002').first
-    t2.should_not be_nil
-    t2.name.should == 'Winter12'
-    t2.start_at.should be_nil
-    t2.end_at.should be_nil
+    expect(t2).not_to be_nil
+    expect(t2.name).to eq 'Winter12'
+    expect(t2.start_at).to be_nil
+    expect(t2.end_at).to be_nil
 
-    importer.warnings.map{|r|r.last}.should == ["Bad date format for term T002"]
-    importer.errors.should == []
+    expect(importer.warnings.map{|r|r.last}).to eq ["Bad date format for term T002"]
+    expect(importer.errors).to eq []
   end
 
   it 'should support stickiness' do
@@ -71,20 +71,20 @@ describe SIS::CSV::TermImporter do
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
-    EnrollmentTerm.count.should == before_count + 1
+    expect(EnrollmentTerm.count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
-      t.name.should == "Winter11"
-      t.start_at.should == DateTime.parse("2011-1-05 00:00:00")
-      t.end_at.should == DateTime.parse("2011-4-14 00:00:00")
+      expect(t.name).to eq "Winter11"
+      expect(t.start_at).to eq DateTime.parse("2011-1-05 00:00:00")
+      expect(t.end_at).to eq DateTime.parse("2011-4-14 00:00:00")
     end
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00")
-    EnrollmentTerm.count.should == before_count + 1
+    expect(EnrollmentTerm.count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
-      t.name.should == "Winter12"
-      t.start_at.should == DateTime.parse("2010-1-05 00:00:00")
-      t.end_at.should == DateTime.parse("2010-4-14 00:00:00")
+      expect(t.name).to eq "Winter12"
+      expect(t.start_at).to eq DateTime.parse("2010-1-05 00:00:00")
+      expect(t.end_at).to eq DateTime.parse("2010-4-14 00:00:00")
       t.name = "Fall11"
       t.start_at = DateTime.parse("2009-1-05 00:00:00")
       t.end_at = DateTime.parse("2009-4-14 00:00:00")
@@ -93,11 +93,11 @@ describe SIS::CSV::TermImporter do
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
-    EnrollmentTerm.count.should == before_count + 1
+    expect(EnrollmentTerm.count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
-      t.name.should == "Fall11"
-      t.start_at.should == DateTime.parse("2009-1-05 00:00:00")
-      t.end_at.should == DateTime.parse("2009-4-14 00:00:00")
+      expect(t.name).to eq "Fall11"
+      expect(t.start_at).to eq DateTime.parse("2009-1-05 00:00:00")
+      expect(t.end_at).to eq DateTime.parse("2009-4-14 00:00:00")
     end
   end
 

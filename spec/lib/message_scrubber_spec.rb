@@ -55,7 +55,7 @@ describe MessageScrubber do
       messages = old_messages(2)
       scrubber = MessageScrubber.new
       scrubber.scrub
-      Message.where(id: messages.map(&:id)).count.should == 0
+      expect(Message.where(id: messages.map(&:id)).count).to eq 0
     end
 
     it 'should not delete messages younger than 360 days' do
@@ -63,7 +63,7 @@ describe MessageScrubber do
 
       scrubber = MessageScrubber.new
       scrubber.scrub
-      Message.where(id: messages.map(&:id)).count.should == 1
+      expect(Message.where(id: messages.map(&:id)).count).to eq 1
     end
 
     it 'should log predicted results if passed dry_run=true' do
@@ -104,7 +104,7 @@ describe MessageScrubber do
       scrubber.scrub_all
       [@shard1, @shard2].each do |shard|
         shard.activate do
-          Message.where(id: @messages.map(&:id)).count.should == 0
+          expect(Message.where(id: @messages.map(&:id)).count).to eq 0
         end
       end
     end

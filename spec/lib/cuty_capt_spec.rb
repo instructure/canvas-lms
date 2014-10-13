@@ -26,37 +26,37 @@ describe CutyCapt do
   context "configuration" do
     it "should correctly look up parameters specified by string keys in the config" do
       ConfigFile.stub('cutycapt', { "path" => 'not used', 'timeout' => 1000 })
-      CutyCapt.config[:path].should == "not used"
-      CutyCapt.config[:timeout].should == 1000
+      expect(CutyCapt.config[:path]).to eq "not used"
+      expect(CutyCapt.config[:timeout]).to eq 1000
     end
   end
 
   context "url validation" do
     it "should check for an http scheme" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
-      CutyCapt.verify_url("ftp://example.com/").should be_false
-      CutyCapt.verify_url("http://example.com/").should be_true
-      CutyCapt.verify_url("https://example.com/").should be_true
+      expect(CutyCapt.verify_url("ftp://example.com/")).to be_falsey
+      expect(CutyCapt.verify_url("http://example.com/")).to be_truthy
+      expect(CutyCapt.verify_url("https://example.com/")).to be_truthy
     end
 
     it "should check for blacklisted domains" do
       ConfigFile.stub('cutycapt', { :path => 'not used', :domain_blacklist => ['example.com'] })
 
-      CutyCapt.verify_url("http://example.com/blah").should be_false
-      CutyCapt.verify_url("http://foo.example.com/blah").should be_false
-      CutyCapt.verify_url("http://bar.foo.example.com/blah").should be_false
-      CutyCapt.verify_url("http://google.com/blah").should be_true
+      expect(CutyCapt.verify_url("http://example.com/blah")).to be_falsey
+      expect(CutyCapt.verify_url("http://foo.example.com/blah")).to be_falsey
+      expect(CutyCapt.verify_url("http://bar.foo.example.com/blah")).to be_falsey
+      expect(CutyCapt.verify_url("http://google.com/blah")).to be_truthy
     end
 
     it "should check for blacklisted ip blocks" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
       
-      CutyCapt.verify_url("http://10.0.1.1/blah").should be_false
-      CutyCapt.verify_url("http://169.254.169.254/blah").should be_false
-      CutyCapt.verify_url("http://4.4.4.4/blah").should be_true
+      expect(CutyCapt.verify_url("http://10.0.1.1/blah")).to be_falsey
+      expect(CutyCapt.verify_url("http://169.254.169.254/blah")).to be_falsey
+      expect(CutyCapt.verify_url("http://4.4.4.4/blah")).to be_truthy
 
       Resolv.stubs(:getaddresses).returns([ "8.8.8.8", "10.0.1.1" ])
-      CutyCapt.verify_url("http://workingexample.com/blah").should be_false
+      expect(CutyCapt.verify_url("http://workingexample.com/blah")).to be_falsey
     end
   end
 

@@ -50,12 +50,12 @@ describe SIS::CSV::XlistImporter do
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted"
       )
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
     it 'should have proper account associations when being undeleted' do
@@ -68,18 +68,18 @@ describe SIS::CSV::XlistImporter do
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      Course.where(sis_source_id: "X001").first.deleted?.should be_false
+      expect(Course.where(sis_source_id: "X001").first.deleted?).to be_falsey
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "X001,TC 101,Test Course 101,,,deleted"
       )
-      Course.where(sis_source_id: "X001").first.deleted?.should be_true
+      expect(Course.where(sis_source_id: "X001").first.deleted?).to be_truthy
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S002,active"
       )
-      Course.where(sis_source_id: "X001").first.deleted?.should be_false
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.deleted?).to be_falsey
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
     it 'should have proper account associations when a section is added and then removed' do
@@ -87,20 +87,20 @@ describe SIS::CSV::XlistImporter do
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C005,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,active"
       )
-      Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).should == [Account.where(sis_source_id: 'A004').first.id, @account.id]
-      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id)).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id]
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A004').first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"
       )
-      Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
     it 'should get account associations updated when the template course is updated' do
@@ -112,20 +112,20 @@ describe SIS::CSV::XlistImporter do
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).should == [@account.id]
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).should == [@account.id]
+      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id)).to eq [@account.id]
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id)).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,A004,,active"
       )
-      Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,A001,,active"
       )
-      Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
-      Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort.should == [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
     it 'should import active enrollments with states based on enrollment date restrictions' do
@@ -146,8 +146,8 @@ describe SIS::CSV::XlistImporter do
         "C001,user_1,student,,active,"
       )
       course = Course.where(sis_source_id: "C001").first
-      course.enrollments.length.should == 1
-      course.enrollments.first.state_based_on_date.should == :inactive
+      expect(course.enrollments.length).to eq 1
+      expect(course.enrollments.first.state_based_on_date).to eq :inactive
     end
 
     it "should allow enrollments on crosslisted sections' original course" do
@@ -163,8 +163,8 @@ describe SIS::CSV::XlistImporter do
         "course_id,user_id,role,section_id,status,associated_user_id",
         "C001,user_1,student,S001,active,"
       )
-      @account.courses.where(sis_source_id: "C001").first.students.first.name.should == "User Uno"
-      @account.courses.where(sis_source_id: "X001").first.should be_nil
+      expect(@account.courses.where(sis_source_id: "C001").first.students.first.name).to eq "User Uno"
+      expect(@account.courses.where(sis_source_id: "X001").first).to be_nil
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
@@ -173,8 +173,8 @@ describe SIS::CSV::XlistImporter do
         "course_id,user_id,role,section_id,status,associated_user_id",
         "C001,user_1,student,S001,active,"
       )
-      @account.courses.where(sis_source_id: "C001").first.students.size.should == 0
-      @account.courses.where(sis_source_id: "X001").first.students.first.name.should == "User Uno"
+      expect(@account.courses.where(sis_source_id: "C001").first.students.size).to eq 0
+      expect(@account.courses.where(sis_source_id: "X001").first.students.first.name).to eq "User Uno"
     end
 
   end
