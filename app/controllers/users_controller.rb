@@ -479,7 +479,7 @@ class UsersController < ApplicationController
   #     'id': 1234,
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
-  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...',
+  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|AssessmentRequest...',
   #     'read_state': false,
   #     'context_type': 'course', // course|group
   #     'course_id': 1,
@@ -558,6 +558,14 @@ class UsersController < ApplicationController
   #   {
   #     'type': 'Collaboration',
   #     'collaboration_id': 1234
+  #   }
+  #
+  # AssessmentRequest:
+  #
+  #   !!!javascript
+  #   {
+  #     'type': 'AssessmentRequest',
+  #     'assessment_request_id': 1234
   #   }
   def activity_stream
     if @current_user
