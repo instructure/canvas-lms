@@ -29,14 +29,14 @@ describe ContextModule do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML(response.body)
-      doc.at_css('.context-modules-main-toolbar .add_module_link').should_not be_nil
+      expect(doc.at_css('.context-modules-main-toolbar .add_module_link')).not_to be_nil
 
       @course.account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_content', enabled: false
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML(response.body)
-      doc.at_css('.context-modules-main-toolbar .add_module_link').should be_nil
+      expect(doc.at_css('.context-modules-main-toolbar .add_module_link')).to be_nil
     end
   end
 
@@ -47,12 +47,12 @@ describe ContextModule do
       content_tag = context_module.add_item :type => 'context_module_sub_header', :title => "My Sub Header Title"
       ContextModule.where(:id => context_module).update_all(:updated_at => 1.hour.ago)
       get "/courses/#{@course.id}/modules"
-      response.body.should match(/My Sub Header Title/)
+      expect(response.body).to match(/My Sub Header Title/)
 
       content_tag.update_attributes(:title => "My New Title")
 
       get "/courses/#{@course.id}/modules"
-      response.body.should match(/My New Title/)
+      expect(response.body).to match(/My New Title/)
     end
   end
 
@@ -68,14 +68,14 @@ describe ContextModule do
       @module.save!
 
       @progression = @module.evaluate_for(@user)
-      @progression.should_not be_nil
-      @progression.should_not be_completed
-      @progression.should be_unlocked
-      @progression.current_position.should eql(@tag.position)
+      expect(@progression).not_to be_nil
+      expect(@progression).not_to be_completed
+      expect(@progression).to be_unlocked
+      expect(@progression.current_position).to eql(@tag.position)
       yield
       @progression = @module.evaluate_for(@user)
-      @progression.should be_completed
-      @progression.current_position.should eql(@tag.position)
+      expect(@progression).to be_completed
+      expect(@progression.current_position).to eql(@tag.position)
     end
 
     it "should progress for discussions" do
@@ -83,7 +83,7 @@ describe ContextModule do
       @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
       before_after do
         post "/courses/#{@course.id}/discussion_entries", :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id }
-        response.should be_redirect
+        expect(response).to be_redirect
       end
     end
 
@@ -92,7 +92,7 @@ describe ContextModule do
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
         put "/courses/#{@course.id}/wiki/#{@page.url}", :wiki_page => { :body => 'i agree', :title => 'talk page' }
-        response.should be_redirect
+        expect(response).to be_redirect
       end
     end
 
@@ -101,7 +101,7 @@ describe ContextModule do
       @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
       before_after do
         post "/courses/#{@course.id}/discussion_entries", :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id }
-        response.should be_redirect
+        expect(response).to be_redirect
       end
     end
   end
@@ -131,23 +131,23 @@ describe ContextModule do
         end
 
         # all modules, tags, etc need to be published
-        @mod1.should be_published
-        @mod2.should be_published
-        @quiz.should be_published
-        @tag1.should be_published
+        expect(@mod1).to be_published
+        expect(@mod2).to be_published
+        expect(@quiz).to be_published
+        expect(@tag1).to be_published
 
         yield '<div id="test_content">yay!</div>'
-        @tag2.should be_published
+        expect(@tag2).to be_published
 
         # verify the second item is locked (doesn't display)
         get @test_url
-        response.should be_success
+        expect(response).to be_success
         html = Nokogiri::HTML(response.body)
-        html.css('#test_content').length.should == (@test_content_length || 0)
+        expect(html.css('#test_content').length).to eq(@test_content_length || 0)
 
         # complete first module's requirements
         p1 = @mod1.evaluate_for(@student)
-        p1.workflow_state.should == 'unlocked'
+        expect(p1.workflow_state).to eq 'unlocked'
 
         @quiz_submission = @quiz.generate_submission(@student)
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
@@ -161,17 +161,17 @@ describe ContextModule do
           "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
           "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
         get next_link
-        response.should be_redirect
-        response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}").should be_true
+        expect(response).to be_redirect
+        expect(response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}")).to be_truthy
 
         # verify the second item is accessible
         get @test_url
-        response.should be_success
+        expect(response).to be_success
         html = Nokogiri::HTML(response.body)
         if @is_attachment
-          html.at_css('#file_content')['src'].should =~ %r{#{@test_url}}
+          expect(html.at_css('#file_content')['src']).to match %r{#{@test_url}}
         else
-          html.css('#test_content').length.should == 1
+          expect(html.css('#test_content').length).to eq 1
         end
       end
     end
@@ -182,7 +182,7 @@ describe ContextModule do
           asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
           @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
           @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
-          @tag2.should be_published
+          expect(@tag2).to be_published
         end
       end
     end
@@ -193,7 +193,7 @@ describe ContextModule do
           discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
           @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
-          @tag2.should be_published
+          expect(@tag2).to be_published
           @test_content_length = 1
         end
       end
@@ -206,7 +206,7 @@ describe ContextModule do
           quiz.publish!
           @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
           @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
-          @tag2.should be_published
+          expect(@tag2).to be_published
         end
       end
     end
@@ -217,7 +217,7 @@ describe ContextModule do
           page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
           @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
-          @tag2.should be_published
+          expect(@tag2).to be_published
         end
       end
     end
@@ -229,7 +229,7 @@ describe ContextModule do
           att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
           @test_url = "/courses/#{@course.id}/files/#{att.id}"
           @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
-          @tag2.should be_published
+          expect(@tag2).to be_published
         end
       end
     end
@@ -255,16 +255,16 @@ describe ContextModule do
 
         user_session teacher1
         get "/courses/#{@course.id}/modules"
-        response.should be_success
+        expect(response).to be_success
         body1 = Nokogiri::HTML(response.body)
 
         user_session teacher2
         get "/courses/#{@course.id}/modules"
-        response.should be_success
+        expect(response).to be_success
         body2 = Nokogiri::HTML(response.body)
 
-        body1.at_css("#context_module_content_#{mod.id} .unlock_details").text.should =~ /4am/
-        body2.at_css("#context_module_content_#{mod.id} .unlock_details").text.should =~ /7am/
+        expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
+        expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/
       end
     end
   end

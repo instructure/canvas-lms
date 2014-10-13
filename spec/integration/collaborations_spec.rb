@@ -35,19 +35,19 @@ describe CollaborationsController, type: :request do
     )
 
     get "/courses/#{@course.id}/collaborations/"
-    response.should be_success
+    expect(response).to be_success
 
     post "/courses/#{@course.id}/collaborations/", { :collaboration => { :collaboration_type => "EtherPad", :title => "My Collab" } }
-    response.should be_redirect
+    expect(response).to be_redirect
 
     get "/courses/#{@course.id}/collaborations/"
-    response.should be_success
+    expect(response).to be_success
 
     html = Nokogiri::HTML(response.body)
     links = html.css("div.collaboration_#{Collaboration.last.id} a.collaborator_link")
-    links.count.should == 1
+    expect(links.count).to eq 1
     link = links.first
-    link.attr("href").should == "/courses/#{@course.id}/users/#{@teacher.id}"
-    link.text.should == "teacher 1"
+    expect(link.attr("href")).to eq "/courses/#{@course.id}/users/#{@teacher.id}"
+    expect(link.text).to eq "teacher 1"
   end
 end

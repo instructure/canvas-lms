@@ -30,13 +30,13 @@ describe "discussion_topics" do
     @group.users << @user
 
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
-    response.should be_success
+    expect(response).to be_success
 
     post "/groups/#{@group.id}/discussion_entries", :discussion_entry => { :discussion_topic_id => @topic.id, :message => "frist!!1" }
-    response.should be_redirect
+    expect(response).to be_redirect
 
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
-    response.should be_success
+    expect(response).to be_success
   end
   
   it "should show speed grader button" do
@@ -44,9 +44,9 @@ describe "discussion_topics" do
     discussion_assignment
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('.admin-links .icon-speed-grader').should_not be_nil
+    expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
   end
 
   it "should show peer reviews button" do
@@ -56,9 +56,9 @@ describe "discussion_topics" do
     @assignment.save
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('.admin-links .icon-peer-review').should_not be_nil
+    expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
   end
 
 end

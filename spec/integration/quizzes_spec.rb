@@ -30,8 +30,8 @@ describe Quizzes::QuizzesController do
           get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML(response.body)
-          doc.css(".assignment_dates").text.should include "Everyone"
-          doc.css(".assignment_dates").text.should_not include "Everyone else"
+          expect(doc.css(".assignment_dates").text).to include "Everyone"
+          expect(doc.css(".assignment_dates").text).not_to include "Everyone else"
         end
       end
 
@@ -48,14 +48,14 @@ describe Quizzes::QuizzesController do
           get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML(response.body)
-          doc.css("#quiz_student_details .value").first.text.should include(datetime_string(@due_at))
+          expect(doc.css("#quiz_student_details .value").first.text).to include(datetime_string(@due_at))
         end
 
         it "should show 'Everyone else' when some sections have a due date override" do
           get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML(response.body)
-          doc.css(".assignment_dates").text.should include "Everyone else"
+          expect(doc.css(".assignment_dates").text).to include "Everyone else"
         end
       end
 
@@ -70,16 +70,16 @@ describe Quizzes::QuizzesController do
           get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML(response.body)
-          doc.css(".assignment_dates tbody tr").count.should be 2
-          doc.css(".assignment_dates tbody tr > td:first-child").text.
-            should include(datetime_string(@due_at1), datetime_string(@due_at2))
+          expect(doc.css(".assignment_dates tbody tr").count).to be 2
+          expect(doc.css(".assignment_dates tbody tr > td:first-child").text).
+            to include(datetime_string(@due_at1), datetime_string(@due_at2))
         end
 
         it "should not show a date for 'Everyone else'" do
           get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML(response.body)
-          doc.css(".assignment_dates").text.should_not include "Everyone"
+          expect(doc.css(".assignment_dates").text).not_to include "Everyone"
         end
       end
     end
@@ -89,14 +89,14 @@ describe Quizzes::QuizzesController do
         @course.large_roster = false
         @course.save!
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
-        response.body.should match(%r{SpeedGrader})
+        expect(response.body).to match(%r{SpeedGrader})
       end
 
       it "should not link to SpeedGrader when large_roster" do
         @course.large_roster = true
         @course.save!
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
-        response.body.should_not match(%r{SpeedGrader})
+        expect(response.body).not_to match(%r{SpeedGrader})
       end
     end
   end
@@ -115,7 +115,7 @@ describe Quizzes::QuizzesController do
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("#not_right_side .take_quiz_button").text.should include "Resume Quiz"
+        expect(doc.css("#not_right_side .take_quiz_button").text).to include "Resume Quiz"
       end
     end
 
@@ -124,7 +124,7 @@ describe Quizzes::QuizzesController do
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("#right-side .rs-margin-top").text.should_not include "Resume Quiz"
+        expect(doc.css("#right-side .rs-margin-top").text).not_to include "Resume Quiz"
       end
     end
   end
@@ -146,12 +146,12 @@ describe Quizzes::QuizzesController do
       it "should list the questions needing review" do
         mkquiz
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        response.body.should match(%r{The following questions need review})
-        response.body.should_not match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(%r{The following questions need review})
+        expect(response.body).not_to match(%r{The quiz has changed significantly since this submission was made})
         doc = Nokogiri::HTML(response.body)
         needing_review = doc.at_css('#questions_needing_review')
-        needing_review.should be_present
-        needing_review.children.css('li a').map { |n| n.text }.should == @quiz.quiz_data.map { |qq| qq['name'] }
+        expect(needing_review).to be_present
+        expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
       end
 
       it "should display message about the quiz changing significantly" do
@@ -161,20 +161,20 @@ describe Quizzes::QuizzesController do
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
         @quiz_submission.save
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        response.body.should_not match(%r{The following questions need review})
-        response.body.should match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).not_to match(%r{The following questions need review})
+        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
       end
 
       it "should display both messages" do
         Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
         mkquiz
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        response.body.should match(%r{The following questions need review})
-        response.body.should match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(%r{The following questions need review})
+        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
         doc = Nokogiri::HTML(response.body)
         needing_review = doc.at_css('#questions_needing_review')
-        needing_review.should be_present
-        needing_review.children.css('li a').map { |n| n.text }.should == @quiz.quiz_data.map { |qq| qq['name'] }
+        expect(needing_review).to be_present
+        expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
       end
 
       it "shoudn't show the user's name/email when it's an anonymous submission" do
@@ -188,9 +188,9 @@ describe Quizzes::QuizzesController do
         @student.save!
         @student.reload
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        response.body.should_not match @student.name
-        response.body.should_not match @student.sortable_name
-        response.body.should_not match @student.email
+        expect(response.body).not_to match @student.name
+        expect(response.body).not_to match @student.sortable_name
+        expect(response.body).not_to match @student.email
       end
     end
   end

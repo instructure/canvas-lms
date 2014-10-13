@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "hair_trigger" do
   describe "migrations" do
     it "should be current for all models" do
-      HairTrigger::migrations_current?.should be_true
+      expect(HairTrigger::migrations_current?).to be_truthy
     end
   end
 end

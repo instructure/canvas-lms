@@ -25,21 +25,21 @@ describe "varied due dates" do
 
   def assert_coming_up_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .coming_up .event a .tooltip_text").text.should include(
+    expect(doc.at_css("#right-side .coming_up .event a .tooltip_text").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_todo_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .to-do-list").text.should include(
+    expect(doc.at_css("#right-side .to-do-list").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_recent_feedback_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text.should include(
+    expect(doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
@@ -214,7 +214,7 @@ describe "varied due dates" do
         context "with overrides" do
           it "shows multiple due dates" do
             get course_assignments_path(@course)
-            response.body.should include multiple_due_dates
+            expect(response.body).to include multiple_due_dates
           end
         end
 
@@ -222,7 +222,7 @@ describe "varied due dates" do
           it "shows the course due date" do
             AssignmentOverride.delete_all
             get course_assignments_path(@course)
-            response.body.should include formatted_date(@course_due_date)
+            expect(response.body).to include formatted_date(@course_due_date)
           end
         end
       end

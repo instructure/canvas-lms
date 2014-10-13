@@ -34,7 +34,7 @@ describe WikiPagesController do
                                                 :body => "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
-    response.body.should_not include(@wiki_page.body)
+    expect(response.body).not_to include(@wiki_page.body)
   end
 
   it "should link correctly in the breadcrumbs for group wikis" do
@@ -45,13 +45,13 @@ describe WikiPagesController do
 
     def test_page(url)
       get url
-      response.should be_success
+      expect(response).to be_success
 
       html = Nokogiri::HTML(response.body)
       html.css('#breadcrumbs a').each do |link|
         href = link.attr('href')
         next if href == "/"
-        href.should =~ %r{/groups/#{@group.id}}
+        expect(href).to match %r{/groups/#{@group.id}}
       end
     end
 
@@ -76,34 +76,34 @@ describe WikiPagesController do
         @course.wiki.has_no_front_page = true
         @course.wiki.save!
         get @base_url + "wiki"
-        response.should redirect_to(course_pages_url(@course))
+        expect(response).to redirect_to(course_pages_url(@course))
       end
 
       it "should forward /wiki to /pages/front-page" do
         @front.save!
         @front.set_as_front_page!
         get @base_url + "wiki"
-        response.should redirect_to(course_named_page_url(@course, "front-page"))
+        expect(response).to redirect_to(course_named_page_url(@course, "front-page"))
       end
 
       it "should forward /wiki/name to /pages/name" do
         get @base_url + "wiki/a-page"
-        response.should redirect_to(course_named_page_url(@course, "a-page"))
+        expect(response).to redirect_to(course_named_page_url(@course, "a-page"))
       end
 
       it "should forward module_item_id parameter" do
         get @base_url + "wiki/a-page?module_item_id=123"
-        response.should redirect_to(course_named_page_url(@course, "a-page") + "?module_item_id=123")
+        expect(response).to redirect_to(course_named_page_url(@course, "a-page") + "?module_item_id=123")
       end
 
       it "should forward /wiki/name/revisions to /pages/name/revisions" do
         get @base_url + "wiki/a-page/revisions"
-        response.should redirect_to(course_named_page_revisions_url(@course, "a-page"))
+        expect(response).to redirect_to(course_named_page_revisions_url(@course, "a-page"))
       end
 
       it "should forward /wiki/name/revisions/revision to /pages/name/revisions" do
         get @base_url + "wiki/a-page/revisions/42"
-        response.should redirect_to(course_named_page_revisions_url(@course, "a-page"))
+        expect(response).to redirect_to(course_named_page_revisions_url(@course, "a-page"))
       end
     end
 
