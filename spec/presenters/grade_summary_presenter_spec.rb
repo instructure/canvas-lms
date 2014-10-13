@@ -16,7 +16,7 @@ describe GradeSummaryPresenter do
       end
 
       it 'includes courses where the user is enrolled' do
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
     end
 
@@ -35,7 +35,7 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
 
       it 'can find courses when the user and course are on different shards' do
@@ -53,7 +53,7 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
     end
   end
@@ -73,9 +73,9 @@ describe GradeSummaryPresenter do
         p = GradeSummaryPresenter.new(@course, @teacher, nil)
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
-        assignment_stats.max.to_f.should == 10
-        assignment_stats.min.to_f.should == 0
-        assignment_stats.avg.to_f.should == 5
+        expect(assignment_stats.max.to_f).to eq 10
+        expect(assignment_stats.min.to_f).to eq 0
+        expect(assignment_stats.avg.to_f).to eq 5
       end
 
       it 'filters out test students and inactive enrollments' do
@@ -99,9 +99,9 @@ describe GradeSummaryPresenter do
         p = GradeSummaryPresenter.new(@course, @teacher, nil)
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
-        assignment_stats.max.to_f.should == 10
-        assignment_stats.min.to_f.should == 0
-        assignment_stats.avg.to_f.should == 5
+        expect(assignment_stats.max.to_f).to eq 10
+        expect(assignment_stats.min.to_f).to eq 0
+        expect(assignment_stats.avg.to_f).to eq 5
       end
 
     end
@@ -133,9 +133,9 @@ describe GradeSummaryPresenter do
         p = GradeSummaryPresenter.new(@course, @teacher, nil)
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
-        assignment_stats.max.to_f.should == 10
-        assignment_stats.min.to_f.should == 0
-        assignment_stats.avg.to_f.should == 5
+        expect(assignment_stats.max.to_f).to eq 10
+        expect(assignment_stats.min.to_f).to eq 0
+        expect(assignment_stats.avg.to_f).to eq 5
       end
 
       it 'filters out assignments that arent visible to students' do
@@ -147,7 +147,7 @@ describe GradeSummaryPresenter do
         p = GradeSummaryPresenter.new(@course, @teacher, nil)
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
-        assignment_stats.should be_nil
+        expect(assignment_stats).to be_nil
       end
 
       it 'gets the right submissions when only_visible_to_overrides is true' do
@@ -167,9 +167,9 @@ describe GradeSummaryPresenter do
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
         # ensure s1 is filtered and s2 and s3 are not
-        assignment_stats.max.to_f.should == 10
-        assignment_stats.min.to_f.should == 8
-        assignment_stats.avg.to_f.should == 9
+        expect(assignment_stats.max.to_f).to eq 10
+        expect(assignment_stats.min.to_f).to eq 8
+        expect(assignment_stats.avg.to_f).to eq 9
       end
 
       it 'does not filter out submissions that would be invisibile when only_visible_to_overrides is true (but is really false or nil)' do
@@ -192,9 +192,9 @@ describe GradeSummaryPresenter do
         stats = p.assignment_stats
         [a1,a2].each do |a|
           assignment_1_stats = stats[a.id]
-          assignment_1_stats.max.to_f.should == 10
-          assignment_1_stats.min.to_f.should == 0
-          assignment_1_stats.avg.to_f.should == 5
+          expect(assignment_1_stats.max.to_f).to eq 10
+          expect(assignment_1_stats.min.to_f).to eq 0
+          expect(assignment_1_stats.avg.to_f).to eq 5
         end
       end
     end
@@ -223,7 +223,7 @@ describe GradeSummaryPresenter do
       end
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
-      p.submission_counts.values[0].should == 3
+      expect(p.submission_counts.values[0]).to eq 3
     end
   end
 
@@ -240,7 +240,7 @@ describe GradeSummaryPresenter do
       a2.destroy
 
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-      p.submissions.map(&:assignment_id).should == [a1.id]
+      expect(p.submissions.map(&:assignment_id)).to eq [a1.id]
     end
 
     it "doesn't error on submissions for assignments not in the pre-loaded assignment list" do
@@ -251,7 +251,7 @@ describe GradeSummaryPresenter do
       assign.update_attribute(:submission_types, "not_graded")
 
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-      p.submissions.map(&:assignment_id).should == [assign.id]
+      expect(p.submissions.map(&:assignment_id)).to eq [assign.id]
     end
   end
 
@@ -265,7 +265,7 @@ describe GradeSummaryPresenter do
       unpublished_assign.update_attribute(:workflow_state, "unpublished")
 
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-      p.assignments.should == [published_assignment]
+      expect(p.assignments).to eq [published_assignment]
     end
   end
 end
