@@ -2546,7 +2546,7 @@ describe User do
       user
     end
 
-    let_once(:user) do
+    let_once(:sub_admin) do
       user = User.create!
       subaccount.account_users.create!(user: user)
       user
@@ -2570,7 +2570,75 @@ describe User do
     end
 
     it 'only considers root accounts when checking subset permissions' do
-      expect(user.grants_right?(local_admin, :manage_logins)).to be_truthy
+      expect(sub_admin.grants_right?(local_admin, :manage_logins)).to be_truthy
+    end
+
+    describe ":reset_mfa" do
+      let(:account1) { Account.default }
+      let(:account2) { Account.create! }
+
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
+
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
+
+      let(:charlie) { student_in_course(account: account1).user }
+
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
+
+      it "should grant non-admins :reset_mfa on themselves" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(charlie, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on fully admined users" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant admins :reset_mfa on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant subadmins :reset_mfa on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      context "MFA is required on the account" do
+        before do
+          account1.settings[:mfa_settings] = :required
+          account1.save!
+        end
+
+        it "should no longer grant non-admins :reset_mfa on themselves" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).not_to be_grants_right(charlie, :reset_mfa)
+        end
+
+        it "should no longer grant admins :reset_mfa on themselves" do
+          pseudonym(sally, account: account1)
+          expect(sally).not_to be_grants_right(sally, :reset_mfa)
+        end
+
+        it "should still grant admins :reset_mfa on other fully admined users" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).to be_grants_right(sally, :reset_mfa)
+        end
+      end
     end
   end
 

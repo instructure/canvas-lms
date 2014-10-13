@@ -90,4 +90,75 @@ describe "users/_logins.html.erb" do
       expect(response).not_to have_tag("a.add_pseudonym_link")
     end
   end
+
+  describe "reset_mfa_link" do
+    let(:account) { Account.default }
+    let(:sally) { account_admin_user(account: account) }
+    let(:bob) { student_in_course(account: account).user }
+
+    it "should display when user has permission to reset MFA" do
+      pseudonym(bob, account: account)
+      bob.otp_secret_key = 'secret'
+
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = sally
+      assigns[:user] = bob
+      render
+      expect(response).to have_tag("a.reset_mfa_link")
+    end
+
+    it "should not display when user lacks permission to reset MFA" do
+      pseudonym(sally, account: account)
+      sally.otp_secret_key = 'secret'
+
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = bob
+      assigns[:user] = sally
+      render
+      expect(response).not_to have_tag("a.reset_mfa_link")
+    end
+  end
+
+  describe "add_holder" do
+    let(:account) { Account.default }
+    let(:sally) { account_admin_user(account: account) }
+    let(:bob) { student_in_course(account: account).user }
+
+    it "should display when user can only reset MFA" do
+      pseudonym(bob, account: account)
+      bob.otp_secret_key = 'secret'
+
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = bob
+      assigns[:user] = bob
+      render
+      expect(response).to have_tag(".add_holder")
+    end
+
+    it "should display when user can only add pseudonym" do
+      pseudonym(sally, account: account)
+      sally.otp_secret_key = 'secret'
+      account.settings[:mfa_settings] = :required
+      account.save!
+
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = sally
+      assigns[:user] = sally
+      render
+      expect(response).to have_tag(".add_holder")
+    end
+
+    it "should not display when user lacks permission to do either" do
+      pseudonym(bob, account: account)
+      bob.otp_secret_key = 'secret'
+      account.settings[:mfa_settings] = :required
+      account.save!
+
+      assigns[:domain_root_account] = Account.default
+      assigns[:current_user] = bob
+      assigns[:user] = bob
+      render
+      expect(response).not_to have_tag(".add_holder")
+    end
+  end
 end

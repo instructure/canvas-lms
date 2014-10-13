@@ -57,15 +57,15 @@
         </tr>
       <% end %>
       <% can_add_pseudonym = can_do(@user.pseudonyms.build(account: @domain_root_account), @current_user, :create) %>
-      <% can_disable_mfa = @user.otp_secret_key && (@user.mfa_settings != :required || @user != @current_user) && can_do(@user, @current_user, :manage_logins) && can_do(@domain_root_account, @current_user, :manage_user_logins) %>
-      <% if can_add_pseudonym || can_disable_mfa %>
+      <% can_reset_mfa = @user.otp_secret_key && can_do(@user, @current_user, :reset_mfa) %>
+      <% if can_add_pseudonym || can_reset_mfa %>
         <tr class="add_holder">
           <td colspan="4" style="font-size: 0.8em;">
             <% if can_add_pseudonym %>
               <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
             <% end %>
-            <% if can_add_pseudonym && can_disable_mfa %> | <% end %>
-            <% if can_disable_mfa %>
+            <% if can_add_pseudonym && can_reset_mfa %> | <% end %>
+            <% if can_reset_mfa %>
               <a href="<%= disable_mfa_path(@user) %>" class="reset_mfa_link"><%=  t('reset_mfa', "Reset Multi-Factor Authentication") %></a>
             <% end %>
           </td>

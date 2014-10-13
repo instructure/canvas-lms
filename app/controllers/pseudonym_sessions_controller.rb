@@ -606,9 +606,8 @@ class PseudonymSessionsController < ApplicationController
       @user = @current_user
     else
       @user = User.find(params[:user_id])
-      return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     end
-    return render_unauthorized_action if @user == @current_user && @user.mfa_settings == :required
+    return unless authorized_action(@user, @current_user, :reset_mfa)
 
     @user.otp_secret_key = nil
     @user.otp_communication_channel = nil

@@ -1014,6 +1014,16 @@ class User < ActiveRecord::Base
       )
     end
     can :delete
+
+    given do |user|
+      # a user can reset their own MFA, but only if the setting isn't required
+      (self == user && self.mfa_settings != :required) ||
+
+      # an admin can reset another user's MFA only if they can manage *all*
+      # of the user's pseudonyms
+      (self != user && self.pseudonyms.with_each_shard.all?{ |p| p.grants_right?(user, :update) })
+    end
+    can :reset_mfa
   end
 
   def can_masquerade?(masquerader, account)
