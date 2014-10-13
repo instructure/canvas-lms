@@ -135,24 +135,16 @@ describe Pseudonym do
 
   it "should allow deleting pseudonyms" do
     user_with_pseudonym(:active_all => true)
-    expect(@pseudonym.destroy(true)).to eql(true)
+    expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
-  it "should not allow deleting system-generated pseudonyms by default" do
+  it "should allow deleting system-generated pseudonyms" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
     @pseudonym.account.account_authorization_configs.create!(:auth_type => 'ldap')
-    expect{ @pseudonym.destroy}.to raise_error("Cannot delete system-generated pseudonyms")
-    expect(@pseudonym).not_to be_deleted
-  end
-
-  it "should not allow deleting system-generated pseudonyms by default" do
-    user_with_pseudonym(:active_all => true)
-    @pseudonym.sis_user_id = 'something_cool'
-    @pseudonym.save!
-    expect(@pseudonym.destroy(true)).to eql(true)
+    expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
@@ -573,6 +565,34 @@ describe Pseudonym do
 
         it "should not grant admins :manage_sis even for their own pseudonyms" do
           expect(account1.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :manage_sis)
+        end
+      end
+    end
+
+    describe ":delete" do
+      it "should grants users :delete on pseudonyms they can update" do
+        expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :delete)
+        expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :delete)
+        expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(bob, :delete)
+        expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :delete)
+        expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :delete)
+      end
+
+      context "system-created pseudonyms" do
+        let(:system_pseudonym) do
+          p = account1.pseudonyms.build(user: sally)
+          p.sis_user_id = 'sis'
+          p
+        end
+
+        it "should grant admins :delete if they can :manage_sis" do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: true)
+          expect(system_pseudonym).to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should not grant admins :delete if they can't :manage_sis" do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: false)
+          expect(system_pseudonym).not_to be_grants_right(sally, :manage_sis)
         end
       end
     end

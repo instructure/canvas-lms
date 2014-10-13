@@ -321,7 +321,6 @@ describe User do
     p1.sis_user_id = 'sis_id1'
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
-    expect { p1.destroy }.to raise_error /Cannot delete system-generated pseudonyms/
     user.remove_from_root_account account1
     expect(user.associated_root_accounts).to eql [account2]
   end
@@ -573,24 +572,11 @@ describe User do
     end
   end
 
-  it "should delete the user transactionally in case the pseudonym removal fails" do
+  it "should delete system generated pseudonyms on delete" do
     user_with_managed_pseudonym
     expect(@pseudonym).to be_managed_password
     expect(@user.workflow_state).to eq "pre_registered"
-    expect { @user.destroy }.to raise_error("Cannot delete system-generated pseudonyms")
-    expect(@user.workflow_state).to eq "deleted"
-    @user.reload
-    expect(@user.workflow_state).to eq "pre_registered"
-    @account.account_authorization_config.destroy
-    expect(@pseudonym).not_to be_managed_password
     @user.destroy
-    expect(@user.workflow_state).to eq "deleted"
-    @user.reload
-    expect(@user.workflow_state).to eq "deleted"
-    user_with_managed_pseudonym
-    expect(@pseudonym).to be_managed_password
-    expect(@user.workflow_state).to eq "pre_registered"
-    @user.destroy(true)
     expect(@user.workflow_state).to eq "deleted"
     @user.reload
     expect(@user.workflow_state).to eq "deleted"

@@ -169,7 +169,7 @@
     <td><%= p.account.name %></td>
     <td><a href="<%= login_url(:host => HostUrl.context_host(p.account)) %>" class="not_external"><%= p.unique_id %></a></td>
     <td>
-      <a class="delete_pseudonym_link no-hover" href="<%= profile_pseudonym_url(p.id) %>" style="<%= hidden if p.managed_password? || (p.sis_user_id && !can_do(p.account, @current_user, :manage_sis)) %>" title="<%= t('titles.remove_account_from_profile', "Remove account from this profile") %>"><%= image_tag "delete.png" %></a>
+      <a class="delete_pseudonym_link no-hover" href="<%= profile_pseudonym_url(p.id) %>" style="<%= hidden unless can_do(p, @current_user, :delete) %>" title="<%= t('titles.remove_account_from_profile', "Remove account from this profile") %>"><%= image_tag "delete.png" %></a>
     </td>
   </tr>
   <% end %>

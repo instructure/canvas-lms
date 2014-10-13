@@ -1485,7 +1485,7 @@ class UsersController < ApplicationController
   def destroy
     @user = api_find(User, params[:id])
     if authorized_action(@user, @current_user, :delete)
-      @user.destroy(true)
+      @user.destroy
       if @user == @current_user
         logout_current_user
       end

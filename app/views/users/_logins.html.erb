@@ -49,7 +49,7 @@
           <% if !pseudonym || can_do(pseudonym, @current_user, :update) %>
             <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link" data-account-id="<%= pseudonym.account.id if pseudonym %>"><i class="icon-edit standalone-icon"></i></a>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.system_created? && !can_do(pseudonym, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && !can_do(pseudonym, @current_user, :delete)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
           <% else %>
             <td>&nbsp;</td>

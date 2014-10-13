@@ -580,7 +580,7 @@ class AccountsController < ApplicationController
         if !(@user.associated_root_accounts.map(&:id).compact.uniq - [@root_account.id]).empty?
           @user.remove_from_root_account(@root_account)
         else
-          @user.destroy(true)
+          @user.destroy
         end
         flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       end

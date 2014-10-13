@@ -156,42 +156,34 @@ describe PseudonymsController do
       expect(@pseudonym).to be_active
 
       delete 'destroy', :user_id => @other_user.id, :id => @pseudonym.id
-      assert_unauthorized
+      assert_status(404)
       expect(@other_pseudonym).to be_active
       expect(@pseudonym).to be_active
     end
 
     it "should not destroy if it's the last active pseudonym" do
+      account_admin_user(user: @user)
       delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
       assert_status(400)
       expect(@pseudonym).to be_active
     end
 
     it "should not destroy if it's SIS and the user doesn't have permission" do
+      account_admin_user_with_role_changes(user: @user, role_changes: {manage_sis: false})
       @pseudonym.sis_user_id = 'bob'
       @pseudonym.save!
       delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
-      assert_status(400)
+      assert_unauthorized
       expect(@pseudonym).to be_active
     end
 
     it "should destroy if for the current user with more than one pseudonym" do
+      account_admin_user(user: @user)
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
       assert_status(200)
       expect(@pseudonym).to be_active
       expect(@p2.reload).to be_deleted
-    end
-
-    it "should not destroy if for the current user and it's a system-generated pseudonym" do
-      @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
-      @p2.sis_user_id = 'another_one@test.com'
-      @p2.save!
-      @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
-      delete 'destroy', :user_id => @user.id, :id => @p2.id
-      assert_status(401)
-      expect(@pseudonym).to be_active
-      expect(@p2).to be_active
     end
 
     it "should destroy if authorized to delete pseudonyms" do

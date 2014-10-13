@@ -278,15 +278,14 @@ class PseudonymsController < ApplicationController
   #   }
   def destroy
     return unless get_user
-    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     @pseudonym = Pseudonym.active.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
+    return unless authorized_action(@pseudonym, @current_user, :delete)
+
     if @user.all_active_pseudonyms.length < 2
       @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors, :status => :bad_request
-    elsif @pseudonym.sis_user_id && !@pseudonym.grants_right?(@current_user, :manage_sis)
-      return render_unauthorized_action
-    elsif @pseudonym.destroy(@user.grants_right?(@current_user, session, :manage_logins))
+    elsif @pseudonym.destroy
       api_request? ?
         render(:json => pseudonym_json(@pseudonym, @current_user, session)) :
         render(:json => @pseudonym)

@@ -279,11 +279,24 @@ class Pseudonym < ActiveRecord::Base
       self.grants_right?(user, :update)
     end
     can :manage_sis
+
+    # an admin can delete any non-SIS pseudonym that they can update
+    given do |user|
+      !self.system_created? &&
+      self.grants_right?(user, :update)
+    end
+    can :delete
+
+    # an admin can only delete an SIS pseudonym if they also can :manage_sis
+    given do |user|
+      self.system_created? &&
+      self.grants_right?(user, :manage_sis)
+    end
+    can :delete
   end
 
   alias_method :destroy!, :destroy
-  def destroy(even_if_managed_password=false)
-    raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
+  def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     result = self.save

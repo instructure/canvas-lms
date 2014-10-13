@@ -809,12 +809,12 @@ class User < ActiveRecord::Base
   end
 
   alias_method :destroy!, :destroy
-  def destroy(even_if_managed_passwords=false)
+  def destroy
     ActiveRecord::Base.transaction do
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       self.save
-      self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
+      self.pseudonyms.each{|p| p.destroy }
       self.communication_channels.each{|cc| cc.destroy }
       self.delete_enrollments
     end
@@ -833,7 +833,7 @@ class User < ActiveRecord::Base
 
   def remove_from_root_account(account)
     self.enrollments.where(root_account_id: account).each(&:destroy)
-    self.pseudonyms.active.where(account_id: account).each { |p| p.destroy(true) }
+    self.pseudonyms.active.where(account_id: account).each(&:destroy)
     self.account_users.where(account_id: account).each(&:destroy)
     self.save
     self.update_account_associations
