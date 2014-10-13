@@ -17,8 +17,8 @@ shared_examples_for 'QuizReportSerializer Associations' do
     })
 
     json = serializer.as_json[:quiz_report].stringify_keys
-    json.should have_key 'file'
-    json['file']['id'].should be_present
+    expect(json).to have_key 'file'
+    expect(json['file']['id']).to be_present
   end
 
   it 'should embed its progress when present' do
@@ -33,8 +33,8 @@ shared_examples_for 'QuizReportSerializer Associations' do
     })
 
     json = serializer.as_json[:quiz_report].stringify_keys
-    json.should have_key 'progress'
-    json['progress'][:id].should be_present
+    expect(json).to have_key 'progress'
+    expect(json['progress'][:id]).to be_present
   end
 end
 
@@ -85,17 +85,18 @@ describe Quizzes::QuizReportSerializer do
       created_at updated_at
     ].each do |attr|
       it "serializes #{attr}" do
-        json[attr].should == statistics.send(attr)
+        expect(json[attr]).to eq statistics.send(attr)
       end
     end
 
     it 'should expose whether the report is generatable' do
-      json['generatable'].should == statistics.report.generatable?
+      expect(json['generatable']).to eq statistics.report.generatable?
     end
 
     it 'should link to itself' do
-      json['url'].should ==
+      expect(json['url']).to eq(
         "http://example.com/api/v1/courses/1/quizzes/2/reports/#{statistics.id}"
+      )
     end
   end
 
@@ -105,15 +106,15 @@ describe Quizzes::QuizReportSerializer do
     end
 
     it 'serializes id' do
-      json['id'].should == "#{statistics.id}"
+      expect(json['id']).to eq "#{statistics.id}"
     end
 
     context 'associations' do
       include_examples 'QuizReportSerializer Associations'
 
       it 'should link to the quiz' do
-        json['links'].should be_present
-        json['links']['quiz'].should == 'http://example.com/api/v1/courses/1/quizzes/2'
+        expect(json['links']).to be_present
+        expect(json['links']['quiz']).to eq 'http://example.com/api/v1/courses/1/quizzes/2'
       end
     end
   end
@@ -124,19 +125,20 @@ describe Quizzes::QuizReportSerializer do
     end
 
     it 'serializes id' do
-      json['id'].should == statistics.id
+      expect(json['id']).to eq statistics.id
     end
 
     it 'should include quiz_id' do
-      json['quiz_id'].should == quiz.id
+      expect(json['quiz_id']).to eq quiz.id
     end
 
     it 'should include the progress_url' do
       statistics.start_progress
       statistics.reload
 
-      json['progress_url'].should ==
+      expect(json['progress_url']).to eq(
         "http://example.com/api/v1/progress/#{statistics.progress.id}"
+      )
     end
 
     context 'associations' do
