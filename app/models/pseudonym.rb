@@ -232,6 +232,19 @@ class Pseudonym < ActiveRecord::Base
     state :deleted
   end
 
+  set_policy do
+    # an admin can only create pseudonyms when they have :manage_user_logins
+    # permission on the pseudonym's account, :read permission on the
+    # pseudonym's owner, and a superset of hte pseudonym's owner's rights (if
+    # any) on the pseudonym's account.
+    given do |user|
+      self.account.grants_right?(user, :manage_user_logins) &&
+      self.user.has_subset_of_account_permissions?(user, self.account) &&
+      self.user.grants_right?(user, :read)
+    end
+    can :create
+  end
+
   alias_method :destroy!, :destroy
   def destroy(even_if_managed_password=false)
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?

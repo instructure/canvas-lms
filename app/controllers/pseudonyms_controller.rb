@@ -186,12 +186,12 @@ class PseudonymsController < ApplicationController
         params[:pseudonym].delete :password_confirmation
       end
     end
-    return unless authorized_action?(@account, @current_user, :manage_user_logins) &&
-                  authorized_action?(@user, @current_user, :manage_logins)
 
     params[:pseudonym][:user] = @user
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
     @pseudonym = @account.pseudonyms.build(params[:pseudonym])
+    return unless authorized_action(@pseudonym, @current_user, :create)
+
     @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if @pseudonym.save_without_session_maintenance

@@ -403,5 +403,52 @@ describe Pseudonym do
 
     end
   end
+
+  describe "permissions" do
+    let(:account1) { Account.default }
+    let(:account2) { Account.create! }
+
+    let(:sally) { account_admin_user(
+      user: student_in_course(account: account2).user,
+      account: account1) }
+
+    let(:bob) { student_in_course(
+      user: student_in_course(account: account2).user,
+      course: course(account: account1)).user }
+
+    let(:charlie) { student_in_course(account: account2).user }
+
+    let(:alice) { account_admin_user_with_role_changes(
+      account: account1,
+      membership_type: 'StrongerAdmin',
+      role_changes: { view_notifications: true }) }
+
+    describe ":create" do
+      it "should grant admins :create for themselves on the account" do
+        expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :create)
+      end
+
+      it "should grant admins :create for others on the account" do
+        expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :create)
+      end
+
+      it "should not grant non-admins :create for themselves on the account" do
+        expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :create)
+      end
+
+      it "should only grant admins :create on accounts they admin" do
+        expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :create)
+        expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :create)
+      end
+
+      it "should not grant admins :create for others from other accounts" do
+        expect(account1.pseudonyms.build(user: charlie)).not_to be_grants_right(sally, :create)
+      end
+
+      it "should not grant subadmins :create on stronger admins" do
+        expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :create)
+      end
+    end
+  end
 end
 

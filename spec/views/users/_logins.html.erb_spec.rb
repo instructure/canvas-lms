@@ -68,4 +68,26 @@ describe "users/_logins.html.erb" do
       expect(page.css(".login .delete_pseudonym_link").first['style']).to eq 'display: none;'
     end
   end
+
+  describe "add_pseudonym_link" do
+    let(:account) { Account.default }
+    let(:sally) { account_admin_user(account: account) }
+    let(:bob) { student_in_course(account: account).user }
+
+    it "should display when user has permission to create pseudonym" do
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = sally
+      assigns[:user] = bob
+      render
+      expect(response).to have_tag("a.add_pseudonym_link")
+    end
+
+    it "should not display when user lacks permission to create pseudonym" do
+      assigns[:domain_root_account] = account
+      assigns[:current_user] = bob
+      assigns[:user] = sally
+      render
+      expect(response).not_to have_tag("a.add_pseudonym_link")
+    end
+  end
 end
