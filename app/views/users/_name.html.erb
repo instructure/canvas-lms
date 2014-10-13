@@ -56,7 +56,7 @@
               <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% end %>
           <% end %>
-          <% if @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) }  %>
+          <% if @user.grants_right?(@current_user, :merge) %>
             | 
             <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
           <% end %>

@@ -2640,6 +2640,57 @@ describe User do
         end
       end
     end
+
+    describe ":merge" do
+      let(:account1) { Account.default }
+      let(:account2) { Account.create! }
+
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
+
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
+
+      let(:charlie) { student_in_course(account: account2).user }
+
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
+
+      it "should grant admins :merge on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant non-admins :merge on themselves" do
+        pseudonym(bob, account: account1)
+        expect(bob).not_to be_grants_right(bob, :merge)
+      end
+
+      it "should not grant non-admins :merge on other users" do
+        pseudonym(sally, account: account1)
+        expect(sally).not_to be_grants_right(bob, :merge)
+      end
+
+      it "should grant admins :merge on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant admins :merge on users from other accounts" do
+        pseudonym(charlie, account: account2)
+        expect(charlie).not_to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant subadmins :merge on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :merge)
+      end
+    end
   end
 
   describe "#conversation_context_codes" do

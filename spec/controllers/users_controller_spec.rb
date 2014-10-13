@@ -743,6 +743,7 @@ describe UsersController do
 
       it 'warns about merging a user with itself' do
         user = User.create!
+        pseudonym(user)
         get 'admin_merge', :user_id => user.id, :pending_user_id => user.id
         expect(flash[:error]).to eq 'You can\'t merge an account with itself.'
       end
@@ -756,6 +757,7 @@ describe UsersController do
     end
 
     it "should not allow you to view any user by id" do
+      pseudonym(@admin)
       user_with_pseudonym(:account => account)
       get 'admin_merge', :user_id => @admin.id, :pending_user_id => @user.id
       expect(response).to be_success

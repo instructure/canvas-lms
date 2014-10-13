@@ -1015,6 +1015,9 @@ class User < ActiveRecord::Base
     end
     can :delete
 
+    given{ |user| self.pseudonyms.with_each_shard.any?{ |p| p.grants_right?(user, :update) } }
+    can :merge
+
     given do |user|
       # a user can reset their own MFA, but only if the setting isn't required
       (self == user && self.mfa_settings != :required) ||

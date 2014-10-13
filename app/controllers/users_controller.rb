@@ -1372,68 +1372,56 @@ class UsersController < ApplicationController
   end
 
   def merge
-    @user_about_to_go_away = User.find(params[:user_id])
-
-    @true_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
-    @true_user ||= @current_user
-
-    if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
-      @user_that_will_still_be_around = @true_user
-    else
-      @user_that_will_still_be_around = nil
-    end
-
-    if @user_about_to_go_away && @user_that_will_still_be_around
-      UserMerge.from(@user_about_to_go_away).into(@user_that_will_still_be_around)
-      @user_that_will_still_be_around.touch
-      flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
+    @source_user = User.find(params[:user_id])
+    @target_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
+    @target_user ||= @current_user
+    if @source_user.grants_right?(@current_user, :merge) && @target_user.grants_right?(@current_user, :merge)
+      UserMerge.from(@source_user).into(@target_user)
+      @target_user.touch
+      flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @target_user.name, :second_user => @source_user.name)
+      if @target_user == @current_user
+        redirect_to user_profile_url(@current_user)
+      else
+        redirect_to user_url(@target_user)
+      end
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
-    end
-
-    if @user_that_will_still_be_around == @current_user
-      redirect_to user_profile_url(@current_user)
-    elsif @user_that_will_still_be_around
-      redirect_to user_url(@user_that_will_still_be_around)
-    else
       redirect_to dashboard_url
     end
   end
 
   def admin_merge
     @user = User.find(params[:user_id])
-    pending_other_error = get_pending_user_and_error(params[:pending_user_id])
-    @other_user = User.where(id: params[:new_user_id]).first if params[:new_user_id].present?
-    if authorized_action(@user, @current_user, :manage_logins)
-      flash[:error] = pending_other_error if pending_other_error.present?
-
-      if @user && (params[:clear] || !@pending_other_user)
-        @pending_other_user = nil
+    if authorized_action(@user, @current_user, :merge)
+      if params[:clear]
+        params.delete(:new_user_id)
+        params.delete(:pending_user_id)
       end
 
-      unless @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
-        @other_user = nil
+      if params[:new_user_id].present?
+        @other_user = api_find_all(User, [params[:new_user_id]]).first
+        if !@other_user || !@other_user.grants_right?(@current_user, :merge)
+          @other_user = nil
+          flash[:error] = t('user_not_found', "No active user with that ID was found.")
+        elsif @other_user == @user
+          @other_user = nil
+          flash[:error] = t('cant_self_merge', "You can't merge an account with itself.")
+        end
       end
 
-      render :action => 'admin_merge'
+      if params[:pending_user_id].present?
+        @pending_other_user = api_find_all(User, [params[:pending_user_id]]).first
+        if !@pending_other_user || !@pending_other_user.grants_right?(@current_user, :merge)
+          @pending_other_user = nil
+          flash[:error] = t('user_not_found', "No active user with that ID was found.")
+        elsif @pending_other_user == @user
+          @pending_other_user = nil
+          flash[:error] = t('cant_self_merge', "You can't merge an account with itself.")
+        end
+      end
+
+      render action: 'admin_merge'
     end
-  end
-
-  def get_pending_user_and_error(pending_user_id)
-    pending_other_error = nil
-
-    if pending_user_id.present?
-      @pending_other_user = api_find_all(User, [pending_user_id]).first
-      @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
-      if @pending_other_user == @user
-        @pending_other_user = nil
-        pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
-      elsif @pending_other_user.blank? && pending_other_error.blank?
-        pending_other_error = t('user_not_found', "No active user with that ID was found.")
-      end
-    end
-
-    pending_other_error
   end
 
   def assignments_needing_grading
@@ -1672,7 +1660,7 @@ class UsersController < ApplicationController
   # @returns User
   def merge_into
     user = api_find(User, params[:id])
-    if authorized_action(user, @current_user, :manage_logins)
+    if authorized_action(user, @current_user, :merge)
 
       if (account_id = params[:destination_account_id])
         destination_account = Account.find_by_domain(account_id)
@@ -1683,7 +1671,7 @@ class UsersController < ApplicationController
 
       into_user = api_find(User, params[:destination_user_id], account: destination_account)
 
-      if authorized_action(into_user, @current_user, :manage_logins)
+      if authorized_action(into_user, @current_user, :merge)
         UserMerge.from(user).into into_user
         render(:json => user_json(into_user,
                                   @current_user,
