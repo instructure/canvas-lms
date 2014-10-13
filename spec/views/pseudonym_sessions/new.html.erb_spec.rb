@@ -23,9 +23,9 @@ describe "/pseudonym_sessions/new" do
   it "should render" do
     assigns[:domain_root_account] = Account.default
     render "pseudonym_sessions/new"
-    response.should_not be_nil
+    expect(response).not_to be_nil
     doc = Nokogiri::HTML(response.body)
-    doc.at_css('form#login_form')['action'].should == '/login?nonldap=true'
+    expect(doc.at_css('form#login_form')['action']).to eq '/login?nonldap=true'
   end
 
   it "should not add nonldap param to login form with ldap" do
@@ -35,9 +35,9 @@ describe "/pseudonym_sessions/new" do
     config.save
     assigns[:domain_root_account] = @account
     render "pseudonym_sessions/new"
-    response.should_not be_nil
+    expect(response).not_to be_nil
     doc = Nokogiri::HTML(response.body)
-    doc.at_css('form#login_form')['action'].should == '/login'
+    expect(doc.at_css('form#login_form')['action']).to eq '/login'
   end
 end
 

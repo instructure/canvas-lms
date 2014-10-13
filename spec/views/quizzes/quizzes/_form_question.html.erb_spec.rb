@@ -30,7 +30,7 @@ describe "/quizzes/quizzes/_form_question" do
     assigns[:js_env] = {quiz_max_combination_count: 200}
     render :partial => "quizzes/quizzes/form_question"
 
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

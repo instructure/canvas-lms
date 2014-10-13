@@ -31,7 +31,7 @@ describe "/assignments/show" do
     assigns[:assignment_groups] = [g]
     assigns[:current_user_rubrics] = []
     render 'assignments/show'
-    response.should_not be_nil # have_tag()
+    expect(response).not_to be_nil # have_tag()
   end
 end
 

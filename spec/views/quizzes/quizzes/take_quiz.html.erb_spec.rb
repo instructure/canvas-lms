@@ -35,8 +35,8 @@ describe "/quizzes/quizzes/take_quiz" do
                                                     )
     render "quizzes/quizzes/take_quiz"
     doc = Nokogiri::HTML(response.body)
-    doc.css('#quiz-instructions').first.content.strip.should == "Hello"
-    response.should_not be_nil
+    expect(doc.css('#quiz-instructions').first.content.strip).to eq "Hello"
+    expect(response).not_to be_nil
   end
 end
 

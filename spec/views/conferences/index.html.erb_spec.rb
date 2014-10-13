@@ -36,7 +36,7 @@ describe "/conference/index" do
     assigns[:conferences] = [@conference]
     assigns[:users] = @course.users
     render "conferences/index"
-    response.should have_tag("#new-conference-list")
+    expect(response).to have_tag("#new-conference-list")
   end
 end
 

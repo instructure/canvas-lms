@@ -24,14 +24,14 @@ describe "/shared/_wiki_sidebar" do
     course_with_student
     view_context
     render :partial => "shared/wiki_sidebar"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
   
   it "should render in user context" do
     user
     view_context(@user, @user)
     render :partial => "shared/wiki_sidebar"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

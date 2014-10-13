@@ -29,7 +29,7 @@ describe "/shared/errors/404_message" do
       assigns[:exception] = e
     end
     render "shared/errors/404_message", :locals => {:exception => assigns[:exception], :status => ""}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

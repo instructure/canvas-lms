@@ -33,7 +33,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     assigns[:quiz] = @course.quizzes.create!
     render "quizzes/quizzes/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should render a notice instead of grades if muted" do
@@ -54,7 +54,7 @@ describe "/quizzes/quizzes/show" do
     assigns[:submission] = submission
     view_context
     render "quizzes/quizzes/show"
-    response.should have_tag ".muted-notice"
+    expect(response).to have_tag ".muted-notice"
     true
   end
 
@@ -65,7 +65,7 @@ describe "/quizzes/quizzes/show" do
     assigns[:quiz] = quiz
     view_context
     render "quizzes/quizzes/show"
-    response.should_not have_tag ".unpublished_warning"
+    expect(response).not_to have_tag ".unpublished_warning"
   end
 
   it "should show header bar and publish button" do
@@ -75,8 +75,8 @@ describe "/quizzes/quizzes/show" do
     view_context
     render "quizzes/quizzes/show"
 
-    response.should have_tag ".header-bar"
-    response.should have_tag "#quiz-publish-link"
+    expect(response).to have_tag ".header-bar"
+    expect(response).to have_tag "#quiz-publish-link"
   end
 
   it "should show unpublished quiz changes to instructors" do
@@ -92,8 +92,8 @@ describe "/quizzes/quizzes/show" do
     view_context
     render "quizzes/quizzes/show"
 
-    response.should have_tag ".unsaved_quiz_warning"
-    response.should_not have_tag ".unpublished_quiz_warning"
+    expect(response).to have_tag ".unsaved_quiz_warning"
+    expect(response).not_to have_tag ".unpublished_quiz_warning"
   end
 
 end

@@ -26,7 +26,7 @@ describe "/assignments/text_entry_page" do
     assigns[:assignment] = @course.assignments.create!(:title => "some assignment")
     assigns[:submission] = assigns[:assignment].submit_homework(@user)
     render 'assignments/text_entry_page'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

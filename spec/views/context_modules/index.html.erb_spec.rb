@@ -31,7 +31,7 @@ describe "/context_modules/index" do
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should show content_tags" do
@@ -42,9 +42,9 @@ describe "/context_modules/index" do
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
-    response.should_not be_nil
+    expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css("#context_module_item_#{content_tag.id}").length.should == 1
+    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 1
   end
 
   it "should show unpublished content_tags" do
@@ -55,15 +55,15 @@ describe "/context_modules/index" do
 
     context_module = @course.context_modules.create!
     content_tag = context_module.add_item(:type => 'wiki_page', :id => wiki_page.id)
-    content_tag.workflow_state.should == 'unpublished'
+    expect(content_tag.workflow_state).to eq 'unpublished'
 
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
 
-    response.should_not be_nil
+    expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css("#context_module_item_#{content_tag.id}").length.should == 1
+    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 1
   end
 
   it "should not show deleted content_tags" do
@@ -74,8 +74,8 @@ describe "/context_modules/index" do
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
-    response.should_not be_nil
+    expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css("#context_module_item_#{content_tag.id}").length.should == 0
+    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 0
   end
 end

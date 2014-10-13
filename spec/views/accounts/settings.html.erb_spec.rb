@@ -39,7 +39,7 @@ describe "accounts/settings.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("input#account_sis_source_id")
+      expect(response).to have_tag("input#account_sis_source_id")
     end
 
     it "should not show to non-sis admin" do
@@ -47,8 +47,8 @@ describe "accounts/settings.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("span.sis_source_id", @account.sis_source_id)
-      response.should_not have_tag("input#account_sis_source_id")
+      expect(response).to have_tag("span.sis_source_id", @account.sis_source_id)
+      expect(response).not_to have_tag("input#account_sis_source_id")
     end
   end
 
@@ -66,15 +66,15 @@ describe "accounts/settings.html.erb" do
 
     it "should show by default" do
       render
-      response.should have_tag("input#account_settings_open_registration")
-      response.should_not have_tag("div#open_registration_delegated_warning_dialog")
+      expect(response).to have_tag("input#account_settings_open_registration")
+      expect(response).not_to have_tag("div#open_registration_delegated_warning_dialog")
     end
 
     it "should show warning dialog when a delegated auth config is around" do
       @account.account_authorization_configs.create!(:auth_type => 'cas')
       render
-      response.should have_tag("input#account_settings_open_registration")
-      response.should have_tag("div#open_registration_delegated_warning_dialog")
+      expect(response).to have_tag("input#account_settings_open_registration")
+      expect(response).to have_tag("div#open_registration_delegated_warning_dialog")
     end
   end
 
@@ -92,18 +92,18 @@ describe "accounts/settings.html.erb" do
       admin = site_admin_user
       view_context(@account, admin)
       render
-      response.should have_tag("input#account_settings_global_includes")
-      response.should have_tag("input#account_settings_show_scheduler")
-      response.should have_tag("input#account_settings_enable_profiles")
+      expect(response).to have_tag("input#account_settings_global_includes")
+      expect(response).to have_tag("input#account_settings_show_scheduler")
+      expect(response).to have_tag("input#account_settings_enable_profiles")
     end
 
     it "it should not show settings to regular admin user" do
       admin = account_admin_user
       view_context(@account, admin)
       render
-      response.should_not have_tag("input#account_settings_global_includes")
-      response.should_not have_tag("input#account_settings_show_scheduler")
-      response.should_not have_tag("input#account_settings_enable_profiles")
+      expect(response).not_to have_tag("input#account_settings_global_includes")
+      expect(response).not_to have_tag("input#account_settings_show_scheduler")
+      expect(response).not_to have_tag("input#account_settings_enable_profiles")
     end
   end
   
@@ -126,9 +126,9 @@ describe "accounts/settings.html.erb" do
       
       it "should show quota options" do
         render
-        @controller.js_env.include?(:ACCOUNT).should be_true
-        response.should have_tag '#tab-quotas-link'
-        response.should have_tag '#tab-quotas'
+        expect(@controller.js_env.include?(:ACCOUNT)).to be_truthy
+        expect(response).to have_tag '#tab-quotas-link'
+        expect(response).to have_tag '#tab-quotas'
       end
     end
     
@@ -141,9 +141,9 @@ describe "accounts/settings.html.erb" do
       
       it "should not show quota options" do
         render
-        @controller.js_env.include?(:ACCOUNT).should be_false
-        response.should_not have_tag '#tab-quotas-link'
-        response.should_not have_tag '#tab-quotas'
+        expect(@controller.js_env.include?(:ACCOUNT)).to be_falsey
+        expect(response).not_to have_tag '#tab-quotas-link'
+        expect(response).not_to have_tag '#tab-quotas'
       end
     end
   end
@@ -158,7 +158,7 @@ describe "accounts/settings.html.erb" do
       assigns[:account] = Account.default
       assigns[:announcements] = []
       render
-      response.should_not have_tag '#enroll_users_form'
+      expect(response).not_to have_tag '#enroll_users_form'
     end
   end
 end

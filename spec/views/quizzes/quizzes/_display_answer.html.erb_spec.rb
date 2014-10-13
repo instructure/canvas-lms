@@ -32,7 +32,7 @@ describe "/quizzes/quizzes/_display_answer" do
     answer[:id] = 5
     answer[:weight] = 100
     render :partial => "quizzes/quizzes/display_answer", :object => answer, :locals => {:question_type => OpenObject.new}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

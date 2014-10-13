@@ -27,7 +27,7 @@ describe "/courses/index" do
     assigns[:past_enrollments] = []
     assigns[:future_enrollments] = []
     render "courses/index"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should show context name under group name" do
@@ -39,6 +39,6 @@ describe "/courses/index" do
     assigns[:future_enrollments] = []
     render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
-    doc.at_css('#my_groups_table tr:first span.subtitle').text.should == @course.name
+    expect(doc.at_css('#my_groups_table tr:first span.subtitle').text).to eq @course.name
   end
 end

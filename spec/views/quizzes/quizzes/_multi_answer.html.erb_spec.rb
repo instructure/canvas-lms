@@ -38,7 +38,7 @@ describe "/quizzes/quizzes/_multi_answer" do
     }
     question_type = OpenObject.new
     render :partial => "quizzes/quizzes/multi_answer", :object => answer, :locals => {:question => question, :question_type => question_type, :user_answer => nil}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

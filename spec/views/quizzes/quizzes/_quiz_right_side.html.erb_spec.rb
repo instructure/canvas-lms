@@ -29,7 +29,7 @@ describe "/quizzes/quizzes/_quiz_right_side" do
     view_context
     assigns[:quiz] = @course.quizzes.create!
     render :partial => "quizzes/quizzes/quiz_right_side"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

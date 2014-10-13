@@ -29,10 +29,10 @@ describe "/wiki_pages/_wiki_right_side" do
     assigns[:page].save!
     assigns[:context] = @group
     render :partial => "wiki_pages/wiki_right_side"
-    response.should_not be_nil
-    response.body.should match(/Edit this Page/)
-    response.body.should match(/Delete this Page/)
-    response.body.should match(/Create a New Page/)
+    expect(response).not_to be_nil
+    expect(response.body).to match(/Edit this Page/)
+    expect(response.body).to match(/Delete this Page/)
+    expect(response.body).to match(/Create a New Page/)
   end
 end
 

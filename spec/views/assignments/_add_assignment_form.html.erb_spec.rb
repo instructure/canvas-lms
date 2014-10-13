@@ -24,7 +24,7 @@ describe "/assignments/_add_assignment_form" do
     course_with_teacher
     view_context(@course, @user)
     render 'assignments/_add_assignment_form'
-    response.should have_tag('form#add_assignment_form')
+    expect(response).to have_tag('form#add_assignment_form')
   end
 end
 

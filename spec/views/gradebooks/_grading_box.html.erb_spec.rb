@@ -25,7 +25,7 @@ describe "/gradebooks/_grading_box" do
     view_context
     a = @course.assignments.create!(:title => "some assignment")
     render :partial => "gradebooks/grading_box", :object => a
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

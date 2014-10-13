@@ -31,7 +31,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
     Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
     render :partial => "quizzes/quizzes/quiz_submission"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should render when quiz results are not supposed to be shown to the student" do
@@ -45,7 +45,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
     Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
     render :partial => "quizzes/quizzes/quiz_submission"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

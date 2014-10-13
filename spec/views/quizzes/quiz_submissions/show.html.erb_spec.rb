@@ -39,7 +39,7 @@ describe "/quiz_submissions/show" do
     assigns[:submission] = @submission
     
     render "quizzes/quiz_submissions/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

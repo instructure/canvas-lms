@@ -46,6 +46,6 @@ describe "/quizzes/quizzes/_display_question" do
     render :partial => "quizzes/quizzes/display_question", :object => q, :locals => {
         :user_answer => @submission.submission_data.find{|a| a[:question_id] == q[:id]},
         :assessment_results => true}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end

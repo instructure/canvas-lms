@@ -35,7 +35,7 @@ describe "/quizzes/quizzes/index_legacy" do
     assigns[:surveys] = assigns[:quizzes]
     assigns[:submissions_hash] = {}
     render "quizzes/quizzes/index_legacy"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "with draft state enabled should render" do
@@ -46,7 +46,7 @@ describe "/quizzes/quizzes/index_legacy" do
     assigns[:body_classes] = []
 
     render "quizzes/quizzes/index"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

@@ -31,8 +31,8 @@ describe "/context_modules/url_show" do
     assigns[:tag] = @tag
     render 'context_modules/url_show'
     doc = Nokogiri::HTML.parse(response.body)
-    doc.at_css('iframe')['src'].should == 'http://example.com/lolcats'
-    doc.css('a').collect{ |a| [a['href'], a.inner_text] }.should be_include ['http://example.com/lolcats', 'pls view']
+    expect(doc.at_css('iframe')['src']).to eq 'http://example.com/lolcats'
+    expect(doc.css('a').collect{ |a| [a['href'], a.inner_text] }).to be_include ['http://example.com/lolcats', 'pls view']
   end
 
   it "should check whether the content is locked" do
@@ -47,10 +47,11 @@ describe "/context_modules/url_show" do
     assigns[:tag] = @tag
     render 'context_modules/url_show'
     doc = Nokogiri::HTML.parse(response.body)
-    doc.at_css('h2').inner_text.should == 'pls view'
-    doc.at_css('b').inner_text.should == 'locked module'
-    doc.at_css('#module_prerequisites_lookup_link')['href'].should ==
+    expect(doc.at_css('h2').inner_text).to eq 'pls view'
+    expect(doc.at_css('b').inner_text).to eq 'locked module'
+    expect(doc.at_css('#module_prerequisites_lookup_link')['href']).to eq(
         "/courses/#{@course.id}/modules/#{@module.id}/prerequisites/content_tag_#{@tag.id}"
-    doc.css('iframe').should be_empty
+    )
+    expect(doc.css('iframe')).to be_empty
   end
 end

@@ -35,8 +35,8 @@ describe "/quizzes/quizzes/_question_statistic" do
     question[:question_name] = "title of glory"
     question[:unexpected_response_values] = []
     render :partial => "quizzes/quizzes/question_statistic", :object => question, :locals => {:in_group => true, :ignore_correct_answers => true}
-    response.should_not be_nil
-    response.body.should =~ /title of glory/
+    expect(response).not_to be_nil
+    expect(response.body).to match /title of glory/
   end
 
   it "should not show the submitter's name on anonymous surveys" do
@@ -54,8 +54,8 @@ describe "/quizzes/quizzes/_question_statistic" do
     }
 
     render :partial => 'quizzes/quizzes/question_statistic', :object => question
-    response.should_not be_nil
-    response.body.should_not include @student.name
+    expect(response).not_to be_nil
+    expect(response.body).not_to include @student.name
   end
 
   it "renders a link to download all quiz submissions for file upload questions" do
@@ -67,7 +67,7 @@ describe "/quizzes/quizzes/_question_statistic" do
     quiz.stubs(:quiz_data).returns [question]
     assigns[:quiz] = quiz
     render :partial => 'quizzes/quizzes/question_statistic', object: question
-    response.body.should include "Download All Files"
+    expect(response.body).to include "Download All Files"
   end
 end
 

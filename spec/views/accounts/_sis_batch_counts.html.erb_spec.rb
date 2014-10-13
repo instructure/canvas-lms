@@ -31,7 +31,7 @@ describe "accounts/_sis_batch_counts.html.erb" do
     
     data[:counts].each_pair do |type, count|
       name = map[type] || type.to_s.capitalize
-      response.body.should =~ /#{name}: #{count}/
+      expect(response.body).to match /#{name}: #{count}/
     end
   end
 end
