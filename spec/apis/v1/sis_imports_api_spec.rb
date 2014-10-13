@@ -486,11 +486,6 @@ describe SisImportsApiController, type: :request do
   end
 
   it "should list sis imports for an account" do
-    @user = user_with_pseudonym :active_all => true
-    @account = Account.create(name: 'sis account')
-    @account.allow_sis_import = true
-    @account.save!
-    @account.account_users.create!(user: @user)
     batch = post_csv(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"
@@ -528,5 +523,14 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil }]
     })
+  end
+
+  it "should not fail when options are nil" do
+    batch = @account.sis_batches.create
+    expect(batch.options).to be_nil
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s })
+    assert_status(200)
   end
 end
