@@ -6,15 +6,14 @@
     <table>
       <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
-        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) && pseudonym.account.canvas_authentication? %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
-            <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym.account, @current_user, :read_sis)) || can_do(pseudonym.account, @current_user, :manage_sis)) %>
+            <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym.account, @current_user, :read_sis)) || can_do(pseudonym, @current_user, :manage_sis)) %>
               <div style="font-size: 0.8em; padding-left: 20px;">
                 <%= before_label('sis_id', 'SIS ID') %> <span id="sis_user_id_<%= pseudonym.id %>" class="sis_user_id"><%= pseudonym.sis_user_id %></span> 
               </div>
-              <div style="display:none" class="can_edit_sis_user_id"><%= can_do(pseudonym.account, @current_user, :manage_sis) %></div>
+              <div style="display:none" class="can_edit_sis_user_id"><%= can_do(pseudonym, @current_user, :manage_sis) %></div>
             <% end %>
           </th>
           <td class='account'>
@@ -47,10 +46,10 @@
               <a href="#" class="login_details_link"><%= t('more', 'more...') %></a>
             <% end %>
           </td>
-          <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
-            <td class='links <%= 'passwordable' if can_change_pseudonym_password %>'>
+          <% if !pseudonym || can_do(pseudonym, @current_user, :update) %>
+            <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link" data-account-id="<%= pseudonym.account.id if pseudonym %>"><i class="icon-edit standalone-icon"></i></a>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.system_created? && !can_do(pseudonym, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
           <% else %>
             <td>&nbsp;</td>

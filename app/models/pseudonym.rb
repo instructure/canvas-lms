@@ -233,16 +233,52 @@ class Pseudonym < ActiveRecord::Base
   end
 
   set_policy do
-    # an admin can only create pseudonyms when they have :manage_user_logins
-    # permission on the pseudonym's account, :read permission on the
-    # pseudonym's owner, and a superset of hte pseudonym's owner's rights (if
-    # any) on the pseudonym's account.
+    # an admin can only create and update pseudonyms when they have
+    # :manage_user_logins permission on the pseudonym's account, :read
+    # permission on the pseudonym's owner, and a superset of hte pseudonym's
+    # owner's rights (if any) on the pseudonym's account. some fields of the
+    # pseudonym may require additional conditions to update (see below)
     given do |user|
       self.account.grants_right?(user, :manage_user_logins) &&
       self.user.has_subset_of_account_permissions?(user, self.account) &&
       self.user.grants_right?(user, :read)
     end
-    can :create
+    can :create and can :update
+
+    # any user (admin or not) can change their own non-managed password.
+    # managed passwords cannot be changed in Canvas.
+    given do |user|
+      self.user_id == user.try(:id) &&
+      !self.managed_password?
+    end
+    can :change_password
+
+    # an admin can set the initial non-managed password on another user's new
+    # pseudonym.
+    given do |user|
+      self.new_record? &&
+      self.grants_right?(user, :create) &&
+      !self.managed_password?
+    end
+    can :change_password
+
+    # an admin can only change another user's non-managed password on an
+    # existing pseudonym when :admins_can_change_passwords is enabled. managed
+    # passwords cannot be changed in Canvas, even by admins.
+    given do |user|
+      self.account.settings[:admins_can_change_passwords] &&
+      self.grants_right?(user, :update) &&
+      !self.managed_password?
+    end
+    can :change_password
+
+    # an admin can only update a pseudonym's SIS ID when they have :manage_sis
+    # permission on the pseudonym's account
+    given do |user|
+      self.account.grants_right?(user, :manage_sis) &&
+      self.grants_right?(user, :update)
+    end
+    can :manage_sis
   end
 
   alias_method :destroy!, :destroy

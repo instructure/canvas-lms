@@ -383,6 +383,46 @@ describe PseudonymsController do
       expect(response).to be_success
       expect(@pseudonym1.reload.sis_user_id).to eq 'sis1'
     end
+
+    it "should be able to change unique_id with permission" do
+      bob = user_with_pseudonym(username: 'old_username')
+      sally = account_admin_user
+      user_session(sally)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: { unique_id: 'new_username' }
+      expect(response).to be_redirect
+      expect(bob.pseudonym.reload.unique_id).to eq 'new_username'
+    end
+
+    it "should not be able to change unique_id without permission" do
+      bob = user_with_pseudonym(username: 'old_username')
+      user_session(bob)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: { unique_id: 'new_username' }
+      expect(response).not_to be_success
+      expect(bob.pseudonym.reload.unique_id).to eq 'old_username'
+    end
+
+    it "should succeed with partial update" do
+      bob = user_with_pseudonym(username: 'old_username', password: 'old_password')
+      user_session(bob)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: {
+          password: 'new_password',
+          password_confirmation: 'new_password',
+          unique_id: 'new_username'
+        }
+      expect(response).to be_redirect
+      bob.pseudonym.reload
+      expect(bob.pseudonym.unique_id).to eq 'old_username'
+      expect(bob.pseudonym).to be_valid_password('new_password')
+    end
   end
 
   context "sharding" do

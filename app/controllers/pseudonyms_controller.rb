@@ -180,19 +180,12 @@ class PseudonymsController < ApplicationController
       account_id = params[:pseudonym].delete(:account_id)
       @account = Account.root_accounts.find(account_id) if account_id
       @account ||= @domain_root_account
-      if !@account.settings[:admins_can_change_passwords] &&
-          !Account.site_admin.grants_right?(@current_user, :manage_user_logins)
-        params[:pseudonym].delete :password
-        params[:pseudonym].delete :password_confirmation
-      end
     end
 
-    params[:pseudonym][:user] = @user
-    sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    @pseudonym = @account.pseudonyms.build(params[:pseudonym])
+    @pseudonym = @account.pseudonyms.build(user: @user)
     return unless authorized_action(@pseudonym, @current_user, :create)
+    return unless update_pseudonym_from_params
 
-    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if @pseudonym.save_without_session_maintenance
       respond_to do |format|
@@ -249,28 +242,10 @@ class PseudonymsController < ApplicationController
       @pseudonym = Pseudonym.active.find(params[:id])
       raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     end
-    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
-    params[:pseudonym].delete :account_id
-    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, :manage_logins)
-    unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
-      params[:pseudonym].delete :unique_id
-      params[:pseudonym].delete :password
-      params[:pseudonym].delete :password_confirmation
-    end
-    unless @pseudonym.account && @pseudonym.account.settings[:admins_can_change_passwords]
-      params[:pseudonym].delete :password
-      params[:pseudonym].delete :password_confirmation
-    end
-    if (sis_id = params[:pseudonym].delete(:sis_user_id)) && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
-      @pseudonym.sis_user_id = sis_id.presence
-    end
-    # silently delete unallowed attributes
-    params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :password_confirmation, :sis_user_id].include?(k.to_sym) }
-    # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
-    return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && !sis_id
 
-    @pseudonym.assign_attributes(params[:pseudonym])
+    return unless authorized_action(@pseudonym, @current_user, [:update, :change_password])
+    return unless update_pseudonym_from_params
+
     if @pseudonym.save_without_session_maintenance
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
@@ -309,7 +284,7 @@ class PseudonymsController < ApplicationController
     if @user.all_active_pseudonyms.length < 2
       @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors, :status => :bad_request
-    elsif @pseudonym.sis_user_id && !@pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+    elsif @pseudonym.sis_user_id && !@pseudonym.grants_right?(@current_user, :manage_sis)
       return render_unauthorized_action
     elsif @pseudonym.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       api_request? ?
@@ -328,5 +303,41 @@ class PseudonymsController < ApplicationController
       render(:json => { 'message' => 'Action must be called on a root account.' }, :status => :bad_request)
       false
     end
+  end
+
+  def update_pseudonym_from_params
+    # you have to at least attempt something recognized...
+    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id).blank?
+      render json: nil, status: :bad_request
+      return false
+    end
+
+    # perform the updates they have permission for. silently ignore
+    # unrecognized fields or fields they don't have permission to. note: make
+    # sure sis_user_id is updated (if happening) before password, since it may
+    # affect the :change_password permissions
+    update = false
+
+    if params[:pseudonym].has_key?(:unique_id) && @pseudonym.grants_right?(@current_user, :update)
+      @pseudonym.unique_id = params[:pseudonym][:unique_id]
+      updated = true
+    end
+
+    if params[:pseudonym].has_key?(:sis_user_id) && @pseudonym.grants_right?(@current_user, :manage_sis)
+      # convert "" -> nil for sis_user_id
+      @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
+      updated = true
+    end
+
+    if params[:pseudonym].has_key?(:password) && @pseudonym.grants_right?(@current_user, :change_password)
+      @pseudonym.password = params[:pseudonym][:password]
+      @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
+      updated = true
+    end
+
+    # if we didn't actually update anything, it's because of permissions (we
+    # already checked for nothing attempted), so 401
+    render_unauthorized_action unless updated
+    return updated
   end
 end
