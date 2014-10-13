@@ -459,25 +459,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "jt" do
-    after do
-      I18n.locale = I18n.default_locale
-    end
-
-    it "should output the translated default" do
-      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      def i18n_scope; "date.days"; end
-      (I18n.available_locales - [:en]).each do |locale|
-        I18n.locale = locale
-        expected = I18n.t("#date.days.today").to_json
-        # relative
-        expect(jt("today", nil)).to include expected
-        # and absolute
-        expect(jt("#date.days.today", nil)).to include expected
-      end
-    end
-  end
-
   context "dashboard_url" do
     before :once do
       @domain_root_account = Account.default
