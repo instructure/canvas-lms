@@ -93,6 +93,12 @@ module Api::V1::StreamItem
         # TODO: this type isn't even shown on the web activity stream yet
         hash['type'] = 'Collaboration'
         hash['html_url'] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
+      when /AssessmentRequest/
+        assessment_request = stream_item.asset
+        assignment = assessment_request.asset.assignment
+        hash['assessment_request_id'] = assessment_request.id
+        hash['html_url'] = course_assignment_submission_url(assignment.context_id, assignment.id, assessment_request.user_id)
+        hash['title'] = I18n.t("stream_items_api.assessment_request_title", 'Peer Review for %{title}', title: assignment.title)
       else
         raise("Unexpected stream item type: #{stream_item.asset_type}")
       end

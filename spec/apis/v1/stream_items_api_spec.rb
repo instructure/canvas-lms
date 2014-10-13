@@ -353,7 +353,7 @@ describe UsersController, type: :request do
       'course_id' => @course.id,
     }]
   end
-  
+
   it "should format ungraded Submission with comments" do
     #set @domain_root_account
     @domain_root_account = Account.default
@@ -525,6 +525,30 @@ describe UsersController, type: :request do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
+  end
+
+  it "should format AssessmentRequest" do
+    assignment = assignment_model(:course => @course)
+    submission = submission_model(assignment: assignment, user: @student)
+    assessor_submission = submission_model(assignment: assignment, user: @user)
+    assessment_request = AssessmentRequest.create!(assessor: @user, asset: submission,
+                                                    user: @student, assessor_asset: assessor_submission)
+    assessment_request.workflow_state = 'assigned'
+    assessment_request.save
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+
+    expect(json[0]['id']).to eq StreamItem.last.id
+    expect(json[0]['title']).to eq "Peer Review for #{assignment.title}"
+    expect(json[0]['type']).to eq 'AssessmentRequest'
+    expect(json[0]['message']).to eq nil
+    expect(json[0]['context_type']).to eq 'Course'
+    expect(json[0]['course_id']).to eq @course.id
+    expect(json[0]['assessment_request_id']).to eq assessment_request.id
+    expect(json[0]['html_url']).to eq "http://www.example.com/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{assessment_request.user_id}"
+    expect(json[0]['created_at']).to eq StreamItem.last.created_at.as_json
+    expect(json[0]['updated_at']).to eq StreamItem.last.updated_at.as_json
   end
 
   it "should return the course-specific activity stream" do
