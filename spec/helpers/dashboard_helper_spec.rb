@@ -25,13 +25,13 @@ describe DashboardHelper do
     it "should be true if the user has no current enrollments" do
       user_model
       @current_user = @user
-      show_welcome_message?().should be_true
+      expect(show_welcome_message?()).to be_truthy
     end
 
     it "should be false otherwise" do
       course_with_student(:active_all => true)
       @current_user = @student
-      show_welcome_message?().should be_false
+      expect(show_welcome_message?()).to be_falsey
     end
   end
 end

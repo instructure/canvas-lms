@@ -37,7 +37,7 @@ describe QuizzesHelper do
       quiz = Quizzes::Quiz.new(:context => @course)
 
       def can_publish(quiz); false; end
-      needs_unpublished_warning?(quiz, User.new).should be_false
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_falsey
     end
 
     it "is false if quiz is available with no unpublished changes" do
@@ -47,7 +47,7 @@ describe QuizzesHelper do
       quiz.published_at   = Time.now
 
       def can_publish(quiz); true; end
-      needs_unpublished_warning?(quiz, User.new).should be_false
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_falsey
     end
 
     it "is true if quiz is not available" do
@@ -55,7 +55,7 @@ describe QuizzesHelper do
       quiz.workflow_state = 'created'
 
       def can_publish(quiz); true; end
-      needs_unpublished_warning?(quiz, User.new).should be_true
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_truthy
     end
 
     it "is true if quiz has unpublished changes" do
@@ -65,7 +65,7 @@ describe QuizzesHelper do
       quiz.published_at   = 10.minutes.ago
 
       def can_publish(quiz); true; end
-      needs_unpublished_warning?(quiz, User.new).should be_true
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_truthy
     end
   end
 
@@ -75,7 +75,7 @@ describe QuizzesHelper do
       question = {:id => 1}
       @attachments = { 1 => {:id => "11"} }
       @stored_params = { "question_1" => ["1"]}
-      attachment_id_for(question).should == "11"
+      expect(attachment_id_for(question)).to eq "11"
     end
 
     it "returns empty string when no attachments stored" do
@@ -83,93 +83,96 @@ describe QuizzesHelper do
       question = {:id => 1}
       @stored_params = {}
       @attachments = {}
-      attachment_id_for(question).should == nil
+      expect(attachment_id_for(question)).to eq nil
     end
   end
 
   context 'render_score' do
     it 'should render nil scores' do
-      render_score(nil).should == '_'
+      expect(render_score(nil)).to eq '_'
     end
 
     it 'should render non-nil scores' do
-      render_score(1).should == '1'
-      render_score(100).should == '100'
-      render_score(1.123).should == '1.12'
-      render_score(1000.45166).should == '1000.45'
-      render_score(1000.45966).should == '1000.46'
-      render_score('100').should == '100'
-      render_score('1.43').should == '1.43'
+      expect(render_score(1)).to eq '1'
+      expect(render_score(100)).to eq '100'
+      expect(render_score(1.123)).to eq '1.12'
+      expect(render_score(1000.45166)).to eq '1000.45'
+      expect(render_score(1000.45966)).to eq '1000.46'
+      expect(render_score('100')).to eq '100'
+      expect(render_score('1.43')).to eq '1.43'
     end
 
     it 'should remove trailing zeros' do
-      render_score(1.20000000).should == '1.2'
-      render_score(0.10340000, 5).should == '0.1034'
+      expect(render_score(1.20000000)).to eq '1.2'
+      expect(render_score(0.10340000, 5)).to eq '0.1034'
     end
 
     it 'should remove trailing zeros and decimal point' do
-      render_score(0.00000000).should == '0'
-      render_score(1.00000000).should == '1'
-      render_score(100.0).should == '100'
+      expect(render_score(0.00000000)).to eq '0'
+      expect(render_score(1.00000000)).to eq '1'
+      expect(render_score(100.0)).to eq '100'
     end
   end
 
   context 'render_quiz_type' do
     it 'should render a humanized quiz type string' do
-      render_quiz_type('practice_quiz').should == "Practice Quiz"
-      render_quiz_type('assignment').should == "Graded Quiz"
-      render_quiz_type('graded_survey').should == "Graded Survey"
-      render_quiz_type('survey').should == "Ungraded Survey"
+      expect(render_quiz_type('practice_quiz')).to eq "Practice Quiz"
+      expect(render_quiz_type('assignment')).to eq "Graded Quiz"
+      expect(render_quiz_type('graded_survey')).to eq "Graded Survey"
+      expect(render_quiz_type('survey')).to eq "Ungraded Survey"
     end
 
     it 'should return nil for an unrecognized quiz_type' do
-      render_quiz_type(nil).should be_nil
-      render_quiz_type('made_up_quiz_type').should be_nil
+      expect(render_quiz_type(nil)).to be_nil
+      expect(render_quiz_type('made_up_quiz_type')).to be_nil
     end
   end
 
   context 'render_score_to_keep' do
     it 'should render which score to keep when passed in a scoring_policy option' do
-      render_score_to_keep('keep_highest').should == "Highest"
-      render_score_to_keep('keep_latest').should == "Latest"
+      expect(render_score_to_keep('keep_highest')).to eq "Highest"
+      expect(render_score_to_keep('keep_latest')).to eq "Latest"
     end
 
     it 'should return nil for an unrecognized scoring_policy' do
-      render_score_to_keep(nil).should be_nil
-      render_score_to_keep('made_up_scoring_policy').should be_nil
+      expect(render_score_to_keep(nil)).to be_nil
+      expect(render_score_to_keep('made_up_scoring_policy')).to be_nil
     end
   end
 
   context 'render_show_responses' do
     it "should answer 'Let Students See Quiz Responses?' when passed a hide_results option" do
-      render_show_responses('always').should == "No"
-      render_show_responses('until_after_last_attempt').should == "After Last Attempt"
-      render_show_responses(nil).should == "Always"
+      expect(render_show_responses('always')).to eq "No"
+      expect(render_show_responses('until_after_last_attempt')).to eq "After Last Attempt"
+      expect(render_show_responses(nil)).to eq "Always"
     end
 
     it "should return nil for an unrecognized hide_results value" do
-      render_show_responses('made_up_hide_results').should be_nil
+      expect(render_show_responses('made_up_hide_results')).to be_nil
     end
   end
 
   context 'score_out_of_points_possible' do
     it 'should show single digit scores' do
-      score_out_of_points_possible(1, 5).should == "1 out of 5"
-      score_out_of_points_possible(0, 9).should == "0 out of 9"
+      expect(score_out_of_points_possible(1, 5)).to eq "1 out of 5"
+      expect(score_out_of_points_possible(0, 9)).to eq "0 out of 9"
     end
 
     it 'should show 2-decimal precision if necessary' do
-      score_out_of_points_possible(0.66666666666, 1).should == "0.67 out of 1"
-      score_out_of_points_possible(5.23333333333, 10.0).should == "5.23 out of 10"
+      expect(score_out_of_points_possible(0.66666666666, 1)).to eq "0.67 out of 1"
+      expect(score_out_of_points_possible(5.23333333333, 10.0)).to eq "5.23 out of 10"
     end
 
     it 'should be wrapped by a span when a CSS class, id, or style is given' do
-      score_out_of_points_possible(1.5, 3, :class => "score_value").should == \
+      expect(score_out_of_points_possible(1.5, 3, :class => "score_value")).to eq( \
         '<span class="score_value">1.5</span> out of 3'
-      score_out_of_points_possible(1.5, 3, :id => "score").should == \
+      )
+      expect(score_out_of_points_possible(1.5, 3, :id => "score")).to eq( \
         '<span id="score">1.5</span> out of 3'
-      score_out_of_points_possible(1.5, 3, :style => "width:100%").should == \
+      )
+      expect(score_out_of_points_possible(1.5, 3, :style => "width:100%")).to eq( \
         '<span style="width:100%">1.5</span> out of 3'
+      )
     end
   end
 
@@ -191,7 +194,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      html.should == %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
     end
 
     it 'should sanitize user input' do
@@ -206,8 +209,8 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      html.should == %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
-      html.should be_html_safe
+      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to be_html_safe
     end
 
     it 'should add an appropriate label' do
@@ -217,8 +220,8 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      html.should =~ /aria\-label/
-      html.should =~ /Fill in the blank/
+      expect(html).to match /aria\-label/
+      expect(html).to match /Fill in the blank/
     end
     it 'should handle equation img tags in the question text' do
       broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
@@ -231,9 +234,9 @@ describe QuizzesHelper do
         answer_list: @answer_list,
         answers: @answers
       )
-      html.should =~ /"readonly"/
-      html.should =~ /value='fixing'/
-      html.should =~ /value='protein'/
+      expect(html).to match /"readonly"/
+      expect(html).to match /value='fixing'/
+      expect(html).to match /value='protein'/
     end
   end
 
@@ -245,8 +248,8 @@ describe QuizzesHelper do
     it "should select the user's answer" do
       html = multiple_dropdowns_question(question: { question_text: "some <select name='question_4'><option value='val'>val</option></select>"},
                                          answer_list: ['val'])
-      html.should == "some <select name='question_4'><option value='val' selected>val</option></select>"
-      html.should be_html_safe
+      expect(html).to eq "some <select name='question_4'><option value='val' selected>val</option></select>"
+      expect(html).to be_html_safe
     end
   end
 
@@ -254,12 +257,12 @@ describe QuizzesHelper do
 
     it "returns correct string for survey" do
       quiz = stub(:survey? => true)
-      quiz_edit_text(quiz).should == "Edit Survey"
+      expect(quiz_edit_text(quiz)).to eq "Edit Survey"
     end
 
     it "returns correct string for quiz" do
       quiz = stub(:survey? => false)
-      quiz_edit_text(quiz).should == "Edit Quiz"
+      expect(quiz_edit_text(quiz)).to eq "Edit Quiz"
     end
   end
 
@@ -267,41 +270,41 @@ describe QuizzesHelper do
 
     it "returns correct string for survey" do
       quiz = stub(:survey? => true)
-      quiz_delete_text(quiz).should == "Delete Survey"
+      expect(quiz_delete_text(quiz)).to eq "Delete Survey"
     end
 
     it "returns correct string for quiz" do
       quiz = stub(:survey? => false)
-      quiz_delete_text(quiz).should == "Delete Quiz"
+      expect(quiz_delete_text(quiz)).to eq "Delete Quiz"
     end
   end
 
   describe "#score_affected_by_regrade" do
     it "returns true if kept score differs from score before regrade" do
       submission = stub(:score_before_regrade => 5, :kept_score => 10, :score => 5)
-      score_affected_by_regrade?(submission).should be_true
+      expect(score_affected_by_regrade?(submission)).to be_truthy
     end
 
     it "returns false if kept score equals score before regrade" do
       submission = stub(:score_before_regrade => 5, :kept_score => 5, :score => 0)
-      score_affected_by_regrade?(submission).should be_false
+      expect(score_affected_by_regrade?(submission)).to be_falsey
     end
   end
 
   describe "#answer_title" do
     it "builds title if answer is selected" do
       title = answer_title('foo', true, false, false)
-      title.should == "title=\"foo. You selected this answer.\""
+      expect(title).to eq "title=\"foo. You selected this answer.\""
     end
 
     it "builds title if answer is correct" do
       title = answer_title('foo', false, true, true)
-      title.should == "title=\"foo. This was the correct answer.\""
+      expect(title).to eq "title=\"foo. This was the correct answer.\""
     end
 
     it "returns nil if not selected or correct" do
       title = answer_title('foo', false, false, false)
-      title.should be_nil
+      expect(title).to be_nil
     end
   end
 
@@ -314,7 +317,7 @@ describe QuizzesHelper do
       })
 
       message = render_correct_answer_protection(quiz)
-      message.should =~ /are hidden/
+      expect(message).to match /are hidden/
     end
 
     it 'should provide nothing when "yes"' do
@@ -325,7 +328,7 @@ describe QuizzesHelper do
       })
 
       message = render_correct_answer_protection(quiz)
-      message.should == nil
+      expect(message).to eq nil
     end
 
     it 'should provide a useful message, and an availability date, when "show at" is set' do
@@ -336,7 +339,7 @@ describe QuizzesHelper do
       })
 
       message = render_correct_answer_protection(quiz)
-      message.should =~ /will be available/
+      expect(message).to match /will be available/
     end
 
     it 'should provide a useful message, and a date, when "hide at" is set' do
@@ -347,7 +350,7 @@ describe QuizzesHelper do
       })
 
       message = render_correct_answer_protection(quiz)
-      message.should =~ /are available until/
+      expect(message).to match /are available until/
     end
   end
 
@@ -364,22 +367,23 @@ describe QuizzesHelper do
     it "returns user_answer[:points] if correct is true/false" do
       [true, false].each do |bool|
         user_answer[:correct] = bool
-        point_value_for_input(user_answer, question).should == user_answer[:points]
+        expect(point_value_for_input(user_answer, question)).to eq user_answer[:points]
       end
     end
 
     it "returns -- if quiz is practice quiz or assignment" do
       ['assignment', 'practice_quiz'].each do |quiz_type|
         @quiz.expects(:quiz_type).returns quiz_type
-        point_value_for_input(user_answer, question).should == "--"
+        expect(point_value_for_input(user_answer, question)).to eq "--"
       end
     end
 
     it "returns points possible for the question if (un)graded survey" do
       ['survey', 'graded_survey'].each do |quiz_type|
         @quiz.expects(:quiz_type).returns quiz_type
-        point_value_for_input(user_answer, question).should ==
+        expect(point_value_for_input(user_answer, question)).to eq(
           question[:points_possible]
+        )
       end
     end
   end
