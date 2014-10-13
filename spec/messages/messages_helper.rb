@@ -30,10 +30,10 @@ def generate_message(notification_name, path_type, asset, options = {})
   @message = Message.new(:notification => @notification, :context => asset, :user => user, :communication_channel => @cc, :asset_context => asset_context, :data => data)
   @message.delayed_messages = []
   @message.parse!(path_type.to_s)
-  @message.body.should_not be_nil
+  expect(@message.body).not_to be_nil
   if path_type == :email
-    @message.subject.should_not be_nil
-    @message.url.should_not be_nil
+    expect(@message.subject).not_to be_nil
+    expect(@message.url).not_to be_nil
   end
   @message
 end

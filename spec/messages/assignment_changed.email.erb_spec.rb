@@ -23,10 +23,10 @@ describe 'assignment_changed.email' do
   it "should render" do
     assignment_model(:title => "Quiz 1")
     generate_message(:assignment_changed, :email, @assignment)
-    @message.subject.should match(/Quiz 1/)
-    @message.body.should match(/Quiz 1/)
-    @message.body.should match(Regexp.new(@course.name))
-    @message.body.should match(/#{HostUrl.protocol}:\/\//)
-    @message.body.should match(/courses\/#{@assignment.context_id}\/assignments\/#{@assignment.id}/)
+    expect(@message.subject).to match(/Quiz 1/)
+    expect(@message.body).to match(/Quiz 1/)
+    expect(@message.body).to match(Regexp.new(@course.name))
+    expect(@message.body).to match(/#{HostUrl.protocol}:\/\//)
+    expect(@message.body).to match(/courses\/#{@assignment.context_id}\/assignments\/#{@assignment.id}/)
   end
 end

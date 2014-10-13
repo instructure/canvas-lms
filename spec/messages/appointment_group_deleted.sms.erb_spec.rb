@@ -26,6 +26,6 @@ describe 'appointment_group_deleted.sms' do
     generate_message(:appointment_group_deleted, :sms, @appointment_group,
                      :data => {:cancel_reason => "just because"})
 
-    @message.body.should include('some title')
+    expect(@message.body).to include('some title')
   end
 end

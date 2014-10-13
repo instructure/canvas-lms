@@ -24,7 +24,7 @@ describe 'rubric_association_created.summary' do
     rubric_association_model
     @object = @rubric_association
     @object.reload
-    @object.context.should_not be_nil
+    expect(@object.context).not_to be_nil
     generate_message(:rubric_association_created, :summary, @object)
   end
 end

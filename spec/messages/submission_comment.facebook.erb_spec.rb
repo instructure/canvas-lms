@@ -23,10 +23,10 @@ describe 'submission_comment.facebook' do
   it "should render" do
     submission_model
     @object = @submission.add_comment(:comment => "new comment")
-    @object.submission.should_not be_nil
-    @object.submission.assignment.should_not be_nil
-    @object.submission.assignment.context.should_not be_nil
-    @object.submission.user.should_not be_nil
+    expect(@object.submission).not_to be_nil
+    expect(@object.submission.assignment).not_to be_nil
+    expect(@object.submission.assignment.context).not_to be_nil
+    expect(@object.submission.user).not_to be_nil
     generate_message(:submission_comment, :facebook, @object)
   end
 end

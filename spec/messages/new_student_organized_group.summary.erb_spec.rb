@@ -25,9 +25,9 @@ describe 'new_student_organized_group.summary' do
     user_model
     @group = @course.groups.create!(:name => "student group")
     @object = @group.add_user(@user)
-    @object.user.should eql(@user)
-    @object.group.should eql(@group)
-    @object.group.context.should eql(@course)
+    expect(@object.user).to eql(@user)
+    expect(@object.group).to eql(@group)
+    expect(@object.group.context).to eql(@course)
     generate_message(:new_student_organized_group, :summary, @object)
   end
 end
