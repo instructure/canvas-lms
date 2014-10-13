@@ -48,34 +48,34 @@ describe 'ExternalFeedsController', type: :request do
       @feeds[1].external_feed_entries.create!(user: @allowed_user)
       external_feed_model(:context => Course.create!)
       json = api_call_as_user(@allowed_user, :get, @url_base, @url_params, { :per_page => 2 })
-      json.should == @feeds[0,2].map { |f| feed_json(f) }
+      expect(json).to eq @feeds[0,2].map { |f| feed_json(f) }
     end
 
     it "should allow creating feeds" do
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "http://www.example.com/feed" })
       feed = @context.external_feeds.find(json['id'])
-      json.should == feed_json(feed)
+      expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "http://www.example.com/feed", :header_match => '' })
       feed = @context.external_feeds.find(json['id'])
-      feed.verbosity.should == 'full'
-      feed.header_match.should == nil
-      json.should == feed_json(feed)
+      expect(feed.verbosity).to eq 'full'
+      expect(feed.header_match).to eq nil
+      expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "http://www.example.com/feed", :header_match => ' #mytag  ', :verbosity => 'truncate' })
       feed = @context.external_feeds.find(json['id'])
-      feed.verbosity.should == 'truncate'
-      feed.header_match.should == '#mytag'
-      json.should == feed_json(feed)
+      expect(feed.verbosity).to eq 'truncate'
+      expect(feed.header_match).to eq '#mytag'
+      expect(json).to eq feed_json(feed)
 
       # bad verbosity value
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "http://www.example.com/feed", :verbosity => 'bogus' })
       feed = @context.external_feeds.find(json['id'])
-      feed.verbosity.should == 'full'
+      expect(feed.verbosity).to eq 'full'
 
       # invalid url
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
@@ -89,14 +89,14 @@ describe 'ExternalFeedsController', type: :request do
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "www.example.com/feed" })
       feed = @context.external_feeds.find(json['id'])
-      feed.url.should == "http://www.example.com/feed"
-      json.should == feed_json(feed)
+      expect(feed.url).to eq "http://www.example.com/feed"
+      expect(json).to eq feed_json(feed)
     end
 
     it "should allow deleting a feed" do
       feed = external_feed_model(:url => "http://www.example.com/feed", :context => @context, :user => @allowed_user)
       json = api_call_as_user(@allowed_user, :delete, @url_base+"/#{feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => feed.to_param))
-      json.should == feed_json(feed)
+      expect(json).to eq feed_json(feed)
     end
   end
 

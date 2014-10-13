@@ -73,7 +73,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}")
-        json.should == [
+        expect(json).to eq [
             {
                "name" => @module1.name,
                "unlock_at" => nil,
@@ -117,7 +117,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :include => %w(items))
-        json.map { |mod| mod['items'].size }.should == [5, 2, 0]
+        expect(json.map { |mod| mod['items'].size }).to eq [5, 2, 0]
       end
 
       context 'index including content details' do
@@ -130,17 +130,17 @@ describe "Modules API", type: :request do
         let(:wiki_page_details) { json.find{|mod| mod['id'] == @module2.id}['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
 
         it 'should include user specific details' do
-          assignment_details.should include(
+          expect(assignment_details).to include(
             'points_possible' => @assignment.points_possible,
           )
         end
 
         it 'sould include lock information' do
-          assignment_details.should include(
+          expect(assignment_details).to include(
             'locked_for_user' => false,
           )
 
-          wiki_page_details.should include(
+          expect(wiki_page_details).to include(
             'locked_for_user' => false,
           )
         end
@@ -151,7 +151,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :include => %w(items))
-        json.map { |mod| mod['items'].try(:size) }.should == [nil, 2, 0]
+        expect(json.map { |mod| mod['items'].try(:size) }).to eq [nil, 2, 0]
       end
 
       it "should paginate the module list" do
@@ -160,17 +160,17 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :per_page => "3")
-        response.headers["Link"].should be_present
-        json.size.should == 3
+        expect(response.headers["Link"]).to be_present
+        expect(json.size).to eq 3
         ids = json.collect{ |mod| mod['id'] }
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3&page=2",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :page => "2", :per_page => "3")
-        json.size.should == 2
+        expect(json.size).to eq 2
         ids += json.collect{ |mod| mod['id'] }
 
-        ids.should == @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
+        expect(ids).to eq @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
       end
 
       it "should search for modules by name" do
@@ -179,8 +179,8 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?search_term=spur",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :search_term => "spur")
-        json.size.should == 2
-        json.map{ |mod| mod['id'] }.sort.should == mods.map(&:id).sort
+        expect(json.size).to eq 2
+        expect(json.map{ |mod| mod['id'] }.sort).to eq mods.map(&:id).sort
       end
 
       it "should search for modules and items by name" do
@@ -205,12 +205,12 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&search_term=spur",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :include => %w{items}, :search_term => "spur")
-        json.size.should == 4
-        json.map{ |mod| mod['id'] }.sort.should == (matching_mods + nonmatching_mods).map(&:id).sort
+        expect(json.size).to eq 4
+        expect(json.map{ |mod| mod['id'] }.sort).to eq (matching_mods + nonmatching_mods).map(&:id).sort
 
         json.each do |mod|
-          mod['items'].count.should == 1
-          mod['items'].first['title'].should_not include('ignore')
+          expect(mod['items'].count).to eq 1
+          expect(mod['items'].first['title']).not_to include('ignore')
         end
       end
     end
@@ -220,7 +220,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => "#{@module2.id}")
-        json.should == {
+        expect(json).to eq({
           "name" => @module2.name,
           "unlock_at" => @christmas.as_json,
           "position" => 2,
@@ -231,7 +231,7 @@ describe "Modules API", type: :request do
           "items_count" => 2,
           "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items",
           "publish_final_grade" => false,
-        }
+        })
       end
 
       context 'show including content details' do
@@ -249,17 +249,17 @@ describe "Modules API", type: :request do
         let(:wiki_page_details) { module2_json['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
 
         it 'should include user specific details' do
-          assignment_details.should include(
+          expect(assignment_details).to include(
             'points_possible' => @assignment.points_possible,
           )
         end
 
         it 'sould include lock information' do
-          assignment_details.should include(
+          expect(assignment_details).to include(
             'locked_for_user' => false,
           )
 
-          wiki_page_details.should include(
+          expect(wiki_page_details).to include(
             'locked_for_user' => false,
           )
         end
@@ -269,7 +269,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module3.id.to_param)
-        json.should == {
+        expect(json).to eq({
           "name" => @module3.name,
           "unlock_at" => nil,
           "position" => 3,
@@ -280,14 +280,14 @@ describe "Modules API", type: :request do
           "items_count" => 0,
           "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items",
           "publish_final_grade" => false,
-        }
+        })
       end
 
       it "should include items if requested" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module1.id.to_param, :include => %w(items))
-        json['items'].map{|item|item['type']}.should == %w(Assignment Quiz Discussion SubHeader ExternalUrl)
+        expect(json['items'].map{|item|item['type']}).to eq %w(Assignment Quiz Discussion SubHeader ExternalUrl)
       end
 
       it "should not include items if there are too many" do
@@ -295,7 +295,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module1.id.to_param, :include => %w(items))
-        json['items'].should be_nil
+        expect(json['items']).to be_nil
       end
     end
 
@@ -306,7 +306,7 @@ describe "Modules API", type: :request do
                        :course_id => @course.to_param }
         @test_modules = (1..4).map { |x| @course.context_modules.create! :name => "test module #{x}" }
         @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
-        @test_modules.map { |tm| tm.workflow_state }.should == %w(active active unpublished unpublished)
+        expect(@test_modules.map { |tm| tm.workflow_state }).to eq %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
         @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
@@ -318,31 +318,31 @@ describe "Modules API", type: :request do
       
       it "should publish modules (and their tags)" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
-        json['completed'].sort.should == @ids_to_update
-        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active active unpublished active)
+        expect(json['completed'].sort).to eq @ids_to_update
+        expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active active unpublished active)
 
         @wiki_page_tag.reload
-        @wiki_page_tag.active?.should == true
+        expect(@wiki_page_tag.active?).to eq true
         @wiki_page.reload
-        @wiki_page.active?.should == true
+        expect(@wiki_page.active?).to eq true
       end
 
       it "should unpublish modules" do
         json = api_call(:put, @path, @path_opts, { :event => 'unpublish', :module_ids => @ids_to_update })
-        json['completed'].sort.should == @ids_to_update
-        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active unpublished unpublished unpublished)
+        expect(json['completed'].sort).to eq @ids_to_update
+        expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active unpublished unpublished unpublished)
       end
 
       it "should delete modules" do
         json = api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update })
-        json['completed'].sort.should == @ids_to_update
-        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active deleted unpublished deleted)
+        expect(json['completed'].sort).to eq @ids_to_update
+        expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active deleted unpublished deleted)
       end
 
       it "should convert module ids to integer and ignore non-numeric ones" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => %w(lolcats abc123) + @ids_to_update.map(&:to_s) })
-        json['completed'].sort.should == @ids_to_update
-        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active active unpublished active)
+        expect(json['completed'].sort).to eq @ids_to_update
+        expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active active unpublished active)
       end
       
       it "should not update soft-deleted modules" do
@@ -368,8 +368,8 @@ describe "Modules API", type: :request do
       it "should succeed if only some ids don't exist" do
         @modules_to_update.first.destroy!
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
-        json['completed'].should == [@modules_to_update.last.id]
-        @modules_to_update.last.reload.should be_active
+        expect(json['completed']).to eq [@modules_to_update.last.id]
+        expect(@modules_to_update.last.reload).to be_active
       end
       
       it "should 400 if :module_ids is missing" do
@@ -391,10 +391,10 @@ describe "Modules API", type: :request do
         
         json = api_call(:put, @path, @path_opts, { :event => 'unpublish',
           :module_ids => [@test_modules[1].id, other_module.id] })
-        json['completed'].should == [@test_modules[1].id]
+        expect(json['completed']).to eq [@test_modules[1].id]
 
-        @test_modules[1].reload.should be_unpublished
-        other_module.reload.should be_active
+        expect(@test_modules[1].reload).to be_unpublished
+        expect(other_module.reload).to be_active
       end
     end
 
@@ -422,15 +422,15 @@ describe "Modules API", type: :request do
                                      :require_sequential_progress => true}}
         )
 
-        json['id'].should == @module1.id
-        json['name'].should == "new name"
-        json['unlock_at'].should == unlock_at.as_json
-        json['require_sequential_progress'].should == true
+        expect(json['id']).to eq @module1.id
+        expect(json['name']).to eq "new name"
+        expect(json['unlock_at']).to eq unlock_at.as_json
+        expect(json['require_sequential_progress']).to eq true
 
         @module1.reload
-        @module1.name.should == "new name"
-        @module1.unlock_at.as_json.should == unlock_at.as_json
-        @module1.require_sequential_progress.should == true
+        expect(@module1.name).to eq "new name"
+        expect(@module1.unlock_at.as_json).to eq unlock_at.as_json
+        expect(@module1.require_sequential_progress).to eq true
       end
 
       it "should update the position" do
@@ -440,11 +440,11 @@ describe "Modules API", type: :request do
                         {:module => {:position => '2'}}
         )
 
-        json['position'].should == 2
+        expect(json['position']).to eq 2
         @module1.reload
         @module2.reload
-        @module1.position.should == 2
-        @module2.position.should == 1
+        expect(@module1.position).to eq 2
+        expect(@module2.position).to eq 1
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
@@ -452,11 +452,11 @@ describe "Modules API", type: :request do
                         {:module => {:position => '1'}}
         )
 
-        json['position'].should == 1
+        expect(json['position']).to eq 1
         @module1.reload
         @module2.reload
-        @module1.position.should == 1
-        @module2.position.should == 2
+        expect(@module1.position).to eq 1
+        expect(@module2.position).to eq 2
       end
 
       it "should publish modules (and their tags)" do
@@ -465,14 +465,14 @@ describe "Modules API", type: :request do
                         :course_id => "#{@course.id}", :id => "#{@module1.id}"},
                         {:module => {:published => '1'}}
         )
-        json['published'].should == true
+        expect(json['published']).to eq true
         @module1.reload
-        @module1.active?.should == true
+        expect(@module1.active?).to eq true
 
         @wiki_page_tag.reload
-        @wiki_page_tag.active?.should == true
+        expect(@wiki_page_tag.active?).to eq true
         @wiki_page.reload
-        @wiki_page.active?.should == true
+        expect(@wiki_page.active?).to eq true
       end
 
       it "should publish module tag items even if the tag itself is already published" do
@@ -486,7 +486,7 @@ describe "Modules API", type: :request do
         )
 
         @wiki_page.reload
-        @wiki_page.active?.should == true
+        expect(@wiki_page.active?).to eq true
       end
 
       it "should unpublish modules" do
@@ -495,9 +495,9 @@ describe "Modules API", type: :request do
                          :course_id => "#{@course.id}", :id => "#{@module2.id}"},
                         {:module => {:published => '0'}}
         )
-        json['published'].should == false
+        expect(json['published']).to eq false
         @module2.reload
-        @module2.unpublished?.should == true
+        expect(@module2.unpublished?).to eq true
       end
 
       it "should set prerequisites" do
@@ -509,9 +509,9 @@ describe "Modules API", type: :request do
                         {:module => {:name => 'name', :prerequisite_module_ids => [@module1.id, @module2.id]}}
         )
 
-        json['prerequisite_module_ids'].sort.should == [@module1.id, @module2.id].sort
+        expect(json['prerequisite_module_ids'].sort).to eq [@module1.id, @module2.id].sort
         new_module.reload
-        new_module.prerequisites.map{|m| m[:id]}.sort.should == [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map{|m| m[:id]}.sort).to eq [@module1.id, @module2.id].sort
       end
 
       it "should only reset prerequisites if parameter is included and is blank" do
@@ -520,7 +520,7 @@ describe "Modules API", type: :request do
         new_module.save!
 
         new_module.reload
-        new_module.prerequisites.map{|m| m[:id]}.sort.should == [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map{|m| m[:id]}.sort).to eq [@module1.id, @module2.id].sort
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
@@ -529,7 +529,7 @@ describe "Modules API", type: :request do
                                      :require_sequential_progress => true}}
         )
         new_module.reload
-        new_module.prerequisites.map{|m| m[:id]}.sort.should == [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map{|m| m[:id]}.sort).to eq [@module1.id, @module2.id].sort
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
@@ -538,7 +538,7 @@ describe "Modules API", type: :request do
                                      :prerequisite_module_ids => ''}}
         )
         new_module.reload
-        new_module.prerequisites.map{|m| m[:id]}.sort.should be_empty
+        expect(new_module.prerequisites.map{|m| m[:id]}.sort).to be_empty
       end
 
     end
@@ -557,16 +557,16 @@ describe "Modules API", type: :request do
                                      :require_sequential_progress => true}}
         )
 
-        @course.context_modules.count.should == 1
+        expect(@course.context_modules.count).to eq 1
 
-        json['name'].should == "new name"
-        json['unlock_at'].should == unlock_at.as_json
-        json['require_sequential_progress'].should == true
+        expect(json['name']).to eq "new name"
+        expect(json['unlock_at']).to eq unlock_at.as_json
+        expect(json['require_sequential_progress']).to eq true
 
         new_module = @course.context_modules.find(json['id'])
-        new_module.name.should == "new name"
-        new_module.unlock_at.as_json.should == unlock_at.as_json
-        new_module.require_sequential_progress.should == true
+        expect(new_module.name).to eq "new name"
+        expect(new_module.unlock_at.as_json).to eq unlock_at.as_json
+        expect(new_module.require_sequential_progress).to eq true
       end
 
       it "should require a name" do
@@ -576,7 +576,7 @@ describe "Modules API", type: :request do
                         {:module => {:name => ''}}, {}, {:expected_status => 400}
         )
 
-        @course.context_modules.count.should == 0
+        expect(@course.context_modules.count).to eq 0
       end
 
       it "should insert new module into specified position" do
@@ -591,17 +591,17 @@ describe "Modules API", type: :request do
                         {:module => {:name => 'new name', :position => '2'}}
         )
 
-        @course.context_modules.not_deleted.count.should == 3
+        expect(@course.context_modules.not_deleted.count).to eq 3
 
-        json['position'].should == 2
+        expect(json['position']).to eq 2
 
         module1.reload
-        module1.position.should == 1
+        expect(module1.position).to eq 1
         new_module = @course.context_modules.find(json['id'])
-        new_module.position.should == 2
+        expect(new_module.position).to eq 2
 
         module2.reload
-        module2.position.should == 3
+        expect(module2.position).to eq 3
       end
 
       it "should set prerequisites" do
@@ -614,12 +614,12 @@ describe "Modules API", type: :request do
                         {:module => {:name => 'name', :prerequisite_module_ids => [module1.id, module2.id]}}
         )
 
-        @course.context_modules.count.should == 3
+        expect(@course.context_modules.count).to eq 3
 
-        json['prerequisite_module_ids'].sort.should == [module1.id, module2.id].sort
+        expect(json['prerequisite_module_ids'].sort).to eq [module1.id, module2.id].sort
 
         new_module = @course.context_modules.find(json['id'])
-        new_module.prerequisites.map{|m| m[:id]}.sort.should == [module1.id, module2.id].sort
+        expect(new_module.prerequisites.map{|m| m[:id]}.sort).to eq [module1.id, module2.id].sort
       end
     end
 
@@ -629,9 +629,9 @@ describe "Modules API", type: :request do
                 :course_id => "#{@course.id}", :id => "#{@module1.id}"},
                {}, {}
       )
-      json['id'].should == @module1.id
+      expect(json['id']).to eq @module1.id
       @module1.reload
-      @module1.workflow_state.should == 'deleted'
+      expect(@module1.workflow_state).to eq 'deleted'
     end
 
     it "should show module progress for a student" do
@@ -647,16 +647,16 @@ describe "Modules API", type: :request do
                       :controller => "context_modules_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :student_id => "#{student.id}", :include => ["items"])
       h = json.find{|m| m["id"] == @module1.id}
-      h['state'].should == 'completed'
-      h['completed_at'].should_not be_nil
-      h['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"].should == true
+      expect(h['state']).to eq 'completed'
+      expect(h['completed_at']).not_to be_nil
+      expect(h['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"]).to eq true
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&student_id=#{student.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module1.id}", :student_id => "#{student.id}", :include => ["items"])
-      json['state'].should == 'completed'
-      json['completed_at'].should_not be_nil
-      json['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"].should == true
+      expect(json['state']).to eq 'completed'
+      expect(json['completed_at']).not_to be_nil
+      expect(json['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"]).to eq true
     end
   end
   
@@ -669,7 +669,7 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module2.id}")
-      json['state'].should == 'locked'
+      expect(json['state']).to eq 'locked'
     end
 
     it "should show module progress" do
@@ -680,21 +680,21 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module1.id}")
-      json['state'].should == 'unlocked'
+      expect(json['state']).to eq 'unlocked'
 
       @assignment.submit_homework(@user, :body => "done!")
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module1.id}")
-      json['state'].should == 'started'
-      json['completed_at'].should be_nil
+      expect(json['state']).to eq 'started'
+      expect(json['completed_at']).to be_nil
 
       @external_url_tag.context_module_action(@user, :read)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module1.id}")
-      json['state'].should == 'completed'
-      json['completed_at'].should_not be_nil
+      expect(json['state']).to eq 'completed'
+      expect(json['completed_at']).not_to be_nil
     end
 
     context 'show including content details' do
@@ -712,22 +712,22 @@ describe "Modules API", type: :request do
       let(:wiki_page_details) { module2_json['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
 
       it 'should include user specific details' do
-        assignment_details.should include(
+        expect(assignment_details).to include(
           'points_possible' => @assignment.points_possible,
         )
       end
 
       it 'sould include lock information' do
-        assignment_details.should include(
+        expect(assignment_details).to include(
           'locked_for_user' => false,
         )
 
-        wiki_page_details.should include(
+        expect(wiki_page_details).to include(
           'lock_info',
           'lock_explanation',
           'locked_for_user' => true,
         )
-        wiki_page_details['lock_info'].should include(
+        expect(wiki_page_details['lock_info']).to include(
           'asset_string' => @wiki_page.asset_string,
           'unlock_at' => @christmas.as_json,
         )
@@ -738,8 +738,8 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                       :controller => "context_modules_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}")
-      json.length.should == 2
-      json.each{|cm| @course.context_modules.find(cm['id']).workflow_state.should == 'active'}
+      expect(json.length).to eq 2
+      json.each{|cm| expect(@course.context_modules.find(cm['id']).workflow_state).to eq 'active'}
     end
 
     it "should not show a single unpublished module" do

@@ -22,6 +22,17 @@ RSpec::configure do |c|
   c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
       :file_path => c.escaped_path(%w[spec apis])
   }
+
+  # rspec-rails 3 will no longer automatically infer an example group's spec type
+  # from the file location. You can explicitly opt-in to the feature using this
+  # config option.
+  # To explicitly tag specs without using automatic inference, set the `:type`
+  # metadata manually:
+  #
+  #     describe ThingsController, :type => :controller do
+  #       # Equivalent to being in spec/controllers
+  #     end
+  c.infer_spec_type_from_file_location!
 end
 
 class HashWithDupCheck < Hash
@@ -44,7 +55,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   if opts[:expected_status]
     assert_status(opts[:expected_status])
   else
-    response.should be_success, response.body
+    expect(response).to be_success, response.body
   end
 
   if response.headers['Link']
@@ -59,7 +70,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
 
   case params[:format]
   when 'json'
-    response.header['content-type'].should == 'application/json; charset=utf-8'
+    expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
 
     body = response.body
     if body.respond_to?(:call)
@@ -106,7 +117,7 @@ end
 def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
   enable_forgery_protection do
-    params_from_with_nesting(method, path).each{|k, v| params[k].to_s.should == v.to_s}
+    params_from_with_nesting(method, path).each{|k, v| expect(params[k].to_s).to eq v.to_s}
 
     headers['HTTP_AUTHORIZATION'] = headers['Authorization'] if headers.key?('Authorization')
     if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('HTTP_AUTHORIZATION') && @user
@@ -158,18 +169,18 @@ def should_translate_user_content(course)
   html = yield content
   doc = Nokogiri::HTML::DocumentFragment.parse(html)
   img1 = doc.at_css('img#1')
-  img1.should be_present
-  img1['src'].should == "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview?verifier=#{attachment.uuid}"
+  expect(img1).to be_present
+  expect(img1['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview?verifier=#{attachment.uuid}"
   img2 = doc.at_css('img#2')
-  img2.should be_present
-  img2['src'].should == "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
+  expect(img2).to be_present
+  expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
   video = doc.at_css('video')
-  video.should be_present
-  video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
-  video['src'].should match(%r{http://www.example.com/courses/#{course.id}/media_download})
-  video['src'].should match(%r{entryId=qwerty})
-  doc.css('a').last['data-api-endpoint'].should match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
-  doc.css('a').last['data-api-returntype'].should == 'Page'
+  expect(video).to be_present
+  expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+  expect(video['src']).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
+  expect(video['src']).to match(%r{entryId=qwerty})
+  expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
+  expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
 end
 
 def should_process_incoming_user_content(context)
@@ -177,13 +188,13 @@ def should_process_incoming_user_content(context)
   incoming_content = "<p>content blahblahblah <a href=\"/files/#{@attachment.id}/download?a=1&amp;verifier=2&amp;b=3\">haha</a></p>"
 
   saved_content = yield incoming_content
-  saved_content.should == "<p>content blahblahblah <a href=\"/#{context.class.to_s.underscore.pluralize}/#{context.id}/files/#{@attachment.id}/download?a=1&amp;b=3\">haha</a></p>"
+  expect(saved_content).to eq "<p>content blahblahblah <a href=\"/#{context.class.to_s.underscore.pluralize}/#{context.id}/files/#{@attachment.id}/download?a=1&amp;b=3\">haha</a></p>"
 end
 
 def verify_json_error(error, field, code, message = nil)
-  error["field"].should == field
-  error["code"].should == code
-  error["message"].should == message if message
+  expect(error["field"]).to eq field
+  expect(error["code"]).to eq code
+  expect(error["message"]).to eq message if message
 end
 
 
@@ -237,14 +248,14 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
   end
 
   # test key values instead of nr. of keys so we get meaningful failures
-  json.keys.sort.should == required_keys.sort
+  expect(json.keys.sort).to eq required_keys.sort
 
   required_keys.each do |key|
-    json.should be_has_key(key)
-    json[key].is_a?(Array).should be_true unless key == 'meta'
+    expect(json).to be_has_key(key)
+    expect(json[key].is_a?(Array)).to be_truthy unless key == 'meta'
   end
 
   if associations.any?
-    json['meta']['primaryCollection'].should == primary_set
+    expect(json['meta']['primaryCollection']).to eq primary_set
   end
 end

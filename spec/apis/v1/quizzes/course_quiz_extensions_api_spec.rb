@@ -70,7 +70,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           {user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id)}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
       it "should extend attempts for a new submission" do
@@ -78,7 +78,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           {user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id)}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
       it "should extend attempts for multiple students" do
@@ -87,8 +87,8 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           {user_id: @student2.id, extra_attempts: 3, quiz_ids: @quizzes.map(&:id)}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
-        res['quiz_extensions'][1]['extra_attempts'].should == 3
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res['quiz_extensions'][1]['extra_attempts']).to eq 3
       end
     end
   end

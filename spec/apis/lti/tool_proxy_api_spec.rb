@@ -45,7 +45,7 @@ module Lti
     describe "Get #show" do
       it 'the tool proxy raw data' do
         get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
-        JSON.parse(body).should == tool_proxy.raw_data
+        expect(JSON.parse(body)).to eq tool_proxy.raw_data
       end
     end
 
@@ -58,8 +58,8 @@ module Lti
         json[:account_id] = @course.account.id
         headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
-        response.should == 201
-        JSON.parse(body).keys.should =~ ["@context", "@type", "@id", "tool_proxy_guid"]
+        expect(response).to eq 201
+        expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid"]
       end
 
     end

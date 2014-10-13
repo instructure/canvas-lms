@@ -62,7 +62,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
 
     it "sends a message to unsubmitted users" do
       expect { send_message(:unsubmitted) }.to change { recipient_messages(:unsubmitted) }.by 1
-      recipient_messages(:submitted).should == 0
+      expect(recipient_messages(:submitted)).to eq 0
     end
 
     it "sends a message to submitted users" do
@@ -70,7 +70,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       sub.mark_completed
       sub.grade_submission
       expect { send_message(:submitted) }.to change { recipient_messages(:submitted) }.by 1
-      recipient_messages(:unsubmitted).should == 0
+      expect(recipient_messages(:unsubmitted)).to eq 0
     end
   end
 
@@ -96,36 +96,36 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     it "does not allow students to view information at the endpoint" do
       @user = @student1
       get_submitted_users
-      response.should_not be_success
+      expect(response).not_to be_success
     end
 
     it "allows teachers to see submitted students with ?submitted=true" do
       json = get_submitted_users(submitted: true)
-      response.should be_success
-      json['users'].first['id'].should == @student1.id.to_s
+      expect(response).to be_success
+      expect(json['users'].first['id']).to eq @student1.id.to_s
     end
 
     it "allows teachers to see unsubmitted students with ?submitted=false" do
       json = get_submitted_users(submitted: false)
-      response.should be_success
+      expect(response).to be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should_not include @student1.id.to_s
-      user_ids.should include @student2.id.to_s
+      expect(user_ids).not_to include @student1.id.to_s
+      expect(user_ids).to include @student2.id.to_s
     end
 
     it "allows teachers to see all students for quiz when submitted parameter not passed" do
       json = get_submitted_users
-      response.should be_success
+      expect(response).to be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should include @student1.id.to_s
-      user_ids.should include @student2.id.to_s
+      expect(user_ids).to include @student1.id.to_s
+      expect(user_ids).to include @student2.id.to_s
     end
 
     it "will sideload quiz_submissions" do
       json = get_submitted_users(include: ['quiz_submissions'])
-      response.should be_success
-      json['quiz_submissions'].first.with_indifferent_access[:id].should == @quiz_submission.id.to_s
-      json['quiz_submissions'].length.should == 1
+      expect(response).to be_success
+      expect(json['quiz_submissions'].first.with_indifferent_access[:id]).to eq @quiz_submission.id.to_s
+      expect(json['quiz_submissions'].length).to eq 1
     end
 
     context "differentiated_assignments" do
@@ -135,16 +135,16 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
         @course.enable_feature!(:differentiated_assignments)
 
         json = get_submitted_users(submitted: false)
-        response.should be_success
+        expect(response).to be_success
         user_ids = json['users'].map { |h| h['id'] }
-        user_ids.should_not include @student2.id.to_s
+        expect(user_ids).not_to include @student2.id.to_s
 
         create_section_override_for_quiz(@quiz, {course_section: @student2.current_enrollments.first.course_section})
 
         json = get_submitted_users(submitted: false)
-        response.should be_success
+        expect(response).to be_success
         user_ids = json['users'].map { |h| h['id'] }
-        user_ids.should include @student2.id.to_s
+        expect(user_ids).to include @student2.id.to_s
       end
     end
   end

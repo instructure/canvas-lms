@@ -14,16 +14,16 @@ module Api
 
         it 'affirms when the public_description key is in the includes array' do
           includes << 'public_description'
-          predicate.should be_true
+          expect(predicate).to be_truthy
         end
 
         it 'affirms when the public_description key is a symbol' do
           includes << :public_description
-          predicate.should be_true
+          expect(predicate).to be_truthy
         end
 
         it 'negates when the public_description key is missing' do
-          predicate.should be_false
+          expect(predicate).to be_falsey
         end
       end
 
@@ -38,12 +38,12 @@ module Api
 
           it 'is false if the final grade is hidden' do
             course_settings[:hide_final_grades?] = true
-            predicate.should be_false
+            expect(predicate).to be_falsey
           end
 
           it 'is true if the course allows the grade to be seen' do
             course_settings[:hide_final_grades?] = false
-            predicate.should be_true
+            expect(predicate).to be_truthy
           end
         end
 
@@ -52,12 +52,12 @@ module Api
 
           it 'is false if the final grade is hidden' do
             course_settings[:hide_final_grades?] = true
-            predicate.should be_false
+            expect(predicate).to be_falsey
           end
 
           it 'is false even even if the final grade is NOT hidden' do
             course_settings[:hide_final_grades?] = false
-            predicate.should be_false
+            expect(predicate).to be_falsey
           end
         end
       end
@@ -66,32 +66,32 @@ module Api
       describe '#allowed_attributes' do
         it 'just returns the base attributes when there are no includes' do
           includes.clear
-          course_json.allowed_attributes.should == CourseJson::BASE_ATTRIBUTES
+          expect(course_json.allowed_attributes).to eq CourseJson::BASE_ATTRIBUTES
         end
 
         it 'tacks on any includes' do
           includes << :some << :other << :keys
-          course_json.allowed_attributes.should == ( CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys] )
+          expect(course_json.allowed_attributes).to eq( CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys] )
         end
       end
 
 
       describe '#methods_to_send' do
         it 'includes the end_at field' do
-          course_json.methods_to_send.should include('end_at')
+          expect(course_json.methods_to_send).to include('end_at')
         end
 
         it 'includes the public_syllabus field' do
-          course_json.methods_to_send.should include('public_syllabus')
+          expect(course_json.methods_to_send).to include('public_syllabus')
         end
 
         it 'includes the storage_quota_mb field' do
-          course_json.methods_to_send.should include('storage_quota_mb')
+          expect(course_json.methods_to_send).to include('storage_quota_mb')
         end
 
         it 'includes the hide_final_grades method if its in the includes array' do
           includes << :hide_final_grades
-          course_json.methods_to_send.should include('hide_final_grades')
+          expect(course_json.methods_to_send).to include('hide_final_grades')
         end
       end
 
@@ -104,11 +104,11 @@ module Api
 
           it 'kicks the key-value pair out if the value is nil' do
             hash['enrollments'] = nil
-            course_json.clear_unneeded_fields(hash).should == { }
+            expect(course_json.clear_unneeded_fields(hash)).to eq({ })
           end
 
           it 'keeps the key-value pair if the value is not nil' do
-            course_json.clear_unneeded_fields(hash).should == {'enrollments' => [] }
+            expect(course_json.clear_unneeded_fields(hash)).to eq({'enrollments' => [] })
           end
         end
 
@@ -117,11 +117,11 @@ module Api
 
           it 'keeps the key-value pair even if the value is nil' do
             hash['some_other_key'] = nil
-            course_json.clear_unneeded_fields(hash).should == { 'some_other_key' => nil }
+            expect(course_json.clear_unneeded_fields(hash)).to eq({ 'some_other_key' => nil })
           end
 
           it 'keeps the key-value pair if the value is not nil' do
-            course_json.clear_unneeded_fields(hash).should == {'some_other_key' => 'some_value' }
+            expect(course_json.clear_unneeded_fields(hash)).to eq({'some_other_key' => 'some_value' })
           end
         end
 
@@ -132,13 +132,13 @@ module Api
 
         it 'returns the description when its configured for inclusion' do
           includes << :public_description
-          course_json.include_description.should be_true
-          course_json.description(course).should == 'an eloquent anecdote'
+          expect(course_json.include_description).to be_truthy
+          expect(course_json.description(course)).to eq 'an eloquent anecdote'
         end
 
         it 'is nil when configured not to be included' do
           includes.clear
-          course_json.description(course).should be_nil
+          expect(course_json.description(course)).to be_nil
         end
       end
 
@@ -153,11 +153,30 @@ module Api
 
         subject{ @json }
 
-        its(:course) { should == course }
-        its(:user) { should == user }
-        its(:includes) { should == [:these, :three, :keys] }
-        its(:enrollments) { should == enrollments }
-        its(:hash) { should == hash }
+        describe '#course' do
+          subject { super().course }
+          it { is_expected.to eq course }
+        end
+
+        describe '#user' do
+          subject { super().user }
+          it { is_expected.to eq user }
+        end
+
+        describe '#includes' do
+          subject { super().includes }
+          it { is_expected.to eq [:these, :three, :keys] }
+        end
+
+        describe '#enrollments' do
+          subject { super().enrollments }
+          it { is_expected.to eq enrollments }
+        end
+
+        describe '#hash' do
+          subject { super().hash }
+          it { is_expected.to eq hash }
+        end
       end
 
       describe '#set_sis_course_id' do
@@ -174,7 +193,7 @@ module Api
 
           it 'adds sis the key-value pair to the hash' do
             course_json.set_sis_course_id( hash, sis_course, user )
-            hash['sis_course_id'].should == 1357
+            expect(hash['sis_course_id']).to eq 1357
           end
 
           describe 'with a nil sis_id' do
@@ -184,18 +203,18 @@ module Api
             end
 
             it 'allows the nil value to go into the has' do
-              hash['sis_course_id'].should == nil
+              expect(hash['sis_course_id']).to eq nil
             end
 
             it 'does not get cleared out before translation to json' do
-              course_json.clear_unneeded_fields( hash ).should == { 'sis_course_id' => nil }
+              expect(course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil })
             end
           end
         end
 
         it 'doesnt add the sis_course_id key at all if the rights are NOT present' do
           course_json.set_sis_course_id( hash, sis_course, user)
-          hash.should == {}
+          expect(hash).to eq({})
         end
       end
 
@@ -204,13 +223,13 @@ module Api
 
         it 'returns the permissions when its configured for inclusion' do
           includes << :permissions
-          course_json.include_permissions.should be_true
-          course_json.permissions_to_include.should == [ :create_discussion_topic ]
+          expect(course_json.include_permissions).to be_truthy
+          expect(course_json.permissions_to_include).to eq [ :create_discussion_topic ]
         end
 
         it 'is nil when configured not to be included' do
           includes.clear
-          course_json.permissions_to_include.should be_nil
+          expect(course_json.permissions_to_include).to be_nil
         end
       end
     end

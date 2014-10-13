@@ -48,7 +48,7 @@ shared_examples_for "file uploads api" do
     json = preflight({ :name => filename })
     attachment = Attachment.order(:id).last
     exemption_string = has_query_exemption? ? ("?quota_exemption=" + attachment.quota_exemption_key) : ""
-    json['upload_url'].should == "http://www.example.com/files_api#{exemption_string}"
+    expect(json['upload_url']).to eq "http://www.example.com/files_api#{exemption_string}"
 
     # step 2, upload
     tmpfile = Tempfile.new(["test", File.extname(filename)])
@@ -58,16 +58,16 @@ shared_examples_for "file uploads api" do
     send_multipart(json["upload_url"], post_params)
 
     attachment = Attachment.order(:id).last
-    attachment.should be_deleted
+    expect(attachment).to be_deleted
     exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
-    response.should redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
+    expect(response).to redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
 
     # step 3, confirmation
     post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
-    response.should be_success
+    expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
-    json.should == {
+    expect(json).to eq({
       'id' => attachment.id,
       'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
       'content-type' => attachment.content_type,
@@ -83,13 +83,13 @@ shared_examples_for "file uploads api" do
       'created_at' => attachment.created_at.as_json,
       'updated_at' => attachment.updated_at.as_json,
       'thumbnail_url' => attachment.thumbnail_url
-    }
+    })
 
-    attachment.file_state.should == 'available'
-    attachment.content_type.should == "application/msword"
-    attachment.open.read.should == content
-    attachment.display_name.should == filename
-    attachment.user.id.should == @user.id
+    expect(attachment.file_state).to eq 'available'
+    expect(attachment.content_type).to eq "application/msword"
+    expect(attachment.open.read).to eq content
+    expect(attachment.display_name).to eq filename
+    expect(attachment.user.id).to eq @user.id
     attachment
   end
 
@@ -100,12 +100,12 @@ shared_examples_for "file uploads api" do
     s3_storage!
     # step 1, preflight
     json = preflight({ :name => filename })
-    json['upload_url'].should == "http://no-bucket.s3.amazonaws.com/"
+    expect(json['upload_url']).to eq "http://no-bucket.s3.amazonaws.com/"
     attachment = Attachment.order(:id).last
     redir = json['upload_params']['success_action_redirect']
     exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
-    redir.should == "http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}"
-    attachment.should be_deleted
+    expect(redir).to eq "http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}"
+    expect(attachment).to be_deleted
 
     # step 2, upload
     # we skip the actual call and stub this out, since we can't hit s3 during specs
@@ -116,15 +116,15 @@ shared_examples_for "file uploads api" do
 
     # step 3, confirmation
     post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
-    response.should be_success
+    expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
-    json.should == attachment_json(attachment)
+    expect(json).to eq attachment_json(attachment)
 
-    attachment.file_state.should == 'available'
-    attachment.content_type.should == "application/msword"
-    attachment.display_name.should == filename
-    attachment.user.id.should == @user.id
+    expect(attachment.file_state).to eq 'available'
+    expect(attachment.content_type).to eq "application/msword"
+    expect(attachment.display_name).to eq filename
+    expect(attachment.user.id).to eq @user.id
     attachment
   end
 
@@ -135,26 +135,26 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => "http://www.example.com/images/delete.png" })
     attachment = Attachment.order(:id).last
-    attachment.file_state.should == 'deleted'
+    expect(attachment.file_state).to eq 'deleted'
     status_url = json['status_url']
-    status_url.should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(status_url).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'pending'
+    expect(json['upload_status']).to eq 'pending'
     
     CanvasHttp.expects(:get).with("http://www.example.com/images/delete.png").yields(FakeHttpResponse.new(200, "asdf"))
     run_download_job
 
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
 
-    json.should == {
+    expect(json).to eq({
       'upload_status' => 'ready',
       'attachment' => attachment_json(attachment.reload),
-    }
-    attachment.file_state.should == 'available'
-    attachment.size.should == 4
-    attachment.user.id.should == @user.id
+    })
+    expect(attachment.file_state).to eq 'available'
+    expect(attachment.size).to eq 4
+    expect(attachment.user.id).to eq @user.id
   end
   
   it "should fail gracefully with a malformed url" do
@@ -164,14 +164,14 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => '#@$YA#Y#AGWREG' })
     attachment = Attachment.order(:id).last
-    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     run_download_job
     json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should == "Could not parse the URL: \#@$YA#Y#AGWREG"
-    attachment.reload.file_state.should == 'errored'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq "Could not parse the URL: \#@$YA#Y#AGWREG"
+    expect(attachment.reload.file_state).to eq 'errored'
   end
   
   it "should fail gracefully with a relative url" do
@@ -181,14 +181,14 @@ shared_examples_for "file uploads api" do
     # step 1, preflight
     json = preflight({ :name => filename, :size => 20, :url => '/images/delete.png' })
     attachment = Attachment.order(:id).last
-    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     run_download_job
     json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should == "No host provided for the URL: /images/delete.png"
-    attachment.reload.file_state.should == 'errored'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq "No host provided for the URL: /images/delete.png"
+    expect(attachment.reload.file_state).to eq 'errored'
   end
   
   it "should fail gracefully with a non-200 and non-300 status return" do
@@ -200,14 +200,14 @@ shared_examples_for "file uploads api" do
     CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new(404))
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
-    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     run_download_job
     json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should ==  "Invalid response code, expected 200 got 404"
-    attachment.reload.file_state.should == 'errored'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq  "Invalid response code, expected 200 got 404"
+    expect(attachment.reload.file_state).to eq 'errored'
   end
   
   it "should fail gracefully with a GET request timeout" do
@@ -219,14 +219,14 @@ shared_examples_for "file uploads api" do
     CanvasHttp.expects(:get).with(url).raises(Timeout::Error)
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
-    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     run_download_job
     json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should == "The request timed out: http://www.example.com/images/delete.png"
-    attachment.reload.file_state.should == 'errored'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq "The request timed out: http://www.example.com/images/delete.png"
+    expect(attachment.reload.file_state).to eq 'errored'
   end
   
   it "should fail gracefully with too many redirects" do
@@ -238,19 +238,19 @@ shared_examples_for "file uploads api" do
     CanvasHttp.expects(:get).with(url).raises(CanvasHttp::TooManyRedirectsError)
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
-    attachment.workflow_state.should == 'unattached'
-    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    expect(attachment.workflow_state).to eq 'unattached'
+    expect(json['status_url']).to eq "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
     
     # step 2, download
     run_download_job
     json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should == "Too many redirects"
-    attachment.reload.file_state.should == 'errored'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq "Too many redirects"
+    expect(attachment.reload.file_state).to eq 'errored'
   end
   
   def run_download_job
-    Delayed::Job.strand_size('file_download').should > 0
+    expect(Delayed::Job.strand_size('file_download')).to be > 0
     run_jobs
   end
 
@@ -262,13 +262,13 @@ shared_examples_for "file uploads api with folders" do
   it "should allow specifying a folder with deprecated argument name" do
     preflight({ :name => "with_path.txt", :folder => "files/a/b/c/mypath" })
     attachment = Attachment.order(:id).last
-    attachment.folder.should == Folder.assert_path("/files/a/b/c/mypath", context)
+    expect(attachment.folder).to eq Folder.assert_path("/files/a/b/c/mypath", context)
   end
 
   it "should allow specifying a folder" do
     preflight({ :name => "with_path.txt", :parent_folder_path => "files/a/b/c/mypath" })
     attachment = Attachment.order(:id).last
-    attachment.folder.should == Folder.assert_path("/files/a/b/c/mypath", context)
+    expect(attachment.folder).to eq Folder.assert_path("/files/a/b/c/mypath", context)
   end
 
   it "should allow specifying a parent folder by id" do
@@ -276,16 +276,16 @@ shared_examples_for "file uploads api with folders" do
     sub = root.sub_folders.create!(:name => "folder1", :context => context)
     preflight({ :name => "with_path.txt", :parent_folder_id => sub.id.to_param })
     attachment = Attachment.order(:id).last
-    attachment.folder_id.should == sub.id
+    expect(attachment.folder_id).to eq sub.id
   end
 
   it "should upload to an existing folder" do
     @folder = Folder.assert_path("/files/a/b/c/mypath", context)
-    @folder.should be_present
-    @folder.should be_visible
+    expect(@folder).to be_present
+    expect(@folder).to be_visible
     preflight({ :name => "my_essay.doc", :folder => "files/a/b/c/mypath" })
     attachment = Attachment.order(:id).last
-    attachment.folder.should == @folder
+    expect(attachment.folder).to eq @folder
   end
 
   it "should overwrite duplicate files by default" do
@@ -300,13 +300,13 @@ shared_examples_for "file uploads api with folders" do
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
     post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
-    response.should be_success
+    expect(response).to be_success
     attachment = Attachment.order(:id).last
-    a1.reload.should be_deleted
-    attachment.reload.should be_available
-    attachment.display_name.should == "test.txt"
-    attachment.folder.should == @folder
-    attachment.open.read.should == "second"
+    expect(a1.reload).to be_deleted
+    expect(attachment.reload).to be_available
+    expect(attachment.display_name).to eq "test.txt"
+    expect(attachment.folder).to eq @folder
+    expect(attachment.open.read).to eq "second"
   end
 
   it "should overwrite duplicate files by default for URL uploads" do
@@ -318,11 +318,11 @@ shared_examples_for "file uploads api with folders" do
     CanvasHttp.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
     run_jobs
 
-    a1.reload.should be_deleted
-    attachment.reload.should be_available
-    attachment.display_name.should == "test.txt"
-    attachment.folder.should == @folder
-    attachment.open.read.should == "second"
+    expect(a1.reload).to be_deleted
+    expect(attachment.reload).to be_available
+    expect(attachment.display_name).to eq "test.txt"
+    expect(attachment.folder).to eq @folder
+    expect(attachment.open.read).to eq "second"
   end
 
   it "should allow renaming instead of overwriting duplicate files (local storage)" do
@@ -337,13 +337,13 @@ shared_examples_for "file uploads api with folders" do
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
     post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
-    response.should be_success
+    expect(response).to be_success
     attachment = Attachment.order(:id).last
-    a1.reload.should be_available
-    attachment.reload.should be_available
-    a1.display_name.should == "test.txt"
-    attachment.display_name.should == "test-1.txt"
-    attachment.folder.should == @folder
+    expect(a1.reload).to be_available
+    expect(attachment.reload).to be_available
+    expect(a1.display_name).to eq "test.txt"
+    expect(attachment.display_name).to eq "test-1.txt"
+    expect(attachment.folder).to eq @folder
   end
 
   it "should allow renaming instead of overwriting duplicate files for URL uploads" do
@@ -355,11 +355,11 @@ shared_examples_for "file uploads api with folders" do
     CanvasHttp.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
     run_jobs
 
-    a1.reload.should be_available
-    attachment.reload.should be_available
-    a1.display_name.should == "test.txt"
-    attachment.display_name.should == "test-1.txt"
-    attachment.folder.should == @folder
+    expect(a1.reload).to be_available
+    expect(attachment.reload).to be_available
+    expect(a1.display_name).to eq "test.txt"
+    expect(attachment.display_name).to eq "test-1.txt"
+    expect(attachment.folder).to eq @folder
   end
 
   it "should allow renaming instead of overwriting duplicate files (s3 storage)" do
@@ -376,14 +376,14 @@ shared_examples_for "file uploads api with folders" do
                                     })
 
     post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
-    response.should be_success
-    a1.reload.should be_available
-    attachment.reload.should be_available
-    attachment.display_name.should == "test-1.txt"
+    expect(response).to be_success
+    expect(a1.reload).to be_available
+    expect(attachment.reload).to be_available
+    expect(attachment.display_name).to eq "test-1.txt"
   end
 
   it "should reject other duplicate file handling params" do
-    proc { preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }) }.should raise_error
+    expect { preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }) }.to raise_error
   end
 end
 
@@ -393,8 +393,8 @@ shared_examples_for "file uploads api with quotas" do
     @context.save!
     json = preflight({ :name => "test.txt", :size => 3.megabytes })
     attachment = Attachment.order(:id).last
-    attachment.workflow_state.should == 'unattached'
-    attachment.filename.should == 'test.txt'
+    expect(attachment.workflow_state).to eq 'unattached'
+    expect(attachment.filename).to eq 'test.txt'
   end
   
   it "should return unsuccessful preflight for files exceeding quota limits" do
@@ -406,7 +406,7 @@ shared_examples_for "file uploads api with quotas" do
     rescue => e
       json = JSON.parse(e.message)
     end
-    json['message'].should == "file size exceeds quota"
+    expect(json['message']).to eq "file size exceeds quota"
   end
 
   it "should return unsuccessful preflight for files exceeding quota limits (URL uploads)" do
@@ -418,7 +418,7 @@ shared_examples_for "file uploads api with quotas" do
     rescue => e
       json = JSON.parse(e.message)
     end
-    json['message'].should == "file size exceeds quota"
+    expect(json['message']).to eq "file size exceeds quota"
   end
   
   it "should return successful create_success for files within quota" do
@@ -432,9 +432,9 @@ shared_examples_for "file uploads api with quotas" do
     attachment.size = 4.megabytes
     attachment.save!
     json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success", {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'}, {:uuid => attachment.uuid})
-    json['id'].should == attachment.id
+    expect(json['id']).to eq attachment.id
     attachment.reload
-    attachment.file_state.should == 'available'
+    expect(attachment.file_state).to eq 'available'
   end
   
   it "should return unsuccessful create_success for files exceeding quota limits" do
@@ -453,9 +453,9 @@ shared_examples_for "file uploads api with quotas" do
     rescue => e
       json = JSON.parse(e.message)
     end
-    json['message'].should == 'file size exceeds quota limits'
+    expect(json['message']).to eq 'file size exceeds quota limits'
     attachment.reload
-    attachment.file_state.should == 'deleted'
+    expect(attachment.file_state).to eq 'deleted'
   end
 
   it "should fail URL uploads for files exceeding quota limits" do
@@ -468,9 +468,9 @@ shared_examples_for "file uploads api with quotas" do
     run_jobs
 
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
-    json['upload_status'].should == 'errored'
-    json['message'].should == "file size exceeds quota limits: #{2.megabytes} bytes"
-    attachment.file_state.should == 'deleted'
+    expect(json['upload_status']).to eq 'errored'
+    expect(json['message']).to eq "file size exceeds quota limits: #{2.megabytes} bytes"
+    expect(attachment.file_state).to eq 'deleted'
   end
 end
 
@@ -480,7 +480,7 @@ shared_examples_for "file uploads api without quotas" do
     @context.save!
     json = preflight({ :name => "test.txt", :size => 1.megabyte })
     attachment = Attachment.order(:id).last
-    json['upload_url'].should match(/#{attachment.quota_exemption_key}/)
+    expect(json['upload_url']).to match(/#{attachment.quota_exemption_key}/)
   end
   it "should ignore context-related quotas in preflight" do
     s3_storage!
@@ -488,6 +488,6 @@ shared_examples_for "file uploads api without quotas" do
     @context.save!
     json = preflight({ :name => "test.txt", :size => 1.megabyte })
     attachment = Attachment.order(:id).last
-    json['upload_params']['success_action_redirect'].should match(/#{attachment.quota_exemption_key}/)
+    expect(json['upload_params']['success_action_redirect']).to match(/#{attachment.quota_exemption_key}/)
   end
 end

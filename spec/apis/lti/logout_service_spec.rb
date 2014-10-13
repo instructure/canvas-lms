@@ -54,20 +54,20 @@ describe LtiApiController, type: :integration do
   it "should generate a logout service URL with token" do
     user_session(@student)
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::HTML(response.body)
     logout_service_url = doc.css('#custom_sub_logout_service_url').attr('value').value
     match = %r{\Ahttp://www.example.com/api/lti/v1/logout_service/([a-z0-9-]+)\z}.match(logout_service_url)
-    match.should_not be_nil
+    expect(match).not_to be_nil
     token = Lti::LogoutService::Token.parse_and_validate(match[1])
-    token.tool.should eql(@tool)
-    token.pseudonym.should eql(@pseudonym)
+    expect(token.tool).to eql(@tool)
+    expect(token.pseudonym).to eql(@pseudonym)
   end
 
   it "should reject an invalid secret" do
     make_call('secret' => 'not secret')
-    response.status.should eql 401
-    response.body.should =~ /Invalid authorization header/
+    expect(response.status).to eql 401
+    expect(response.body).to match /Invalid authorization header/
   end
 
   it "should reject an invalid token" do
@@ -75,8 +75,8 @@ describe LtiApiController, type: :integration do
     # falsify the pseudonym to try and get notified when somebody else logs out
     token_parts[1] = (token_parts[1].to_i + 1).to_s
     make_call('path' => api_path(token_parts.join('-')))
-    response.status.should eql 401
-    response.body.should =~ /Invalid logout service token/
+    expect(response.status).to eql 401
+    expect(response.body).to match /Invalid logout service token/
   end
 
   it "should reject an expired token" do
@@ -84,8 +84,8 @@ describe LtiApiController, type: :integration do
       Lti::LogoutService.create_token(@tool, @pseudonym)
     end
     make_call('path' => api_path(token))
-    response.status.should eql 401
-    response.body.should =~ /Logout service token has expired/
+    expect(response.status).to eql 401
+    expect(response.body).to match /Logout service token has expired/
   end
 
   it "should register callbacks" do
@@ -94,7 +94,7 @@ describe LtiApiController, type: :integration do
       make_call('path' => api_path(token1, 'http://logout.notify.example.com/123'))
       token2 = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token2, 'http://logout.notify.example.com/456'))
-      Lti::LogoutService.get_logout_callbacks(@pseudonym).values.should =~ [
+      expect(Lti::LogoutService.get_logout_callbacks(@pseudonym).values).to match_array [
           'http://logout.notify.example.com/123',
           'http://logout.notify.example.com/456'
       ]
@@ -105,10 +105,10 @@ describe LtiApiController, type: :integration do
     enable_cache do
       token = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token, 'http://logout.notify.example.com/123'))
-      response.should be_success
+      expect(response).to be_success
       make_call('path' => api_path(token, 'http://logout.notify.example.com/456'))
-      response.status.should eql 401
-      response.body.should =~ /Logout service token has already been used/
+      expect(response.status).to eql 401
+      expect(response.body).to match /Logout service token has already been used/
     end
   end
 

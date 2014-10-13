@@ -44,9 +44,9 @@ describe SectionsController, type: :request do
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
-      json.size.should == 2
-      json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
-      json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
+      expect(json.size).to eq 2
+      expect(json.find { |s| s['name'] == section1.name }['students']).to eq api_json_response([user1], :only => USER_API_FIELDS)
+      expect(json.find { |s| s['name'] == section2.name }['students']).to eq api_json_response([user2], :only => USER_API_FIELDS)
     end
 
     it "should not return deleted sections" do
@@ -56,7 +56,7 @@ describe SectionsController, type: :request do
       section2.save!
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
-      json.size.should == 1
+      expect(json.size).to eq 1
     end
 
     it "should return sections but not students if user has :read but not :read_roster, :view_all_grades, or :manage_grades" do
@@ -66,10 +66,10 @@ describe SectionsController, type: :request do
       enrollment = course_with_ta(:active_all => true)
       enrollment.update_attribute(:limit_privileges_to_course_section, true)
 
-      @course.grants_right?(@ta, :read).should be_true
-      @course.grants_right?(@ta, :read_roster).should be_false
-      @course.grants_right?(@ta, :view_all_grades).should be_false
-      @course.grants_right?(@ta, :manage_grades).should be_false
+      expect(@course.grants_right?(@ta, :read)).to be_truthy
+      expect(@course.grants_right?(@ta, :read_roster)).to be_falsey
+      expect(@course.grants_right?(@ta, :view_all_grades)).to be_falsey
+      expect(@course.grants_right?(@ta, :manage_grades)).to be_falsey
 
       route_params = {
         :controller => 'sections',
@@ -82,8 +82,8 @@ describe SectionsController, type: :request do
                       route_params,
                       { :include => ['students'] })
 
-      json.first["name"].should == @course.default_section.name
-      json.first.keys.include?("students").should be_false
+      expect(json.first["name"]).to eq @course.default_section.name
+      expect(json.first.keys.include?("students")).to be_falsey
     end
   end
 
@@ -101,27 +101,27 @@ describe SectionsController, type: :request do
 
       it "should be accessible from the course" do
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
-        json.should == {
+        expect(json).to eq({
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
-        }
+        })
       end
 
       it "should be accessible from the course context via sis id" do
         @section.update_attribute(:sis_source_id, 'my_section')
         json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => 'sis_section_id:my_section' }))
-        json.should == {
+        expect(json).to eq({
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
-        }
+        })
       end
 
       it "should scope course sections to the course" do
@@ -140,40 +140,40 @@ describe SectionsController, type: :request do
 
       it "should be accessible without a course context" do
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
-        json.should == {
+        expect(json).to eq({
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
-        }
+        })
       end
 
       it "should be accessible without a course context via sis id" do
         @section.update_attribute(:sis_source_id, 'my_section')
         json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => "sis_section_id:my_section" }))
-        json.should == {
+        expect(json).to eq({
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
-        }
+        })
       end
 
       it "should be accessible without a course context via integration id" do
         @section.update_attribute(:integration_id, 'my_section')
         json = api_call(:get, "#{@path_prefix}/sis_integration_id:my_section", @path_params.merge({ :id => "sis_integration_id:my_section" }))
-        json.should == {
+        expect(json).to eq({
             'id' => @section.id,
             'name' => @section.name,
             'course_id' => @course.id,
             'nonxlist_course_id' => nil,
             'start_at' => nil,
             'end_at' => nil
-        }
+        })
       end
 
       it "should not be accessible if the associated course is not accessible" do
@@ -192,7 +192,7 @@ describe SectionsController, type: :request do
 
       it "should show sis information" do
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
-        json.should == {
+        expect(json).to eq({
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
@@ -203,7 +203,7 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
-        }
+        })
       end
     end
   end
@@ -223,7 +223,7 @@ describe SectionsController, type: :request do
       it "should create a section with default parameters" do
         json = api_call(:post, @path_prefix, @path_params)
         @course.reload
-        @course.active_course_sections.where(id: json['id'].to_i).should be_exists
+        expect(@course.active_course_sections.where(id: json['id'].to_i)).to be_exists
       end
 
       it "should find the course by SIS ID" do
@@ -231,7 +231,7 @@ describe SectionsController, type: :request do
         json = api_call(:post, "/api/v1/courses/sis_course_id:SISCOURSE/sections",
           { :controller => 'sections', :action => 'create', :course_id => "sis_course_id:SISCOURSE", :format => 'json' })
         @course.reload
-        @course.active_course_sections.where(id: json['id'].to_i).should be_exists
+        expect(@course.active_course_sections.where(id: json['id'].to_i)).to be_exists
       end
 
       it "should create a section with custom parameters" do
@@ -239,10 +239,10 @@ describe SectionsController, type: :request do
           { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z' }})
         @course.reload
         section = @course.active_course_sections.find(json['id'].to_i)
-        section.name.should == 'Name'
-        section.sis_source_id.should be_nil
-        section.start_at.should == Time.parse('2011-01-01T01:00Z')
-        section.end_at.should == Time.parse('2011-07-01T01:00Z')
+        expect(section.name).to eq 'Name'
+        expect(section.sis_source_id).to be_nil
+        expect(section.start_at).to eq Time.parse('2011-01-01T01:00Z')
+        expect(section.end_at).to eq Time.parse('2011-07-01T01:00Z')
       end
 
       it "should fail if the context is deleted" do
@@ -255,8 +255,8 @@ describe SectionsController, type: :request do
                                                                  { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' }})
         @course.reload
         section = @course.active_course_sections.find(json['id'].to_i)
-        section.name.should == 'Name'
-        section.sis_source_id.should be_nil
+        expect(section.name).to eq 'Name'
+        expect(section.sis_source_id).to be_nil
       end
     end
 
@@ -280,9 +280,9 @@ describe SectionsController, type: :request do
           { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' }})
         @course.reload
         section = @course.active_course_sections.find(json['id'].to_i)
-        section.name.should == 'Name'
-        section.sis_source_id.should == 'fail'
-        section.sis_batch_id.should == nil
+        expect(section.name).to eq 'Name'
+        expect(section.sis_source_id).to eq 'fail'
+        expect(section.sis_batch_id).to eq nil
       end
     end
   end
@@ -304,28 +304,28 @@ describe SectionsController, type: :request do
       it "should modify section data by id" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
-        json['id'].should == @section.id
+        expect(json['id']).to eq @section.id
         @section.reload
-        @section.name.should == 'New Name'
-        @section.sis_source_id.should == 'SISsy'
-        @section.start_at.should == Time.parse('2012-01-01T01:00Z')
-        @section.end_at.should == Time.parse('2012-07-01T01:00Z')
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'SISsy'
+        expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
+        expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
       end
 
       it "should modify section data by sis id" do
         json = api_call(:put, "#@path_prefix/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
-        json['id'].should == @section.id
+        expect(json['id']).to eq @section.id
         @section.reload
-        @section.name.should == 'New Name'
-        @section.sis_source_id.should == 'SISsy'
-        @section.start_at.should == Time.parse('2012-01-01T01:00Z')
-        @section.end_at.should == Time.parse('2012-07-01T01:00Z')
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'SISsy'
+        expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
+        expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
       end
 
       it "should behave gracefully if the course_section parameter is missing" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param))
-        json['id'].should == @section.id
+        expect(json['id']).to eq @section.id
       end
 
       it "should fail if the section is deleted" do
@@ -343,10 +343,10 @@ describe SectionsController, type: :request do
       it "should ignore the sis id parameter" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :sis_section_id => 'NEWSIS' }})
-        json['id'].should == @section.id
+        expect(json['id']).to eq @section.id
         @section.reload
-        @section.name.should == 'New Name'
-        @section.sis_source_id.should == 'SISsy'
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'SISsy'
       end
     end
 
@@ -369,10 +369,10 @@ describe SectionsController, type: :request do
       it "should set the sis id" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :sis_section_id => 'NEWSIS' }})
-        json['id'].should == @section.id
+        expect(json['id']).to eq @section.id
         @section.reload
-        @section.name.should == 'New Name'
-        @section.sis_source_id.should == 'NEWSIS'
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'NEWSIS'
       end
     end
   end
@@ -393,14 +393,14 @@ describe SectionsController, type: :request do
 
       it "should delete a section by id" do
         json = api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param))
-        json['id'].should == @section.id
-        @section.reload.should be_deleted
+        expect(json['id']).to eq @section.id
+        expect(@section.reload).to be_deleted
       end
 
       it "should delete a section by sis id" do
         json = api_call(:delete, "#@path_prefix/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"))
-        json['id'].should == @section.id
-        @section.reload.should be_deleted
+        expect(json['id']).to eq @section.id
+        expect(@section.reload).to be_deleted
       end
 
       it "should fail to delete a section with enrollments" do
@@ -445,17 +445,17 @@ describe SectionsController, type: :request do
       end
 
       it "should cross-list a section" do
-        @course.active_course_sections.should be_include(@section)
-        @dest_course.active_course_sections.should_not be_include(@section)
+        expect(@course.active_course_sections).to be_include(@section)
+        expect(@dest_course.active_course_sections).not_to be_include(@section)
 
         json = api_call(:post, "/api/v1/sections/#{@section.id}/crosslist/#{@dest_course.id}",
                         @params.merge(:id => @section.to_param, :new_course_id => @dest_course.to_param))
-        json['id'].should == @section.id
-        json['course_id'].should == @dest_course.id
-        json['nonxlist_course_id'].should == @course.id
+        expect(json['id']).to eq @section.id
+        expect(json['course_id']).to eq @dest_course.id
+        expect(json['nonxlist_course_id']).to eq @course.id
 
-        @course.reload.active_course_sections.should_not be_include(@section)
-        @dest_course.reload.active_course_sections.should be_include(@section)
+        expect(@course.reload.active_course_sections).not_to be_include(@section)
+        expect(@dest_course.reload.active_course_sections).to be_include(@section)
       end
 
       it "should work with sis IDs" do
@@ -466,18 +466,18 @@ describe SectionsController, type: :request do
         @section.sis_batch_id = @sis_batch.id
         @section.save!
 
-        @course.active_course_sections.should be_include(@section)
-        @dest_course.active_course_sections.should_not be_include(@section)
+        expect(@course.active_course_sections).to be_include(@section)
+        expect(@dest_course.active_course_sections).not_to be_include(@section)
 
         json = api_call(:post, "/api/v1/sections/sis_section_id:the_section/crosslist/sis_course_id:dest_course",
                         @params.merge(:id => "sis_section_id:the_section", :new_course_id => "sis_course_id:dest_course"))
-        json['id'].should == @section.id
-        json['course_id'].should == @dest_course.id
-        json['nonxlist_course_id'].should == @course.id
-        json['sis_import_id'].should == @sis_batch.id
+        expect(json['id']).to eq @section.id
+        expect(json['course_id']).to eq @dest_course.id
+        expect(json['nonxlist_course_id']).to eq @course.id
+        expect(json['sis_import_id']).to eq @sis_batch.id
 
-        @course.reload.active_course_sections.should_not be_include(@section)
-        @dest_course.reload.active_course_sections.should be_include(@section)
+        expect(@course.reload.active_course_sections).not_to be_include(@section)
+        expect(@dest_course.reload.active_course_sections).to be_include(@section)
       end
 
 
@@ -506,7 +506,7 @@ describe SectionsController, type: :request do
         raw_api_call(:get, "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.sis_source_id}",
                  @params.merge(:action => 'crosslist_check', :course_id => @course.to_param, :section_id => @section.to_param, :new_course_id => @dest_course.sis_source_id))
         json = JSON.parse response.body.gsub(/\Awhile\(1\)\;/, '')
-        json['course']['id'].should eql @dest_course.id
+        expect(json['course']['id']).to eql @dest_course.id
       end
     end
 
@@ -537,34 +537,34 @@ describe SectionsController, type: :request do
       end
 
       it "should un-crosslist a section" do
-        @course.active_course_sections.should_not be_include @section
-        @dest_course.active_course_sections.should be_include @section
+        expect(@course.active_course_sections).not_to be_include @section
+        expect(@dest_course.active_course_sections).to be_include @section
 
         json = api_call(:delete, "/api/v1/sections/#{@section.id}/crosslist",
                  @params.merge(:id => @section.to_param))
-        json['id'].should == @section.id
-        json['course_id'].should == @course.id
-        json['nonxlist_course_id'].should be_nil
+        expect(json['id']).to eq @section.id
+        expect(json['course_id']).to eq @course.id
+        expect(json['nonxlist_course_id']).to be_nil
 
-        @course.reload.active_course_sections.should be_include @section
-        @dest_course.reload.active_course_sections.should_not be_include @section
+        expect(@course.reload.active_course_sections).to be_include @section
+        expect(@dest_course.reload.active_course_sections).not_to be_include @section
       end
 
       it "should work by SIS ID" do
         @dest_course.update_attribute(:sis_source_id, "dest_course")
         @section.update_attribute(:sis_source_id, "the_section")
 
-        @course.active_course_sections.should_not be_include @section
-        @dest_course.active_course_sections.should be_include @section
+        expect(@course.active_course_sections).not_to be_include @section
+        expect(@dest_course.active_course_sections).to be_include @section
 
         json = api_call(:delete, "/api/v1/sections/sis_section_id:the_section/crosslist",
                         @params.merge(:id => "sis_section_id:the_section"))
-        json['id'].should == @section.id
-        json['course_id'].should == @course.id
-        json['nonxlist_course_id'].should be_nil
+        expect(json['id']).to eq @section.id
+        expect(json['course_id']).to eq @course.id
+        expect(json['nonxlist_course_id']).to be_nil
 
-        @course.reload.active_course_sections.should be_include @section
-        @dest_course.reload.active_course_sections.should_not be_include @section
+        expect(@course.reload.active_course_sections).to be_include @section
+        expect(@dest_course.reload.active_course_sections).not_to be_include @section
       end
 
       it "should fail if the section is not crosslisted" do
@@ -583,7 +583,7 @@ describe SectionsController, type: :request do
         @course.destroy
         api_call(:delete, "/api/v1/sections/#{@section.id}/crosslist",
                  @params.merge(:id => @section.to_param))
-        @course.reload.should be_claimed
+        expect(@course.reload).to be_claimed
       end
 
       it "should fail if the crosslisted course is deleted" do

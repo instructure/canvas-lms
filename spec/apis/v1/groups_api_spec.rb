@@ -94,9 +94,9 @@ describe "Groups API", type: :request do
 
     @user = @member
     json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
-    json.should == [group_json(@community), group_json(@group)]
+    expect(json).to eq [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
-    links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
+    expect(links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
   end
 
   it "should allow listing all a user's group in a given context_type" do
@@ -107,10 +107,10 @@ describe "Groups API", type: :request do
 
     @user = @member
     json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(:action => "index", :context_type => 'Course'))
-    json.should == [group_json(@group)]
+    expect(json).to eq [group_json(@group)]
 
     json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(:action => "index", :context_type => 'Account'))
-    json.should == [group_json(@community)]
+    expect(json).to eq [group_json(@community)]
   end
 
   it "should allow listing all of a course's groups" do
@@ -120,8 +120,8 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
-    json.count.should == 1
-    json.first['id'].should == @group.id
+    expect(json.count).to eq 1
+    expect(json.first['id']).to eq @group.id
   end
 
   it "should allow listing all of an account's groups for account admins" do
@@ -136,12 +136,12 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :account_id => @account.to_param))
-    json.count.should == 1
-    json.first.should == group_json(@community, :is_admin =>true)
+    expect(json.count).to eq 1
+    expect(json.first).to eq group_json(@community, :is_admin =>true)
 
-    json.first['id'].should == @community.id
-    json.first['sis_group_id'].should == 'sis'
-    json.first['sis_import_id'].should == sis_batch.id
+    expect(json.first['id']).to eq @community.id
+    expect(json.first['sis_group_id']).to eq 'sis'
+    expect(json.first['sis_import_id']).to eq sis_batch.id
   end
 
   it "should not allow non-admins to view an account's groups" do
@@ -149,7 +149,7 @@ describe "Groups API", type: :request do
     raw_api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :account_id => @account.to_param))
-    response.code.should == '401'
+    expect(response.code).to eq '401'
   end
 
   it "should show students all groups" do
@@ -161,43 +161,43 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
-    json.count.should == 2
-    json.first['id'].should == @group_1.id
+    expect(json.count).to eq 2
+    expect(json.first['id']).to eq @group_1.id
   end
 
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
-    json.should == group_json(@community)
+    expect(json).to eq group_json(@community)
   end
 
   it "should include the group category" do
     @user = @member
     json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => [ "group_category" ]))
-    json.has_key?("group_category").should be_true
+    expect(json.has_key?("group_category")).to be_truthy
   end
 
   it 'should include permissions' do
     # Make sure it only returns permissions when asked
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json'))
-    json.has_key?("permissions").should be_false
+    expect(json.has_key?("permissions")).to be_falsey
 
     # When its asked to return permissions make sure they are there
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "permissions" ]))
-    json.has_key?("permissions").should be_true
+    expect(json.has_key?("permissions")).to be_truthy
   end
 
   it 'should include permission create_discussion_topic' do
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "permissions" ]))
 
-    json.has_key?("permissions").should be_true
-    json["permissions"].has_key?("create_discussion_topic").should be_true
+    expect(json.has_key?("permissions")).to be_truthy
+    expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
   end
 
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')
     json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
-    json.should == group_json(@community)
+    expect(json).to eq group_json(@community)
   end
 
   it "should allow anyone to create a new community" do
@@ -209,8 +209,8 @@ describe "Groups API", type: :request do
       'join_level'=> "parent_context_request",
     })
     @community2 = Group.order(:id).last
-    @community2.group_category.should be_communities
-    json.should == group_json(@community2, :include_users => true)
+    expect(@community2.group_category).to be_communities
+    expect(json).to eq group_json(@community2, :include_users => true)
   end
 
   it "should allow a teacher to create a group in a course" do
@@ -220,7 +220,7 @@ describe "Groups API", type: :request do
     project_groups.name = "Course Project Groups"
     project_groups.save
     json = api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
-    project_groups.groups.active.count.should == 1
+    expect(project_groups.groups.active.count).to eq 1
   end
 
   it "should not allow a student to create a group in a course" do
@@ -230,7 +230,7 @@ describe "Groups API", type: :request do
     project_groups.name = "Course Project Groups"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
-    response.code.should == '401'
+    expect(response.code).to eq '401'
   end
 
   it "should allow an admin to create a group in a account" do
@@ -240,7 +240,7 @@ describe "Groups API", type: :request do
     project_groups.name = "test group category"
     project_groups.save
     api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
-    project_groups.groups.active.count.should == 1
+    expect(project_groups.groups.active.count).to eq 1
   end
 
   it "should not allow a non-admin to create a group in a account" do
@@ -249,7 +249,7 @@ describe "Groups API", type: :request do
     project_groups.name = "test group category"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
-    response.code.should == '401'
+    expect(response.code).to eq '401'
   end
 
 
@@ -265,12 +265,12 @@ describe "Groups API", type: :request do
     }
     json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
     @community.reload
-    @community.name.should == "Algebra II Teachers"
-    @community.description.should == "Math rocks!"
-    @community.is_public.should == true
-    @community.join_level.should == "parent_context_auto_join"
-    @community.avatar_attachment.should == avatar
-    json.should == group_json(@community)
+    expect(@community.name).to eq "Algebra II Teachers"
+    expect(@community.description).to eq "Math rocks!"
+    expect(@community.is_public).to eq true
+    expect(@community.join_level).to eq "parent_context_auto_join"
+    expect(@community.avatar_attachment).to eq avatar
+    expect(json).to eq group_json(@community)
   end
 
   it "should only allow updating a group from private to public" do
@@ -280,14 +280,14 @@ describe "Groups API", type: :request do
     }
     json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
     @community.reload
-    @community.is_public.should == true
+    expect(@community.is_public).to eq true
 
     new_attrs = {
       'is_public' => false,
     }
     json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
     @community.reload
-    @community.is_public.should == true
+    expect(@community.is_public).to eq true
   end
 
   it "should not allow a member to edit a group" do
@@ -303,7 +303,7 @@ describe "Groups API", type: :request do
   it "should allow a moderator to delete a group" do
     @user = @moderator
     json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
-    @community.reload.workflow_state.should == 'deleted'
+    expect(@community.reload.workflow_state).to eq 'deleted'
   end
 
   it "should not allow a member to delete a group" do
@@ -326,14 +326,14 @@ describe "Groups API", type: :request do
         json = api_call(:post, '/api/v1/groups?name=TehGroup&storage_quota_mb=22',
                  { :controller => "groups", :action => 'create', :format => "json", :name => 'TehGroup', :storage_quota_mb => '22' })
         group = @account.groups.find(json['id'])
-        group.storage_quota_mb.should == 22
+        expect(group.storage_quota_mb).to eq 22
       end
 
       it "should set the quota on update" do
         group = @account.groups.create! :name => 'TehGroup'
         api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22",
                  { :controller => 'groups', :action => 'update', :group_id => group.id.to_s, :format => 'json', :storage_quota_mb => '22' })
-        group.reload.storage_quota_mb.should == 22
+        expect(group.reload.storage_quota_mb).to eq 22
       end
     end
 
@@ -346,7 +346,7 @@ describe "Groups API", type: :request do
         json = api_call(:post, '/api/v1/groups?storage_quota_mb=22',
                         { :controller => 'groups', :action => 'create', :format => 'json', :storage_quota_mb => '22' })
         group = @account.groups.find(json['id'])
-        group.storage_quota_mb.should == 11
+        expect(group.storage_quota_mb).to eq 11
       end
 
       it "should ignore the quota on update" do
@@ -354,8 +354,8 @@ describe "Groups API", type: :request do
         api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22&name=TheGruop",
                  { :controller => 'groups', :action => 'update', :format => 'json', :group_id => group.id.to_s, :name => 'TheGruop', :storage_quota_mb => '22' })
         group.reload
-        group.name.should == 'TheGruop'
-        group.storage_quota_mb.should == 11
+        expect(group.name).to eq 'TheGruop'
+        expect(group.storage_quota_mb).to eq 11
       end
     end
   end
@@ -370,7 +370,7 @@ describe "Groups API", type: :request do
     it "should allow listing the group memberships" do
       @user = @moderator
       json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"))
-      json.sort_by{|a| a['id'] }.should == [membership_json(@community.has_member?(@member)), membership_json(@community.has_member?(@moderator))]
+      expect(json.sort_by{|a| a['id'] }).to eq [membership_json(@community.has_member?(@member)), membership_json(@community.has_member?(@moderator))]
     end
 
     it "should allow filtering to a certain membership state" do
@@ -380,8 +380,8 @@ describe "Groups API", type: :request do
       json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
         :filter_states => ["invited"]
       })
-      json.count.should == 1
-      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
+      expect(json.count).to eq 1
+      expect(json.first).to eq membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
     end
 
     it "should allow someone to request to join a group" do
@@ -392,8 +392,8 @@ describe "Groups API", type: :request do
         :user_id => @user.id
       })
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "requested"
-      json.should == membership_json(@membership).merge("just_created" => true)
+      expect(@membership.workflow_state).to eq "requested"
+      expect(json).to eq membership_json(@membership).merge("just_created" => true)
     end
 
     it "should allow someone to join a group" do
@@ -404,8 +404,8 @@ describe "Groups API", type: :request do
         :user_id => @user.id
       })
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership).merge("just_created" => true)
+      expect(@membership.workflow_state).to eq "accepted"
+      expect(json).to eq membership_json(@membership).merge("just_created" => true)
     end
 
     it "should not allow a moderator to add someone directly to the group" do
@@ -427,8 +427,8 @@ describe "Groups API", type: :request do
       json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "accepted"
       })
-      @membership.reload.should be_active
-      json.should == membership_json(@membership)
+      expect(@membership.reload).to be_active
+      expect(json).to eq membership_json(@membership)
     end
 
     it "should allow accepting a join request by a moderator using users/:user_id endpoint" do
@@ -441,8 +441,8 @@ describe "Groups API", type: :request do
       json = api_call(:put, "#{@alternate_memberships_path}/#{user_id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => user_id.to_param, :action => "update"), {
           :workflow_state => "accepted"
       })
-      @membership.reload.should be_active
-      json.should == membership_json(@membership)
+      expect(@membership.reload).to be_active
+      expect(json).to eq membership_json(@membership)
     end
 
     it "should not allow other workflow_state modifications" do
@@ -451,17 +451,17 @@ describe "Groups API", type: :request do
       json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "requested"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
 
       json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "invited"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
 
       json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "deleted"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
     end
 
     it "should not allow other workflow_state modifications using users/:user_id endpoint" do
@@ -470,17 +470,17 @@ describe "Groups API", type: :request do
       json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :workflow_state => "requested"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
 
       json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :workflow_state => "invited"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
 
       json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :workflow_state => "deleted"
       })
-      @membership.reload.should be_active
+      expect(@membership.reload).to be_active
     end
 
     it "should not allow a member to accept join requests" do
@@ -492,7 +492,7 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "accepted"
       }, {}, :expected_status => 401)
-      @membership.reload.should be_requested
+      expect(@membership.reload).to be_requested
     end
 
     it "should not allow a member to accept join requests using users/:user_id endpoint" do
@@ -504,7 +504,7 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :workflow_state => "accepted"
       }, {}, :expected_status => 401)
-      @membership.reload.should be_requested
+      expect(@membership.reload).to be_requested
     end
 
     it "should allow changing moderator privileges" do
@@ -513,12 +513,12 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => true
       })
-      @membership.reload.moderator.should be_true
+      expect(@membership.reload.moderator).to be_truthy
 
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => false
       })
-      @membership.reload.moderator.should be_false
+      expect(@membership.reload.moderator).to be_falsey
     end
 
     it "should allow changing moderator privileges using users/:user_id endpoint" do
@@ -527,12 +527,12 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
           :moderator => true
       })
-      @membership.reload.moderator.should be_true
+      expect(@membership.reload.moderator).to be_truthy
 
       api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
           :moderator => false
       })
-      @membership.reload.moderator.should be_false
+      expect(@membership.reload.moderator).to be_falsey
     end
 
     it "should not allow a member to change moderator privileges" do
@@ -541,7 +541,7 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => false
       }, {}, :expected_status => 401)
-      @membership.reload.moderator.should be_true
+      expect(@membership.reload.moderator).to be_truthy
     end
 
     it "should not allow a member to change moderator privileges using users/:user_id endpoint" do
@@ -550,7 +550,7 @@ describe "Groups API", type: :request do
       api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
           :moderator => false
       }, {}, :expected_status => 401)
-      @membership.reload.moderator.should be_true
+      expect(@membership.reload.moderator).to be_truthy
     end
 
     it "should allow someone to leave a group" do
@@ -558,7 +558,7 @@ describe "Groups API", type: :request do
       @gm = @community.group_memberships.where(:user_id => @user).first
       api_call(:delete, "#{@memberships_path}/#{@gm.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @gm.to_param, :action => "destroy"))
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "deleted"
+      expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "should allow someone to leave a group using users/:user_id endpoint" do
@@ -566,21 +566,21 @@ describe "Groups API", type: :request do
       @gm = @community.group_memberships.where(:user_id => @user).first
       api_call(:delete, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "destroy"))
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "deleted"
+      expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "should allow leaving a group using 'self'" do
       @user = @member
       api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "deleted"
+      expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "should allow leaving a group using 'self' using users/:user_id endpoint" do
       @user = @member
       api_call(:delete, "#{@alternate_memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'self', :action => "destroy"))
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
-      @membership.workflow_state.should == "deleted"
+      expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "should allow a moderator to invite people to a group" do
@@ -590,15 +590,15 @@ describe "Groups API", type: :request do
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
-      @memberships.count.should == 2
-      @json.sort_by{ |a| a['id'] }.should == @memberships.map{ |gm| membership_json(gm) }
+      expect(@memberships.count).to eq 2
+      expect(@json.sort_by{ |a| a['id'] }).to eq @memberships.map{ |gm| membership_json(gm) }
     end
 
     it "should not allow a member to invite people to a group" do
       @user = @member
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
       api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
-      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).count.should == 0
+      @memberships = expect(@community.reload.group_memberships.where(:workflow_state => "invited").order(:id).count).to eq 0
     end
 
     it "should find people when inviting to a group in a non-default account" do
@@ -620,7 +620,7 @@ describe "Groups API", type: :request do
         {},
         { :domain_root_account => @account })
 
-      @member.group_memberships.count.should == 1
+      expect(@member.group_memberships.count).to eq 1
     end
 
     it "should allow being added to a non-community account group" do
@@ -637,8 +637,8 @@ describe "Groups API", type: :request do
         { :user_id => @to_add.id })
 
       @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
-      @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership, true).merge("just_created" => true)
+      expect(@membership.workflow_state).to eq "accepted"
+      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
     end
 
     it "should show sis_import_id for group" do
@@ -652,8 +652,8 @@ describe "Groups API", type: :request do
       json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
         :filter_states => ["invited"]
       })
-      json.first['sis_import_id'].should == sis_batch.id
-      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first, true)
+      expect(json.first['sis_import_id']).to eq sis_batch.id
+      expect(json.first).to eq membership_json(@community.group_memberships.where(:workflow_state => 'invited').first, true)
     end
   end
 
@@ -672,10 +672,10 @@ describe "Groups API", type: :request do
       expected_keys = %w{id name sortable_name short_name}
       json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
                       { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
-      json.count.should == 2
+      expect(json.count).to eq 2
       json.each do |user|
-        (user.keys & expected_keys).sort.should == expected_keys.sort
-        @community.users.map(&:id).should include(user['id'])
+        expect((user.keys & expected_keys).sort).to eq expected_keys.sort
+        expect(@community.users.map(&:id)).to include(user['id'])
       end
     end
 
@@ -683,7 +683,7 @@ describe "Groups API", type: :request do
       user
       raw_api_call(:get, "/api/v1/groups/#{@community.id}/users",
                          { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     it "returns an error when search_term is fewer than 3 characters" do
@@ -697,10 +697,10 @@ describe "Groups API", type: :request do
 
       json = api_call(:get, api_url, api_route, {:search_term => 'value'})
 
-      json.count.should == 1
+      expect(json.count).to eq 1
       json.each do |user|
-        (user.keys & expected_keys).sort.should == expected_keys.sort
-        @community.users.map(&:id).should include(user['id'])
+        expect((user.keys & expected_keys).sort).to eq expected_keys.sort
+        expect(@community.users.map(&:id)).to include(user['id'])
       end
     end
 
@@ -714,7 +714,7 @@ describe "Groups API", type: :request do
       user.save!
 
       json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
-      json.first['avatar_url'].should == user.avatar_image_url
+      expect(json.first['avatar_url']).to eq user.avatar_image_url
     end
   end
 
@@ -749,7 +749,7 @@ describe "Groups API", type: :request do
     @topic1 = discussion_topic_model
     json = api_call(:get, "/api/v1/groups/#{@group.id}/activity_stream.json",
                     { controller: "groups", group_id: @group.id.to_s, action: "activity_stream", format: 'json' })
-    json.size.should == 1
+    expect(json.size).to eq 1
   end
 
   it "should return the activity stream summary" do
@@ -760,7 +760,7 @@ describe "Groups API", type: :request do
     @topic1 = discussion_topic_model
     json = api_call(:get, "/api/v1/groups/#{@group.id}/activity_stream/summary.json",
                     { controller: "groups", group_id: @group.id.to_s, action: "activity_stream_summary", format: 'json' })
-    json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
+    expect(json).to eq [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
   end
 
   describe "/preview_html" do
@@ -778,8 +778,8 @@ describe "Groups API", type: :request do
                       { :html => html})
 
       returned_html = json["html"]
-      returned_html.should_not include("<script>")
-      returned_html.should include("/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+      expect(returned_html).not_to include("<script>")
+      expect(returned_html).to include("/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
     end
 
     it "should require permission to preview" do

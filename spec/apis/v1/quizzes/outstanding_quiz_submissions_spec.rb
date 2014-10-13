@@ -63,7 +63,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
       it 'returns all outstanding QS' do
         json = api_index({})
-        json["quiz_submissions"].first["id"].should == @submission.id
+        expect(json["quiz_submissions"].first["id"]).to eq @submission.id
       end
     end
   end
@@ -117,11 +117,11 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
       it 'should continue w/o error when given already graded ids' do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
-        @submission.needs_grading?.should == false
+        expect(@submission.needs_grading?).to eq false
         api_grade({raw: true},{quiz_submission_ids: [@submission.id, @submission2.id]})
         @submission2.reload
-        @submission2.needs_grading?.should == false
-        Quizzes::OutstandingQuizSubmissionManager.new(@quiz).find_by_quiz.size.should == 0
+        expect(@submission2.needs_grading?).to eq false
+        expect(Quizzes::OutstandingQuizSubmissionManager.new(@quiz).find_by_quiz.size).to eq 0
         assert_status 204
       end
     end

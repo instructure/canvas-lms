@@ -38,7 +38,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
-        json.should == @student.pseudonyms.map do |p|
+        expect(json).to eq(@student.pseudonyms.map do |p|
           {
             'account_id' => p.account_id,
             'id' => p.id,
@@ -46,7 +46,7 @@ describe PseudonymsController, type: :request do
             'unique_id' => p.unique_id,
             'user_id' => p.user_id
           }
-        end
+        end)
       end
 
       it "should return multiple pseudonyms if they exist" do
@@ -54,7 +54,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
-        json.count.should eql 2
+        expect(json.count).to eql 2
       end
 
       it "should paginate results" do
@@ -62,12 +62,12 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ :per_page => '1' }), {
           :user => { :id => @student.id }
         })
-        json.count.should eql 1
+        expect(json.count).to eql 1
         headers = response.headers['Link'].split(',')
-        headers[0].should match /page=1&per_page=1/ # current page
-        headers[1].should match /page=2&per_page=1/ # next page
-        headers[2].should match /page=1&per_page=1/ # first page
-        headers[3].should match /page=2&per_page=1/ # last page
+        expect(headers[0]).to match /page=1&per_page=1/ # current page
+        expect(headers[1]).to match /page=2&per_page=1/ # next page
+        expect(headers[2]).to match /page=1&per_page=1/ # first page
+        expect(headers[3]).to match /page=2&per_page=1/ # last page
       end
 
       it "should return all pseudonyms for a user" do
@@ -76,7 +76,7 @@ describe PseudonymsController, type: :request do
         @student.pseudonyms.create!(:unique_id => 'two@example.com', :account => new_account)
 
         json = api_call(:get, @user_path, @user_path_options)
-        json.count.should eql 2
+        expect(json.count).to eql 2
       end
 
       it "should not included deleted pseudonyms" do
@@ -85,8 +85,8 @@ describe PseudonymsController, type: :request do
         to_delete.destroy
 
         json = api_call(:get, @user_path, @user_path_options)
-        json.count.should eql 2
-        json.map{|j| j['id']}.include?(to_delete.id).should be_false
+        expect(json.count).to eql 2
+        expect(json.map{|j| j['id']}.include?(to_delete.id)).to be_falsey
       end
     end
 
@@ -95,7 +95,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
-        json.should be_empty
+        expect(json).to be_empty
       end
     end
 
@@ -108,12 +108,12 @@ describe PseudonymsController, type: :request do
         raw_api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
 
       it "should return 401 unauthorized when listing user pseudonyms" do
         raw_api_call(:get, @user_path, @user_path_options)
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
   end
@@ -134,13 +134,13 @@ describe PseudonymsController, type: :request do
             :unique_id   => 'test@example.com'
           }
         })
-        json.should == {
+        expect(json).to eq({
           'account_id'  => @account.id,
           'id'          => json['id'],
           'sis_user_id' => '12345',
           'unique_id'   => 'test@example.com',
           'user_id'     => @student.id
-        }
+        })
       end
 
       it "should return 400 if account_id is not a root account" do
@@ -155,7 +155,7 @@ describe PseudonymsController, type: :request do
             :unique_id => 'duplicate@example.com'
           }
         })
-        response.code.should eql '400'
+        expect(response.code).to eql '400'
       end
 
       it "should return 400 on duplicate pseudonyms" do
@@ -168,12 +168,12 @@ describe PseudonymsController, type: :request do
             :unique_id => 'duplicate@example.com'
           }
         })
-        response.code.should eql '400'
+        expect(response.code).to eql '400'
       end
 
       it "should return 400 when nothing is passed" do
         raw_api_call(:post, @path, @path_options)
-        response.code.should eql '400'
+        expect(response.code).to eql '400'
       end
     end
 
@@ -188,7 +188,7 @@ describe PseudonymsController, type: :request do
             :unique_id => 'test@example.com'
           }
         })
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
 
@@ -199,7 +199,7 @@ describe PseudonymsController, type: :request do
                      action: 'create', format: 'json'},
                    user: { id: @user.id },
                    login: { unique_id: 'user'} )
-      response.code.should eql '401'
+      expect(response.code).to eql '401'
     end
   end
 
@@ -224,14 +224,14 @@ describe PseudonymsController, type: :request do
             :sis_user_id => 'new-12345'
           }
         })
-        json.should == {
+        expect(json).to eq({
           'account_id' => @student.pseudonym.account_id,
           'id' => @student.pseudonym.id,
           'sis_user_id' => 'new-12345',
           'unique_id' => 'student+new@example.com',
           'user_id' => @student.id
-        }
-        @student.pseudonym.reload.valid_password?('password123').should be_true
+        })
+        expect(@student.pseudonym.reload.valid_password?('password123')).to be_truthy
       end
 
       it "should return 400 if the unique_id already exists" do
@@ -240,7 +240,7 @@ describe PseudonymsController, type: :request do
             :unique_id => 'teacher@example.com'
           }
         })
-        response.code.should eql '400'
+        expect(response.code).to eql '400'
       end
 
       it "should return 200 if a user's sis id is updated to its current value" do
@@ -248,14 +248,14 @@ describe PseudonymsController, type: :request do
         json = api_call(:put, @path, @path_options, {
           :login => { :sis_user_id => 'old-12345' }
         })
-        json['sis_user_id'].should eql 'old-12345'
+        expect(json['sis_user_id']).to eql 'old-12345'
       end
 
       it "should return 200 if changing only sis id" do
         json = api_call(:put, @path, @path_options, {
             :login => { :sis_user_id => 'old-12345' }
         })
-        json['sis_user_id'].should eql 'old-12345'
+        expect(json['sis_user_id']).to eql 'old-12345'
       end
 
       it "should allow changing sis id even if password setting is disabled" do
@@ -265,7 +265,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:put, @path, @path_options, {
             :login => { :sis_user_id => 'old-12345' }
         })
-        json['sis_user_id'].should eql 'old-12345'
+        expect(json['sis_user_id']).to eql 'old-12345'
       end
 
       it "should not allow updating a deleted pseudonym" do
@@ -278,7 +278,7 @@ describe PseudonymsController, type: :request do
             :unique_id => 'changed@example.com'
           }
         })
-        response.code.should eql '404'
+        expect(response.code).to eql '404'
       end
     end
 
@@ -289,7 +289,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options.merge({ :id => @teacher.pseudonym.id.to_param }), {
           :login => { :unique_id => 'teacher+new@example.com' }
         })
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
   end
@@ -308,26 +308,26 @@ describe PseudonymsController, type: :request do
         pseudonym = @student.pseudonym
         @student.pseudonyms.create!(:unique_id => 'student1@example.com')
         json = api_call(:delete, @path, @path_options)
-        @student.pseudonyms.active.count.should eql 1
-        json.should == {
+        expect(@student.pseudonyms.active.count).to eql 1
+        expect(json).to eq({
           'unique_id' => 'student@example.com',
           'sis_user_id' => nil,
           'account_id' => Account.default.id,
           'id' => pseudonym.id,
           'user_id' => @student.id
-        }
+        })
       end
 
       it "should receive an error when trying to delete the user's last pseudonym" do
         raw_api_call(:delete, @path, @path_options)
-        response.code.should eql '400'
-        JSON.parse(response.body).should == {
+        expect(response.code).to eql '400'
+        expect(JSON.parse(response.body)).to eq({
           'errors' => {
             'base' => [
               { 'type' => 'Users must have at least one login', 'attribute' => 'base', 'message' => 'Users must have at least one login' }
             ]
           }
-        }
+        })
       end
 
       it "should not allow re-deleting a login that has already been deleted" do
@@ -336,7 +336,7 @@ describe PseudonymsController, type: :request do
         to_delete.destroy
 
         raw_api_call(:delete, @path, @path_options)
-        response.code.should eql '404'
+        expect(response.code).to eql '404'
       end
     end
 
@@ -344,7 +344,7 @@ describe PseudonymsController, type: :request do
       it "should return 401" do
         user_with_pseudonym
         raw_api_call(:delete, @path, @path_options)
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
   end

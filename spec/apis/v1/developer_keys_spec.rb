@@ -91,7 +91,7 @@ describe DeveloperKeysController, type: :request do
                     {:controller => 'developer_keys', :action => 'create', :format => 'json',
                      }, post_hash)
 
-    DeveloperKey.count.should == 1
+    expect(DeveloperKey.count).to eq 1
     confirm_valid_key(json, DeveloperKey.last)
   end
 
@@ -114,18 +114,18 @@ describe DeveloperKeysController, type: :request do
                     {:controller => 'developer_keys', :action => 'destroy', :format => 'json',
                      :id => key.id.to_s})
     
-    DeveloperKey.where(id: key).should_not be_exists
+    expect(DeveloperKey.where(id: key)).not_to be_exists
   end
   
   def unauthorized_api_call(*args)
     raw_api_call(*args)
-    response.code.should == "401"
+    expect(response.code).to eq "401"
   end
   
   def confirm_valid_key(hash, key)
-    hash['id'].should == key.global_id
-    hash['tool_id'].should == key.tool_id
-    hash['icon_url'].should == key.icon_url
-    hash['name'].should == key.name
+    expect(hash['id']).to eq key.global_id
+    expect(hash['tool_id']).to eq key.tool_id
+    expect(hash['icon_url']).to eq key.icon_url
+    expect(hash['name']).to eq key.name
   end
 end

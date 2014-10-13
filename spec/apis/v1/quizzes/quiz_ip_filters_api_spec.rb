@@ -46,8 +46,8 @@ describe Quizzes::QuizIpFiltersController, type: :request do
 
     it 'should return an empty list' do
       json = get_index
-      json.has_key?('quiz_ip_filters').should be_true
-      json['quiz_ip_filters'].size.should == 0
+      expect(json.has_key?('quiz_ip_filters')).to be_truthy
+      expect(json['quiz_ip_filters'].size).to eq 0
     end
 
     it 'should list the active IP filter' do
@@ -55,7 +55,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       @quiz.save
 
       json = get_index
-      json['quiz_ip_filters'].size.should == 1
+      expect(json['quiz_ip_filters'].size).to eq 1
     end
 
     it 'should list available IP filters' do
@@ -68,7 +68,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       @quiz.context.account.save
 
       json = get_index
-      json['quiz_ip_filters'].size.should == 2
+      expect(json['quiz_ip_filters'].size).to eq 2
     end
 
     it 'should restrict access to itself' do
@@ -90,15 +90,15 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         @quiz.context.account.save
 
         page1 = get_index false, { per_page: 25 }
-        page1['quiz_ip_filters'].size.should == 25
+        expect(page1['quiz_ip_filters'].size).to eq 25
 
         page1 = get_index false, { page: 2, per_page: 25 }
-        page1['quiz_ip_filters'].size.should == 15
+        expect(page1['quiz_ip_filters'].size).to eq 15
       end
 
       it 'should return an empty array with a cursor past the end' do
         page = get_index false, { page: 2 }
-        page['quiz_ip_filters'].should == []
+        expect(page['quiz_ip_filters']).to eq []
       end
 
       it 'should bail out on an invalid cursor' do
@@ -113,15 +113,15 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         @quiz.save
 
         json = get_index
-        json.has_key?('quiz_ip_filters').should be_true
-        json['quiz_ip_filters'][0]['name'].should == 'Current Filter'
-        json['quiz_ip_filters'][0]['account'].should == @quiz.title
-        json['quiz_ip_filters'][0]['filter'].should == '192.168.1.101'
+        expect(json.has_key?('quiz_ip_filters')).to be_truthy
+        expect(json['quiz_ip_filters'][0]['name']).to eq 'Current Filter'
+        expect(json['quiz_ip_filters'][0]['account']).to eq @quiz.title
+        expect(json['quiz_ip_filters'][0]['filter']).to eq '192.168.1.101'
       end
 
       context 'JSON-API compliance' do
         it 'should render as JSON-API' do
-          pending 'CNVS-8978: JSON-API compliance API spec helper'
+          skip 'CNVS-8978: JSON-API compliance API spec helper'
 
           json = get_index
           assert_jsonapi_compliance(json, 'quiz_ip_filters')
