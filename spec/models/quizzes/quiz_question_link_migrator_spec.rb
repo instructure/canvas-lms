@@ -39,7 +39,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       Quizzes::QuizQuestionLinkMigrator.for_each_interesting_field(data) do |field|
         yielded << field
       end
-      yielded.sort.should == data.values.sort
+      expect(yielded.sort).to eq data.values.sort
     end
 
     it "should yield for each answers comments" do
@@ -52,7 +52,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       Quizzes::QuizQuestionLinkMigrator.for_each_interesting_field(data) do |field|
         yielded << field
       end
-      yielded.sort.should == data[:answers].map{ |a| a[:comments] }.sort
+      expect(yielded.sort).to eq data[:answers].map{ |a| a[:comments] }.sort
     end
 
     it "should not yield empty fields" do
@@ -70,7 +70,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       Quizzes::QuizQuestionLinkMigrator.for_each_interesting_field(data) do |field|
         yielded << field
       end
-      yielded.sort.should == [data[:question_text], data[:answers].first[:comments]].sort
+      expect(yielded.sort).to eq [data[:question_text], data[:answers].first[:comments]].sort
     end
 
     it "should not yield irrelevant fields" do
@@ -86,7 +86,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       Quizzes::QuizQuestionLinkMigrator.for_each_interesting_field(data) do |field|
         yielded << field
       end
-      yielded.sort.should == [data[:question_text], data[:answers].first[:comments]].sort
+      expect(yielded.sort).to eq [data[:question_text], data[:answers].first[:comments]].sort
     end
   end
 
@@ -100,7 +100,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
 
     it "should include the input" do
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.should include(@file.id)
+      expect(ids).to include(@file.id)
     end
 
     it "should include files for the same cloned_item" do
@@ -113,7 +113,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       @new_file.save!
 
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.should include(@new_file.id)
+      expect(ids).to include(@new_file.id)
     end
 
     it "should include files derived from the input" do
@@ -123,7 +123,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       @new_file.save!
 
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.should include(@new_file.id)
+      expect(ids).to include(@new_file.id)
     end
 
     it "should include files the input is derived from" do
@@ -135,7 +135,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       @file.save!
 
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.should include(@new_file.id)
+      expect(ids).to include(@new_file.id)
     end
 
     it "should include files derived from the same file the input is derived from" do
@@ -152,7 +152,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       @other_file.save!
 
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.should include(@other_file.id)
+      expect(ids).to include(@other_file.id)
     end
 
     it "should only include each files once" do
@@ -166,7 +166,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
       @new_file.save!
 
       ids = Quizzes::QuizQuestionLinkMigrator.related_attachment_ids(@file.id)
-      ids.select{ |id| id == @new_file.id }.size.should == 1
+      expect(ids.select{ |id| id == @new_file.id }.size).to eq 1
     end
   end
 
@@ -178,16 +178,16 @@ describe Quizzes::QuizQuestionLinkMigrator do
 
     it "should pass links unchanged when the question has no assessment_question" do
       @question = @quiz.quiz_questions.create!(:question_data => {})
-      @question.assessment_question.should be_nil
+      expect(@question.assessment_question).to be_nil
       link = '/courses/1/files/1/preview'
       new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, link)
-      new_link.should == link
+      expect(new_link).to eq link
     end
 
     context "with assessment questions" do
       before :once do
         @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
-        @question.assessment_question.should_not be_nil
+        expect(@question.assessment_question).not_to be_nil
       end
 
       let_once(:file) do
@@ -209,7 +209,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-        new_link.should == target_link
+        expect(new_link).to eq target_link
       end
 
       it "should look for links in more than the question text" do
@@ -224,7 +224,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-        new_link.should == target_link
+        expect(new_link).to eq target_link
       end
 
       it "should just pass the link through if the assessment question doesn't have a matching link" do
@@ -239,7 +239,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-        new_link.should == source_link
+        expect(new_link).to eq source_link
       end
 
       it "reuse cached translations" do
@@ -258,7 +258,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         new_link = Quizzes::QuizQuestionLinkMigrator.migrate_file_link(@question, source_link)
-        new_link.should == target_link
+        expect(new_link).to eq target_link
       end
     end
   end
@@ -293,7 +293,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
-        source_blob.should == target_blob
+        expect(source_blob).to eq target_blob
       end
 
       it "should not migrate links for the correct course" do
@@ -313,7 +313,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         # done this way because the modification is in place
         original_blob = source_blob.dup
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)
-        source_blob.should == original_blob
+        expect(source_blob).to eq original_blob
       end
 
       it "should return true iff a link was migrated" do
@@ -321,8 +321,8 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.assessment_question.save!
 
         # first time true, second time false because it's already migrated
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_true
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz).should be_false
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)).to be_truthy
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_blob(source_blob, @question, @question.quiz)).to be_falsey
       end
     end
 
@@ -342,17 +342,17 @@ describe Quizzes::QuizQuestionLinkMigrator do
         }
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question)
-        question_data[:question_text].should == target_blob
-        question_data[:correct_comments].should == target_blob
-        question_data[:incorrect_comments].should == target_blob
-        question_data[:neutral_comments].should == target_blob
-        question_data[:answers].first[:comments].should == target_blob
+        expect(question_data[:question_text]).to eq target_blob
+        expect(question_data[:correct_comments]).to eq target_blob
+        expect(question_data[:incorrect_comments]).to eq target_blob
+        expect(question_data[:neutral_comments]).to eq target_blob
+        expect(question_data[:answers].first[:comments]).to eq target_blob
       end
 
       it "should infer the contextual question from the question_data" do
         question_data = { :question_text => source_blob.dup, :id => @question.id }
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data)
-        question_data[:question_text].should == target_blob
+        expect(question_data[:question_text]).to eq target_blob
       end
 
       it "should return true iff a link was migrated" do
@@ -365,8 +365,8 @@ describe Quizzes::QuizQuestionLinkMigrator do
         }
 
         # first time true, second time false because it's already migrated
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_true
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question).should be_false
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question)).to be_truthy
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question_data(question_data, :question => @question)).to be_falsey
       end
     end
 
@@ -382,7 +382,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.question_data = qd
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)
-        @question.question_data[:question_text].should == target_blob
+        expect(@question.question_data[:question_text]).to eq target_blob
       end
 
       it "should return true iff a question was migrated" do
@@ -391,8 +391,8 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @question.question_data = qd
 
         # first time true, second time false because it's already migrated
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_true
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_false
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)).to be_truthy
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)).to be_falsey
       end
     end
 
@@ -410,7 +410,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         ]
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-        @quiz.quiz_data.each{ |q| q[:question_text].should == target_blob }
+        @quiz.quiz_data.each{ |q| expect(q[:question_text]).to eq target_blob }
       end
 
       it "should migrate links from each question in each question group in the quiz's data" do
@@ -421,7 +421,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         ]}]
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-        @quiz.quiz_data.first[:questions].each{ |q| q[:question_text].should == target_blob }
+        @quiz.quiz_data.first[:questions].each{ |q| expect(q[:question_text]).to eq target_blob }
       end
 
       it "should migrate links where the course matches the question's quiz's course but not the quiz's course" do
@@ -439,7 +439,7 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question2.id}]
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)
-        @quiz.quiz_data.first[:question_text].should == target_blob
+        expect(@quiz.quiz_data.first[:question_text]).to eq target_blob
       end
 
       it "should not migrate links where the course matches the quiz's course but not the question's quiz's course" do
@@ -453,15 +453,15 @@ describe Quizzes::QuizQuestionLinkMigrator do
         @quiz2.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id}]
 
         Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz2)
-        @quiz2.quiz_data.first[:question_text].should == source_blob
+        expect(@quiz2.quiz_data.first[:question_text]).to eq source_blob
       end
 
       it "should return true iff a link was migrated" do
         @quiz.quiz_data = [{:question_type => :multiple_choice, :question_text => source_blob.dup, :id => @question.id}]
 
         # first time true, second time false because it's already migrated
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_true
-        Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz).should be_false
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)).to be_truthy
+        expect(Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(@quiz)).to be_falsey
       end
     end
   end

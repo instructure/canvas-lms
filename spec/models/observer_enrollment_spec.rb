@@ -29,16 +29,16 @@ describe ObserverEnrollment do
   end
   describe 'observed_students' do
     it "should not fail if the observed has been deleted" do
-      ObserverEnrollment.observed_students(@course, @observer).should == { @student => [@student_enrollment]}
+      expect(ObserverEnrollment.observed_students(@course, @observer)).to eq({ @student => [@student_enrollment]})
       @student_enrollment.destroy
-      ObserverEnrollment.observed_students(@course, @observer).should == {}
+      expect(ObserverEnrollment.observed_students(@course, @observer)).to eq({})
     end
   end
   describe 'observed_student_ids_by_observer_id' do
     it "should return a properly formatted hash" do
       @observer_two = user
       @observer_enrollment_two = @course.enroll_user(@observer_two, 'ObserverEnrollment')
-      ObserverEnrollment.observed_student_ids_by_observer_id(@course, [@observer.id,@observer_two.id]).should == {@observer.id => [@student.id], @observer_two.id => []}
+      expect(ObserverEnrollment.observed_student_ids_by_observer_id(@course, [@observer.id,@observer_two.id])).to eq({@observer.id => [@student.id], @observer_two.id => []})
     end
   end
 end

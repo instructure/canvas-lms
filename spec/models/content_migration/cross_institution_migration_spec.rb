@@ -37,36 +37,36 @@ describe ContentMigration do
     end
 
     it "should retain external references when importing into the same root account" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       run_import(@export.attachment_id)
 
-      @copy_to.context_module_tags.first.content.should == @tool
-      @copy_to.tab_configuration.should == [ {"id" =>0 }, {"id" => "context_external_tool_#{@tool.id}"} ]
-      @copy_to.learning_outcome_links.first.content.should == @outcome
+      expect(@copy_to.context_module_tags.first.content).to eq @tool
+      expect(@copy_to.tab_configuration).to eq [ {"id" =>0 }, {"id" => "context_external_tool_#{@tool.id}"} ]
+      expect(@copy_to.learning_outcome_links.first.content).to eq @outcome
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-      to_assignment.rubric.should == @rubric
-      @copy_to.quizzes.first.quiz_groups.first.assessment_question_bank.should == @bank
+      expect(to_assignment.rubric).to eq @rubric
+      expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to eq @bank
     end
 
     it "should discard external references when importing into a different root account" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       @copy_to.root_account.update_attribute(:uuid, 'more_different_uuid')
       run_import(@export.attachment_id)
 
-      @copy_to.context_module_tags.first.url.should == 'https://blah.example.com/what'
-      @copy_to.context_module_tags.first.content.should be_nil
-      @copy_to.tab_configuration.should == [{'id'=>0}]
-      @copy_to.learning_outcome_links.first.content.context.should == @copy_to
+      expect(@copy_to.context_module_tags.first.url).to eq 'https://blah.example.com/what'
+      expect(@copy_to.context_module_tags.first.content).to be_nil
+      expect(@copy_to.tab_configuration).to eq [{'id'=>0}]
+      expect(@copy_to.learning_outcome_links.first.content.context).to eq @copy_to
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-      to_assignment.rubric.context.should == @copy_to
-      @copy_to.quizzes.first.quiz_groups.first.assessment_question_bank.should be_nil
+      expect(to_assignment.rubric.context).to eq @copy_to
+      expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to be_nil
 
-      @cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }.should_not be_nil
-      @cm.warnings.detect { |w| w =~ /external Rubric couldn't be found.+creating a copy/ }.should_not be_nil
-      @cm.warnings.detect { |w| w =~ /external Learning Outcome couldn't be found.+creating a copy/ }.should_not be_nil
-      @cm.warnings.detect { |w| w =~ /Couldn't find the question bank/ }.should_not be_nil
+      expect(@cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w =~ /external Rubric couldn't be found.+creating a copy/ }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w =~ /external Learning Outcome couldn't be found.+creating a copy/ }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w =~ /Couldn't find the question bank/ }).not_to be_nil
     end
   end
 end

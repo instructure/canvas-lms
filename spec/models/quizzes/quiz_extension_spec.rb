@@ -28,7 +28,7 @@ describe Quizzes::QuizExtension do
       params = {user_id: 1, extra_attempts: 2}
       extension = Quizzes::QuizExtension.new(qs, params)
 
-      extension.quiz_submission.should == qs
+      expect(extension.quiz_submission).to eq qs
     end
   end
 
@@ -38,7 +38,7 @@ describe Quizzes::QuizExtension do
       params = {user_id: 1, extra_attempts: 2}
       extension = Quizzes::QuizExtension.new(qs, params)
 
-      extension.ext_params.should == params
+      expect(extension.ext_params).to eq params
     end
   end
 
@@ -54,12 +54,12 @@ describe Quizzes::QuizExtension do
 
       extension = Quizzes::QuizExtension.new(qs, {})
 
-      extension.quiz_id.should           == qs.quiz_id
-      extension.user_id.should           == qs.user_id
-      extension.extra_attempts.should    == qs.extra_attempts
-      extension.extra_time.should        == qs.extra_time
-      extension.manually_unlocked.should == qs.manually_unlocked
-      extension.end_at.should            == qs.end_at
+      expect(extension.quiz_id).to           eq qs.quiz_id
+      expect(extension.user_id).to           eq qs.user_id
+      expect(extension.extra_attempts).to    eq qs.extra_attempts
+      expect(extension.extra_time).to        eq qs.extra_time
+      expect(extension.manually_unlocked).to eq qs.manually_unlocked
+      expect(extension.end_at).to            eq qs.end_at
     end
   end
 
@@ -86,10 +86,10 @@ describe Quizzes::QuizExtension do
         yielded << ext
       end
 
-      yielded.size.should == 2
-      extensions.size.should == 2
-      extensions[0].ext_params.should == params[0]
-      extensions[1].ext_params.should == params[1]
+      expect(yielded.size).to eq 2
+      expect(extensions.size).to eq 2
+      expect(extensions[0].ext_params).to eq params[0]
+      expect(extensions[1].ext_params).to eq params[1]
     end
   end
 
@@ -109,26 +109,26 @@ describe Quizzes::QuizExtension do
       extension = Quizzes::QuizExtension.new(@qs, extra_attempts: 2)
 
       extension.extend_submission!
-      extension.extra_attempts.should == 2
+      expect(extension.extra_attempts).to eq 2
     end
 
     it "should extend a submission's extra time" do
       extension = Quizzes::QuizExtension.new(@qs, extra_time: 20)
 
       extension.extend_submission!
-      extension.extra_time.should == 20
+      expect(extension.extra_time).to eq 20
     end
 
     it "should extend a submission being manually unlocked" do
       extension = Quizzes::QuizExtension.new(@qs, manually_unlocked: true)
 
       extension.extend_submission!
-      extension.manually_unlocked.should be_true
+      expect(extension.manually_unlocked).to be_truthy
 
       extension = Quizzes::QuizExtension.new(@qs, manually_unlocked: false)
 
       extension.extend_submission!
-      extension.manually_unlocked.should be_false
+      expect(extension.manually_unlocked).to be_falsey
     end
 
     it "should extend a submission's end at using extend_from_now" do
@@ -138,7 +138,7 @@ describe Quizzes::QuizExtension do
       Timecop.freeze(time) do
         extension = Quizzes::QuizExtension.new(@qs, extend_from_now: 20)
         extension.extend_submission!
-        extension.end_at.should == time + 20.minutes
+        expect(extension.end_at).to eq time + 20.minutes
       end
     end
 
@@ -151,7 +151,7 @@ describe Quizzes::QuizExtension do
       extension = Quizzes::QuizExtension.new(@qs, extend_from_end_at: 20)
 
       extension.extend_submission!
-      extension.end_at.should == end_at + 20.minutes
+      expect(extension.end_at).to eq end_at + 20.minutes
     end
 
     it "should have reasonable limits on extendable attributes" do
@@ -159,8 +159,8 @@ describe Quizzes::QuizExtension do
         extra_attempts: 99999999, extra_time: 99999999)
 
       extension.extend_submission!
-      extension.extra_attempts.should == 1000
-      extension.extra_time.should == 10080
+      expect(extension.extra_attempts).to eq 1000
+      expect(extension.extra_time).to eq 10080
     end
 
     it "should only allow numbers or bool for input" do
@@ -171,9 +171,9 @@ describe Quizzes::QuizExtension do
 
       extension.extend_submission!
 
-      extension.extra_attempts.should == 0
-      extension.extra_time.should == 0
-      extension.manually_unlocked.should == false
+      expect(extension.extra_attempts).to eq 0
+      expect(extension.extra_time).to eq 0
+      expect(extension.manually_unlocked).to eq false
     end
   end
 end

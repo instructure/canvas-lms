@@ -49,10 +49,10 @@ describe SubmissionComment do
     Notification.create(:name => 'Submission Comment')
     Notification.create(:name => 'Submission Comment For Teacher')
     @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
-    @comment.messages_sent.keys.sort.should == ["Submission Comment"]
+    expect(@comment.messages_sent.keys.sort).to eq ["Submission Comment"]
     @comment.clear_broadcast_messages
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    @comment.messages_sent.keys.sort.should == ["Submission Comment", "Submission Comment For Teacher"]
+    expect(@comment.messages_sent.keys.sort).to eq ["Submission Comment", "Submission Comment For Teacher"]
   end
 
   it "should dispatch notification on create if assignment is published" do
@@ -68,7 +68,7 @@ describe SubmissionComment do
     @submission.save
     Notification.create(:name => 'Submission Comment')
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    @comment.messages_sent.should be_include('Submission Comment')
+    expect(@comment.messages_sent).to be_include('Submission Comment')
   end
   
   it "should dispatch notification on create to teachers even if submission not submitted yet" do
@@ -82,16 +82,16 @@ describe SubmissionComment do
     @submission.save
     Notification.create(:name => 'Submission Comment For Teacher')
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    @comment.messages_sent.should be_include('Submission Comment For Teacher')
+    expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
   end
   
   it "should allow valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     @comment = SubmissionComment.create!(@valid_attributes)
-    a.recently_created.should eql(true)
+    expect(a.recently_created).to eql(true)
     @comment.reload
     @comment.update_attributes(:attachments => [a])
-    @comment.attachment_ids.should eql(a.id.to_s)
+    expect(@comment.attachment_ids).to eql(a.id.to_s)
   end
   
   it "should reject invalid attachments" do
@@ -99,7 +99,7 @@ describe SubmissionComment do
     a.recently_created = false
     @comment = SubmissionComment.create!(@valid_attributes)
     @comment.update_attributes(:attachments => [a])
-    @comment.attachment_ids.should eql("")
+    expect(@comment.attachment_ids).to eql("")
   end
   
   it "should render formatted_body correctly" do
@@ -112,8 +112,8 @@ This text has a http://www.google.com link in it...
 }
     @comment.save!
     body = @comment.formatted_body
-    body.should match(/\<a/)
-    body.should match(/quoted_text/)
+    expect(body).to match(/\<a/)
+    expect(body).to match(/quoted_text/)
   end
   
   it "should send the submission to the stream" do
@@ -129,11 +129,11 @@ This text has a http://www.google.com link in it...
     @submission.save
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     @item = StreamItem.last
-    @item.should_not be_nil
-    @item.asset.should == @submission
-    @item.data.should be_is_a(Submission)
-    @item.data.submission_comments.target.should == [] # not stored on the stream item
-    @item.data.submission_comments.should == [@comment] # but we can still get them
+    expect(@item).not_to be_nil
+    expect(@item.asset).to eq @submission
+    expect(@item.data).to be_is_a(Submission)
+    expect(@item.data.submission_comments.target).to eq [] # not stored on the stream item
+    expect(@item.data.submission_comments).to eq [@comment] # but we can still get them
   end
 
   it "should ensure the media object exists" do
@@ -158,13 +158,13 @@ This text has a http://www.google.com link in it...
     @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
     @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
 
-    @teacher_comment.grants_right?(@student3, :read).should be_false
-    @reviewer_comment.grants_right?(@student3, :read).should be_false
-    @my_comment.grants_right?(@student3, :read).should be_true
+    expect(@teacher_comment.grants_right?(@student3, :read)).to be_falsey
+    expect(@reviewer_comment.grants_right?(@student3, :read)).to be_falsey
+    expect(@my_comment.grants_right?(@student3, :read)).to be_truthy
 
-    @teacher_comment.grants_right?(@student1, :read).should be_true
-    @reviewer_comment.grants_right?(@student1, :read).should be_true
-    @my_comment.grants_right?(@student1, :read).should be_true
+    expect(@teacher_comment.grants_right?(@student1, :read)).to be_truthy
+    expect(@reviewer_comment.grants_right?(@student1, :read)).to be_truthy
+    expect(@my_comment.grants_right?(@student1, :read)).to be_truthy
   end
 
   describe "reply_from" do
@@ -172,9 +172,9 @@ This text has a http://www.google.com link in it...
       comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
       Account.default.destroy
       comment.reload
-      lambda { 
+      expect { 
         comment.reply_from(:user => @student, :text => "some reply") 
-      }.should raise_error(IncomingMail::Errors::UnknownAddress)
+      }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
   end
 
@@ -183,15 +183,15 @@ This text has a http://www.google.com link in it...
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @teacher}))
       }.to change(ContentParticipation, :count).by(1)
-      ContentParticipation.where(user_id: @student).first.should be_unread
-      @submission.unread?(@student).should be_true
+      expect(ContentParticipation.where(user_id: @student).first).to be_unread
+      expect(@submission.unread?(@student)).to be_truthy
     end
 
     it "should be read after submission is commented on by self" do
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
       }.to change(ContentParticipation, :count).by(0)
-      @submission.read?(@student).should be_true
+      expect(@submission.read?(@student)).to be_truthy
     end
   end
 end

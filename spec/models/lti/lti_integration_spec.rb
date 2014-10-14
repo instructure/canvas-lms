@@ -88,52 +88,52 @@ describe "LTI integration tests" do
     adapter.prepare_tool_launch(return_url, custom_substitutions: {'$Canvas.api.domain' => root_account.domain})
     post_payload = adapter.generate_post_payload
 
-    post_payload['oauth_consumer_key'].should == canvas_tool.consumer_key
-    post_payload['oauth_version'].should == '1.0'
-    post_payload['context_id'].should == canvas_tool.opaque_identifier_for(canvas_course)
-    post_payload['context_label'].should == canvas_course.course_code
-    post_payload['context_title'].should == canvas_course.name
-    post_payload['custom_canvas_enrollment_state'].should == '$Canvas.enrollment.enrollmentState'
-    post_payload['custom_canvas_api_domain'].should == root_account.domain
-    post_payload['custom_canvas_course_id'].should == canvas_course.id.to_s
-    post_payload['custom_canvas_user_id'].should == '$Canvas.user.id'
-    post_payload['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
-    post_payload['custom_variable_canvas_api_domain'].should == root_account.domain
-    post_payload['custom_variable_canvas_assignment_id'].should == '$Canvas.assignment.id'
-    post_payload['custom_variable_canvas_assignment_points_possible'].should == '$Canvas.assignment.pointsPossible'
-    post_payload['custom_variable_canvas_assignment_title'].should == '$Canvas.assignment.title'
-    post_payload['custom_variable_canvas_course_id'].should == canvas_course.id.to_s
-    post_payload['custom_variable_canvas_enrollment_enrollment_state'].should == '$Canvas.enrollment.enrollmentState'
-    post_payload['custom_variable_canvas_membership_concluded_roles'].should == '$Canvas.membership.concludedRoles'
-    post_payload['custom_variable_canvas_user_id'].should == '$Canvas.user.id'
-    post_payload['custom_variable_canvas_user_login_id'].should == '$Canvas.user.loginId'
-    post_payload['custom_variable_person_address_timezone'].should == 'my/zone'
-    post_payload['custom_variable_person_name_family'].should == canvas_user.last_name
-    post_payload['custom_variable_person_name_full'].should == canvas_user.name
-    post_payload['custom_variable_person_name_given'].should == canvas_user.first_name
-    post_payload['launch_presentation_document_target'].should == 'iframe'
-    post_payload['launch_presentation_locale'].should == 'en'
-    post_payload['launch_presentation_return_url'].should == '/return/url'
-    post_payload['lis_course_offering_sourcedid'].should == canvas_course.sis_source_id
-    post_payload['lis_person_contact_email_primary'].should == canvas_user.email
-    post_payload['lis_person_name_family'].should == canvas_user.last_name
-    post_payload['lis_person_name_full'].should == canvas_user.name
-    post_payload['lis_person_name_given'].should == canvas_user.first_name
-    post_payload['lis_person_sourcedid'].should == pseudonym.sis_user_id
-    post_payload['lti_message_type'].should == 'basic-lti-launch-request'
-    post_payload['lti_version'].should == 'LTI-1p0'
-    post_payload['oauth_callback'].should == 'about:blank'
-    post_payload['resource_link_id'].should == canvas_tool.opaque_identifier_for(canvas_course)
-    post_payload['resource_link_title'].should == canvas_tool.name
-    post_payload['roles'].should == 'urn:lti:role:ims/lis/TeachingAssistant,Instructor'
-    post_payload['ext_roles'].should == "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User"
-    post_payload['tool_consumer_info_product_family_code'].should == 'canvas'
-    post_payload['tool_consumer_info_version'].should == 'cloud'
-    post_payload['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
-    post_payload['tool_consumer_instance_guid'].should == root_account.lti_guid
-    post_payload['tool_consumer_instance_name'].should == root_account.name
-    post_payload['user_id'].should == canvas_tool.opaque_identifier_for(canvas_user)
-    post_payload['user_image'].should == canvas_user.avatar_url
+    expect(post_payload['oauth_consumer_key']).to eq canvas_tool.consumer_key
+    expect(post_payload['oauth_version']).to eq '1.0'
+    expect(post_payload['context_id']).to eq canvas_tool.opaque_identifier_for(canvas_course)
+    expect(post_payload['context_label']).to eq canvas_course.course_code
+    expect(post_payload['context_title']).to eq canvas_course.name
+    expect(post_payload['custom_canvas_enrollment_state']).to eq '$Canvas.enrollment.enrollmentState'
+    expect(post_payload['custom_canvas_api_domain']).to eq root_account.domain
+    expect(post_payload['custom_canvas_course_id']).to eq canvas_course.id.to_s
+    expect(post_payload['custom_canvas_user_id']).to eq '$Canvas.user.id'
+    expect(post_payload['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+    expect(post_payload['custom_variable_canvas_api_domain']).to eq root_account.domain
+    expect(post_payload['custom_variable_canvas_assignment_id']).to eq '$Canvas.assignment.id'
+    expect(post_payload['custom_variable_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
+    expect(post_payload['custom_variable_canvas_assignment_title']).to eq '$Canvas.assignment.title'
+    expect(post_payload['custom_variable_canvas_course_id']).to eq canvas_course.id.to_s
+    expect(post_payload['custom_variable_canvas_enrollment_enrollment_state']).to eq '$Canvas.enrollment.enrollmentState'
+    expect(post_payload['custom_variable_canvas_membership_concluded_roles']).to eq '$Canvas.membership.concludedRoles'
+    expect(post_payload['custom_variable_canvas_user_id']).to eq '$Canvas.user.id'
+    expect(post_payload['custom_variable_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+    expect(post_payload['custom_variable_person_address_timezone']).to eq 'my/zone'
+    expect(post_payload['custom_variable_person_name_family']).to eq canvas_user.last_name
+    expect(post_payload['custom_variable_person_name_full']).to eq canvas_user.name
+    expect(post_payload['custom_variable_person_name_given']).to eq canvas_user.first_name
+    expect(post_payload['launch_presentation_document_target']).to eq 'iframe'
+    expect(post_payload['launch_presentation_locale']).to eq 'en'
+    expect(post_payload['launch_presentation_return_url']).to eq '/return/url'
+    expect(post_payload['lis_course_offering_sourcedid']).to eq canvas_course.sis_source_id
+    expect(post_payload['lis_person_contact_email_primary']).to eq canvas_user.email
+    expect(post_payload['lis_person_name_family']).to eq canvas_user.last_name
+    expect(post_payload['lis_person_name_full']).to eq canvas_user.name
+    expect(post_payload['lis_person_name_given']).to eq canvas_user.first_name
+    expect(post_payload['lis_person_sourcedid']).to eq pseudonym.sis_user_id
+    expect(post_payload['lti_message_type']).to eq 'basic-lti-launch-request'
+    expect(post_payload['lti_version']).to eq 'LTI-1p0'
+    expect(post_payload['oauth_callback']).to eq 'about:blank'
+    expect(post_payload['resource_link_id']).to eq canvas_tool.opaque_identifier_for(canvas_course)
+    expect(post_payload['resource_link_title']).to eq canvas_tool.name
+    expect(post_payload['roles']).to eq 'urn:lti:role:ims/lis/TeachingAssistant,Instructor'
+    expect(post_payload['ext_roles']).to eq "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User"
+    expect(post_payload['tool_consumer_info_product_family_code']).to eq 'canvas'
+    expect(post_payload['tool_consumer_info_version']).to eq 'cloud'
+    expect(post_payload['tool_consumer_instance_contact_email']).to eq HostUrl.outgoing_email_address
+    expect(post_payload['tool_consumer_instance_guid']).to eq root_account.lti_guid
+    expect(post_payload['tool_consumer_instance_name']).to eq root_account.name
+    expect(post_payload['user_id']).to eq canvas_tool.opaque_identifier_for(canvas_user)
+    expect(post_payload['user_image']).to eq canvas_user.avatar_url
   end
 
   describe "legacy integration tests" do
@@ -152,35 +152,35 @@ describe "LTI integration tests" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
-      hash['lti_message_type'].should == 'basic-lti-launch-request'
-      hash['lti_version'].should == 'LTI-1p0'
-      hash['resource_link_id'].should == '123456'
-      hash['resource_link_title'].should == @tool.name
-      hash['user_id'].should == @tool.opaque_identifier_for(@user)
-      hash['user_image'].should == @user.avatar_url
-      hash['roles'].should == 'Instructor'
-      hash['context_id'].should == @tool.opaque_identifier_for(@course)
-      hash['context_title'].should == @course.name
-      hash['context_label'].should == @course.course_code
-      hash['custom_canvas_user_id'].should == '$Canvas.user.id'
-      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
-      hash['custom_canvas_course_id'].should == @course.id.to_s
-      hash['custom_canvas_api_domain'].should == '$Canvas.api.domain'
-      hash['lis_course_offering_sourcedid'].should == 'coursesis'
-      hash['lis_person_contact_email_primary'].should == 'nobody@example.com'
-      hash['lis_person_name_full'].should == 'A Name'
-      hash['lis_person_name_family'].should == 'Name'
-      hash['lis_person_name_given'].should == 'A'
-      hash['lis_person_sourcedid'].should == 'testfun'
-      hash['launch_presentation_locale'].should == I18n.default_locale.to_s
-      hash['launch_presentation_document_target'].should == 'iframe'
-      hash['launch_presentation_return_url'].should == 'http://www.google.com'
-      hash['tool_consumer_instance_guid'].should == @course.root_account.lti_guid
-      hash['tool_consumer_instance_name'].should == @course.root_account.name
-      hash['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
-      hash['tool_consumer_info_product_family_code'].should == 'canvas'
-      hash['tool_consumer_info_version'].should == 'cloud'
-      hash['oauth_callback'].should == 'about:blank'
+      expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
+      expect(hash['lti_version']).to eq 'LTI-1p0'
+      expect(hash['resource_link_id']).to eq '123456'
+      expect(hash['resource_link_title']).to eq @tool.name
+      expect(hash['user_id']).to eq @tool.opaque_identifier_for(@user)
+      expect(hash['user_image']).to eq @user.avatar_url
+      expect(hash['roles']).to eq 'Instructor'
+      expect(hash['context_id']).to eq @tool.opaque_identifier_for(@course)
+      expect(hash['context_title']).to eq @course.name
+      expect(hash['context_label']).to eq @course.course_code
+      expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
+      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+      expect(hash['custom_canvas_course_id']).to eq @course.id.to_s
+      expect(hash['custom_canvas_api_domain']).to eq '$Canvas.api.domain'
+      expect(hash['lis_course_offering_sourcedid']).to eq 'coursesis'
+      expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
+      expect(hash['lis_person_name_full']).to eq 'A Name'
+      expect(hash['lis_person_name_family']).to eq 'Name'
+      expect(hash['lis_person_name_given']).to eq 'A'
+      expect(hash['lis_person_sourcedid']).to eq 'testfun'
+      expect(hash['launch_presentation_locale']).to eq I18n.default_locale.to_s
+      expect(hash['launch_presentation_document_target']).to eq 'iframe'
+      expect(hash['launch_presentation_return_url']).to eq 'http://www.google.com'
+      expect(hash['tool_consumer_instance_guid']).to eq @course.root_account.lti_guid
+      expect(hash['tool_consumer_instance_name']).to eq @course.root_account.name
+      expect(hash['tool_consumer_instance_contact_email']).to eq HostUrl.outgoing_email_address
+      expect(hash['tool_consumer_info_product_family_code']).to eq 'canvas'
+      expect(hash['tool_consumer_info_version']).to eq 'cloud'
+      expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
     it "should set the locale if I18n.localizer exists" do
@@ -189,7 +189,7 @@ describe "LTI integration tests" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
-      hash['launch_presentation_locale'].should == 'es'
+      expect(hash['launch_presentation_locale']).to eq 'es'
       I18n.localizer = lambda { :en }
     end
 
@@ -204,10 +204,10 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['custom_canvas_account_id'].should == sub_account.id.to_s
-      hash['custom_canvas_account_sis_id'].should == 'accountsis'
-      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
-      hash['custom_variable_canvas_membership_concluded_roles'].should == "$Canvas.membership.concludedRoles"
+      expect(hash['custom_canvas_account_id']).to eq sub_account.id.to_s
+      expect(hash['custom_canvas_account_sis_id']).to eq 'accountsis'
+      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+      expect(hash['custom_variable_canvas_membership_concluded_roles']).to eq "$Canvas.membership.concludedRoles"
     end
 
     it "should add account and user info in launch data for user profile launch" do
@@ -223,9 +223,9 @@ describe "LTI integration tests" do
 
       hash['custom_canvas_account_id'] = sub_account.id.to_s
       hash['custom_canvas_account_sis_id'] = 'accountsis'
-      hash['lis_person_sourcedid'].should == 'testfun'
-      hash['custom_canvas_user_id'].should == '$Canvas.user.id'
-      hash['tool_consumer_instance_guid'].should == sub_account.root_account.lti_guid
+      expect(hash['lis_person_sourcedid']).to eq 'testfun'
+      expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
+      expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
     it "should include URI query parameters" do
@@ -233,8 +233,8 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['a'].should == '1'
-      hash['b'].should == '2'
+      expect(hash['a']).to eq '1'
+      expect(hash['b']).to eq '2'
     end
 
     it "should not allow overwriting other parameters from the URI query string" do
@@ -242,8 +242,8 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com?user_id=123&oauth_callback=1234', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['user_id'].should == @tool.opaque_identifier_for(@user)
-      hash['oauth_callback'].should == 'about:blank'
+      expect(hash['user_id']).to eq @tool.opaque_identifier_for(@user)
+      expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
     it "should include custom fields" do
@@ -254,76 +254,76 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
-      hash['custom_bob'].should eql('bob')
-      hash['custom_fred'].should eql('fred')
-      hash['custom_john'].should eql('john')
-      hash['custom___taa____'].should eql('123')
-      hash['@$TAA$#$#'].should be_nil
-      hash['john'].should be_nil
+      expect(hash.keys.select{|k| k.match(/^custom_/) }.sort).to eq ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
+      expect(hash['custom_bob']).to eql('bob')
+      expect(hash['custom_fred']).to eql('fred')
+      expect(hash['custom_john']).to eql('john')
+      expect(hash['custom___taa____']).to eql('123')
+      expect(hash['@$TAA$#$#']).to be_nil
+      expect(hash['john']).to be_nil
     end
 
     it "should not include name and email if anonymous" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
-      @tool.include_name?.should eql(false)
-      @tool.include_email?.should eql(false)
+      expect(@tool.include_name?).to eql(false)
+      expect(@tool.include_email?).to eql(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['lis_person_name_given'].should be_nil
-      hash['lis_person_name_family'].should be_nil
-      hash['lis_person_name_full'].should be_nil
-      hash['lis_person_contact_email_primary'].should be_nil
+      expect(hash['lis_person_name_given']).to be_nil
+      expect(hash['lis_person_name_family']).to be_nil
+      expect(hash['lis_person_name_full']).to be_nil
+      expect(hash['lis_person_contact_email_primary']).to be_nil
     end
 
     it "should include name if name_only" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'name_only', :name => 'tool')
-      @tool.include_name?.should eql(true)
-      @tool.include_email?.should eql(false)
+      expect(@tool.include_name?).to eql(true)
+      expect(@tool.include_email?).to eql(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['lis_person_name_given'].should == 'User'
-      hash['lis_person_name_family'].should == nil
-      hash['lis_person_name_full'].should == @user.name
-      hash['lis_person_contact_email_primary'].should be_nil
+      expect(hash['lis_person_name_given']).to eq 'User'
+      expect(hash['lis_person_name_family']).to eq nil
+      expect(hash['lis_person_name_full']).to eq @user.name
+      expect(hash['lis_person_contact_email_primary']).to be_nil
     end
 
     it "should include email if email_only" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'email_only', :name => 'tool')
-      @tool.include_name?.should eql(false)
-      @tool.include_email?.should eql(true)
+      expect(@tool.include_name?).to eql(false)
+      expect(@tool.include_email?).to eql(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['lis_person_name_given'].should == nil
-      hash['lis_person_name_family'].should == nil
-      hash['lis_person_name_full'].should == nil
+      expect(hash['lis_person_name_given']).to eq nil
+      expect(hash['lis_person_name_family']).to eq nil
+      expect(hash['lis_person_name_full']).to eq nil
       hash['lis_person_contact_email_primary'] = @user.email
     end
 
     it "should include email if public" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
-      @tool.include_name?.should eql(true)
-      @tool.include_email?.should eql(true)
+      expect(@tool.include_name?).to eql(true)
+      expect(@tool.include_email?).to eql(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['lis_person_name_given'].should == 'User'
-      hash['lis_person_name_family'].should == nil
-      hash['lis_person_name_full'].should == @user.name
+      expect(hash['lis_person_name_given']).to eq 'User'
+      expect(hash['lis_person_name_family']).to eq nil
+      expect(hash['lis_person_name_full']).to eq @user.name
       hash['lis_person_contact_email_primary'] = @user.email
     end
 
@@ -336,7 +336,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
+      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
     end
 
     it "should include text if set" do
@@ -348,7 +348,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456', selected_html: html)
 
       hash = adapter.generate_post_payload
-      hash['text'].should == CGI::escape(html)
+      expect(hash['text']).to eq CGI::escape(html)
     end
   end
 
@@ -373,23 +373,23 @@ describe "LTI integration tests" do
       hash = tool_setup
 
       payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')
-      hash['lis_result_sourcedid'].should == "#{payload}-some_sha"
-      hash['lis_outcome_service_url'].should == "/my/test/url"
-      hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
-      hash['ext_outcome_data_values_accepted'].should == 'url,text'
-      hash['custom_canvas_assignment_title'].should == @assignment.title
-      hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
-      hash['custom_canvas_assignment_id'].should == @assignment.id.to_s
+      expect(hash['lis_result_sourcedid']).to eq "#{payload}-some_sha"
+      expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
+      expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
+      expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['custom_canvas_assignment_title']).to eq @assignment.title
+      expect(hash['custom_canvas_assignment_points_possible']).to eq @assignment.points_possible.to_s
+      expect(hash['custom_canvas_assignment_id']).to eq @assignment.id.to_s
     end
 
     it "should include assignment outcome service params for teacher" do
       hash = tool_setup(false)
-      hash['lis_result_sourcedid'].should be_nil
-      hash['lis_outcome_service_url'].should == "/my/test/url"
-      hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
-      hash['ext_outcome_data_values_accepted'].should == 'url,text'
-      hash['custom_canvas_assignment_title'].should == @assignment.title
-      hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
+      expect(hash['lis_result_sourcedid']).to be_nil
+      expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
+      expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
+      expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['custom_canvas_assignment_title']).to eq @assignment.title
+      expect(hash['custom_canvas_assignment_points_possible']).to eq @assignment.points_possible.to_s
     end
   end
 
@@ -406,15 +406,15 @@ describe "LTI integration tests" do
     adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456', resource_type: 'editor_button')
     hash = adapter.generate_post_payload
 
-    hash['launch_presentation_width'].should == '1000'
-    hash['launch_presentation_height'].should == '300'
+    expect(hash['launch_presentation_width']).to eq '1000'
+    expect(hash['launch_presentation_height']).to eq '300'
   end
 
   context "sharding" do
     specs_require_sharding
 
     # TODO: Replace this once we have LTIInbound
-    it "should roundtrip source ids from mixed shards", pending: true do
+    it "should roundtrip source ids from mixed shards", skip: true do
       @shard1.activate do
         @account = Account.create!
         course_with_teacher(:active_all => true, :account => @account)
@@ -433,9 +433,9 @@ describe "LTI integration tests" do
       end
 
       course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-      course.should == @course
-      assignment.should == @assignment
-      user.should == @user
+      expect(course).to eq @course
+      expect(assignment).to eq @assignment
+      expect(user).to eq @user
     end
 
     it "should provide different user ids for users with the same local id from different shards" do
@@ -458,7 +458,7 @@ describe "LTI integration tests" do
       adapter2.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash2 = adapter2.generate_post_payload
 
-      hash1['user_id'].should_not == hash2['user_id']
+      expect(hash1['user_id']).not_to eq hash2['user_id']
     end
   end
 end

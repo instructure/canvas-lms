@@ -36,13 +36,13 @@ describe "Assessment Question import from hash" do
     data = {'assessment_questions'=>{'assessment_questions'=>data}}
 
     migration = ContentMigration.create!(:context => context)
-    context.assessment_questions.count.should == 0
+    expect(context.assessment_questions.count).to eq 0
 
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    context.assessment_question_banks.count.should == 1
-    context.assessment_questions.count.should == 1
+    expect(context.assessment_question_banks.count).to eq 1
+    expect(context.assessment_questions.count).to eq 1
   end
 
   it "should update assessment question on re-import" do
@@ -51,15 +51,15 @@ describe "Assessment Question import from hash" do
     data = {'assessment_questions'=>{'assessment_questions'=>data}}
 
     migration = ContentMigration.create!(:context => context)
-    context.assessment_questions.count.should == 0
+    expect(context.assessment_questions.count).to eq 0
 
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     data['assessment_questions']['assessment_questions'].first['question_name'] = "Bee2"
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    context.assessment_question_banks.count.should == 1
-    context.assessment_questions.count.should == 1
-    context.assessment_questions.first.name.should == "Bee2"
+    expect(context.assessment_question_banks.count).to eq 1
+    expect(context.assessment_questions.count).to eq 1
+    expect(context.assessment_questions.first.name).to eq "Bee2"
   end
 
   it "should use the question bank settings" do
@@ -70,8 +70,8 @@ describe "Assessment Question import from hash" do
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  q[:question_bank_name]).first
-    bank.assessment_questions.count.should == 1
-    bank.assessment_questions.first.migration_id.should == q[:migration_id]
+    expect(bank.assessment_questions.count).to eq 1
+    expect(bank.assessment_questions.first.migration_id).to eq q[:migration_id]
   end
 
   it "should use the specified question group" do
@@ -85,7 +85,7 @@ describe "Assessment Question import from hash" do
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  q_hash[:question_bank_name]).first
     bank_aq = bank.assessment_questions.first
-    bank_aq.id.should == q.id
+    expect(bank_aq.id).to eq q.id
   end
 
   it "should use the default question group if none specified" do
@@ -99,7 +99,7 @@ describe "Assessment Question import from hash" do
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  AssessmentQuestionBank.default_imported_title).first
     bank_aq = bank.assessment_questions.first
-    bank_aq.id.should == q.id
+    expect(bank_aq.id).to eq q.id
   end
 
   it "should use the correct question bank" do
@@ -111,21 +111,21 @@ describe "Assessment Question import from hash" do
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    context.assessment_question_banks.count.should eql(3)
-    context.assessment_questions.count.should eql(4)
+    expect(context.assessment_question_banks.count).to eql(3)
+    expect(context.assessment_questions.count).to eql(4)
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  'Group1').first
-    bank.assessment_questions.count.should eql(1)
-    bank.assessment_questions.first.migration_id.should eql('1')
+    expect(bank.assessment_questions.count).to eql(1)
+    expect(bank.assessment_questions.first.migration_id).to eql('1')
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  'Assmnt1').first
-    bank.assessment_questions.count.should eql(2)
-    ['2','3'].member?(bank.assessment_questions.first.migration_id).should_not be_nil
-    ['2','3'].member?(bank.assessment_questions.last.migration_id).should_not be_nil
+    expect(bank.assessment_questions.count).to eql(2)
+    expect(['2','3'].member?(bank.assessment_questions.first.migration_id)).not_to be_nil
+    expect(['2','3'].member?(bank.assessment_questions.last.migration_id)).not_to be_nil
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  "test question bank").first
-    bank.assessment_questions.count.should eql(1)
-    bank.assessment_questions.first.migration_id.should eql('4')
+    expect(bank.assessment_questions.count).to eql(1)
+    expect(bank.assessment_questions.first.migration_id).to eql('4')
   end
 
   it "should allow question groups to point to question banks" do
@@ -143,7 +143,7 @@ describe "Assessment Question import from hash" do
     quiz = context.quizzes.where(migration_id: quiz[:migration_id]).first
 
     group = quiz.quiz_groups.first
-    group.assessment_question_bank_id.should == bank.id
+    expect(group.assessment_question_bank_id).to eq bank.id
   end
 
 end
@@ -156,13 +156,13 @@ def test_question_import(hash_name, system, question_type=nil)
   data = {'assessment_questions' => {'assessment_questions' => [q]}}
   migration = ContentMigration.create!(:context => context)
   Importers::AssessmentQuestionImporter.process_migration(data, migration)
-  context.assessment_questions.count.should == 1
+  expect(context.assessment_questions.count).to eq 1
 
   db_aq = AssessmentQuestion.where(migration_id: q[:migration_id]).first
-  db_aq.migration_id.should == q[:migration_id]
+  expect(db_aq.migration_id).to eq q[:migration_id]
   db_aq.name == q[:question_name]
 
   bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  AssessmentQuestionBank.default_imported_title).first
   bank_aq = bank.assessment_questions.first
-  bank_aq.id.should == db_aq.id
+  expect(bank_aq.id).to eq db_aq.id
 end

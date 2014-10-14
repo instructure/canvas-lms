@@ -54,12 +54,12 @@ describe GradingPeriod do
   context "associations" do
     it "should belong to a course" do
       association = GradingPeriod.reflect_on_association(:course)
-      association.macro.should == :belongs_to
+      expect(association.macro).to eq :belongs_to
     end
 
     it "should belong to an account" do
       association = GradingPeriod.reflect_on_association(:account)
-      association.macro.should == :belongs_to
+      expect(association.macro).to eq :belongs_to
     end
   end
 

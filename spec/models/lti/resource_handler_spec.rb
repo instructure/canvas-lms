@@ -32,13 +32,13 @@ module Lti
       it 'requires the name' do
         subject.name = nil
         subject.save
-        subject.errors.first.should == [:name, "can't be blank"]
+        expect(subject.errors.first).to eq [:name, "can't be blank"]
       end
 
       it 'requires a tool proxy' do
         subject.tool_proxy = nil
         subject.save
-        subject.errors.first.should == [:tool_proxy, "can't be blank"]
+        expect(subject.errors.first).to eq [:tool_proxy, "can't be blank"]
       end
 
     end

@@ -46,14 +46,14 @@ describe Submission do
 
   it "should add http:// to the body for long urls, too" do
     s = Submission.create!(@valid_attributes)
-    s.url.should == 'http://www.instructure.com'
+    expect(s.url).to eq 'http://www.instructure.com'
 
     long_url = ("a"*300 + ".com")
     s.url = long_url
     s.save!
-    s.url.should == "http://#{long_url}"
+    expect(s.url).to eq "http://#{long_url}"
     # make sure it adds the "http://" to the body for long urls, too
-    s.body.should == "http://#{long_url}"
+    expect(s.body).to eq "http://#{long_url}"
   end
 
   it "should offer the context, if one is available" do
@@ -62,43 +62,43 @@ describe Submission do
     @assignment.expects(:context).returns(@course)
 
     @submission = Submission.new
-    lambda{@submission.context}.should_not raise_error
-    @submission.context.should be_nil
+    expect{@submission.context}.not_to raise_error
+    expect(@submission.context).to be_nil
     @submission.assignment = @assignment
-    @submission.context.should eql(@course)
+    expect(@submission.context).to eql(@course)
   end
 
   it "should have an interesting state machine" do
     submission_spec_model
-    @submission.state.should eql(:submitted)
+    expect(@submission.state).to eql(:submitted)
     @submission.grade_it
-    @submission.state.should eql(:graded)
+    expect(@submission.state).to eql(:graded)
   end
 
   it "should be versioned" do
     submission_spec_model
-    @submission.should be_respond_to(:versions)
+    expect(@submission).to be_respond_to(:versions)
   end
 
   it "should not save new versions by default" do
     submission_spec_model
-    lambda {
+    expect {
       @submission.save!
-    }.should_not change(@submission.versions, :count)
+    }.not_to change(@submission.versions, :count)
   end
 
   describe "version indexing" do
     it "should create a SubmissionVersion when a new submission is created" do
-      lambda {
+      expect {
         submission_spec_model
-      }.should change(SubmissionVersion, :count)
+      }.to change(SubmissionVersion, :count)
     end
 
     it "should create a SubmissionVersion when a new version is saved" do
       submission_spec_model
-      lambda {
+      expect {
         @submission.with_versioning(:explicit => true) { @submission.save }
-      }.should change(SubmissionVersion, :count)
+      }.to change(SubmissionVersion, :count)
     end
   end
 
@@ -136,7 +136,7 @@ describe Submission do
       Time.stubs(:now).returns(new_time)
       @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
       @submission.reload
-      (@submission.submitted_at.to_i - @submission.created_at.to_i).abs.should < 1.minute
+      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
     end
   end
 
@@ -159,7 +159,7 @@ describe Submission do
         @assignment.update_attributes(:due_at => Time.now + 1000)
 
         submission_spec_model(:user => @student)
-        @submission.messages_sent.keys.should == ['Assignment Submitted']
+        expect(@submission.messages_sent.keys).to eq ['Assignment Submitted']
       end
 
       it "should send the correct message when an assignment is turned in late" do
@@ -167,7 +167,7 @@ describe Submission do
         @assignment.update_attributes(:due_at => Time.now - 1000)
 
         submission_spec_model(:user => @student)
-        @submission.messages_sent.keys.should == ['Assignment Submitted Late']
+        expect(@submission.messages_sent.keys).to eq ['Assignment Submitted Late']
       end
 
       it "should send the correct message when an assignment is resubmitted on-time" do
@@ -177,7 +177,7 @@ describe Submission do
 
         @assignment.submit_homework(@student, :body => "lol")
         resubmission = @assignment.submit_homework(@student, :body => "frd")
-        resubmission.messages_sent.keys.should == ['Assignment Resubmitted']
+        expect(resubmission.messages_sent.keys).to eq ['Assignment Resubmitted']
       end
 
       it "should send the correct message when an assignment is resubmitted late" do
@@ -187,7 +187,7 @@ describe Submission do
 
         @assignment.submit_homework(@student, :body => "lol")
         resubmission = @assignment.submit_homework(@student, :body => "frd")
-        resubmission.messages_sent.keys.should == ['Assignment Submitted Late']
+        expect(resubmission.messages_sent.keys).to eq ['Assignment Submitted Late']
       end
 
       it "should send the correct message when a group assignment is submitted late" do
@@ -196,7 +196,7 @@ describe Submission do
         @group1.add_user(@student)
         submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
 
-        submission.messages_sent.keys.should == ['Group Assignment Submitted Late']
+        expect(submission.messages_sent.keys).to eq ['Group Assignment Submitted Late']
       end
     end
 
@@ -209,10 +209,10 @@ describe Submission do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @submission.reload
-        @submission.assignment.should eql(@assignment)
-        @submission.assignment.state.should eql(:published)
+        expect(@submission.assignment).to eql(@assignment)
+        expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
-        @submission.messages_sent.should be_include('Submission Graded')
+        expect(@submission.messages_sent).to be_include('Submission Graded')
       end
 
       it "should not create a message when a muted assignment has been graded and published" do
@@ -220,10 +220,10 @@ describe Submission do
         @cc = @user.communication_channels.create(:path => "somewhere")
         @assignment.mute!
         @submission.reload
-        @submission.assignment.should eql(@assignment)
-        @submission.assignment.state.should eql(:published)
+        expect(@submission.assignment).to eql(@assignment)
+        expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
-        @submission.messages_sent.should_not be_include "Submission Graded"
+        expect(@submission.messages_sent).not_to be_include "Submission Graded"
       end
 
       it "should not create a message when this is a quiz submission" do
@@ -233,31 +233,31 @@ describe Submission do
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
-        @submission.assignment.should eql(@assignment)
-        @submission.assignment.state.should eql(:published)
+        expect(@submission.assignment).to eql(@assignment)
+        expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
-        @submission.messages_sent.should_not include('Submission Graded')
+        expect(@submission.messages_sent).not_to include('Submission Graded')
       end
 
       it "should create a hidden stream_item_instance when muted, graded, and published" do
         submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         @assignment.mute!
-        lambda {
+        expect {
           @submission = @assignment.grade_student(@user, :grade => 10)[0]
-        }.should change StreamItemInstance, :count
-        @user.stream_item_instances.last.should be_hidden
+        }.to change StreamItemInstance, :count
+        expect(@user.stream_item_instances.last).to be_hidden
       end
 
       it "should hide any existing stream_item_instances when muted" do
         submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
-        lambda {
+        expect {
           @submission = @assignment.grade_student(@user, :grade => 10)[0]
-        }.should change StreamItemInstance, :count
-        @user.stream_item_instances.last.should_not be_hidden
+        }.to change StreamItemInstance, :count
+        expect(@user.stream_item_instances.last).not_to be_hidden
         @assignment.mute!
-        @user.stream_item_instances.last.should be_hidden
+        expect(@user.stream_item_instances.last).to be_hidden
       end
 
       it "should not create a message for admins and teachers with quiz submissions" do
@@ -281,8 +281,8 @@ describe Submission do
         submission2 = quiz.generate_submission(@teacher, false)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
-        submission.submission.messages_sent.should_not be_include('Submission Graded')
-        submission2.submission.messages_sent.should_not be_include('Submission Graded')
+        expect(submission.submission.messages_sent).not_to be_include('Submission Graded')
+        expect(submission2.submission.messages_sent).not_to be_include('Submission Graded')
       end
     end
 
@@ -290,9 +290,9 @@ describe Submission do
       Notification.create :name => "Submission Graded"
       submission_spec_model
       @cc = @user.communication_channels.create :path => "somewhere"
-      lambda {
+      expect {
         @assignment.grade_student(@user, :grade => 10)
-      }.should change StreamItemInstance, :count
+      }.to change StreamItemInstance, :count
     end
 
     it "should create a stream_item_instance when graded, and then made it visible when unmuted" do
@@ -300,14 +300,14 @@ describe Submission do
       submission_spec_model
       @cc = @user.communication_channels.create :path => "somewhere"
       @assignment.mute!
-      lambda {
+      expect {
         @assignment.grade_student(@user, :grade => 10)
-      }.should change StreamItemInstance, :count
+      }.to change StreamItemInstance, :count
 
       @assignment.unmute!
       stream_item_ids       = StreamItem.where(:asset_type => 'Submission', :asset_id => @assignment.submissions.all).pluck(:id)
       stream_item_instances = StreamItemInstance.where(:stream_item_id => stream_item_ids)
-      stream_item_instances.each { |sii| sii.should_not be_hidden }
+      stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
     end
 
 
@@ -323,8 +323,8 @@ describe Submission do
         s.graded_at = Time.parse("Jan 1 2000")
         s.save
         @submission = @assignment.grade_student(@user, :grade => 9)[0]
-        @submission.should eql(s)
-        @submission.messages_sent.should be_include('Submission Grade Changed')
+        expect(@submission).to eql(s)
+        expect(@submission.messages_sent).to be_include('Submission Grade Changed')
       end
 
       it 'doesnt create a grade changed message when theres a quiz attached' do
@@ -340,8 +340,8 @@ describe Submission do
         s.graded_at = Time.parse("Jan 1 2000")
         s.save
         @submission = @assignment.grade_student(@user, :grade => 9)[0]
-        @submission.should eql(s)
-        @submission.messages_sent.should_not include('Submission Grade Changed')
+        expect(@submission).to eql(s)
+        expect(@submission.messages_sent).not_to include('Submission Grade Changed')
       end
 
       it "should create a message when the score is changed and the grades were already published" do
@@ -354,9 +354,9 @@ describe Submission do
         @cc = @user.communication_channels.create(:path => "somewhere")
         s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
         @submission = @assignment.grade_student(@user, :grade => 9)[0]
-        @submission.should eql(s)
-        @submission.messages_sent.should_not be_include('Submission Grade Changed')
-        @submission.messages_sent.should be_include('Submission Graded')
+        expect(@submission).to eql(s)
+        expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
+        expect(@submission.messages_sent).to be_include('Submission Graded')
       end
 
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
@@ -371,8 +371,8 @@ describe Submission do
         s.graded_at = Time.parse("Jan 1 2000")
         s.save
         @submission = @assignment.grade_student(@user, :grade => 9)[0]
-        @submission.should eql(s)
-        @submission.messages_sent.should_not be_include('Submission Grade Changed')
+        expect(@submission).to eql(s)
+        expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
 
       end
 
@@ -385,8 +385,8 @@ describe Submission do
         @cc = @user.communication_channels.create(:path => "somewhere")
         s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
         @submission = @assignment.grade_student(@user, :grade => 9)[0]
-        @submission.should eql(s)
-        @submission.messages_sent.should_not be_include('Submission Grade Changed')
+        expect(@submission).to eql(s)
+        expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
       end
     end
   end
@@ -409,8 +409,8 @@ describe Submission do
 
       it "should submit to turnitin after a delay" do
         job = Delayed::Job.list_jobs(:future, 100).find { |j| j.tag == 'Submission#submit_to_turnitin' }
-        job.should_not be_nil
-        job.run_at.should > Time.now.utc
+        expect(job).not_to be_nil
+        expect(job.run_at).to be > Time.now.utc
       end
 
       it "should initially set turnitin submission to pending" do
@@ -419,7 +419,7 @@ describe Submission do
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(true)
         @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => @submission.plaintext_body)).returns(Nokogiri('<objectID>12345</objectID>'))
         @submission.submit_to_turnitin
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'pending'
       end
 
       it "should schedule a retry if something fails initially" do
@@ -427,7 +427,7 @@ describe Submission do
         @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
         @submission.submit_to_turnitin
-        Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size.should == 2
+        expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
       end
 
       it "should set status as failed if something fails after several attempts" do
@@ -437,7 +437,7 @@ describe Submission do
         example_error = '<rerror><rcode>1001</rcode><rmessage>You may not submit a paper to this assignment until the assignment start date</rmessage></rerror>'
         @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => @submission.plaintext_body)).returns(Nokogiri(example_error))
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'error'
       end
 
       it "should set status back to pending on retry" do
@@ -447,11 +447,11 @@ describe Submission do
         @turnitin_api.expects(:sendRequest).with(:create_assignment, '2', has_entries(@assignment.turnitin_settings)).returns(Nokogiri(example_error))
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'error'
 
         # resubmit
         @submission.resubmit_to_turnitin
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'pending'
       end
 
       it "should set status to scored on success" do
@@ -466,7 +466,7 @@ describe Submission do
         })
 
         @submission.check_turnitin_status
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'scored'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'scored'
       end
 
       it "should set status as failed if something fails after several attempts" do
@@ -477,11 +477,11 @@ describe Submission do
 
         expects_job_with_tag('Submission#check_turnitin_status') do
           @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
-          @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+          expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'pending'
         end
 
         @submission.check_turnitin_status(Submission::TURNITIN_RETRY)
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+        expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'error'
       end
 
       it "should check status for all assets" do
@@ -496,8 +496,8 @@ describe Submission do
 
         @submission.check_turnitin_status
         @submission.reload
-        @submission.turnitin_data[@submission.asset_string][:status].should == 'scored'
-        @submission.turnitin_data["other_asset"][:status].should == 'scored'
+        expect(@submission.turnitin_data[@submission.asset_string][:status]).to eq 'scored'
+        expect(@submission.turnitin_data["other_asset"][:status]).to eq 'scored'
       end
     end
 
@@ -524,9 +524,9 @@ describe Submission do
         submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
         Submission.where(assignment_id: @a).each do |s|
           if s.id == submission.id
-            s.turnitin_data[:last_processed_attempt].should > 0
+            expect(s.turnitin_data[:last_processed_attempt]).to be > 0
           else
-            s.turnitin_data.should == {}
+            expect(s.turnitin_data).to eq({})
           end
         end
       end
@@ -563,8 +563,8 @@ describe Submission do
       it "should let teachers view the turnitin report" do
         @teacher = User.create
         @context.enroll_teacher(@teacher)
-        @submission.should be_grants_right(@teacher, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @teacher).should_not be_nil
+        expect(@submission).to be_grants_right(@teacher, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @teacher)).not_to be_nil
       end
 
       it "should let students view the turnitin report after grading" do
@@ -572,14 +572,14 @@ describe Submission do
         @assignment.save!
         @submission.reload
 
-        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+        expect(@submission).not_to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).to be_nil
 
         @submission.score = 1
         @submission.grade_it!
 
-        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+        expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil
       end
 
       it "should let students view the turnitin report immediately if the visibility setting allows it" do
@@ -587,15 +587,15 @@ describe Submission do
         @assignment.save
         @submission.reload
 
-        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+        expect(@submission).not_to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).to be_nil
 
         @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
         @assignment.save
         @submission.reload
 
-        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+        expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil
       end
 
       it "should let students view the turnitin report after the due date if the visibility setting allows it" do
@@ -604,15 +604,15 @@ describe Submission do
         @assignment.save
         @submission.reload
 
-        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+        expect(@submission).not_to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).to be_nil
 
         @assignment.due_at = Time.now - 1.day
         @assignment.save
         @submission.reload
 
-        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+        expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
+        expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil
       end
     end
   end
@@ -652,8 +652,8 @@ describe Submission do
     quiz_submission.save
 
     # verify the data is weird, to_i says they are equal, but the usecs are off
-    quiz_submission.finished_at.to_i.should == submission.submitted_at.to_i
-    quiz_submission.finished_at.usec.should > submission.submitted_at.usec
+    expect(quiz_submission.finished_at.to_i).to eq submission.submitted_at.to_i
+    expect(quiz_submission.finished_at.usec).to be > submission.submitted_at.usec
 
     # create the versions that Submission#quiz_submission_version uses
     quiz_submission.with_versioning do
@@ -662,7 +662,7 @@ describe Submission do
     end
 
     # the real test, quiz_submission_version shouldn't care about usecs
-    submission.reload.quiz_submission_version.should == 2
+    expect(submission.reload.quiz_submission_version).to eq 2
   end
 
   it "should return only comments readable by the user" do
@@ -683,40 +683,40 @@ describe Submission do
     @submission.reload
 
     @submission.limit_comments(@teacher)
-    @submission.submission_comments.count.should eql 4
-    @submission.visible_submission_comments.count.should eql 3
+    expect(@submission.submission_comments.count).to eql 4
+    expect(@submission.visible_submission_comments.count).to eql 3
 
     @submission.limit_comments(@student1)
-    @submission.submission_comments.count.should eql 3
-    @submission.visible_submission_comments.count.should eql 3
+    expect(@submission.submission_comments.count).to eql 3
+    expect(@submission.visible_submission_comments.count).to eql 3
 
     @submission.limit_comments(@student2)
-    @submission.submission_comments.count.should eql 1
-    @submission.visible_submission_comments.count.should eql 1
+    expect(@submission.submission_comments.count).to eql 1
+    expect(@submission.visible_submission_comments.count).to eql 1
   end
 
   describe "read/unread state" do
     it "should be read if a submission exists with no grade" do
       @submission = @assignment.submit_homework(@user)
-      @submission.read?(@user).should be_true
+      expect(@submission.read?(@user)).to be_truthy
     end
 
     it "should be unread after assignment is graded" do
       @submission = @assignment.grade_student(@user, { :grade => 3 }).first
-      @submission.unread?(@user).should be_true
+      expect(@submission.unread?(@user)).to be_truthy
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@user)
       @submission = @assignment.grade_student(@user, { :grade => 3 }).first
-      @submission.unread?(@user).should be_true
+      expect(@submission.unread?(@user)).to be_truthy
     end
 
     it "should be unread after submission is commented on by teacher" do
       @student = @user
       course_with_teacher(:course => @context, :active_all => true)
       @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
-      @submission.unread?(@user).should be_true
+      expect(@submission.unread?(@user)).to be_truthy
     end
 
     it "should be read if other submission fields change" do
@@ -724,7 +724,7 @@ describe Submission do
       @submission.workflow_state = 'graded'
       @submission.graded_at = Time.now
       @submission.save!
-      @submission.read?(@user).should be_true
+      expect(@submission.read?(@user)).to be_truthy
     end
   end
 
@@ -740,11 +740,11 @@ describe Submission do
       submission.mute
     end
 
-    specify { submission.published_score.should be_nil }
-    specify { submission.published_grade.should be_nil }
-    specify { submission.graded_at.should be_nil }
-    specify { submission.grade.should be_nil }
-    specify { submission.score.should be_nil }
+    specify { expect(submission.published_score).to be_nil }
+    specify { expect(submission.published_grade).to be_nil }
+    specify { expect(submission.graded_at).to be_nil }
+    specify { expect(submission.grade).to be_nil }
+    specify { expect(submission.score).to be_nil }
   end
 
   describe "muted_assignment?" do
@@ -752,14 +752,14 @@ describe Submission do
       assignment = stub(:muted? => true)
       @submission = Submission.new
       @submission.expects(:assignment).returns(assignment)
-      @submission.muted_assignment?.should == true
+      expect(@submission.muted_assignment?).to eq true
     end
 
     it "returns false if assignment is not muted" do
       assignment = stub(:muted? => false)
       @submission = Submission.new
       @submission.expects(:assignment).returns(assignment)
-      @submission.muted_assignment?.should == false
+      expect(@submission.muted_assignment?).to eq false
     end
   end
 
@@ -769,19 +769,19 @@ describe Submission do
     it "returns false if submission does not has_submission?" do
       submission.stubs(:has_submission?).returns false
       submission.stubs(:graded?).returns true
-      submission.without_graded_submission?.should == false
+      expect(submission.without_graded_submission?).to eq false
     end
 
     it "returns false if submission does is not graded" do
       submission.stubs(:has_submission?).returns true
       submission.stubs(:graded?).returns false
-      submission.without_graded_submission?.should == false
+      expect(submission.without_graded_submission?).to eq false
     end
 
     it "returns true if submission is not graded and has no submission" do
       submission.stubs(:has_submission?).returns false
       submission.stubs(:graded?).returns false
-      submission.without_graded_submission?.should == true
+      expect(submission.without_graded_submission?).to eq true
     end
   end
 
@@ -791,17 +791,17 @@ describe Submission do
     it "returns false when its not autograded" do
       assignment = stub(:muted? => false)
       @submission = Submission.new
-      @submission.autograded?.should == false
+      expect(@submission.autograded?).to eq false
 
       @submission.grader_id = Shard.global_id_for(@user.id)
-      @submission.autograded?.should == false
+      expect(@submission.autograded?).to eq false
     end
 
     it "returns true when its autograded" do
       assignment = stub(:muted? => false)
       @submission = Submission.new
       @submission.grader_id = -1
-      @submission.autograded?.should == true
+      expect(@submission.autograded?).to eq true
     end
   end
 
@@ -822,20 +822,20 @@ describe Submission do
     end
 
     it "should update when an assignment's due date is changed" do
-      @submission1.should be_past_due
+      expect(@submission1).to be_past_due
       @assignment.reload.update_attribute(:due_at, Time.zone.now + 1.day)
-      @submission1.reload.should_not be_past_due
+      expect(@submission1.reload).not_to be_past_due
     end
 
     it "should update when an applicable override is changed" do
-      @submission1.should be_past_due
-      @submission2.should be_past_due
+      expect(@submission1).to be_past_due
+      expect(@submission2).to be_past_due
 
       assignment_override_model :assignment => @assignment,
                                 :due_at => Time.zone.now + 1.day,
                                 :set => @course_section
-      @submission1.reload.should be_past_due
-      @submission2.reload.should_not be_past_due
+      expect(@submission1.reload).to be_past_due
+      expect(@submission2.reload).not_to be_past_due
     end
 
     it "should give a quiz submission 30 extra seconds before making it past due" do
@@ -856,10 +856,10 @@ describe Submission do
 
       submission = @quiz_submission.submission.reload
       submission.write_attribute(:submitted_at, @assignment.due_at + 3.days)
-      submission.should be_past_due
+      expect(submission).to be_past_due
 
       submission.write_attribute(:submitted_at, @assignment.due_at + 30.seconds)
-      submission.should_not be_past_due
+      expect(submission).not_to be_past_due
     end
   end
 
@@ -871,19 +871,19 @@ describe Submission do
     it "should be false if not past due" do
       @submission.submitted_at = 2.days.ago
       @submission.cached_due_date = 1.day.ago
-      @submission.should_not be_late
+      expect(@submission).not_to be_late
     end
 
     it "should be false if not submitted, even if past due" do
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
-      @submission.should_not be_late
+      expect(@submission).not_to be_late
     end
 
     it "should be true if submitted and past due" do
       @submission.submitted_at = 1.day.ago
       @submission.cached_due_date = 2.days.ago
-      @submission.should be_late
+      expect(@submission).to be_late
     end
   end
 
@@ -895,13 +895,13 @@ describe Submission do
     it "should be false if not past due" do
       @submission.submitted_at = 2.days.ago
       @submission.cached_due_date = 1.day.ago
-      @submission.should_not be_missing
+      expect(@submission).not_to be_missing
     end
 
     it "should be false if submitted, even if past due" do
       @submission.submitted_at = 1.day.ago
       @submission.cached_due_date = 2.days.ago
-      @submission.should_not be_missing
+      expect(@submission).not_to be_missing
     end
 
     it "should be true if not submitted, past due, and expects a submission" do
@@ -913,7 +913,7 @@ describe Submission do
       @submission.score = 0.00000001
       @submission.graded_at = Time.zone.now + 1.day
 
-      @submission.should be_missing
+      expect(@submission).to be_missing
     end
 
     it "should be true if not submitted, score of zero, and does not expect a submission" do
@@ -922,7 +922,7 @@ describe Submission do
       @submission.cached_due_date = 1.day.ago
       @submission.score = 0
       @submission.graded_at = Time.zone.now + 1.day
-      @submission.should be_missing
+      expect(@submission).to be_missing
     end
 
     it "should be false if not submitted, score greater than zero, and does not expect a submission" do
@@ -931,7 +931,7 @@ describe Submission do
       @submission.cached_due_date = 1.day.ago
       @submission.score = 0.00000001
       @submission.graded_at = Time.zone.now + 1.day
-      @submission.should be_missing
+      expect(@submission).to be_missing
     end
   end
 
@@ -948,7 +948,7 @@ describe Submission do
       override.reload
 
       submission = @assignment.submissions.create(:user => @user)
-      submission.cached_due_date.should == override.due_at
+      expect(submission.cached_due_date).to eq override.due_at
     end
   end
 
@@ -963,7 +963,7 @@ describe Submission do
         context: @course,
         filename: 'blah.txt'
       sub = @assignment.submit_homework(@user, attachments: [f])
-      sub.attachments.should == []
+      expect(sub.attachments).to eq []
     end
   end
 
@@ -972,7 +972,7 @@ describe Submission do
       student_in_course(active_all: true)
       att = attachment_model(filename: "submission.doc", :context => @student)
       sub = @assignment.submit_homework(@student, attachments: [att])
-      sub.versioned_attachments.should == [att]
+      expect(sub.versioned_attachments).to eq [att]
     end
 
     it "should not include attachments with a context of Submission" do
@@ -980,7 +980,7 @@ describe Submission do
       att = attachment_model(filename: "submission.doc", :context => @student)
       sub = @assignment.submit_homework(@student, attachments: [att])
       sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
-      sub.reload.versioned_attachments.should be_empty
+      expect(sub.reload.versioned_attachments).to be_empty
     end
   end
 
@@ -1005,7 +1005,7 @@ describe Submission do
       Submission.bulk_load_versioned_attachments(submissions)
       ensure_attachments_arent_queried
       submissions.each_with_index { |s, i|
-        s.versioned_attachments.should == attachments[i]
+        expect(s.versioned_attachments).to eq attachments[i]
       }
     end
 
@@ -1023,14 +1023,14 @@ describe Submission do
 
       Submission.bulk_load_versioned_attachments([s])
       ensure_attachments_arent_queried
-      s.versioned_attachments.should == [s.attachment]
+      expect(s.versioned_attachments).to eq [s.attachment]
     end
 
     it "handles bad data" do
       s = submission_for_some_user
       s.update_attribute(:attachment_ids, '99999999')
       Submission.bulk_load_versioned_attachments([s])
-      s.versioned_attachments.should == []
+      expect(s.versioned_attachments).to eq []
     end
   end
 
@@ -1076,8 +1076,8 @@ end
 
 def submission_spec_model(opts={})
   @submission = Submission.new(@valid_attributes.merge(opts))
-  @submission.assignment.should eql(@assignment)
-  @assignment.context.should eql(@context)
-  @submission.assignment.context.should eql(@context)
+  expect(@submission.assignment).to eql(@assignment)
+  expect(@assignment.context).to eql(@context)
+  expect(@submission.assignment.context).to eql(@context)
   @submission.save!
 end

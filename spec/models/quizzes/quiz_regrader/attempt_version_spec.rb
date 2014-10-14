@@ -52,11 +52,11 @@ describe Quizzes::QuizRegrader::AttemptVersion do
 
   describe "#initialize" do
     it "saves a reference to the passed version" do
-      attempt_version.version.should == version
+      expect(attempt_version.version).to eq version
     end
 
     it "saves a reference to the passed regrade quiz questions" do
-      attempt_version.question_regrades.should == question_regrades
+      expect(attempt_version.question_regrades).to eq question_regrades
     end
   end
 

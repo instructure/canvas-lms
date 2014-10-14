@@ -26,17 +26,17 @@ describe Quizzes::QuizQuestion::RawFields do
   describe "#fetch_any" do
     let(:fields) { Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment", comments: "another answer comment") }
     it "fetches a specified key" do
-      fields.fetch_any(:answer_comment).should == "an answer comment"
+      expect(fields.fetch_any(:answer_comment)).to eq "an answer comment"
     end
 
     it "fetches one of any supplied keys, in order" do
-      fields.fetch_any([:answer_comment]).should == "an answer comment"
-      fields.fetch_any([:answer_comment, :comments]).should == "an answer comment"
-      fields.fetch_any([:comments, :answer_comment]).should == "another answer comment"
+      expect(fields.fetch_any([:answer_comment])).to eq "an answer comment"
+      expect(fields.fetch_any([:answer_comment, :comments])).to eq "an answer comment"
+      expect(fields.fetch_any([:comments, :answer_comment])).to eq "another answer comment"
     end
 
     it "defaults if it can't find any of the supplied keys" do
-      fields.fetch_any([:foo, :blah], "default value").should == "default value"
+      expect(fields.fetch_any([:foo, :blah], "default value")).to eq "default value"
     end
   end
 
@@ -44,7 +44,7 @@ describe Quizzes::QuizQuestion::RawFields do
 
     it "has no problem with short data" do
       fields = Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment")
-      fields.fetch_with_enforced_length(:answer_comment).should == "an answer comment"
+      expect(fields.fetch_with_enforced_length(:answer_comment)).to eq "an answer comment"
     end
 
     it "bombs with data that's too long" do

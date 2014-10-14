@@ -15,8 +15,8 @@ describe ContentMigration do
       run_course_copy
 
       new_attachment = @copy_to.attachments.where(migration_id: mig_id(old_attachment)).first
-      new_attachment.should_not be_nil
-      new_attachment.full_path.should == "course files/folder_1/folder_2/folder_3/merge.test"
+      expect(new_attachment).not_to be_nil
+      expect(new_attachment.full_path).to eq "course files/folder_1/folder_2/folder_3/merge.test"
       folder.reload
     end
 
@@ -30,10 +30,10 @@ describe ContentMigration do
 
       to_root = Folder.root_folders(@copy_to).first
       new_attachment = @copy_to.attachments.where(migration_id: mig_id(att)).first
-      new_attachment.should_not be_nil
-      new_attachment.full_path.should == "course files/dummy.txt"
-      new_attachment.folder.should == to_root
-      @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+      expect(new_attachment).not_to be_nil
+      expect(new_attachment.full_path).to eq "course files/dummy.txt"
+      expect(new_attachment.folder).to eq to_root
+      expect(@copy_to.syllabus_body).to eq %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
     it "should copy files into the correct folders when the folders share the same name" do
@@ -49,7 +49,7 @@ describe ContentMigration do
 
       atts.each do |att|
         new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
-        new_att.full_path.should == att.full_path
+        expect(new_att.full_path).to eq att.full_path
       end
     end
 
@@ -58,7 +58,7 @@ describe ContentMigration do
       Attachment.where(:id => att).update_all(:filename => nil)
 
       att.reload
-      att.should_not be_valid
+      expect(att).not_to be_valid
 
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
@@ -81,21 +81,21 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      @copy_to.attachments.count.should == 2
+      expect(@copy_to.attachments.count).to eq 2
       att_2 = @copy_to.attachments.where(migration_id: mig_id(att)).first
-      att_2.should_not be_nil
+      expect(att_2).not_to be_nil
       att2_2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
-      att2_2.should_not be_nil
+      expect(att2_2).not_to be_nil
 
-      @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
-      @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
+      expect(@copy_to.assignments.first.description).to eq asmnt_des % [@copy_to.id, att_2.id]
+      expect(@copy_to.wiki.wiki_pages.first.body).to eq wiki_body % [@copy_to.id, att2_2.id]
     end
 
     it "should preserve links to re-uploaded attachments" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.destroy
       new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      @copy_from.attachments.find(att.id).should == new_att
+      expect(@copy_from.attachments.find(att.id)).to eq new_att
 
       page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
 
@@ -106,7 +106,7 @@ describe ContentMigration do
 
       att2 = @copy_to.attachments.where(filename: 'first.png').first
       page2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
-      page2.body.should include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
+      expect(page2.body).to include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 
   end

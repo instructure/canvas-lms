@@ -42,9 +42,9 @@ describe ActiveRecord::Base do
       create_courses(account, start_times)
 
       # updated_at
-      account.courses.count_by_date.should eql({start_times.first.to_date => 10})
+      expect(account.courses.count_by_date).to eql({start_times.first.to_date => 10})
 
-      account.courses.count_by_date(:column => :start_at).should eql Hash[
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
         start_times.each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
     end
@@ -59,9 +59,9 @@ describe ActiveRecord::Base do
       create_courses(account, start_times)
 
       # updated_at
-      account.courses.count_by_date.should eql({start_times.first.to_date => 10})
+      expect(account.courses.count_by_date).to eql({start_times.first.to_date => 10})
 
-      account.courses.count_by_date(:column => :start_at).should eql Hash[
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
         start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
     end
@@ -88,37 +88,37 @@ describe ActiveRecord::Base do
       batch_size = 2
       es = []
       e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
-        batch.size.should == batch_size
+        expect(batch.size).to eq batch_size
         batch.each do |r|
           es << r["e_id"].to_i
         end
       end
-      es.length.should == 6
-      es.should == [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
+      expect(es.length).to eq 6
+      expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
     it "should honor includes when using a cursor" do
-      pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.default.courses.create!
       Account.transaction do
         Account.where(:id => Account.default).includes(:courses).find_each do |a|
-          a.courses.loaded?.should be_true
+          expect(a.courses.loaded?).to be_truthy
         end
       end
     end
 
     it "should not use a cursor when start is passed" do
-      pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.transaction do
         Account.expects(:find_in_batches_with_cursor).never
         Account.where(:id => Account.default).includes(:courses).find_each(start: 0) do |a|
-          a.courses.loaded?.should be_true
+          expect(a.courses.loaded?).to be_truthy
         end
       end
     end
 
     it "should raise an error when start is used with group" do
-      lambda { Account.group(:id).find_each(start: 0) }.should raise_error(ArgumentError)
+      expect { Account.group(:id).find_each(start: 0) }.to raise_error(ArgumentError)
     end
   end
 
@@ -134,20 +134,20 @@ describe ActiveRecord::Base do
     end
 
     it "should mask columns marked as dropped from column info methods" do
-      User.columns.any? { |c| c.name == 'name' }.should be_true
-      User.column_names.should be_include('name')
+      expect(User.columns.any? { |c| c.name == 'name' }).to be_truthy
+      expect(User.column_names).to be_include('name')
       u = User.create!(:name => 'my name')
       # if we ever actually drop the name column, this spec will fail on the line
       # above, so it's all good
       ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
       ActiveRecord::Base::DROPPED_COLUMNS = { 'users' => %w(name) }
       User.reset_column_information
-      User.columns.any? { |c| c.name == 'name' }.should be_false
-      User.column_names.should_not be_include('name')
+      expect(User.columns.any? { |c| c.name == 'name' }).to be_falsey
+      expect(User.column_names).not_to be_include('name')
 
       # load from the db should hide the attribute
       u = User.find(u.id)
-      u.attributes.keys.include?('name').should be_false
+      expect(u.attributes.keys.include?('name')).to be_falsey
     end
 
     it "should only drop columns from the specific table specified" do
@@ -155,30 +155,30 @@ describe ActiveRecord::Base do
       ActiveRecord::Base::DROPPED_COLUMNS = { 'users' => %w(name) }
       User.reset_column_information
       Group.reset_column_information
-      User.columns.any? { |c| c.name == 'name' }.should be_false
-      Group.columns.any? { |c| c.name == 'name' }.should be_true
+      expect(User.columns.any? { |c| c.name == 'name' }).to be_falsey
+      expect(Group.columns.any? { |c| c.name == 'name' }).to be_truthy
     end
   end
 
   context "rank helpers" do
     it "should generate appropriate rank sql" do
-      ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo').
-        should eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
+      expect(ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo')).
+        to eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
     end
 
     it "should generate appropriate rank hashes" do
       hash = ActiveRecord::Base.rank_hash(['a', ['b', 'c'], ['d']])
-      hash.should == {'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3}
-      hash['e'].should eql 4
+      expect(hash).to eq({'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3})
+      expect(hash['e']).to eql 4
     end
   end
 
   it "should have a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
-    lambda {
+    expect {
       User.find_by_sql "SELECT id, name FROM users GROUP BY #{conn.group_by('id', 'name')}"
       User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
-    }.should_not raise_error
+    }.not_to raise_error
   end
 
   context "unique_constraint_retry" do
@@ -192,35 +192,35 @@ describe ActiveRecord::Base do
       User.unique_constraint_retry do
         User.create!
       end
-      User.count.should eql @orig_user_count + 1
+      expect(User.count).to eql @orig_user_count + 1
     end
 
     it "should run twice if it gets a RecordNotUnique" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      lambda{
+      expect{
         User.unique_constraint_retry do
           tries += 1
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.should raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
-      Submission.count.should eql 1
-      tries.should eql 2
-      User.count.should eql @orig_user_count
+      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
+      expect(Submission.count).to eql 1
+      expect(tries).to eql 2
+      expect(User.count).to eql @orig_user_count
     end
 
     it "should run additional times if specified" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      lambda{
+      expect{
         User.unique_constraint_retry(2) do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.should raise_error # we don't catch the error the last time 
-      tries.should eql 3
-      Submission.count.should eql 1
+      }.to raise_error # we don't catch the error the last time 
+      expect(tries).to eql 3
+      expect(Submission.count).to eql 1
     end
 
     it "should not cause outer transactions to roll back if the second attempt succeeds" do
@@ -235,30 +235,30 @@ describe ActiveRecord::Base do
         end
         User.create!
       end
-      Submission.count.should eql 1
-      User.count.should eql @orig_user_count + 3
+      expect(Submission.count).to eql 1
+      expect(User.count).to eql @orig_user_count + 3
     end
 
     it "should not eat other ActiveRecord::StatementInvalid exceptions" do
       tries = 0
-      lambda {
+      expect {
         User.unique_constraint_retry {
           tries += 1
           User.connection.execute "this is not valid sql"
         }
-      }.should raise_error(ActiveRecord::StatementInvalid)
-      tries.should eql 1
+      }.to raise_error(ActiveRecord::StatementInvalid)
+      expect(tries).to eql 1
     end
 
     it "should not eat any other exceptions" do
       tries = 0
-      lambda {
+      expect {
         User.unique_constraint_retry {
           tries += 1
           raise "oh crap"
         }
-      }.should raise_error
-      tries.should eql 1
+      }.to raise_error
+      expect(tries).to eql 1
     end
   end
 
@@ -288,7 +288,7 @@ describe ActiveRecord::Base do
 
         u2 = User.new
         u2.id = u.id
-        lambda{ u2.save! }.should raise_error(ActiveRecord::RecordNotUnique)
+        expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
         User.connection.expects(:select).once.returns([])
         User.first
       end
@@ -314,14 +314,14 @@ describe ActiveRecord::Base do
         m = @conversation.conversation_messages.build
         m.asset = sub
 
-        m.submission.should be_an_instance_of(Submission)
+        expect(m.submission).to be_an_instance_of(Submission)
       end
 
       it "should not return the polymorph if the type is wrong" do
         m = @conversation.conversation_messages.build
         m.asset = @user.submissions.create!(:assignment => @assignment)
 
-        m.other_polymorphy_thing.should be_nil
+        expect(m.other_polymorphy_thing).to be_nil
       end
     end
 
@@ -331,17 +331,17 @@ describe ActiveRecord::Base do
         s = @user.submissions.create!(:assignment => @assignment)
         m.submission = s
         
-        m.asset_type.should eql 'Submission'
-        m.asset_id.should eql s.id
-        m.asset.should eql s
-        m.submission.should eql s
+        expect(m.asset_type).to eql 'Submission'
+        expect(m.asset_id).to eql s.id
+        expect(m.asset).to eql s
+        expect(m.submission).to eql s
         
         m.submission = nil
 
-        m.asset_type.should be_nil
-        m.asset_id.should be_nil
-        m.asset.should be_nil
-        m.submission.should be_nil
+        expect(m.asset_type).to be_nil
+        expect(m.asset_id).to be_nil
+        expect(m.asset).to be_nil
+        expect(m.submission).to be_nil
       end
 
       it "should not change the underlying association if it's another object and we're setting nil" do
@@ -350,11 +350,11 @@ describe ActiveRecord::Base do
         m.submission = s
         m.other_polymorphy_thing = nil
 
-        m.asset_type.should eql 'Submission'
-        m.asset_id.should eql s.id
-        m.asset.should eql s
-        m.submission.should eql s
-        m.other_polymorphy_thing.should be_nil
+        expect(m.asset_type).to eql 'Submission'
+        expect(m.asset_id).to eql s.id
+        expect(m.asset).to eql s
+        expect(m.submission).to eql s
+        expect(m.other_polymorphy_thing).to be_nil
       end
     end
   end
@@ -366,8 +366,8 @@ describe ActiveRecord::Base do
         {:name => "bulk_insert_2", :workflow_state => "registered"}
       ]
       names = User.order(:name).pluck(:name)
-      names.should be_include("bulk_insert_1")
-      names.should be_include("bulk_insert_2")
+      expect(names).to be_include("bulk_insert_1")
+      expect(names).to be_include("bulk_insert_2")
     end
 
     it "should not raise an error if there are no records" do
@@ -385,11 +385,11 @@ describe ActiveRecord::Base do
     end
 
     it "should return distinct values" do
-      User.distinct(:locale).should eql ["en", "es"]
+      expect(User.distinct(:locale)).to eql ["en", "es"]
     end
 
     it "should return distinct values with nil" do
-      User.distinct(:locale, :include_nil => true).should eql [nil, "en", "es"]
+      expect(User.distinct(:locale, :include_nil => true)).to eql [nil, "en", "es"]
     end
   end
 
@@ -401,7 +401,7 @@ describe ActiveRecord::Base do
       User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
         batches << found_ids
       end
-      batches.should == [ ids[0,2], ids[2,2], ids[4,1] ]
+      expect(batches).to eq [ ids[0,2], ids[2,2], ids[4,1] ]
     end
   end
 
@@ -413,7 +413,7 @@ describe ActiveRecord::Base do
       User.where(id: ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
         batches << found_ids
       end
-      batches.should == [ [ids[0], ids[3]],
+      expect(batches).to eq [ [ids[0], ids[3]],
                           [ids[4], ids[7]],
                           [ids[8], ids[9]] ]
     end
@@ -423,7 +423,7 @@ describe ActiveRecord::Base do
       user2 = User.create!
       user2.destroy
       User.active.where(id: [user, user2]).find_ids_in_ranges do |*found_ids|
-        found_ids.should == [user.id, user.id]
+        expect(found_ids).to eq [user.id, user.id]
       end
     end
   end
@@ -438,39 +438,39 @@ describe ActiveRecord::Base do
     it "should execute the callback immediately if not in a transaction" do
       a = 0
       User.connection.after_transaction_commit { a += 1 }
-      a.should == 1
+      expect(a).to eq 1
     end
 
     it "should execute the callback after commit if in a transaction" do
       a = 0
       User.connection.transaction do
         User.connection.after_transaction_commit { a += 1 }
-        a.should == 0
+        expect(a).to eq 0
       end
-      a.should == 1
+      expect(a).to eq 1
     end
 
     it "should not execute the callbacks on rollback" do
       a = 0
       User.connection.transaction do
         User.connection.after_transaction_commit { a += 1 }
-        a.should == 0
+        expect(a).to eq 0
         raise ActiveRecord::Rollback
       end
-      a.should == 0
+      expect(a).to eq 0
       User.connection.transaction do
         # verify that the callback gets cleared out, so this second transaction won't trigger it
       end
-      a.should == 0
+      expect(a).to eq 0
     end
 
     it "should avoid loops due to callbacks causing a new transaction" do
       a = 0
       User.connection.transaction do
         User.connection.after_transaction_commit { User.connection.transaction { a += 1 } }
-        a.should == 0
+        expect(a).to eq 0
       end
-      a.should == 1
+      expect(a).to eq 1
     end
   end
 
@@ -492,16 +492,16 @@ describe ActiveRecord::Base do
     end
 
     it "should not fail with a dot in column name only" do
-      User.where('users.id' => @user).first.should_not be_nil
+      expect(User.where('users.id' => @user).first).not_to be_nil
     end
   end
 
   describe "find_by_asset_string" do
     it "should enforce type restrictions" do
       u = User.create!
-      ActiveRecord::Base.find_by_asset_string(u.asset_string).should == u
-      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User']).should == u
-      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course']).should == nil
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string)).to eq u
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User'])).to eq u
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course'])).to eq nil
     end
   end
 
@@ -516,22 +516,22 @@ describe ActiveRecord::Base do
     end
 
     before do
-      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
+      skip "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
     end
 
     it "should do an update all with a join" do
       Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
-      @p1.reload.unique_id.should == 'pa3'
-      @p1_2.reload.unique_id.should == 'pa2'
-      @p2.reload.unique_id.should == 'pb'
+      expect(@p1.reload.unique_id).to eq 'pa3'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      expect(@p2.reload.unique_id).to eq 'pb'
     end
 
     it "should do a delete all with a join" do
       Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all
-      lambda { @p1.reload }.should raise_error(ActiveRecord::RecordNotFound)
-      @u1.reload.should_not be_deleted
-      @p1_2.reload.unique_id.should == 'pa2'
-      @p2.reload.unique_id.should == 'pb'
+      expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(@u1.reload).not_to be_deleted
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      expect(@p2.reload.unique_id).to eq 'pb'
     end
   end
 
@@ -542,20 +542,20 @@ describe ActiveRecord::Base do
       p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
       u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).delete_all
       p1.reload
-      lambda { p2.reload }.should raise_error(ActiveRecord::RecordNotFound)
+      expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
   describe "add_index" do
     it "should raise an error on too long of name" do
       name = 'some_really_long_name_' * 10
-      lambda { User.connection.add_index :users, [:id], name: name }.should raise_error
+      expect { User.connection.add_index :users, [:id], name: name }.to raise_error
     end
   end
 
   describe "nested conditions" do
     it "should not barf if the condition has a question mark" do
-      User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first.should be_nil
+      expect(User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first).to be_nil
     end
   end
 
@@ -588,38 +588,39 @@ describe ActiveRecord::Base do
 
       @us = [@u1, @u2, @u3, @u4]
       # for sanity
-      User.where(id: @us, name: nil).order(:id).all.should == [@u1, @u3]
+      expect(User.where(id: @us, name: nil).order(:id).all).to eq [@u1, @u3]
     end
 
     it "should sort nulls first" do
-      User.where(id: @us).order(User.nulls(:first, :name), :id).all.should == [@u1, @u3, @u2, @u4]
+      expect(User.where(id: @us).order(User.nulls(:first, :name), :id).all).to eq [@u1, @u3, @u2, @u4]
     end
 
     it "should sort nulls last" do
-      User.where(id: @us).order(User.nulls(:last, :name), :id).all.should == [@u2, @u4, @u1, @u3]
+      expect(User.where(id: @us).order(User.nulls(:last, :name), :id).all).to eq [@u2, @u4, @u1, @u3]
     end
 
     it "should sort nulls first, desc" do
-      User.where(id: @us).order(User.nulls(:first, :name, :desc), :id).all.should == [@u1, @u3, @u4, @u2]
+      expect(User.where(id: @us).order(User.nulls(:first, :name, :desc), :id).all).to eq [@u1, @u3, @u4, @u2]
     end
 
     it "should sort nulls last, desc" do
-      User.where(id: @us).order(User.nulls(:last, :name, :desc), :id).all.should == [@u4, @u2, @u1, @u3]
+      expect(User.where(id: @us).order(User.nulls(:last, :name, :desc), :id).all).to eq [@u4, @u2, @u1, @u3]
     end
   end
 
   describe "marshalling" do
     it "should not load associations when marshalling" do
       a = Account.default
-      a.user_account_associations.loaded?.should be_false
+      expect(a.user_account_associations.loaded?).to be_falsey
       Marshal.dump(a)
-      a.user_account_associations.loaded?.should be_false
+      expect(a.user_account_associations.loaded?).to be_falsey
     end
   end
 
   describe "callbacks" do
     it "should use default scope" do
-      Account.before_save { Account.scoped.to_sql.should_not =~ /callbacks something/; true }
+      Account.send(:include, RSpec::Matchers)
+      Account.before_save { expect(Account.scoped.to_sql).not_to match /callbacks something/; true }
       Account.where(name: 'callbacks something').create!
     end
   end

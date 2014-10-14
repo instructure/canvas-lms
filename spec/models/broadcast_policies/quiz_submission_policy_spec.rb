@@ -55,12 +55,12 @@ module BroadcastPolicies
       end
 
       it 'is true when the dependent inputs are true' do
-        policy.should_dispatch_submission_graded?.should be_true
+        expect(policy.should_dispatch_submission_graded?).to be_truthy
       end
 
       def wont_send_when
         yield
-        policy.should_dispatch_submission_graded?.should be_false
+        expect(policy.should_dispatch_submission_graded?).to be_falsey
       end
 
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
@@ -81,11 +81,11 @@ module BroadcastPolicies
       before { quiz_submission.stubs(:pending_review?).returns false }
       def wont_send_when
         yield
-        policy.should_dispatch_submission_needs_grading?.should be_false
+        expect(policy.should_dispatch_submission_needs_grading?).to be_falsey
       end
       it "is true when quiz is pending review" do
         quiz_submission.stubs(:pending_review?).returns true
-        policy.should_dispatch_submission_needs_grading?.should == true
+        expect(policy.should_dispatch_submission_needs_grading?).to eq true
       end
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
       specify { wont_send_when { quiz.stubs(:survey?).returns true} }
@@ -101,7 +101,7 @@ module BroadcastPolicies
     describe '#should_dispatch_submission_grade_changed?' do
       def wont_send_when
         yield
-        policy.should_dispatch_submission_grade_changed?.should be_false
+        expect(policy.should_dispatch_submission_grade_changed?).to be_falsey
       end
 
       before do
@@ -110,7 +110,7 @@ module BroadcastPolicies
       end
 
       it 'is true when the necessary inputs are true' do
-        policy.should_dispatch_submission_grade_changed?.should be_true
+        expect(policy.should_dispatch_submission_grade_changed?).to be_truthy
       end
 
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
@@ -130,8 +130,8 @@ module BroadcastPolicies
 
     describe '#when there is no quiz submission' do
       let(:policy) { QuizSubmissionPolicy.new(nil) }
-      specify { policy.should_dispatch_submission_graded?.should be_false }
-      specify { policy.should_dispatch_submission_grade_changed?.should be_false }
+      specify { expect(policy.should_dispatch_submission_graded?).to be_falsey }
+      specify { expect(policy.should_dispatch_submission_grade_changed?).to be_falsey }
     end
 
   end

@@ -33,8 +33,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
 
     it 'should reject an answer for an unknown blank' do
       rc = subject.serialize({ foobar: 123456 })
-      rc.error.should_not be_nil
-      rc.error.should match(/unknown blank/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/unknown blank/i)
     end
   end
 end

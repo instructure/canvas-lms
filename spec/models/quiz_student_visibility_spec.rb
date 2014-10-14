@@ -78,12 +78,12 @@ describe "differentiated_assignments" do
 
   def ensure_user_does_not_see_quiz
     visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    visibile_quiz_ids.map(&:to_i).include?(@quiz.id).should be_false
+    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
   end
 
   def ensure_user_sees_quiz
     visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    visibile_quiz_ids.map(&:to_i).include?(@quiz.id).should be_true
+    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
   end
 
   context "table" do
@@ -98,24 +98,24 @@ describe "differentiated_assignments" do
     end
 
     it "returns objects" do
-      @visibility_object.should_not be_nil
+      expect(@visibility_object).not_to be_nil
     end
 
     it "doesnt allow updates" do
       @visibility_object.user_id = @visibility_object.user_id + 1
-      lambda {@visibility_object.save!}.should raise_error(ActiveRecord::ReadOnlyRecord)
+      expect {@visibility_object.save!}.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow new records" do
-      lambda {
+      expect {
         Quizzes::QuizStudentVisibility.create!(user_id: @user.id,
                                             quiz_id: @quiz_id,
                                             course_id: @course.id)
-        }.should raise_error(ActiveRecord::ReadOnlyRecord)
+        }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow deletion" do
-      lambda {@visibility_object.destroy}.should raise_error(ActiveRecord::ReadOnlyRecord)
+      expect {@visibility_object.destroy}.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
   end

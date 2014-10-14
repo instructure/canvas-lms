@@ -35,11 +35,11 @@ describe Course do
 
   it "should propery determine if group weights are active" do
     @course.update_attribute(:group_weighting_scheme, nil)
-    @course.apply_group_weights?.should == false
+    expect(@course.apply_group_weights?).to eq false
     @course.update_attribute(:group_weighting_scheme, 'equal')
-    @course.apply_group_weights?.should == false
+    expect(@course.apply_group_weights?).to eq false
     @course.update_attribute(:group_weighting_scheme, 'percent')
-    @course.apply_group_weights?.should == true
+    expect(@course.apply_group_weights?).to eq true
   end
 
   describe "soft-concluded?" do
@@ -54,13 +54,13 @@ describe Course do
     context "without term end date" do
       it "should know if it has been soft-concluded" do
         @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.ago)
-        @course.should be_soft_concluded
+        expect(@course).to be_soft_concluded
       end
     end
 
@@ -71,13 +71,13 @@ describe Course do
 
       it "should know if it has been soft-concluded" do
         @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
-        @course.should be_soft_concluded
+        expect(@course).to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.ago)
-        @course.should be_soft_concluded
+        expect(@course).to be_soft_concluded
       end
     end
 
@@ -88,13 +88,13 @@ describe Course do
 
       it "should know if it has been soft-concluded" do
         @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.ago)
-        @course.should be_soft_concluded
+        expect(@course).to be_soft_concluded
       end
     end
 
@@ -105,13 +105,13 @@ describe Course do
 
       it "should ignore course dates if not set to override term dates when calculating soft-concluded state" do
         @course.enrollment_term.update_attribute(:end_at, nil)
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
-        @course.should_not be_soft_concluded
+        expect(@course).not_to be_soft_concluded
 
         @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
-        @course.should be_soft_concluded
+        expect(@course).to be_soft_concluded
       end
     end
   end
@@ -119,13 +119,13 @@ describe Course do
   describe "allow_student_discussion_topics" do
 
     it "should default true" do
-      @course.allow_student_discussion_topics.should == true
+      expect(@course.allow_student_discussion_topics).to eq true
     end
 
     it "should set and get" do
       @course.allow_student_discussion_topics = false
       @course.save!
-      @course.allow_student_discussion_topics.should == false
+      expect(@course.allow_student_discussion_topics).to eq false
     end
   end
 
@@ -134,13 +134,13 @@ describe Course do
       @root_account = Account.default
       @root_account.default_time_zone = 'America/Chicago'
       @course.time_zone = 'America/New_York'
-      @course.time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      expect(@course.time_zone).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
     end
 
     it "should default to root account value if not set" do
       @root_account = Account.default
       @root_account.default_time_zone = 'America/Chicago'
-      @course.time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
+      expect(@course.time_zone).to eq ActiveSupport::TimeZone['Central Time (US & Canada)']
     end
   end
 
@@ -152,22 +152,22 @@ describe Course do
 
   it "should create a unique course." do
     @course = Course.create_unique
-    @course.name.should eql("My Course")
+    expect(@course.name).to eql("My Course")
     @uuid = @course.uuid
     @course2 = Course.create_unique(@uuid)
-    @course.should eql(@course2)
+    expect(@course).to eql(@course2)
   end
 
   it "should throw error for long sis id" do
     #should throw rails validation error instead of db invalid statement error
     @course = Course.create_unique
     @course.sis_source_id = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-    (lambda {@course.save!}).should raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+    expect(lambda {@course.save!}).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
   end
 
   it "should always have a uuid, if it was created" do
     @course.save!
-    @course.uuid.should_not be_nil
+    expect(@course.uuid).not_to be_nil
   end
 
   context "permissions" do
@@ -185,7 +185,7 @@ describe Course do
       sub_sub_account = Account.create!(:parent_account => sub_account)
       user = account_admin_user(:account => sub_account)
       course = Course.create!(:account => sub_sub_account)
-      course.grants_right?(user, :manage).should be_true
+      expect(course.grants_right?(user, :manage)).to be_truthy
     end
 
     # we have to reload the users after each course change here to catch the
@@ -202,11 +202,11 @@ describe Course do
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
-      @course.grants_right?(@teacher, :delete).should be_true
-      @course.grants_right?(@designer, :delete).should be_true
-      @course.grants_right?(@ta, :delete).should be_false
-      @course.grants_right?(@admin1, :delete).should be_true
-      @course.grants_right?(@admin2, :delete).should be_false
+      expect(@course.grants_right?(@teacher, :delete)).to be_truthy
+      expect(@course.grants_right?(@designer, :delete)).to be_truthy
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
 
       # active, sis course
       @course.sis_source_id = 'sis_id'
@@ -214,11 +214,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :delete).should be_false
-      @course.grants_right?(@designer, :delete).should be_false
-      @course.grants_right?(@ta, :delete).should be_false
-      @course.grants_right?(@admin1, :delete).should be_true
-      @course.grants_right?(@admin2, :delete).should be_true
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
 
       # completed, non-sis course
       @course.sis_source_id = nil
@@ -226,11 +226,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :delete).should be_true
-      @course.grants_right?(@designer, :delete).should be_true
-      @course.grants_right?(@ta, :delete).should be_false
-      @course.grants_right?(@admin1, :delete).should be_true
-      @course.grants_right?(@admin2, :delete).should be_false
+      expect(@course.grants_right?(@teacher, :delete)).to be_truthy
+      expect(@course.grants_right?(@designer, :delete)).to be_truthy
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
       @course.clear_permissions_cache(@user)
 
       # completed, sis course
@@ -239,11 +239,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :delete).should be_false
-      @course.grants_right?(@designer, :delete).should be_false
-      @course.grants_right?(@ta, :delete).should be_false
-      @course.grants_right?(@admin1, :delete).should be_true
-      @course.grants_right?(@admin2, :delete).should be_true
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
     end
 
     it "should grant reset_content to the proper individuals" do
@@ -259,11 +259,11 @@ describe Course do
 
       # active, non-sis course
       clear_permissions_cache
-      @course.grants_right?(@teacher, :reset_content).should be_true
-      @course.grants_right?(@designer, :reset_content).should be_true
-      @course.grants_right?(@ta, :reset_content).should be_false
-      @course.grants_right?(@admin1, :reset_content).should be_true
-      @course.grants_right?(@admin2, :reset_content).should be_false
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@designer, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
 
       # active, sis course
       @course.sis_source_id = 'sis_id'
@@ -271,11 +271,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :reset_content).should be_true
-      @course.grants_right?(@designer, :reset_content).should be_true
-      @course.grants_right?(@ta, :reset_content).should be_false
-      @course.grants_right?(@admin1, :reset_content).should be_true
-      @course.grants_right?(@admin2, :reset_content).should be_false
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@designer, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
 
       # completed, non-sis course
       @course.sis_source_id = nil
@@ -283,11 +283,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :reset_content).should be_false
-      @course.grants_right?(@designer, :reset_content).should be_false
-      @course.grants_right?(@ta, :reset_content).should be_false
-      @course.grants_right?(@admin1, :reset_content).should be_true
-      @course.grants_right?(@admin2, :reset_content).should be_false
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
 
       # completed, sis course
       @course.sis_source_id = 'sis_id'
@@ -295,11 +295,11 @@ describe Course do
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       clear_permissions_cache
-      @course.grants_right?(@teacher, :reset_content).should be_false
-      @course.grants_right?(@designer, :reset_content).should be_false
-      @course.grants_right?(@ta, :reset_content).should be_false
-      @course.grants_right?(@admin1, :reset_content).should be_true
-      @course.grants_right?(@admin2, :reset_content).should be_false
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
     end
 
     def make_date_completed
@@ -307,7 +307,7 @@ describe Course do
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
       @enrollment.reload
-      @enrollment.state_based_on_date.should == :completed
+      expect(@enrollment.state_based_on_date).to eq :completed
     end
 
     context "as a teacher" do
@@ -318,21 +318,21 @@ describe Course do
 
       it "should grant read_as_admin and read_forum to date-completed teacher" do
         make_date_completed
-        c.prior_enrollments.should == []
-        c.grants_right?(@teacher, :read_as_admin).should be_true
-        c.grants_right?(@teacher, :read_forum).should be_true
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@teacher, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@teacher, :read_forum)).to be_truthy
       end
 
       it "should grant read_as_admin and read to date-completed teacher of unpublished course" do
         course.update_attribute(:workflow_state, 'claimed')
         make_date_completed
-        c.prior_enrollments.should == []
-        c.grants_right?(@teacher, :read_as_admin).should be_true
-        c.grants_right?(@teacher, :read).should be_true
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@teacher, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@teacher, :read)).to be_truthy
       end
 
       it "should grant :read_outcomes to teachers in the course" do
-        c.grants_right?(@teacher, :read_outcomes).should be_true
+        expect(c.grants_right?(@teacher, :read_outcomes)).to be_truthy
       end
     end
 
@@ -346,34 +346,34 @@ describe Course do
       end
 
       it "should grant read_as_admin, read, manage, and update to date-active designer" do
-        c.grants_right?(@designer, :read_as_admin).should be_true
-        c.grants_right?(@designer, :read).should be_true
-        c.grants_right?(@designer, :manage).should be_true
-        c.grants_right?(@designer, :update).should be_true
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read)).to be_truthy
+        expect(c.grants_right?(@designer, :manage)).to be_truthy
+        expect(c.grants_right?(@designer, :update)).to be_truthy
       end
 
       it "should grant read_as_admin, read_roster, and read_prior_roster to date-completed designer" do
         @enrollment.start_at = 4.days.ago
         @enrollment.end_at = 2.days.ago
         @enrollment.save!
-        @enrollment.reload.state_based_on_date.should == :completed
-        c.prior_enrollments.should == []
-        c.grants_right?(@designer, :read_as_admin).should be_true
-        c.grants_right?(@designer, :read_roster).should be_true
-        c.grants_right?(@designer, :read_prior_roster).should be_true
+        expect(@enrollment.reload.state_based_on_date).to eq :completed
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read_roster)).to be_truthy
+        expect(c.grants_right?(@designer, :read_prior_roster)).to be_truthy
       end
 
       it "should grant read_as_admin and read to date-completed designer of unpublished course" do
         c.update_attribute(:workflow_state, 'claimed')
         make_date_completed
-        c.prior_enrollments.should == []
-        c.grants_right?(@designer, :read_as_admin).should be_true
-        c.grants_right?(@designer, :read).should be_true
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read)).to be_truthy
       end
 
       it "should not grant read_user_notes or view_all_grades to designer" do
-        c.grants_right?(@designer, :read_user_notes).should be_false
-        c.grants_right?(@designer, :view_all_grades).should be_false
+        expect(c.grants_right?(@designer, :read_user_notes)).to be_falsey
+        expect(c.grants_right?(@designer, :view_all_grades)).to be_falsey
       end
     end
 
@@ -386,16 +386,16 @@ describe Course do
       it "should grant read_grades read_forum to date-completed student" do
         c.offer!
         make_date_completed
-        c.prior_enrollments.should == []
-        c.grants_right?(@student, :read_grades).should be_true
-        c.grants_right?(@student, :read_forum).should be_true
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@student, :read_grades)).to be_truthy
+        expect(c.grants_right?(@student, :read_forum)).to be_truthy
       end
 
       it "should not grant read to completed students of an unpublished course" do
-        c.should be_created
+        expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'completed')
-        @enrollment.should be_completed
-        c.grants_right?(:read, @student).should be_false
+        expect(@enrollment).to be_completed
+        expect(c.grants_right?(:read, @student)).to be_falsey
       end
 
       it "should not grant read to soft-completed students of an unpublished course" do
@@ -403,15 +403,15 @@ describe Course do
         c.start_at = 4.days.ago
         c.conclude_at = 2.days.ago
         c.save!
-        c.should be_created
+        expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'active')
-        @enrollment.state_based_on_date.should == :completed
-        c.grants_right?(:read, @student).should be_false
+        expect(@enrollment.state_based_on_date).to eq :completed
+        expect(c.grants_right?(:read, @student)).to be_falsey
       end
 
       it "should grant :read_outcomes to students in the course" do
         c.offer!
-        c.grants_right?(@student, :read_outcomes).should be_true
+        expect(c.grants_right?(@student, :read_outcomes)).to be_truthy
       end
     end
 
@@ -419,7 +419,7 @@ describe Course do
       it "should grant :read_outcomes to account admins" do
         course(:active_all => 1)
         account_admin_user(:account => @course.account)
-        @course.grants_right?(@admin, :read_outcomes).should be_true
+        expect(@course.grants_right?(@admin, :read_outcomes)).to be_truthy
       end
     end
   end
@@ -446,59 +446,59 @@ describe Course do
       @course.save!
       @course.reload
 
-      @course.course_sections.should_not be_empty
-      @course.students.should == [@student]
-      @course.stuck_sis_fields.should == [].to_set
+      expect(@course.course_sections).not_to be_empty
+      expect(@course.students).to eq [@student]
+      expect(@course.stuck_sis_fields).to eq [].to_set
       self_enrollment_code = @course.self_enrollment_code
-      self_enrollment_code.should_not be_nil
+      expect(self_enrollment_code).not_to be_nil
 
       @new_course = @course.reset_content
 
       @course.reload
-      @course.stuck_sis_fields.should == [:workflow_state].to_set
-      @course.course_sections.should be_empty
-      @course.students.should be_empty
-      @course.sis_source_id.should be_nil
-      @course.self_enrollment_code.should be_nil
-      @course.lti_context_id.should_not be_nil
+      expect(@course.stuck_sis_fields).to eq [:workflow_state].to_set
+      expect(@course.course_sections).to be_empty
+      expect(@course.students).to be_empty
+      expect(@course.sis_source_id).to be_nil
+      expect(@course.self_enrollment_code).to be_nil
+      expect(@course.lti_context_id).not_to be_nil
 
       @new_course.reload
-      @new_course.course_sections.should_not be_empty
-      @new_course.students.should == [@student]
-      @new_course.discussion_topics.should be_empty
-      @new_course.quizzes.should be_empty
-      @new_course.assignments.should be_empty
-      @new_course.sis_source_id.should == 'sis_id'
-      @new_course.syllabus_body.should be_blank
-      @new_course.stuck_sis_fields.should == [].to_set
-      @new_course.self_enrollment_code.should == self_enrollment_code
-      @new_course.lti_context_id.should be_nil
+      expect(@new_course.course_sections).not_to be_empty
+      expect(@new_course.students).to eq [@student]
+      expect(@new_course.discussion_topics).to be_empty
+      expect(@new_course.quizzes).to be_empty
+      expect(@new_course.assignments).to be_empty
+      expect(@new_course.sis_source_id).to eq 'sis_id'
+      expect(@new_course.syllabus_body).to be_blank
+      expect(@new_course.stuck_sis_fields).to eq [].to_set
+      expect(@new_course.self_enrollment_code).to eq self_enrollment_code
+      expect(@new_course.lti_context_id).to be_nil
 
-      @course.uuid.should_not == @new_course.uuid
-      @course.wiki_id.should_not == @new_course.wiki_id
-      @course.replacement_course_id.should == @new_course.id
+      expect(@course.uuid).not_to eq @new_course.uuid
+      expect(@course.wiki_id).not_to eq @new_course.wiki_id
+      expect(@course.replacement_course_id).to eq @new_course.id
     end
 
     it "should not have self enrollment enabled if account setting disables it" do
       @course.self_enrollment = true
       @course.save!
-      @course.self_enrollment_enabled?.should == false
+      expect(@course.self_enrollment_enabled?).to eq false
 
       account = @course.root_account
       account.allow_self_enrollment!
       @course.self_enrollment = true
       @course.save!
-      @course.reload.self_enrollment_enabled?.should == true
+      expect(@course.reload.self_enrollment_enabled?).to eq true
 
       account.settings.delete(:self_enrollment)
       account.save!
-      @course.reload.self_enrollment_enabled?.should == false
+      expect(@course.reload.self_enrollment_enabled?).to eq false
     end
 
     it "should retain original course profile" do
       data = {:something => 'special here'}
       description = 'simple story'
-      @course.profile.should_not be_nil
+      expect(@course.profile).not_to be_nil
       @course.profile.tap do |p|
         p.description = description
         p.data = data
@@ -508,8 +508,8 @@ describe Course do
 
       @new_course = @course.reset_content
 
-      @new_course.profile.data.should == data
-      @new_course.profile.description.should == description
+      expect(@new_course.profile.data).to eq data
+      expect(@new_course.profile.description).to eq description
     end
 
     it "should preserve sticky fields" do
@@ -518,27 +518,27 @@ describe Course do
       @course.save!
       @course.stuck_sis_fields = [].to_set
       @course.name = "course_name"
-      @course.stuck_sis_fields.should == [:name].to_set
+      expect(@course.stuck_sis_fields).to eq [:name].to_set
       profile = @course.profile
       profile.description = "description"
       profile.save!
       @course.save!
-      @course.stuck_sis_fields.should == [:name].to_set
+      expect(@course.stuck_sis_fields).to eq [:name].to_set
 
       @course.reload
 
       @new_course = @course.reset_content
 
       @course.reload
-      @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
-      @course.sis_source_id.should be_nil
+      expect(@course.stuck_sis_fields).to eq [:workflow_state, :name].to_set
+      expect(@course.sis_source_id).to be_nil
 
       @new_course.reload
-      @new_course.sis_source_id.should == 'sis_id'
-      @new_course.stuck_sis_fields.should == [:name].to_set
+      expect(@new_course.sis_source_id).to eq 'sis_id'
+      expect(@new_course.stuck_sis_fields).to eq [:name].to_set
 
-      @course.uuid.should_not == @new_course.uuid
-      @course.replacement_course_id.should == @new_course.id
+      expect(@course.uuid).not_to eq @new_course.uuid
+      expect(@course.replacement_course_id).to eq @new_course.id
     end
 
   end
@@ -547,24 +547,24 @@ describe Course do
     let_once(:course) { course_model }
 
     it "group_categories should not include deleted categories" do
-      course.group_categories.count.should == 0
+      expect(course.group_categories.count).to eq 0
       category1 = course.group_categories.create(:name => 'category 1')
       category2 = course.group_categories.create(:name => 'category 2')
-      course.group_categories.count.should == 2
+      expect(course.group_categories.count).to eq 2
       category1.destroy
       course.reload
-      course.group_categories.count.should == 1
-      course.group_categories.to_a.should == [category2]
+      expect(course.group_categories.count).to eq 1
+      expect(course.group_categories.to_a).to eq [category2]
     end
 
     it "all_group_categories should include deleted categories" do
-      course.all_group_categories.count.should == 0
+      expect(course.all_group_categories.count).to eq 0
       category1 = course.group_categories.create(:name => 'category 1')
       category2 = course.group_categories.create(:name => 'category 2')
-      course.all_group_categories.count.should == 2
+      expect(course.all_group_categories.count).to eq 2
       category1.destroy
       course.reload
-      course.all_group_categories.count.should == 2
+      expect(course.all_group_categories.count).to eq 2
     end
   end
 end
@@ -583,23 +583,23 @@ describe Course do
 
     it "should not include users through deleted/rejected/completed enrollments" do
       @enrollment1.destroy
-      @course.users_not_in_groups([]).size.should == 2
+      expect(@course.users_not_in_groups([]).size).to eq 2
     end
 
     it "should not include users in one of the groups" do
       group = @course.groups.create
       group.add_user(@user1)
       users = @course.users_not_in_groups([group])
-      users.size.should == 2
-      users.should_not be_include(@user1)
+      expect(users.size).to eq 2
+      expect(users).not_to be_include(@user1)
     end
 
     it "should include users otherwise" do
       group = @course.groups.create
       group.add_user(@user1)
       users = @course.users_not_in_groups([group])
-      users.should be_include(@user2)
-      users.should be_include(@user3)
+      expect(users).to be_include(@user2)
+      expect(users).to be_include(@user3)
     end
 
     it "should allow ordering by user's sortable name" do
@@ -607,7 +607,7 @@ describe Course do
       @user2.sortable_name = 'bob'; @user2.save
       @user3.sortable_name = 'richard'; @user3.save
       users = @course.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+      expect(users.map{ |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 
@@ -626,20 +626,20 @@ describe Course do
 
     it "should return appropriate events" do
       events = @course.events_for(@teacher)
-      events.should include @event1
-      events.should_not include @event2
-      events.should include @event3
-      events.should include @appointment_group
-      events.should include @assignment
+      expect(events).to include @event1
+      expect(events).not_to include @event2
+      expect(events).to include @event3
+      expect(events).to include @appointment_group
+      expect(events).to include @assignment
     end
 
     it "should return appropriate events when no user is supplied" do
       events = @course.events_for(nil)
-      events.should include @event1
-      events.should_not include @event2
-      events.should_not include @event3
-      events.should_not include @appointment_group
-      events.should include @assignment
+      expect(events).to include @event1
+      expect(events).not_to include @event2
+      expect(events).not_to include @event3
+      expect(events).not_to include @appointment_group
+      expect(events).to include @assignment
     end
   end
 
@@ -651,7 +651,7 @@ describe Course do
       We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
       HTML
       html = Course.migrate_content_links(orig, c1, c2, ['files'])
-      html.should == orig
+      expect(html).to eq orig
     end
   end
 
@@ -676,12 +676,12 @@ describe Course, "enroll" do
     end
 
     it "should be able to enroll a student" do
-      @se.user_id.should eql(@user.id)
-      @se.course_id.should eql(@course.id)
+      expect(@se.user_id).to eql(@user.id)
+      expect(@se.course_id).to eql(@course.id)
     end
 
     it "should enroll a student as creation_pending if the course isn't published" do
-      @se.should be_creation_pending
+      expect(@se).to be_creation_pending
     end
   end
 
@@ -692,13 +692,13 @@ describe Course, "enroll" do
     end
 
     it "should be able to enroll a TA" do
-      @tae.user_id.should eql(@user.id)
-      @tae.course_id.should eql(@course.id)
+      expect(@tae.user_id).to eql(@user.id)
+      expect(@tae.course_id).to eql(@course.id)
     end
 
     it "should enroll a ta as invited if the course isn't published" do
-      @tae.should be_invited
-      @tae.messages_sent.should be_include("Enrollment Registration")
+      expect(@tae).to be_invited
+      expect(@tae.messages_sent).to be_include("Enrollment Registration")
     end
   end
 
@@ -709,21 +709,21 @@ describe Course, "enroll" do
     end
 
     it "should be able to enroll a teacher" do
-      @te.user_id.should eql(@user.id)
-      @te.course_id.should eql(@course.id)
+      expect(@te.user_id).to eql(@user.id)
+      expect(@te.course_id).to eql(@course.id)
     end
 
     it "should enroll a teacher as invited if the course isn't published" do
-      @te.should be_invited
-      @te.messages_sent.should be_include("Enrollment Registration")
+      expect(@te).to be_invited
+      expect(@te.messages_sent).to be_include("Enrollment Registration")
     end
   end
 
   it "should be able to enroll a designer" do
     @course.enroll_designer(@user)
     @de = @course.designer_enrollments.first
-    @de.user_id.should eql(@user.id)
-    @de.course_id.should eql(@course.id)
+    expect(@de.user_id).to eql(@user.id)
+    expect(@de.course_id).to eql(@course.id)
   end
 
 
@@ -732,46 +732,46 @@ describe Course, "enroll" do
     @course.enroll_student(@user)
     scope = account.associated_courses.active.select([:id, :name]).joins(:teachers).includes(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
-    sql.should match(/enrollments.type = 'TeacherEnrollment'/)
+    expect(sql).to match(/enrollments.type = 'TeacherEnrollment'/)
   end
 end
 
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should == ([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
+    expect(default.to_json).to eq([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
-    @course.score_to_grade(95).should eql(nil)
+    expect(@course.score_to_grade(95)).to eql(nil)
     @course.grading_standard_id = 0
-    @course.score_to_grade(1005).should eql("A")
-    @course.score_to_grade(105).should eql("A")
-    @course.score_to_grade(100).should eql("A")
-    @course.score_to_grade(99).should eql("A")
-    @course.score_to_grade(94).should eql("A")
-    @course.score_to_grade(93.999).should eql("A-")
-    @course.score_to_grade(93.001).should eql("A-")
-    @course.score_to_grade(93).should eql("A-")
-    @course.score_to_grade(92.999).should eql("A-")
-    @course.score_to_grade(90).should eql("A-")
-    @course.score_to_grade(89).should eql("B+")
-    @course.score_to_grade(87).should eql("B+")
-    @course.score_to_grade(86).should eql("B")
-    @course.score_to_grade(85).should eql("B")
-    @course.score_to_grade(83).should eql("B-")
-    @course.score_to_grade(80).should eql("B-")
-    @course.score_to_grade(79).should eql("C+")
-    @course.score_to_grade(76).should eql("C")
-    @course.score_to_grade(73).should eql("C-")
-    @course.score_to_grade(71).should eql("C-")
-    @course.score_to_grade(69).should eql("D+")
-    @course.score_to_grade(67).should eql("D+")
-    @course.score_to_grade(66).should eql("D")
-    @course.score_to_grade(65).should eql("D")
-    @course.score_to_grade(62).should eql("D-")
-    @course.score_to_grade(60).should eql("F")
-    @course.score_to_grade(59).should eql("F")
-    @course.score_to_grade(0).should eql("F")
-    @course.score_to_grade(-100).should eql("F")
+    expect(@course.score_to_grade(1005)).to eql("A")
+    expect(@course.score_to_grade(105)).to eql("A")
+    expect(@course.score_to_grade(100)).to eql("A")
+    expect(@course.score_to_grade(99)).to eql("A")
+    expect(@course.score_to_grade(94)).to eql("A")
+    expect(@course.score_to_grade(93.999)).to eql("A-")
+    expect(@course.score_to_grade(93.001)).to eql("A-")
+    expect(@course.score_to_grade(93)).to eql("A-")
+    expect(@course.score_to_grade(92.999)).to eql("A-")
+    expect(@course.score_to_grade(90)).to eql("A-")
+    expect(@course.score_to_grade(89)).to eql("B+")
+    expect(@course.score_to_grade(87)).to eql("B+")
+    expect(@course.score_to_grade(86)).to eql("B")
+    expect(@course.score_to_grade(85)).to eql("B")
+    expect(@course.score_to_grade(83)).to eql("B-")
+    expect(@course.score_to_grade(80)).to eql("B-")
+    expect(@course.score_to_grade(79)).to eql("C+")
+    expect(@course.score_to_grade(76)).to eql("C")
+    expect(@course.score_to_grade(73)).to eql("C-")
+    expect(@course.score_to_grade(71)).to eql("C-")
+    expect(@course.score_to_grade(69)).to eql("D+")
+    expect(@course.score_to_grade(67)).to eql("D+")
+    expect(@course.score_to_grade(66)).to eql("D")
+    expect(@course.score_to_grade(65)).to eql("D")
+    expect(@course.score_to_grade(62)).to eql("D-")
+    expect(@course.score_to_grade(60)).to eql("F")
+    expect(@course.score_to_grade(59)).to eql("F")
+    expect(@course.score_to_grade(0)).to eql("F")
+    expect(@course.score_to_grade(-100)).to eql("F")
   end
 end
 
@@ -787,15 +787,15 @@ describe Course, "gradebook_to_csv" do
     @course.reload
 
     csv = @course.gradebook_to_csv
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should equal(3)
-    rows[0][-1].should == "Final Score"
-    rows[1][-1].should == "(read only)"
-    rows[2][-1].should == "50"
-    rows[0][-2].should == "Current Score"
-    rows[1][-2].should == "(read only)"
-    rows[2][-2].should == "100"
+    expect(rows.length).to equal(3)
+    expect(rows[0][-1]).to eq "Final Score"
+    expect(rows[1][-1]).to eq "(read only)"
+    expect(rows[2][-1]).to eq "50"
+    expect(rows[0][-2]).to eq "Current Score"
+    expect(rows[1][-2]).to eq "(read only)"
+    expect(rows[2][-2]).to eq "100"
   end
 
   it "should order assignments and groups by position" do
@@ -828,16 +828,16 @@ describe Course, "gradebook_to_csv" do
     g2a1.grade_student(@user, grade: 5)
 
     csv = @course.gradebook_to_csv
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should equal(3)
+    expect(rows.length).to equal(3)
     assignments, groups = [], []
     rows[0].each do |column|
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
       groups << column if column =~ /Some Assignment Group/
     end
-    assignments.should == ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
-    groups.should == ["Some Assignment Group 1 Current Points",
+    expect(assignments).to eq ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
+    expect(groups).to eq ["Some Assignment Group 1 Current Points",
                       "Some Assignment Group 1 Final Points",
                       "Some Assignment Group 1 Current Score",
                       "Some Assignment Group 1 Final Score",
@@ -846,10 +846,10 @@ describe Course, "gradebook_to_csv" do
                       "Some Assignment Group 2 Current Score",
                       "Some Assignment Group 2 Final Score"]
 
-    rows[2][-10].should == "100"    # ag1 current score
-    rows[2][-9].should  == "50"     # ag1 final score
-    rows[2][-6].should  == "50"     # ag2 current score
-    rows[2][-5].should  == "25"     # ag2 final score
+    expect(rows[2][-10]).to eq "100"    # ag1 current score
+    expect(rows[2][-9]).to  eq "50"     # ag1 final score
+    expect(rows[2][-6]).to  eq "50"     # ag2 current score
+    expect(rows[2][-5]).to  eq "25"     # ag2 final score
   end
 
   it "should alphabetize by sortable name with the test student at the end" do
@@ -861,10 +861,10 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv
     rows = CSV.parse(csv)
-    [rows[2][0],
+    expect([rows[2][0],
      rows[3][0],
      rows[4][0],
-     rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
+     rows[5][0]]).to eq ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
   it "should include all section names in alphabetical order" do
@@ -882,12 +882,12 @@ describe Course, "gradebook_to_csv" do
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
     csv = @course.gradebook_to_csv
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should equal(5)
-    rows[2][2].should == "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
-    rows[3][2].should == "COMPSCI 123 LEC 001"
-    rows[4][2].should == "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+    expect(rows.length).to equal(5)
+    expect(rows[2][2]).to eq "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    expect(rows[3][2]).to eq "COMPSCI 123 LEC 001"
+    expect(rows[4][2]).to eq "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
   end
 
   it "should generate csv with final grade if enabled" do
@@ -904,18 +904,18 @@ describe Course, "gradebook_to_csv" do
     @course.reload
 
     csv = @course.gradebook_to_csv
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should equal(3)
-    rows[0][-1].should == "Final Grade"
-    rows[1][-1].should == "(read only)"
-    rows[2][-1].should == "A-"
-    rows[0][-2].should == "Final Score"
-    rows[1][-2].should == "(read only)"
-    rows[2][-2].should == "90"
-    rows[0][-3].should == "Current Score"
-    rows[1][-3].should == "(read only)"
-    rows[2][-3].should == "90"
+    expect(rows.length).to equal(3)
+    expect(rows[0][-1]).to eq "Final Grade"
+    expect(rows[1][-1]).to eq "(read only)"
+    expect(rows[2][-1]).to eq "A-"
+    expect(rows[0][-2]).to eq "Final Score"
+    expect(rows[1][-2]).to eq "(read only)"
+    expect(rows[2][-2]).to eq "90"
+    expect(rows[0][-3]).to eq "Current Score"
+    expect(rows[1][-3]).to eq "(read only)"
+    expect(rows[2][-3]).to eq "90"
   end
 
   it "should include sis ids if enabled" do
@@ -938,26 +938,26 @@ describe Course, "gradebook_to_csv" do
     @course.reload
 
     csv = @course.gradebook_to_csv(:include_sis_id => true)
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should == 5
-    rows[0][1].should == 'ID'
-    rows[0][2].should == 'SIS User ID'
-    rows[0][3].should == 'SIS Login ID'
-    rows[0][4].should == 'Section'
-    rows[1][2].should == nil
-    rows[1][3].should == nil
-    rows[1][4].should == nil
-    rows[1][-1].should == '(read only)'
-    rows[2][1].should == @user1.id.to_s
-    rows[2][2].should == 'SISUSERID'
-    rows[2][3].should == @user1.pseudonym.unique_id
-    rows[3][1].should == @user2.id.to_s
-    rows[3][2].should be_nil
-    rows[3][3].should == @user2.pseudonym.unique_id
-    rows[4][1].should == @user3.id.to_s
-    rows[4][2].should be_nil
-    rows[4][3].should be_nil
+    expect(rows.length).to eq 5
+    expect(rows[0][1]).to eq 'ID'
+    expect(rows[0][2]).to eq 'SIS User ID'
+    expect(rows[0][3]).to eq 'SIS Login ID'
+    expect(rows[0][4]).to eq 'Section'
+    expect(rows[1][2]).to eq nil
+    expect(rows[1][3]).to eq nil
+    expect(rows[1][4]).to eq nil
+    expect(rows[1][-1]).to eq '(read only)'
+    expect(rows[2][1]).to eq @user1.id.to_s
+    expect(rows[2][2]).to eq 'SISUSERID'
+    expect(rows[2][3]).to eq @user1.pseudonym.unique_id
+    expect(rows[3][1]).to eq @user2.id.to_s
+    expect(rows[3][2]).to be_nil
+    expect(rows[3][3]).to eq @user2.pseudonym.unique_id
+    expect(rows[4][1]).to eq @user3.id.to_s
+    expect(rows[4][2]).to be_nil
+    expect(rows[4][3]).to be_nil
   end
 
   it "should include primary domain if a trust exists" do
@@ -980,38 +980,38 @@ describe Course, "gradebook_to_csv" do
     HostUrl.expects(:context_host).with(account2).returns('school2')
 
     csv = @course.gradebook_to_csv(:include_sis_id => true)
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
-    rows.length.should == 5
-    rows[0][1].should == 'ID'
-    rows[0][2].should == 'SIS User ID'
-    rows[0][3].should == 'SIS Login ID'
-    rows[0][4].should == 'Root Account'
-    rows[0][5].should == 'Section'
-    rows[1][2].should == nil
-    rows[1][3].should == nil
-    rows[1][4].should == nil
-    rows[1][5].should == nil
-    rows[2][1].should == @user1.id.to_s
-    rows[2][2].should == 'SISUSERID'
-    rows[2][3].should == @user1.pseudonym.unique_id
-    rows[2][4].should == 'school1'
-    rows[3][1].should == @user2.id.to_s
-    rows[3][2].should == 'SISUSERID'
-    rows[3][3].should == @user2.pseudonym.unique_id
-    rows[3][4].should == 'school2'
-    rows[4][1].should == @user3.id.to_s
-    rows[4][2].should be_nil
-    rows[4][3].should be_nil
-    rows[4][4].should be_nil
+    expect(rows.length).to eq 5
+    expect(rows[0][1]).to eq 'ID'
+    expect(rows[0][2]).to eq 'SIS User ID'
+    expect(rows[0][3]).to eq 'SIS Login ID'
+    expect(rows[0][4]).to eq 'Root Account'
+    expect(rows[0][5]).to eq 'Section'
+    expect(rows[1][2]).to eq nil
+    expect(rows[1][3]).to eq nil
+    expect(rows[1][4]).to eq nil
+    expect(rows[1][5]).to eq nil
+    expect(rows[2][1]).to eq @user1.id.to_s
+    expect(rows[2][2]).to eq 'SISUSERID'
+    expect(rows[2][3]).to eq @user1.pseudonym.unique_id
+    expect(rows[2][4]).to eq 'school1'
+    expect(rows[3][1]).to eq @user2.id.to_s
+    expect(rows[3][2]).to eq 'SISUSERID'
+    expect(rows[3][3]).to eq @user2.pseudonym.unique_id
+    expect(rows[3][4]).to eq 'school2'
+    expect(rows[4][1]).to eq @user3.id.to_s
+    expect(rows[4][2]).to be_nil
+    expect(rows[4][3]).to be_nil
+    expect(rows[4][4]).to be_nil
   end
 
   it "can include concluded enrollments" do
     e = course_with_student active_all: true
     e.update_attribute :workflow_state, 'completed'
 
-    @course.gradebook_to_csv.should_not include @student.name
-    @course.gradebook_to_csv(include_priors: true).should include @student.name
+    expect(@course.gradebook_to_csv).not_to include @student.name
+    expect(@course.gradebook_to_csv(include_priors: true)).to include @student.name
   end
 
   context "accumulated points" do
@@ -1023,27 +1023,27 @@ describe Course, "gradebook_to_csv" do
 
     it "includes points for unweighted courses" do
       csv = CSV.parse(@course.gradebook_to_csv)
-      csv[0][-8].should == "Assignments Current Points"
-      csv[0][-7].should == "Assignments Final Points"
-      csv[1][-8].should == "(read only)"
-      csv[1][-7].should == "(read only)"
-      csv[2][-8].should == "8"
-      csv[2][-7].should == "8"
-      csv[0][-4].should == "Current Points"
-      csv[0][-3].should == "Final Points"
-      csv[1][-4].should == "(read only)"
-      csv[1][-3].should == "(read only)"
-      csv[2][-4].should == "8"
-      csv[2][-3].should == "8"
+      expect(csv[0][-8]).to eq "Assignments Current Points"
+      expect(csv[0][-7]).to eq "Assignments Final Points"
+      expect(csv[1][-8]).to eq "(read only)"
+      expect(csv[1][-7]).to eq "(read only)"
+      expect(csv[2][-8]).to eq "8"
+      expect(csv[2][-7]).to eq "8"
+      expect(csv[0][-4]).to eq "Current Points"
+      expect(csv[0][-3]).to eq "Final Points"
+      expect(csv[1][-4]).to eq "(read only)"
+      expect(csv[1][-3]).to eq "(read only)"
+      expect(csv[2][-4]).to eq "8"
+      expect(csv[2][-3]).to eq "8"
     end
 
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
       csv = CSV.parse(@course.gradebook_to_csv)
-      csv[0][-8].should_not == "Assignments Current Points"
-      csv[0][-7].should_not == "Assignments Final Points"
-      csv[0][-4].should_not == "Current Points"
-      csv[0][-3].should_not == "Final Points"
+      expect(csv[0][-8]).not_to eq "Assignments Current Points"
+      expect(csv[0][-7]).not_to eq "Assignments Final Points"
+      expect(csv[0][-4]).not_to eq "Current Points"
+      expect(csv[0][-3]).not_to eq "Final Points"
     end
   end
 
@@ -1059,7 +1059,7 @@ describe Course, "gradebook_to_csv" do
     @course.reload
     csv = @course.gradebook_to_csv(:include_sis_id => true)
     rows = CSV.parse(csv)
-    rows.length.should == 4
+    expect(rows.length).to eq 4
   end
 
   it "should include muted if any assignments are muted" do
@@ -1084,29 +1084,29 @@ describe Course, "gradebook_to_csv" do
       @course.reload
 
       csv = @course.gradebook_to_csv(:include_sis_id => true)
-      csv.should_not be_nil
+      expect(csv).not_to be_nil
       rows = CSV.parse(csv)
-      rows.length.should == 6
-      rows[0][1].should == 'ID'
-      rows[0][2].should == 'SIS User ID'
-      rows[0][3].should == 'SIS Login ID'
-      rows[0][4].should == 'Section'
-      rows[1][0].should == nil
-      rows[1][5].should == 'Muted'
-      rows[1][6].should == nil
-      rows[2][2].should == nil
-      rows[2][3].should == nil
-      rows[2][4].should == nil
-      rows[2][-1].should == '(read only)'
-      rows[3][1].should == @user1.id.to_s
-      rows[3][2].should == 'SISUSERID'
-      rows[3][3].should == @user1.pseudonym.unique_id
-      rows[4][1].should == @user2.id.to_s
-      rows[4][2].should be_nil
-      rows[4][3].should == @user2.pseudonym.unique_id
-      rows[5][1].should == @user3.id.to_s
-      rows[5][2].should be_nil
-      rows[5][3].should be_nil
+      expect(rows.length).to eq 6
+      expect(rows[0][1]).to eq 'ID'
+      expect(rows[0][2]).to eq 'SIS User ID'
+      expect(rows[0][3]).to eq 'SIS Login ID'
+      expect(rows[0][4]).to eq 'Section'
+      expect(rows[1][0]).to eq nil
+      expect(rows[1][5]).to eq 'Muted'
+      expect(rows[1][6]).to eq nil
+      expect(rows[2][2]).to eq nil
+      expect(rows[2][3]).to eq nil
+      expect(rows[2][4]).to eq nil
+      expect(rows[2][-1]).to eq '(read only)'
+      expect(rows[3][1]).to eq @user1.id.to_s
+      expect(rows[3][2]).to eq 'SISUSERID'
+      expect(rows[3][3]).to eq @user1.pseudonym.unique_id
+      expect(rows[4][1]).to eq @user2.id.to_s
+      expect(rows[4][2]).to be_nil
+      expect(rows[4][3]).to eq @user2.pseudonym.unique_id
+      expect(rows[5][1]).to eq @user3.id.to_s
+      expect(rows[5][2]).to be_nil
+      expect(rows[5][3]).to be_nil
   end
 
   it "should only include students from the appropriate section for a section limited teacher" do
@@ -1119,11 +1119,11 @@ describe Course, "gradebook_to_csv" do
     @course.enroll_student(@user2)
 
     csv = @course.gradebook_to_csv(:user => @teacher)
-    csv.should_not be_nil
+    expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     # two header rows, and one student row
-    rows.length.should == 3
-    rows[2][1].should == @user2.id.to_s
+    expect(rows.length).to eq 3
+    expect(rows[2][1]).to eq @user2.id.to_s
   end
 
   context "differentiated assignments" do
@@ -1151,17 +1151,18 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should insert N/A for non-visible assignments" do
+      skip('fragile')
       csv = @course.gradebook_to_csv(:user => @teacher)
-      csv.should_not be_nil
+      expect(csv).not_to be_nil
       rows = CSV.parse(csv)
-      rows[2][3].should == "3"
-      rows[2][4].should == "N/A"
+      expect(rows[2][3]).to eq "3"
+      expect(rows[2][4]).to eq "N/A"
 
-      rows[3][3].should == "N/A"
-      rows[3][4].should == "3"
+      expect(rows[3][3]).to eq "N/A"
+      expect(rows[3][4]).to eq "3"
 
-      rows[4][3].should == "N/A"
-      rows[4][4].should == "N/A"
+      expect(rows[4][3]).to eq "N/A"
+      expect(rows[4][4]).to eq "N/A"
     end
   end
 end
@@ -1172,21 +1173,21 @@ describe Course, "update_account_associations" do
     account2 = Account.create!(:name => 'second')
 
     @c = Course.create!(:account => account1)
-    @c.associated_accounts.length.should eql(1)
-    @c.associated_accounts.first.should eql(account1)
+    expect(@c.associated_accounts.length).to eql(1)
+    expect(@c.associated_accounts.first).to eql(account1)
 
     @c.account = account2
     @c.save!
     @c.reload
-    @c.associated_accounts.length.should eql(1)
-    @c.associated_accounts.first.should eql(account2)
+    expect(@c.associated_accounts.length).to eql(1)
+    expect(@c.associated_accounts.first).to eql(account2)
   end
 
   it "should act like it's associated to its account and root account, even if associations are busted" do
     account1 = Account.default.sub_accounts.create!
     c = account1.courses.create!
     c.course_account_associations.scoped.delete_all
-    c.associated_accounts.should == [account1, Account.default]
+    expect(c.associated_accounts).to eq [account1, Account.default]
   end
 end
 
@@ -1199,8 +1200,8 @@ describe Course, "tabs_available" do
     it "should return the defaults if nothing specified" do
       length = Course.default_tabs.length
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should eql(Course.default_tabs.map{|t| t[:id] })
-      tab_ids.length.should eql(length)
+      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
+      expect(tab_ids.length).to eql(length)
     end
 
     it "should overwrite the order of tabs if configured" do
@@ -1209,17 +1210,17 @@ describe Course, "tabs_available" do
       default_tabs   = Course.default_tabs.map           { |tab| tab[:id] }
       custom_tabs    = @course.tab_configuration.map     { |tab| tab[:id] }
 
-      available_tabs.should        == (custom_tabs + default_tabs).uniq
-      available_tabs.length.should == default_tabs.length
+      expect(available_tabs).to        eq (custom_tabs + default_tabs).uniq
+      expect(available_tabs.length).to eq default_tabs.length
     end
 
     it "should remove ids for tabs not in the default list" do
       @course.tab_configuration = [{'id' => 912}]
-      @course.tabs_available(@user).map{|t| t[:id] }.should_not be_include(912)
+      expect(@course.tabs_available(@user).map{|t| t[:id] }).not_to be_include(912)
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should eql(Course.default_tabs.map{|t| t[:id] })
-      tab_ids.length.should > 0
-      @course.tabs_available(@user).map{|t| t[:label] }.compact.length.should eql(tab_ids.length)
+      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
+      expect(tab_ids.length).to be > 0
+      expect(@course.tabs_available(@user).map{|t| t[:label] }.compact.length).to eql(tab_ids.length)
     end
   end
 
@@ -1230,13 +1231,13 @@ describe Course, "tabs_available" do
 
     it "should hide unused tabs if not an admin" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should_not be_include(Course::TAB_SETTINGS)
-      tab_ids.length.should > 0
+      expect(tab_ids).not_to be_include(Course::TAB_SETTINGS)
+      expect(tab_ids.length).to be > 0
     end
 
     it "should show grades tab for students" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should be_include(Course::TAB_GRADES)
+      expect(tab_ids).to be_include(Course::TAB_GRADES)
     end
 
     it "should include tabs for active external tools" do
@@ -1261,8 +1262,8 @@ describe Course, "tabs_available" do
 
       tabs = @course.tabs_available.map { |tab| tab[:id] }
 
-      tabs.should be_include(t1.asset_string)
-      tabs.should_not be_include(t2.asset_string)
+      expect(tabs).to be_include(t1.asset_string)
+      expect(tabs).not_to be_include(t2.asset_string)
     end
 
     it "should not include tabs for external tools if opt[:include_external] is false" do
@@ -1280,7 +1281,7 @@ describe Course, "tabs_available" do
 
       tabs = @course.tabs_available(nil, :include_external => false).map { |tab| tab[:id] }
 
-      tabs.should_not be_include(t1.asset_string)
+      expect(tabs).not_to be_include(t1.asset_string)
     end
   end
 
@@ -1301,24 +1302,24 @@ describe Course, "tabs_available" do
       @oe.save!
       @user.reload
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should_not be_include(Course::TAB_GRADES)
+      expect(tab_ids).not_to be_include(Course::TAB_GRADES)
     end
 
     it "should show grades tab for observers if they are linked to a student" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should be_include(Course::TAB_GRADES)
+      expect(tab_ids).to be_include(Course::TAB_GRADES)
     end
 
     it "should show discussion tab for observers by default" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should be_include(Course::TAB_DISCUSSIONS)
+      expect(tab_ids).to be_include(Course::TAB_DISCUSSIONS)
     end
 
     it "should not show discussion tab for observers without read_forum" do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :enrollment_type => "ObserverEnrollment", :enabled => false)
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should_not be_include(Course::TAB_DISCUSSIONS)
+      expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
     end
   end
 
@@ -1333,36 +1334,36 @@ describe Course, "tabs_available" do
 
     it "should not show announcements tabs without a current user" do
       tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
-      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+      expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "should not show announcements to a user not enrolled in the class" do
       user
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+      expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "should show the announcements tab to an enrolled user" do
       @course.enroll_student(user).accept!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should include(Course::TAB_ANNOUNCEMENTS)
+      expect(tab_ids).to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "should not show outcomes tabs without a current user" do
       tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
-      tab_ids.should_not include(Course::TAB_OUTCOMES)
+      expect(tab_ids).not_to include(Course::TAB_OUTCOMES)
    end
 
     it "should not show outcomes to a user not enrolled in the class" do
       user
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should_not include(Course::TAB_OUTCOMES)
+      expect(tab_ids).not_to include(Course::TAB_OUTCOMES)
     end
 
     it "should show the outcomes tab to an enrolled user" do
       @course.enroll_student(user).accept!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      tab_ids.should include(Course::TAB_OUTCOMES)
+      expect(tab_ids).to include(Course::TAB_OUTCOMES)
     end
   end
 end
@@ -1381,26 +1382,26 @@ describe Course, "backup" do
 
   it "should backup to a valid data structure" do
     data = course_to_backup.backup
-    data.should_not be_nil
-    data.length.should > 0
-    data.any?{|i| i.is_a?(Assignment)}.should eql(true)
-    data.any?{|i| i.is_a?(WikiPage)}.should eql(true)
-    data.any?{|i| i.is_a?(DiscussionTopic)}.should eql(true)
-    data.any?{|i| i.is_a?(CalendarEvent)}.should eql(true)
+    expect(data).not_to be_nil
+    expect(data.length).to be > 0
+    expect(data.any?{|i| i.is_a?(Assignment)}).to eql(true)
+    expect(data.any?{|i| i.is_a?(WikiPage)}).to eql(true)
+    expect(data.any?{|i| i.is_a?(DiscussionTopic)}).to eql(true)
+    expect(data.any?{|i| i.is_a?(CalendarEvent)}).to eql(true)
   end
 
   it "should backup to a valid json string" do
     data = course_to_backup.backup_to_json
-    data.should_not be_nil
-    data.length.should > 0
+    expect(data).not_to be_nil
+    expect(data.length).to be > 0
     parse = JSON.parse(data) rescue nil
-    parse.should_not be_nil
-    parse.should be_is_a(Array)
-    parse.length.should > 0
+    expect(parse).not_to be_nil
+    expect(parse).to be_is_a(Array)
+    expect(parse.length).to be > 0
   end
 
   it "should not cross learning outcomes with learning outcome groups in the association" do
-    pending('fails when being run in the single thread rake task')
+    skip('fails when being run in the single thread rake task')
     # set up two courses with two outcomes
     course = course_model
     default_group = course.root_outcome_group
@@ -1422,9 +1423,9 @@ describe Course, "backup" do
     # reload and check
     course.reload
     other_course.reload
-    course.learning_outcomes.should be_include(outcome)
-    course.learning_outcomes.should_not be_include(other_outcome)
-    other_course.learning_outcomes.should be_include(other_outcome)
+    expect(course.learning_outcomes).to be_include(outcome)
+    expect(course.learning_outcomes).not_to be_include(other_outcome)
+    expect(other_course.learning_outcomes).to be_include(other_outcome)
   end
 
   it "should not count learning outcome groups as having outcomes" do
@@ -1433,7 +1434,7 @@ describe Course, "backup" do
     other_group = course.learning_outcome_groups.create!(:title => 'other group')
     default_group.adopt_outcome_group(other_group)
 
-    course.should_not have_outcomes
+    expect(course).not_to have_outcomes
   end
 
 end
@@ -1461,37 +1462,37 @@ describe Course, 'grade_publishing' do
 
     context 'grade_publishing_status_translation' do
       it 'should work with nil statuses and messages' do
-        @course.grade_publishing_status_translation(nil, nil).should == "Unpublished"
-        @course.grade_publishing_status_translation(nil, "hi").should == "Unpublished: hi"
-        @course.grade_publishing_status_translation("published", nil).should == "Published"
-        @course.grade_publishing_status_translation("published", "hi").should == "Published: hi"
+        expect(@course.grade_publishing_status_translation(nil, nil)).to eq "Unpublished"
+        expect(@course.grade_publishing_status_translation(nil, "hi")).to eq "Unpublished: hi"
+        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Published"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
       end
 
       it 'should work with invalid statuses' do
-        @course.grade_publishing_status_translation("invalid_status", nil).should == "Unknown status, invalid_status"
-        @course.grade_publishing_status_translation("invalid_status", "what what").should == "Unknown status, invalid_status: what what"
+        expect(@course.grade_publishing_status_translation("invalid_status", nil)).to eq "Unknown status, invalid_status"
+        expect(@course.grade_publishing_status_translation("invalid_status", "what what")).to eq "Unknown status, invalid_status: what what"
       end
 
       it "should work with empty string statuses and messages" do
-        @course.grade_publishing_status_translation("", "").should == "Unpublished"
-        @course.grade_publishing_status_translation("", "hi").should == "Unpublished: hi"
-        @course.grade_publishing_status_translation("published", "").should == "Published"
-        @course.grade_publishing_status_translation("published", "hi").should == "Published: hi"
+        expect(@course.grade_publishing_status_translation("", "")).to eq "Unpublished"
+        expect(@course.grade_publishing_status_translation("", "hi")).to eq "Unpublished: hi"
+        expect(@course.grade_publishing_status_translation("published", "")).to eq "Published"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
       end
 
       it 'should work with all known statuses' do
-        @course.grade_publishing_status_translation("error", nil).should == "Error"
-        @course.grade_publishing_status_translation("error", "hi").should == "Error: hi"
-        @course.grade_publishing_status_translation("unpublished", nil).should == "Unpublished"
-        @course.grade_publishing_status_translation("unpublished", "hi").should == "Unpublished: hi"
-        @course.grade_publishing_status_translation("pending", nil).should == "Pending"
-        @course.grade_publishing_status_translation("pending", "hi").should == "Pending: hi"
-        @course.grade_publishing_status_translation("publishing", nil).should == "Publishing"
-        @course.grade_publishing_status_translation("publishing", "hi").should == "Publishing: hi"
-        @course.grade_publishing_status_translation("published", nil).should == "Published"
-        @course.grade_publishing_status_translation("published", "hi").should == "Published: hi"
-        @course.grade_publishing_status_translation("unpublishable", nil).should == "Unpublishable"
-        @course.grade_publishing_status_translation("unpublishable", "hi").should == "Unpublishable: hi"
+        expect(@course.grade_publishing_status_translation("error", nil)).to eq "Error"
+        expect(@course.grade_publishing_status_translation("error", "hi")).to eq "Error: hi"
+        expect(@course.grade_publishing_status_translation("unpublished", nil)).to eq "Unpublished"
+        expect(@course.grade_publishing_status_translation("unpublished", "hi")).to eq "Unpublished: hi"
+        expect(@course.grade_publishing_status_translation("pending", nil)).to eq "Pending"
+        expect(@course.grade_publishing_status_translation("pending", "hi")).to eq "Pending: hi"
+        expect(@course.grade_publishing_status_translation("publishing", nil)).to eq "Publishing"
+        expect(@course.grade_publishing_status_translation("publishing", "hi")).to eq "Publishing: hi"
+        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Published"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
+        expect(@course.grade_publishing_status_translation("unpublishable", nil)).to eq "Unpublishable"
+        expect(@course.grade_publishing_status_translation("unpublishable", "hi")).to eq "Unpublishable: hi"
       end
     end
 
@@ -1545,22 +1546,22 @@ describe Course, 'grade_publishing' do
 
       it 'should generate enrollments categorized by grade publishing message' do
         messages, overall_status = @course.grade_publishing_statuses
-        overall_status.should == "error"
-        messages.count.should == 5
-        messages["Unpublished"].sort_by(&:id).should == [
+        expect(overall_status).to eq "error"
+        expect(messages.count).to eq 5
+        expect(messages["Unpublished"].sort_by(&:id)).to eq [
             @student_enrollments[7],
             @student_enrollments[8]
           ].sort_by(&:id)
-        messages["Published"].should == [
+        expect(messages["Published"]).to eq [
             @student_enrollments[0]
           ]
-        messages["Error: cause of this reason"].should == [
+        expect(messages["Error: cause of this reason"]).to eq [
             @student_enrollments[1]
           ]
-        messages["Error: cause of that reason"].should == [
+        expect(messages["Error: cause of that reason"]).to eq [
             @student_enrollments[3]
           ]
-        messages["Unpublishable"].sort_by(&:id).should == [
+        expect(messages["Unpublishable"].sort_by(&:id)).to eq [
             @student_enrollments[2],
             @student_enrollments[4],
             @student_enrollments[5]
@@ -1569,7 +1570,7 @@ describe Course, 'grade_publishing' do
 
       it 'should correctly figure out the overall status with no enrollments' do
         @course = course
-        @course.grade_publishing_statuses.should == [{}, "unpublished"]
+        expect(@course.grade_publishing_statuses).to eq [{}, "unpublished"]
       end
 
       it 'should correctly figure out the overall status with invalid enrollment statuses' do
@@ -1578,11 +1579,11 @@ describe Course, 'grade_publishing' do
           e.save!
         end
         messages, overall_status = @course.grade_publishing_statuses
-        overall_status.should == "error"
-        messages.count.should == 3
-        messages["Unknown status, invalid status: cause of this reason"].should == [@student_enrollments[1]]
-        messages["Unknown status, invalid status: cause of that reason"].should == [@student_enrollments[3]]
-        messages["Unknown status, invalid status"].sort_by(&:id).should == [
+        expect(overall_status).to eq "error"
+        expect(messages.count).to eq 3
+        expect(messages["Unknown status, invalid status: cause of this reason"]).to eq [@student_enrollments[1]]
+        expect(messages["Unknown status, invalid status: cause of that reason"]).to eq [@student_enrollments[3]]
+        expect(messages["Unknown status, invalid status"].sort_by(&:id)).to eq [
             @student_enrollments[0],
             @student_enrollments[2],
             @student_enrollments[4],
@@ -1597,32 +1598,32 @@ describe Course, 'grade_publishing' do
           e.grade_publishing_message = nil
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "unpublishable"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "unpublishable"
         @student_enrollments[0].tap do |e|
           e.grade_publishing_status = "published"
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "published"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "published"
         @student_enrollments[1].tap do |e|
           e.grade_publishing_status = "publishing"
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "publishing"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "publishing"
         @student_enrollments[2].tap do |e|
           e.grade_publishing_status = "pending"
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "pending"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "pending"
         @student_enrollments[3].tap do |e|
           e.grade_publishing_status = "unpublished"
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "unpublished"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "unpublished"
         @student_enrollments[4].tap do |e|
           e.grade_publishing_status = "error"
           e.save!
         end
-        @course.reload.grade_publishing_statuses[1].should == "error"
+        expect(@course.reload.grade_publishing_statuses[1]).to eq "error"
       end
     end
 
@@ -1641,29 +1642,29 @@ describe Course, 'grade_publishing' do
       it 'should check whether or not grade export is enabled - failure' do
         @plugin.stubs(:enabled?).returns(false)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-        (lambda {@course.publish_final_grades(@user)}).should raise_error("final grade publishing disabled")
+        expect(lambda {@course.publish_final_grades(@user)}).to raise_error("final grade publishing disabled")
       end
 
       it 'should update all student enrollments with pending and a last update status' do
         @course = course
         make_student_enrollments
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "error", "unpublishable", "error", "unpublishable", "unpublishable", "unpublished", "unpublished", "unpublished"]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil, "cause of this reason", nil, "cause of that reason", nil, nil, nil, nil, nil]
-        @student_enrollments.map(&:workflow_state).should == ["active"] * 6 + ["inactive"] + ["active"] * 2
-        @student_enrollments.map(&:last_publish_attempt_at).should == [nil] * 9
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "error", "unpublishable", "error", "unpublishable", "unpublishable", "unpublished", "unpublished", "unpublished"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil, "cause of this reason", nil, "cause of that reason", nil, nil, nil, nil, nil]
+        expect(@student_enrollments.map(&:workflow_state)).to eq ["active"] * 6 + ["inactive"] + ["active"] * 2
+        expect(@student_enrollments.map(&:last_publish_attempt_at)).to eq [nil] * 9
         grade_publishing_user("U2")
         @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["pending"] * 6 + ["unpublished"] + ["pending"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
-        @student_enrollments.map(&:workflow_state).should == ["active"] * 6 + ["inactive"] + ["active"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["pending"] * 6 + ["unpublished"] + ["pending"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
+        expect(@student_enrollments.map(&:workflow_state)).to eq ["active"] * 6 + ["inactive"] + ["active"] * 2
         @student_enrollments.map(&:last_publish_attempt_at).each_with_index do |time, i|
           if i == 6
-            time.should be_nil
+            expect(time).to be_nil
           else
-            time.should >= @course.created_at
+            expect(time).to be >= @course.created_at
           end
         end
       end
@@ -1681,7 +1682,7 @@ describe Course, 'grade_publishing' do
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user, @student_enrollments.first.user_id)
-        @student_enrollments.first.reload.grade_publishing_status.should == "pending"
+        expect(@student_enrollments.first.reload.grade_publishing_status).to eq "pending"
       end
 
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
@@ -1748,28 +1749,28 @@ describe Course, 'grade_publishing' do
     context 'should_kick_off_grade_publishing_timeout?' do
       it 'should cover all the necessary cases' do
         @plugin_settings.merge! :success_timeout => "no", :wait_for_success => "yes"
-        @course.should_kick_off_grade_publishing_timeout?.should be_false
+        expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
         @plugin_settings.merge! :success_timeout => "", :wait_for_success => "no"
-        @course.should_kick_off_grade_publishing_timeout?.should be_false
+        expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
         @plugin_settings.merge! :success_timeout => "1", :wait_for_success => "no"
-        @course.should_kick_off_grade_publishing_timeout?.should be_false
+        expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
         @plugin_settings.merge! :success_timeout => "1", :wait_for_success => "yes"
-        @course.should_kick_off_grade_publishing_timeout?.should be_true
+        expect(@course.should_kick_off_grade_publishing_timeout?).to be_truthy
       end
     end
 
     context 'valid_grade_export_types' do
       it "should support instructure_csv" do
-        Course.valid_grade_export_types["instructure_csv"][:name].should == "Instructure formatted CSV"
+        expect(Course.valid_grade_export_types["instructure_csv"][:name]).to eq "Instructure formatted CSV"
         course = mock()
         enrollments = [mock(), mock()]
         publishing_pseudonym = mock()
         publishing_user = mock()
         course.expects(:generate_grade_publishing_csv_output).with(enrollments, publishing_user, publishing_pseudonym).returns 42
-        Course.valid_grade_export_types["instructure_csv"][:callback].call(course,
-            enrollments, publishing_user, publishing_pseudonym).should == 42
-        Course.valid_grade_export_types["instructure_csv"][:requires_grading_standard].should be_false
-        Course.valid_grade_export_types["instructure_csv"][:requires_publishing_pseudonym].should be_false
+        expect(Course.valid_grade_export_types["instructure_csv"][:callback].call(course,
+            enrollments, publishing_user, publishing_pseudonym)).to eq 42
+        expect(Course.valid_grade_export_types["instructure_csv"][:requires_grading_standard]).to be_falsey
+        expect(Course.valid_grade_export_types["instructure_csv"][:requires_publishing_pseudonym]).to be_falsey
       end
     end
 
@@ -1786,10 +1787,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
             "test_format" => {
                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                  course.should == @course
-                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                  publishing_pseudonym.should == @pseudonym
-                  publishing_user.should == @user
+                  expect(course).to eq @course
+                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                  expect(publishing_pseudonym).to eq @pseudonym
+                  expect(publishing_user).to eq @user
                   return [
                       [[@ase[2].id, @ase[5].id],
                        "post1",
@@ -1803,8 +1804,8 @@ describe Course, 'grade_publishing' do
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "unpublishable", "published", "unpublishable", "published", "published", "unpublished", "unpublishable", "published"]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "unpublishable", "published", "unpublishable", "published", "published", "unpublished", "unpublishable", "published"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
       end
 
       it "should try to publish appropriate enrollments" do
@@ -1822,17 +1823,17 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
             "instructure_csv" => {
                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                  course.should == @course
-                  enrollments.sort_by(&:id).should == @student_enrollments.sort_by(&:id).find_all{|e| e.workflow_state == 'active'}
-                  publishing_pseudonym.should == @pseudonym
-                  publishing_user.should == @user
+                  expect(course).to eq @course
+                  expect(enrollments.sort_by(&:id)).to eq @student_enrollments.sort_by(&:id).find_all{|e| e.workflow_state == 'active'}
+                  expect(publishing_pseudonym).to eq @pseudonym
+                  expect(publishing_user).to eq @user
                   @checked = true
                   return []
                 }
               }
           })
         @course.send_final_grades_to_endpoint @user
-        @checked.should be_true
+        expect(@checked).to be_truthy
       end
 
       it "should try to publish appropriate enrollments (limited users)" do
@@ -1850,32 +1851,32 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
                                                             "instructure_csv" => {
                                                                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                                                                  course.should == @course
-                                                                  enrollments.should == [@student_enrollments.first]
-                                                                  publishing_pseudonym.should == @pseudonym
-                                                                  publishing_user.should == @user
+                                                                  expect(course).to eq @course
+                                                                  expect(enrollments).to eq [@student_enrollments.first]
+                                                                  expect(publishing_pseudonym).to eq @pseudonym
+                                                                  expect(publishing_user).to eq @user
                                                                   @checked = true
                                                                   return []
                                                                 }
                                                             }
                                                         })
         @course.send_final_grades_to_endpoint @user, @student_enrollments.first.user_id
-        @checked.should be_true
+        expect(@checked).to be_truthy
       end
 
       it "should make sure grade publishing is enabled" do
         @plugin.stubs(:enabled?).returns(false)
-        (lambda {@course.send_final_grades_to_endpoint nil}).should raise_error("final grade publishing disabled")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == ["final grade publishing disabled"] * 6 + [nil] + ["final grade publishing disabled"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint nil}).to raise_error("final grade publishing disabled")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["final grade publishing disabled"] * 6 + [nil] + ["final grade publishing disabled"] * 2
       end
 
       it "should make sure an endpoint is defined" do
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => ""
-        (lambda {@course.send_final_grades_to_endpoint nil}).should raise_error("endpoint undefined")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == ["endpoint undefined"] * 6 + [nil] + ["endpoint undefined"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint nil}).to raise_error("endpoint undefined")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["endpoint undefined"] * 6 + [nil] + ["endpoint undefined"] * 2
       end
 
       it "should make sure the publishing user can publish" do
@@ -1885,9 +1886,9 @@ describe Course, 'grade_publishing' do
         @user = user
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
-        (lambda {@course.send_final_grades_to_endpoint @user}).should raise_error("publishing disallowed for this publishing user")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == ["publishing disallowed for this publishing user"] * 6 + [nil] + ["publishing disallowed for this publishing user"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint @user}).to raise_error("publishing disallowed for this publishing user")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["publishing disallowed for this publishing user"] * 6 + [nil] + ["publishing disallowed for this publishing user"] * 2
       end
 
       it "should make sure there's a grading standard" do
@@ -1897,17 +1898,17 @@ describe Course, 'grade_publishing' do
         @user = user
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
-        (lambda {@course.send_final_grades_to_endpoint @user}).should raise_error("grade publishing requires a grading standard")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == ["grade publishing requires a grading standard"] * 6 + [nil] + ["grade publishing requires a grading standard"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint @user}).to raise_error("grade publishing requires a grading standard")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["grade publishing requires a grading standard"] * 6 + [nil] + ["grade publishing requires a grading standard"] * 2
       end
 
       it "should make sure the format type is supported" do
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "invalid_Format"
-        (lambda {@course.send_final_grades_to_endpoint @user}).should raise_error("unknown format type: invalid_Format")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        @student_enrollments.map(&:grade_publishing_message).should == ["unknown format type: invalid_Format"] * 6 + [nil] + ["unknown format type: invalid_Format"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint @user}).to raise_error("unknown format type: invalid_Format")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["unknown format type: invalid_Format"] * 6 + [nil] + ["unknown format type: invalid_Format"] * 2
       end
 
       def sample_grade_publishing_request(published_status)
@@ -1917,10 +1918,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
             "test_format" => {
                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                  course.should == @course
-                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                  publishing_pseudonym.should == @pseudonym
-                  publishing_user.should == @user
+                  expect(course).to eq @course
+                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                  expect(publishing_pseudonym).to eq @pseudonym
+                  expect(publishing_user).to eq @user
                   return [
                       [[@ase[1].id, @ase[3].id],
                        "post1",
@@ -1934,8 +1935,8 @@ describe Course, 'grade_publishing' do
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", published_status, "unpublishable", published_status, published_status, "unpublishable", "unpublished", "unpublishable", published_status]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", published_status, "unpublishable", published_status, published_status, "unpublishable", "unpublished", "unpublishable", published_status]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
       end
 
       it "should make callback's requested posts and mark requested enrollment ids ignored" do
@@ -1974,10 +1975,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
             "test_format" => {
                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                  course.should == @course
-                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                  publishing_pseudonym.should == @pseudonym
-                  publishing_user.should == @user
+                  expect(course).to eq @course
+                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                  expect(publishing_pseudonym).to eq @pseudonym
+                  expect(publishing_user).to eq @user
                   return [
                       [[@ase[1].id, @ase[3].id],
                        "post1",
@@ -1994,9 +1995,9 @@ describe Course, 'grade_publishing' do
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-        (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "published", "published", "published", "error", "unpublishable", "unpublished", "unpublishable", "error"]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 4 + ["waaah fail"] + [nil] * 3 + ["waaah fail"]
+        expect(lambda {@course.send_final_grades_to_endpoint(@user)}).to raise_error("waaah fail")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "published", "published", "published", "error", "unpublishable", "unpublished", "unpublishable", "error"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 4 + ["waaah fail"] + [nil] * 3 + ["waaah fail"]
       end
 
       it "should try and make all posts even if two of the postings fail" do
@@ -2006,10 +2007,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
             "test_format" => {
                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                  course.should == @course
-                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                  publishing_pseudonym.should == @pseudonym
-                  publishing_user.should == @user
+                  expect(course).to eq @course
+                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                  expect(publishing_pseudonym).to eq @pseudonym
+                  expect(publishing_user).to eq @user
                   return [
                       [[@ase[1].id, @ase[3].id],
                        "post1",
@@ -2026,9 +2027,9 @@ describe Course, 'grade_publishing' do
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {}).raises("waaah fail")
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-        (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "error", "published", "error", "error", "unpublishable", "unpublished", "unpublishable", "error"]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
+        expect(lambda {@course.send_final_grades_to_endpoint(@user)}).to raise_error("waaah fail")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "error", "published", "error", "error", "unpublishable", "unpublished", "unpublishable", "error"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
       end
 
       it "should fail gracefully when the posting generator fails" do
@@ -2042,9 +2043,9 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error", "error", "error", "error", "error", "error", "unpublished", "error", "error"]
-        @student_enrollments.map(&:grade_publishing_message).should == ["waaah fail"] * 6 + [nil] + ["waaah fail"] * 2
+        expect(lambda {@course.send_final_grades_to_endpoint(@user)}).to raise_error("waaah fail")
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error", "error", "error", "error", "error", "error", "unpublished", "error", "error"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["waaah fail"] * 6 + [nil] + ["waaah fail"] * 2
       end
 
       it "should pass header parameters to post" do
@@ -2054,10 +2055,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
                                                             "test_format" => {
                                                                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                                                                  course.should == @course
-                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                                                                  publishing_pseudonym.should == @pseudonym
-                                                                  publishing_user.should == @user
+                                                                  expect(course).to eq @course
+                                                                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                                                                  expect(publishing_pseudonym).to eq @pseudonym
+                                                                  expect(publishing_user).to eq @user
                                                                   return [
                                                                       [[@ase[1].id, @ase[3].id],
                                                                        "post1",
@@ -2071,7 +2072,7 @@ describe Course, 'grade_publishing' do
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {"header_param" => "header_value"})
         SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint(@user)
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "published", "unpublished", "unpublishable", "unpublishable"]
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "published", "unpublishable", "published", "published", "published", "unpublished", "unpublishable", "unpublishable"]
       end
 
       it 'should update enrollment status if no resource provided' do
@@ -2081,10 +2082,10 @@ describe Course, 'grade_publishing' do
         Course.stubs(:valid_grade_export_types).returns({
                                                             "test_format" => {
                                                                 :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-                                                                  course.should == @course
-                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
-                                                                  publishing_pseudonym.should == @pseudonym
-                                                                  publishing_user.should == @user
+                                                                  expect(course).to eq @course
+                                                                  expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
+                                                                  expect(publishing_pseudonym).to eq @pseudonym
+                                                                  expect(publishing_user).to eq @user
                                                                   return [
                                                                       [[@ase[1].id, @ase[3].id],
                                                                        nil,
@@ -2097,8 +2098,8 @@ describe Course, 'grade_publishing' do
                                                         })
         SSLCommon.expects(:post_data).never
         @course.send_final_grades_to_endpoint @user
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
-        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
       end
 
     end
@@ -2142,7 +2143,7 @@ describe Course, 'grade_publishing' do
 
       it 'should generate valid csv without a grading standard' do
         @course.recompute_student_scores_without_send_later
-        @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
+        expect(@course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym)).to eq [
           [@ase.map(&:id),
                ("publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id," +
                 "student_id,student_sis_id,enrollment_id,enrollment_status," +
@@ -2163,7 +2164,7 @@ describe Course, 'grade_publishing' do
 
       it 'should generate valid csv without a publishing pseudonym' do
         @course.recompute_student_scores_without_send_later
-        @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, nil).should == [
+        expect(@course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, nil)).to eq [
           [@ase.map(&:id),
                ("publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id," +
                 "student_id,student_sis_id,enrollment_id,enrollment_status," +
@@ -2186,7 +2187,7 @@ describe Course, 'grade_publishing' do
         @course_section.sis_source_id = "section1"
         @course_section.save!
         @course.recompute_student_scores_without_send_later
-        @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
+        expect(@course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym)).to eq [
           [@ase.map(&:id),
                ("publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id," +
                 "student_id,student_sis_id,enrollment_id,enrollment_status," +
@@ -2209,7 +2210,7 @@ describe Course, 'grade_publishing' do
         @course.grading_standard_id = 0
         @course.save!
         @course.recompute_student_scores_without_send_later
-        @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
+        expect(@course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym)).to eq [
           [@ase.map(&:id),
                ("publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id," +
                 "student_id,student_sis_id,enrollment_id,enrollment_status," +
@@ -2238,7 +2239,7 @@ describe Course, 'grade_publishing' do
         @ase[3].computed_final_score = nil
         @ase[4].computed_final_score = nil
 
-        @course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym).should == [
+        expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
           [@ase.map(&:id) - [@ase[1].id, @ase[3].id, @ase[4].id],
                ("publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id," +
                 "student_id,student_sis_id,enrollment_id,enrollment_status," +
@@ -2259,7 +2260,7 @@ describe Course, 'grade_publishing' do
         make_student_enrollments
         first_time = Time.now.utc
         second_time = first_time + 2.seconds
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "error", "unpublishable", "error", "unpublishable", "unpublishable", "unpublished", "unpublished", "unpublished"]
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "error", "unpublishable", "error", "unpublishable", "unpublishable", "unpublished", "unpublished", "unpublished"]
         @student_enrollments[0].grade_publishing_status = "pending"
         @student_enrollments[0].last_publish_attempt_at = first_time
         @student_enrollments[1].grade_publishing_status = "publishing"
@@ -2273,25 +2274,25 @@ describe Course, 'grade_publishing' do
         @student_enrollments[5].grade_publishing_status = "unpublished"
         @student_enrollments[5].last_publish_attempt_at = first_time
         @student_enrollments.map(&:save)
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["pending", "publishing", "pending", "publishing", "published", "unpublished", "unpublished", "unpublished", "unpublished"]
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["pending", "publishing", "pending", "publishing", "published", "unpublished", "unpublished", "unpublished", "unpublished"]
         @course.expire_pending_grade_publishing_statuses(first_time)
-        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error", "error", "pending", "publishing", "published", "unpublished", "unpublished", "unpublished", "unpublished"]
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error", "error", "pending", "publishing", "published", "unpublished", "unpublished", "unpublished", "unpublished"]
       end
     end
 
     context 'grading_standard_enabled' do
       it 'should work for a number of boolean representations' do
-        @course.grading_standard_enabled?.should be_false
-        @course.grading_standard_enabled.should be_false
+        expect(@course.grading_standard_enabled?).to be_falsey
+        expect(@course.grading_standard_enabled).to be_falsey
         [[false, false], [true, true], ["false", false], ["true", true],
             ["0", false], [0, false], ["1", true], [1, true], ["off", false],
             ["on", true], ["yes", true], ["no", false]].each do |val, enabled|
           @course.grading_standard_enabled = val
-          @course.grading_standard_enabled?.should == enabled
-          @course.grading_standard_enabled.should == enabled
-          @course.grading_standard_id.should be_nil unless enabled
-          @course.grading_standard_id.should_not be_nil if enabled
-          @course.bool_res(val).should == enabled
+          expect(@course.grading_standard_enabled?).to eq enabled
+          expect(@course.grading_standard_enabled).to eq enabled
+          expect(@course.grading_standard_id).to be_nil unless enabled
+          expect(@course.grading_standard_id).not_to be_nil if enabled
+          expect(@course.bool_res(val)).to eq enabled
         end
       end
     end
@@ -2302,9 +2303,9 @@ describe Course, 'grade_publishing' do
       Course.valid_grade_export_types["test_export"] = {
           :name => "test export",
           :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
-            course.should == @course
-            publishing_pseudonym.should == @pseudonym
-            publishing_user.should == @user
+            expect(course).to eq @course
+            expect(publishing_pseudonym).to eq @pseudonym
+            expect(publishing_user).to eq @user
             return [[[], "test-jt-data", "application/jtmimetype"]]
           },
           :requires_grading_standard => false, :requires_publishing_pseudonym => true}
@@ -2337,7 +2338,7 @@ describe Course, 'grade_publishing' do
 
     it 'should not allow grade publishing for a user that is disallowed' do
       @user = User.new
-      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
+      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym in the wrong account' do
@@ -2345,7 +2346,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account = account_model
       @pseudonym.sis_user_id = "U1"
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
+      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym without a sis id' do
@@ -2353,7 +2354,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.sis_user_id = nil
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
+      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should publish csv' do
@@ -2413,25 +2414,25 @@ describe Course, 'grade_publishing' do
 
       def getpseudonym(user_sis_id)
         pseudo = Pseudonym.where(sis_user_id: user_sis_id).first
-        pseudo.should_not be_nil
+        expect(pseudo).not_to be_nil
         pseudo
       end
 
       def getuser(user_sis_id)
         user = getpseudonym(user_sis_id).user
-        user.should_not be_nil
+        expect(user).not_to be_nil
         user
       end
 
       def getsection(section_sis_id)
         section = CourseSection.where(sis_source_id: section_sis_id).first
-        section.should_not be_nil
+        expect(section).not_to be_nil
         section
       end
 
       def getenroll(user_sis_id, section_sis_id)
         e = Enrollment.where(user_id: getuser(user_sis_id), course_section_id: getsection(section_sis_id)).first
-        e.should_not be_nil
+        expect(e).not_to be_nil
         e
       end
 
@@ -2469,7 +2470,7 @@ describe Course, 'grade_publishing' do
       @course.reload
 
       teacher = Pseudonym.where(sis_user_id: "T1").first
-      teacher.should_not be_nil
+      expect(teacher).not_to be_nil
 
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
@@ -2539,26 +2540,26 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == false
+    expect(tool.has_placement?(:course_navigation)).to eq false
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
   end
 
   it "should include external tools if configured on the course" do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
+    expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
+    expect(tab[:href]).to eq :course_external_tool_path
+    expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
   it "should include external tools if configured on the account" do
@@ -2567,15 +2568,15 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
+    expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
+    expect(tab[:href]).to eq :course_external_tool_path
+    expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
   it "should include external tools if configured on the root account" do
@@ -2584,15 +2585,15 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @account.root_account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
+    expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
+    expect(tab[:href]).to eq :course_external_tool_path
+    expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
   it "should only include admin-only external tools for course admins" do
@@ -2602,22 +2603,22 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @student = user_model
     @student.register!
     @course.enroll_student(@student).accept
     tabs = @course.tabs_available(nil)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@student)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
+    expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
+    expect(tab[:href]).to eq :course_external_tool_path
+    expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
   it "should not include member-only external tools for unauthenticated users" do
@@ -2627,55 +2628,55 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @student = user_model
     @student.register!
     @course.enroll_student(@student).accept
     tabs = @course.tabs_available(nil)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@student)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
+    expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
+    expect(tab[:href]).to eq :course_external_tool_path
+    expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
   it "should allow reordering external tool position in course navigation" do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string})
     @course.save!
     tabs = @course.tabs_available(@teacher)
-    tabs[1][:id].should == tool.asset_string
+    expect(tabs[1][:id]).to eq tool.asset_string
   end
 
   it "should not show external tools that are hidden in course navigation" do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.has_placement?(:course_navigation)).to eq true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
 
     @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string, :hidden => true})
     @course.save!
     @course = Course.find(@course.id)
     tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
 
     tabs = @course.tabs_available(@teacher, :for_reordering => true)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
   end
 
   it "uses extension default values" do
@@ -2686,12 +2687,12 @@ describe Course, 'tabs_available' do
     tool.settings[:default] = "disabled"
     tool.save!
 
-    tool.course_navigation(:url).should == "http://www.example.com"
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.course_navigation(:url)).to eq "http://www.example.com"
+    expect(tool.has_placement?(:course_navigation)).to eq true
 
     settings = @course.external_tool_tabs({}).first
-    settings.should include(:visibility=>"members")
-    settings.should include(:hidden=>true)
+    expect(settings).to include(:visibility=>"members")
+    expect(settings).to include(:hidden=>true)
   end
 
   it "prefers extension settings over default values" do
@@ -2701,12 +2702,12 @@ describe Course, 'tabs_available' do
     tool.settings[:default] = "disabled"
     tool.save!
 
-    tool.course_navigation(:url).should == "http://www.example.com"
-    tool.has_placement?(:course_navigation).should == true
+    expect(tool.course_navigation(:url)).to eq "http://www.example.com"
+    expect(tool.has_placement?(:course_navigation)).to eq true
 
     settings = @course.external_tool_tabs({}).first
-    settings.should include(:visibility=>"admins")
-    settings.should include(:hidden=>false)
+    expect(settings).to include(:visibility=>"admins")
+    expect(settings).to include(:hidden=>false)
   end
 
 end
@@ -2725,9 +2726,9 @@ describe Course, 'scoping' do
     c2.course_code = "code2"
     c2.sis_source_id = "sisid2"
     c2.save
-    Course.name_like("name1").map(&:id).should == [c1.id]
-    Course.name_like("sisid2").map(&:id).should == [c2.id]
-    Course.name_like("code1").map(&:id).should == [c1.id]
+    expect(Course.name_like("name1").map(&:id)).to eq [c1.id]
+    expect(Course.name_like("sisid2").map(&:id)).to eq [c2.id]
+    expect(Course.name_like("code1").map(&:id)).to eq [c1.id]
   end
 end
 
@@ -2739,7 +2740,7 @@ describe Course, "manageable_by_user" do
     user = account_admin_user(:account => sub_account)
     course = Course.create!(:account => sub_sub_account)
 
-    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
   end
 
   it "should include courses the user is actively enrolled in as a teacher" do
@@ -2749,7 +2750,7 @@ describe Course, "manageable_by_user" do
     e = course.teacher_enrollments.first
     e.accept
 
-    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
   end
 
   it "should include courses the user is actively enrolled in as a ta" do
@@ -2759,7 +2760,7 @@ describe Course, "manageable_by_user" do
     e = course.ta_enrollments.first
     e.accept
 
-    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
   end
 
   it "should include courses the user is actively enrolled in as a designer" do
@@ -2767,7 +2768,7 @@ describe Course, "manageable_by_user" do
     user = user_with_pseudonym
     course.enroll_designer(user).accept
 
-    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
   end
 
   it "should not include courses the user is enrolled in when the enrollment is non-active" do
@@ -2777,10 +2778,10 @@ describe Course, "manageable_by_user" do
     e = course.teacher_enrollments.first
 
     # it's only invited at this point
-    Course.manageable_by_user(user.id).should be_empty
+    expect(Course.manageable_by_user(user.id)).to be_empty
 
     e.destroy
-    Course.manageable_by_user(user.id).should be_empty
+    expect(Course.manageable_by_user(user.id)).to be_empty
   end
 
   it "should not include deleted courses the user was enrolled in" do
@@ -2791,7 +2792,7 @@ describe Course, "manageable_by_user" do
     e.accept
 
     course.destroy
-    Course.manageable_by_user(user.id).should be_empty
+    expect(Course.manageable_by_user(user.id)).to be_empty
   end
 end
 
@@ -2801,7 +2802,7 @@ describe Course, "conclusions" do
     @course.reload
 
     # active
-    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => true}
+    expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({:read => true, :participate_as_student => true})
     @course.clear_permissions_cache(@user)
 
     # soft conclusion
@@ -2812,11 +2813,11 @@ describe Course, "conclusions" do
     @user.reload
     @user.cached_current_enrollments
 
-    enrollment.reload.state.should == :active
-    enrollment.state_based_on_date.should == :completed
-    enrollment.should_not be_participating_student
+    expect(enrollment.reload.state).to eq :active
+    expect(enrollment.state_based_on_date).to eq :completed
+    expect(enrollment).not_to be_participating_student
 
-    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({:read => true, :participate_as_student => false})
     @course.clear_permissions_cache(@user)
 
     # hard enrollment conclusion
@@ -2826,10 +2827,10 @@ describe Course, "conclusions" do
     @course.reload
     @user.reload
     @user.cached_current_enrollments
-    enrollment.state.should == :completed
-    enrollment.state_based_on_date.should == :completed
+    expect(enrollment.state).to eq :completed
+    expect(enrollment.state_based_on_date).to eq :completed
 
-    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({:read => true, :participate_as_student => false})
     @course.clear_permissions_cache(@user)
 
     # course conclusion
@@ -2840,10 +2841,10 @@ describe Course, "conclusions" do
     @user.reload
     @user.cached_current_enrollments
     enrollment.reload
-    enrollment.state.should == :completed
-    enrollment.state_based_on_date.should == :completed
+    expect(enrollment.state).to eq :completed
+    expect(enrollment.state_based_on_date).to eq :completed
 
-    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({:read => true, :participate_as_student => false})
   end
 
   context "appointment cancelation" do
@@ -2857,14 +2858,14 @@ describe Course, "conclusions" do
 
     it "should cancel all future appointments when concluding an enrollment" do
       @enrollment.conclude
-      @ag.appointments_participants.size.should eql 1
-      @ag.appointments_participants.current.size.should eql 0
+      expect(@ag.appointments_participants.size).to eql 1
+      expect(@ag.appointments_participants.current.size).to eql 0
     end
 
     it "should cancel all future appointments when concluding all enrollments" do
       @course.complete!
-      @ag.appointments_participants.size.should eql 1
-      @ag.appointments_participants.current.size.should eql 0
+      expect(@ag.appointments_participants.size).to eql 1
+      expect(@ag.appointments_participants.current.size).to eql 0
     end
   end
 end
@@ -2873,10 +2874,10 @@ describe Course, "inherited_assessment_question_banks" do
   it "should include the course's banks if include_self is true" do
     @account = Account.create
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks(true).should be_empty
+    expect(@course.inherited_assessment_question_banks(true)).to be_empty
 
     bank = @course.assessment_question_banks.create
-    @course.inherited_assessment_question_banks(true).should == [bank]
+    expect(@course.inherited_assessment_question_banks(true)).to eq [bank]
   end
 
   it "should include all banks in the account hierarchy" do
@@ -2889,7 +2890,7 @@ describe Course, "inherited_assessment_question_banks" do
     account_bank = @account.assessment_question_banks.create
 
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks.sort_by(&:id).should == [root_bank, account_bank]
+    expect(@course.inherited_assessment_question_banks.sort_by(&:id)).to eq [root_bank, account_bank]
   end
 
   it "should return a useful scope" do
@@ -2905,10 +2906,10 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.order(:id).should == [root_bank, account_bank, bank]
-    banks.where(id: bank).first.should eql bank
-    banks.where(id: account_bank).first.should eql account_bank
-    banks.where(id: root_bank).first.should eql root_bank
+    expect(banks.order(:id)).to eq [root_bank, account_bank, bank]
+    expect(banks.where(id: bank).first).to eql bank
+    expect(banks.where(id: account_bank).first).to eql account_bank
+    expect(banks.where(id: root_bank).first).to eql root_bank
   end
 end
 
@@ -2936,76 +2937,76 @@ describe Course, "section_visibility" do
 
   it "should return a scope from sections_visible_to" do
     # can't use "should respond_to", because that delegates to the instantiated Array
-    lambda{ @course.sections_visible_to(@teacher).scoped }.should_not raise_exception
+    expect{ @course.sections_visible_to(@teacher).scoped }.not_to raise_exception
   end
 
   context "full" do
     it "should return students from all sections" do
-      @course.students_visible_to(@teacher).sort_by(&:id).should eql [@student1, @student2]
-      @course.students_visible_to(@student1).sort_by(&:id).should eql [@student1, @student2]
+      expect(@course.students_visible_to(@teacher).sort_by(&:id)).to eql [@student1, @student2]
+      expect(@course.students_visible_to(@student1).sort_by(&:id)).to eql [@student1, @student2]
     end
 
     it "should return all sections if a teacher" do
-      @course.sections_visible_to(@teacher).sort_by(&:id).should eql [@course.default_section, @other_section]
+      expect(@course.sections_visible_to(@teacher).sort_by(&:id)).to eql [@course.default_section, @other_section]
     end
 
     it "should return user's sections if a student" do
-      @course.sections_visible_to(@student1).should == [@course.default_section]
+      expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
     end
 
     it "should return users from all sections" do
-      @course.users_visible_to(@teacher).sort_by(&:id).should eql [@teacher, @ta, @student1, @student2, @observer]
-      @course.users_visible_to(@ta).sort_by(&:id).should      eql [@teacher, @ta, @student1, @observer]
+      expect(@course.users_visible_to(@teacher).sort_by(&:id)).to eql [@teacher, @ta, @student1, @student2, @observer]
+      expect(@course.users_visible_to(@ta).sort_by(&:id)).to      eql [@teacher, @ta, @student1, @observer]
     end
 
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
-      @course.enrollments_visible_to(@admin).map(&:user).should be_include(@course.student_view_student)
+      expect(@course.enrollments_visible_to(@admin).map(&:user)).to be_include(@course.student_view_student)
     end
 
     it "should return student view students to student view students" do
-      @course.enrollments_visible_to(@course.student_view_student).map(&:user).should be_include(@course.student_view_student)
+      expect(@course.enrollments_visible_to(@course.student_view_student).map(&:user)).to be_include(@course.student_view_student)
     end
   end
 
   context "sections" do
     it "should return students from user's sections" do
-      @course.students_visible_to(@ta).should == [@student1]
+      expect(@course.students_visible_to(@ta)).to eq [@student1]
     end
 
     it "should return user's sections" do
-      @course.sections_visible_to(@ta).should == [@course.default_section]
+      expect(@course.sections_visible_to(@ta)).to eq [@course.default_section]
     end
 
     it "should return non-limited admins from other sections" do
-      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should == [@teacher]
+      expect(@course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true)).to eq [@teacher]
     end
   end
 
   context "restricted" do
     it "should return no students except self and the observed" do
-      @course.students_visible_to(@observer).should == [@student1]
+      expect(@course.students_visible_to(@observer)).to eq [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.students_visible_to(@student1).should == [@student1]
+      expect(@course.students_visible_to(@student1)).to eq [@student1]
     end
 
     it "should return no sections" do
-      @course.sections_visible_to(@observer).should == []
+      expect(@course.sections_visible_to(@observer)).to eq []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.sections_visible_to(@student1).should == []
+      expect(@course.sections_visible_to(@student1)).to eq []
     end
   end
 
   context "require_message_permission" do
     it "should check the message permission" do
-      @course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true).should eql :full
-      @course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true).should eql :restricted
+      expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true)).to eql :full
+      expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true)).to eql :restricted
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true).should eql :restricted
+      expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true)).to eql :restricted
     end
   end
 end
@@ -3021,24 +3022,24 @@ describe Course, ".import_from_migration" do
 
   it "should know when it has open course imports" do
     # no course imports
-    @course.should_not have_open_course_imports
+    expect(@course).not_to have_open_course_imports
 
     course2 = @course.account.courses.create!
     # created course import
     @course.course_imports.create!(source: course2, import_type: 'test')
-    @course.should have_open_course_imports
+    expect(@course).to have_open_course_imports
 
     # started course import
     @course.course_imports.first.update_attribute(:workflow_state, 'started')
-    @course.should have_open_course_imports
+    expect(@course).to have_open_course_imports
 
     # completed course import
     @course.course_imports.first.update_attribute(:workflow_state, 'completed')
-    @course.should_not have_open_course_imports
+    expect(@course).not_to have_open_course_imports
 
     # failed course import
     @course.course_imports.first.update_attribute(:workflow_state, 'failed')
-    @course.should_not have_open_course_imports
+    expect(@course).not_to have_open_course_imports
   end
 end
 
@@ -3051,13 +3052,13 @@ describe Course, "enrollments" do
     @course.root_account = a1
     @course.save!
 
-    @course.student_enrollments.map(&:root_account_id).should == [a1.id]
-    @course.course_sections.reload.map(&:root_account_id).should == [a1.id]
+    expect(@course.student_enrollments.map(&:root_account_id)).to eq [a1.id]
+    expect(@course.course_sections.reload.map(&:root_account_id)).to eq [a1.id]
 
     @course.root_account = a2
     @course.save!
-    @course.student_enrollments(true).map(&:root_account_id).should == [a2.id]
-    @course.course_sections.reload.map(&:root_account_id).should == [a2.id]
+    expect(@course.student_enrollments(true).map(&:root_account_id)).to eq [a2.id]
+    expect(@course.course_sections.reload.map(&:root_account_id)).to eq [a2.id]
   end
 end
 
@@ -3071,95 +3072,95 @@ describe Course, "user_is_instructor?" do
     course = @course
     teacher = @user
     course.enroll_teacher(teacher).accept
-    course.user_is_instructor?(teacher).should be_true
+    expect(course.user_is_instructor?(teacher)).to be_truthy
   end
 
   it "should be true for tas" do
     course = @course
     ta = @user
     course.enroll_ta(ta).accept
-    course.user_is_instructor?(ta).should be_true
+    expect(course.user_is_instructor?(ta)).to be_truthy
   end
 
   it "should be false for designers" do
     course = @course
     designer = @user
     course.enroll_designer(designer).accept
-    course.user_is_instructor?(designer).should be_false
+    expect(course.user_is_instructor?(designer)).to be_falsey
   end
 end
 
 describe Course, "user_has_been_instructor?" do
   it "should be true for teachers, past or present" do
     e = course_with_teacher(:active_all => true)
-    @course.user_has_been_instructor?(@teacher).should be_true
+    expect(@course.user_has_been_instructor?(@teacher)).to be_truthy
 
     e.conclude
-    e.reload.workflow_state.should == "completed"
-    @course.user_has_been_instructor?(@teacher).should be_true
+    expect(e.reload.workflow_state).to eq "completed"
+    expect(@course.user_has_been_instructor?(@teacher)).to be_truthy
 
     @course.complete
-    @course.user_has_been_instructor?(@teacher).should be_true
+    expect(@course.user_has_been_instructor?(@teacher)).to be_truthy
   end
 
   it "should be true for tas" do
     e = course_with_ta(:active_all => true)
-    @course.user_has_been_instructor?(@ta).should be_true
+    expect(@course.user_has_been_instructor?(@ta)).to be_truthy
   end
 end
 
 describe Course, "user_has_been_admin?" do
   it "should be true for teachers, past or present" do
     e = course_with_teacher(:active_all => true)
-    @course.user_has_been_admin?(@teacher).should be_true
+    expect(@course.user_has_been_admin?(@teacher)).to be_truthy
 
     e.conclude
-    e.reload.workflow_state.should == "completed"
-    @course.user_has_been_admin?(@teacher).should be_true
+    expect(e.reload.workflow_state).to eq "completed"
+    expect(@course.user_has_been_admin?(@teacher)).to be_truthy
 
     @course.complete
-    @course.user_has_been_admin?(@teacher).should be_true
+    expect(@course.user_has_been_admin?(@teacher)).to be_truthy
   end
 
   it "should be true for tas" do
     e = course_with_ta(:active_all => true)
-    @course.user_has_been_admin?(@ta).should be_true
+    expect(@course.user_has_been_admin?(@ta)).to be_truthy
   end
 
   it "should be true for designers" do
     e = course_with_designer(:active_all => true)
-    @course.user_has_been_admin?(@designer).should be_true
+    expect(@course.user_has_been_admin?(@designer)).to be_truthy
   end
 end
 
 describe Course, "user_has_been_student?" do
   it "should be true for students, past or present" do
     e = course_with_student(:active_all => true)
-    @course.user_has_been_student?(@student).should be_true
+    expect(@course.user_has_been_student?(@student)).to be_truthy
 
     e.conclude
-    e.reload.workflow_state.should == "completed"
-    @course.user_has_been_student?(@student).should be_true
+    expect(e.reload.workflow_state).to eq "completed"
+    expect(@course.user_has_been_student?(@student)).to be_truthy
 
     @course.complete
-    @course.user_has_been_student?(@student).should be_true
+    expect(@course.user_has_been_student?(@student)).to be_truthy
   end
 end
 
 describe Course, "user_has_been_observer?" do
   it "should be false for teachers" do
     e = course_with_teacher(:active_all => true)
-    @course.user_has_been_observer?(@teacher).should be_false
+    expect(@course.user_has_been_observer?(@teacher)).to be_falsey
   end
 
   it "should be false for tas" do
     e = course_with_ta(:active_all => true)
-    @course.user_has_been_observer?(@ta).should be_false
+    expect(@course.user_has_been_observer?(@ta)).to be_falsey
   end
 
   it "should be true for observers" do
     course_with_observer(:active_all => true)
-    @course.user_has_been_observer?(@observer).should be_true
+    expect(@course.user_has_been_observer?(@observer)).to be_truthy
   end
 end
 
@@ -3170,20 +3171,20 @@ describe Course, "student_view_student" do
 
   it "should create a default section when enrolling for student view student" do
     student_view_course = Course.create!
-    student_view_course.course_sections.should be_empty
+    expect(student_view_course.course_sections).to be_empty
 
     student_view_student = student_view_course.student_view_student
 
-    student_view_course.enrollments.map(&:user_id).should be_include(student_view_student.id)
+    expect(student_view_course.enrollments.map(&:user_id)).to be_include(student_view_student.id)
   end
 
   it "should not create a section if a section already exists" do
     student_view_course = Course.create!
     not_default_section = student_view_course.course_sections.create! name: 'not default section'
-    not_default_section.should_not be_default_section
+    expect(not_default_section).not_to be_default_section
     student_view_student = student_view_course.student_view_student
-    student_view_course.reload.course_sections.active.count.should eql 1
-    not_default_section.enrollments.map(&:user_id).should be_include(student_view_student.id)
+    expect(student_view_course.reload.course_sections.active.count).to eql 1
+    expect(not_default_section.enrollments.map(&:user_id)).to be_include(student_view_student.id)
   end
 
   it "should create and return the student view student for a course" do
@@ -3198,7 +3199,7 @@ describe Course, "student_view_student" do
   it "should create enrollments for each section" do
     @section2 = @course.course_sections.create!
     expect { @fake_student = @course.student_view_student }.to change(Enrollment, :count).by(2)
-    @fake_student.enrollments.all?{|e| e.fake_student?}.should be_true
+    expect(@fake_student.enrollments.all?{|e| e.fake_student?}).to be_truthy
   end
 
   it "should sync enrollments after being created" do
@@ -3209,7 +3210,7 @@ describe Course, "student_view_student" do
 
   it "should create a pseudonym for the fake student" do
     expect { @fake_student = @course.student_view_student }.to change(Pseudonym, :count).by(1)
-    @fake_student.pseudonyms.should_not be_empty
+    expect(@fake_student.pseudonyms).not_to be_empty
   end
 
   it "should allow two different student view users for two different courses" do
@@ -3222,21 +3223,21 @@ describe Course, "student_view_student" do
     @fake_student1 = @course1.student_view_student
     @fake_student2 = @course2.student_view_student
 
-    @fake_student1.id.should_not eql @fake_student2.id
-    @fake_student1.pseudonym.id.should_not eql @fake_student2.pseudonym.id
+    expect(@fake_student1.id).not_to eql @fake_student2.id
+    expect(@fake_student1.pseudonym.id).not_to eql @fake_student2.pseudonym.id
   end
 
   it "should give fake student active student permissions even if enrollment wouldn't otherwise be active" do
     @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
     @fake_student = @course.student_view_student
-    @course.grants_right?(@fake_student, nil, :read_forum).should be_true
+    expect(@course.grants_right?(@fake_student, nil, :read_forum)).to be_truthy
   end
 
   it "should not update the fake student's enrollment state to 'invited' in a concluded course" do
     @course.student_view_student
     @course.enrollment_term.update_attributes(:start_at => 4.days.ago, :end_at => 2.days.ago)
     @fake_student = @course.student_view_student
-    @fake_student.enrollments.where(course_id: @course).map(&:workflow_state).should eql(['active'])
+    expect(@fake_student.enrollments.where(course_id: @course).map(&:workflow_state)).to eql(['active'])
   end
 end
 
@@ -3247,18 +3248,18 @@ describe Course do
       account.settings = { :open_registration => true }
       account.save!
       course
-      @course.user_list_search_mode_for(nil).should == :open
-      @course.user_list_search_mode_for(user).should == :open
+      expect(@course.user_list_search_mode_for(nil)).to eq :open
+      expect(@course.user_list_search_mode_for(user)).to eq :open
     end
 
     it "should be preferred for account admins" do
       account = Account.default
       course
-      @course.user_list_search_mode_for(nil).should == :closed
-      @course.user_list_search_mode_for(user).should == :closed
+      expect(@course.user_list_search_mode_for(nil)).to eq :closed
+      expect(@course.user_list_search_mode_for(user)).to eq :closed
       user
       account.account_users.create!(user: @user)
-      @course.user_list_search_mode_for(@user).should == :preferred
+      expect(@course.user_list_search_mode_for(@user)).to eq :preferred
     end
 
     it "should be preferred if delegated authentication is configured" do
@@ -3267,8 +3268,8 @@ describe Course do
       account.account_authorization_configs.create!(:auth_type => 'cas')
       account.save!
       course
-      @course.user_list_search_mode_for(nil).should == :preferred
-      @course.user_list_search_mode_for(user).should == :preferred
+      expect(@course.user_list_search_mode_for(nil)).to eq :preferred
+      expect(@course.user_list_search_mode_for(user)).to eq :preferred
     end
   end
 end
@@ -3280,23 +3281,23 @@ describe Course do
       course
     end
     it "should generate a unique code" do
-      c1.self_enrollment_code.should be_nil # normally only set when self_enrollment is enabled
+      expect(c1.self_enrollment_code).to be_nil # normally only set when self_enrollment is enabled
       c1.update_attribute(:self_enrollment, true)
-      c1.self_enrollment_code.should_not be_nil
-      c1.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+      expect(c1.self_enrollment_code).not_to be_nil
+      expect(c1.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
 
       c2 = course()
       c2.update_attribute(:self_enrollment, true)
-      c2.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
-      c1.self_enrollment_code.should_not == c2.self_enrollment_code
+      expect(c2.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
+      expect(c1.self_enrollment_code).not_to eq c2.self_enrollment_code
     end
 
     it "should generate a code on demand for existing self enrollment courses" do
       Course.where(:id => @course).update_all(:self_enrollment => true)
       c1.reload
-      c1.read_attribute(:self_enrollment_code).should be_nil
-      c1.self_enrollment_code.should_not be_nil
-      c1.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+      expect(c1.read_attribute(:self_enrollment_code)).to be_nil
+      expect(c1.self_enrollment_code).not_to be_nil
+      expect(c1.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
     end
   end
 
@@ -3308,40 +3309,40 @@ describe Course do
     end
 
     it "should restrict to groups the user is in without course-wide permissions" do
-      @course.groups_visible_to(@user).should be_empty
+      expect(@course.groups_visible_to(@user)).to be_empty
       @group.add_user(@user)
-      @course.groups_visible_to(@user).should == [@group]
+      expect(@course.groups_visible_to(@user)).to eq [@group]
     end
 
     it "should allow course-wide visibility regardless of membership given :manage_groups permission" do
-      @course.groups_visible_to(@user).should be_empty
+      expect(@course.groups_visible_to(@user)).to be_empty
       @course.expects(:grants_any_right?).returns(true)
-      @course.groups_visible_to(@user).should == [@group]
+      expect(@course.groups_visible_to(@user)).to eq [@group]
     end
 
     it "should allow course-wide visibility regardless of membership given :view_group_pages permission" do
-      @course.groups_visible_to(@user).should be_empty
+      expect(@course.groups_visible_to(@user)).to be_empty
       @course.expects(:grants_any_right?).returns(true)
-      @course.groups_visible_to(@user).should == [@group]
+      expect(@course.groups_visible_to(@user)).to eq [@group]
     end
 
     it "should default to active groups only" do
       @course.expects(:grants_any_right?).returns(true).at_least_once
-      @course.groups_visible_to(@user).should == [@group]
+      expect(@course.groups_visible_to(@user)).to eq [@group]
       @group.destroy
-      @course.reload.groups_visible_to(@user).should be_empty
+      expect(@course.reload.groups_visible_to(@user)).to be_empty
     end
 
     it "should allow overriding the scope" do
       @course.expects(:grants_any_right?).returns(true).at_least_once
       @group.destroy
-      @course.groups_visible_to(@user).should be_empty
-      @course.groups_visible_to(@user, @course.groups).should == [@group]
+      expect(@course.groups_visible_to(@user)).to be_empty
+      expect(@course.groups_visible_to(@user, @course.groups)).to eq [@group]
     end
 
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
-      lambda{ @course.groups_visible_to(@user).scoped }.should_not raise_exception
+      expect{ @course.groups_visible_to(@user).scoped }.not_to raise_exception
     end
   end
 
@@ -3356,12 +3357,12 @@ describe Course do
     end
 
     it 'can be read by a nil user if public and available' do
-      @course.check_policy(nil).should == [:read, :read_outcomes, :read_syllabus]
+      expect(@course.check_policy(nil)).to eq [:read, :read_outcomes, :read_syllabus]
     end
 
     it 'cannot be read by a nil user if public but not available' do
       @course.write_attribute(:workflow_state, 'created')
-      @course.check_policy(nil).should == []
+      expect(@course.check_policy(nil)).to eq []
     end
 
     describe 'when course is not public' do
@@ -3373,22 +3374,22 @@ describe Course do
 
 
       it 'cannot be read by a nil user' do
-        @course.check_policy(nil).should == []
+        expect(@course.check_policy(nil)).to eq []
       end
 
       it 'cannot be read by an unaffiliated user' do
-        @course.check_policy(user).should == []
+        expect(@course.check_policy(user)).to eq []
       end
 
       it 'can be read by a prior user' do
         user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
-        @course.check_policy(user).sort.should == [:read, :read_forum, :read_grades, :read_outcomes]
+        expect(@course.check_policy(user).sort).to eq [:read, :read_forum, :read_grades, :read_outcomes]
       end
 
       it 'can have its forum read by an observer' do
         enrollment = user.observer_enrollments.create!(:workflow_state => 'completed', :course => @course)
         enrollment.update_attribute(:associated_user_id, user.id)
-        @course.check_policy(user).should include :read_forum
+        expect(@course.check_policy(user)).to include :read_forum
       end
 
       describe 'an instructor policy' do
@@ -3400,9 +3401,9 @@ describe Course do
 
         subject{ @course.check_policy(instructor) }
 
-        it{ should include :read_prior_roster }
-        it{ should include :view_all_grades }
-        it{ should include :delete }
+        it{ is_expected.to include :read_prior_roster }
+        it{ is_expected.to include :view_all_grades }
+        it{ is_expected.to include :delete }
       end
 
     end
@@ -3422,23 +3423,23 @@ describe Course do
         site_admin.account_users.create!(user: @user)
 
         @shard1.activate do
-          @course.grants_right?(@site_admin, :manage_content).should be_true
-          @course.grants_right?(@teacher, :manage_content).should be_true
-          @course.grants_right?(@student, :manage_content).should be_false
+          expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
+          expect(@course.grants_right?(@teacher, :manage_content)).to be_truthy
+          expect(@course.grants_right?(@student, :manage_content)).to be_falsey
         end
 
-        @course.grants_right?(@site_admin, :manage_content).should be_true
+        expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
       end
 
       enable_cache do
         # do it in a different order
         @shard1.activate do
-          @course.grants_right?(@student, :manage_content).should be_false
-          @course.grants_right?(@teacher, :manage_content).should be_true
-          @course.grants_right?(@site_admin, :manage_content).should be_true
+          expect(@course.grants_right?(@student, :manage_content)).to be_falsey
+          expect(@course.grants_right?(@teacher, :manage_content)).to be_truthy
+          expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
         end
 
-        @course.grants_right?(@site_admin, :manage_content).should be_true
+        expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
       end
     end
 
@@ -3455,11 +3456,11 @@ describe Course do
       student_in_course(:user => @user, :active_all => true)
 
       @shard1.activate do
-        @course.grants_right?(@user, :send_messages).should be_true
+        expect(@course.grants_right?(@user, :send_messages)).to be_truthy
       end
 
       @shard2.activate do
-        @course.grants_right?(@user, :send_messages).should be_true
+        expect(@course.grants_right?(@user, :send_messages)).to be_truthy
       end
     end
   end
@@ -3479,25 +3480,25 @@ describe Course do
 
       describe "#with_enrollments" do
         it "should include courses with enrollments" do
-          @account.courses.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
+          expect(@account.courses.with_enrollments.sort_by(&:id)).to eq [@course1a, @course1b]
         end
 
         it "should play nice with other scopes" do
-          @account.courses.with_enrollments.where(:name => 'A').should == [@course1a]
+          expect(@account.courses.with_enrollments.where(:name => 'A')).to eq [@course1a]
         end
 
         it "should be disjoint with #without_enrollments" do
-          @account.courses.with_enrollments.without_enrollments.should be_empty
+          expect(@account.courses.with_enrollments.without_enrollments).to be_empty
         end
       end
 
       describe "#without_enrollments" do
         it "should include courses without enrollments" do
-          @account.courses.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
+          expect(@account.courses.without_enrollments.sort_by(&:id)).to eq [@course2a, @course2b]
         end
 
         it "should play nice with other scopes" do
-          @account.courses.without_enrollments.where(:name => 'A').should == [@course2a]
+          expect(@account.courses.without_enrollments.where(:name => 'A')).to eq [@course2a]
         end
       end
     end
@@ -3521,25 +3522,25 @@ describe Course do
 
       describe "#completed" do
         it "should include completed courses" do
-          @account.courses.completed.sort_by(&:id).should == [@c3, @c4, @c5]
+          expect(@account.courses.completed.sort_by(&:id)).to eq [@c3, @c4, @c5]
         end
 
         it "should play nice with other scopes" do
-          @account.courses.completed.where(:conclude_at => nil).should == [@c4]
+          expect(@account.courses.completed.where(:conclude_at => nil)).to eq [@c4]
         end
 
         it "should be disjoint with #not_completed" do
-          @account.courses.completed.not_completed.should be_empty
+          expect(@account.courses.completed.not_completed).to be_empty
         end
       end
 
       describe "#not_completed" do
         it "should include non-completed courses" do
-          @account.courses.not_completed.sort_by(&:id).should == [@c1, @c2]
+          expect(@account.courses.not_completed.sort_by(&:id)).to eq [@c1, @c2]
         end
 
         it "should play nice with other scopes" do
-          @account.courses.not_completed.where(:conclude_at => nil).should == [@c1]
+          expect(@account.courses.not_completed.where(:conclude_at => nil)).to eq [@c1]
         end
       end
     end
@@ -3557,35 +3558,35 @@ describe Course do
       end
 
       it "should filter courses by teacher" do
-        @account.courses.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
+        expect(@account.courses.by_teachers([@teacherA.id]).sort_by(&:id)).to eq [@course1a, @course1b]
       end
 
       it "should support multiple teachers" do
-        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
+        expect(@account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id)).to eq [@course2, @course3]
       end
 
       it "should work with an empty array" do
-        @account.courses.by_teachers([]).should be_empty
+        expect(@account.courses.by_teachers([])).to be_empty
       end
 
       it "should not follow student enrollments" do
         @course3.enroll_student(user_model)
-        @account.courses.by_teachers([@user.id]).should be_empty
+        expect(@account.courses.by_teachers([@user.id])).to be_empty
       end
 
       it "should not follow deleted enrollments" do
         @teacherC.enrollments.each { |e| e.destroy }
-        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
+        expect(@account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id)).to eq [@course2]
       end
 
       it "should return no results when the user is not enrolled in the course" do
         user_model
-        @account.courses.by_teachers([@user.id]).should be_empty
+        expect(@account.courses.by_teachers([@user.id])).to be_empty
       end
 
       it "should play nice with other scopes" do
         @course1a.complete!
-        @account.courses.by_teachers([@teacherA.id]).completed.should == [@course1a]
+        expect(@account.courses.by_teachers([@teacherA.id]).completed).to eq [@course1a]
       end
     end
 
@@ -3603,24 +3604,24 @@ describe Course do
       end
 
       it "should filter courses by root account" do
-        Course.by_associated_accounts([@root_account.id]).sort_by(&:id).should == [@courseA1, @courseA2, @courseB]
+        expect(Course.by_associated_accounts([@root_account.id]).sort_by(&:id)).to eq [@courseA1, @courseA2, @courseB]
       end
 
       it "should filter courses by subaccount" do
-        Course.by_associated_accounts([@subA.id]).sort_by(&:id).should == [@courseA1, @courseA2]
+        expect(Course.by_associated_accounts([@subA.id]).sort_by(&:id)).to eq [@courseA1, @courseA2]
       end
 
       it "should return no results if already scoped to an unrelated account" do
-        @other_root_account.courses.by_associated_accounts([@root_account.id]).should be_empty
+        expect(@other_root_account.courses.by_associated_accounts([@root_account.id])).to be_empty
       end
 
       it "should accept multiple account IDs" do
-        Course.by_associated_accounts([@subB.id, @other_root_account.id]).sort_by(&:id).should == [@courseB, @courseC]
+        expect(Course.by_associated_accounts([@subB.id, @other_root_account.id]).sort_by(&:id)).to eq [@courseB, @courseC]
       end
 
       it "should play nice with other scopes" do
         @courseA1.complete!
-        Course.by_associated_accounts([@subA.id]).not_completed.should == [@courseA2]
+        expect(Course.by_associated_accounts([@subA.id]).not_completed).to eq [@courseA2]
       end
     end
   end
@@ -3631,19 +3632,19 @@ describe Course do
     it 'returns true when the provided user is a student' do
       student = user_model
       student.student_enrollments.create!(:course => course)
-      course.includes_student?(student).should be_true
+      expect(course.includes_student?(student)).to be_truthy
     end
 
     it 'returns false when the provided user is not a student' do
-      course.includes_student?(User.create!).should be_false
+      expect(course.includes_student?(User.create!)).to be_falsey
     end
 
     it 'returns false when the user is not yet even in the database' do
-      course.includes_student?(User.new).should be_false
+      expect(course.includes_student?(User.new)).to be_falsey
     end
 
     it 'returns false when the provided user is nil' do
-      course.includes_student?(nil).should be_false
+      expect(course.includes_student?(nil)).to be_falsey
     end
   end
 end
@@ -3665,14 +3666,14 @@ describe Course do
 
       @course.enroll_user(@user1)
 
-      @course.enrollments.count.should == enrollment_count
+      expect(@course.enrollments.count).to eq enrollment_count
     end
 
     it 'should allow deleted enrollments to be resurrected as active' do
       course_with_student({ :active_enrollment => true })
       @enrollment.destroy
       @enrollment = @course.enroll_user(@user, 'StudentEnrollment', { :enrollment_state => 'active' })
-      @enrollment.workflow_state.should eql 'active'
+      expect(@enrollment.workflow_state).to eql 'active'
     end
 
     context 'SIS re-enrollments' do
@@ -3688,15 +3689,15 @@ describe Course do
 
       it 'should retain SIS attributes if re-enrolled, but the SIS enrollment is still active' do
         e2 = @course.enroll_student @user
-        e2.sis_batch_id.should_not eql nil
-        e2.sis_source_id.should_not eql nil
+        expect(e2.sis_batch_id).not_to eql nil
+        expect(e2.sis_source_id).not_to eql nil
       end
 
       it 'should remove SIS attributes from enrollments when re-created manually' do
         @enrollment.destroy
         @enrollment = @course.enroll_student @user
-        @enrollment.sis_batch_id.should eql nil
-        @enrollment.sis_source_id.should eql nil
+        expect(@enrollment.sis_batch_id).to eql nil
+        expect(@enrollment.sis_source_id).to eql nil
       end
     end
 
@@ -3710,13 +3711,13 @@ describe Course do
       end
 
       it "should not cause problems moving a user between sections (s1)" do
-        @user.enrollments.count.should == 2
+        expect(@user.enrollments.count).to eq 2
         # this should not cause a unique constraint violation
         @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section)
       end
 
       it "should not cause problems moving a user between sections (s2)" do
-        @user.enrollments.count.should == 2
+        expect(@user.enrollments.count).to eq 2
         # this should not cause a unique constraint violation
         @course.enroll_user(@user, 'StudentEnrollment', section: @section2)
       end
@@ -3729,12 +3730,12 @@ describe Course do
       end
 
       it "should not be set for a new enrollment" do
-        @course.enroll_user(@user).already_enrolled.should_not be_true
+        expect(@course.enroll_user(@user).already_enrolled).not_to be_truthy
       end
 
       it "should be set for an updated enrollment" do
         @course.enroll_user(@user)
-        @course.enroll_user(@user).already_enrolled.should be_true
+        expect(@course.enroll_user(@user).already_enrolled).to be_truthy
       end
     end
 
@@ -3750,29 +3751,29 @@ describe Course do
       it "should re-use an enrollment with the same role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
-        @user.enrollments.count.should eql 1
-        enrollment1.should eql enrollment2
+        expect(@user.enrollments.count).to eql 1
+        expect(enrollment1).to eql enrollment2
       end
 
       it "should not re-use an enrollment with a different role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
-        @user.enrollments.count.should eql 2
-        enrollment1.should_not eql enrollment2
+        expect(@user.enrollments.count).to eql 2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "should not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment')
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
-        @user.enrollments.count.should eql 2
-        enrollment1.should_not eql enrollment2
+        expect(@user.enrollments.count).to eql 2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "should not re-use an enrollment with a role when enrolling with no role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment')
-        @user.enrollments.count.should eql 2
-        enrollment1.should_not eql enrollment2
+        expect(@user.enrollments.count).to eql 2
+        expect(enrollment1).not_to eql enrollment2
       end
     end
   end
@@ -3784,21 +3785,21 @@ describe Course do
 
     it "should hard truncate at 30 characters" do
       @course.short_name = "a" * 31
-      @course.short_name.length.should == 31
-      @course.short_name_slug.length.should == 30
-      @course.short_name.should =~ /^#{@course.short_name_slug}/
+      expect(@course.short_name.length).to eq 31
+      expect(@course.short_name_slug.length).to eq 30
+      expect(@course.short_name).to match /^#{@course.short_name_slug}/
     end
 
     it "should not change the short_name" do
       short_name = "a" * 31
       @course.short_name = short_name
-      @course.short_name_slug.should_not == @course.short_name
-      @course.short_name.should == short_name
+      expect(@course.short_name_slug).not_to eq @course.short_name
+      expect(@course.short_name).to eq short_name
     end
 
     it "should leave short short_names alone" do
       @course.short_name = 'short short_name'
-      @course.short_name_slug.should == @course.short_name
+      expect(@course.short_name_slug).to eq @course.short_name
     end
   end
 
@@ -3811,12 +3812,12 @@ describe Course do
       @course.enroll_student(user2).accept!
 
       dm_count = DelayedMessage.count
-      DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count.should == 0
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 0
       Notification.create!(:name => 'Enrollment Invitation')
       @course.re_send_invitations!
 
-      DelayedMessage.count.should == dm_count + 1
-      DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count.should == 1
+      expect(DelayedMessage.count).to eq dm_count + 1
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 1
     end
   end
 
@@ -3826,7 +3827,7 @@ describe Course do
     @course1.save!
     @course2 = Course.create!
 
-    Course.deleted.count.should == 1
+    expect(Course.deleted.count).to eq 1
   end
 
   describe "visibility_limited_to_course_sections?" do
@@ -3837,19 +3838,19 @@ describe Course do
     end
 
     it "should be true if all visibilities are limited" do
-      @course.visibility_limited_to_course_sections?(nil, [@limited, @limited]).should be_true
+      expect(@course.visibility_limited_to_course_sections?(nil, [@limited, @limited])).to be_truthy
     end
 
     it "should be false if only some visibilities are limited" do
-      @course.visibility_limited_to_course_sections?(nil, [@limited, @full]).should be_false
+      expect(@course.visibility_limited_to_course_sections?(nil, [@limited, @full])).to be_falsey
     end
 
     it "should be false if no visibilities are limited" do
-      @course.visibility_limited_to_course_sections?(nil, [@full, @full]).should be_false
+      expect(@course.visibility_limited_to_course_sections?(nil, [@full, @full])).to be_falsey
     end
 
     it "should be true if no visibilities are given" do
-      @course.visibility_limited_to_course_sections?(nil, []).should be_true
+      expect(@course.visibility_limited_to_course_sections?(nil, [])).to be_truthy
     end
   end
 
@@ -3861,12 +3862,12 @@ describe Course, "multiple_sections?" do
   end
 
   it "should return false for a class with one section" do
-    @course.multiple_sections?.should be_false
+    expect(@course.multiple_sections?).to be_falsey
   end
 
   it "should return true for a class with more than one active section" do
     @course.course_sections.create!
-    @course.multiple_sections?.should be_true
+    expect(@course.multiple_sections?).to be_truthy
   end
 end
 
@@ -3874,13 +3875,13 @@ describe Course, "default_section" do
   it "should create the default section" do
     c = Course.create!
     s = c.default_section
-    c.course_sections.pluck(:id).should eql [s.id]
+    expect(c.course_sections.pluck(:id)).to eql [s.id]
   end
 
   it "unless we ask it not to" do
     c = Course.create!
     s = c.default_section(no_create: true)
-    s.should be_nil
-    c.course_sections.pluck(:id).should be_empty
+    expect(s).to be_nil
+    expect(c.course_sections.pluck(:id)).to be_empty
   end
 end

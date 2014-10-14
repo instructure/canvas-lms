@@ -15,32 +15,32 @@ describe Quizzes::QuizRegrade do
   describe "relationships" do
 
     it "belongs to a quiz" do
-      Quizzes::QuizRegrade.new.should respond_to :quiz
+      expect(Quizzes::QuizRegrade.new).to respond_to :quiz
     end
 
     it "belongs to a user" do
-      Quizzes::QuizRegrade.new.should respond_to :user
+      expect(Quizzes::QuizRegrade.new).to respond_to :user
     end
 
   end
 
   describe "validations" do
     it "validates presence of quiz_id" do
-      Quizzes::QuizRegrade.new(quiz_id: nil).should_not be_valid
+      expect(Quizzes::QuizRegrade.new(quiz_id: nil)).not_to be_valid
     end
 
     it "validates presence of user id" do
-      Quizzes::QuizRegrade.new(quiz_id: 1,user_id: nil).should_not be_valid
+      expect(Quizzes::QuizRegrade.new(quiz_id: 1,user_id: nil)).not_to be_valid
     end
 
     it "validates presence of quiz_version" do
-      Quizzes::QuizRegrade.new(quiz_id: 1, user_id: 1, quiz_version: nil).
-        should_not be_valid
+      expect(Quizzes::QuizRegrade.new(quiz_id: 1, user_id: 1, quiz_version: nil)).
+        not_to be_valid
     end
 
     it "is valid when all required attributes are present" do
-      Quizzes::QuizRegrade.new(quiz_id: 1, user_id: 1, quiz_version: 1).
-        should be_valid
+      expect(Quizzes::QuizRegrade.new(quiz_id: 1, user_id: 1, quiz_version: 1)).
+        to be_valid
     end
   end
 end

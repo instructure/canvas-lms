@@ -38,35 +38,35 @@ class Enrollment
       before(:once) { course_with_student(:active_all => 1) }
       let(:recent_activity) { Enrollment::RecentActivity.new(@enrollment) }
       let(:now){ Time.zone.now }
-      before(:each){ @enrollment.last_activity_at.should be_nil }
+      before(:each){ expect(@enrollment.last_activity_at).to be_nil }
 
       describe "#record!" do
         it "should record on the first call (last_activity_at is nil)" do
           recent_activity.record!
-          @enrollment.last_activity_at.should_not be_nil
+          expect(@enrollment.last_activity_at).not_to be_nil
         end
 
         it "should not record anything within the time threshold" do
           recent_activity.record!(now)
           recent_activity.record!(now + 1.minutes)
-          @enrollment.last_activity_at.to_s.should == now.to_s
+          expect(@enrollment.last_activity_at.to_s).to eq now.to_s
         end
 
         it "should record again after the threshold is done" do
           recent_activity.record!(now)
           recent_activity.record!(now + 11.minutes)
-          @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
+          expect(@enrollment.last_activity_at.to_s).to eq (now + 11.minutes).to_s
         end
 
         it "should update total_activity_time within the time threshold" do
-          @enrollment.total_activity_time.should == 0
+          expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)
           recent_activity.record!(now + 1.minutes)
-          @enrollment.total_activity_time.should == 0
+          expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now + 3.minutes)
-          @enrollment.total_activity_time.should == 3.minutes.to_i
+          expect(@enrollment.total_activity_time).to eq 3.minutes.to_i
           recent_activity.record!(now + 30.minutes)
-          @enrollment.total_activity_time.should == 3.minutes.to_i
+          expect(@enrollment.total_activity_time).to eq 3.minutes.to_i
         end
       end
 
@@ -74,24 +74,24 @@ class Enrollment
         it "records activity for a positive response" do
           response = stub(response_code: 200)
           recent_activity.record_for_access(response)
-          @enrollment.last_activity_at.should_not be_nil
+          expect(@enrollment.last_activity_at).not_to be_nil
         end
 
         it "skips recording for 4xx or 5xx errors" do
           recent_activity.record_for_access(stub(response_code: 401))
-          @enrollment.last_activity_at.should be_nil
+          expect(@enrollment.last_activity_at).to be_nil
           recent_activity.record_for_access(stub(response_code: 500))
-          @enrollment.last_activity_at.should be_nil
+          expect(@enrollment.last_activity_at).to be_nil
           recent_activity.record_for_access(stub(response_code: 567))
-          @enrollment.last_activity_at.should be_nil
+          expect(@enrollment.last_activity_at).to be_nil
           recent_activity.record_for_access(stub(response_code: 234))
-          @enrollment.last_activity_at.should_not be_nil
+          expect(@enrollment.last_activity_at).not_to be_nil
         end
 
         it "skips recording for non-course contexts" do
           local_activity = Enrollment::RecentActivity.new(@enrollment, Account.new)
           local_activity.record_for_access(stub(response_code: 200))
-          @enrollment.last_activity_at.should be_nil
+          expect(@enrollment.last_activity_at).to be_nil
         end
       end
     end

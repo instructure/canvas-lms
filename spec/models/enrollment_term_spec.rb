@@ -34,16 +34,16 @@ describe EnrollmentTerm do
       I18n.backend.stub(translations) do
         I18n.locale = :test_locale
 
-        term.name.should == "mreT tluafeD"
-        term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
+        expect(term.name).to eq "mreT tluafeD"
+        expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
         term.name = "my term name"
         term.save!
-        term.read_attribute(:name).should == "my term name"
-        term.name.should == "my term name"
+        expect(term.read_attribute(:name)).to eq "my term name"
+        expect(term.name).to eq "my term name"
         term.name = "mreT tluafeD"
         term.save!
-        term.read_attribute(:name).should == EnrollmentTerm::DEFAULT_TERM_NAME
-        term.name.should == "mreT tluafeD"
+        expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
+        expect(term.name).to eq "mreT tluafeD"
       end
     end
   end

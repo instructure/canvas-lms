@@ -68,7 +68,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
       end
 
       it "defaults to the first answer being correct" do
-        @answer_data.answers.first[:weight].should == 100
+        expect(@answer_data.answers.first[:weight]).to eq 100
       end
 
     end

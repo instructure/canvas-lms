@@ -41,7 +41,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
       essay = Quizzes::QuizQuestion::AnswerParsers::Essay.new(raw_answers)
       question = Quizzes::QuizQuestion::QuestionData.new({})
       essay.parse(question)
-      question[:comments].should == raw_answers[0][:answer_comments]
+      expect(question[:comments]).to eq raw_answers[0][:answer_comments]
     end
   end
 end

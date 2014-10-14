@@ -29,46 +29,46 @@ describe Alert do
       it "should translate string-symbols to symbols when assigning to recipients" do
         alert = Alert.new
         alert.recipients = [':student', :teachers, 'AccountAdmin']
-        alert.recipients.should == [:student, :teachers, 'AccountAdmin']
+        expect(alert.recipients).to eq [:student, :teachers, 'AccountAdmin']
       end
 
       it "should accept mass assignment of criteria" do
         alert = Alert.new(:context => Account.default, :recipients => [:student])
         alert.criteria = [{:criterion_type => 'Interaction', :threshold => 1}]
-        alert.criteria.length.should == 1
-        alert.criteria.first.criterion_type.should == 'Interaction'
-        alert.criteria.first.threshold.should == 1
+        expect(alert.criteria.length).to eq 1
+        expect(alert.criteria.first.criterion_type).to eq 'Interaction'
+        expect(alert.criteria.first.threshold).to eq 1
         alert.save!
         original_criterion_id = alert.criteria.first.id
 
         alert.criteria = [{:criterion_type => 'Interaction', :threshold => 7, :id => alert.criteria.first.id},
                           {:criterion_type => 'UserNote', :threshold => 6}]
-        alert.criteria.length.should == 2
-        alert.criteria.first.id.should == original_criterion_id
-        alert.criteria.first.threshold.should == 7
-        alert.criteria.last.should be_new_record
+        expect(alert.criteria.length).to eq 2
+        expect(alert.criteria.first.id).to eq original_criterion_id
+        expect(alert.criteria.first.threshold).to eq 7
+        expect(alert.criteria.last).to be_new_record
 
         alert.criteria = []
         alert.criteria be_empty
 
-        AlertCriterion.where(id: original_criterion_id).first.should be_nil
+        expect(AlertCriterion.where(id: original_criterion_id).first).to be_nil
       end
     end
 
     context "validation" do
       it "should require a context" do
         alert = Alert.new(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-        alert.save.should be_false
+        expect(alert.save).to be_falsey
       end
 
       it "should require recipients" do
         alert = Account.default.alerts.build(:criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-        alert.save.should be_false
+        expect(alert.save).to be_falsey
       end
 
       it "should require criteria" do
         alert = Account.default.alerts.build(:recipients => [:student])
-        alert.save.should be_false
+        expect(alert.save).to be_falsey
       end
     end
   end

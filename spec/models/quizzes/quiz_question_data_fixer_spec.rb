@@ -86,13 +86,13 @@ describe Quizzes::QuizQuestionDataFixer do
     @good[:assessment_question_id] = aq.id
 
     aq.reload
-    aq.question_data.should == @good
+    expect(aq.question_data).to eq @good
     qq.reload
-    qq.question_data.to_hash.should == @good.merge({points_possible: 5, id: qq.id})
+    expect(qq.question_data.to_hash).to eq @good.merge({points_possible: 5, id: qq.id})
     qq2.reload
-    qq2.question_data[:name].should == "changed"
+    expect(qq2.question_data[:name]).to eq "changed"
     qq3.reload
-    qq3.question_data.to_hash.should == @good.merge({id: qq3.id})
+    expect(qq3.question_data.to_hash).to eq @good.merge({id: qq3.id})
   end
 
   it "should fix questions from quiz question" do
@@ -110,9 +110,9 @@ describe Quizzes::QuizQuestionDataFixer do
     @good[:assessment_question_id] = aq.id
 
     aq.reload
-    aq.question_data.should == @good.merge({id: qq.id})
+    expect(aq.question_data).to eq @good.merge({id: qq.id})
     qq2.reload
-    qq2.question_data.to_hash.should == @good.merge({id: qq2.id})
+    expect(qq2.question_data.to_hash).to eq @good.merge({id: qq2.id})
   end
 
 end

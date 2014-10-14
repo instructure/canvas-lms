@@ -26,18 +26,18 @@ describe AccessToken do
     end
 
     it "should only store the encrypted token" do
-      @token_string.should be_present
-      @token_string.should_not == @at.crypted_token
-      AccessToken.find(@at.id).full_token.should be_nil
+      expect(@token_string).to be_present
+      expect(@token_string).not_to eq @at.crypted_token
+      expect(AccessToken.find(@at.id).full_token).to be_nil
     end
 
     it "should authenticate via crypted_token" do
-      AccessToken.authenticate(@token_string).should == @at
+      expect(AccessToken.authenticate(@token_string)).to eq @at
     end
 
     it "should not authenticate expired tokens" do
       @at.update_attribute(:expires_at, 2.hours.ago)
-      AccessToken.authenticate(@token_string).should be_nil
+      expect(AccessToken.authenticate(@token_string)).to be_nil
     end
   end
 
@@ -49,20 +49,20 @@ describe AccessToken do
     end
 
     it "should match named scopes" do
-      token.scoped_to?(['https://canvas.instructure.com/login/oauth2/auth/user_profile', 'accounts']).should == true
+      expect(token.scoped_to?(['https://canvas.instructure.com/login/oauth2/auth/user_profile', 'accounts'])).to eq true
     end
 
     it "should not partially match scopes" do
-      token.scoped_to?(['user', 'accounts']).should == false
-      token.scoped_to?(['profile', 'accounts']).should == false
+      expect(token.scoped_to?(['user', 'accounts'])).to eq false
+      expect(token.scoped_to?(['profile', 'accounts'])).to eq false
     end
 
     it "should not match if token has more scopes then requested" do
-      token.scoped_to?(['user_profile', 'accounts', 'courses']).should == false
+      expect(token.scoped_to?(['user_profile', 'accounts', 'courses'])).to eq false
     end
 
     it "should not match if token has less scopes then requested" do
-      token.scoped_to?(['user_profile']).should == false
+      expect(token.scoped_to?(['user_profile'])).to eq false
     end
   end
 end

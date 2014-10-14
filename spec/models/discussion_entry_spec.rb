@@ -28,11 +28,11 @@ describe DiscussionEntry do
     sub_entry.parent_id = entry.id
     sub_entry.save!
 
-    topic.discussion_entries.active.length.should == 2
+    expect(topic.discussion_entries.active.length).to eq 2
     entry.destroy
     sub_entry.reload
-    sub_entry.should_not be_deleted
-    topic.discussion_entries.active.length.should == 1
+    expect(sub_entry).not_to be_deleted
+    expect(topic.discussion_entries.active.length).to eq 1
   end
 
   it "should preserve parent_id if valid" do
@@ -42,8 +42,8 @@ describe DiscussionEntry do
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id
     sub_entry.save!
-    sub_entry.should_not be_nil
-    sub_entry.parent_id.should eql(entry.id)
+    expect(sub_entry).not_to be_nil
+    expect(sub_entry.parent_id).to eql(entry.id)
   end
 
   it "should santize message" do
@@ -52,7 +52,7 @@ describe DiscussionEntry do
     topic.discussion_entries.create!
     topic.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
     topic.save!
-    topic.message.should eql("<a href=\"#\">only this should stay</a>")
+    expect(topic.message).to eql("<a href=\"#\">only this should stay</a>")
   end
 
   context "entry notifications" do
@@ -75,23 +75,23 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
-      to_users.should include(@teacher.id) # teacher is auto-subscribed
-      to_users.should_not include(@student.id) # posters are auto-subscribed, but student is not notified of his own post
-      to_users.should_not include(@non_posting_student.id)
+      expect(to_users).to include(@teacher.id) # teacher is auto-subscribed
+      expect(to_users).not_to include(@student.id) # posters are auto-subscribed, but student is not notified of his own post
+      expect(to_users).not_to include(@non_posting_student.id)
 
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
-      to_users.should_not include(@teacher.id) # author
-      to_users.should include(@student.id)
-      to_users.should_not include(@non_posting_student.id)
+      expect(to_users).not_to include(@teacher.id) # author
+      expect(to_users).to include(@student.id)
+      expect(to_users).not_to include(@non_posting_student.id)
 
       topic.subscribe(@non_posting_student)
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Welcome to the class")
       # now that the non_posting_student is subscribed, he should get notified of posts
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
-      to_users.should_not include(@teacher.id)
-      to_users.should include(@student.id)
-      to_users.should include(@non_posting_student.id)
+      expect(to_users).not_to include(@teacher.id)
+      expect(to_users).to include(@student.id)
+      expect(to_users).to include(@non_posting_student.id)
     end
 
     it "should send them for group discussion topics" do
@@ -109,15 +109,15 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
       # teacher is subscribed but is not in the "participating_users" for this group
       # s1 is the author, s2 is not subscribed
-      entry.messages_sent[@notification_name].should be_blank
+      expect(entry.messages_sent[@notification_name]).to be_blank
 
       # s1 should be subscribed from posting to the topic
       topic.subscribe(s2)
       entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should_not include(@teacher)
-      to_users.should include(s1)
-      to_users.should_not include(s2) # s2 not notified of own post
+      expect(to_users).not_to include(@teacher)
+      expect(to_users).to include(s1)
+      expect(to_users).not_to include(s2) # s2 not notified of own post
     end
 
     it "should not send them to irrelevant users" do
@@ -143,18 +143,18 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include teacher      # because teacher is subscribed and enrolled
-      to_users.should_not include outsider # because they're not in the class
-      to_users.should_not include student1 # because they wrote this entry
-      to_users.should_not include quitter  # because they dropped the class
+      expect(to_users).to include teacher      # because teacher is subscribed and enrolled
+      expect(to_users).not_to include outsider # because they're not in the class
+      expect(to_users).not_to include student1 # because they wrote this entry
+      expect(to_users).not_to include quitter  # because they dropped the class
     end
 
     it "should send relevent notifications on announcements" do
       topic = @course.announcements.create!(:user => @teacher, :message => "This is an important announcement")
       topic.subscribe(@student)
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
-      entry.messages_sent[@notification_name].should be_blank
-      entry.messages_sent["Announcement Reply"].should_not be_blank
+      expect(entry.messages_sent[@notification_name]).to be_blank
+      expect(entry.messages_sent["Announcement Reply"]).not_to be_blank
     end
 
   end
@@ -164,7 +164,7 @@ describe DiscussionEntry do
       course
       @course.offer
       topic = @course.discussion_topics.create!(:title => "abc " * 63 + "abc")
-      topic.title.length.should == 255
+      expect(topic.title.length).to eq 255
       @u = user_model
       entry = topic.discussion_entries.create!(:user => @u)
       @u2 = user_model
@@ -172,12 +172,12 @@ describe DiscussionEntry do
       sub_entry.parent_id = entry.id
       sub_entry.user = @u2
       sub_entry.save!
-      sub_entry.inbox_item_recipient_ids.should_not be_nil
-      sub_entry.inbox_item_recipient_ids.should_not be_empty
-      sub_entry.inbox_item_recipient_ids.should be_include(entry.user_id)
+      expect(sub_entry.inbox_item_recipient_ids).not_to be_nil
+      expect(sub_entry.inbox_item_recipient_ids).not_to be_empty
+      expect(sub_entry.inbox_item_recipient_ids).to be_include(entry.user_id)
       item = InboxItem.last
-      item.subject.length.should <= 255
-      item.subject.should match /abc /
+      expect(item.subject.length).to be <= 255
+      expect(item.subject).to match /abc /
     end
   end
 
@@ -197,10 +197,10 @@ describe DiscussionEntry do
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
       @sub_entry = @sub_topic.discussion_entries.create!(:message => "entry", :user => @first_user)
-      @group_entry.grants_right?(@first_user, :update).should eql(true)
-      @group_entry.grants_right?(@second_user, :update).should eql(false)
-      @sub_entry.grants_right?(@first_user, :update).should eql(true)
-      @sub_entry.grants_right?(@second_user, :update).should eql(false)
+      expect(@group_entry.grants_right?(@first_user, :update)).to eql(true)
+      expect(@group_entry.grants_right?(@second_user, :update)).to eql(false)
+      expect(@sub_entry.grants_right?(@first_user, :update)).to eql(true)
+      expect(@sub_entry.grants_right?(@second_user, :update)).to eql(false)
     end
   end
 
@@ -221,7 +221,7 @@ describe DiscussionEntry do
     it "should tickle updated_at on the associated discussion_topic" do
       @entry.update_topic
       @topic.reload
-      @topic.updated_at.should_not == @original_updated_at
+      expect(@topic.updated_at).not_to eq @original_updated_at
     end
 
     it "should set last_reply_at on the associated discussion_topic given a newer entry" do
@@ -230,7 +230,7 @@ describe DiscussionEntry do
 
       @entry.update_topic
       @topic.reload
-      @topic.last_reply_at.should == @new_last_reply_at
+      expect(@topic.last_reply_at).to eq @new_last_reply_at
     end
 
     it "should leave last_reply_at on the associated discussion_topic alone given an older entry" do
@@ -239,7 +239,7 @@ describe DiscussionEntry do
 
       @entry.update_topic
       @topic.reload
-      @topic.last_reply_at.should == @original_last_reply_at
+      expect(@topic.last_reply_at).to eq @original_last_reply_at
     end
   end
 
@@ -270,18 +270,18 @@ describe DiscussionEntry do
     end
 
     it "should decrement unread topic counts" do
-      @topic.unread_count(@reader).should == 2
+      expect(@topic.unread_count(@reader)).to eq 2
 
       # delete one read and one unread entry and check again
       @entry_1.destroy
       @entry_4.destroy
-      @topic.unread_count(@reader).should == 1
+      expect(@topic.unread_count(@reader)).to eq 1
       # delete remaining unread
       @entry_3.destroy
-      @topic.unread_count(@reader).should == 0
+      expect(@topic.unread_count(@reader)).to eq 0
       # delete final 'read' entry
       @entry_2.destroy
-      @topic.unread_count(@reader).should == 0
+      expect(@topic.unread_count(@reader)).to eq 0
     end
   end
 
@@ -298,8 +298,8 @@ describe DiscussionEntry do
 
     @subtopic_entry = @subtopic.discussion_entries.create!(:message => "hello", :user => @user)
 
-    @subtopic_updated_at.to_i.should_not == @subtopic.reload.updated_at.to_i
-    @topic_updated_at.to_i.should_not == @topic.reload.updated_at.to_i
+    expect(@subtopic_updated_at.to_i).not_to eq @subtopic.reload.updated_at.to_i
+    expect(@topic_updated_at.to_i).not_to eq @topic.reload.updated_at.to_i
   end
 
   context "read/unread state" do
@@ -311,31 +311,31 @@ describe DiscussionEntry do
     end
 
     it "should mark a entry you created as read" do
-      @entry.read?(@teacher).should be_true
-      @topic.unread_count(@teacher).should == 0
+      expect(@entry.read?(@teacher)).to be_truthy
+      expect(@topic.unread_count(@teacher)).to eq 0
     end
 
     it "should be unread by default" do
-      @entry.read?(@student).should be_false
-      @topic.unread_count(@student).should == 1
+      expect(@entry.read?(@student)).to be_falsey
+      expect(@topic.unread_count(@student)).to eq 1
     end
 
     it "should allow being marked unread" do
       @entry.change_read_state("unread", @teacher)
-      @entry.read?(@teacher).should be_false
-      @topic.unread_count(@teacher).should == 1
+      expect(@entry.read?(@teacher)).to be_falsey
+      expect(@topic.unread_count(@teacher)).to eq 1
     end
 
     it "should allow being marked read" do
       @entry.change_read_state("read", @student)
-      @entry.read?(@student).should be_true
-      @topic.unread_count(@student).should == 0
+      expect(@entry.read?(@student)).to be_truthy
+      expect(@topic.unread_count(@student)).to eq 0
     end
 
     it "should update counts for an entry without a user" do
       @other_entry = @topic.discussion_entries.create!(:message => "no user entry")
-      @topic.unread_count(@teacher).should == 1
-      @topic.unread_count(@student).should == 2
+      expect(@topic.unread_count(@teacher)).to eq 1
+      expect(@topic.unread_count(@student)).to eq 2
     end
 
     it "should allow a complex series of read/unread updates" do
@@ -346,44 +346,44 @@ describe DiscussionEntry do
       @topic.change_read_state("read", @s1)
       @entry.change_read_state("read", @s1)
       @s1entry = @topic.discussion_entries.create!(:message => "s1 entry", :user => @s1)
-      @topic.unread_count(@s1).should == 0
+      expect(@topic.unread_count(@s1)).to eq 0
 
       @entry.change_read_state("read", @s2)
-      @topic.discussion_topic_participants.where(user_id: @s2).first.should_not be_nil
+      expect(@topic.discussion_topic_participants.where(user_id: @s2).first).not_to be_nil
       @topic.change_read_state("read", @s2)
       @s2entry = @topic.discussion_entries.create!(:message => "s2 entry", :user => @s2)
       @s1entry.change_read_state("read", @s2)
       @s1entry.change_read_state("unread", @s2)
-      @topic.unread_count(@s2).should == 1
+      expect(@topic.unread_count(@s2)).to eq 1
 
-      @topic.unread_count(@s3).should == 3
+      expect(@topic.unread_count(@s3)).to eq 3
       @entry.change_read_state("read", @s3)
       @s3reply = @entry.discussion_subentries.create!(:discussion_topic => @topic, :message => "s3 reply", :user => @s3)
-      @topic.unread_count(@s3).should == 2
+      expect(@topic.unread_count(@s3)).to eq 2
 
-      @topic.unread_count(@s1).should == 2
-      @topic.unread_count(@s2).should == 2
-      @topic.unread_count(@teacher).should == 3
+      expect(@topic.unread_count(@s1)).to eq 2
+      expect(@topic.unread_count(@s2)).to eq 2
+      expect(@topic.unread_count(@teacher)).to eq 3
 
       @topic.change_all_read_state("read", @s1)
-      @topic.unread_count(@s1).should == 0
-      @topic.read?(@s1).should be_true
-      @entry.read?(@s1).should be_true
+      expect(@topic.unread_count(@s1)).to eq 0
+      expect(@topic.read?(@s1)).to be_truthy
+      expect(@entry.read?(@s1)).to be_truthy
 
       @topic.change_all_read_state("unread", @s2)
-      @topic.unread_count(@s2).should == 4
-      @topic.read?(@s2).should be_false
-      @entry.read?(@s2).should be_false
+      expect(@topic.unread_count(@s2)).to eq 4
+      expect(@topic.read?(@s2)).to be_falsey
+      expect(@entry.read?(@s2)).to be_falsey
 
       student_in_course(:active_all => true); @s4 = @student
-      @topic.unread_count(@s4).should == 4
+      expect(@topic.unread_count(@s4)).to eq 4
       @topic.change_all_read_state("unread", @s4)
-      @topic.read?(@s4).should be_false
-      @entry.read?(@s4).should be_false
+      expect(@topic.read?(@s4)).to be_falsey
+      expect(@entry.read?(@s4)).to be_falsey
 
       student_in_course(:active_all => true); @s5 = @student
       @topic.change_all_read_state("read", @s5)
-      @topic.unread_count(@s5).should == 0
+      expect(@topic.unread_count(@s5)).to eq 0
     end
 
     it "should use unique_constaint_retry when updating read state" do
@@ -401,22 +401,22 @@ describe DiscussionEntry do
       discussion_topic_model
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
-      sub1.parent_entry.should == root
-      sub1.root_entry.should == root
+      expect(sub1.parent_entry).to eq root
+      expect(sub1.root_entry).to eq root
       sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
-      sub2.parent_entry.should == root
-      sub2.root_entry.should == root
+      expect(sub2.parent_entry).to eq root
+      expect(sub2.root_entry).to eq root
     end
 
     it "should allow a sub-entry as parent if the discussion is threaded" do
       discussion_topic_model(:threaded => true)
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
-      sub1.parent_entry.should == root
-      sub1.root_entry.should == root
+      expect(sub1.parent_entry).to eq root
+      expect(sub1.root_entry).to eq root
       sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
-      sub2.parent_entry.should == sub1
-      sub2.root_entry.should == root
+      expect(sub2.parent_entry).to eq sub1
+      expect(sub2.root_entry).to eq root
     end
   end
 
@@ -428,7 +428,7 @@ describe DiscussionEntry do
       @topic.save!
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       sub1 = root.reply_from(:user => @teacher, :html => "shouldn't really be a subentry")
-      sub1.reload.parent_entry.should be_nil
+      expect(sub1.reload.parent_entry).to be_nil
     end
   end
 
@@ -446,7 +446,7 @@ describe DiscussionEntry do
         # change one back to unread, it shouldn't be returned
         @reply_reply2.change_read_state('unread', @teacher)
         read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
-        read.should == [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
+        expect(read).to eq [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
       end
     end
 
@@ -463,7 +463,7 @@ describe DiscussionEntry do
         marked_entries -= [@reply3]
 
         forced = DiscussionEntryParticipant.forced_read_state_entry_ids(@all_entries.map(&:id), @teacher).sort
-        forced.should == marked_entries.map(&:id).sort
+        expect(forced).to eq marked_entries.map(&:id).sort
       end
     end
 
@@ -471,22 +471,22 @@ describe DiscussionEntry do
       it "should return existing data" do
         @root2.change_read_state('read', @teacher, :forced => true)
         participant = @root2.find_existing_participant(@teacher)
-        participant.id.should_not be_nil
-        participant.should be_readonly
-        participant.user.should == @teacher
-        participant.discussion_entry.should == @root2
-        participant.workflow_state.should == 'read'
-        participant.forced_read_state.should be_true
+        expect(participant.id).not_to be_nil
+        expect(participant).to be_readonly
+        expect(participant.user).to eq @teacher
+        expect(participant.discussion_entry).to eq @root2
+        expect(participant.workflow_state).to eq 'read'
+        expect(participant.forced_read_state).to be_truthy
       end
 
       it "should return default data" do
         participant = @reply2.find_existing_participant(@student)
-        participant.id.should be_nil
-        participant.should be_readonly
-        participant.user.should == @student
-        participant.discussion_entry.should == @reply2
-        participant.workflow_state.should == 'unread'
-        participant.forced_read_state.should be_false
+        expect(participant.id).to be_nil
+        expect(participant).to be_readonly
+        expect(participant.user).to eq @student
+        expect(participant.discussion_entry).to eq @reply2
+        expect(participant.workflow_state).to eq 'unread'
+        expect(participant.forced_read_state).to be_falsey
       end
     end
 
@@ -502,21 +502,21 @@ describe DiscussionEntry do
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       Account.default.destroy
       root.reload
-      lambda { root.reply_from(:user => @teacher, :text => "sub entry") }.should raise_error(IncomingMail::Errors::UnknownAddress)
+      expect { root.reply_from(:user => @teacher, :text => "sub entry") }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should prefer html to text" do
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       msg = @entry.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
-      msg.should_not be_nil
-      msg.message.should == "<p>html body</p>"
+      expect(msg).not_to be_nil
+      expect(msg.message).to eq "<p>html body</p>"
     end
 
     it "should not allow replies to locked topics" do
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       @topic.lock!
       @topic.clear_permissions_cache(@teacher)
-      lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+      expect { @entry.reply_from(:user => @teacher, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end
 end

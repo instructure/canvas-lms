@@ -87,15 +87,15 @@ describe Quizzes::QuizSubmissionEvent do
       submission_data = submission_data_sample_one
 
       event = build_event(submission_data, quiz_data)
-      event.attempt.should == 1
-      event.event_type.should be_present
-      event.answers.should_not be_empty
+      expect(event.attempt).to eq 1
+      expect(event.event_type).to be_present
+      expect(event.answers).not_to be_empty
     end
   end
 
   describe '#self.infer_event_type' do
     it do
-      described_class.infer_event_type({}).should == Quizzes::QuizSubmissionEvent::EVT_ANSWERED
+      expect(described_class.infer_event_type({})).to eq Quizzes::QuizSubmissionEvent::EVT_ANSWERED
     end
   end
 
@@ -104,11 +104,11 @@ describe Quizzes::QuizSubmissionEvent do
       submission_data = submission_data_sample_one
 
       answers = described_class.extract_answers(submission_data, quiz_data)
-      answers.length.should == 1
-      answers.first.as_json.should == {
+      expect(answers.length).to eq 1
+      expect(answers.first.as_json).to eq({
         quiz_question_id: "1",
         answer: 11
-      }.as_json
+      }.as_json)
     end
   end
 
@@ -120,7 +120,7 @@ describe Quizzes::QuizSubmissionEvent do
     end
 
     it 'should be a noop if there are no previous events' do
-      event.optimize_answers.should be false
+      expect(event.optimize_answers).to be false
     end
 
     it 'should not include answers recorded in a previous event' do
@@ -132,13 +132,13 @@ describe Quizzes::QuizSubmissionEvent do
       JSON
 
       next_event = build_event(second_event_data, quiz_data)
-      next_event.answers.length.should == 2
-      next_event.optimize_answers(event).should be true
-      next_event.answers.length.should == 1
-      next_event.answers.first.as_json.should == {
+      expect(next_event.answers.length).to eq 2
+      expect(next_event.optimize_answers(event)).to be true
+      expect(next_event.answers.length).to eq 1
+      expect(next_event.answers.first.as_json).to eq({
         quiz_question_id: "2",
         answer: 21
-      }.as_json
+      }.as_json)
     end
   end
 
@@ -155,8 +155,8 @@ describe Quizzes::QuizSubmissionEvent do
       event_two.quiz_submission = quiz_submission
       event_two.save!
 
-      event_one.predecessor.should == nil
-      event_two.predecessor.should == event_one
+      expect(event_one.predecessor).to eq nil
+      expect(event_two.predecessor).to eq event_one
     end
 
     it 'is aware of attempts' do
@@ -168,8 +168,8 @@ describe Quizzes::QuizSubmissionEvent do
       event_two.quiz_submission = quiz_submission
       event_two.save!
 
-      event_one.predecessor.should == nil
-      event_two.predecessor.should == nil
+      expect(event_one.predecessor).to eq nil
+      expect(event_two.predecessor).to eq nil
     end
   end
 
@@ -216,17 +216,17 @@ describe Quizzes::QuizSubmissionEvent do
         question_2: 21
       }, 2.seconds.from_now)
 
-      one.answers.as_json.should == [{
+      expect(one.answers.as_json).to eq [{
         quiz_question_id: "1",
         answer: 11
       }].as_json
 
-      two.answers.as_json.should == [{
+      expect(two.answers.as_json).to eq [{
         quiz_question_id: "2",
         answer: 21
       }].as_json
 
-      three.answers.as_json.should == [{
+      expect(three.answers.as_json).to eq [{
         quiz_question_id: "1",
         answer: 12
       }].as_json
@@ -240,22 +240,22 @@ describe Quizzes::QuizSubmissionEvent do
       end
 
       it 'should be true if it has no answer records' do
-        subject.should be_empty
+        expect(subject).to be_empty
       end
 
       it 'should not be true if it has any answer record' do
         subject.answers = [{}]
-        subject.should_not be_empty
+        expect(subject).not_to be_empty
       end
 
       it 'should be true after optimizing against a similar event' do
         one = build_event(submission_data_sample_one, quiz_data)
         two = build_event(submission_data_sample_one, quiz_data)
 
-        two.should_not be_empty
+        expect(two).not_to be_empty
 
         two.optimize_answers(one)
-        two.should be_empty
+        expect(two).to be_empty
       end
     end
   end
@@ -268,7 +268,7 @@ describe Quizzes::QuizSubmissionEvent do
       one.event_type = 'foo'
       two.event_type = 'bar'
 
-      one.should_not == two
+      expect(one).not_to eq two
     end
 
     context Quizzes::QuizSubmissionEvent::EVT_ANSWERED do
@@ -278,28 +278,28 @@ describe Quizzes::QuizSubmissionEvent do
       end
 
       it 'should be true if both events have no answers' do
-        one.should == two
+        expect(one).to eq two
       end
 
       it 'should be true if both events have the same answers' do
         one.answers = [{ quiz_question_id: "1", answer: 11 }]
         two.answers = [{ quiz_question_id: "1", answer: 11 }]
 
-        one.should == two
+        expect(one).to eq two
       end
 
       it 'should be false if answer record counts differ' do
         one.answers = [{}]
         two.answers = []
 
-        one.should_not == two
+        expect(one).not_to eq two
       end
 
       it 'should be false if answer records differ' do
         one.answers = [{ quiz_question_id: "1", answer: 11 }]
         two.answers = [{ quiz_question_id: "1", answer: 12 }]
 
-        one.should_not == two
+        expect(one).not_to eq two
       end
     end
   end

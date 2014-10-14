@@ -15,7 +15,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
 
   describe "#initialize" do
     it "assign question data" do
-      question.question_id.should == question_data[:id]
+      expect(question.question_id).to eq question_data[:id]
     end
   end
 
@@ -26,20 +26,20 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     it "should not calculate margin of tolerance for answers if answer text is nil" do
       answer_data = {:"question_#{question_id}" => nil}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-      question.correct_answer_parts(user_answer).should be_nil
+      expect(question.correct_answer_parts(user_answer)).to be_nil
     end
 
     it "should not calculate margin of tolerance for answers if answer text is blank" do
       answer_data = {:"question_#{question_id}" => ""}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "should calculate if answer falls within start/end range" do
       answer_data = {:"question_#{question_id}" => "2.5"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
 
@@ -47,7 +47,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
       answer_data = {:"question_#{question_id}" => "4"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     describe 'flexible ranges' do
@@ -68,7 +68,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
           })
 
           user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-          question.correct_answer_parts(user_answer).should == is_correct
+          expect(question.correct_answer_parts(user_answer)).to eq is_correct
         end
       end
 

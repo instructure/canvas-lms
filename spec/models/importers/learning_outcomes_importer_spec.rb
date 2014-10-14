@@ -29,14 +29,14 @@ describe "Importing Learning Outcomes" do
     Importers::LearningOutcomeImporter.process_migration(data, migration)
     Importers::LearningOutcomeImporter.process_migration(data, migration)
 
-    context.learning_outcomes.count.should == 2
+    expect(context.learning_outcomes.count).to eq 2
     lo1 = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
-    lo1.description.should == "Outcome 1: Read stuff"
+    expect(lo1.description).to eq "Outcome 1: Read stuff"
     lo2 = LearningOutcome.where(migration_id: "fa67b467-37c7-4fb9-aef4-21a33a06d0be").first
-    lo2.description.should == "Outcome 2: follow directions"
+    expect(lo2.description).to eq "Outcome 2: follow directions"
 
     log = context.root_outcome_group
-    log.child_outcome_links.detect{ |link| link.content == lo1 }.should_not be_nil
-    log.child_outcome_links.detect{ |link| link.content == lo2 }.should_not be_nil
+    expect(log.child_outcome_links.detect{ |link| link.content == lo1 }).not_to be_nil
+    expect(log.child_outcome_links.detect{ |link| link.content == lo2 }).not_to be_nil
   end
 end

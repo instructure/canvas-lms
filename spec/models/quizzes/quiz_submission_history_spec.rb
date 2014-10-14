@@ -34,68 +34,68 @@ describe Quizzes::QuizSubmissionHistory do
       @submission.score = 5.0
       @submission.attempt = 1
       @submission.with_versioning(true, &:save!)
-      @submission.version_number.should eql(1)
-      @submission.score.should eql(5.0)
+      expect(@submission.version_number).to eql(1)
+      expect(@submission.score).to eql(5.0)
 
       # regrade 1
       @submission.score_before_regrade = 5.0
       @submission.score = 4.0
       @submission.attempt = 1
       @submission.with_versioning(true, &:save!)
-      @submission.version_number.should eql(2)
+      expect(@submission.version_number).to eql(2)
 
       # new attempt
       @submission.score = 3.0
       @submission.attempt = 2
       @submission.with_versioning(true, &:save!)
-      @submission.version_number.should eql(3)
+      expect(@submission.version_number).to eql(3)
     end
 
     describe "#initialize" do
       it "should group list of attempts for the quiz submission" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
-        attempts.length.should == 2
-        attempts.first.should be_a(Quizzes::QuizSubmissionAttempt)
+        expect(attempts.length).to eq 2
+        expect(attempts.first).to be_a(Quizzes::QuizSubmissionAttempt)
       end
 
       it "should sort attempts sequentially" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
-        attempts.length.should == 2
-        attempts.map {|attempt| attempt.number }.should == [1, 2]
+        expect(attempts.length).to eq 2
+        expect(attempts.map {|attempt| attempt.number }).to eq [1, 2]
       end
     end
 
     describe "#last_versions" do
       it "should return last versions for each attempt" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
-        attempts.length.should == 2
+        expect(attempts.length).to eq 2
 
         versions = attempts.last_versions
-        versions.length.should == 2
-        versions.first.should be_a(Version)
+        expect(versions.length).to eq 2
+        expect(versions.first).to be_a(Version)
       end
     end
 
     describe "#version_models" do
       it "should return models for the latest versions" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
-        attempts.length.should == 2
+        expect(attempts.length).to eq 2
 
         models = attempts.version_models
-        models.length.should == 2
-        models.first.should be_a(Quizzes::QuizSubmission)
+        expect(models.length).to eq 2
+        expect(models.first).to be_a(Quizzes::QuizSubmission)
       end
     end
 
     describe "#kept" do
       it "should return the version of the submission that was kept" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
-        attempts.length.should == 2
+        expect(attempts.length).to eq 2
 
         models = attempts.version_models
-        models.length.should == 2
+        expect(models.length).to eq 2
 
-        attempts.kept.should == models.first
+        expect(attempts.kept).to eq models.first
       end
     end
   end

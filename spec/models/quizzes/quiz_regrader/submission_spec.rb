@@ -51,11 +51,11 @@ describe Quizzes::QuizRegrader::Submission do
 
   describe "#initialize" do
     it "saves a reference to the passed submission" do
-      wrapper.submission.should == submission
+      expect(wrapper.submission).to eq submission
     end
 
     it "saves a reference to the passed regrade quiz questions" do
-      wrapper.question_regrades.should == question_regrades
+      expect(wrapper.question_regrades).to eq question_regrades
     end
   end
 
@@ -112,7 +112,7 @@ describe Quizzes::QuizRegrader::Submission do
         q[:question_name]
       end
 
-      question_names.sort.should == [
+      expect(question_names.sort).to eq [
         'Question 1',
         'Question 2',
         'Question 3'

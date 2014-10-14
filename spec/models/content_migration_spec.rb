@@ -27,7 +27,7 @@ describe ContentMigration do
           'question_name' => "hai\xfbabcd"
         }]
       }
-      ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name].should == "haiabcd"
+      expect(ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name]).to eq "haiabcd"
     end
   end
 
@@ -38,49 +38,49 @@ describe ContentMigration do
     end
 
     it "should return true for everything if there are no copy options" do
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "should return true for everything if 'everything' is selected" do
       @cm.migration_ids_to_import = {:copy => {:everything => "1"}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "should return true if there are no copy options" do
       @cm.migration_ids_to_import = {:copy => {}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "should return false for nil objects" do
-      @cm.import_object?("content_migrations", nil).should == false
+      expect(@cm.import_object?("content_migrations", nil)).to eq false
     end
 
     it "should return true for all object types if the all_ option is true" do
       @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "1"}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "should return false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "0"}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
       @cm.migration_ids_to_import = {:copy => {:content_migrations => {}}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
       @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "0"}}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
     end
 
     it "should return true for selected objects" do
       @cm.save!
       @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "1"}}}
-      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
   end
 
   it "should exclude user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
-    ContentMigration.migration_plugins(true).include?(ab).should be_false
+    expect(ContentMigration.migration_plugins(true).include?(ab)).to be_falsey
   end
 
   context "zip file import" do
@@ -102,7 +102,7 @@ describe ContentMigration do
 
       cm.queue_migration
       run_jobs
-      context.reload.attachments.count.should == 1
+      expect(context.reload.attachments.count).to eq 1
     end
 
     it "should import into a course" do
@@ -139,7 +139,7 @@ describe ContentMigration do
 
   context "account-level import" do
     it "should import question banks from qti migrations" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
       @user = user
@@ -164,17 +164,17 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
-      cm.migration_issues.should be_empty
+      expect(cm.migration_issues).to be_empty
 
-      account.assessment_question_banks.count.should == 1
+      expect(account.assessment_question_banks.count).to eq 1
       bank = account.assessment_question_banks.first
-      bank.title.should == qb_name
+      expect(bank.title).to eq qb_name
 
-      bank.assessment_questions.count.should == 1
+      expect(bank.assessment_questions.count).to eq 1
     end
 
     it "should import questions from quizzes into question banks" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
       @user = user
@@ -197,17 +197,17 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
-      cm.migration_issues.should be_empty
+      expect(cm.migration_issues).to be_empty
 
-      account.assessment_question_banks.count.should == 1
+      expect(account.assessment_question_banks.count).to eq 1
       bank = account.assessment_question_banks.first
-      bank.title.should == "Unnamed Quiz"
+      expect(bank.title).to eq "Unnamed Quiz"
 
-      bank.assessment_questions.count.should == 1
+      expect(bank.assessment_questions.count).to eq 1
     end
 
     it "should not re-use the question_bank without overwrite_quizzes" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
       @user = user
@@ -234,17 +234,17 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
-      cm.migration_issues.should be_empty
+      expect(cm.migration_issues).to be_empty
 
-      account.assessment_question_banks.count.should == 2
+      expect(account.assessment_question_banks.count).to eq 2
       account.assessment_question_banks.each do |bank|
-        bank.title.should == "Unnamed Quiz"
-        bank.assessment_questions.count.should == 1
+        expect(bank.title).to eq "Unnamed Quiz"
+        expect(bank.assessment_questions.count).to eq 1
       end
     end
 
     it "should re-use the question_bank (and everything else) with overwrite_quizzes" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
       @user = user
@@ -277,18 +277,18 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
-      cm.migration_issues.should be_empty
+      expect(cm.migration_issues).to be_empty
 
-      account.assessment_question_banks.count.should == 1
+      expect(account.assessment_question_banks.count).to eq 1
       bank = account.assessment_question_banks.first
-      bank.title.should == "Unnamed Quiz"
+      expect(bank.title).to eq "Unnamed Quiz"
 
-      bank.assessment_questions.count.should == 1
+      expect(bank.assessment_questions.count).to eq 1
     end
   end
 
   it "should identify and import compressed tarball archives" do
-    pending unless Qti.qti_enabled?
+    skip unless Qti.qti_enabled?
 
     course_with_teacher
     cm = ContentMigration.new(:context => @course, :user => @user)
@@ -309,8 +309,8 @@ describe ContentMigration do
     cm.queue_migration
     run_jobs
 
-    cm.migration_issues.should be_empty
+    expect(cm.migration_issues).to be_empty
 
-    @course.assessment_question_banks.count.should == 1
+    expect(@course.assessment_question_banks.count).to eq 1
   end
 end

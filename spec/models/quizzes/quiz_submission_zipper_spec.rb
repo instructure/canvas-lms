@@ -46,30 +46,31 @@ describe Quizzes::QuizSubmissionZipper do
   describe "#initialize" do
 
     it "finds the submissions for the given quiz" do
-      @zipper.submissions.should == submissions
+      expect(@zipper.submissions).to eq submissions
     end
 
     it "stores the passed zip attachment" do
-      @zipper.zip_attachment.should == zip_attachment
+      expect(@zipper.zip_attachment).to eq zip_attachment
     end
 
     it "finds and stores attachments for all the submissions" do
-      @zipper.attachments.should == {
+      expect(@zipper.attachments).to eq({
         1 => attachments.first,
         2 => attachments.second
-      }
+      })
     end
 
     it "sets the filename" do
-      @zipper.filename.should ==
+      expect(@zipper.filename).to eq(
         "#{@quiz.context.short_name_slug}-#{@quiz.title} submissions"
+      )
     end
   end
 
   describe "#attachments_with_filenames" do
 
     it "returns the correct attachment and file name for each attachment" do
-      @zipper.attachments_with_filenames.should == [
+      expect(@zipper.attachments_with_filenames).to eq [
         [attachments.first, "dale_tom1_question_1_1_Foobar.ppt"],
         [attachments.second, "florence_ryan2_question_2_2_Cats.docx"]
       ]
@@ -104,11 +105,11 @@ describe Quizzes::QuizSubmissionZipper do
         quiz: quiz,
         zip_attachment: attachment).zip!
       attachment.reload
-      attachment.should be_zipped
+      expect(attachment).to be_zipped
       names = []
       Zip::File.foreach(attachment.full_filename) { |f| names << f.name }
-      names.length.should == 1
-      names.first.should == "user#{student.id}_question_#{question.id}_#{attach.id}_#{attach.display_name}"
+      expect(names.length).to eq 1
+      expect(names.first).to eq "user#{student.id}_question_#{question.id}_#{attach.id}_#{attach.display_name}"
     end
   end
 end

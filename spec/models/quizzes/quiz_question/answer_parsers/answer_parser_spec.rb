@@ -29,7 +29,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
 
     it "returns the question with answers assigned" do
       question = OpenStruct.new
-      answer_parser.parse(question).answers.should == []
+      expect(answer_parser.parse(question).answers).to eq []
     end
   end
 end

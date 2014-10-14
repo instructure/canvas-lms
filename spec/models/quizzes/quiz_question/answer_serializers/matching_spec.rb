@@ -32,25 +32,25 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     it 'should reject a bad pairing set' do
       [ nil, 'asdf' ].each do |bad_input|
         rc = subject.serialize(bad_input)
-        rc.error.should_not be_nil
-        rc.error.should match(/of type array/i)
+        expect(rc.error).not_to be_nil
+        expect(rc.error).to match(/of type array/i)
       end
     end
 
     it 'should reject a bad pairing entry' do
       rc = subject.serialize([ 'asdf' ])
-      rc.error.should_not be_nil
-      rc.error.should match(/of type hash/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/of type hash/i)
     end
 
     it 'should reject a pairing entry missing a required parameter' do
       rc = subject.serialize([ match_id: 123 ])
-      rc.error.should_not be_nil
-      rc.error.should match(/missing parameter "answer_id"/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/missing parameter "answer_id"/i)
 
       rc = subject.serialize([ answer_id: 123 ])
-      rc.error.should_not be_nil
-      rc.error.should match(/missing parameter "match_id"/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/missing parameter "match_id"/i)
     end
 
     it 'should reject a match for an unknown answer' do
@@ -59,8 +59,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         match_id: 6061
       }])
 
-      rc.error.should_not be_nil
-      rc.error.should match(/unknown answer/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/unknown answer/i)
     end
 
     it 'should reject an unknown match' do
@@ -69,8 +69,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         match_id: 123456
       }])
 
-      rc.error.should_not be_nil
-      rc.error.should match(/unknown match/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/unknown match/i)
     end
 
     it 'should reject a bad match' do
@@ -79,8 +79,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         match_id: 'adooken'
       }])
 
-      rc.error.should_not be_nil
-      rc.error.should match(/must be of type integer/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/must be of type integer/i)
     end
 
     it 'should reject a bad answer' do
@@ -89,8 +89,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         match_id: 6061
       }])
 
-      rc.error.should_not be_nil
-      rc.error.should match(/must be of type integer/i)
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match(/must be of type integer/i)
     end
   end
 end

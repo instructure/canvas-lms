@@ -16,11 +16,11 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.context_modules.count.should == 2
+      expect(@copy_to.context_modules.count).to eq 2
       cm_2 = @copy_to.context_modules.where(migration_id: mig_id(cm)).first
-      cm_2.workflow_state.should == 'active'
+      expect(cm_2.workflow_state).to eq 'active'
       cm2_2 = @copy_to.context_modules.where(migration_id: mig_id(cm2)).first
-      cm2_2.workflow_state.should == 'unpublished'
+      expect(cm2_2.workflow_state).to eq 'unpublished'
     end
 
     it "should copy links to unpublished items in modules" do
@@ -38,11 +38,11 @@ describe ContentMigration do
       run_course_copy
 
       mod1_copy = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
-      mod1_copy.content_tags.count.should == 2
+      expect(mod1_copy.content_tags.count).to eq 2
 
       mod1_copy.content_tags.each do |tag_copy|
-        tag_copy.unpublished?.should == true
-        tag_copy.content.unpublished?.should == true
+        expect(tag_copy.unpublished?).to eq true
+        expect(tag_copy.content.unpublished?).to eq true
       end
     end
 
@@ -57,9 +57,9 @@ describe ContentMigration do
       run_course_copy
 
       dt1_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first
-      dt1_copy.workflow_state.should == 'unpublished'
+      expect(dt1_copy.workflow_state).to eq 'unpublished'
       dt2_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt2)).first
-      dt2_copy.workflow_state.should == 'active'
+      expect(dt2_copy.workflow_state).to eq 'active'
     end
 
     it "should copy unpublished wiki pages" do
@@ -70,16 +70,16 @@ describe ContentMigration do
       run_course_copy
 
       wiki2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first
-      wiki2.workflow_state.should == 'unpublished'
+      expect(wiki2.workflow_state).to eq 'unpublished'
     end
 
     it "should copy unpublished quiz assignments" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
       @quiz = @copy_from.quizzes.create!
       @quiz.did_edit
       @quiz.offer!
       @quiz.unpublish!
-      @quiz.assignment.should be_unpublished
+      expect(@quiz.assignment).to be_unpublished
 
       @cm.copy_options = {
           :assignments => {mig_id(@quiz.assignment) => "0"},
@@ -90,10 +90,10 @@ describe ContentMigration do
       run_course_copy
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(@quiz)).first
-      quiz_to.should_not be_nil
-      quiz_to.assignment.should_not be_nil
-      quiz_to.assignment.should be_unpublished
-      quiz_to.assignment.migration_id.should == mig_id(@quiz.assignment)
+      expect(quiz_to).not_to be_nil
+      expect(quiz_to.assignment).not_to be_nil
+      expect(quiz_to.assignment).to be_unpublished
+      expect(quiz_to.assignment.migration_id).to eq mig_id(@quiz.assignment)
     end
   end
 end

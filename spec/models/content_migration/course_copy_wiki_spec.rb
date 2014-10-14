@@ -14,7 +14,7 @@ describe ContentMigration do
 
       page1_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page1)).first
       page2_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first
-      page2_to.body.should == body % [@copy_to.id, page1_to.url]
+      expect(page2_to.body).to eq body % [@copy_to.id, page1_to.url]
     end
 
     it "should find and fix wiki links by title or id" do
@@ -26,8 +26,8 @@ describe ContentMigration do
       main_page.save!
       @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
       run_course_copy
-      @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>}
-      @copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body.should == %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>}
+      expect(@copy_to.wiki.front_page.body).to eq %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>}
+      expect(@copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body).to eq %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>}
     end
 
     context "wiki front page" do
@@ -39,7 +39,7 @@ describe ContentMigration do
         run_course_copy
 
         new_page = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
-        @copy_to.wiki.front_page.should == new_page
+        expect(@copy_to.wiki.front_page).to eq new_page
       end
 
       it "should not overwrite current front page" do
@@ -53,7 +53,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.wiki.front_page.should == copy_to_front_page
+        expect(@copy_to.wiki.front_page).to eq copy_to_front_page
       end
 
       it "should remain with no front page if other front page is not selected for copy" do
@@ -74,7 +74,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.wiki.has_no_front_page.should == true
+        expect(@copy_to.wiki.has_no_front_page).to eq true
       end
 
       it "should set retain default behavior if front page is missing and draft state is not enabled" do
@@ -86,8 +86,8 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.wiki.has_front_page?.should == true
-        @copy_to.wiki.get_front_page_url.should == 'front-page'
+        expect(@copy_to.wiki.has_front_page?).to eq true
+        expect(@copy_to.wiki.get_front_page_url).to eq 'front-page'
       end
 
       it "should set default view to feed if wiki front page is missing and draft state is enabled" do
@@ -99,8 +99,8 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.default_view.should == 'feed'
-        @copy_to.wiki.has_front_page?.should == false
+        expect(@copy_to.default_view).to eq 'feed'
+        expect(@copy_to.wiki.has_front_page?).to eq false
       end
     end
   end

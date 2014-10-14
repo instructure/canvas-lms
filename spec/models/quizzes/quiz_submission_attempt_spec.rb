@@ -27,13 +27,13 @@ describe Quizzes::QuizSubmissionAttempt do
   describe "#initialize" do
     it "should assign number" do
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1)
-      attempt.number.should == 1
+      expect(attempt.number).to eq 1
     end
 
     it "should assign versions" do
       versions = [1, 2, 3]
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1, :versions => versions)
-      attempt.versions.should == versions
+      expect(attempt.versions).to eq versions
     end
   end
 end

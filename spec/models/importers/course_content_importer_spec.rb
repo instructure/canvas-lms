@@ -59,133 +59,133 @@ describe Course do
     course.reload
 
     # discussion topic tests
-    course.discussion_topics.length.should eql(3)
+    expect(course.discussion_topics.length).to eql(3)
     migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
     added_migration_ids = course.discussion_topics.map(&:migration_id).uniq.sort
-    added_migration_ids.should eql(migration_ids)
+    expect(added_migration_ids).to eql(migration_ids)
     topic = course.discussion_topics.where(migration_id: "1864019689002").first
-    topic.should_not be_nil
-    topic.title.should eql("Post here for group events, etc.")
-    topic.discussion_entries.should be_empty
+    expect(topic).not_to be_nil
+    expect(topic.title).to eql("Post here for group events, etc.")
+    expect(topic.discussion_entries).to be_empty
     topic = course.discussion_topics.where(migration_id: "1865116155002").first
-    topic.should_not be_nil
-    topic.assignment.should_not be_nil
+    expect(topic).not_to be_nil
+    expect(topic.assignment).not_to be_nil
 
     # quizzes
-    course.quizzes.length.should eql(1)
+    expect(course.quizzes.length).to eql(1)
     quiz = course.quizzes.first
     quiz.migration_id = '1865116175002'
-    quiz.title.should eql("Orientation Quiz")
+    expect(quiz.title).to eql("Orientation Quiz")
 
     # wiki pages tests
     migration_ids = ["1865116206002", "1865116207002"].sort
     added_migration_ids = course.wiki.wiki_pages.map(&:migration_id).uniq.sort
-    added_migration_ids.should eql(migration_ids)
-    course.wiki.wiki_pages.length.should eql(migration_ids.length)
+    expect(added_migration_ids).to eql(migration_ids)
+    expect(course.wiki.wiki_pages.length).to eql(migration_ids.length)
     # front page
     page = course.wiki.front_page
-    page.should_not be_nil
-    page.migration_id.should eql("1865116206002")
-    page.body.should_not be_nil
-    page.body.scan(/<li>/).length.should eql(4)
-    page.body.should match(/Orientation/)
-    page.body.should match(/Orientation Quiz/)
+    expect(page).not_to be_nil
+    expect(page.migration_id).to eql("1865116206002")
+    expect(page.body).not_to be_nil
+    expect(page.body.scan(/<li>/).length).to eql(4)
+    expect(page.body).to match(/Orientation/)
+    expect(page.body).to match(/Orientation Quiz/)
     file = course.attachments.where(migration_id: "1865116527002").first
-    file.should_not be_nil
+    expect(file).not_to be_nil
     re = Regexp.new("\\/courses\\/#{course.id}\\/files\\/#{file.id}\\/preview")
-    page.body.should match(re) #)
+    expect(page.body).to match(re) #)
 
     # assignment tests
     course.reload
-    course.assignments.length.should == 4
-    course.assignments.map(&:migration_id).sort.should eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
+    expect(course.assignments.length).to eq 4
+    expect(course.assignments.map(&:migration_id).sort).to eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
     # assignment with due date
     assignment = course.assignments.where(migration_id: "1865116014002").first
-    assignment.should_not be_nil
-    assignment.title.should eql("Concert Review Assignment")
-    assignment.description.should match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
+    expect(assignment).not_to be_nil
+    expect(assignment.title).to eql("Concert Review Assignment")
+    expect(assignment.description).to match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
     # The old due date (Fri Mar 27 23:55:00 -0600 2009) should have been adjusted to new time frame
-    assignment.due_at.year.should == 2011
+    expect(assignment.due_at.year).to eq 2011
 
     # discussion topic assignment
     assignment = course.assignments.where(migration_id: "1865116155002").first
-    assignment.should_not be_nil
-    assignment.title.should eql("Introduce yourself!")
-    assignment.points_possible.should eql(10.0)
-    assignment.discussion_topic.should_not be_nil
+    expect(assignment).not_to be_nil
+    expect(assignment.title).to eql("Introduce yourself!")
+    expect(assignment.points_possible).to eql(10.0)
+    expect(assignment.discussion_topic).not_to be_nil
     # assignment with rubric
     assignment = course.assignments.where(migration_id: "4469882339231").first
-    assignment.should_not be_nil
-    assignment.title.should eql("Rubric assignment")
-    assignment.rubric.should_not be_nil
-    assignment.rubric.migration_id.should eql("4469882249231")
+    expect(assignment).not_to be_nil
+    expect(assignment.title).to eql("Rubric assignment")
+    expect(assignment.rubric).not_to be_nil
+    expect(assignment.rubric.migration_id).to eql("4469882249231")
     # assignment with file
     assignment = course.assignments.where(migration_id: "4407365899221").first
-    assignment.should_not be_nil
-    assignment.title.should eql("new assignment")
+    expect(assignment).not_to be_nil
+    expect(assignment.title).to eql("new assignment")
     file = course.attachments.where(migration_id: "1865116527002").first
-    file.should_not be_nil
-    assignment.description.should match(Regexp.new("/files/#{file.id}/download"))
+    expect(file).not_to be_nil
+    expect(assignment.description).to match(Regexp.new("/files/#{file.id}/download"))
 
     # calendar events
-    course.calendar_events.should be_empty
+    expect(course.calendar_events).to be_empty
 
     # rubrics
-    course.rubrics.length.should eql(1)
+    expect(course.rubrics.length).to eql(1)
     rubric = course.rubrics.first
-    rubric.data.length.should eql(3)
+    expect(rubric.data.length).to eql(3)
     # Spelling
     criterion = rubric.data[0].with_indifferent_access
-    criterion["description"].should eql("Spelling")
-    criterion["points"].should eql(15.0)
-    criterion["ratings"].length.should eql(3)
-    criterion["ratings"][0]["points"].should eql(15.0)
-    criterion["ratings"][0]["description"].should eql("Exceptional - fff")
-    criterion["ratings"][1]["points"].should eql(10.0)
-    criterion["ratings"][1]["description"].should eql("Meet Expectations - asdf")
-    criterion["ratings"][2]["points"].should eql(5.0)
-    criterion["ratings"][2]["description"].should eql("Need Improvement - rubric entry text")
+    expect(criterion["description"]).to eql("Spelling")
+    expect(criterion["points"]).to eql(15.0)
+    expect(criterion["ratings"].length).to eql(3)
+    expect(criterion["ratings"][0]["points"]).to eql(15.0)
+    expect(criterion["ratings"][0]["description"]).to eql("Exceptional - fff")
+    expect(criterion["ratings"][1]["points"]).to eql(10.0)
+    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations - asdf")
+    expect(criterion["ratings"][2]["points"]).to eql(5.0)
+    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - rubric entry text")
 
     # Grammar
     criterion = rubric.data[1]
-    criterion["description"].should eql("Grammar")
-    criterion["points"].should eql(15.0)
-    criterion["ratings"].length.should eql(3)
-    criterion["ratings"][0]["points"].should eql(15.0)
-    criterion["ratings"][0]["description"].should eql("Exceptional")
-    criterion["ratings"][1]["points"].should eql(10.0)
-    criterion["ratings"][1]["description"].should eql("Meet Expectations")
-    criterion["ratings"][2]["points"].should eql(5.0)
-    criterion["ratings"][2]["description"].should eql("Need Improvement - you smell")
+    expect(criterion["description"]).to eql("Grammar")
+    expect(criterion["points"]).to eql(15.0)
+    expect(criterion["ratings"].length).to eql(3)
+    expect(criterion["ratings"][0]["points"]).to eql(15.0)
+    expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
+    expect(criterion["ratings"][1]["points"]).to eql(10.0)
+    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
+    expect(criterion["ratings"][2]["points"]).to eql(5.0)
+    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - you smell")
 
     # Style
     criterion = rubric.data[2]
-    criterion["description"].should eql("Style")
-    criterion["points"].should eql(15.0)
-    criterion["ratings"].length.should eql(3)
-    criterion["ratings"][0]["points"].should eql(15.0)
-    criterion["ratings"][0]["description"].should eql("Exceptional")
-    criterion["ratings"][1]["points"].should eql(10.0)
-    criterion["ratings"][1]["description"].should eql("Meet Expectations")
-    criterion["ratings"][2]["points"].should eql(5.0)
-    criterion["ratings"][2]["description"].should eql("Need Improvement")
+    expect(criterion["description"]).to eql("Style")
+    expect(criterion["points"]).to eql(15.0)
+    expect(criterion["ratings"].length).to eql(3)
+    expect(criterion["ratings"][0]["points"]).to eql(15.0)
+    expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
+    expect(criterion["ratings"][1]["points"]).to eql(10.0)
+    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
+    expect(criterion["ratings"][2]["points"]).to eql(5.0)
+    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement")
 
     #groups
-    course.groups.length.should eql(2)
+    expect(course.groups.length).to eql(2)
 
     # files
-    course.attachments.length.should eql(4)
+    expect(course.attachments.length).to eql(4)
     course.attachments.each do |file|
-      File.should be_exist(file.full_filename)
+      expect(File).to be_exist(file.full_filename)
     end
     file = course.attachments.where(migration_id: "1865116044002").first
-    file.should_not be_nil
-    file.filename.should eql("theatre_example.htm")
-    file.folder.full_name.should eql("course files/Writing Assignments/Examples")
+    expect(file).not_to be_nil
+    expect(file.filename).to eql("theatre_example.htm")
+    expect(file.folder.full_name).to eql("course files/Writing Assignments/Examples")
     file = course.attachments.where(migration_id: "1864019880002").first
-    file.should_not be_nil
-    file.filename.should eql("dropbox.zip")
-    file.folder.full_name.should eql("course files/Course Content/Orientation/WebCT specific and old stuff")
+    expect(file).not_to be_nil
+    expect(file.filename).to eql("dropbox.zip")
+    expect(file.folder.full_name).to eql("course files/Course Content/Orientation/WebCT specific and old stuff")
   end
 
   it "should not duplicate assessment questions in question banks" do
@@ -202,9 +202,9 @@ describe Course do
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
     aqb1 = @course.assessment_question_banks.where(migration_id: "i7c16375e1a00381824d060d3d4f9acc4").first
-    aqb1.assessment_questions.count.should == 3
+    expect(aqb1.assessment_questions.count).to eq 3
     aqb2 = @course.assessment_question_banks.where(migration_id: "i966491408fab70dfc76ae02b197938a3").first
-    aqb2.assessment_questions.count.should == 2
+    expect(aqb2.assessment_questions.count).to eq 2
   end
 
   it "should not create assessment question banks if they are not selected" do
@@ -223,17 +223,17 @@ describe Course do
 
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
-    @course.assessment_question_banks.count.should == 1
+    expect(@course.assessment_question_banks.count).to eq 1
     aqb1 = @course.assessment_question_banks.where(migration_id: "i7c16375e1a00381824d060d3d4f9acc4").first
-    aqb1.assessment_questions.count.should == 3
-    @course.assessment_questions.count.should == 3
+    expect(aqb1.assessment_questions.count).to eq 3
+    expect(@course.assessment_questions.count).to eq 3
 
-    @course.quizzes.count.should == 2
+    expect(@course.quizzes.count).to eq 2
     quiz1 = @course.quizzes.where(migration_id: "i7ed12d5eade40d9ee8ecb5300b8e02b2").first
-    quiz1.quiz_questions.each{|qq| qq.assessment_question.should_not be_nil }
+    quiz1.quiz_questions.each{|qq| expect(qq.assessment_question).not_to be_nil }
 
     quiz2 = @course.quizzes.where(migration_id: "ife86eb19e30869506ee219b17a6a1d4e").first
-    quiz2.quiz_questions.each{|qq| qq.assessment_question.should be_nil } # since the bank wasn't brought in
+    quiz2.quiz_questions.each{|qq| expect(qq.assessment_question).to be_nil } # since the bank wasn't brought in
   end
 
   describe "shift_date_options" do
@@ -244,7 +244,7 @@ describe Course do
       @course.start_at = 1.month.ago
       @course.conclude_at = 1.month.from_now
       options = Importers::CourseContentImporter.shift_date_options(@course, {})
-      options[:time_zone].should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      expect(options[:time_zone]).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
     end
   end
 
@@ -264,9 +264,9 @@ describe Course do
       new_due_at    = Importers::CourseContentImporter.shift_date(due_at, options)
       new_lock_at   = Importers::CourseContentImporter.shift_date(lock_at, options)
 
-      new_unlock_at.should == DateTime.new(2014, 6,  1,  0,  0)
-      new_due_at.should    == DateTime.new(2014, 6,  7, 23, 59)
-      new_lock_at.should   == DateTime.new(2014, 6, 10, 23, 59)
+      expect(new_unlock_at).to eq DateTime.new(2014, 6,  1,  0,  0)
+      expect(new_due_at).to    eq DateTime.new(2014, 6,  7, 23, 59)
+      expect(new_lock_at).to   eq DateTime.new(2014, 6, 10, 23, 59)
     end
   end
 
@@ -302,19 +302,19 @@ describe Course do
 
     it "should not adjust for unauthorized user" do
       Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 1
+      expect(@course.storage_quota).to eq 1
     end
 
     it "should adjust for authorized user" do
       account_admin_user(:user => @user)
       Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
+      expect(@course.storage_quota).to eq 4
     end
 
     it "should be set for course copy" do
       @cm.migration_type = 'course_copy_importer'
       Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
+      expect(@course.storage_quota).to eq 4
     end
   end
 

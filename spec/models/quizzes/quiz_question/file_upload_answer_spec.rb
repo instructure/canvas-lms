@@ -17,15 +17,15 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
   describe "#initialize" do
 
     it "saves question_ids" do
-      answer.question_id.should == question_id
+      expect(answer.question_id).to eq question_id
     end
 
     it "saves the points possible" do
-      answer.points_possible.should == points_possible
+      expect(answer.points_possible).to eq points_possible
     end
 
     it "saves answer_details with attachment_ids" do
-      answer.answer_details.should == {:attachment_ids => ["1"] }
+      expect(answer.answer_details).to eq({:attachment_ids => ["1"] })
     end
 
   end
@@ -33,7 +33,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
   describe "attachment_ids" do
 
     it "returns attachment ids when there are attachment ids" do
-      answer.attachment_ids.should == ["1"]
+      expect(answer.attachment_ids).to eq ["1"]
     end
 
     it "returns nil if no attachment ids" do
@@ -41,7 +41,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
         :question_1 => [""]
       }
       answer = Quizzes::QuizQuestion::FileUploadAnswer.new(question_id,points_possible,data)
-      answer.attachment_ids.should be_nil
+      expect(answer.attachment_ids).to be_nil
     end
 
     it "handles the case where attachment_ids is nil" do
@@ -52,7 +52,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
       expect {
         ids = answer.attachment_ids
       }.to_not raise_error
-      ids.should be_nil
+      expect(ids).to be_nil
     end
 
   end

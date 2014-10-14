@@ -20,7 +20,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
     begin
       expect { serializer = ASes.serializer_for qq }.to_not raise_error
 
-      serializer.is_a?(ASes::AnswerSerializer).should be_true
+      expect(serializer.is_a?(ASes::AnswerSerializer)).to be_truthy
     ensure
       Quizzes::QuizQuestion::AnswerSerializers.send(:remove_const, :UberHax)
     end

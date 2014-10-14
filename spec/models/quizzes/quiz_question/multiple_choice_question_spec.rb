@@ -15,7 +15,7 @@ describe Quizzes::QuizQuestion::MultipleChoiceQuestion do
 
   describe "#initialize" do
     it "assign question data" do
-      question.question_id.should == question_data[:id]
+      expect(question.question_id).to eq question_data[:id]
     end
   end
 end

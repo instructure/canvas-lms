@@ -25,12 +25,12 @@ describe AccountUser do
       enable_cache do
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
-        @account.grants_right?(@user, :read).should be_false
+        expect(@account.grants_right?(@user, :read)).to be_falsey
         @account.account_users.create!(user: @user)
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
-        @account.grants_right?(@user, :read).should be_true
+        expect(@account.grants_right?(@user, :read)).to be_truthy
       end
     end
 
@@ -39,12 +39,12 @@ describe AccountUser do
         au = @account.account_users.create!(user: @user)
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
-        @account.grants_right?(@user, :read).should be_true
+        expect(@account.grants_right?(@user, :read)).to be_truthy
         au.destroy
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
-        @account.grants_right?(@user, :read).should be_false
+        expect(@account.grants_right?(@user, :read)).to be_falsey
       end
     end
   end
@@ -75,9 +75,9 @@ describe AccountUser do
       account_admin_user_with_role_changes(:user => user, :membership_type => 'role2', :role_changes => {:manage_wiki => true})
 
       permissions = AccountUser.all_permissions_for(user, Account.default)
-      permissions.delete(:manage_sis).should_not be_empty
-      permissions.delete(:manage_wiki).should_not be_empty
-      permissions.values.all?(&:empty?).should be_true
+      expect(permissions.delete(:manage_sis)).not_to be_empty
+      expect(permissions.delete(:manage_wiki)).not_to be_empty
+      expect(permissions.values.all?(&:empty?)).to be_truthy
     end
   end
 
@@ -92,8 +92,8 @@ describe AccountUser do
     end
 
     it "should be symmetric for applies_to everything" do
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should be symmetric for applies_to self" do
@@ -101,8 +101,8 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_descendants = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should be symmetric for applies_to descendants" do
@@ -110,22 +110,22 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_self = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should properly compute differing applies_to (descendants vs. all)" do
       @ro1.applies_to_self = false
       @ro1.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
     it "should properly compute differing applies_to (self vs. all)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
     it "should properly compute differing applies_to (self vs. descendants)" do
@@ -133,8 +133,8 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_self = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_false
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_falsey
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
   end
 
@@ -142,12 +142,12 @@ describe AccountUser do
     it "should not allow a lesser admin to create" do
       account_admin_user_with_role_changes(membership_type: 'lesser', role_changes: { manage_account_memberships: true })
       au = Account.default.account_users.build(user: @user, membership_type: 'AccountAdmin')
-      au.grants_right?(@user, :create).should be_false
+      expect(au.grants_right?(@user, :create)).to be_falsey
       u2 = User.create!
       au = Account.default.account_users.build(user: u2, membership_type: 'lesser')
-      au.grants_right?(@user, :create).should be_true
+      expect(au.grants_right?(@user, :create)).to be_truthy
       au = Account.default.account_users.build(user: u2, membership_type: 'AccountAdmin')
-      au.grants_right?(@user, :create).should be_false
+      expect(au.grants_right?(@user, :create)).to be_falsey
     end
   end
 end

@@ -28,14 +28,14 @@ describe Polling::PollChoice do
 
   context "creating a poll choice" do
     it "requires an associated poll" do
-        lambda { Polling::PollChoice.create!(is_correct: false, text: 'Poll Choice A') }.should raise_error(ActiveRecord::RecordInvalid,
+        expect { Polling::PollChoice.create!(is_correct: false, text: 'Poll Choice A') }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                     /Poll can't be blank/)
     end
 
     it "saves successfully" do
       @poll_choice = Polling::PollChoice.new(poll: @poll, text: 'A Poll Choice', is_correct: true)
       @poll_choice.save
-      @poll_choice.should be_valid
+      expect(@poll_choice).to be_valid
     end
   end
 end

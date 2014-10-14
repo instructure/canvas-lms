@@ -26,9 +26,9 @@ describe ContentMigration do
       run_course_copy
 
       to_assign = @copy_to.assignments.first
-      to_assign.rubric.should == rub
+      expect(to_assign.rubric).to eq rub
 
-      to_assign.learning_outcome_alignments.map(&:learning_outcome_id).should == [lo.id].sort
+      expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id)).to eq [lo.id].sort
     end
 
     it "should copy rubric outcomes in selective copy" do
@@ -40,7 +40,7 @@ describe ContentMigration do
       run_course_copy
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
-      to_outcomes.should eql [mig_id(@outcome)]
+      expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 
     it "should link assignments to assignment groups on selective copy" do
@@ -51,7 +51,7 @@ describe ContentMigration do
       run_course_copy
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
-      to_assign.assignment_group.should == @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+      expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
     end
 
     it "should link assignments to assignment groups on complete export" do
@@ -59,7 +59,7 @@ describe ContentMigration do
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
       run_export_and_import
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
-      to_assign.assignment_group.should == @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+      expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
     end
 
     it "should not link assignments to assignment groups on selective export" do
@@ -72,8 +72,8 @@ describe ContentMigration do
         export.selected_content = { 'assignments' => { mig_id(from_assign) => "1" } }
       end
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
-      to_assign.assignment_group.should_not == unrelated_group
-      unrelated_group.reload.name.should_not eql g.name
+      expect(to_assign.assignment_group).not_to eq unrelated_group
+      expect(unrelated_group.reload.name).not_to eql g.name
     end
 
 
@@ -99,7 +99,7 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
-        @assignment[attr].should == new_assignment[attr]
+        expect(@assignment[attr]).to eq new_assignment[attr]
       end
     end
 
@@ -112,7 +112,7 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
-      new_assignment.peer_reviews_assigned.should be_false
+      expect(new_assignment.peer_reviews_assigned).to be_falsey
     end
 
     it "should include implied objects for context modules" do
@@ -151,28 +151,28 @@ describe ContentMigration do
       run_course_copy
 
       mod1_copy = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
-      mod1_copy.should_not be_nil
+      expect(mod1_copy).not_to be_nil
       if Qti.qti_enabled?
-        mod1_copy.content_tags.count.should == 8
+        expect(mod1_copy.content_tags.count).to eq 8
       else
-        mod1_copy.content_tags.count.should == 7
+        expect(mod1_copy.content_tags.count).to eq 7
       end
 
 
-      @copy_to.assignments.where(migration_id: mig_id(asmnt1)).first.should_not be_nil
-      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first.should_not be_nil
-      @copy_to.attachments.where(migration_id: mig_id(att)).first.should_not be_nil
-      @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.should_not be_nil
-      @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first.should_not be_nil
-      @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.should_not be_nil if Qti.qti_enabled?
+      expect(@copy_to.assignments.where(migration_id: mig_id(asmnt1)).first).not_to be_nil
+      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first).not_to be_nil
+      expect(@copy_to.attachments.where(migration_id: mig_id(att)).first).not_to be_nil
+      expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first).not_to be_nil
+      expect(@copy_to.discussion_topics.where(migration_id: mig_id(topic)).first).not_to be_nil
+      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first).not_to be_nil if Qti.qti_enabled?
 
-      @copy_to.context_modules.where(migration_id: mig_id(mod2)).first.should be_nil
-      @copy_to.assignments.where(migration_id: mig_id(asmnt2)).first.should be_nil
-      @copy_to.attachments.where(migration_id: mig_id(att2)).first.should be_nil
-      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first.should be_nil
-      @copy_to.context_external_tools.where(migration_id: mig_id(tool2)).first.should be_nil
-      @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first.should be_nil
-      @copy_to.quizzes.where(migration_id: mig_id(quiz2)).first.should be_nil
+      expect(@copy_to.context_modules.where(migration_id: mig_id(mod2)).first).to be_nil
+      expect(@copy_to.assignments.where(migration_id: mig_id(asmnt2)).first).to be_nil
+      expect(@copy_to.attachments.where(migration_id: mig_id(att2)).first).to be_nil
+      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first).to be_nil
+      expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool2)).first).to be_nil
+      expect(@copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first).to be_nil
+      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz2)).first).to be_nil
     end
 
     it "should copy module prerequisites" do
@@ -187,8 +187,8 @@ describe ContentMigration do
 
         to_mod = @copy_to.context_modules.where(migration_id: mig_id(mod)).first
         to_mod2 = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
-        to_mod2.prerequisites.should_not == []
-        to_mod2.prerequisites[0][:id].should eql(to_mod.id)
+        expect(to_mod2.prerequisites).not_to eq []
+        expect(to_mod2.prerequisites[0][:id]).to eql(to_mod.id)
       end
     end
 
@@ -224,10 +224,10 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
-        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
-        @copy_to.discussion_topics.count.should == 1
-        @cm.content_export.error_messages.should == []
+        expect(@copy_to.assignments.count).to eq(Qti.qti_enabled? ? 3 : 2)
+        expect(@copy_to.quizzes.count).to eq 1 if Qti.qti_enabled?
+        expect(@copy_to.discussion_topics.count).to eq 1
+        expect(@cm.content_export.error_messages).to eq []
       end
 
       it "should copy for teacher if flag not set" do
@@ -236,19 +236,19 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
-        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
-        @copy_to.discussion_topics.count.should == 1
-        @cm.content_export.error_messages.should == []
+        expect(@copy_to.assignments.count).to eq(Qti.qti_enabled? ? 3 : 2)
+        expect(@copy_to.quizzes.count).to eq 1 if Qti.qti_enabled?
+        expect(@copy_to.discussion_topics.count).to eq 1
+        expect(@cm.content_export.error_messages).to eq []
       end
 
       it "should not copy for teacher" do
         run_course_copy
 
-        @copy_to.assignments.count.should == 0
-        @copy_to.quizzes.count.should == 0
-        @copy_to.discussion_topics.count.should == 0
-        @cm.content_export.error_messages.should == [
+        expect(@copy_to.assignments.count).to eq 0
+        expect(@copy_to.quizzes.count).to eq 0
+        expect(@copy_to.discussion_topics.count).to eq 0
+        expect(@cm.content_export.error_messages).to eq [
                 ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
                 ["The topic \"topic\" could not be copied because it is locked.", nil],
                 ["The quiz \"quiz\" could not be copied because it is locked.", nil]]
@@ -262,8 +262,8 @@ describe ContentMigration do
         run_course_copy
 
         asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
-        asmnt_2.freeze_on_copy.should be_nil
-        asmnt_2.copied.should be_nil
+        expect(asmnt_2.freeze_on_copy).to be_nil
+        expect(asmnt_2.copied).to be_nil
       end
     end
 
@@ -276,7 +276,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.grading_standard.should == gs
+        expect(@copy_to.grading_standard).to eq gs
       end
 
       it "should copy a course grading standard not owned by the copy_from course" do
@@ -288,8 +288,8 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.grading_standard_enabled.should be_true
-        @copy_to.grading_standard.data.should == gs.data
+        expect(@copy_to.grading_standard_enabled).to be_truthy
+        expect(@copy_to.grading_standard.data).to eq gs.data
       end
 
       it "should create a warning if an account grading standard can't be found" do
@@ -302,7 +302,7 @@ describe ContentMigration do
 
         run_course_copy(["Couldn't find account grading standard for the course."])
 
-        @copy_to.grading_standard.should == nil
+        expect(@copy_to.grading_standard).to eq nil
       end
 
       it "should not copy deleted grading standards" do
@@ -315,7 +315,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        @copy_to.grading_standards.should be_empty
+        expect(@copy_to.grading_standards).to be_empty
       end
 
       it "should not copy grading standards if nothing is selected" do
@@ -324,7 +324,7 @@ describe ContentMigration do
         @cm.copy_options = { 'everything' => '0' }
         @cm.save!
         run_course_copy
-        @copy_to.grading_standards.should be_empty
+        expect(@copy_to.grading_standards).to be_empty
       end
 
       it "should copy the course's grading standard (once) if course_settings are selected" do
@@ -333,8 +333,8 @@ describe ContentMigration do
         @cm.copy_options = { 'everything' => '0', 'all_course_settings' => '1' }
         @cm.save!
         run_course_copy
-        @copy_to.grading_standards.count.should eql 1 # no dupes
-        @copy_to.grading_standard.title.should eql gs.title
+        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
       it "should copy grading standards referenced by exported assignments" do
@@ -344,8 +344,8 @@ describe ContentMigration do
         assign.save!
         @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
         run_course_copy
-        @copy_to.grading_standards.map(&:title).should eql %w(Two)
-        @copy_to.assignments.first.grading_standard.title.should eql 'Two'
+        expect(@copy_to.grading_standards.map(&:title)).to eql %w(Two)
+        expect(@copy_to.assignments.first.grading_standard.title).to eql 'Two'
       end
 
       it "should copy referenced grading standards in complete export" do
@@ -354,7 +354,7 @@ describe ContentMigration do
         assign.grading_standard = gs
         assign.save!
         run_export_and_import
-        @copy_to.assignments.first.grading_standard.title.should eql gs.title
+        expect(@copy_to.assignments.first.grading_standard.title).to eql gs.title
       end
 
       it "should not copy referenced grading standards in selective export" do
@@ -368,9 +368,9 @@ describe ContentMigration do
         run_export_and_import do |export|
           export.selected_content = { 'assignments' => { mig_id(assign) => "1" } }
         end
-        @copy_to.assignments.count.should eql 1
-        @copy_to.assignments.first.grading_standard.should be_nil
-        unrelated_grading_standard.reload.title.should_not eql gs.title
+        expect(@copy_to.assignments.count).to eql 1
+        expect(@copy_to.assignments.first.grading_standard).to be_nil
+        expect(unrelated_grading_standard.reload.title).not_to eql gs.title
       end
     end
   end

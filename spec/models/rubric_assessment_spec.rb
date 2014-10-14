@@ -44,11 +44,11 @@ describe RubricAssessment do
         }
       }
     })
-    @assessment.data.first[:comments].should == comment
+    expect(@assessment.data.first[:comments]).to eq comment
     t = Class.new
     t.extend HtmlTextHelper
     # data has been round-tripped through YAML, and syck doesn't preserve carriage returns
-    @assessment.data.first[:comments_html].should == t.format_message(comment).first.gsub("\r", '')
+    expect(@assessment.data.first[:comments_html]).to eq t.format_message(comment).first.gsub("\r", '')
   end
 
   context "grading" do
@@ -64,15 +64,15 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@teacher)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(@teacher)
-      @assessment.artifact.score.should eql(5.0)
-      @assessment.data.first[:comments_html].should be_nil
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@teacher)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(@teacher)
+      expect(@assessment.artifact.score).to eql(5.0)
+      expect(@assessment.data.first[:comments_html]).to be_nil
     end
     
     it "should not update scores if not used for grading" do
@@ -89,14 +89,14 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@teacher)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(nil)
-      @assessment.artifact.score.should eql(nil)
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@teacher)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(nil)
+      expect(@assessment.artifact.score).to eql(nil)
     end
     
     it "should not update scores if not a valid grader" do
@@ -113,14 +113,14 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@student2)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(nil)
-      @assessment.artifact.score.should eql(nil)
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@student2)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(nil)
+      expect(@assessment.artifact.score).to eql(nil)
     end
   end
 end

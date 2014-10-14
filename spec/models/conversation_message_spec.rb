@@ -52,34 +52,34 @@ describe ConversationMessage do
 
     it "should format an author line with shared contexts" do
       message = add_message
-      message.author_short_name_with_shared_contexts(@first_student).should == "#{message.author.short_name} (#{@course.name})"
+      expect(message.author_short_name_with_shared_contexts(@first_student)).to eq "#{message.author.short_name} (#{@course.name})"
     end
 
     it "should format an author line without shared contexts" do
       user
       @conversation = @teacher.initiate_conversation([@user])
       message = add_message
-      message.author_short_name_with_shared_contexts(@user).should == "#{message.author.short_name}"
+      expect(message.author_short_name_with_shared_contexts(@user)).to eq "#{message.author.short_name}"
     end
 
     it "should create appropriate notifications on new message" do
       message = add_message
-      message.messages_sent.should be_include("Conversation Message")
-      message.messages_sent.should_not be_include("Added To Conversation")
+      expect(message.messages_sent).to be_include("Conversation Message")
+      expect(message.messages_sent).not_to be_include("Added To Conversation")
     end
 
     it "should create appropriate notifications on added participants" do
       event = add_last_student
-      event.messages_sent.should_not be_include("Conversation Message")
-      event.messages_sent.should be_include("Added To Conversation")
+      expect(event.messages_sent).not_to be_include("Conversation Message")
+      expect(event.messages_sent).to be_include("Added To Conversation")
     end
 
     it "should not notify the author" do
       message = add_message
-      message.messages_sent["Conversation Message"].map(&:user_id).should_not be_include(@teacher.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to be_include(@teacher.id)
 
       event = add_last_student
-      event.messages_sent["Added To Conversation"].map(&:user_id).should_not be_include(@teacher.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to be_include(@teacher.id)
     end
 
     it "should not notify unsubscribed participants" do
@@ -88,46 +88,46 @@ describe ConversationMessage do
       student_view.save
 
       message = add_message
-      message.messages_sent["Conversation Message"].map(&:user_id).should_not be_include(@first_student.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to be_include(@first_student.id)
     end
 
     it "should notify subscribed participants on new message" do
       message = add_message
-      message.messages_sent["Conversation Message"].map(&:user_id).should be_include(@first_student.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).to be_include(@first_student.id)
     end
 
     it "should limit notifications to message recipients, still excluding the author" do
       message = add_message(only_users: [@teacher, @students.first])
       message_user_ids = message.messages_sent["Conversation Message"].map(&:user_id)
-      message_user_ids.should_not include(@teacher.id)
-      message_user_ids.should include(@students.first.id)
+      expect(message_user_ids).not_to include(@teacher.id)
+      expect(message_user_ids).to include(@students.first.id)
       @students[1..-1].each do |student|
-        message_user_ids.should_not include(student.id)
+        expect(message_user_ids).not_to include(student.id)
       end
     end
 
     it "should notify new participants" do
       event = add_last_student
-      event.messages_sent["Added To Conversation"].map(&:user_id).should be_include(@last_student.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).to be_include(@last_student.id)
     end
 
     it "should not notify existing participants on added participant" do
       event = add_last_student
-      event.messages_sent["Added To Conversation"].map(&:user_id).should_not be_include(@first_student.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to be_include(@first_student.id)
     end
 
     it "should add a new message when a user replies to a notification" do
       conversation_message = add_message
       message = conversation_message.messages_sent["Conversation Message"].first
 
-      message.context.should == conversation_message
+      expect(message.context).to eq conversation_message
       message.context.reply_from(:user => message.user, :purpose => 'general',
         :subject => message.subject,
         :text => "Reply to notification")
       # The initial message, the one the sent the notification,
       # and the response to the notification
-      @conversation.messages.size.should == 3
-      @conversation.messages.first.body.should match(/Reply to notification/)
+      expect(@conversation.messages.size).to eq 3
+      expect(@conversation.messages.first.body).to match(/Reply to notification/)
     end
   end
 
@@ -138,11 +138,11 @@ describe ConversationMessage do
       student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
-      student.user_notes.size.should be(1)
+      expect(student.user_notes.size).to be(1)
       note = student.user_notes.first
-      note.creator.should eql(@teacher)
-      note.title.should eql("Private message")
-      note.note.should eql("reprimanded!")
+      expect(note.creator).to eql(@teacher)
+      expect(note.title).to eql("Private message")
+      expect(note.note).to eql("reprimanded!")
     end
 
     it "should fail if notes are disabled on the account" do
@@ -151,7 +151,7 @@ describe ConversationMessage do
       student = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
-      student.user_notes.size.should be(0)
+      expect(student.user_notes.size).to be(0)
     end
 
     it "should allow user notes on more than one recipient" do
@@ -161,8 +161,8 @@ describe ConversationMessage do
       student2 = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student1, student2])
       conversation.add_message("reprimanded!", :generate_user_note => true)
-      student1.user_notes.size.should be(1)
-      student2.user_notes.size.should be(1)
+      expect(student1.user_notes.size).to be(1)
+      expect(student2.user_notes.size).to be(1)
     end
   end
 
@@ -178,9 +178,9 @@ describe ConversationMessage do
       conversation = @teacher.initiate_conversation([@user])
       message = conversation.add_message("initial message")
 
-      StreamItem.count.should eql(old_count + 1)
+      expect(StreamItem.count).to eql(old_count + 1)
       stream_item = StreamItem.last
-      stream_item.asset.should == message.conversation
+      expect(stream_item.asset).to eq message.conversation
     end
 
     it "should not create a conversation stream item for a submission comment" do
@@ -192,7 +192,7 @@ describe ConversationMessage do
       @submission = @assignment.submit_homework(@user, :body => 'some message')
       @submission.add_comment(:author => @user, :comment => "hello")
 
-      StreamItem.all.select{ |i| i.asset_string =~ /conversation_/ }.should be_empty
+      expect(StreamItem.all.select{ |i| i.asset_string =~ /conversation_/ }).to be_empty
     end
 
     it "should not create additional stream_items for additional messages in the same conversation" do
@@ -204,8 +204,8 @@ describe ConversationMessage do
       conversation.add_message("second message")
       conversation.add_message("third message")
 
-      StreamItem.count.should eql(old_count + 1)
-      StreamItem.last.should eql(stream_item)
+      expect(StreamItem.count).to eql(old_count + 1)
+      expect(StreamItem.last).to eql(stream_item)
     end
 
     it "should not delete the stream_item if a message is deleted, just regenerate" do
@@ -218,7 +218,7 @@ describe ConversationMessage do
       stream_item = StreamItem.last
 
       message.destroy
-      StreamItem.count.should eql(old_count + 1)
+      expect(StreamItem.count).to eql(old_count + 1)
     end
 
     it "should delete the stream_item if the conversation is deleted" # not yet implemented
@@ -233,18 +233,18 @@ describe ConversationMessage do
     it "should set has_attachments if there are attachments" do
       a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
       m = @teacher.initiate_conversation([@student]).add_message("ohai", :attachment_ids => [a.id])
-      m.read_attribute(:has_attachments).should be_true
-      m.conversation.reload.has_attachments.should be_true
-      m.conversation.conversation_participants.all?(&:has_attachments?).should be_true
+      expect(m.read_attribute(:has_attachments)).to be_truthy
+      expect(m.conversation.reload.has_attachments).to be_truthy
+      expect(m.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
 
     it "should set has_attachments if there are forwareded attachments" do
       a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
       m1 = @teacher.initiate_conversation([user]).add_message("ohai", :attachment_ids => [a.id])
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
-      m2.read_attribute(:has_attachments).should be_true
-      m2.conversation.reload.has_attachments.should be_true
-      m2.conversation.conversation_participants.all?(&:has_attachments?).should be_true
+      expect(m2.read_attribute(:has_attachments)).to be_truthy
+      expect(m2.conversation.reload.has_attachments).to be_truthy
+      expect(m2.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
 
     it "should set has_media_objects if there is a media comment" do
@@ -254,9 +254,9 @@ describe ConversationMessage do
       mc.context = mc.user = @teacher
       mc.save
       m = @teacher.initiate_conversation([@student]).add_message("ohai", :media_comment => mc)
-      m.read_attribute(:has_media_objects).should be_true
-      m.conversation.reload.has_media_objects.should be_true
-      m.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
+      expect(m.read_attribute(:has_media_objects)).to be_truthy
+      expect(m.conversation.reload.has_media_objects).to be_truthy
+      expect(m.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end
 
     it "should set has_media_objects if there are forwarded media comments" do
@@ -267,9 +267,9 @@ describe ConversationMessage do
       mc.save
       m1 = @teacher.initiate_conversation([user]).add_message("ohai", :media_comment => mc)
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
-      m2.read_attribute(:has_media_objects).should be_true
-      m2.conversation.reload.has_media_objects.should be_true
-      m2.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
+      expect(m2.read_attribute(:has_media_objects)).to be_truthy
+      expect(m2.conversation.reload.has_media_objects).to be_truthy
+      expect(m2.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end
   end
 
@@ -286,13 +286,13 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      lambda { cm.reply_from({
+      expect { cm.reply_from({
         :purpose => 'general',
         :user => @teacher,
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      }) }.should raise_error(IncomingMail::Errors::UnknownAddress)
+      }) }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should reply only to the message author on conversations2 conversations" do
@@ -300,7 +300,7 @@ describe ConversationMessage do
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
-      cm2.conversation_message_participants.size.should == 3
+      expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({
         :purpose => 'general',
         :user => users[2],
@@ -308,8 +308,8 @@ describe ConversationMessage do
         :html => "body",
         :text => "body"
       })
-      cm3.conversation_message_participants.size.should == 2
-      cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.size).to eq 2
+      expect(cm3.conversation_message_participants.map{|x| x.user_id}.sort).to eq [users[1].id, users[2].id].sort
     end
 
     it "should mark conversations as read for the replying author" do
@@ -318,7 +318,7 @@ describe ConversationMessage do
       cm = cp.add_message("initial message", :root_account_id => Account.default.id)
 
       cp2 = cp.conversation.conversation_participants.where(user_id: @user).first
-      cp2.workflow_state.should == 'unread'
+      expect(cp2.workflow_state).to eq 'unread'
       cm.reply_from({
         :purpose => 'general',
         :user => @user,
@@ -327,7 +327,7 @@ describe ConversationMessage do
         :text => "body"
       })
       cp2.reload
-      cp2.workflow_state.should == 'read'
+      expect(cp2.workflow_state).to eq 'read'
     end
   end
 end

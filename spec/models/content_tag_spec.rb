@@ -37,17 +37,17 @@ describe ContentTag do
 
       it "returns 'deleted' for deleted assets" do
         a = mock_asset.new(deleted: true)
-        ContentTag.asset_workflow_state(a).should == 'deleted'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'deleted'
       end
 
       it "returns 'active' for published assets" do
         a = mock_asset.new(published: true)
-        ContentTag.asset_workflow_state(a).should == 'active'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'active'
       end
 
       it "returns 'unpublished' for unpublished assets" do
         a = mock_asset.new(published: false)
-        ContentTag.asset_workflow_state(a).should == 'unpublished'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'unpublished'
       end
     end
 
@@ -61,32 +61,32 @@ describe ContentTag do
 
       it "returns 'active' for 'active' workflow_state" do
         a = mock_asset.new('active')
-        ContentTag.asset_workflow_state(a).should == 'active'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'active'
       end
 
       it "returns 'active' for 'available' workflow_state" do
         a = mock_asset.new('available')
-        ContentTag.asset_workflow_state(a).should == 'active'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'active'
       end
 
       it "returns 'active' for 'published' workflow_state" do
         a = mock_asset.new('published')
-        ContentTag.asset_workflow_state(a).should == 'active'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'active'
       end
 
       it "returns 'unpublished' for 'unpublished' workflow_state" do
         a = mock_asset.new('unpublished')
-        ContentTag.asset_workflow_state(a).should == 'unpublished'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'unpublished'
       end
 
       it "returns 'deleted' for 'deleted' workflow_state" do
         a = mock_asset.new('deleted')
-        ContentTag.asset_workflow_state(a).should == 'deleted'
+        expect(ContentTag.asset_workflow_state(a)).to eq 'deleted'
       end
 
       it "returns nil for other workflow_state" do
         a = mock_asset.new('terrified')
-        ContentTag.asset_workflow_state(a).should == nil
+        expect(ContentTag.asset_workflow_state(a)).to eq nil
       end
     end
   end
@@ -94,43 +94,43 @@ describe ContentTag do
   describe "#sync_workflow_state_to_asset?" do
     it "true when content_type is Quiz" do
       content_tag = ContentTag.new(:content_type => "Quiz")
-      content_tag.sync_workflow_state_to_asset?.should be_true
+      expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is Quizzes::Quiz" do
       content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
-      content_tag.sync_workflow_state_to_asset?.should be_true
+      expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is Assignment" do
       content_tag = ContentTag.new(:content_type => "Assignment")
-      content_tag.sync_workflow_state_to_asset?.should be_true
+      expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is WikiPage" do
       content_tag = ContentTag.new(:content_type => "WikiPage")
-      content_tag.sync_workflow_state_to_asset?.should be_true
+      expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is DiscussionTopic" do
-      ContentTag.new(content_type: "DiscussionTopic").should be_sync_workflow_state_to_asset
+      expect(ContentTag.new(content_type: "DiscussionTopic")).to be_sync_workflow_state_to_asset
     end
   end
 
   describe "#content_type_quiz?" do
     it "true when content_type is Quiz" do
       content_tag = ContentTag.new(:content_type => "Quiz")
-      content_tag.content_type_quiz?.should be_true
+      expect(content_tag.content_type_quiz?).to be_truthy
     end
 
     it "true when content_type is Quizzes::Quiz" do
       content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
-      content_tag.content_type_quiz?.should be_true
+      expect(content_tag.content_type_quiz?).to be_truthy
     end
 
     it "false when content_type is not valid" do
       content_tag = ContentTag.new(:content_type => "Assignment")
-      content_tag.content_type_quiz?.should be_false
+      expect(content_tag.content_type_quiz?).to be_falsey
     end
   end
 
@@ -138,61 +138,61 @@ describe ContentTag do
     it "true when quiz" do
       content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
 
-      content_tag.scoreable?.should be_true
+      expect(content_tag.scoreable?).to be_truthy
     end
 
     it "true when gradeable" do
       content_tag = ContentTag.new(:content_type => "Assignment")
 
-      content_tag.scoreable?.should be_true
+      expect(content_tag.scoreable?).to be_truthy
     end
 
     it "false when neither quiz nor gradeable" do
       content_tag = ContentTag.new(:content_type => "DiscussionTopic")
 
-      content_tag.scoreable?.should be_false
+      expect(content_tag.scoreable?).to be_falsey
     end
   end
 
   it "should allow setting a valid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'discussion_topic_5'
-    tag.content_type.should eql('DiscussionTopic')
-    tag.content_id.should eql(5)
+    expect(tag.content_type).to eql('DiscussionTopic')
+    expect(tag.content_id).to eql(5)
   end
   
   it "should not allow setting an invalid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'bad_class_41'
-    tag.content_type.should eql(nil)
-    tag.content_id.should eql(nil)
+    expect(tag.content_type).to eql(nil)
+    expect(tag.content_id).to eql(nil)
     
     tag.content_asset_string = 'bad_class'
-    tag.content_type.should eql(nil)
-    tag.content_id.should eql(nil)
+    expect(tag.content_type).to eql(nil)
+    expect(tag.content_id).to eql(nil)
     
     tag.content_asset_string = 'course_55'
-    tag.content_type.should eql(nil)
-    tag.content_id.should eql(nil)
+    expect(tag.content_type).to eql(nil)
+    expect(tag.content_id).to eql(nil)
   end
 
   it "should return content for a assignment" do
     course
     assignment = course.assignments.create!
     tag = ContentTag.new(:content => assignment, :context => @course)
-    tag.assignment.should == assignment
+    expect(tag.assignment).to eq assignment
   end
 
   it "should return associated assignment for a quiz" do
     course
     quiz = course.quizzes.create!
     tag = ContentTag.new(:content => quiz, :context => @course)
-    tag.assignment.should == quiz.assignment
+    expect(tag.assignment).to eq quiz.assignment
   end
 
   it "should return nil assignment for something else" do
     tag = ContentTag.new
-    tag.assignment.should be_nil
+    expect(tag.assignment).to be_nil
   end
 
   it "should include tags from a course in the for_context named scope" do
@@ -200,8 +200,8 @@ describe ContentTag do
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
     tags = ContentTag.for_context(@course)
-    tags.should_not be_empty
-    tags.any?{ |t| t.id == tag.id }.should be_true
+    expect(tags).not_to be_empty
+    expect(tags.any?{ |t| t.id == tag.id }).to be_truthy
   end
 
   it "should include tags from an account in the for_context named scope" do
@@ -209,8 +209,8 @@ describe ContentTag do
     outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => '<p>This is <b>awesome</b>.</p>')
     tag = ContentTag.create!(:content => outcome, :context => account)
     tags = ContentTag.for_context(account)
-    tags.should_not be_empty
-    tags.any?{ |t| t.id == tag.id }.should be_true
+    expect(tags).not_to be_empty
+    expect(tags.any?{ |t| t.id == tag.id }).to be_truthy
   end
 
   it "should include tags from courses under an account in the for_context named scope" do
@@ -218,8 +218,8 @@ describe ContentTag do
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
     tags = ContentTag.for_context(@course.account)
-    tags.should_not be_empty
-    tags.any?{ |t| t.id == tag.id }.should be_true
+    expect(tags).not_to be_empty
+    expect(tags.any?{ |t| t.id == tag.id }).to be_truthy
   end
   
   it "should not rename the linked external tool if the tag is renamed" do
@@ -234,9 +234,9 @@ describe ContentTag do
     })
     @tag.update_asset_name!
     @tool.reload
-    @tool.name.should == "new tool"
+    expect(@tool.name).to eq "new tool"
     @tag.reload
-    @tag.title.should == "Example"
+    expect(@tag.title).to eq "Example"
   end
     
   it "should not rename the tag if the linked external tool is renamed" do
@@ -251,9 +251,9 @@ describe ContentTag do
     })
     ContentTag.update_for(@tool)
     @tool.reload
-    @tool.name.should == "new tool"
+    expect(@tool.name).to eq "new tool"
     @tag.reload
-    @tag.title.should == "Example"
+    expect(@tag.title).to eq "Example"
   end
 
   it "should rename the linked assignment if the tag is renamed" do
@@ -267,9 +267,9 @@ describe ContentTag do
     })
     @tag.update_asset_name!
     @tag.reload
-    @tag.title.should == 'some assignment (renamed)'
+    expect(@tag.title).to eq 'some assignment (renamed)'
     @assignment.reload
-    @assignment.title.should == 'some assignment (renamed)'
+    expect(@assignment.title).to eq 'some assignment (renamed)'
   end
   
   it "should rename the tag if the linked assignment is renamed" do
@@ -282,16 +282,16 @@ describe ContentTag do
       :id => @assignment.id
     })
     @tag.reload
-    @tag.title.should == 'some assignment'
+    expect(@tag.title).to eq 'some assignment'
     @assignment.reload
-    @assignment.title.should == 'some assignment'
+    expect(@assignment.title).to eq 'some assignment'
     @assignment.title = "some assignment (renamed)"
     @assignment.save!
     ContentTag.update_for(@assignment)
     @tag.reload
-    @tag.title.should == 'some assignment (renamed)'
+    expect(@tag.title).to eq 'some assignment (renamed)'
     @assignment.reload
-    @assignment.title.should == 'some assignment (renamed)'
+    expect(@assignment.title).to eq 'some assignment (renamed)'
   end
 
   describe ".update_for with draft state enabled" do
@@ -319,7 +319,7 @@ describe ContentTag do
         ContentTag.update_for @quiz
 
         @tag.reload
-        @tag.workflow_state.should == "unpublished"
+        expect(@tag.workflow_state).to eq "unpublished"
 
         @quiz.publish!
         @quiz.reload
@@ -327,7 +327,7 @@ describe ContentTag do
         ContentTag.update_for @quiz
 
         @tag.reload
-        @tag.workflow_state.should == "active"
+        expect(@tag.workflow_state).to eq "active"
       end
     end
   end
@@ -341,7 +341,7 @@ describe ContentTag do
     @tag.update_asset_name!
 
     @page.reload
-    @tag.title[0, 250].should == @page.title[0, 250]
+    expect(@tag.title[0, 250]).to eq @page.title[0, 250]
   end
 
   it "should properly trim asset name for assignments" do
@@ -353,7 +353,7 @@ describe ContentTag do
     @tag.update_asset_name!
 
     @assign.reload
-    @tag.title[0, 250].should == @assign.title[0, 250]
+    expect(@tag.title[0, 250]).to eq @assign.title[0, 250]
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
@@ -365,19 +365,19 @@ describe ContentTag do
     @page.save!
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'some page', :id => @page.id})
-    @tag.workflow_state.should == 'unpublished'
+    expect(@tag.workflow_state).to eq 'unpublished'
 
     @page.reload
     @page.workflow_state = 'active'
     @page.save!
     @tag.reload
-    @tag.workflow_state.should == 'active'
+    expect(@tag.workflow_state).to eq 'active'
 
     @page.reload
     @page.workflow_state = 'unpublished'
     @page.save!
     @tag.reload
-    @tag.workflow_state.should == 'unpublished'
+    expect(@tag.workflow_state).to eq 'unpublished'
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
@@ -396,18 +396,18 @@ describe ContentTag do
     @tag.save!
     @tag.update_asset_workflow_state!
     @page.reload
-    @page.workflow_state.should == 'active'
+    expect(@page.workflow_state).to eq 'active'
     @tag2.reload
-    @tag2.workflow_state.should == 'active'
+    expect(@tag2.workflow_state).to eq 'active'
 
     @tag.reload
     @tag.workflow_state = 'unpublished'
     @tag.save!
     @tag.update_asset_workflow_state!
     @page.reload
-    @page.workflow_state.should == 'unpublished'
+    expect(@page.workflow_state).to eq 'unpublished'
     @tag2.reload
-    @tag2.workflow_state.should == 'unpublished'
+    expect(@tag2.workflow_state).to eq 'unpublished'
   end
 
   it "should publish content via publish!" do
@@ -444,7 +444,7 @@ describe ContentTag do
     att.display_name = "no longer important.txt"
     ContentTag.update_for(att)
     tag.reload
-    tag.title.should == 'important title.txt'
+    expect(tag.title).to eq 'important title.txt'
   end
   
   it "should not rename attachment if linked tag is renamed" do
@@ -456,7 +456,7 @@ describe ContentTag do
     tag.update_asset_name!
     
     att.reload
-    att.display_name.should == 'important title.txt'
+    expect(att.display_name).to eq 'important title.txt'
   end
 
   include_examples "url validation tests"
@@ -472,9 +472,9 @@ describe ContentTag do
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
     tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
-    mod.reload.updated_at.to_i.should == yesterday.to_i
+    expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
     mod.connection.run_transaction_commit_callbacks
-    mod.reload.updated_at.should > 5.seconds.ago
+    expect(mod.reload.updated_at).to be > 5.seconds.ago
   end
 
   it "should allow skipping touches on save" do
@@ -495,24 +495,24 @@ describe ContentTag do
     @tag.skip_touch = true
     @tag.save
 
-    @module.reload.updated_at.to_i.should == yesterday.to_i
+    expect(@module.reload.updated_at.to_i).to eq yesterday.to_i
   end
 
   describe '.content_type' do
     it 'returns the correct representation of a quiz' do
       content_tag = ContentTag.create! content: quiz_model, context: course_model
-      content_tag.content_type.should == 'Quizzes::Quiz'
+      expect(content_tag.content_type).to eq 'Quizzes::Quiz'
 
       content_tag.content_type = 'Quiz'
       content_tag.send(:save_without_callbacks)
 
-      ContentTag.find(content_tag.id).content_type.should == 'Quizzes::Quiz'
+      expect(ContentTag.find(content_tag.id).content_type).to eq 'Quizzes::Quiz'
     end
 
     it 'returns the content type attribute if not a quiz' do
       content_tag = ContentTag.create! content: assignment_model, context: course_model
 
-      content_tag.content_type.should == 'Assignment'
+      expect(content_tag.content_type).to eq 'Assignment'
     end
   end
 
@@ -534,10 +534,10 @@ describe ContentTag do
       end
       it "returns assignments if there is visibility" do
         create_section_override_for_assignment(@assignment, {course_section: @section})
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "does not return assignments if there is no visibility" do
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
     context "discussions" do
@@ -558,16 +558,16 @@ describe ContentTag do
         })
       end
       it "returns discussions without attached assignments" do
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "returns discussions with attached assignments if there is visibility" do
         set_up_discussion
         create_section_override_for_assignment(@assignment, {course_section: @section})
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "does not return discussions with attached assignments if there is no visibility" do
         set_up_discussion
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
     context "quizzes" do
@@ -582,10 +582,10 @@ describe ContentTag do
       end
       it "returns a quiz if there is visibility" do
         create_section_override_for_quiz(@quiz, course_section: @section)
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "does not return quiz if there is visibility" do
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should_not include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
     context "other" do
@@ -593,7 +593,7 @@ describe ContentTag do
         @page = @course.wiki.wiki_pages.create!(:title => "some page")
         @module = @course.context_modules.create!(:name => "module")
         @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
-        ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id).should include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
     end
   end
@@ -616,7 +616,7 @@ describe ContentTag do
 
       @tag.destroy
 
-      @module.reload.completion_requirements.should == [{id: @tag2.id, type: 'must_submit'}]
+      expect(@module.reload.completion_requirements).to eq [{id: @tag2.id, type: 'must_submit'}]
     end
   end
 
@@ -629,16 +629,16 @@ describe ContentTag do
 
     a_module = @course.context_modules.create!(:name => "module")
     tag = a_module.add_item({ :type => 'attachment', :id => att.id })
-    tag.unpublished?.should be_true
+    expect(tag.unpublished?).to be_truthy
 
     att.locked = false
     att.save!
     tag.reload
-    tag.unpublished?.should be_false
+    expect(tag.unpublished?).to be_falsey
 
     att.locked = true
     att.save!
     tag.reload
-    tag.unpublished?.should be_true
+    expect(tag.unpublished?).to be_truthy
   end
 end

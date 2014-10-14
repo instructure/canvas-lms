@@ -57,19 +57,19 @@ describe Quizzes::QuizQuestion::AnswerGroup do
 
   describe ".generate" do
     it "seeds a question with parsed answers" do
-      question_data.answers.should be_instance_of(Quizzes::QuizQuestion::AnswerGroup)
-      question_data.answers.to_a.size.should == 3
+      expect(question_data.answers).to be_instance_of(Quizzes::QuizQuestion::AnswerGroup)
+      expect(question_data.answers.to_a.size).to eq 3
     end
   end
 
   describe "#to_a" do
     it "returns an array" do
-      question_data.answers.to_a.should be_instance_of(Array)
+      expect(question_data.answers.to_a).to be_instance_of(Array)
     end
 
     it "converts each answer to a hash" do
       question_data.answers.to_a.each do |a|
-        a.should be_instance_of(Hash)
+        expect(a).to be_instance_of(Hash)
       end
     end
   end
@@ -77,13 +77,13 @@ describe Quizzes::QuizQuestion::AnswerGroup do
   describe "#set_correct_if_none" do
     it "sets the first answer to correct if none are set" do
       question_data.answers.set_correct_if_none
-      question_data.answers.to_a.first[:weight].should == 100
+      expect(question_data.answers.to_a.first[:weight]).to eq 100
     end
   end
 
   describe "#correct_answer" do
     it "returns the correct answer" do
-      question_data.answers.correct_answer[:text].should == "A"
+      expect(question_data.answers.correct_answer[:text]).to eq "A"
     end
 
   end
@@ -104,57 +104,57 @@ describe Quizzes::QuizQuestion::AnswerGroup::Answer do
 
   describe "#to_hash" do
     it "returns the internal hash" do
-      @answer.to_hash.should be_instance_of(Hash)
-      @answer.to_hash[:text].should == "Answer 1"
+      expect(@answer.to_hash).to be_instance_of(Hash)
+      expect(@answer.to_hash[:text]).to eq "Answer 1"
     end
   end
 
   describe "#correct?" do
     context "when weight is 100" do
       it "returns true" do
-        @answer.correct?.should be_true
+        expect(@answer.correct?).to be_truthy
       end
     end
 
     context "when weight isn't 100" do
       it "returns false" do
         @answer[:weight] = 0
-        @answer.correct?.should be_false
+        expect(@answer.correct?).to be_falsey
         @answer[:weight] = nil
-        @answer.correct?.should be_false
+        expect(@answer.correct?).to be_falsey
         @answer[:weight] = ""
-        @answer.correct?.should be_false
+        expect(@answer.correct?).to be_falsey
         @answer[:weight] = 5
-        @answer.correct?.should be_false
+        expect(@answer.correct?).to be_falsey
       end
     end
   end
 
   describe "#any_value_of" do
     it "returns the value of the first key that exists" do
-      @answer.any_value_of([:answer_weight, :weight]).should == 100
+      expect(@answer.any_value_of([:answer_weight, :weight])).to eq 100
     end
 
     it "ignores any keys supplied that don't exist" do
-      @answer.any_value_of([:blah, :weight, :answer_weight, :foo]).should == 100
+      expect(@answer.any_value_of([:blah, :weight, :answer_weight, :foo])).to eq 100
     end
 
     it "returns the supplied default if none of the keys are found" do
-      @answer.any_value_of([:foo], "default").should == "default"
+      expect(@answer.any_value_of([:foo], "default")).to eq "default"
     end
   end
 
   describe "#set_id" do
     it "assigns a randomly generated id to the answer" do
       @answer.set_id([])
-      @answer[:id].should be_kind_of(Fixnum)
-      @answer[:id].should be > 0
+      expect(@answer[:id]).to be_kind_of(Fixnum)
+      expect(@answer[:id]).to be > 0
     end
 
     it "takes taken ids into account and prevents collisions" do
       range = [1..1000]
       @answer.set_id(range)
-      range.should_not include(@answer[:id])
+      expect(range).not_to include(@answer[:id])
     end
 
     it "doesn't reassign a new id if one has already been set" do
@@ -162,7 +162,7 @@ describe Quizzes::QuizQuestion::AnswerGroup::Answer do
       @answer.set_id([])
       @answer.set_id([])
 
-      @answer[:id].should eql(id)
+      expect(@answer[:id]).to eql(id)
     end
   end
 end

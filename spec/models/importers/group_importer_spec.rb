@@ -27,16 +27,16 @@ describe "Importing Groups" do
         context = get_import_context(system)
 
         data[:groups_to_import] = {}
-        Importers::GroupImporter.import_from_migration(data, context).should be_nil
-        context.groups.count.should == 0
+        expect(Importers::GroupImporter.import_from_migration(data, context)).to be_nil
+        expect(context.groups.count).to eq 0
 
         data[:groups_to_import][data[:migration_id]] = true
         Importers::GroupImporter.import_from_migration(data, context)
         Importers::GroupImporter.import_from_migration(data, context)
-        context.groups.count.should == 1
+        expect(context.groups.count).to eq 1
         g = Group.where(migration_id: data[:migration_id]).first
 
-        g.name.should == data[:title]
+        expect(g.name).to eq data[:title]
       end
     end
   end
@@ -46,7 +46,7 @@ describe "Importing Groups" do
     context = get_import_context('bb8')
 
     Importers::GroupImporter.import_from_migration(data, context)
-    context.groups.count.should == 1
+    expect(context.groups.count).to eq 1
 
     category = get_import_data('bb8', 'group_discussion')
 
@@ -59,20 +59,20 @@ describe "Importing Groups" do
     end
 
     group = Group.where(migration_id: data[:migration_id]).first
-    group.discussion_topics.count.should == 1
+    expect(group.discussion_topics.count).to eq 1
   end
 
   it "should respect group_category from the hash" do
     course_with_teacher
     group = @course.groups.build
     Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, nil, group)
-    group.group_category.name.should == "random category"
+    expect(group.group_category.name).to eq "random category"
   end
 
   it "should default group_category to imported if not in the hash" do
     course_with_teacher
     group = @course.groups.build
     Importers::GroupImporter.import_from_migration({}, @course, nil, group)
-    group.group_category.should == GroupCategory.imported_for(@course)
+    expect(group.group_category).to eq GroupCategory.imported_for(@course)
   end
 end

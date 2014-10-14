@@ -25,16 +25,16 @@ describe Eportfolio do
     end
 
     it "should create a category if one doesn't exist" do
-      @portfolio.eportfolio_categories.should be_empty
+      expect(@portfolio.eportfolio_categories).to be_empty
       @portfolio.ensure_defaults
-      @portfolio.reload.eportfolio_categories.should_not be_empty
+      expect(@portfolio.reload.eportfolio_categories).not_to be_empty
     end
 
     it "should create an entry in the first category if one doesn't exist" do
       @category = @portfolio.eportfolio_categories.create!(:name => "Hi")
-      @category.eportfolio_entries.should be_empty
+      expect(@category.eportfolio_entries).to be_empty
       @portfolio.ensure_defaults
-      @category.reload.eportfolio_entries.should_not be_empty
+      expect(@category.reload.eportfolio_entries).not_to be_empty
     end
   end
 end

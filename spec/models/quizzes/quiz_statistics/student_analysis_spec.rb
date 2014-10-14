@@ -21,10 +21,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   it 'should calculate mean/stddev as expected with no submissions' do
     q = @course.quizzes.create!
     stats = q.statistics
-    stats[:submission_score_average].should be_nil
-    stats[:submission_score_high].should be_nil
-    stats[:submission_score_low].should be_nil
-    stats[:submission_score_stdev].should be_nil
+    expect(stats[:submission_score_average]).to be_nil
+    expect(stats[:submission_score_high]).to be_nil
+    expect(stats[:submission_score_low]).to be_nil
+    expect(stats[:submission_score_stdev]).to be_nil
   end
 
   it 'should calculate mean/stddev as expected with a few submissions' do
@@ -53,33 +53,33 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.score = 15
     sub.with_versioning(true, &:save!)
     stats = q.statistics
-    stats[:submission_score_average].should == 15
-    stats[:submission_score_high].should == 15
-    stats[:submission_score_low].should == 15
-    stats[:submission_score_stdev].should == 0
-    stats[:submission_scores].should == { 50 => 1 }
+    expect(stats[:submission_score_average]).to eq 15
+    expect(stats[:submission_score_high]).to eq 15
+    expect(stats[:submission_score_low]).to eq 15
+    expect(stats[:submission_score_stdev]).to eq 0
+    expect(stats[:submission_scores]).to eq({ 50 => 1 })
     sub = q.generate_submission(@user2)
     sub.workflow_state = 'complete'
     sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => question.id }]
     sub.score = 17
     sub.with_versioning(true, &:save!)
     stats = q.statistics
-    stats[:submission_score_average].should == 16
-    stats[:submission_score_high].should == 17
-    stats[:submission_score_low].should == 15
-    stats[:submission_score_stdev].should == 1
-    stats[:submission_scores].should == { 50 => 1, 57 => 1 }
+    expect(stats[:submission_score_average]).to eq 16
+    expect(stats[:submission_score_high]).to eq 17
+    expect(stats[:submission_score_low]).to eq 15
+    expect(stats[:submission_score_stdev]).to eq 1
+    expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1 })
     sub = q.generate_submission(@user3)
     sub.workflow_state = 'complete'
     sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => question.id }]
     sub.score = 20
     sub.with_versioning(true, &:save!)
     stats = q.statistics
-    stats[:submission_score_average].should be_close(17 + 1.0/3, 0.0000000001)
-    stats[:submission_score_high].should == 20
-    stats[:submission_score_low].should == 15
-    stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
-    stats[:submission_scores].should == { 50 => 1, 57 => 1, 67 => 1 }
+    expect(stats[:submission_score_average]).to be_within(0.0000000001).of(17 + 1.0/3)
+    expect(stats[:submission_score_high]).to eq 20
+    expect(stats[:submission_score_low]).to eq 15
+    expect(stats[:submission_score_stdev]).to be_within(0.0000000001).of(Math::sqrt(4 + 2.0/9))
+    expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1, 67 => 1 })
   end
 
   context "csv" do
@@ -133,16 +133,16 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       # and one in progress
       @quiz.generate_submission(@student)
       stats = CSV.parse(csv(:include_all_versions => true))
-      stats.last.length.should == 9
+      expect(stats.last.length).to eq 9
       stats.first.first == "section"
     end
 
     it 'should succeed with logged-out user submissions' do
       survey_with_logged_out_submission
       stats = CSV.parse(csv(:include_all_versions => true))
-      stats.last[0].should == ''
-      stats.last[1].should == ''
-      stats.last[2].should == ''
+      expect(stats.last[0]).to eq ''
+      expect(stats.last[1]).to eq ''
+      expect(stats.last[2]).to eq ''
     end
 
     it 'should have sections in quiz statistics_csv' do
@@ -163,22 +163,22 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv(:include_all_versions => true))
-      stats.last[0].should == "nobody@example.com"
-      stats.last[1].should == @student.id.to_s
-      stats.last[2].should == "user_sis_id_01"
+      expect(stats.last[0]).to eq "nobody@example.com"
+      expect(stats.last[1]).to eq @student.id.to_s
+      expect(stats.last[2]).to eq "user_sis_id_01"
 
       splitter = lambda { |str| str.split(",").map(&:strip) }
       sections = splitter.call(stats.last[3])
-      sections.should include("section2")
-      sections.should include("Unnamed Course")
+      expect(sections).to include("section2")
+      expect(sections).to include("Unnamed Course")
 
       section_ids = splitter.call(stats.last[4])
-      section_ids.should include(section2.id.to_s)
-      section_ids.should include(section1.id.to_s)
+      expect(section_ids).to include(section2.id.to_s)
+      expect(section_ids).to include(section1.id.to_s)
 
       section_sis_ids = splitter.call(stats.last[5])
-      section_sis_ids.should include("SISSection02")
-      section_sis_ids.should include("SISSection01")
+      expect(section_sis_ids).to include("SISSection02")
+      expect(section_sis_ids).to include("SISSection01")
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do
@@ -195,7 +195,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
             {'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100'}]})
       @quiz.generate_quiz_data
       @quiz.save!
-      @quiz.quiz_questions.size.should == 3
+      expect(@quiz.quiz_questions.size).to eq 3
       qs = @quiz.generate_submission(@student)
       # submission will not answer question 2 and will partially answer question 3
       qs.submission_data = {
@@ -203,8 +203,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       }
       Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = CSV.parse(csv)
-      stats.last.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
-      stats.last[11].should == ',baz'
+      expect(stats.last.size).to eq 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
+      expect(stats.last[11]).to eq ',baz'
     end
 
     it 'should contain answers to numerical questions' do
@@ -225,7 +225,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv)
-      stats.last[9].should == '5'
+      expect(stats.last[9]).to eq '5'
     end
 
     it 'should include primary domain if trust exists' do
@@ -240,7 +240,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
       stats = CSV.parse(csv(:include_all_versions => true))
-      stats[1][3].should == 'school1'
+      expect(stats[1][3]).to eq 'school1'
     end
   end
 
@@ -278,7 +278,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     qs.save!
     stats = CSV.parse(csv({:include_all_versions => true},q.reload))
     stats = stats.sort_by {|s| s[1] } # sort by the id
-    stats.first[7].should == attach.display_name
+    expect(stats.first[7]).to eq attach.display_name
   end
 
   it 'should strip tags from html multiple-choice/multiple-answers' do
@@ -299,26 +299,26 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     # visual statistics
     stats = q.statistics
-    stats[:questions].length.should == 2
-    stats[:questions][0].length.should == 2
-    stats[:questions][0][0].should == "question"
-    stats[:questions][0][1][:answers].length.should == 2
-    stats[:questions][0][1][:answers][0][:responses].should == 1
-    stats[:questions][0][1][:answers][0][:text].should == "zero"
-    stats[:questions][0][1][:answers][1][:responses].should == 0
-    stats[:questions][0][1][:answers][1][:text].should == "one"
-    stats[:questions][1].length.should == 2
-    stats[:questions][1][0].should == "question"
-    stats[:questions][1][1][:answers].length.should == 2
-    stats[:questions][1][1][:answers][0][:responses].should == 1
-    stats[:questions][1][1][:answers][0][:text].should == "lolcats"
-    stats[:questions][1][1][:answers][1][:responses].should == 1
-    stats[:questions][1][1][:answers][1][:text].should == "lolrus"
+    expect(stats[:questions].length).to eq 2
+    expect(stats[:questions][0].length).to eq 2
+    expect(stats[:questions][0][0]).to eq "question"
+    expect(stats[:questions][0][1][:answers].length).to eq 2
+    expect(stats[:questions][0][1][:answers][0][:responses]).to eq 1
+    expect(stats[:questions][0][1][:answers][0][:text]).to eq "zero"
+    expect(stats[:questions][0][1][:answers][1][:responses]).to eq 0
+    expect(stats[:questions][0][1][:answers][1][:text]).to eq "one"
+    expect(stats[:questions][1].length).to eq 2
+    expect(stats[:questions][1][0]).to eq "question"
+    expect(stats[:questions][1][1][:answers].length).to eq 2
+    expect(stats[:questions][1][1][:answers][0][:responses]).to eq 1
+    expect(stats[:questions][1][1][:answers][0][:text]).to eq "lolcats"
+    expect(stats[:questions][1][1][:answers][1][:responses]).to eq 1
+    expect(stats[:questions][1][1][:answers][1][:text]).to eq "lolrus"
 
     # csv statistics
     stats = CSV.parse(csv({}, q))
-    stats.last[7].should == "zero"
-    stats.last[9].should == "lolcats,lolrus"
+    expect(stats.last[7]).to eq "zero"
+    expect(stats.last[9]).to eq "lolcats,lolrus"
   end
 
   it 'should strip tags from all student-provided answers' do
@@ -343,15 +343,15 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = CSV.parse(csv({}, q))
-    stats.last[7].should == "short_answer"
-    stats.last[9].should == "fimb"
-    stats.last[11].should == "essay"
-    stats.last[13].should == "numerical"
+    expect(stats.last[7]).to eq "short_answer"
+    expect(stats.last[9]).to eq "fimb"
+    expect(stats.last[11]).to eq "essay"
+    expect(stats.last[13]).to eq "numerical"
 
     # calculated field also includes the values for the variables, something like:
     #   "x=>4.3,y=>21,calculated"
     # so we'll match instead
-    stats.last[15].should =~ /,calculated$/
+    expect(stats.last[15]).to match /,calculated$/
   end
 
   it 'should not count teacher preview submissions' do
@@ -371,7 +371,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = q.statistics
-    stats[:unique_submission_count].should == 0
+    expect(stats[:unique_submission_count]).to eq 0
   end
 
   it 'should not count student view submissions' do
@@ -392,7 +392,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = q.statistics
-    stats[:unique_submission_count].should == 0
+    expect(stats[:unique_submission_count]).to eq 0
   end
 
   describe 'question statistics' do
@@ -408,10 +408,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
           returns({ some_metric: 5 })
 
       output = subject.send(:stats_for_question, question_data, responses, false)
-      output.should == {
+      expect(output).to eq({
         question_type: 'essay_question',
         some_metric: 5
-      }
+      })
     end
 
     it "shouldn't proxy if the legacy flag is on" do

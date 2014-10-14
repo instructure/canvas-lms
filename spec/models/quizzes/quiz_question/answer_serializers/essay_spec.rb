@@ -20,7 +20,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
   end
 
   it 'should return nil when un-answered' do
-    subject.deserialize({}).should == nil
+    expect(subject.deserialize({})).to eq nil
   end
 
   context 'validations' do

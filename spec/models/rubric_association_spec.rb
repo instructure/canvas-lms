@@ -68,7 +68,7 @@ describe RubricAssociation do
         end
 
         it "should have 2 assessment_requests" do
-          @rubric_assoc.assessment_requests.count.should == 2
+          expect(@rubric_assoc.assessment_requests.count).to eq 2
         end
       end
     end
@@ -95,7 +95,7 @@ describe RubricAssociation do
           end
 
           it "should have 2 assessment_requests" do
-            @rubric_assoc.assessment_requests.count.should == 2
+            expect(@rubric_assoc.assessment_requests.count).to eq 2
           end
         end
       end
@@ -126,10 +126,10 @@ describe RubricAssociation do
           :context => @course,
           :purpose => 'grading'
         )
-        assignment.reload.learning_outcome_alignments.count.should == 1
+        expect(assignment.reload.learning_outcome_alignments.count).to eq 1
 
         ra.destroy
-        assignment.reload.learning_outcome_alignments.count.should == 0
+        expect(assignment.reload.learning_outcome_alignments.count).to eq 0
       end
     end
 
@@ -157,9 +157,9 @@ describe RubricAssociation do
         }
       })
       
-      assess.should_not be_nil
+      expect(assess).not_to be_nil
       ra.destroy
-      assess.reload.should_not be_nil
+      expect(assess.reload).not_to be_nil
     end
   end
 
@@ -172,7 +172,7 @@ describe RubricAssociation do
       rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
       rubric_association_params = HashWithIndifferentAccess.new({:association_object=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
       #8864: the below raised a MethodNotFound error by trying to call @account.submissions
-      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.should_not raise_error
+      expect { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.not_to raise_error
     end
   end
 

@@ -30,24 +30,24 @@ describe Assignment do
 
   it "should have a useful state machine" do
     assignment_model(course: @course)
-    @a.state.should eql(:published)
+    expect(@a.state).to eql(:published)
     @a.unpublish
-    @a.state.should eql(:unpublished)
+    expect(@a.state).to eql(:unpublished)
   end
 
   it "should always be associated with a group" do
     assignment_model(course: @course)
     @assignment.save!
-    @assignment.assignment_group.should_not be_nil
+    expect(@assignment.assignment_group).not_to be_nil
   end
 
   it "should be associated with a group when the course has no active groups" do
     @course.require_assignment_group
     @course.assignment_groups.first.destroy
-    @course.assignment_groups.size.should == 1
-    @course.assignment_groups.active.size.should == 0
+    expect(@course.assignment_groups.size).to eq 1
+    expect(@course.assignment_groups.active.size).to eq 0
     @assignment = assignment_model(:course => @course)
-    @assignment.assignment_group.should_not be_nil
+    expect(@assignment.assignment_group).not_to be_nil
   end
 
   it "should touch assignment group on create/save" do
@@ -57,17 +57,17 @@ describe Assignment do
     a = @course.assignments.build("title"=>"test")
     a.assignment_group = group
     a.save!
-    @course.assignments.count.should == 1
+    expect(@course.assignments.count).to eq 1
     group.reload
-    group.updated_at.to_i.should_not == orig_time
+    expect(group.updated_at.to_i).not_to eq orig_time
   end
 
   it "should be able to submit homework" do
     setup_assignment_with_homework
-    @assignment.submissions.size.should eql(1)
+    expect(@assignment.submissions.size).to eql(1)
     @submission = @assignment.submissions.first
-    @submission.user_id.should eql(@user.id)
-    @submission.versions.length.should eql(1)
+    expect(@submission.user_id).to eql(@user.id)
+    expect(@submission.versions.length).to eql(1)
   end
 
   describe "#has_student_submissions?" do
@@ -78,17 +78,17 @@ describe Assignment do
 
     it "does not allow itself to be unpublished if it has student submissions" do
       @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
-      @assignment.should_not be_can_unpublish
+      expect(@assignment).not_to be_can_unpublish
       @assignment.unpublish
-      @assignment.should_not be_valid
-      @assignment.errors['workflow_state'].should == ["Can't unpublish if there are student submissions"]
+      expect(@assignment).not_to be_valid
+      expect(@assignment.errors['workflow_state']).to eq ["Can't unpublish if there are student submissions"]
     end
 
     it "does allow itself to be unpublished if it has nil submissions" do
       @assignment.submit_homework @stu1, :submission_type => nil
-      @assignment.should be_can_unpublish
+      expect(@assignment).to be_can_unpublish
       @assignment.unpublish
-      @assignment.workflow_state.should == "unpublished"
+      expect(@assignment.workflow_state).to eq "unpublished"
     end
   end
 
@@ -102,30 +102,41 @@ describe Assignment do
       end
 
       it 'returns an array' do
-        @result.should be_is_a(Array)
+        expect(@result).to be_is_a(Array)
       end
 
       it 'now has a submission' do
-        @assignment.submissions.size.should eql(1)
+        expect(@assignment.submissions.size).to eql(1)
       end
 
       describe 'the submission after grading' do
         subject { @assignment.submissions.first }
 
-        its(:state) { should eql(:graded) }
-        it { should == @result[0] }
-        its(:score) { should == 10.0 }
-        its(:user_id) { should == @user.id }
-        specify { subject.versions.length.should == 1 }
+        describe '#state' do
+          subject { super().state }
+          it { is_expected.to eql(:graded) }
+        end
+        it { is_expected.to eq @result[0] }
+
+        describe '#score' do
+          subject { super().score }
+          it { is_expected.to eq 10.0 }
+        end
+
+        describe '#user_id' do
+          subject { super().user_id }
+          it { is_expected.to eq @user.id }
+        end
+        specify { expect(subject.versions.length).to eq 1 }
       end
     end
 
     it 'raises an error if there is no student' do
-      lambda { @assignment.grade_student(nil) }.should raise_error(StandardError, 'Student is required')
+      expect { @assignment.grade_student(nil) }.to raise_error(StandardError, 'Student is required')
     end
 
     it 'will not continue if the student does not belong here' do
-      lambda { @assignment.grade_student(User.new) }.should raise_error(StandardError, 'Student must be enrolled in the course as a student to be graded')
+      expect { @assignment.grade_student(User.new) }.to raise_error(StandardError, 'Student must be enrolled in the course as a student to be graded')
     end
   end
 
@@ -138,7 +149,7 @@ describe Assignment do
     Time.stubs(:now).returns(new_time)
     @assignment.grade_student(@user, :grade => 2)
     @submission.reload
-    @submission.graded_at.should_not eql original_graded_at
+    expect(@submission.graded_at).not_to eql original_graded_at
   end
 
   context "needs_grading_count" do
@@ -147,10 +158,10 @@ describe Assignment do
     end
 
     it "should update when submissions transition state" do
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
       @assignment.grade_student(@user, :grade => "0")
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
+      expect(@assignment.needs_grading_count).to eql(0)
     end
 
     it "should not update when non-student submissions transition state" do
@@ -159,23 +170,23 @@ describe Assignment do
       s.submission_type = 'online_quiz'
       s.workflow_state = 'submitted'
       s.save!
-      @assignment.needs_grading_count.should eql(0)
+      expect(@assignment.needs_grading_count).to eql(0)
       s.workflow_state = 'graded'
       s.save!
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
+      expect(@assignment.needs_grading_count).to eql(0)
     end
 
     it "should update when enrollment changes" do
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
       @course.enrollments.where(user_id: @user.id).first.destroy
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
+      expect(@assignment.needs_grading_count).to eql(0)
       e = @course.enroll_student(@user)
       e.invite
       e.accept
       @assignment.reload
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
 
       # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
       section2 = @course.course_sections.create!(:name => 's2')
@@ -189,48 +200,48 @@ describe Assignment do
                                   :enrollment_state => 'active',
                                   :section => section3,
                                   :allow_multiple_enrollments => true)
-      @user.enrollments.where(:workflow_state => 'active').count.should eql(3)
+      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(3)
       @assignment.reload
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
 
       # and as long as one enrollment is still active, the count should not change
       e2.destroy
       e3.complete
       @assignment.reload
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
 
       # ok, now gone for good
       e.destroy
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
-      @user.enrollments.where(:workflow_state => 'active').count.should eql(0)
+      expect(@assignment.needs_grading_count).to eql(0)
+      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(0)
 
       # enroll the user as a teacher, it should have no effect
       e4 = @course.enroll_teacher(@user)
       e4.accept
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
-      @user.enrollments.where(:workflow_state => 'active').count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(0)
+      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(1)
     end
 
     it "updated_at should be set when needs_grading_count changes due to a submission" do
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
       old_timestamp = Time.now.utc - 1.minute
       Assignment.where(:id => @assignment).update_all(:updated_at => old_timestamp)
       @assignment.grade_student(@user, :grade => "0")
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
-      @assignment.updated_at.should > old_timestamp
+      expect(@assignment.needs_grading_count).to eql(0)
+      expect(@assignment.updated_at).to be > old_timestamp
     end
 
     it "updated_at should be set when needs_grading_count changes due to an enrollment change" do
       old_timestamp = Time.now.utc - 1.minute
-      @assignment.needs_grading_count.should eql(1)
+      expect(@assignment.needs_grading_count).to eql(1)
       Assignment.where(:id => @assignment).update_all(:updated_at => old_timestamp)
       @course.enrollments.where(user_id: @user).first.destroy
       @assignment.reload
-      @assignment.needs_grading_count.should eql(0)
-      @assignment.updated_at.should > old_timestamp
+      expect(@assignment.needs_grading_count).to eql(0)
+      expect(@assignment.updated_at).to be > old_timestamp
     end
   end
 
@@ -245,20 +256,20 @@ describe Assignment do
         context "differentiated_assignment on" do
           before {@course.enable_feature!(:differentiated_assignments)}
           it "should return assignments only when a student has overrides" do
-            @assignment.students_with_visibility.include?(@student1).should be_true
-            @assignment.students_with_visibility.include?(@student2).should be_false
+            expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
+            expect(@assignment.students_with_visibility.include?(@student2)).to be_falsey
           end
 
           it "should not return students outside the class" do
-            @assignment.students_with_visibility.include?(@student3).should be_false
+            expect(@assignment.students_with_visibility.include?(@student3)).to be_falsey
           end
         end
 
         context "differentiated_assignment off" do
           before {@course.disable_feature!(:differentiated_assignments)}
           it "should return all published assignments" do
-            @assignment.students_with_visibility.include?(@student1).should be_true
-            @assignment.students_with_visibility.include?(@student2).should be_true
+            expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
+            expect(@assignment.students_with_visibility.include?(@student2)).to be_truthy
           end
         end
       end
@@ -271,8 +282,8 @@ describe Assignment do
         end
 
         it "should not allow students without visibility to submit" do
-          @assignment.check_policy(@student1).should include :submit
-          @assignment.check_policy(@student2).should_not include :submit
+          expect(@assignment.check_policy(@student1)).to include :submit
+          expect(@assignment.check_policy(@student2)).not_to include :submit
         end
       end
     end
@@ -288,25 +299,25 @@ describe Assignment do
       @assignment.points_possible = 0.0
       @assignment.save
       s = @assignment.grade_student(@user, :grade => 'pass')
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.should eql(s[0])
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('complete')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission).to eql(s[0])
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('complete')
+      expect(@submission.user_id).to eql(@user.id)
 
       @assignment.grade_student(@user, :grade => 'fail')
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.should eql(s[0])
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('incomplete')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission).to eql(s[0])
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('incomplete')
+      expect(@submission.user_id).to eql(@user.id)
     end
 
     it "should preserve letter grades with zero points possible" do
@@ -315,35 +326,35 @@ describe Assignment do
       @assignment.save!
 
       s = @assignment.grade_student(@user, :grade => 'C')
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('C')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('C')
+      expect(@submission.user_id).to eql(@user.id)
     end
 
     it "should properly calculate letter grades" do
       @assignment.grading_type = 'letter_grade'
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(8.7)
-      grade.should eql("B+")
+      expect(grade).to eql("B+")
     end
 
     it "should properly allow decimal points in grading" do
       @assignment.grading_type = 'letter_grade'
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(8.6999)
-      grade.should eql("B")
+      expect(grade).to eql("B")
     end
 
     it "should properly compute pass/fail for nil" do
       @assignment.grading_type = 'pass_fail'
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(nil)
-      grade.should eql("incomplete")
+      expect(grade).to eql("incomplete")
     end
 
     it "should preserve letter grades grades with nil points possible" do
@@ -352,14 +363,14 @@ describe Assignment do
       @assignment.save!
 
       s = @assignment.grade_student(@user, :grade => 'C')
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('C')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('C')
+      expect(@submission.user_id).to eql(@user.id)
     end
 
     it "should preserve gpa scale grades with nil points possible" do
@@ -384,14 +395,14 @@ describe Assignment do
       @assignment.save!
 
       s = @assignment.grade_student(@user, :grade => '3.0')
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('3.0')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('3.0')
+      expect(@submission.user_id).to eql(@user.id)
     end
 
     it "should preserve gpa scale grades with zero points possible" do
@@ -416,14 +427,14 @@ describe Assignment do
       @assignment.save!
 
       s = @assignment.grade_student(@user, :grade => '3.0')
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.score.should eql(0.0)
-      @submission.grade.should eql('3.0')
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission.score).to eql(0.0)
+      expect(@submission.grade).to eql('3.0')
+      expect(@submission.user_id).to eql(@user.id)
     end
 
     it "should give a grade to extra credit assignments" do
@@ -431,30 +442,30 @@ describe Assignment do
       @assignment.points_possible = 0.0
       @assignment.save
       s = @assignment.grade_student(@user, :grade => "1")
-      s.should be_is_a(Array)
+      expect(s).to be_is_a(Array)
       @assignment.reload
-      @assignment.submissions.size.should eql(1)
+      expect(@assignment.submissions.size).to eql(1)
       @submission = @assignment.submissions.first
-      @submission.state.should eql(:graded)
-      @submission.should eql(s[0])
-      @submission.score.should eql(1.0)
-      @submission.grade.should eql("1")
-      @submission.user_id.should eql(@user.id)
+      expect(@submission.state).to eql(:graded)
+      expect(@submission).to eql(s[0])
+      expect(@submission.score).to eql(1.0)
+      expect(@submission.grade).to eql("1")
+      expect(@submission.user_id).to eql(@user.id)
 
       @submission.score = 2.0
       @submission.save
       @submission.reload
-      @submission.grade.should eql("2")
+      expect(@submission.grade).to eql("2")
     end
 
     it "should be able to grade an already-existing submission" do
       s = @a.submit_homework(@user)
       s2 = @a.grade_student(@user, :grade => "10")
       s.reload
-      s.should eql(s2[0])
+      expect(s).to eql(s2[0])
       # there should only be one version, even though the grade changed
-      s.versions.length.should eql(1)
-      s2[0].state.should eql(:graded)
+      expect(s.versions.length).to eql(1)
+      expect(s2[0].state).to eql(:graded)
     end
   end
 
@@ -465,17 +476,17 @@ describe Assignment do
 
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       @assignment.points_possible = 100
-      @assignment.interpret_grade("").should be_nil
+      expect(@assignment.interpret_grade("")).to be_nil
     end
 
     it "should allow grading an assignment with nil points_possible" do
       @assignment.points_possible = nil
-      @assignment.interpret_grade("100%").should == 0
+      expect(@assignment.interpret_grade("100%")).to eq 0
     end
 
     it "should not round scores" do
       @assignment.points_possible = 15
-      @assignment.interpret_grade("88.75%").should == 13.3125
+      expect(@assignment.interpret_grade("88.75%")).to eq 13.3125
     end
   end
 
@@ -493,32 +504,32 @@ describe Assignment do
       @a.submit_homework(@user)
       @a.submit_homework(@user)
       @a.reload
-      @a.submissions.first.versions.length.should eql(3)
+      expect(@a.submissions.first.versions.length).to eql(3)
     end
 
     it "doesn't mark as submitted if no submission" do
       s = @a.submit_homework(@user)
-      s.workflow_state.should == "unsubmitted"
+      expect(s.workflow_state).to eq "unsubmitted"
     end
 
     it "clears out stale submission information" do
       s = @a.submit_homework(@user, submission_type: "online_url",
                              url: "http://example.com")
-      s.submission_type.should == "online_url"
-      s.url.should == "http://example.com"
+      expect(s.submission_type).to eq "online_url"
+      expect(s.url).to eq "http://example.com"
 
       s2 = @a.submit_homework(@user, submission_type: "online_text_entry",
                               body: "blah blah blah blah blah blah blah")
-      s2.submission_type.should == "online_text_entry"
-      s2.body.should == "blah blah blah blah blah blah blah"
-      s2.url.should be_nil
-      s2.workflow_state.should == "submitted"
+      expect(s2.submission_type).to eq "online_text_entry"
+      expect(s2.body).to eq "blah blah blah blah blah blah blah"
+      expect(s2.url).to be_nil
+      expect(s2.workflow_state).to eq "submitted"
 
       # comments shouldn't clear out submission data
       s3 = @a.submit_homework(@user, comment: "BLAH BLAH")
-      s3.body.should == "blah blah blah blah blah blah blah"
-      s3.submission_comments.first.comment.should == "BLAH BLAH"
-      s3.submission_type.should == "online_text_entry"
+      expect(s3.body).to eq "blah blah blah blah blah blah blah"
+      expect(s3.submission_comments.first.comment).to eq "BLAH BLAH"
+      expect(s3.submission_type).to eq "online_text_entry"
     end
   end
 
@@ -528,20 +539,20 @@ describe Assignment do
     end
 
     it "should default to unmuted" do
-      @assignment.muted?.should eql false
+      expect(@assignment.muted?).to eql false
     end
 
     it "should be mutable" do
-      @assignment.respond_to?(:mute!).should eql true
+      expect(@assignment.respond_to?(:mute!)).to eql true
       @assignment.mute!
-      @assignment.muted?.should eql true
+      expect(@assignment.muted?).to eql true
     end
 
     it "should be unmutable" do
-      @assignment.respond_to?(:unmute!).should eql true
+      expect(@assignment.respond_to?(:unmute!)).to eql true
       @assignment.mute!
       @assignment.unmute!
-      @assignment.muted?.should eql false
+      expect(@assignment.muted?).to eql false
     end
   end
 
@@ -551,22 +562,22 @@ describe Assignment do
                       :lock_at => "Sep 3 2008 12:00am",
                       :unlock_at => "Sep 3 2008 12:00am",
                       :course => @course)
-      @assignment.all_day.should eql(false)
+      expect(@assignment.all_day).to eql(false)
       @assignment.infer_times
       @assignment.save!
-      @assignment.all_day.should eql(true)
-      @assignment.due_at.strftime("%H:%M").should eql("23:59")
-      @assignment.lock_at.strftime("%H:%M").should eql("23:59")
-      @assignment.unlock_at.strftime("%H:%M").should eql("00:00")
-      @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
+      expect(@assignment.all_day).to eql(true)
+      expect(@assignment.due_at.strftime("%H:%M")).to eql("23:59")
+      expect(@assignment.lock_at.strftime("%H:%M")).to eql("23:59")
+      expect(@assignment.unlock_at.strftime("%H:%M")).to eql("00:00")
+      expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
     end
 
     it "should not set to all_day without infer_times call" do
       assignment_model(:due_at => "Sep 3 2008 12:00am",
                        :course => @course)
-      @assignment.all_day.should eql(false)
-      @assignment.due_at.strftime("%H:%M").should eql("00:00")
-      @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
+      expect(@assignment.all_day).to eql(false)
+      expect(@assignment.due_at.strftime("%H:%M")).to eql("00:00")
+      expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
     end
   end
 
@@ -587,7 +598,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska')
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == true
+      expect(@assignment.all_day).to eq true
     end
 
     it "should interpret 11:59pm as all day with same-tz all-day prior value" do
@@ -596,7 +607,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska')
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == true
+      expect(@assignment.all_day).to eq true
     end
 
     it "should interpret 11:59pm as all day with other-tz all-day prior value" do
@@ -605,7 +616,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska')
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == true
+      expect(@assignment.all_day).to eq true
     end
 
     it "should interpret 11:59pm as all day with non-all-day prior value" do
@@ -614,14 +625,14 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska')
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == true
+      expect(@assignment.all_day).to eq true
     end
 
     it "should not interpret non-11:59pm as all day no prior value" do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
       @assignment.time_zone_edited = 'Baghdad'
       @assignment.save!
-      @assignment.all_day.should == false
+      expect(@assignment.all_day).to eq false
     end
 
     it "should not interpret non-11:59pm as all day with same-tz all-day prior value" do
@@ -630,7 +641,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == false
+      expect(@assignment.all_day).to eq false
     end
 
     it "should not interpret non-11:59pm as all day with other-tz all-day prior value" do
@@ -639,7 +650,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == false
+      expect(@assignment.all_day).to eq false
     end
 
     it "should not interpret non-11:59pm as all day with non-all-day prior value" do
@@ -648,7 +659,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == false
+      expect(@assignment.all_day).to eq false
     end
 
     it "should preserve all-day when only changing time zone" do
@@ -658,7 +669,7 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
       @assignment.time_zone_edited = 'Baghdad'
       @assignment.save!
-      @assignment.all_day.should == true
+      expect(@assignment.all_day).to eq true
     end
 
     it "should preserve non-all-day when only changing time zone" do
@@ -667,19 +678,19 @@ describe Assignment do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska')
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day.should == false
+      expect(@assignment.all_day).to eq false
     end
 
     it "should determine date from due_at's timezone" do
       @assignment.due_at = Date.today.in_time_zone('Baghdad') + 1.hour # 01:00:00 AST +03:00 today
       @assignment.time_zone_edited = 'Baghdad'
       @assignment.save!
-      @assignment.all_day_date.should == Date.today
+      expect(@assignment.all_day_date).to eq Date.today
 
       @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') - 2.hours # 12:00:00 AKDT -08:00 previous day
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day_date.should == Date.today - 1.day
+      expect(@assignment.all_day_date).to eq Date.today - 1.day
     end
 
     it "should preserve all-day date when only changing time zone" do
@@ -689,7 +700,7 @@ describe Assignment do
       @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') # 13:00:00 AKDT -08:00 previous day
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
-      @assignment.all_day_date.should == Date.today
+      expect(@assignment.all_day_date).to eq Date.today
     end
 
     it "should preserve non-all-day date when only changing time zone" do
@@ -698,7 +709,7 @@ describe Assignment do
       @assignment.due_at = @assignment.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
       @assignment.time_zone_edited = 'Baghdad'
       @assignment.save!
-      @assignment.all_day_date.should == Date.today - 1.day
+      expect(@assignment.all_day_date).to eq Date.today - 1.day
     end
   end
 
@@ -712,7 +723,7 @@ describe Assignment do
       override.set = @assignment.group_category.groups.create!(context: @assignment.context)
       override.save!
 
-      override.workflow_state.should == 'active'
+      expect(override.workflow_state).to eq 'active'
       override
     end
 
@@ -722,9 +733,9 @@ describe Assignment do
     overrides.each do |override|
       override.reload
 
-      override.workflow_state.should == 'deleted'
-      override.versions.size.should == 2
-      override.assignment_version.should == @assignment.version_number
+      expect(override.workflow_state).to eq 'deleted'
+      expect(override.versions.size).to eq 2
+      expect(override.assignment_version).to eq @assignment.version_number
     end
   end
 
@@ -744,12 +755,12 @@ describe Assignment do
       @assignment.stubs(:submissions).returns(mock_submissions)
 
       sub = nil
-      lambda {
+      expect {
         sub = yield(@assignment, @user)
-      }.should_not raise_error
+      }.not_to raise_error
 
-      sub.should_not be_new_record
-      sub.should eql real_sub
+      expect(sub).not_to be_new_record
+      expect(sub).to eql real_sub
     end
 
     it "should handle them gracefully in find_or_create_submission" do
@@ -782,10 +793,10 @@ describe Assignment do
       it "should assign peer reviews" do
         @a.peer_review_count = 1
         res = @a.assign_peer_reviews
-        res.length.should eql(@submissions.length)
+        expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          res.map{|a| a.asset}.should be_include(s)
-          res.map{|a| a.assessor_asset}.should be_include(s)
+          expect(res.map{|a| a.asset}).to be_include(s)
+          expect(res.map{|a| a.assessor_asset}).to be_include(s)
         end
       end
 
@@ -795,10 +806,10 @@ describe Assignment do
         end
         @a.peer_review_count = 1
         res = @a.assign_peer_reviews
-        res.length.should eql(@submissions.length)
+        expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          res.map{|a| a.asset}.should be_include(s)
-          res.map{|a| a.assessor_asset}.should be_include(s)
+          expect(res.map{|a| a.asset}).to be_include(s)
+          expect(res.map{|a| a.assessor_asset}).to be_include(s)
         end
       end
     end
@@ -821,18 +832,18 @@ describe Assignment do
       @a.save!
 
       @a.assign_peer_reviews
-      @a.peer_reviews_assigned.should be_true
+      expect(@a.peer_reviews_assigned).to be_truthy
 
       @a.peer_reviews_assign_at = 1.day.from_now
       @a.save!
 
-      @a.peer_reviews_assigned.should be_false
+      expect(@a.peer_reviews_assigned).to be_falsey
     end
 
     it "should allow setting peer_reviews_assign_at" do
       now = Time.now
       @assignment.peer_reviews_assign_at = now
-      @assignment.peer_reviews_assign_at.should == now
+      expect(@assignment.peer_reviews_assign_at).to eq now
     end
 
     it "should assign multiple peer reviews" do
@@ -844,15 +855,15 @@ describe Assignment do
       end
       @a.peer_review_count = 2
       res = @a.assign_peer_reviews
-      res.length.should eql(@submissions.length * 2)
+      expect(res.length).to eql(@submissions.length * 2)
       @submissions.each do |s|
         assets = res.select{|a| a.asset == s}
-        assets.length.should be > 0 #eql(2)
-        assets.map{|a| a.assessor_id}.uniq.length.should eql(assets.length)
+        expect(assets.length).to be > 0 #eql(2)
+        expect(assets.map{|a| a.assessor_id}.uniq.length).to eql(assets.length)
 
         assessors = res.select{|a| a.assessor_asset == s}
-        assessors.length.should eql(2)
-        assessors[0].asset_id.should_not eql(assessors[1].asset_id)
+        expect(assessors.length).to eql(2)
+        expect(assessors[0].asset_id).not_to eql(assessors[1].asset_id)
       end
     end
 
@@ -865,13 +876,13 @@ describe Assignment do
       end
       @a.peer_review_count = 2
       res = @a.assign_peer_reviews
-      res.length.should eql(@submissions.length * 2)
+      expect(res.length).to eql(@submissions.length * 2)
       user = create_users_in_course(@course, [{name: "new user"}], return_type: :record).first
       @a.reload
       s = @a.submit_homework(user, :submission_type => "online_url", :url => "http://www.google.com")
       res = @a.assign_peer_reviews
-      res.length.should >= 2
-      res.any?{|a| a.assessor_asset == s}.should eql(true)
+      expect(res.length).to be >= 2
+      expect(res.any?{|a| a.assessor_asset == s}).to eql(true)
     end
 
     it "should assign late peer reviews to each other if there is more than one" do
@@ -883,7 +894,7 @@ describe Assignment do
       end
       @a.peer_review_count = 2
       res = @a.assign_peer_reviews
-      res.length.should eql(@submissions.length * 2)
+      expect(res.length).to eql(@submissions.length * 2)
 
       @late_submissions = []
       users = create_users_in_course(@course, 3.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
@@ -891,7 +902,7 @@ describe Assignment do
         @late_submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
       res = @a.assign_peer_reviews
-      res.length.should >= 6
+      expect(res.length).to be >= 6
       ids = @late_submissions.map{|s| s.user_id}
     end
 
@@ -909,10 +920,10 @@ describe Assignment do
         it "should assign peer reviews only to students with visibility" do
           @assignment.peer_review_count = 1
           res = @assignment.assign_peer_reviews
-          res.length.should eql(0)
+          expect(res.length).to eql(0)
           @submissions.each do |s|
-            res.map{|a| a.asset}.should_not be_include(s)
-            res.map{|a| a.assessor_asset}.should_not be_include(s)
+            expect(res.map{|a| a.asset}).not_to be_include(s)
+            expect(res.map{|a| a.assessor_asset}).not_to be_include(s)
           end
 
           # once graded the student will have visibility
@@ -920,10 +931,10 @@ describe Assignment do
           @assignment.grade_student(@student2, :grader => @teacher, :grade => '100')
 
           res = @assignment.assign_peer_reviews
-          res.length.should eql(@submissions.length)
+          expect(res.length).to eql(@submissions.length)
           @submissions.each do |s|
-            res.map{|a| a.asset}.should be_include(s)
-            res.map{|a| a.assessor_asset}.should be_include(s)
+            expect(res.map{|a| a.asset}).to be_include(s)
+            expect(res.map{|a| a.assessor_asset}).to be_include(s)
           end
         end
 
@@ -934,10 +945,10 @@ describe Assignment do
         it "should assign peer reviews to any student with a submission" do
           @assignment.peer_review_count = 1
           res = @assignment.assign_peer_reviews
-          res.length.should eql(@submissions.length)
+          expect(res.length).to eql(@submissions.length)
           @submissions.each do |s|
-            res.map{|a| a.asset}.should be_include(s)
-            res.map{|a| a.assessor_asset}.should be_include(s)
+            expect(res.map{|a| a.asset}).to be_include(s)
+            expect(res.map{|a| a.assessor_asset}).to be_include(s)
           end
         end
       end
@@ -958,23 +969,23 @@ describe Assignment do
         @enrollment = @student.enrollments.first
         @assignment.reload
         @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
-        @sub.grade.should eql('C')
-        @sub.score.should eql(15.2)
-        @enrollment.reload.computed_current_score.should == 76
+        expect(@sub.grade).to eql('C')
+        expect(@sub.score).to eql(15.2)
+        expect(@enrollment.reload.computed_current_score).to eq 76
 
         @assignment.points_possible = 30
         @assignment.save!
         @sub.reload
-        @sub.score.should eql(15.2)
-        @sub.grade.should eql('F')
-        @enrollment.reload.computed_current_score.should == 50.7
+        expect(@sub.score).to eql(15.2)
+        expect(@sub.grade).to eql('F')
+        expect(@enrollment.reload.computed_current_score).to eq 50.7
       end
 
       it "should accept lowercase letter grades" do
         @assignment.reload
         @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'c').first
-        @sub.grade.should eql('C')
-        @sub.score.should eql(15.2)
+        expect(@sub.grade).to eql('C')
+        expect(@sub.score).to eql(15.2)
       end
     end
 
@@ -1003,23 +1014,23 @@ describe Assignment do
         @enrollment = @student.enrollments.first
         @assignment.reload
         @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => '2.0').first
-        @sub.grade.should eql('2.0')
-        @sub.score.should eql(15.2)
-        @enrollment.reload.computed_current_score.should == 76
+        expect(@sub.grade).to eql('2.0')
+        expect(@sub.score).to eql(15.2)
+        expect(@enrollment.reload.computed_current_score).to eq 76
 
         @assignment.points_possible = 30
         @assignment.save!
         @sub.reload
-        @sub.score.should eql(15.2)
-        @sub.grade.should eql('0')
-        @enrollment.reload.computed_current_score.should == 50.7
+        expect(@sub.score).to eql(15.2)
+        expect(@sub.grade).to eql('0')
+        expect(@enrollment.reload.computed_current_score).to eq 50.7
       end
 
       it "should accept lowercase gpa grades" do
         @assignment.reload
         @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'm').first
-        @sub.grade.should eql('M')
-        @sub.score.should eql(0.0)
+        expect(@sub.grade).to eql('M')
+        expect(@sub.score).to eql(0.0)
       end
     end
   end
@@ -1030,47 +1041,47 @@ describe Assignment do
     end
 
     it "should include permissions if specified" do
-      @assignment.to_json.should_not match(/permissions/)
-      @assignment.to_json(:permissions => {:user => nil}).should match(/\"permissions\"\s*:\s*\{/)
-      @assignment.grants_right?(@teacher, :create).should eql(true)
-      @assignment.to_json(:permissions => {:user => @teacher, :session => nil}).should match(/\"permissions\"\s*:\s*\{\"/)
+      expect(@assignment.to_json).not_to match(/permissions/)
+      expect(@assignment.to_json(:permissions => {:user => nil})).to match(/\"permissions\"\s*:\s*\{/)
+      expect(@assignment.grants_right?(@teacher, :create)).to eql(true)
+      expect(@assignment.to_json(:permissions => {:user => @teacher, :session => nil})).to match(/\"permissions\"\s*:\s*\{\"/)
       hash = @assignment.as_json(:permissions => {:user => @teacher, :session => nil})
-      hash["assignment"].should_not be_nil
-      hash["assignment"]["permissions"].should_not be_nil
-      hash["assignment"]["permissions"].should_not be_empty
-      hash["assignment"]["permissions"]["read"].should eql(true)
+      expect(hash["assignment"]).not_to be_nil
+      expect(hash["assignment"]["permissions"]).not_to be_nil
+      expect(hash["assignment"]["permissions"]).not_to be_empty
+      expect(hash["assignment"]["permissions"]["read"]).to eql(true)
     end
 
     it "should serialize with roots included in nested elements" do
       @course.assignments.create!(:title => "some assignment")
       hash = @course.as_json(:include => :assignments)
-      hash["course"].should_not be_nil
-      hash["course"]["assignments"].should_not be_empty
-      hash["course"]["assignments"][0].should_not be_nil
-      hash["course"]["assignments"][0]["assignment"].should_not be_nil
+      expect(hash["course"]).not_to be_nil
+      expect(hash["course"]["assignments"]).not_to be_empty
+      expect(hash["course"]["assignments"][0]).not_to be_nil
+      expect(hash["course"]["assignments"][0]["assignment"]).not_to be_nil
     end
 
     it "should serialize with permissions" do
       hash = @course.as_json(:permissions => {:user => @teacher, :session => nil} )
-      hash["course"].should_not be_nil
-      hash["course"]["permissions"].should_not be_nil
-      hash["course"]["permissions"].should_not be_empty
-      hash["course"]["permissions"]["read"].should eql(true)
+      expect(hash["course"]).not_to be_nil
+      expect(hash["course"]["permissions"]).not_to be_nil
+      expect(hash["course"]["permissions"]).not_to be_empty
+      expect(hash["course"]["permissions"]["read"]).to eql(true)
     end
 
     it "should exclude root" do
       hash = @course.as_json(:include_root => false, :permissions => {:user => @teacher, :session => nil} )
-      hash["course"].should be_nil
-      hash["name"].should eql(@course.name)
-      hash["permissions"].should_not be_nil
-      hash["permissions"].should_not be_empty
-      hash["permissions"]["read"].should eql(true)
+      expect(hash["course"]).to be_nil
+      expect(hash["name"]).to eql(@course.name)
+      expect(hash["permissions"]).not_to be_nil
+      expect(hash["permissions"]).not_to be_empty
+      expect(hash["permissions"]["read"]).to eql(true)
     end
 
     it "should include group_category" do
       assignment_model(:group_category => "Something", :course => @course)
       hash = @assignment.as_json
-      hash["assignment"]["group_category"].should == "Something"
+      expect(hash["assignment"]["group_category"]).to eq "Something"
     end
   end
 
@@ -1078,14 +1089,14 @@ describe Assignment do
     it ".to_ics should not fail for null due dates" do
       assignment_model(:due_at => "", :course => @course)
       res = @assignment.to_ics
-      res.should_not be_nil
-      res.match(/DTSTART/).should be_nil
+      expect(res).not_to be_nil
+      expect(res.match(/DTSTART/)).to be_nil
     end
 
     it ".to_ics should not return data for null due dates" do
       assignment_model(:due_at => "", :course => @course)
       res = @assignment.to_ics(false)
-      res.should be_nil
+      expect(res).to be_nil
     end
 
     it ".to_ics should return string data for assignments with due dates" do
@@ -1094,10 +1105,10 @@ describe Assignment do
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
-      res.should_not be_nil
-      res.match(/DTEND:20080903T115500Z/).should_not be_nil
-      res.match(/DTSTART:20080903T115500Z/).should_not be_nil
-      res.match(/DTSTAMP:20080903T120500Z/).should_not be_nil
+      expect(res).not_to be_nil
+      expect(res.match(/DTEND:20080903T115500Z/)).not_to be_nil
+      expect(res.match(/DTSTART:20080903T115500Z/)).not_to be_nil
+      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
     end
 
     it ".to_ics should return string data for assignments with due dates in correct tz" do
@@ -1106,10 +1117,10 @@ describe Assignment do
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics
-      res.should_not be_nil
-      res.match(/DTEND:20080903T195500Z/).should_not be_nil
-      res.match(/DTSTART:20080903T195500Z/).should_not be_nil
-      res.match(/DTSTAMP:20080903T200500Z/).should_not be_nil
+      expect(res).not_to be_nil
+      expect(res.match(/DTEND:20080903T195500Z/)).not_to be_nil
+      expect(res.match(/DTSTART:20080903T195500Z/)).not_to be_nil
+      expect(res.match(/DTSTAMP:20080903T200500Z/)).not_to be_nil
     end
 
     it ".to_ics should return data for assignments with due dates" do
@@ -1118,13 +1129,13 @@ describe Assignment do
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics(false)
-      res.should_not be_nil
-      res.start.icalendar_tzid.should == 'UTC'
-      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.end.icalendar_tzid.should == 'UTC'
-      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.dtstamp.icalendar_tzid.should == 'UTC'
-      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res).not_to be_nil
+      expect(res.start.icalendar_tzid).to eq 'UTC'
+      expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.end.icalendar_tzid).to eq 'UTC'
+      expect(res.end.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtstamp.icalendar_tzid).to eq 'UTC'
+      expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
 
     it ".to_ics should return data for assignments with due dates in correct tz" do
@@ -1133,22 +1144,22 @@ describe Assignment do
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics(false)
-      res.should_not be_nil
-      res.start.icalendar_tzid.should == 'UTC'
-      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.end.icalendar_tzid.should == 'UTC'
-      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.dtstamp.icalendar_tzid.should == 'UTC'
-      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res).not_to be_nil
+      expect(res.start.icalendar_tzid).to eq 'UTC'
+      expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.end.icalendar_tzid).to eq 'UTC'
+      expect(res.end.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtstamp.icalendar_tzid).to eq 'UTC'
+      expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
 
     it ".to_ics should return string dates for all_day events" do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:59pm", :course => @course)
-      @assignment.all_day.should eql(true)
+      expect(@assignment.all_day).to eql(true)
       res = @assignment.to_ics
-      res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil
-      res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
+      expect(res.match(/DTSTART;VALUE=DATE:20080903/)).not_to be_nil
+      expect(res.match(/DTEND;VALUE=DATE:20080903/)).not_to be_nil
     end
 
     it ".to_ics should return a plain-text description and alt html description" do
@@ -1159,28 +1170,26 @@ describe Assignment do
       </div>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
       ev = @assignment.to_ics(false)
-      pending("assignment description disabled") do
-        ev.description.should == "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
-        ev.x_alt_desc.should == html.strip
-      end
+      pending("assignment description disabled")
+      expect(ev.description).to eq "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
+      expect(ev.x_alt_desc).to eq html.strip
     end
 
     it ".to_ics should run the description through api_user_content to translate links" do
       html = %{<a href="/calendar">Click!</a>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
       ev = @assignment.to_ics(false)
-      pending("assignment description disabled") do
-        ev.description.should == "[Click!](http://localhost/calendar)"
-        ev.x_alt_desc.should == %{<a href="http://localhost/calendar">Click!</a>}
-      end
+      pending("assignment description disabled")
+      expect(ev.description).to eq "[Click!](http://localhost/calendar)"
+      expect(ev.x_alt_desc).to eq %{<a href="http://localhost/calendar">Click!</a>}
     end
 
     it ".to_ics should populate uid and summary fields" do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title", :course => @course)
       ev = @a.to_ics(false)
-      ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
+      expect(ev.uid).to eq "event-assignment-#{@a.id}"
+      expect(ev.summary).to eq "#{@a.title} [#{@a.context.course_code}]"
       # TODO: ev.url.should == ?
     end
 
@@ -1194,8 +1203,8 @@ describe Assignment do
 
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
-      ev.uid.should == "event-assignment-override-#{@override.id}"
-      ev.summary.should == "#{@a.title} (#{@override.title}) [#{assignment.context.course_code}]"
+      expect(ev.uid).to eq "event-assignment-override-#{@override.id}"
+      expect(ev.summary).to eq "#{@a.title} (#{@override.title}) [#{assignment.context.course_code}]"
       #TODO: ev.url.should == ?
     end
 
@@ -1209,8 +1218,8 @@ describe Assignment do
 
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
-      ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
+      expect(ev.uid).to eq "event-assignment-#{@a.id}"
+      expect(ev.summary).to eq "#{@a.title} [#{@a.context.course_code}]"
     end
 
   end
@@ -1223,91 +1232,91 @@ describe Assignment do
 
     it "should create a quiz if none exists and specified" do
       @a.reload
-      @a.submission_types.should eql('online_quiz')
-      @a.quiz.should_not be_nil
-      @a.quiz.assignment_id.should eql(@a.id)
+      expect(@a.submission_types).to eql('online_quiz')
+      expect(@a.quiz).not_to be_nil
+      expect(@a.quiz.assignment_id).to eql(@a.id)
       @a.due_at = Time.now
       @a.save
       @a.reload
-      @a.quiz.should_not be_nil
-      @a.quiz.assignment_id.should eql(@a.id)
+      expect(@a.quiz).not_to be_nil
+      expect(@a.quiz.assignment_id).to eql(@a.id)
     end
 
     it "should delete a quiz if no longer specified" do
       @a.reload
-      @a.submission_types.should eql('online_quiz')
-      @a.quiz.should_not be_nil
-      @a.quiz.assignment_id.should eql(@a.id)
+      expect(@a.submission_types).to eql('online_quiz')
+      expect(@a.quiz).not_to be_nil
+      expect(@a.quiz.assignment_id).to eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
       @a.reload
-      @a.quiz.should be_nil
+      expect(@a.quiz).to be_nil
     end
 
     it "should not delete the assignment when unlinked from a quiz" do
       @a.reload
-      @a.submission_types.should eql('online_quiz')
+      expect(@a.submission_types).to eql('online_quiz')
       @quiz = @a.quiz
       @quiz.unpublish!
-      @quiz.should_not be_nil
-      @quiz.state.should eql(:unpublished)
-      @quiz.assignment_id.should eql(@a.id)
+      expect(@quiz).not_to be_nil
+      expect(@quiz.state).to eql(:unpublished)
+      expect(@quiz.assignment_id).to eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
       @quiz = Quizzes::Quiz.find(@quiz.id)
-      @quiz.assignment_id.should eql(nil)
-      @quiz.state.should eql(:deleted)
+      expect(@quiz.assignment_id).to eql(nil)
+      expect(@quiz.state).to eql(:deleted)
       @a.reload
-      @a.quiz.should be_nil
-      @a.state.should eql(:unpublished)
+      expect(@a.quiz).to be_nil
+      expect(@a.state).to eql(:unpublished)
     end
 
     it "should not delete the quiz if non-empty when unlinked" do
       @a.reload
-      @a.submission_types.should eql('online_quiz')
+      expect(@a.submission_types).to eql('online_quiz')
       @quiz = @a.quiz
-      @quiz.should_not be_nil
-      @quiz.assignment_id.should eql(@a.id)
+      expect(@quiz).not_to be_nil
+      expect(@quiz.assignment_id).to eql(@a.id)
       @quiz.quiz_questions.create!()
       @quiz.generate_quiz_data
       @quiz.save!
       @a.quiz.reload
-      @quiz.root_entries.should_not be_empty
+      expect(@quiz.root_entries).not_to be_empty
       @a.submission_types = 'on_paper'
       @a.save!
       @a.reload
-      @a.quiz.should be_nil
-      @a.state.should eql(:published)
+      expect(@a.quiz).to be_nil
+      expect(@a.state).to eql(:published)
       @quiz = Quizzes::Quiz.find(@quiz.id)
-      @quiz.assignment_id.should eql(nil)
-      @quiz.state.should eql(:available)
+      expect(@quiz.assignment_id).to eql(nil)
+      expect(@quiz.state).to eql(:available)
     end
 
     it "should grab the original quiz if unlinked and relinked" do
       @a.reload
-      @a.submission_types.should eql('online_quiz')
+      expect(@a.submission_types).to eql('online_quiz')
       @quiz = @a.quiz
-      @quiz.should_not be_nil
-      @quiz.assignment_id.should eql(@a.id)
+      expect(@quiz).not_to be_nil
+      expect(@quiz.assignment_id).to eql(@a.id)
       @a.quiz.reload
       @a.submission_types = 'on_paper'
       @a.save!
       @a.submission_types = 'online_quiz'
       @a.save!
       @a.reload
-      @a.quiz.should eql(@quiz)
-      @a.state.should eql(:published)
+      expect(@a.quiz).to eql(@quiz)
+      expect(@a.state).to eql(:published)
       @quiz.reload
-      @quiz.state.should eql(:available)
+      expect(@quiz.state).to eql(:available)
     end
 
     it "updates the draft state of its associated quiz" do
       @a.reload
       @a.publish
       @a.save!
-      @a.quiz.reload.should be_published
+      expect(@a.quiz.reload).to be_published
       @a.unpublish
-      @a.quiz.reload.should_not be_published
+      expect(@a.quiz.reload).not_to be_published
     end
   end
 
@@ -1317,66 +1326,66 @@ describe Assignment do
     end
 
     it "should create a discussion_topic if none exists and specified" do
-      @a.submission_types.should eql('discussion_topic')
-      @a.discussion_topic.should_not be_nil
-      @a.discussion_topic.assignment_id.should eql(@a.id)
-      @a.discussion_topic.user_id.should eql(@teacher.id)
+      expect(@a.submission_types).to eql('discussion_topic')
+      expect(@a.discussion_topic).not_to be_nil
+      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
+      expect(@a.discussion_topic.user_id).to eql(@teacher.id)
       @a.due_at = Time.now
       @a.save
       @a.reload
-      @a.discussion_topic.should_not be_nil
-      @a.discussion_topic.assignment_id.should eql(@a.id)
-      @a.discussion_topic.user_id.should eql(@teacher.id)
+      expect(@a.discussion_topic).not_to be_nil
+      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
+      expect(@a.discussion_topic.user_id).to eql(@teacher.id)
     end
 
     it "should delete a discussion_topic if no longer specified" do
-      @a.submission_types.should eql('discussion_topic')
-      @a.discussion_topic.should_not be_nil
-      @a.discussion_topic.assignment_id.should eql(@a.id)
+      expect(@a.submission_types).to eql('discussion_topic')
+      expect(@a.discussion_topic).not_to be_nil
+      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
       @a.reload
-      @a.discussion_topic.should be_nil
+      expect(@a.discussion_topic).to be_nil
     end
 
     it "should not delete the assignment when unlinked from a topic" do
-      @a.submission_types.should eql('discussion_topic')
+      expect(@a.submission_types).to eql('discussion_topic')
       @topic = @a.discussion_topic
-      @topic.should_not be_nil
-      @topic.state.should eql(:active)
-      @topic.assignment_id.should eql(@a.id)
+      expect(@topic).not_to be_nil
+      expect(@topic.state).to eql(:active)
+      expect(@topic.assignment_id).to eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
       @topic = DiscussionTopic.find(@topic.id)
-      @topic.assignment_id.should eql(nil)
-      @topic.state.should eql(:deleted)
+      expect(@topic.assignment_id).to eql(nil)
+      expect(@topic.state).to eql(:deleted)
       @a.reload
-      @a.discussion_topic.should be_nil
-      @a.state.should eql(:published)
+      expect(@a.discussion_topic).to be_nil
+      expect(@a.state).to eql(:published)
     end
 
     it "should not delete the topic if non-empty when unlinked" do
-      @a.submission_types.should eql('discussion_topic')
+      expect(@a.submission_types).to eql('discussion_topic')
       @topic = @a.discussion_topic
-      @topic.should_not be_nil
-      @topic.assignment_id.should eql(@a.id)
+      expect(@topic).not_to be_nil
+      expect(@topic.assignment_id).to eql(@a.id)
       @topic.discussion_entries.create!(:user => @user, :message => "testing")
       @a.discussion_topic.reload
       @a.submission_types = 'on_paper'
       @a.save!
       @a.reload
-      @a.discussion_topic.should be_nil
-      @a.state.should eql(:published)
+      expect(@a.discussion_topic).to be_nil
+      expect(@a.state).to eql(:published)
       @topic = DiscussionTopic.find(@topic.id)
-      @topic.assignment_id.should eql(nil)
-      @topic.state.should eql(:active)
+      expect(@topic.assignment_id).to eql(nil)
+      expect(@topic.state).to eql(:active)
     end
 
     it "should grab the original topic if unlinked and relinked" do
-      @a.submission_types.should eql('discussion_topic')
+      expect(@a.submission_types).to eql('discussion_topic')
       @topic = @a.discussion_topic
-      @topic.should_not be_nil
-      @topic.assignment_id.should eql(@a.id)
+      expect(@topic).not_to be_nil
+      expect(@topic.assignment_id).to eql(@a.id)
       @topic.discussion_entries.create!(:user => @user, :message => "testing")
       @a.discussion_topic.reload
       @a.submission_types = 'on_paper'
@@ -1384,10 +1393,10 @@ describe Assignment do
       @a.submission_types = 'discussion_topic'
       @a.save!
       @a.reload
-      @a.discussion_topic.should eql(@topic)
-      @a.state.should eql(:published)
+      expect(@a.discussion_topic).to eql(@topic)
+      expect(@a.state).to eql(:published)
       @topic.reload
-      @topic.state.should eql(:active)
+      expect(@topic.state).to eql(:active)
     end
   end
 
@@ -1398,20 +1407,20 @@ describe Assignment do
       end
 
       it 'returns users with visibility' do
-        @assignment.participants.length.should == 3
+        expect(@assignment.participants.length).to eq 3
       end
 
       it 'includes students with visibility' do
-        @assignment.participants.include?(@student_one).should be_true
+        expect(@assignment.participants.include?(@student_one)).to be_truthy
       end
 
       it 'excludes students without visibility' do
-        @assignment.participants.include?(@student_two).should be_false
+        expect(@assignment.participants.include?(@student_two)).to be_falsey
       end
 
       it 'includes admins with visibility' do
-        @assignment.participants.include?(@teacher).should be_true
-        @assignment.participants.include?(@ta).should be_true
+        expect(@assignment.participants.include?(@teacher)).to be_truthy
+        expect(@assignment.participants.include?(@ta)).to be_truthy
       end
     end
 
@@ -1421,7 +1430,7 @@ describe Assignment do
       end
 
       it 'returns all users in the course' do
-        @assignment.participants.length.should == 4
+        expect(@assignment.participants.length).to eq 4
       end
     end
   end
@@ -1437,78 +1446,78 @@ describe Assignment do
         @a.created_at = 1.month.ago
         @a.due_at = Time.now + 60
         @a.save!
-        @a.messages_sent.should be_include('Assignment Due Date Changed')
+        expect(@a.messages_sent).to be_include('Assignment Due Date Changed')
       end
 
       it "should NOT create a message when everything but the assignment due date has changed" do
         t = Time.parse("Sep 1, 2009 5:00pm")
         assignment_model(:title => 'Assignment with unstable due date', :due_at => t, :course => @course)
-        @a.due_at.should eql(t)
+        expect(@a.due_at).to eql(t)
         @a.submission_types = "online_url"
         @a.title = "New Title"
         @a.due_at = t + 1
         @a.description = "New description"
         @a.points_possible = 50
         @a.save!
-        @a.messages_sent.should_not be_include('Assignment Due Date Changed')
+        expect(@a.messages_sent).not_to be_include('Assignment Due Date Changed')
       end
     end
 
     context "assignment graded" do
       before(:once) { setup_assignment_with_students }
 
-      specify { @assignment.should be_published }
+      specify { expect(@assignment).to be_published }
 
       it "should notify students when their grade is changed" do
         @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
-        @sub2.messages_sent.should_not be_empty
-        @sub2.messages_sent['Submission Graded'].should_not be_nil
-        @sub2.messages_sent['Submission Grade Changed'].should be_nil
+        expect(@sub2.messages_sent).not_to be_empty
+        expect(@sub2.messages_sent['Submission Graded']).not_to be_nil
+        expect(@sub2.messages_sent['Submission Grade Changed']).to be_nil
         @sub2.update_attributes(:graded_at => Time.now - 60*60)
         @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
-        @sub2.messages_sent.should_not be_empty
-        @sub2.messages_sent['Submission Graded'].should be_nil
-        @sub2.messages_sent['Submission Grade Changed'].should_not be_nil
+        expect(@sub2.messages_sent).not_to be_empty
+        expect(@sub2.messages_sent['Submission Graded']).to be_nil
+        expect(@sub2.messages_sent['Submission Grade Changed']).not_to be_nil
       end
 
       it "should notify affected students on a mass-grade change" do
-        pending "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
+        skip "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
         @assignment.set_default_grade(:default_grade => 10)
         msg_sub1 = @assignment.submissions.detect{|s| s.id = @sub1.id}
-        msg_sub1.messages_sent.should_not be_nil
-        msg_sub1.messages_sent['Submission Grade Changed'].should_not be_nil
+        expect(msg_sub1.messages_sent).not_to be_nil
+        expect(msg_sub1.messages_sent['Submission Grade Changed']).not_to be_nil
         msg_sub2 = @assignment.submissions.detect{|s| s.id = @sub2.id}
-        msg_sub2.messages_sent.should_not be_nil
-        msg_sub2.messages_sent['Submission Graded'].should_not be_nil
+        expect(msg_sub2.messages_sent).not_to be_nil
+        expect(msg_sub2.messages_sent['Submission Graded']).not_to be_nil
       end
 
       describe 'while they are muted' do
         before(:once) { @assignment.mute! }
 
-        specify { @assignment.should be_muted }
+        specify { expect(@assignment).to be_muted }
 
         it "should not notify affected students on a mass-grade change if muted" do
-          pending "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
+          skip "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
           @assignment.set_default_grade(:default_grade => 10)
-          @assignment.messages_sent.should be_empty
+          expect(@assignment.messages_sent).to be_empty
         end
 
         it "should not notify students when their grade is changed if muted" do
           @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
           @sub2.update_attributes(:graded_at => Time.now - 60*60)
           @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
-          @sub2.messages_sent.should be_empty
+          expect(@sub2.messages_sent).to be_empty
         end
       end
 
       it "should include re-submitted submissions in the list of submissions needing grading" do
-        @assignment.should be_published
-        @assignment.submissions.size.should == 1
-        Assignment.need_grading_info(15).where(id: @assignment).first.should be_nil
+        expect(@assignment).to be_published
+        expect(@assignment.submissions.size).to eq 1
+        expect(Assignment.need_grading_info(15).where(id: @assignment).first).to be_nil
         @assignment.submit_homework(@stu1, :body => "Changed my mind!")
         @sub1.reload
-        @sub1.body.should == "Changed my mind!"
-        Assignment.need_grading_info(15).where(id: @assignment).first.should_not be_nil
+        expect(@sub1.body).to eq "Changed my mind!"
+        expect(Assignment.need_grading_info(15).where(id: @assignment).first).not_to be_nil
       end
     end
 
@@ -1523,13 +1532,13 @@ describe Assignment do
         @a.description = "something different"
         @a.notify_of_update = true
         @a.save
-        @a.messages_sent.should be_include('Assignment Changed')
+        expect(@a.messages_sent).to be_include('Assignment Changed')
       end
 
       it "should NOT create a message when an assigment changes SHORTLY AFTER it's been created" do
         @a.description = "something different"
         @a.save
-        @a.messages_sent.should_not be_include('Assignment Changed')
+        expect(@a.messages_sent).not_to be_include('Assignment Changed')
       end
 
       it "should not create a message when a muted assignment changes" do
@@ -1537,7 +1546,7 @@ describe Assignment do
         @a = Assignment.find(@a.id) # blank slate for messages_sent
         @a.description = "something different"
         @a.save
-        @a.messages_sent.should be_empty
+        expect(@a.messages_sent).to be_empty
       end
     end
 
@@ -1548,14 +1557,14 @@ describe Assignment do
 
       it "should create a message when an assigment is added to a course in process" do
         assignment_model(:course => @course)
-        @a.messages_sent.should be_include('Assignment Created')
+        expect(@a.messages_sent).to be_include('Assignment Created')
       end
 
       it "should not create a message in an unpublished course" do
         Notification.create(:name => 'Assignment Created')
         course_with_teacher(:active_user => true)
         assignment_model(:course => @course)
-        @a.messages_sent.should_not be_include('Assignment Created')
+        expect(@a.messages_sent).not_to be_include('Assignment Created')
       end
     end
 
@@ -1594,11 +1603,11 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent['Assignment Created']
-          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Multiple Dates"
-          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 1, 2011"
-          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Multiple Dates"
-          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
-          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == @teacher.id}.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == @studentA.id}.body).to be_include "Jan 1, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta.id}.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == @studentB.id}.body).to be_include "Jan 2, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta2.id}.body).to be_include "Multiple Dates"
         end
 
         it "should notify the correct people with differentiated_assignments enabled" do
@@ -1608,12 +1617,12 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent['Assignment Created']
-          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Multiple Dates"
-          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 1, 2011"
-          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Multiple Dates"
-          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
-          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
-          messages_sent.detect{|m|m.user_id == student.id}.should be_nil
+          expect(messages_sent.detect{|m|m.user_id == @teacher.id}.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == @studentA.id}.body).to be_include "Jan 1, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta.id}.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == @studentB.id}.body).to be_include "Jan 2, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta2.id}.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect{|m|m.user_id == student.id}).to be_nil
         end
 
         it "should collapse identical instructor due dates" do
@@ -1625,7 +1634,7 @@ describe Assignment do
 
           # when the override matches the default, show the default and not "Multiple"
           messages_sent = @assignment.messages_sent['Assignment Created']
-          messages_sent.each{|m| m.body.should be_include "Jan 1, 2011"}
+          messages_sent.each{|m| expect(m.body).to be_include "Jan 1, 2011"}
         end
       end
 
@@ -1642,11 +1651,11 @@ describe Assignment do
           @assignment.save!
 
           messages_sent = @assignment.messages_sent['Assignment Due Date Changed']
-          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Jan 9, 2011"
-          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 9, 2011"
-          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Jan 9, 2011"
-          messages_sent.detect{|m|m.user_id == @studentB.id}.should be_nil
-          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Jan 9, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @teacher.id}.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @studentA.id}.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta.id}.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @studentB.id}).to be_nil
+          expect(messages_sent.detect{|m|m.user_id == @ta2.id}.body).to be_include "Jan 9, 2011"
         end
 
         it "should notify appropriate parties when an override due date changes" do
@@ -1657,13 +1666,13 @@ describe Assignment do
           override.save!
 
           messages_sent = override.messages_sent['Assignment Due Date Changed']
-          messages_sent.detect{|m|m.user_id == @studentA.id}.should be_nil
-          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 11, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @studentA.id}).to be_nil
+          expect(messages_sent.detect{|m|m.user_id == @studentB.id}.body).to be_include "Jan 11, 2011"
 
           messages_sent = override.messages_sent['Assignment Due Date Override Changed']
-          messages_sent.detect{|m|m.user_id == @ta.id}.should be_nil
-          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Jan 11, 2011"
-          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Jan 11, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta.id}).to be_nil
+          expect(messages_sent.detect{|m|m.user_id == @teacher.id}.body).to be_include "Jan 11, 2011"
+          expect(messages_sent.detect{|m|m.user_id == @ta2.id}.body).to be_include "Jan 11, 2011"
         end
       end
 
@@ -1680,8 +1689,8 @@ describe Assignment do
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "booga"
           Time.unstub(:now)
 
-          subA.messages_sent["Assignment Submitted Late"].should_not be_nil
-          subB.messages_sent["Assignment Submitted Late"].should be_nil
+          expect(subA.messages_sent["Assignment Submitted Late"]).not_to be_nil
+          expect(subB.messages_sent["Assignment Submitted Late"]).to be_nil
         end
       end
 
@@ -1706,8 +1715,8 @@ describe Assignment do
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "meenie"
           Time.unstub(:now)
 
-          subA.messages_sent["Group Assignment Submitted Late"].should_not be_nil
-          subB.messages_sent["Group Assignment Submitted Late"].should be_nil
+          expect(subA.messages_sent["Group Assignment Submitted Late"]).not_to be_nil
+          expect(subB.messages_sent["Group Assignment Submitted Late"]).to be_nil
         end
       end
     end
@@ -1720,13 +1729,13 @@ describe Assignment do
 
     it "should submit the homework for all students in the same group" do
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you")
-      sub.user_id.should eql(@u1.id)
+      expect(sub.user_id).to eql(@u1.id)
       @a.reload
       subs = @a.submissions
-      subs.length.should eql(2)
-      subs.map(&:group_id).uniq.should eql([@group.id])
-      subs.map(&:submission_type).uniq.should eql(['online_text_entry'])
-      subs.map(&:body).uniq.should eql(['Some text for you'])
+      expect(subs.length).to eql(2)
+      expect(subs.map(&:group_id).uniq).to eql([@group.id])
+      expect(subs.map(&:submission_type).uniq).to eql(['online_text_entry'])
+      expect(subs.map(&:body).uniq).to eql(['Some text for you'])
     end
 
     it "should submit the homework for all students in the group if grading them individually" do
@@ -1734,80 +1743,80 @@ describe Assignment do
       res = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Test submission")
       @a.reload
       submissions = @a.submissions
-      submissions.length.should eql 2
-      submissions.map(&:group_id).uniq.should eql [@group.id]
-      submissions.map(&:submission_type).uniq.should eql ["online_text_entry"]
-      submissions.map(&:body).uniq.should eql ["Test submission"]
+      expect(submissions.length).to eql 2
+      expect(submissions.map(&:group_id).uniq).to eql [@group.id]
+      expect(submissions.map(&:submission_type).uniq).to eql ["online_text_entry"]
+      expect(submissions.map(&:body).uniq).to eql ["Test submission"]
     end
 
     it "should update submission for all students in the same group" do
       res = @a.grade_student(@u1, :grade => "10")
-      res.should_not be_nil
-      res.should_not be_empty
-      res.length.should eql(2)
-      res.map{|s| s.user}.should be_include(@u1)
-      res.map{|s| s.user}.should be_include(@u2)
+      expect(res).not_to be_nil
+      expect(res).not_to be_empty
+      expect(res.length).to eql(2)
+      expect(res.map{|s| s.user}).to be_include(@u1)
+      expect(res.map{|s| s.user}).to be_include(@u2)
     end
 
     it "should create an initial submission comment for only the submitter by default" do
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "hey teacher, i hate my group. i did this entire project by myself :(")
-      sub.user_id.should eql(@u1.id)
-      sub.submission_comments.size.should eql 1
+      expect(sub.user_id).to eql(@u1.id)
+      expect(sub.submission_comments.size).to eql 1
       @a.reload
       other_sub = (@a.submissions - [sub])[0]
-      other_sub.submission_comments.size.should eql 0
+      expect(other_sub.submission_comments.size).to eql 0
     end
 
     it "should add a submission comment for only the specified user by default" do
       res = @a.grade_student(@u1, :comment => "woot")
-      res.should_not be_nil
-      res.should_not be_empty
-      res.length.should eql(1)
-      res.find{|s| s.user == @u1}.submission_comments.should_not be_empty
-      res.find{|s| s.user == @u2}.should be_nil #.submission_comments.should be_empty
+      expect(res).not_to be_nil
+      expect(res).not_to be_empty
+      expect(res.length).to eql(1)
+      expect(res.find{|s| s.user == @u1}.submission_comments).not_to be_empty
+      expect(res.find{|s| s.user == @u2}).to be_nil #.submission_comments.should be_empty
     end
 
     it "should update submission for only the individual student if set thay way" do
       @a.update_attribute(:grade_group_students_individually, true)
       res = @a.grade_student(@u1, :grade => "10")
-      res.should_not be_nil
-      res.should_not be_empty
-      res.length.should eql(1)
-      res[0].user.should eql(@u1)
+      expect(res).not_to be_nil
+      expect(res).not_to be_empty
+      expect(res.length).to eql(1)
+      expect(res[0].user).to eql(@u1)
     end
 
     it "should create an initial submission comment for all group members if specified" do
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
-      sub.user_id.should eql(@u1.id)
-      sub.submission_comments.size.should eql 1
+      expect(sub.user_id).to eql(@u1.id)
+      expect(sub.submission_comments.size).to eql 1
       @a.reload
       other_sub = (@a.submissions - [sub])[0]
-      other_sub.submission_comments.size.should eql 1
+      expect(other_sub.submission_comments.size).to eql 1
     end
 
     it "should add a submission comment for all group members if specified" do
       res = @a.grade_student(@u1, :comment => "woot", :group_comment => "1")
-      res.should_not be_nil
-      res.should_not be_empty
-      res.length.should eql(2)
-      res.find{|s| s.user == @u1}.submission_comments.should_not be_empty
-      res.find{|s| s.user == @u2}.submission_comments.should_not be_empty
+      expect(res).not_to be_nil
+      expect(res).not_to be_empty
+      expect(res.length).to eql(2)
+      expect(res.find{|s| s.user == @u1}.submission_comments).not_to be_empty
+      expect(res.find{|s| s.user == @u2}.submission_comments).not_to be_empty
       # all the comments should have the same group_comment_id, for deletion
       comments = SubmissionComment.for_assignment_id(@a.id).all
-      comments.size.should == 2
+      expect(comments.size).to eq 2
       group_comment_id = comments[0].group_comment_id
-      group_comment_id.should be_present
-      comments.all? { |c| c.group_comment_id == group_comment_id }.should be_true
+      expect(group_comment_id).to be_present
+      expect(comments.all? { |c| c.group_comment_id == group_comment_id }).to be_truthy
     end
 
     it "return the single submission if the user is not in a group" do
       res = @a.grade_student(@u3, :comment => "woot", :group_comment => "1")
-      res.should_not be_nil
-      res.should_not be_empty
-      res.length.should eql(1)
+      expect(res).not_to be_nil
+      expect(res).not_to be_empty
+      expect(res.length).to eql(1)
       comments = res.find{|s| s.user == @u3}.submission_comments
-      comments.size.should == 1
-      comments[0].group_comment_id.should be_nil
+      expect(comments.size).to eq 1
+      expect(comments[0].group_comment_id).to be_nil
     end
 
     it "associates attachments with all submissions" do
@@ -1817,7 +1826,7 @@ describe Assignment do
         filename: 'blah.txt'
       @a.submit_homework(@u1, attachments: [f])
       @a.submissions.reload.each { |s|
-        s.attachments.should == [f]
+        expect(s.attachments).to eq [f]
       }
     end
   end
@@ -1826,10 +1835,10 @@ describe Assignment do
     it "should serialize permissions" do
       @assignment = @course.assignments.create!(:title => "some assignment")
       data = @assignment.as_json(:permissions => {:user => @user, :session => nil}) rescue nil
-      data.should_not be_nil
-      data['assignment'].should_not be_nil
-      data['assignment']['permissions'].should_not be_nil
-      data['assignment']['permissions'].should_not be_empty
+      expect(data).not_to be_nil
+      expect(data['assignment']).not_to be_nil
+      expect(data['assignment']['permissions']).not_to be_nil
+      expect(data['assignment']['permissions']).not_to be_empty
     end
   end
 
@@ -1853,16 +1862,16 @@ describe Assignment do
 
    it "returns active_course_sections with differentiated assignments off" do
      @course.disable_feature!(:differentiated_assignments)
-     @assignment.sections_with_visibility(@teacher).should == @course.course_sections
-     @assignment2.sections_with_visibility(@teacher).should == @course.course_sections
-     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+     expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
+     expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
+     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
    end
 
    it "returns only sections with overrides with differentiated assignments on" do
      @course.enable_feature!(:differentiated_assignments)
-     @assignment.sections_with_visibility(@teacher).should == [@section]
-     @assignment2.sections_with_visibility(@teacher).should == []
-     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+     expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
+     expect(@assignment2.sections_with_visibility(@teacher)).to eq []
+     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
    end
  end
 
@@ -1870,7 +1879,7 @@ describe Assignment do
     it "should be locked when part of a locked module" do
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => course)
-      a1.locked_for?(@user).should be_false
+      expect(a1.locked_for?(@user)).to be_falsey
 
       m = @course.context_modules.create!
       ct = ContentTag.new
@@ -1887,13 +1896,13 @@ describe Assignment do
       m.unlock_at = Time.now.in_time_zone + 1.day
       m.save
       a1.reload
-      a1.locked_for?(@user).should be_true
+      expect(a1.locked_for?(@user)).to be_truthy
     end
 
     it "should be locked when associated discussion topic is part of a locked module" do
       a1 = assignment_model(:course => @course, :submission_types => "discussion_topic")
       a1.reload
-      a1.locked_for?(@user).should be_false
+      expect(a1.locked_for?(@user)).to be_falsey
 
       m = @course.context_modules.create!
       m.add_item(:id => a1.discussion_topic.id, :type => 'discussion_topic')
@@ -1901,13 +1910,13 @@ describe Assignment do
       m.unlock_at = Time.now.in_time_zone + 1.day
       m.save
       a1.reload
-      a1.locked_for?(@user).should be_true
+      expect(a1.locked_for?(@user)).to be_truthy
     end
 
     it "should be locked when associated quiz is part of a locked module" do
       a1 = assignment_model(:course => @course, :submission_types => "online_quiz")
       a1.reload
-      a1.locked_for?(@user).should be_false
+      expect(a1.locked_for?(@user)).to be_falsey
 
       m = @course.context_modules.create!
       m.add_item(:id => a1.quiz.id, :type => 'quiz')
@@ -1915,7 +1924,7 @@ describe Assignment do
       m.unlock_at = Time.now.in_time_zone + 1.day
       m.save
       a1.reload
-      a1.locked_for?(@user).should be_true
+      expect(a1.locked_for?(@user)).to be_truthy
     end
   end
 
@@ -1923,20 +1932,20 @@ describe Assignment do
     it "should return [nil, [student]] unless the assignment has a group_category" do
       @assignment = assignment_model(course: @course)
       @student = user_model
-      @assignment.group_students(@student).should == [nil, [@student]]
+      expect(@assignment.group_students(@student)).to eq [nil, [@student]]
     end
 
     it "should return [nil, [student]] if the context doesn't have any active groups in the same category" do
       @assignment = assignment_model(:group_category => "Fake Category", :course => @course)
       @student = user_model
-      @assignment.group_students(@student).should == [nil, [@student]]
+      expect(@assignment.group_students(@student)).to eq [nil, [@student]]
     end
 
     it "should return [nil, [student]] if the student isn't in any of the candidate groups" do
       @assignment = assignment_model(:group_category => "Category", :course => @course)
       @group = @course.groups.create(:name => "Group", :group_category => @assignment.group_category)
       @student = user_model
-      @assignment.group_students(@student).should == [nil, [@student]]
+      expect(@assignment.group_students(@student)).to eq [nil, [@student]]
     end
 
     it "should return [group, [students from group]] if the student is in one of the candidate groups" do
@@ -1953,8 +1962,8 @@ describe Assignment do
       # have to reload because the enrolled students above don't show up in
       # Course#students until the course has been reloaded
       result = @assignment.reload.group_students(@student1)
-      result.first.should == @group1
-      result.last.map{ |u| u.id }.sort.should == [@student1, @student2].map{ |u| u.id }.sort
+      expect(result.first).to eq @group1
+      expect(result.last.map{ |u| u.id }.sort).to eq [@student1, @student2].map{ |u| u.id }.sort
     end
 
     it "returns distinct users" do
@@ -1974,31 +1983,31 @@ describe Assignment do
       a = @course.assignments.create! name: "Group Assignment",
                                       group_category_id: gc.id
       g, students = a.group_students(s1)
-      g.should == group
-      students.sort_by(&:id).should == [s1, s2]
+      expect(g).to eq group
+      expect(students.sort_by(&:id)).to eq [s1, s2]
     end
   end
 
   it "should maintain the deprecated group_category attribute" do
     assignment = assignment_model(course: @course)
-    assignment.read_attribute(:group_category).should be_nil
+    expect(assignment.read_attribute(:group_category)).to be_nil
     assignment.group_category = assignment.context.group_categories.create(:name => "my category")
     assignment.save
     assignment.reload
-    assignment.read_attribute(:group_category).should eql("my category")
+    expect(assignment.read_attribute(:group_category)).to eql("my category")
     assignment.group_category = nil
     assignment.save
     assignment.reload
-    assignment.read_attribute(:group_category).should be_nil
+    expect(assignment.read_attribute(:group_category)).to be_nil
   end
 
   it "should provide has_group_category?" do
     assignment = assignment_model(course: @course)
-    assignment.has_group_category?.should be_false
+    expect(assignment.has_group_category?).to be_falsey
     assignment.group_category = assignment.context.group_categories.create(:name => "my category")
-    assignment.has_group_category?.should be_true
+    expect(assignment.has_group_category?).to be_truthy
     assignment.group_category = nil
-    assignment.has_group_category?.should be_false
+    expect(assignment.has_group_category?).to be_falsey
   end
 
   context "turnitin settings" do
@@ -2017,7 +2026,7 @@ describe Assignment do
         :exclude_value => 'asdf',
         :bogus => 'haha'
       }
-      assignment.turnitin_settings.should eql({
+      expect(assignment.turnitin_settings).to eql({
         :originality_report_visibility => 'immediate',
         :s_paper_check => '1',
         :internet_check => '1',
@@ -2038,12 +2047,12 @@ describe Assignment do
       assignment.turnitin_settings[:created] = true
       assignment.save
       assignment.reload
-      assignment.turnitin_settings[:created].should be_true
+      expect(assignment.turnitin_settings[:created]).to be_truthy
 
       assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
-      assignment.turnitin_settings[:created].should be_true
+      expect(assignment.turnitin_settings[:created]).to be_truthy
     end
 
     it "should clear out :current" do
@@ -2053,12 +2062,12 @@ describe Assignment do
       assignment.turnitin_settings[:current] = true
       assignment.save
       assignment.reload
-      assignment.turnitin_settings[:current].should be_true
+      expect(assignment.turnitin_settings[:current]).to be_truthy
 
       assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
-      assignment.turnitin_settings[:current].should be_nil
+      expect(assignment.turnitin_settings[:current]).to be_nil
     end
   end
 
@@ -2078,18 +2087,18 @@ describe Assignment do
       create_and_submit
       ignore_file = "/tmp/._why_macos_why.txt"
       @assignment.instance_variable_set :@ignored_files, []
-      @assignment.send(:infer_comment_context_from_filename, ignore_file).should be_nil
-      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
+      expect(@assignment.send(:infer_comment_context_from_filename, ignore_file)).to be_nil
+      expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
 
       filename = [@user.last_name_first, @user.id, @attachment.id, @attachment.display_name].join("_")
 
-      @assignment.send(:infer_comment_context_from_filename, filename).should == ({
+      expect(@assignment.send(:infer_comment_context_from_filename, filename)).to eq({
         :user => @user,
         :submission => @submission,
         :filename => filename,
         :display_name => @attachment.display_name
       })
-      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
+      expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
     end
 
     it "should mark comments as hidden for submission zip uploads" do
@@ -2103,7 +2112,7 @@ describe Assignment do
       @assignment.generate_comments_from_files(zip.open.path, @user)
 
       submission = @assignment.submission_for_student(@student)
-      submission.submission_comments.last.hidden.should == true
+      expect(submission.submission_comments.last.hidden).to eq true
     end
   end
 
@@ -2127,22 +2136,22 @@ describe Assignment do
     it "should not be frozen if not copied" do
       stub_plugin
       @asmnt.freeze_on_copy = true
-      @asmnt.frozen?.should == false
-      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+      expect(@asmnt.frozen?).to eq false
+      @att_map.each_key{|att| expect(@asmnt.att_frozen?(att)).to eq false}
     end
 
     it "should not be frozen if copied but not frozen set" do
       stub_plugin
       @asmnt.copied = true
-      @asmnt.frozen?.should == false
-      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+      expect(@asmnt.frozen?).to eq false
+      @att_map.each_key{|att| expect(@asmnt.att_frozen?(att)).to eq false}
     end
 
     it "should not be frozen if plugin not enabled" do
       @asmnt.copied = true
       @asmnt.freeze_on_copy = true
-      @asmnt.frozen?.should == false
-      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+      expect(@asmnt.frozen?).to eq false
+      @att_map.each_key{|att| expect(@asmnt.att_frozen?(att)).to eq false}
     end
 
     context "assignments are frozen" do
@@ -2158,40 +2167,40 @@ describe Assignment do
       end
 
       it "should be frozen" do
-        @asmnt.frozen?.should == true
+        expect(@asmnt.frozen?).to eq true
       end
 
       it "should flag specific attributes as frozen for no user" do
         @att_map.each_pair do |att, setting|
-          @asmnt.att_frozen?(att).should == (setting == "yes")
+          expect(@asmnt.att_frozen?(att)).to eq(setting == "yes")
         end
       end
 
       it "should flag specific attributes as frozen for teacher" do
         @att_map.each_pair do |att, setting|
-          @asmnt.att_frozen?(att, @teacher).should == (setting == "yes")
+          expect(@asmnt.att_frozen?(att, @teacher)).to eq(setting == "yes")
         end
       end
 
       it "should not flag attributes as frozen for admin" do
         @att_map.each_pair do |att, setting|
-          @asmnt.att_frozen?(att, @admin).should == false
+          expect(@asmnt.att_frozen?(att, @admin)).to eq false
         end
       end
 
       it "should be frozen for nil user" do
-        @asmnt.frozen_for_user?(nil).should == true
+        expect(@asmnt.frozen_for_user?(nil)).to eq true
       end
 
       it "should not be frozen for admin" do
-        @asmnt.frozen_for_user?(@admin).should == false
+        expect(@asmnt.frozen_for_user?(@admin)).to eq false
       end
 
       it "should not validate if saving without user" do
         @asmnt.description = "new description"
         @asmnt.save
-        @asmnt.valid?.should == false
-        @asmnt.errors["description"].should == ["You don't have permission to edit the locked attribute description"]
+        expect(@asmnt.valid?).to eq false
+        expect(@asmnt.errors["description"]).to eq ["You don't have permission to edit the locked attribute description"]
       end
 
       it "should allow teacher to edit unlocked attributes" do
@@ -2200,7 +2209,7 @@ describe Assignment do
         @asmnt.save!
 
         @asmnt.reload
-        @asmnt.title.should == "new title"
+        expect(@asmnt.title).to eq "new title"
       end
 
       it "should not allow teacher to edit locked attributes" do
@@ -2208,11 +2217,11 @@ describe Assignment do
         @asmnt.updating_user = @teacher
         @asmnt.save
 
-        @asmnt.valid?.should == false
-        @asmnt.errors["description"].should == ["You don't have permission to edit the locked attribute description"]
+        expect(@asmnt.valid?).to eq false
+        expect(@asmnt.errors["description"]).to eq ["You don't have permission to edit the locked attribute description"]
 
         @asmnt.reload
-        @asmnt.description.should_not == "new title"
+        expect(@asmnt.description).not_to eq "new title"
       end
 
       it "should allow admin to edit unlocked attributes" do
@@ -2221,7 +2230,7 @@ describe Assignment do
         @asmnt.save!
 
         @asmnt.reload
-        @asmnt.description.should == "new description"
+        expect(@asmnt.description).to eq "new description"
       end
 
     end
@@ -2244,40 +2253,40 @@ describe Assignment do
     it "should include assignments with no locks" do
       @quiz.save!
       list = Assignment.not_locked.all
-      list.size.should eql 1
-      list.first.title.should eql 'Test Assignment'
+      expect(list.size).to eql 1
+      expect(list.first.title).to eql 'Test Assignment'
     end
     it "should include assignments with unlock_at in the past" do
       @quiz.unlock_at = 1.day.ago
       @quiz.save!
       list = Assignment.not_locked.all
-      list.size.should eql 1
-      list.first.title.should eql 'Test Assignment'
+      expect(list.size).to eql 1
+      expect(list.first.title).to eql 'Test Assignment'
     end
     it "should include assignments where lock_at is future" do
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
       list = Assignment.not_locked.all
-      list.size.should eql 1
-      list.first.title.should eql 'Test Assignment'
+      expect(list.size).to eql 1
+      expect(list.first.title).to eql 'Test Assignment'
     end
     it "should include assignments where unlock_at is in the past and lock_at is future" do
       @quiz.unlock_at = 1.day.ago
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
       list = Assignment.not_locked.all
-      list.size.should eql 1
-      list.first.title.should eql 'Test Assignment'
+      expect(list.size).to eql 1
+      expect(list.first.title).to eql 'Test Assignment'
     end
     it "should not include assignments where unlock_at is in future" do
       @quiz.unlock_at = 1.hour.from_now
       @quiz.save!
-      Assignment.not_locked.count.should == 0
+      expect(Assignment.not_locked.count).to eq 0
     end
     it "should not include assignments where lock_at is in past" do
       @quiz.lock_at = 1.hours.ago
       @quiz.save!
-      Assignment.not_locked.count.should == 0
+      expect(Assignment.not_locked.count).to eq 0
     end
   end
 
@@ -2297,11 +2306,11 @@ describe Assignment do
     end
 
     it 'should return assignments between the given dates' do
-      @results.should include(@assignment)
+      expect(@results).to include(@assignment)
     end
 
     it 'should return overridden assignments that are due between the given dates' do
-      @results.should include(@overridden_assignment)
+      expect(@results).to include(@overridden_assignment)
     end
   end
 
@@ -2312,19 +2321,19 @@ describe Assignment do
 
     it "should destroy the associated discussion topic" do
       @assignment.destroy
-      @topic.reload.should be_deleted
-      @assignment.reload.should be_deleted
+      expect(@topic.reload).to be_deleted
+      expect(@assignment.reload).to be_deleted
     end
 
     it "should not revive the discussion if touched after destroyed" do
       @assignment.destroy
-      @topic.reload.should be_deleted
+      expect(@topic.reload).to be_deleted
       @assignment.touch
-      @topic.reload.should be_deleted
+      expect(@topic.reload).to be_deleted
     end
     it 'should raise an error on validation error' do
       assignment = Assignment.new
-      lambda {assignment.destroy}.should raise_error(ActiveRecord::RecordInvalid)
+      expect {assignment.destroy}.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 
@@ -2334,7 +2343,7 @@ describe Assignment do
       @submission = @assignment.submissions.first
       @comment = @submission.add_comment(:comment => 'comment')
       json = @assignment.speed_grader_json(@user)
-      json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
+      expect(json[:submissions].first[:submission_comments].first[:created_at].to_i).to eql @comment.created_at.to_i
     end
 
     context "students and active course sections" do
@@ -2354,20 +2363,20 @@ describe Assignment do
         @course.disable_feature!(:differentiated_assignments)
         json = @assignment.speed_grader_json(@teacher)
 
-        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
-        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_truthy
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_truthy
       end
 
       it "should include only students and sections with overrides when DA is on" do
         @course.enable_feature!(:differentiated_assignments)
         json = @assignment.speed_grader_json(@teacher)
 
-        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
-        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_false
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_false
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_falsey
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_falsey
       end
 
       it "should include all students when is only_visible_to_overrides false" do
@@ -2376,10 +2385,10 @@ describe Assignment do
         @assignment.save!
         json = @assignment.speed_grader_json(@teacher)
 
-        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
-        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
-        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
+        expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_truthy
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
+        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_truthy
       end
     end
 
@@ -2415,7 +2424,7 @@ describe Assignment do
       json = assignment.speed_grader_json(@teacher)
       json[:submissions].each do |submission|
         user = [student_1, student_2].detect { |s| s.id == submission[:user_id] }
-        submission[:late].should == user.submissions.first.late?
+        expect(submission[:late]).to eq user.submissions.first.late?
       end
     end
 
@@ -2425,7 +2434,7 @@ describe Assignment do
       submission = assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
       json = assignment.speed_grader_json @teacher
       attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
-      attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
+      expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
     end
 
     context "group assignments" do
@@ -2445,16 +2454,16 @@ describe Assignment do
       it "should not be in group mode for non-group assignments" do
         setup_assignment_with_homework
         json = @assignment.speed_grader_json(@teacher)
-        json["GROUP_GRADING_MODE"].should_not be_true
+        expect(json["GROUP_GRADING_MODE"]).not_to be_truthy
       end
 
       it 'returns "groups" instead of students' do
         json = @assignment.speed_grader_json(@teacher)
         @groups.each do |group|
           j = json["context"]["students"].find { |g| g["name"] == group.name }
-          group.users.map(&:id).should include j["id"]
+          expect(group.users.map(&:id)).to include j["id"]
         end
-        json["GROUP_GRADING_MODE"].should be_true
+        expect(json["GROUP_GRADING_MODE"]).to be_truthy
       end
 
       it 'chooses the student with turnitin data to represent' do
@@ -2468,9 +2477,9 @@ describe Assignment do
         @assignment.update_attribute :turnitin_enabled, true
         json = @assignment.speed_grader_json(@teacher)
 
-        json["submissions"].map { |s|
+        expect(json["submissions"].map { |s|
           s["id"]
-        }.sort.should == turnitin_submissions.map(&:id).sort
+        }.sort).to eq turnitin_submissions.map(&:id).sort
       end
 
       it 'prefers people with submissions' do
@@ -2479,12 +2488,12 @@ describe Assignment do
         g1rep = g1.users.shuffle.first
         s = @assignment.submission_for_student(g1rep)
         s.update_attribute :submission_type, 'online_upload'
-        @assignment.representatives(@teacher).should include g1rep
+        expect(@assignment.representatives(@teacher)).to include g1rep
       end
 
       it "includes users who aren't in a group" do
         student_in_course active_all: true
-        @assignment.representatives(@teacher).last.should == @student
+        expect(@assignment.representatives(@teacher).last).to eq @student
       end
     end
 
@@ -2498,9 +2507,9 @@ describe Assignment do
         assignment = quiz.assignment
         assignment.grade_student(@student, grade: 1)
         json = assignment.speed_grader_json(@teacher)
-        json[:submissions].all? { |s|
+        expect(json[:submissions].all? { |s|
           s.has_key? 'submission_history'
-        }.should be_true
+        }).to be_truthy
       end
 
       context "with quiz_submissions" do
@@ -2514,7 +2523,7 @@ describe Assignment do
             @quiz_submission.versions.create!
           }
           json = @quiz.assignment.speed_grader_json(@teacher)
-          json[:submissions].all? { |s| s["submission_history"].size.should == 1 }
+          json[:submissions].all? { |s| expect(s["submission_history"].size).to eq 1 }
         end
 
         it "returns quiz lateness correctly" do
@@ -2522,24 +2531,24 @@ describe Assignment do
           @quiz.save!
 
           json = @assignment.speed_grader_json(@teacher)
-          json[:submissions].first['submission_history'].first[:submission]['late'].should be_false
+          expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_falsey
 
           @quiz.due_at = 1.day.ago
           @quiz.save!
 
           json = @assignment.speed_grader_json(@teacher)
-          json[:submissions].first['submission_history'].first[:submission]['late'].should be_true
+          expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_truthy
         end
 
         it "returns quiz history for records before and after namespace change" do
           @quiz.save!
 
           json = @assignment.speed_grader_json(@teacher)
-          json[:submissions].first['submission_history'].size.should == 1
+          expect(json[:submissions].first['submission_history'].size).to eq 1
 
           Version.update_all("versionable_type = 'QuizSubmission'", "versionable_type = 'Quizzes::QuizSubmission'")
           json = @assignment.reload.speed_grader_json(@teacher)
-          json[:submissions].first['submission_history'].size.should == 1
+          expect(json[:submissions].first['submission_history'].size).to eq 1
         end
       end
     end
@@ -2552,10 +2561,10 @@ describe Assignment do
 
       Setting.set('too_many_quiz_submission_versions', 3)
       1.times { @quiz_submission.versions.create! }
-      @quiz.assignment.too_many_qs_versions?(submissions).should be_false
+      expect(@quiz.assignment.too_many_qs_versions?(submissions)).to be_falsey
 
       2.times { @quiz_submission.versions.create! }
-      @quiz.reload.assignment.too_many_qs_versions?(submissions).should be_true
+      expect(@quiz.reload.assignment.too_many_qs_versions?(submissions)).to be_truthy
     end
   end
 
@@ -2570,7 +2579,7 @@ describe Assignment do
 
       versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      versions[@quiz_submission.id].size.should == 1
+      expect(versions[@quiz_submission.id].size).to eq 1
     end
   end
 
@@ -2585,19 +2594,19 @@ describe Assignment do
 
     it "should save a version when changing grades" do
       @assignment.update_attribute :points_possible, 10
-      @sub1.reload.version_number.should == 2
+      expect(@sub1.reload.version_number).to eq 2
     end
 
     it "works for pass/fail assignments" do
       @assignment.update_attribute :points_possible, 10
-      @sub1.reload.grade.should == "complete"
-      @sub2.reload.grade.should == "incomplete"
+      expect(@sub1.reload.grade).to eq "complete"
+      expect(@sub2.reload.grade).to eq "incomplete"
     end
 
     it "works for pass/fail assignments with 0 points possible" do
       @assignment.update_attribute :points_possible, 0
-      @sub1.reload.grade.should == "complete"
-      @sub2.reload.grade.should == "incomplete"
+      expect(@sub1.reload.grade).to eq "complete"
+      expect(@sub2.reload.grade).to eq "incomplete"
     end
   end
 
@@ -2608,12 +2617,12 @@ describe Assignment do
     end
 
     it 'counts the submissions that have been graded' do
-      @assignment.graded_count.should == 1
+      expect(@assignment.graded_count).to eq 1
     end
 
     it 'returns the cached value if present' do
       @assignment.write_attribute(:graded_count, 50)
-      @assignment.graded_count.should == 50
+      expect(@assignment.graded_count).to eq 50
     end
   end
 
@@ -2625,12 +2634,12 @@ describe Assignment do
     end
 
     it 'counts the submissions that have submission types' do
-      @assignment.submitted_count.should == 1
+      expect(@assignment.submitted_count).to eq 1
     end
 
     it 'returns the cached value if present' do
       @assignment.write_attribute(:submitted_count, 50)
-      @assignment.submitted_count.should == 50
+      expect(@assignment.submitted_count).to eq 50
     end
   end
 
@@ -2650,21 +2659,21 @@ describe Assignment do
     context "before the assignment has a quiz" do
       context "override" do
         it "has a nil quiz" do
-          override.quiz.should be_nil
+          expect(override.quiz).to be_nil
         end
 
         it "has an assignment" do
-          override.assignment.should == assignment
+          expect(override.assignment).to eq assignment
         end
       end
 
       context "override student" do
         it "has a nil quiz" do
-          @override_student.quiz.should be_nil
+          expect(@override_student.quiz).to be_nil
         end
 
         it "has an assignment" do
-          @override_student.assignment.should == assignment
+          expect(@override_student.assignment).to eq assignment
         end
       end
     end
@@ -2679,26 +2688,26 @@ describe Assignment do
       end
 
       it "has a quiz" do
-        assignment.quiz.should be_present
+        expect(assignment.quiz).to be_present
       end
 
       context "override" do
         it "has an assignment" do
-          override.assignment.should == assignment
+          expect(override.assignment).to eq assignment
         end
 
         it "has the assignment's quiz" do
-          override.quiz.should == assignment.quiz
+          expect(override.quiz).to eq assignment.quiz
         end
       end
 
       context "override student" do
         it "has an assignment" do
-          @override_student.assignment.should == assignment
+          expect(@override_student.assignment).to eq assignment
         end
 
         it "has the assignment's quiz" do
-          @override_student.quiz.should == assignment.quiz
+          expect(@override_student.quiz).to eq assignment.quiz
         end
       end
     end
@@ -2747,21 +2756,21 @@ describe Assignment do
 
     it "should hard truncate at 30 characters" do
       @assignment.title = "a" * 31
-      @assignment.title.length.should == 31
-      @assignment.title_slug.length.should == 30
-      @assignment.title.should =~ /^#{@assignment.title_slug}/
+      expect(@assignment.title.length).to eq 31
+      expect(@assignment.title_slug.length).to eq 30
+      expect(@assignment.title).to match /^#{@assignment.title_slug}/
     end
 
     it "should not change the title" do
       title = "a" * 31
       @assignment.title = title
-      @assignment.title_slug.should_not == @assignment.title
-      @assignment.title.should == title
+      expect(@assignment.title_slug).not_to eq @assignment.title
+      expect(@assignment.title).to eq title
     end
 
     it "should leave short titles alone" do
       @assignment.title = 'short title'
-      @assignment.title_slug.should == @assignment.title
+      expect(@assignment.title_slug).to eq @assignment.title
     end
 
     it "should not allow titles over 255 char" do
@@ -2771,7 +2780,7 @@ describe Assignment do
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
 
-      (lambda { @assignment.save! }).should raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
+      expect(lambda { @assignment.save! }).to raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
     end
   end
 
@@ -2781,13 +2790,13 @@ describe Assignment do
                                       submission_types: 'external_tool',
                                       external_tool_tag_attributes: {url: "http://example.com/launch"})
       tag = a.external_tool_tag
-      tag.should_not be_new_record
+      expect(tag).not_to be_new_record
 
       a = Assignment.find(a.id)
       a.attributes = {external_tool_tag_attributes: {url: "http://example.com/launch2"}}
       a.save!
-      a.external_tool_tag.url.should == "http://example.com/launch2"
-      a.external_tool_tag.should == tag
+      expect(a.external_tool_tag.url).to eq "http://example.com/launch2"
+      expect(a.external_tool_tag).to eq tag
     end
   end
 
@@ -2795,25 +2804,25 @@ describe Assignment do
     it "should accept a string as input" do
       a = Assignment.new
       a.allowed_extensions = "doc,xls,txt"
-      a.allowed_extensions.should == ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
     end
 
     it "should accept an array as input" do
       a = Assignment.new
       a.allowed_extensions = ["doc", "xls", "txt"]
-      a.allowed_extensions.should == ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
     end
 
     it "should sanitize the string" do
       a = Assignment.new
       a.allowed_extensions = ".DOC, .XLS, .TXT"
-      a.allowed_extensions.should == ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
     end
 
     it "should sanitize the array" do
       a = Assignment.new
       a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
-      a.allowed_extensions.should == ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
     end
   end
 
@@ -2835,8 +2844,8 @@ describe Assignment do
         zip.open.path,
         @teacher)
 
-      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1]]
-      ignored.should be_empty
+      expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
+      expect(ignored).to be_empty
     end
 
     it "should work for groups" do
@@ -2856,9 +2865,9 @@ describe Assignment do
         zip.open.path,
         @teacher)
 
-      comments.map { |g|
+      expect(comments.map { |g|
         g.map { |c| c.submission.user }.sort_by(&:id)
-      }.should == [[s1, s2]]
+      }).to eq [[s1, s2]]
     end
   end
 
@@ -2869,7 +2878,7 @@ describe Assignment do
       @a.context.root_account.enable_feature!(:draft_state)
       @a.destroy
       @a.restore
-      @a.reload.should be_unpublished
+      expect(@a.reload).to be_unpublished
     end
 
     it "should restore to published if draft state w/ submissions" do
@@ -2878,14 +2887,14 @@ describe Assignment do
       @assignment.context.root_account.enable_feature!(:draft_state)
       @assignment.destroy
       @assignment.restore
-      @assignment.reload.should be_published
+      expect(@assignment.reload).to be_published
     end
   end
 
   describe '#readable_submission_type' do
     it "should work for on paper assignments" do
       assignment_model(:submission_types => 'on_paper', :course => @course)
-      @assignment.readable_submission_types.should == 'on paper'
+      expect(@assignment.readable_submission_types).to eq 'on paper'
     end
   end
 
@@ -2927,32 +2936,32 @@ describe Assignment do
       it "does not allow a negative value" do
         assignment = Assignment.new(points_possible: -1)
         assignment.valid?
-        assignment.errors.keys.include?(:points_possible).should be_true
+        expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
       end
 
       it "allows a nil value" do
         assignment = Assignment.new(points_possible: nil)
         assignment.valid?
-        assignment.errors.keys.include?(:points_possible).should be_false
+        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
 
       it "allows a 0 value" do
         assignment = Assignment.new(points_possible: 0)
         assignment.valid?
-        assignment.errors.keys.include?(:points_possible).should be_false
+        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
 
       it "allows a positive value" do
         assignment = Assignment.new(points_possible: 13)
         assignment.valid?
-        assignment.errors.keys.include?(:points_possible).should be_false
+        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
 
       it "does not attempt validation unless points_possible has changed" do
         assignment = Assignment.new(points_possible: -13)
         assignment.stubs(:points_possible_changed?).returns(false)
         assignment.valid?
-        assignment.errors.keys.include?(:points_possible).should be_false
+        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
 
     end
@@ -2967,12 +2976,12 @@ describe Assignment do
 
     it 'must allow a title equal to the maximum length' do
       assignment.title = 'a' * Assignment.maximum_string_length
-      errors[:title].should be_empty
+      expect(errors[:title]).to be_empty
     end
 
     it 'must not allow a title longer than the maximum length' do
       assignment.title = 'a' * (Assignment.maximum_string_length + 1)
-      errors[:title].should_not be_empty
+      expect(errors[:title]).not_to be_empty
     end
 
     it 'must allow a blank title when it is unchanged and was previously blank' do
@@ -2982,7 +2991,7 @@ describe Assignment do
 
       assignment.valid?
       errors = assignment.errors
-      errors[:title].should be_empty
+      expect(errors[:title]).to be_empty
     end
 
     it 'must not allow the title to be blank if changed' do
@@ -2990,7 +2999,7 @@ describe Assignment do
       assignment.title = ' '
       assignment.valid?
       errors = assignment.errors
-      errors[:title].should_not be_empty
+      expect(errors[:title]).not_to be_empty
     end
   end
 
@@ -3012,22 +3021,22 @@ describe Assignment do
 
     it "lets you change group category attributes before homework is submitted" do
       a1.group_category = @group_category
-      a1.should be_valid
+      expect(a1).to be_valid
 
       a2 = assignment(@group_category)
       a2.group_category = nil
-      a2.should be_valid
+      expect(a2).to be_valid
     end
 
     it "doesn't let you change group category attributes after homework is submitted" do
       a1.submit_homework @student, body: "hello, world"
       a1.group_category = @group_category
-      a1.should_not be_valid
+      expect(a1).not_to be_valid
 
       a2 = assignment(@group_category)
       a2.submit_homework @student, body: "hello, world"
       a2.group_category = nil
-      a2.should_not be_valid
+      expect(a2).not_to be_valid
     end
   end
 end
@@ -3067,8 +3076,8 @@ end
 def setup_assignment_with_homework
   setup_assignment_without_submission
   res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
-  res.should_not be_nil
-  res.should be_is_a(Submission)
+  expect(res).not_to be_nil
+  expect(res).to be_is_a(Submission)
   @assignment.reload
 end
 
@@ -3079,12 +3088,12 @@ def setup_assignment_with_students
   @course.enroll_student(@stu2 = user)
   @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
   @sub1 = @assignment.grade_student(@stu1, :grade => 9).first
-  @sub1.score.should == 9
+  expect(@sub1.score).to eq 9
   # Took this out until it is asked for
   # @sub1.published_score.should_not == @sub1.score
-  @sub1.published_score.should == @sub1.score
+  expect(@sub1.published_score).to eq @sub1.score
   @assignment.reload
-  @assignment.submissions.should be_include(@sub1)
+  expect(@assignment.submissions).to be_include(@sub1)
 end
 
 def submit_homework(student)

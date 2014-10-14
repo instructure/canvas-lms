@@ -31,8 +31,8 @@ describe ShardedBookmarkedCollection do
       collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.accounts) do |scope|
         scope.active
       end
-      collection.paginate(per_page: 10).size.should equal 1
-      collection.should be_is_a BookmarkedCollection::MergeProxy
+      expect(collection.paginate(per_page: 10).size).to equal 1
+      expect(collection).to be_is_a BookmarkedCollection::MergeProxy
     end
   end
 end

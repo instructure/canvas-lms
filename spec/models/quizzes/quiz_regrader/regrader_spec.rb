@@ -41,13 +41,13 @@ describe Quizzes::QuizRegrader::Regrader do
 
   describe '#initialize' do
     it 'saves the quiz passed' do
-      quiz_regrader.quiz.should == quiz
+      expect(quiz_regrader.quiz).to eq quiz
     end
 
     it 'takes an optional submissions argument' do
       submissions = []
-      Quizzes::QuizRegrader::Regrader.new(quiz: quiz, submissions:submissions).
-        submissions.should == submissions
+      expect(Quizzes::QuizRegrader::Regrader.new(quiz: quiz, submissions:submissions).
+        submissions).to eq submissions
     end
   end
 
@@ -65,7 +65,7 @@ describe Quizzes::QuizRegrader::Regrader do
         versionable_id: quiz.id
       ).once.returns([ stub(:model => quiz_stub) ])
 
-      Quizzes::QuizRegrader::Regrader.new(options).quiz.should == quiz_stub
+      expect(Quizzes::QuizRegrader::Regrader.new(options).quiz).to eq quiz_stub
     end
   end
 
@@ -76,8 +76,8 @@ describe Quizzes::QuizRegrader::Regrader do
       uncompleted_submission = stub(:id => 5, :completed? => false)
       submissions << uncompleted_submission
 
-      quiz_regrader.submissions.length.should == 4
-      quiz_regrader.submissions.detect {|s| s.id == 5 }.should be_nil
+      expect(quiz_regrader.submissions.length).to eq 4
+      expect(quiz_regrader.submissions.detect {|s| s.id == 5 }).to be_nil
     end
   end
 

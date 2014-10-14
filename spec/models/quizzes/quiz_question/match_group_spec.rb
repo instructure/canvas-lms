@@ -30,32 +30,32 @@ describe Quizzes::QuizQuestion::MatchGroup do
 
     it "adds to matches" do
       subject.add(properties)
-      subject.matches.length.should == 1
-      subject.matches.first.text.should == properties[:text]
-      subject.matches.first.id.should == properties[:match_id]
+      expect(subject.matches.length).to eq 1
+      expect(subject.matches.first.text).to eq properties[:text]
+      expect(subject.matches.first.id).to eq properties[:match_id]
     end
 
     it "does not add a duplicate match" do
       subject.add(properties)
-      subject.matches.length.should == 1
+      expect(subject.matches.length).to eq 1
       subject.add(properties)
-      subject.matches.length.should == 1
+      expect(subject.matches.length).to eq 1
     end
 
     context "when providing a match with only text" do
       it "generates a unique id" do
         subject.add(text: "Georgia")
-        subject.matches.first.text.should == "Georgia"
-        subject.matches.first.id.should_not be_nil
+        expect(subject.matches.first.text).to eq "Georgia"
+        expect(subject.matches.first.id).not_to be_nil
       end
     end
 
     context "when providing a match with the same text" do
       it "does not add a duplicate match" do
         subject.add(text: "California")
-        subject.matches.length.should == 1
+        expect(subject.matches.length).to eq 1
         subject.add(text: "California")
-        subject.matches.length.should == 1
+        expect(subject.matches.length).to eq 1
       end
     end
   end

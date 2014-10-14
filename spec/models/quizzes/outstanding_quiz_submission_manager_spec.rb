@@ -37,19 +37,19 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       @outstanding = Quizzes::OutstandingQuizSubmissionManager.new(@quiz)
     end
     it 'should be overdue and need_grading' do
-      @submission.overdue?.should be true
-      @submission.needs_grading?.should be true
+      expect(@submission.overdue?).to be true
+      expect(@submission.needs_grading?).to be true
     end
     it "should #find_by_quiz" do
       subs = @outstanding.find_by_quiz
-      subs.size.should == 1
-      subs.first.id.should == @submission.id
+      expect(subs.size).to eq 1
+      expect(subs.first.id).to eq @submission.id
     end
     it 'should force grading to close the submission' do
       subs = @outstanding.find_by_quiz
       @outstanding.grade_by_ids(subs.map(&:id))
       subs = @outstanding.find_by_quiz
-      subs.size.should == 0
+      expect(subs.size).to eq 0
     end
     it 'should grade multiple submissions' do
       sub_count = @outstanding.find_by_quiz.size
@@ -62,9 +62,9 @@ describe Quizzes::OutstandingQuizSubmissionManager do
         submission
       end
       subs = @outstanding.find_by_quiz
-      subs.size.should == (sub_count + student_count)
+      expect(subs.size).to eq(sub_count + student_count)
       @outstanding.grade_by_ids(subs.map(&:id))
-      @outstanding.find_by_quiz.size.should == 0
+      expect(@outstanding.find_by_quiz.size).to eq 0
     end
   end
   describe '#grade_by_course' do
@@ -82,13 +82,13 @@ describe Quizzes::OutstandingQuizSubmissionManager do
         qs.complete!({})
       end
 
-      ungraded_qs.needs_grading?.should be true
-        graded_qs.needs_grading?.should be false
+      expect(ungraded_qs.needs_grading?).to be true
+        expect(graded_qs.needs_grading?).to be false
 
       described_class.grade_by_course(@course)
 
       ungraded_qs.reload
-      ungraded_qs.needs_grading?.should be false
+      expect(ungraded_qs.needs_grading?).to be false
     end
   end
 end
