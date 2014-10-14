@@ -94,15 +94,21 @@
         </a>
 
         <ul class="al-options">
-          <li>
-            <a href="#" class="icon-lock">
-              {{#if locked}}
+          {{#if locked}}
+            <li>
+              <a href="#" class="icon-lock">
                 {{#t "open_to_comments"}}Open to comments{{/t}}
-              {{else}}
-                {{#t "close_for_comments"}}Close for comments{{/t}}
-              {{/if}}
-            </a>
-          </li>
+              </a>
+            </li>
+          {{else}}
+            {{#if can_lock}}
+              <li>
+                <a href="#" class="icon-lock">
+                  {{#t "close_for_comments"}}Close for comments{{/t}}
+                </a>
+              </li>
+            {{/if}}
+          {{/if}}
           <li>
             <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
           </li>
