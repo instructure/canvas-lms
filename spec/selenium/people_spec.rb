@@ -8,16 +8,16 @@ describe "people" do
     f('textarea.user_list').send_keys(username)
     fj('.verify_syntax_button').click
     wait_for_ajax_requests
-    f('#user_list_parsed').should include_text(username)
+    expect(f('#user_list_parsed')).to include_text(username)
     f('.add_users_button').click
     wait_for_ajaximations
-    f(user_list_selector).should include_text(username)
+    expect(f(user_list_selector)).to include_text(username)
   end
 
   def open_student_group_dialog
     f('.add_category_link').click
     dialog = fj('.ui-dialog:visible')
-    dialog.should be_displayed
+    expect(dialog).to be_displayed
     dialog
   end
 
@@ -28,7 +28,7 @@ describe "people" do
     replace_content(inputs[0], group_text)
     submit_form('#add_category_form')
     wait_for_ajaximations
-    f('#category_list').should include_text(group_text)
+    expect(f('#category_list')).to include_text(group_text)
   end
 
   def enroll_student(student)
@@ -88,19 +88,19 @@ describe "people" do
     end
 
     it "should have tabs" do
-      fj('.collectionViewItems>li:first').text.should match "Everyone"
+      expect(fj('.collectionViewItems>li:first').text).to match "Everyone"
     end
 
     it "should validate the main page" do
       users = ff('.roster_user_name')
-      users[1].text.should match @student_1.name
-      users[0].text.should match @teacher.name
+      expect(users[1].text).to match @student_1.name
+      expect(users[0].text).to match @teacher.name
     end
 
     it "should navigate to registered services on profile page" do
       driver.find_element(:link, 'View Registered Services').click
       driver.find_element(:link, 'Link web services to my account').click
-      f('#unregistered_services').should be_displayed
+      expect(f('#unregistered_services')).to be_displayed
     end
 
     it "should make a new set of student groups" do
@@ -112,15 +112,15 @@ describe "people" do
       open_student_group_dialog
       fj('.self_signup_help_link:visible').click
       help_dialog = f('#self_signup_help_dialog')
-      help_dialog.should be_displayed
+      expect(help_dialog).to be_displayed
     end
 
     it "should test self sign up functionality" do
       expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
-      dialog.find_element(:css, '#category_split_group_count').should_not be_displayed
-      dialog.find_element(:css, '#category_create_group_count').should be_displayed
+      expect(dialog.find_element(:css, '#category_split_group_count')).not_to be_displayed
+      expect(dialog.find_element(:css, '#category_create_group_count')).to be_displayed
     end
 
     it "should test self sign up / group structure functionality" do
@@ -131,8 +131,8 @@ describe "people" do
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
       submit_form('#add_category_form')
       wait_for_ajaximations
-      @course.groups.count.should == 4
-      f('.group_count').should include_text("#{group_count} Groups")
+      expect(@course.groups.count).to eq 4
+      expect(f('.group_count')).to include_text("#{group_count} Groups")
     end
 
     it "should test group structure functionality" do
@@ -143,11 +143,11 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       replace_content(f('#category_split_group_count'), group_count)
-      @course.groups.count.should == 0
+      expect(@course.groups.count).to eq 0
       submit_form('#add_category_form')
       wait_for_ajaximations
-      @course.groups.count.should == group_count.to_i
-      ffj('.left_side .group_name:visible').count.should == group_count.to_i
+      expect(@course.groups.count).to eq group_count.to_i
+      expect(ffj('.left_side .group_name:visible').count).to eq group_count.to_i
     end
 
     it "should edit a student group" do
@@ -158,20 +158,20 @@ describe "people" do
       edit_form.find_element(:css, 'input#category_name').send_keys(new_group_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      fj(".category_name").text.should == new_group_name
+      expect(fj(".category_name").text).to eq new_group_name
     end
 
     it "should delete a student group" do
       create_student_group
       f('.delete_category_link').click
       keep_trying_until do
-        driver.switch_to.alert.should_not be_nil
+        expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         true
       end
       wait_for_ajaximations
       refresh_page
-      f('#no_groups_message').should be_displayed
+      expect(f('#no_groups_message')).to be_displayed
     end
 
     it "should randomly assign students" do
@@ -191,20 +191,20 @@ describe "people" do
       end
       f('.assign_students_link').click
       keep_trying_until do
-        driver.switch_to.alert.should_not be_nil
+        expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         true
       end
       wait_for_ajax_requests
       assert_flash_notice_message /Students assigned to groups/
-      f('.right_side .user_count').text.should == expected_student_count
+      expect(f('.right_side .user_count').text).to eq expected_student_count
     end
 
     it "should test prior enrollment functionality" do
       @course.complete
       get "/courses/#{@course.id}/users"
       expect_new_page_load { driver.find_element(:link, 'View Prior Enrollments').click }
-      f('#users').should include_text(@student_1.name)
+      expect(f('#users')).to include_text(@student_1.name)
     end
 
     def link_to_student(enrollment, student)
@@ -235,32 +235,32 @@ describe "people" do
       f('.more_user_information_link').click
       wait_for_ajaximations
       enrollments = ff(".enrollment")
-      enrollments.length.should == 2
+      expect(enrollments.length).to eq 2
 
-      enrollments[0].should include_text @students[0].name
-      enrollments[1].should include_text @students[1].name
+      expect(enrollments[0]).to include_text @students[0].name
+      expect(enrollments[1]).to include_text @students[1].name
 
       link_to_student(enrollments[0], @students[2])
-      enrollments[0].should include_text @students[2].name
-      enrollments[1].should include_text @students[1].name
+      expect(enrollments[0]).to include_text @students[2].name
+      expect(enrollments[1]).to include_text @students[1].name
 
       link_to_student(enrollments[1], @students[3])
-      enrollments[0].should include_text @students[2].name
-      enrollments[1].should include_text @students[3].name
+      expect(enrollments[0]).to include_text @students[2].name
+      expect(enrollments[1]).to include_text @students[3].name
 
       @obs.reload
-      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[2].id, @students[3].id]
+      expect(@obs.enrollments.map { |e| e.associated_user_id }.sort).to eq [@students[2].id, @students[3].id]
 
       link_to_student(enrollments[0], nil)
-      enrollments[0].find_element(:css, ".associated_user").should_not be_displayed
+      expect(enrollments[0].find_element(:css, ".associated_user")).not_to be_displayed
 
       link_to_student(enrollments[0], @students[0])
       link_to_student(enrollments[1], @students[1])
-      enrollments[0].should include_text @students[0].name
-      enrollments[1].should include_text @students[1].name
+      expect(enrollments[0]).to include_text @students[0].name
+      expect(enrollments[1]).to include_text @students[1].name
 
       @obs.reload
-      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[0].id, @students[1].id]
+      expect(@obs.enrollments.map { |e| e.associated_user_id }.sort).to eq [@students[0].id, @students[1].id]
     end
   end
 
@@ -272,18 +272,17 @@ describe "people" do
 
     it "should validate that the TA cannot delete / conclude or reset course" do
       get "/courses/#{@course.id}/settings"
-      f('.delete_course_link').should be_nil
-      f('.reset_course_content_button').should be_nil
+      expect(f('.delete_course_link')).to be_nil
+      expect(f('.reset_course_content_button')).to be_nil
       get "/courses/#{@course.id}/confirm_action?event=conclude"
-      f('.ui-state-error').should include_text('Unauthorized')
+      expect(f('.ui-state-error')).to include_text('Unauthorized')
     end
 
     it "should validate that a TA cannot rename a teacher" do
-      pending('bug 7106 - do not allow TA to edit teachers name') do
-        teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
-        get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
-        f('.edit_user_link').should_not be_displayed
-      end
+      skip('bug 7106 - do not allow TA to edit teachers name')
+      teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
+      get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
+      expect(f('.edit_user_link')).to_not be_displayed
     end
   end
 
@@ -292,11 +291,11 @@ describe "people" do
     get "/courses/#{@course.id}/settings#tab-sections"
 
     section_input = f('#course_section_name')
-    keep_trying_until { section_input.should be_displayed }
+    keep_trying_until { expect(section_input).to be_displayed }
     replace_content(section_input, section_name)
     submit_form('#add_section_form')
     wait_for_ajaximations
-    ff('#sections > .section')[1].should include_text(section_name)
+    expect(ff('#sections > .section')[1]).to include_text(section_name)
   end
 
   context "course with multiple sections", :priority => "2" do
@@ -311,7 +310,7 @@ describe "people" do
       f('#addUsers').click
       wait_for_ajaximations
 
-      f('#create-users-step-1').should be_displayed
+      expect(f('#create-users-step-1')).to be_displayed
       replace_content(f('#user_list_textarea'), 'student@example.com')
       click_option('#enrollment_type', 'TaEnrollment', :value)
       click_option('#course_section_id', 'Unnamed Course', :text)
@@ -319,15 +318,15 @@ describe "people" do
       f('#next-step').click
       wait_for_ajaximations
 
-      f('#create-users-step-2').should be_displayed
+      expect(f('#create-users-step-2')).to be_displayed
       f('.btn.createUsersStartOver').click
       wait_for_ajaximations
 
       #verify form and options have not changed
-      f('#create-users-step-1').should be_displayed
-      f('#user_list_textarea').text.should == 'student@example.com'
-      first_selected_option(f('#enrollment_type')).text.should == 'TA'
-      first_selected_option(f('#course_section_id')).text.should == 'Unnamed Course'
+      expect(f('#create-users-step-1')).to be_displayed
+      expect(f('#user_list_textarea').text).to eq 'student@example.com'
+      expect(first_selected_option(f('#enrollment_type')).text).to eq 'TA'
+      expect(first_selected_option(f('#course_section_id')).text).to eq 'Unnamed Course'
       is_checked('#limit_privileges_to_course_section') == true
     end
   end

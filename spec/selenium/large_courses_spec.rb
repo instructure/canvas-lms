@@ -23,7 +23,7 @@ describe "large courses", :priority => "2" do
       keep_trying_until { f('div.progressStatus span').text == 'Completed' }
 
       @new_course = Course.last
-      @new_course.assignments.count.should == 500
+      expect(@new_course.assignments.count).to eq 500
     end
 
     it "should export large course content" do
@@ -34,7 +34,7 @@ describe "large courses", :priority => "2" do
       @export.export_without_send_later
       new_download_link = keep_trying_until { f("#export_files a") }
       url = new_download_link.attribute 'href'
-      url.should match(%r{/files/\d+/download\?verifier=})
+      expect(url).to match(%r{/files/\d+/download\?verifier=})
     end
   end
 

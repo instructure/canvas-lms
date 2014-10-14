@@ -37,11 +37,11 @@ describe "settings tabs" do
     submit_form("#add_notification_form")
     wait_for_ajax_requests
     notification = AccountNotification.first
-    notification.message.should include_text("this is a message")
-    notification.subject.should include_text(subject)
-    notification.start_at.to_s.should include_text today
-    notification.end_at.to_s.should include_text tomorrow
-    f("#tab-announcements .user_content").text.should == "this is a message"
+    expect(notification.message).to include_text("this is a message")
+    expect(notification.subject).to include_text(subject)
+    expect(notification.start_at.to_s).to include_text today
+    expect(notification.end_at.to_s).to include_text tomorrow
+    expect(f("#tab-announcements .user_content").text).to eq "this is a message"
     notification
   end
 
@@ -147,8 +147,8 @@ describe "settings tabs" do
         fj('.ui-dialog button:contains(Delete):visible').click
         wait_for_ajax_requests
         tool = ContextExternalTool.last
-        tool.workflow_state.should == "deleted"
-        f("#external_tool#{tool.id} .name").should be_nil
+        expect(tool.workflow_state).to eq "deleted"
+        expect(f("#external_tool#{tool.id} .name")).to be_nil
       end
 
       it "should should edit an external tool" do
@@ -159,15 +159,15 @@ describe "settings tabs" do
         fj('.ui-dialog button:contains(Submit):visible').click
         wait_for_ajax_requests
         tool = ContextExternalTool.last
-        tool.description.should == new_description
+        expect(tool.description).to eq new_description
       end
     end
 
     context "announcements tab" do
       it "should add an announcement" do
         notification = add_announcement
-        notification.required_account_service.should be_nil
-        notification.months_in_display_cycle.should be_nil
+        expect(notification.required_account_service).to be_nil
+        expect(notification.months_in_display_cycle).to be_nil
       end
 
       it "should delete an announcement" do
@@ -175,7 +175,7 @@ describe "settings tabs" do
         f(".delete_notification_link").click
         driver.switch_to.alert.accept
         wait_for_ajaximations
-        AccountNotification.count.should == 0
+        expect(AccountNotification.count).to eq 0
       end
     end
   end

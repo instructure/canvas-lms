@@ -26,12 +26,12 @@ describe "quizzes question creation edge cases" do
     refresh_page #making sure the quizzes load up from the database
     click_questions_tab
     3.times do |i|
-      keep_trying_until(100) {f("#question_#{quiz.quiz_questions[i].id}").should be_displayed}
+      keep_trying_until(100) {expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed}
     end
     questions = ff('.display_question')
-    questions[0].should have_class("multiple_choice_question")
-    questions[1].should have_class("true_false_question")
-    questions[2].should have_class("short_answer_question")
+    expect(questions[0]).to have_class("multiple_choice_question")
+    expect(questions[1]).to have_class("true_false_question")
+    expect(questions[2]).to have_class("short_answer_question")
   end
 
   it "should not create an extra, blank, correct answer when you use [answer] as a placeholder" do
@@ -48,7 +48,7 @@ describe "quizzes question creation edge cases" do
     select_box = question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'answer'
+    expect(options[0].text).to eq 'answer'
 
     # input answers for the blank input
     answers = question.find_elements(:css, ".form_answers > .answer")
@@ -66,11 +66,11 @@ describe "quizzes question creation edge cases" do
     f('#show_question_details').click
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
     # check to make sure extra answers were not generated
-    quiz.quiz_questions.first.question_data["answers"].count.should == 2
-    quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}.should be_nil
+    expect(quiz.quiz_questions.first.question_data["answers"].count).to eq 2
+    expect(quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}).to be_nil
   end
 
   it "respects character limits on short answer questions" do
@@ -93,7 +93,7 @@ describe "quizzes question creation edge cases" do
       alert_present?
     end
     alert = driver.switch_to.alert
-    alert.text.should =~ /Answers for fill in the blank questions must be under 80 characters long/
+    expect(alert.text).to match /Answers for fill in the blank questions must be under 80 characters long/
     alert.dismiss
   end
 
@@ -108,7 +108,7 @@ describe "quizzes question creation edge cases" do
     edit_quiz
     click_questions_tab
     edit_and_save_first_multiple_choice_answer 'instructure!'
-    error_displayed?.should be_false
+    expect(error_displayed?).to be_falsey
 
     refresh_page
     click_questions_tab
@@ -126,13 +126,13 @@ describe "quizzes question creation edge cases" do
     edit_first_question
     delete_first_multiple_choice_answer
     save_question
-    error_displayed?.should be_true
+    expect(error_displayed?).to be_truthy
 
     refresh_page
     click_questions_tab
     edit_first_question
     delete_first_multiple_choice_answer
     save_question
-    error_displayed?.should be_true
+    expect(error_displayed?).to be_truthy
   end
 end

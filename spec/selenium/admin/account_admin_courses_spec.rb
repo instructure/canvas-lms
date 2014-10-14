@@ -12,10 +12,10 @@ describe "account admin courses tab" do
     end
     # we need to refresh the page so the course shows up
     refresh_page
-    f("#course_#{course.id}").should be_displayed
-    f("#course_#{course.id}").should include_text course_name
+    expect(f("#course_#{course.id}")).to be_displayed
+    expect(f("#course_#{course.id}")).to include_text course_name
     if (has_student)
-      f("#course_#{course.id}").should include_text "1 Student"
+      expect(f("#course_#{course.id}")).to include_text "1 Student"
     end
     course
   end
@@ -30,7 +30,7 @@ describe "account admin courses tab" do
       end
 
       it "should add a new course" do
-        pending('sub account course creation, failing at wait_for_dom_ready') if account != Account.default
+        skip('sub account course creation, failing at wait_for_dom_ready') if account != Account.default
         course_name = 'course 1'
         course_code = '12345'
         get url
@@ -42,10 +42,10 @@ describe "account admin courses tab" do
         submit_form("#add_course_form")
         refresh_page # we need to refresh the page so the course shows up
         course = Course.where(name: course_name).first
-        course.should be_present
-        course.course_code.should == course_code
-        f("#course_#{course.id}").should be_displayed
-        f("#course_#{course.id}").should include_text(course_name)
+        expect(course).to be_present
+        expect(course.course_code).to eq course_code
+        expect(f("#course_#{course.id}")).to be_displayed
+        expect(f("#course_#{course.id}")).to include_text(course_name)
       end
     end
   end
@@ -64,9 +64,9 @@ describe "account admin courses tab" do
       f("#course_name").send_keys(name[0])
       f("#course_name").send_keys(" "+name[1])
       ff(".ui-menu-item .ui-corner-all").count > 0
-      keep_trying_until { fj(".ui-menu-item .ui-corner-all:visible").text.should include_text(course.name) }
+      keep_trying_until { expect(fj(".ui-menu-item .ui-corner-all:visible").text).to include_text(course.name) }
       expect_new_page_load { fj("#new_course button").click }
-      f("#crumb_course_#{course.id}").should be_displayed
+      expect(f("#crumb_course_#{course.id}")).to be_displayed
     end
 
     it "should search a bogus course and it should not show up" do
@@ -75,7 +75,7 @@ describe "account admin courses tab" do
       name = name.split(" ")
       f("#course_name").send_keys(name[0])
       f("#course_name").send_keys(" "+name[1])
-      ff(".ui-menu-item .ui-corner-all").count.should == 0
+      expect(ff(".ui-menu-item .ui-corner-all").count).to eq 0
     end
 
     it "should hide enrollmentless courses" do
@@ -86,8 +86,8 @@ describe "account admin courses tab" do
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests
-      f("#course_#{course.id}").should be_nil
-      f("#course_#{course2.id}").should be_displayed
+      expect(f("#course_#{course.id}")).to be_nil
+      expect(f("#course_#{course2.id}")).to be_displayed
     end
 
     it "should hide and then show enrollmentless courses" do
@@ -96,11 +96,11 @@ describe "account admin courses tab" do
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests
-      f("#course_#{course.id}").should be_nil
+      expect(f("#course_#{course.id}")).to be_nil
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests
-      f("#course_#{course.id}").should be_displayed
+      expect(f("#course_#{course.id}")).to be_displayed
     end
   end
 end

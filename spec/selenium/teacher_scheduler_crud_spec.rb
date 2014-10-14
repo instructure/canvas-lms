@@ -31,15 +31,15 @@ describe "scheduler" do
 
       create_appointment_group_manual(:publish => false)
       new_appointment_group = AppointmentGroup.last
-      new_appointment_group.workflow_state.should == 'pending'
-      f('.ag-x-of-x-signed-up').should include_text('unpublished')
+      expect(new_appointment_group.workflow_state).to eq 'pending'
+      expect(f('.ag-x-of-x-signed-up')).to include_text('unpublished')
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
-      keep_trying_until { edit_form.should be_displayed }
+      keep_trying_until { expect(edit_form).to be_displayed }
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       new_appointment_group.reload
-      new_appointment_group.workflow_state.should == 'active'
+      expect(new_appointment_group.workflow_state).to eq 'active'
     end
 
     it "should edit an appointment group" do
@@ -71,7 +71,7 @@ describe "scheduler" do
       open_edit_dialog
       # expect only section1 to be selected
       f('.ag_contexts_selector').click
-      ffj('.ag_sections input:checked').size.should == 1
+      expect(ffj('.ag_sections input:checked').size).to eq 1
     end
 
     it "should delete an appointment group" do
@@ -83,7 +83,7 @@ describe "scheduler" do
       driver.action.move_to(appointment_group).perform
       click_al_option('.delete_link')
       delete_appointment_group
-      f('.list-wrapper').should include_text('You have not created any appointment groups')
+      expect(f('.list-wrapper')).to include_text('You have not created any appointment groups')
     end
 
     it "should delete an appointment group after clicking appointment group link" do
@@ -94,7 +94,7 @@ describe "scheduler" do
 
       click_al_option('.delete_link')
       delete_appointment_group
-      f('.list-wrapper').should include_text('You have not created any appointment groups')
+      expect(f('.list-wrapper')).to include_text('You have not created any appointment groups')
     end
 
     it "should delete the appointment group from the calendar" do
@@ -107,7 +107,7 @@ describe "scheduler" do
       driver.execute_script("$('.event-details .delete_event_link').trigger('click')")
       wait_for_ajaximations
       delete_appointment_group
-      keep_trying_until { element_exists('.fc-event-bg').should be_false }
+      keep_trying_until { expect(element_exists('.fc-event-bg')).to be_falsey }
     end
   end
 end

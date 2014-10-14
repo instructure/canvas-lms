@@ -19,16 +19,16 @@ describe "quizzes question banks" do
           f(".add_bank_link").click
           wait_for_ajaximations
           question_bank_title = f("#assessment_question_bank_title")
-          question_bank_title.should be_displayed
+          expect(question_bank_title).to be_displayed
           question_bank_title
       end
       question_bank_title.send_keys('goober', :return)
       wait_for_ajaximations
       question_bank = AssessmentQuestionBank.find_by_title('goober')
-      question_bank.should be_present
-      question_bank.workflow_state.should == "active"
-      f("#question_bank_adding .title").should(include_text('goober'))
-      question_bank.bookmarked_for?(User.last).should be_true
+      expect(question_bank).to be_present
+      expect(question_bank.workflow_state).to eq "active"
+      expect(f("#question_bank_adding .title")).to(include_text('goober'))
+      expect(question_bank.bookmarked_for?(User.last)).to be_truthy
       question_bank
     end
   end
@@ -62,7 +62,7 @@ describe "quizzes question banks" do
     submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
-    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "17" }
+    keep_trying_until { expect(fj("#quiz_display_points_possible .points_possible").text).to eq "17" }
   end
 
   it "should allow you to use inherited question banks" do
@@ -78,15 +78,15 @@ describe "quizzes question banks" do
     keep_trying_until do
       f('.find_question_link').click
       wait_for_ajaximations
-      f('#find_question_dialog').should be_displayed
-      f(".select_all_link").should be_displayed
+      expect(f('#find_question_dialog')).to be_displayed
+      expect(f(".select_all_link")).to be_displayed
     end
     f(".select_all_link").click
     wait_for_ajaximations
     submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
-    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
+    keep_trying_until { expect(fj("#quiz_display_points_possible .points_possible").text).to eq "1" }
 
     click_questions_tab
     f(".add_question_group_link").click
@@ -99,7 +99,7 @@ describe "quizzes question banks" do
     submit_form(".quiz_group_form")
     wait_for_ajaximations
     click_settings_tab
-    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
+    keep_trying_until { expect(fj("#quiz_display_points_possible .points_possible").text).to eq "2" }
   end
 
   it "should allow you to use bookmarked question banks" do
@@ -116,16 +116,16 @@ describe "quizzes question banks" do
     keep_trying_until do
       f('.find_question_link').click
       wait_for_ajaximations
-      f('#find_question_dialog').should be_displayed
+      expect(f('#find_question_dialog')).to be_displayed
       wait_for_ajaximations
-      f(".select_all_link").should be_displayed
+      expect(f(".select_all_link")).to be_displayed
     end
     f(".select_all_link").click
     wait_for_ajaximations
     submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
-    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
+    keep_trying_until { expect(fj("#quiz_display_points_possible .points_possible").text).to eq "1" }
 
     click_questions_tab
     f(".add_question_group_link").click
@@ -139,7 +139,7 @@ describe "quizzes question banks" do
     submit_form(".quiz_group_form")
     wait_for_ajaximations
     click_settings_tab
-    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
+    keep_trying_until { expect(fj("#quiz_display_points_possible .points_possible").text).to eq "2" }
   end
 
   it "should check permissions when retrieving question banks" do
@@ -160,20 +160,20 @@ describe "quizzes question banks" do
     keep_trying_until do
       f('.find_question_link').click
       wait_for_ajaximations
-      f('#find_question_dialog').should be_displayed
-      f(".select_all_link").should be_displayed
+      expect(f('#find_question_dialog')).to be_displayed
+      expect(f(".select_all_link")).to be_displayed
     end
-    ffj("#find_question_dialog .bank:visible").size.should == 1
+    expect(ffj("#find_question_dialog .bank:visible").size).to eq 1
 
     close_visible_dialog
     keep_trying_until do
       f('.add_question_group_link').click
       wait_for_ajaximations
-      f('.find_bank_link').should be_displayed
+      expect(f('.find_bank_link')).to be_displayed
     end
     f(".find_bank_link").click
     wait_for_ajaximations
-    ffj("#find_bank_dialog .bank:visible").size.should == 1
+    expect(ffj("#find_bank_dialog .bank:visible").size).to eq 1
   end
 
   it "should import questions from a question bank" do
@@ -186,6 +186,6 @@ describe "quizzes question banks" do
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
     replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
     submit_form(group_form)
-    f('#questions .group_top .group_display.name').should include_text('new group')
+    expect(f('#questions .group_top .group_display.name')).to include_text('new group')
   end
 end

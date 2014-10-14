@@ -23,10 +23,10 @@ describe "users" do
       wait_for_ajaximations
 
       new_login = ff('.login').select { |e| e.attribute(:class) !~ /blank/ }.first
-      new_login.should_not be_nil
-      new_login.find_element(:css, '.account_name').text().should_not be_blank
+      expect(new_login).not_to be_nil
+      expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
-      pseudonym.valid_password?('qwerty1').should be_true
+      expect(pseudonym.valid_password?('qwerty1')).to be_truthy
     end
   end
 
@@ -42,17 +42,17 @@ describe "users" do
       page_view(:user => @student, :course => @course, :url => 'assignments')
       get "/users/#{@student.id}"
       rows = ff('#page_view_results tr')
-      rows.count.should == 1
+      expect(rows.count).to eq 1
       page_view = rows.first
-      page_view.should include_text('Firefox')
-      page_view.should include_text('assignments')
-      f('#page_view_results tr img').should be_nil # should not have a participation
+      expect(page_view).to include_text('Firefox')
+      expect(page_view).to include_text('assignments')
+      expect(f('#page_view_results tr img')).to be_nil # should not have a participation
     end
 
     it "should validate page view with a participation" do
       page_view(:user => @student, :course => @course, :participated => true)
       get "/users/#{@student.id}"
-      f("#page_view_results img").should have_attribute(:src, '/images/checked.png')
+      expect(f("#page_view_results img")).to have_attribute(:src, '/images/checked.png')
     end
 
     it "should validate a page view url" do
@@ -62,10 +62,10 @@ describe "users" do
       refresh_page # in order to get the generated page view
       page_view_url = f('#page_view_results a')
       second_student = User.find_by_name(second_student_name)
-      page_view_url.text.should == second_student.id.to_s
+      expect(page_view_url.text).to eq second_student.id.to_s
       expect_new_page_load { page_view_url.click }
-      f('.user_details .name').text.should == second_student.name
-      ff("#page_view_results tr").length.should == 0 # validate the second student has no page views
+      expect(f('.user_details .name').text).to eq second_student.name
+      expect(ff("#page_view_results tr").length).to eq 0 # validate the second student has no page views
     end
 
     it "should validate all page views were loaded" do
@@ -75,7 +75,7 @@ describe "users" do
       wait_for_ajaximations
       driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
       wait_for_ajaximations
-      ff("#page_view_results tr").length.should == page_views_count
+      expect(ff("#page_view_results tr").length).to eq page_views_count
     end
   end
 
@@ -96,7 +96,7 @@ describe "users" do
     end
 
     def validate_login_info(user_id)
-      f('#login_information').should include_text(user_id)
+      expect(f('#login_information')).to include_text(user_id)
     end
 
     before (:each) do
@@ -120,8 +120,8 @@ describe "users" do
       setup_user_merge(@student_2, @student_1)
       submit_merge
       reload_users(@users)
-      @student_1.workflow_state.should == 'registered'
-      @student_2.workflow_state.should == 'deleted'
+      expect(@student_1.workflow_state).to eq 'registered'
+      expect(@student_2.workflow_state).to eq 'deleted'
       validate_login_info(@student_1_id)
     end
 
@@ -129,25 +129,25 @@ describe "users" do
       setup_user_merge(@student_1, @student_2)
       submit_merge
       reload_users(@users)
-      @student_1.workflow_state.should == 'deleted'
-      @student_2.workflow_state.should == 'registered'
+      expect(@student_1.workflow_state).to eq 'deleted'
+      expect(@student_2.workflow_state).to eq 'registered'
       validate_login_info(@student_2_id)
     end
 
     it "should validate switching the users to merge" do
       setup_user_merge(@student_2, @student_1)
       user_names = ff('.result td')
-      user_names[0].should include_text(@student_2.name)
-      user_names[1].should include_text(@student_1.name)
+      expect(user_names[0]).to include_text(@student_2.name)
+      expect(user_names[1]).to include_text(@student_1.name)
       f('#switch_user_positions').click
       wait_for_ajaximations
       user_names = ff('.result td')
-      user_names[0].should include_text(@student_1.name)
-      user_names[1].should include_text(@student_2.name)
+      expect(user_names[0]).to include_text(@student_1.name)
+      expect(user_names[1]).to include_text(@student_2.name)
       submit_merge
       reload_users(@users)
-      @student_1.workflow_state.should == 'deleted'
-      @student_2.workflow_state.should == 'registered'
+      expect(@student_1.workflow_state).to eq 'deleted'
+      expect(@student_2.workflow_state).to eq 'registered'
       validate_login_info(@student_1_id)
     end
 
@@ -157,35 +157,35 @@ describe "users" do
       wait_for_ajaximations
       expect_new_page_load { f('.button-secondary').click }
       wait_for_ajaximations
-      f('#courses_menu_item').should be_displayed
-      @student_1.workflow_state.should == 'registered'
-      @student_2.workflow_state.should == 'registered'
+      expect(f('#courses_menu_item')).to be_displayed
+      expect(@student_1.workflow_state).to eq 'registered'
+      expect(@student_2.workflow_state).to eq 'registered'
     end
 
     it "should show an error if the user id entered is the current users" do
       get "/users/#{@student_1.id}/admin_merge"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
       f('#manual_user_id').send_keys(@student_1.id)
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      flash_message_present?(:error, /You can't merge an account with itself./).should be_true
+      expect(flash_message_present?(:error, /You can't merge an account with itself./)).to be_truthy
     end
 
     it "should show an error if invalid text is entered in the id box" do
       get "/users/#{@student_1.id}/admin_merge"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      flash_message_present?(:error, /No active user with that ID was found./).should be_true
+      expect(flash_message_present?(:error, /No active user with that ID was found./)).to be_truthy
     end
 
     it "should show an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
       f('#manual_user_id').send_keys(1234567809)
       expect_new_page_load { f('button[type="submit"]').click }
-      flash_message_present?(:error, /No active user with that ID was found./).should be_true
+      expect(flash_message_present?(:error, /No active user with that ID was found./)).to be_truthy
     end
   end
 
@@ -204,7 +204,7 @@ describe "users" do
       %w{teacher student parent}.each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
-        f('input[name="user[terms_of_use]"]', form).should be_nil
+        expect(f('input[name="user[terms_of_use]"]', form)).to be_nil
         fj('.ui-dialog-titlebar-close:visible').click
       end
     end
@@ -216,7 +216,7 @@ describe "users" do
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         input = f('input[name="user[terms_of_use]"]', form)
-        input.should_not be_nil
+        expect(input).not_to be_nil
         form.submit
         wait_for_ajaximations
         assert_error_box 'input[name="user[terms_of_use]"]:visible'
@@ -242,8 +242,8 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'student'
+      expect(f('#identity .logout')).to be_present
+      expect(User.last.initial_enrollment_type).to eq 'student'
     end
 
     it "should register a teacher" do
@@ -267,8 +267,8 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'teacher'
+      expect(f('#identity .logout')).to be_present
+      expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 
     it "should register an observer" do
@@ -286,25 +286,25 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'observer'
+      expect(f('#identity .logout')).to be_present
+      expect(User.last.initial_enrollment_type).to eq 'observer'
     end
   end
 
   context "masquerading" do
     it "should masquerade as a user" do
-      pending('testbot fragile')
+      skip('testbot fragile')
       site_admin_logged_in(:name => "The Admin")
       user_with_pseudonym(:active_user => true, :name => "The Student")
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
       wait_for_ajaximations
-      f("#identity .user_name").should include_text "The Student"
+      expect(f("#identity .user_name")).to include_text "The Student"
       bar = f("#masquerade_bar")
-      bar.should include_text "You are currently masquerading"
+      expect(bar).to include_text "You are currently masquerading"
       bar.find_element(:css, ".stop_masquerading").click
       wait_for_ajaximations
-      f("#identity .user_name").should include_text "The Admin"
+      expect(f("#identity .user_name")).to include_text "The Admin"
     end
   end
 end

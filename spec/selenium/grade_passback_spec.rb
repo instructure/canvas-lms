@@ -5,25 +5,25 @@ describe "grade exchange course settings tab" do
 
   def getpseudonym(user_sis_id)
     pseudo = Pseudonym.find_by_sis_user_id(user_sis_id)
-    pseudo.should_not be_nil
+    expect(pseudo).not_to be_nil
     pseudo
   end
 
   def getuser(user_sis_id)
     user = getpseudonym(user_sis_id).user
-    user.should_not be_nil
+    expect(user).not_to be_nil
     user
   end
 
   def getsection(section_sis_id)
     section = CourseSection.find_by_sis_source_id(section_sis_id)
-    section.should_not be_nil
+    expect(section).not_to be_nil
     section
   end
 
   def getenroll(user_sis_id, section_sis_id)
     e = Enrollment.find_by_user_id_and_course_section_id(getuser(user_sis_id).id, getsection(section_sis_id).id)
-    e.should_not be_nil
+    expect(e).not_to be_nil
     e
   end
 
@@ -117,7 +117,7 @@ describe "grade exchange course settings tab" do
     f("#tab-grade-publishing-link").click
     wait_for_ajaximations
 
-    f("#publish_grades_messages").text.should == "Unpublished - 6"
+    expect(f("#publish_grades_messages").text).to eq "Unpublished - 6"
     driver.execute_script "window.confirm = function(msg) { return true; }"
 
     csv =
@@ -132,16 +132,16 @@ describe "grade exchange course settings tab" do
     SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
     f("#publish_grades_link").click
     wait_for_ajaximations
-    f("#publish_grades_messages").text.should == (wait_for_success ? "Publishing - 6" : "Published - 6")
+    expect(f("#publish_grades_messages").text).to eq(wait_for_success ? "Publishing - 6" : "Published - 6")
   end
 
   it "should support grade submission" do
-    pending "spec being rewritten in a refactor"
+    skip "spec being rewritten in a refactor"
     grade_passback_setup(false)
   end
 
   it "should support grade submission and result writeback" do
-    pending "spec being rewritten in a refactor"
+    skip "spec being rewritten in a refactor"
     grade_passback_setup(true)
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",

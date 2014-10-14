@@ -17,10 +17,10 @@ describe "dashboard" do
 
       get "/"
 
-      keep_trying_until { ffj(".to-do-list li:visible").size.should == 5 + 1 } # +1 is the see more link
+      keep_trying_until { expect(ffj(".to-do-list li:visible").size).to eq 5 + 1 } # +1 is the see more link
       f(".more_link").click
       wait_for_ajaximations
-      ffj(".to-do-list li:visible").size.should == 20
+      expect(ffj(".to-do-list li:visible").size).to eq 20
     end
 
     it "should display assignments to do in to do list for a student" do
@@ -35,9 +35,9 @@ describe "dashboard" do
 
       #verify assignment changed notice is in messages
       f('.stream-assignment .stream_header').click
-      f('#assignment-details').should include_text('Assignment Due Date Changed')
+      expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
       #verify assignment is in to do list
-      f('.to-do-list > li').should include_text(assignment.submission_action_string)
+      expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
     end
   end
 end

@@ -20,7 +20,7 @@ describe "links", :priority => "2" do
 
     it "should navigate user to home page after home link is clicked" do
       expect_new_page_load { driver.find_element(:link, 'Home').click }
-			f("#course_home_content").should be_displayed
+			expect(f("#course_home_content")).to be_displayed
     end
 
     it "should navigate user to announcements page after announcements link is clicked" do
@@ -112,7 +112,7 @@ describe "links", :priority => "2" do
       it "should navigate user to main page after canvas logo link is clicked" do
         f('#header-logo')
         expect_new_page_load { f('#header-logo').click }
-        driver.current_url.should == f('#header-logo').attribute('href')
+        expect(driver.current_url).to eq f('#header-logo').attribute('href')
       end
 
       it "should navigate user to assignments page after assignments link is clicked" do
@@ -125,7 +125,7 @@ describe "links", :priority => "2" do
 
       it "should navigate user to the calendar page after calender link is clicked" do
         expect_new_page_load { driver.find_element(:link, 'Calendar').click }
-				f('.calendar_header').should be_displayed
+				expect(f('.calendar_header')).to be_displayed
 			end
 		end
   end

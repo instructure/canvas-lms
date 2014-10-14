@@ -12,7 +12,7 @@ describe "course people" do
   def add_user(email, type, section_name=nil)
     get "/courses/#{@course.id}/users"
     add_button = f('#addUsers')
-    keep_trying_until { add_button.should be_displayed }
+    keep_trying_until { expect(add_button).to be_displayed }
     add_button.click
     wait_for_ajaximations
 
@@ -21,7 +21,7 @@ describe "course people" do
     f('#user_list_textarea').send_keys(email)
     f('#next-step').click
     wait_for_ajaximations
-    f('#create-users-verified').should include_text(email)
+    expect(f('#create-users-verified')).to include_text(email)
     f('#createUsersAddButton').click
     wait_for_ajax_requests
     f('.dialog_closer').click
@@ -40,7 +40,7 @@ describe "course people" do
       }
       wait_for_ajaximations
       element = elements.detect { |e| e.last == text }
-      element.should_not be_nil
+      expect(element).not_to be_nil
       element.first.click
       wait_for_ajaximations
     end
@@ -83,10 +83,10 @@ describe "course people" do
       @enrollment.course_section = @course_section; @enrollment.save!
 
       go_to_people_page
-      f('.roster').should include_text(username)
+      expect(f('.roster')).to include_text(username)
 
       remove_user(@student)
-      f('.roster').should_not include_text(username)
+      expect(f('.roster')).not_to include_text(username)
     end
 
     def add_user_to_second_section(role_name=nil)
@@ -95,17 +95,17 @@ describe "course people" do
       add_section(section_name)
       # open tab
       go_to_people_page
-      f("#user_#{@student.id} .section").should_not include_text(section_name)
+      expect(f("#user_#{@student.id} .section")).not_to include_text(section_name)
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
         select_from_auto_complete(section_name, 'section_input')
       end
       # expect
-      f("#user_#{@student.id}").should include_text(section_name)
-      ff("#user_#{@student.id} .section").length.should == 2
+      expect(f("#user_#{@student.id}")).to include_text(section_name)
+      expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
-      @student.enrollments.each{|e|e.role_name.should == role_name}
+      @student.enrollments.each{|e|expect(e.role_name).to eq role_name}
     end
 
     it "should add a user without custom role to another section" do
@@ -127,7 +127,7 @@ describe "course people" do
       wait_for_ajaximations
       wait_for_ajax_requests
       # expect
-      driver.current_url.should include(href)
+      expect(driver.current_url).to include(href)
     end
 
     def use_link_dialog(observer, role = nil)
@@ -164,21 +164,21 @@ describe "course people" do
       go_to_people_page
 
       observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
-      observer_row.should include_text students[0].name
-      observer_row.should include_text students[1].name
+      expect(observer_row).to include_text students[0].name
+      expect(observer_row).to include_text students[1].name
       # remove an observer
       use_link_dialog(obs) do
         fj("#link_students input:visible").send_keys(:backspace)
       end
       # expect
-      obs.reload.not_ended_enrollments.count.should == 1
+      expect(obs.reload.not_ended_enrollments.count).to eq 1
       # add an observer
       use_link_dialog(obs) do
         select_from_auto_complete(students[2].name, 'student_input')
       end
       # expect
-      obs.reload.not_ended_enrollments.count.should == 2
-      obs.reload.not_ended_enrollments.map { |e| e.associated_user_id }.sort.should include(students[2].id)
+      expect(obs.reload.not_ended_enrollments.count).to eq 2
+      expect(obs.reload.not_ended_enrollments.map { |e| e.associated_user_id }.sort).to include(students[2].id)
     end
 
     it "should handle deleted observee enrollments" do
@@ -195,14 +195,14 @@ describe "course people" do
       go_to_people_page
 
       observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
-      observer_row.should include "Student 1"
-      observer_row.should_not include "Student 2"
+      expect(observer_row).to include "Student 1"
+      expect(observer_row).not_to include "Student 2"
 
       # dialog loads too
       use_link_dialog(obs) do
         input = fj("#link_students")
-        input.text.should include "Student 1"
-        input.text.should_not include "Student 2"
+        expect(input.text).to include "Student 1"
+        expect(input.text).not_to include "Student 2"
       end
     end
 
@@ -216,17 +216,17 @@ describe "course people" do
         go_to_people_page
 
         # should NOT see remove link for teacher
-        kyle_menu(@teacher).should be_nil
+        expect(kyle_menu(@teacher)).to be_nil
         # should see remove link for student
         cog = open_kyle_menu @student
-        fj('a[data-event="removeFromCourse"]', cog).should_not be_nil
+        expect(fj('a[data-event="removeFromCourse"]', cog)).not_to be_nil
       end
     end
 
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_people_page
-      ff(".student_enrollments #user_#{@fake_student.id}").should be_empty
+      expect(ff(".student_enrollments #user_#{@fake_student.id}")).to be_empty
     end
 
     context "multiple enrollments" do
@@ -240,8 +240,8 @@ describe "course people" do
           select_from_auto_complete(@student.name, 'student_input')
         end
 
-        @observer.enrollments.find_by_associated_user_id(@student.id).should_not be_nil
-        f("#user_#{@observer.id}.ObserverEnrollment").text.should include("Observing: #{@student.name}")
+        expect(@observer.enrollments.find_by_associated_user_id(@student.id)).not_to be_nil
+        expect(f("#user_#{@observer.id}.ObserverEnrollment").text).to include("Observing: #{@student.name}")
       end
     end
 
@@ -258,7 +258,7 @@ describe "course people" do
         end
 
         @observer.reload
-        @observer.enrollments.each{|e|e.role_name.should == 'custom observer'}
+        @observer.enrollments.each{|e|expect(e.role_name).to eq 'custom observer'}
       end
 
       it "should create new enrollments as custom type when adding sections" do
@@ -268,7 +268,7 @@ describe "course people" do
       def select_new_role_type(type)
         get "/courses/#{@course.id}/users"
         add_button = f('#addUsers')
-        keep_trying_until { add_button.should be_displayed }
+        keep_trying_until { expect(add_button).to be_displayed }
         add_button.click
         click_option('#enrollment_type', type)
       end
@@ -278,20 +278,20 @@ describe "course people" do
           user = user_with_pseudonym(:active_user => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
-          f("#user_#{user.id} .admin-links").should_not be_nil
+          expect(f("#user_#{user.id} .admin-links")).not_to be_nil
         end
 
         if base_type == 'teacher' || base_type == 'ta'
           it "should show section limited checkbox for custom #{base_type} enrollments" do
             send "custom_#{base_type}_role", "custom"
             select_new_role_type("custom")
-            f('#limit_privileges_to_course_section').should be_displayed
+            expect(f('#limit_privileges_to_course_section')).to be_displayed
           end
         else
           it "should not show section limited checkbox for custom #{base_type} enrollments" do
             send "custom_#{base_type}_role", "custom"
             select_new_role_type("custom")
-            f('#limit_privileges_to_course_section').should_not be_displayed
+            expect(f('#limit_privileges_to_course_section')).not_to be_displayed
           end
         end
       end
@@ -301,8 +301,8 @@ describe "course people" do
       @role = custom_teacher_role "Mentor"
       add_user(@teacher.name, "Mentor")
       teacher_row = f("#user_#{@teacher.id}")
-      teacher_row.should have_class("TeacherEnrollment")
-      teacher_row.should have_class("Mentor")
+      expect(teacher_row).to have_class("TeacherEnrollment")
+      expect(teacher_row).to have_class("Mentor")
     end
   end
 

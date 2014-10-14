@@ -30,19 +30,19 @@ describe "quizzes question with html answers" do
     type_in_tiny '.answer:eq(3) textarea', 'HTML'
     close_first_html_answer
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-    html.should == '<p>HTML</p>'
+    expect(html).to eq '<p>HTML</p>'
     submit_form('.question_form')
     refresh_page
     click_questions_tab
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-    html.should == '<p>HTML</p>'
+    expect(html).to eq '<p>HTML</p>'
   end
 
   def check_for_no_edit_button(option)
     click_option('.question_form:visible .question_type', option)
     driver.execute_script "$('.answer').addClass('hover');"
-    fj('.edit_html:visible').should be_nil
+    expect(fj('.edit_html:visible')).to be_nil
   end
 
   it "should not show the edit html button for question types besides multiple choice and multiple answers" do
@@ -68,7 +68,7 @@ describe "quizzes question with html answers" do
     driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
     close_first_html_answer
     input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
-    input_length.should == 1
+    expect(input_length).to eq 1
   end
 
   it "should populate the editor and input elements properly" do
@@ -86,13 +86,13 @@ describe "quizzes question with html answers" do
     # open it up in the editor, make sure the text matches the input
     edit_first_html_answer
     content = driver.execute_script "return $('.answer:eq(3) textarea')._justGetCode()"
-    content.should == '<p>ohai</p>'
+    expect(content).to eq '<p>ohai</p>'
 
     # clear it out, make sure the original input is empty also
     driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
     close_first_html_answer
     value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
-    value.should == ''
+    expect(value).to eq ''
   end
 
   it "should save open html answers when the question is submitted for multiple choice" do
@@ -105,7 +105,7 @@ describe "quizzes question with html answers" do
     click_questions_tab
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-    html.should == '<p>HTML</p>'
+    expect(html).to eq '<p>HTML</p>'
   end
 
   it "should save open html answers when the question is submitted for multiple answers" do
@@ -118,7 +118,7 @@ describe "quizzes question with html answers" do
     click_questions_tab
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-    html.should == '<p>HTML</p>'
+    expect(html).to eq '<p>HTML</p>'
   end
 
 end

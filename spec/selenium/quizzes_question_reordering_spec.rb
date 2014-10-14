@@ -21,9 +21,9 @@ describe "drag and drop reordering" do
     drag_question_to_top @quest2.id
     refresh_page
     new_data = get_question_data
-    new_data[0][:id].should == old_data[1][:id]
-    new_data[1][:id].should == old_data[0][:id]
-    new_data[2][:id].should == old_data[2][:id]
+    expect(new_data[0][:id]).to eq old_data[1][:id]
+    expect(new_data[1][:id]).to eq old_data[0][:id]
+    expect(new_data[2][:id]).to eq old_data[2][:id]
   end
 
   it "should add and remove questions to/from a group" do
@@ -39,7 +39,7 @@ describe "drag and drop reordering" do
     drag_question_to_top @quest1.id
     refresh_page
     data = get_question_data
-    data[0][:id].should == @quest1.id
+    expect(data[0][:id]).to eq @quest1.id
   end
 
   it "should reorder questions within a group" do
@@ -47,14 +47,14 @@ describe "drag and drop reordering" do
     drag_question_into_group @quest1.id, @group.id
     drag_question_into_group @quest2.id, @group.id
     data = get_question_data_for_group @group.id
-    data[0][:id].should == @quest2.id
-    data[1][:id].should == @quest1.id
+    expect(data[0][:id]).to eq @quest2.id
+    expect(data[1][:id]).to eq @quest1.id
 
     drag_question_to_top_of_group @quest1.id, @group.id
     refresh_page
     data = get_question_data_for_group @group.id
-    data[0][:id].should == @quest1.id
-    data[1][:id].should == @quest2.id
+    expect(data[0][:id]).to eq @quest1.id
+    expect(data[1][:id]).to eq @quest2.id
   end
 
   it "should reorder groups and questions" do
@@ -64,8 +64,8 @@ describe "drag and drop reordering" do
     drag_group_to_top @group.id
     refresh_page
     new_data = get_question_data
-    new_data[0][:id].should == old_data[2][:id]
-    new_data[1][:id].should == old_data[0][:id]
-    new_data[2][:id].should == old_data[1][:id]
+    expect(new_data[0][:id]).to eq old_data[2][:id]
+    expect(new_data[1][:id]).to eq old_data[0][:id]
+    expect(new_data[2][:id]).to eq old_data[1][:id]
   end
 end

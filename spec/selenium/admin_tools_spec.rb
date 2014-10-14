@@ -45,8 +45,8 @@ describe "admin_tools" do
   def click_view_tab(tab_name)
     wait_for_ajaximations
     tab = fj("#adminToolsTabs .#{tab_name} > a")
-    tab.should_not be_nil
-    tab.should be_displayed
+    expect(tab).not_to be_nil
+    expect(tab).to be_displayed
     tab.click
     wait_for_ajaximations
   end
@@ -66,10 +66,10 @@ describe "admin_tools" do
     wait_for_ajaximations
 
     cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-    cols[3].text.should == event_type
+    expect(cols[3].text).to eq event_type
 
     fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
-    fj('.ui-dialog dl dd:first').text.should == event.id
+    expect(fj('.ui-dialog dl dd:first').text).to eq event.id
   end
 
   before do
@@ -101,7 +101,7 @@ describe "admin_tools" do
         perform_user_search("#commMessagesSearchForm", @student.id)
         f('#commMessagesSearchForm .userDateRangeSearchBtn').click
         wait_for_ajaximations
-        f('#commMessagesSearchResults .message-body').text.should include('this is my message')
+        expect(f('#commMessagesSearchResults .message-body').text).to include('this is my message')
       end
     end
 
@@ -114,7 +114,7 @@ describe "admin_tools" do
           perform_user_search("#commMessagesSearchForm", @student.id)
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchResults .message-body').text.should include('nice body')
+          expect(f('#commMessagesSearchResults .message-body').text).to include('nice body')
         end
 
         it "should display nothing found" do
@@ -125,8 +125,8 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 2.months.ago
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchResults .alert').text.should include('No messages found')
-          f('#commMessagesSearchResults .message-body').should be_nil
+          expect(f('#commMessagesSearchResults .alert').text).to include('No messages found')
+          expect(f('#commMessagesSearchResults .message-body')).to be_nil
         end
 
         it "should display valid search params used" do
@@ -137,21 +137,21 @@ describe "admin_tools" do
           perform_user_search("#commMessagesSearchForm", @student.id)
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from the beginning to now.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from the beginning to now.")
           # Search with begin date and end date - should show time actually being used
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12:00am to Mar 9, 2001 at 12:00am.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12:00am to Mar 9, 2001 at 12:00am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001 1:05p'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001 3p'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3:00pm.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3:00pm.")
         end
 
         it "should display search params used when given invalid input data" do
@@ -163,7 +163,7 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'pillow'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from the beginning to now.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from the beginning to now.")
         end
 
         it "should hide tab if account setting disabled" do
@@ -173,7 +173,7 @@ describe "admin_tools" do
           load_admin_tools_page
           wait_for_ajaximations
           tab = fj('#adminToolsTabs .notifications > a')
-          tab.should be_nil
+          expect(tab).to be_nil
         end
       end
 
@@ -183,7 +183,7 @@ describe "admin_tools" do
           load_admin_tools_page
           wait_for_ajaximations
           tab = fj('#adminToolsTabs .notifications > a')
-          tab.should be_nil
+          expect(tab).to be_nil
         end
       end
     end
@@ -197,14 +197,14 @@ describe "admin_tools" do
       click_view_tab "logging"
 
       select = fj('#loggingType')
-      select.should_not be_nil
-      select.should be_displayed
+      expect(select).not_to be_nil
+      expect(select).to be_displayed
 
       change_log_type("Authentication")
 
       loggingTypeView = fj('#loggingAuthentication')
-      loggingTypeView.should_not be_nil
-      loggingTypeView.should be_displayed
+      expect(loggingTypeView).not_to be_nil
+      expect(loggingTypeView).to be_displayed
     end
 
     context "permissions" do
@@ -214,21 +214,21 @@ describe "admin_tools" do
         wait_for_ajaximations
 
         tab = fj('#adminToolsTabs .logging > a')
-        tab.should_not be_nil
-        tab.text.should == "Logging"
+        expect(tab).not_to be_nil
+        expect(tab.text).to eq "Logging"
 
         click_view_tab "logging"
 
         select = fj('#loggingType')
-        select.should_not be_nil
-        select.should be_displayed
+        expect(select).not_to be_nil
+        expect(select).to be_displayed
 
         options = ffj("#loggingType > option")
         options.map!{ |o| o.text }
-        options.should include("Select a Log type")
-        options.should include("Login / Logout Activity")
-        options.should include("Grade Change Activity")
-        options.should include("Course Activity")
+        expect(options).to include("Select a Log type")
+        expect(options).to include("Login / Logout Activity")
+        expect(options).to include("Grade Change Activity")
+        expect(options).to include("Course Activity")
       end
 
       context "without permissions" do
@@ -242,7 +242,7 @@ describe "admin_tools" do
           load_admin_tools_page
           wait_for_ajaximations
           tab = fj('#adminToolsTabs .logging > a')
-          tab.should be_nil
+          expect(tab).to be_nil
         end
 
         it "should not include login activity option for revoked permission" do
@@ -254,7 +254,7 @@ describe "admin_tools" do
 
           options = ffj("#loggingType > option")
           options.map!{ |o| o.text }
-          options.should_not include("Login / Logout Activity")
+          expect(options).not_to include("Login / Logout Activity")
         end
 
         it "should not include grade change activity option for revoked permission" do
@@ -266,7 +266,7 @@ describe "admin_tools" do
 
           options = ffj("#loggingType > option")
           options.map!{ |o| o.text }
-          options.should_not include("Grade Change Activity")
+          expect(options).not_to include("Grade Change Activity")
         end
 
         it "should not include course change activity option for revoked permission" do
@@ -278,7 +278,7 @@ describe "admin_tools" do
 
           options = ffj("#loggingType > option")
           options.map!{ |o| o.text }
-          options.should_not include("Course Activity")
+          expect(options).not_to include("Course Activity")
         end
       end
     end
@@ -301,17 +301,17 @@ describe "admin_tools" do
       perform_user_search("#authLoggingSearchForm", @student.id)
       f('#authLoggingSearchForm .userDateRangeSearchBtn').click
       wait_for_ajaximations
-      ff('#authLoggingSearchResults table tbody tr').length.should == 2
+      expect(ff('#authLoggingSearchResults table tbody tr').length).to eq 2
       cols = ffj('#authLoggingSearchResults table tbody tr:first td')
-      cols.size.should == 3
-      cols.last.text.should == "LOGOUT"
+      expect(cols.size).to eq 3
+      expect(cols.last.text).to eq "LOGOUT"
     end
 
     it "should search by user name" do
       perform_user_search("#authLoggingSearchForm", 'testuser')
       f('#authLoggingSearchForm .userDateRangeSearchBtn').click
       wait_for_ajaximations
-      ff('#authLoggingSearchResults table tbody tr').length.should == 2
+      expect(ff('#authLoggingSearchResults table tbody tr').length).to eq 2
     end
   end
 
@@ -343,38 +343,38 @@ describe "admin_tools" do
       perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
-      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
 
       cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 8
+      expect(cols.size).to eq 8
 
-      cols[2].text.should == "-"
-      cols[3].text.should == "7"
-      cols[4].text.should == @teacher.name
-      cols[5].text.should == @student.name
-      cols[6].text.should == @course.name
-      cols[7].text.should == @assignment.title
+      expect(cols[2].text).to eq "-"
+      expect(cols[3].text).to eq "7"
+      expect(cols[4].text).to eq @teacher.name
+      expect(cols[5].text).to eq @student.name
+      expect(cols[6].text).to eq @course.name
+      expect(cols[7].text).to eq @assignment.title
     end
 
     it "should search by student name" do
       perform_autocomplete_search("#student_id-autocompleteField", @student.name)
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
-      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
 
     it "should search by course id" do
       set_value f("#gradeChangeCourseSearch"), @course.id
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
-      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
 
     it "should search by assignment id" do
       set_value f("#gradeChangeAssignmentSearch"), @assignment.id
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
-      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
   end
 
@@ -406,14 +406,14 @@ describe "admin_tools" do
       f('#loggingCourse button[name=course_submit]').click
       wait_for_ajaximations
 
-      ff('#courseLoggingSearchResults table tbody tr').length.should == @events.length
+      expect(ff('#courseLoggingSearchResults table tbody tr').length).to eq @events.length
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 6
+      expect(cols.size).to eq 6
 
-      cols[2].text.should == @teacher.name
-      cols[3].text.should == "Updated"
-      cols[4].text.should == "Manual"
-      cols[5].text.should == "View Details"
+      expect(cols[2].text).to eq @teacher.name
+      expect(cols[3].text).to eq "Updated"
+      expect(cols[4].text).to eq "Manual"
+      expect(cols[5].text).to eq "View Details"
     end
 
     it "should search by course id" do
@@ -424,7 +424,7 @@ describe "admin_tools" do
       f('#loggingCourse button[name=course_submit]').click
       wait_for_ajaximations
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 6
+      expect(cols.size).to eq 6
     end
 
     it "should find courses in any workflow state" do
@@ -432,13 +432,13 @@ describe "admin_tools" do
       @course.destroy
 
       autocomplete_value = perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      autocomplete_value.should_not be_nil
+      expect(autocomplete_value).not_to be_nil
 
       f('#loggingCourse button[name=course_submit]').click
       wait_for_ajaximations
 
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 6
+      expect(cols.size).to eq 6
     end
 
     it "should show created event details" do
@@ -449,9 +449,9 @@ describe "admin_tools" do
 
       show_event_details("Created")
       cols = ffj('.ui-dialog table:first tbody tr:first td')
-      cols.size.should == 2
-      cols[0].text.should == "Name"
-      cols[1].text.should == @course.name
+      expect(cols.size).to eq 2
+      expect(cols[0].text).to eq "Name"
+      expect(cols[1].text).to eq @course.name
     end
 
     it "should show updated event details" do
@@ -461,14 +461,14 @@ describe "admin_tools" do
 
       show_event_details("Updated", old_name)
       items = ffj('.ui-dialog dl > dd')
-      items[4].text.should == "Manual"
-      items[5].text.should == "Updated"
+      expect(items[4].text).to eq "Manual"
+      expect(items[5].text).to eq "Updated"
 
       cols = ffj('.ui-dialog table:first tbody tr:first td')
-      cols.size.should == 3
-      cols[0].text.should == "Name"
-      cols[1].text.should == old_name
-      cols[2].text.should == @course.name
+      expect(cols.size).to eq 3
+      expect(cols[0].text).to eq "Name"
+      expect(cols[1].text).to eq old_name
+      expect(cols[2].text).to eq @course.name
     end
 
     it "should show sis batch id if source is sis" do
@@ -480,8 +480,8 @@ describe "admin_tools" do
 
       show_event_details("Updated", old_name)
       items = ffj('.ui-dialog dl > dd')
-      items[4].text.should == "SIS"
-      items[5].text.should == sis_batch.id.to_s
+      expect(items[4].text).to eq "SIS"
+      expect(items[5].text).to eq sis_batch.id.to_s
     end
 
     it "should show concluded event details" do
@@ -514,7 +514,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied To", @course.name, @to_event)
-      fj('.ui-dialog dl dd:last').text.should == @copied_course.name
+      expect(fj('.ui-dialog dl dd:last').text).to eq @copied_course.name
     end
 
     it "should show copied_from event details" do
@@ -522,7 +522,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied From", @copied_course.name, @from_event)
-      fj('.ui-dialog dl dd:last').text.should == @course.name
+      expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
     end
 
     it "should show reset_to event details" do
@@ -530,7 +530,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset To", @course.name, @to_event)
-      fj('.ui-dialog dl dd:last').text.should == @reset_course.name
+      expect(fj('.ui-dialog dl dd:last').text).to eq @reset_course.name
     end
 
     it "should show copied_from event details" do
@@ -538,7 +538,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset From", @reset_course.name, @from_event)
-      fj('.ui-dialog dl dd:last').text.should == @course.name
+      expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
     end
   end
 end

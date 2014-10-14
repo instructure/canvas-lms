@@ -4,9 +4,9 @@ describe "login logout test", :priority => "2" do
   it_should_behave_like "in-process server selenium tests"
 
   def should_show_message(message_text, selector)
-    fj(selector).should include_text(message_text)
+    expect(fj(selector)).to include_text(message_text)
     # the text isn't visible on the page so the webdriver .text method doesn't return it
-    driver.execute_script("return $('#aria_alerts div:last').text()").should == message_text
+    expect(driver.execute_script("return $('#aria_alerts div:last').text()")).to eq message_text
   end
 
   def verify_logout
@@ -14,7 +14,7 @@ describe "login logout test", :priority => "2" do
     user_with_pseudonym({:active_user => true})
     login_as
     expect_new_page_load { f('.logout > a').click }
-    driver.current_url.should == expected_url
+    expect(driver.current_url).to eq expected_url
     expected_url
   end
 
@@ -30,7 +30,7 @@ describe "login logout test", :priority => "2" do
   it "should login successfully with correct username and password" do
     user_with_pseudonym({:active_user => true})
     login_as
-    f('.user_name').text.should == @user.primary_pseudonym.unique_id
+    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
   end
 
   it "should show error message if wrong credentials are used" do
@@ -60,7 +60,7 @@ describe "login logout test", :priority => "2" do
     expected_url = verify_logout
     get "/grades"
     assert_flash_warning_message /You must be logged in to access this page/
-    driver.current_url.should == expected_url
+    expect(driver.current_url).to eq expected_url
   end
 
   it "should validate i dont know my password functionality for email account" do
@@ -75,6 +75,6 @@ describe "login logout test", :priority => "2" do
   it "should validate back button works in forgot password page" do
     go_to_forgot_password
     f('.login_link').click
-    f('#login_form').should be_displayed
+    expect(f('#login_form')).to be_displayed
   end
 end

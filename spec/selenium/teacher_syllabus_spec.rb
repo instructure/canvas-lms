@@ -33,27 +33,27 @@ describe "course syllabus" do
 
     it "should confirm existing assignments and dates are correct" do
       assignment_details = ff('td.name')
-      assignment_details[0].text.should == @assignment_1.title
-      assignment_details[1].text.should == @assignment_2.title
+      expect(assignment_details[0].text).to eq @assignment_1.title
+      expect(assignment_details[1].text).to eq @assignment_2.title
     end
 
     it "should edit the description" do
       new_description = "new syllabus description"
       f('.edit_syllabus_link').click
       # check that the wiki sidebar is visible
-      f('#editor_tabs .wiki-sidebar-header').should include_text("Insert Content into the Page")
+      expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
       edit_form = f('#edit_course_syllabus_form')
       wait_for_tiny(keep_trying_until { f('#edit_course_syllabus_form') })
       type_in_tiny('#course_syllabus_body', new_description)
       submit_form(edit_form)
       wait_for_ajaximations
-      f('#course_syllabus').text.should == new_description
+      expect(f('#course_syllabus').text).to eq new_description
     end
 
     it "should validate Jump to Today works on the mini calendar" do
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
-      f('.mini_month .today').should have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
+      expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
     end
   end
 end

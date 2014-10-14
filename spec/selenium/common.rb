@@ -405,7 +405,7 @@ shared_examples_for "all selenium tests" do
     driver.navigate.to(app_host + '/login')
     if expect_success
       expect_new_page_load { fill_in_login_form(username, password) }
-      f('#identity .logout').should be_present
+      expect(f('#identity .logout')).to be_present
     else
       fill_in_login_form(username, password)
     end
@@ -719,7 +719,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def hover_and_click(element_jquery_finder)
-    fj(element_jquery_finder.to_s).should be_present
+    expect(fj(element_jquery_finder.to_s)).to be_present
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
   end
 
@@ -757,7 +757,7 @@ shared_examples_for "all selenium tests" do
   def close_visible_dialog
     visible_dialog_element = fj('.ui-dialog:visible')
     visible_dialog_element.find_element(:css, '.ui-dialog-titlebar-close').click
-    visible_dialog_element.should_not be_displayed
+    expect(visible_dialog_element).not_to be_displayed
   end
 
   def element_exists(css_selector)
@@ -847,7 +847,7 @@ shared_examples_for "all selenium tests" do
   def try_to_close_modal
     begin
       driver.switch_to.alert.accept
-      driver.switch_to.alert.should be nil
+      expect(driver.switch_to.alert).to be nil
       true
     rescue Exception => e
       return false
@@ -926,29 +926,29 @@ shared_examples_for "all selenium tests" do
 
   def check_image(element)
     require 'open-uri'
-    element.should be_displayed
-    element.tag_name.should == 'img'
+    expect(element).to be_displayed
+    expect(element.tag_name).to eq 'img'
     temp_file = open(element.attribute('src'))
-    temp_file.size.should > 0
+    expect(temp_file.size).to be > 0
   end
 
   def check_element_attrs(element, attrs)
-    element.should be_displayed
+    expect(element).to be_displayed
     attrs.each do |k, v|
       if v.is_a? Regexp
-        element.attribute(k).should match v
+        expect(element.attribute(k)).to match v
       else
-        element.attribute(k).should == v
+        expect(element.attribute(k)).to eq v
       end
     end
   end
 
   def check_file(element)
     require 'open-uri'
-    element.should be_displayed
-    element.tag_name.should == 'a'
+    expect(element).to be_displayed
+    expect(element.tag_name).to eq 'a'
     temp_file = open(element.attribute('href'))
-    temp_file.size.should > 0
+    expect(temp_file.size).to be > 0
     temp_file
   end
 
@@ -979,8 +979,8 @@ shared_examples_for "all selenium tests" do
       var $result = $(arguments[0]).data('associated_error_box');
       return $result ? $result.toArray() : []
     JS
-    box.length.should == 1
-    box[0].should be_displayed
+    expect(box.length).to eq 1
+    expect(box[0]).to be_displayed
   end
 
 ##
@@ -1152,13 +1152,13 @@ def validate_breadcrumb_link(link_element, breadcrumb_text)
   expect_new_page_load { link_element.click }
   if breadcrumb_text != nil
     breadcrumb = f('#breadcrumbs')
-    breadcrumb.should include_text(breadcrumb_text)
+    expect(breadcrumb).to include_text(breadcrumb_text)
   end
-  driver.execute_script("return INST.errorCount;").should == 0
+  expect(driver.execute_script("return INST.errorCount;")).to eq 0
 end
 
 def skip_if_ie(additional_error_text)
-  pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+  skip("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
 end
 
 def alert_present?

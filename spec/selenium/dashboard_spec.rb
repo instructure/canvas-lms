@@ -7,7 +7,7 @@ describe "dashboard" do
     it "should load events list sidebar", :priority => "2" do
       driver.navigate.to(app_host)
       wait_for_ajaximations
-      f('.events_list').should be_displayed
+      expect(f('.events_list')).to be_displayed
     end
   end
 
@@ -28,22 +28,22 @@ describe "dashboard" do
     def test_hiding(url)
       create_announcement
       items = @user.stream_item_instances
-      items.size.should == 1
-      items.first.hidden.should == false
+      expect(items.size).to eq 1
+      expect(items.first.hidden).to eq false
 
       get url
       click_recent_activity_header
       item_selector = '#announcement-details tbody tr'
-      ff(item_selector).size.should == 1
+      expect(ff(item_selector).size).to eq 1
       f('#announcement-details .ignore-item').click
-      keep_trying_until { ff(item_selector).size.should == 0 }
+      keep_trying_until { expect(ff(item_selector).size).to eq 0 }
 
       # should still be gone on reload
       get url
-      ff(item_selector).size.should == 0
+      expect(ff(item_selector).size).to eq 0
 
-      @user.recent_stream_items.size.should == 0
-      items.first.reload.hidden.should == true
+      expect(@user.recent_stream_items.size).to eq 0
+      expect(items.first.reload.hidden).to eq true
     end
 
     it_should_behave_like 'load events list'
@@ -61,11 +61,11 @@ describe "dashboard" do
     end
 
     def assert_recent_activity_category_closed(type='announcement')
-      f(".stream-#{type} .details_container").should_not be_displayed
+      expect(f(".stream-#{type} .details_container")).not_to be_displayed
     end
 
     def assert_recent_activity_category_is_open(type='announcement')
-      f(".stream-#{type} .details_container").should be_displayed
+      expect(f(".stream-#{type} .details_container")).to be_displayed
     end
 
     def click_recent_activity_course_link(type='announcement')
@@ -107,10 +107,10 @@ describe "dashboard" do
       c.add_participants([User.create])
 
       items = @user.stream_item_instances
-      items.size.should == 1
+      expect(items.size).to eq 1
 
       get "/"
-      ff('#conversation-details tbody tr').size.should == 1
+      expect(ff('#conversation-details tbody tr').size).to eq 1
     end
 
     it "should show account notifications on the dashboard" do
@@ -125,9 +125,9 @@ describe "dashboard" do
 
       get "/"
       messages = ffj("#dashboard .global-message .message.user_content")
-      messages.size.should == 2
-      messages[0].text.should == a1.message
-      messages[1].text.should == a2.message
+      expect(messages.size).to eq 2
+      expect(messages[0].text).to eq a1.message
+      expect(messages[1].text).to eq a2.message
     end
 
     it "should interpolate the user's domain in global notifications" do
@@ -137,7 +137,7 @@ describe "dashboard" do
                                                            :end_at => Date.today + 1.day)
 
       get "/"
-      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
+      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
     it "should interpolate the user's id in global notifications" do
@@ -146,11 +146,11 @@ describe "dashboard" do
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
       get "/"
-      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
+      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
     it "should show appointment stream items on the dashboard" do
-      pending "we need to add this stuff back in"
+      skip "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Reserved For User', :category => "Appointment Signups")
@@ -167,11 +167,11 @@ describe "dashboard" do
       @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
-      ffj(".topic_message .communication_message.dashboard_notification").size.should == 3
+      expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
       # appointment group publish and update notifications
-      ffj(".communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
+      expect(ffj(".communication_message.message_appointment_group_#{@appointment_group.id}").size).to eq 2
       # signup notification
-      ffj(".communication_message.message_group_#{@group.id}").size.should == 1
+      expect(ffj(".communication_message.message_group_#{@group.id}").size).to eq 1
     end
 
     it "should display course name in course menu" do
@@ -181,12 +181,12 @@ describe "dashboard" do
       get "/"
       driver.execute_script %{$('#courses_menu_item').addClass('hover');}
       wait_for_ajaximations
-      f('#courses_menu_item').should include_text('My Courses')
-      f('#courses_menu_item').should include_text(@course.name)
+      expect(f('#courses_menu_item')).to include_text('My Courses')
+      expect(f('#courses_menu_item')).to include_text(@course.name)
     end
 
     it "should display should display student groups in course menu" do
-      pending('broken')
+      skip('broken')
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@user)
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
@@ -195,8 +195,8 @@ describe "dashboard" do
       get "/"
       driver.execute_script %{$('#courses_menu_item').addClass('hover');}
       wait_for_ajaximations
-      f('#courses_menu_item').should include_text(group.name)
-      f('#courses_menu_item').should include_text('Current Groups')
+      expect(f('#courses_menu_item')).to include_text(group.name)
+      expect(f('#courses_menu_item')).to include_text('Current Groups')
     end
 
     it "should present /courses as the href of the courses nav item" do
@@ -206,7 +206,7 @@ describe "dashboard" do
       get '/'
 
       keep_trying_until do
-        f('#courses_menu_item a').attribute('href').should include('courses')
+        expect(f('#courses_menu_item a').attribute('href')).to include('courses')
       end
     end
 
@@ -218,7 +218,7 @@ describe "dashboard" do
 
       f('#courses_menu_item a').click
       path = driver.execute_script %{ return window.location.pathname;}
-      path.should_not == '/courses'
+      expect(path).not_to eq '/courses'
     end
 
     it "should go to a course when clicking a course link from the menu" do
@@ -232,7 +232,7 @@ describe "dashboard" do
 
       fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
       path = driver.execute_script %{ return window.location.pathname;}
-      path.should == "/courses/#{@course.id}"
+      expect(path).to eq "/courses/#{@course.id}"
     end
 
     it "should display scheduled web conference in stream" do
@@ -249,7 +249,7 @@ describe "dashboard" do
       @conference.save!
 
       get "/courses/#{@course.to_param}"
-      f('.conference .message').should include_text(@conference.title)
+      expect(f('.conference .message')).to include_text(@conference.title)
     end
 
     it "should create an announcement for the first course that is not visible in the second course" do
@@ -270,10 +270,10 @@ describe "dashboard" do
       Enrollment.update_all(:created_at => 1.minute.ago) # need to make created_at and updated_at different
 
       get "/"
-      f('.no-recent-messages').should be_nil
+      expect(f('.no-recent-messages')).to be_nil
 
       get "/courses/#{@second_course.id}"
-      f('.no-recent-messages').should include_text('No Recent Messages')
+      expect(f('.no-recent-messages')).to include_text('No Recent Messages')
     end
 
     it "should validate the functionality of soft concluded courses in dropdown" do
@@ -287,8 +287,8 @@ describe "dashboard" do
 
       driver.execute_script %{$('#courses_menu_item').addClass('hover');}
       item = fj('#menu_enrollments')
-      item.should be_displayed
-      item.should_not include_text(c1.name)
+      expect(item).to be_displayed
+      expect(item).not_to include_text(c1.name)
     end
 
     it "should show recent feedback and it should work" do
@@ -298,12 +298,12 @@ describe "dashboard" do
       get "/"
       wait_for_ajaximations
 
-      f('.recent_feedback a').attribute('href').should match /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/
+      expect(f('.recent_feedback a').attribute('href')).to match /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/
       f('.recent_feedback a').click
       wait_for_ajaximations
 
       # submission page should load
-      f('h2').text.should == "Submission Details"
+      expect(f('h2').text).to eq "Submission Details"
     end
   end
 
@@ -325,7 +325,7 @@ describe "dashboard" do
       c1.reload
 
       get "/courses"
-      fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
+      expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list for a teacher" do
@@ -339,7 +339,7 @@ describe "dashboard" do
         get "/"
 
         #verify assignment is in to do list
-        f('.to-do-list > li').should include_text('Grade ' + assignment.title)
+        expect(f('.to-do-list > li')).to include_text('Grade ' + assignment.title)
       end
     end
 
@@ -359,8 +359,8 @@ describe "dashboard" do
       get "/"
 
       todo_list = f('.to-do-list')
-      todo_list.should_not be_nil
-      todo_list.should include_text(quiz_title)
+      expect(todo_list).not_to be_nil
+      expect(todo_list).to include_text(quiz_title)
     end
 
     context "course menu customization" do
@@ -373,8 +373,8 @@ describe "dashboard" do
         driver.execute_script %{$('#courses_menu_item').addClass('hover');}
         wait_for_ajaximations
 
-        fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('View All or Customize')
+        expect(fj('#courses_menu_item')).to include_text('My Courses')
+        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
       end
     end
   end

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
+    expect(wiki_page_body[:value]).to be_empty
     wiki_page_body
   end
 
@@ -41,7 +41,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     type_in_tiny('#wiki_page_body', text)
     in_frame "wiki_page_body_ifr" do
       f('#tinymce').send_keys(:return)
-      f('#tinymce').should include_text(text)
+      expect(f('#tinymce')).to include_text(text)
     end
   end
 
@@ -62,7 +62,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def validate_link(text)
     in_frame "wiki_page_body_ifr" do
       link = keep_trying_until { f('#tinymce a') }
-      link.attribute('href').should == text
+      expect(link.attribute('href')).to eq text
     end
   end
 
@@ -80,14 +80,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def validate_wiki_style_attrib_empty(selectors)
     in_frame "wiki_page_body_ifr" do
-      f("#tinymce #{selectors}").attribute('style').should be_empty
+      expect(f("#tinymce #{selectors}").attribute('style')).to be_empty
     end
   end
 
   #only handles by #id's
   def validate_wiki_style_attrib(type, value, selectors)
     in_frame "wiki_page_body_ifr" do
-      f("#tinymce #{selectors}").attribute('style').should == "#{type}: #{value}\;"
+      expect(f("#tinymce #{selectors}").attribute('style')).to eq "#{type}: #{value}\;"
     end
   end
 
@@ -95,13 +95,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     el.find_element(:css, '.mce_instructure_image').click
     dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
     f('a[href="#tabUploaded"]', dialog).click
-    keep_trying_until { f('.folderLabel', dialog).should be_displayed }
+    keep_trying_until { expect(f('.folderLabel', dialog)).to be_displayed }
     folder_el = ff('.folderLabel', dialog).detect { |el| el.text == folder }
-    folder_el.should_not be_nil
+    expect(folder_el).not_to be_nil
     folder_el.click unless folder_el['class'].split.include?('expanded')
-    keep_trying_until { f('.treeFile', dialog).should be_displayed }
+    keep_trying_until { expect(f('.treeFile', dialog)).to be_displayed }
     file_el = f(".treeFile[title=\"#{filename}\"]", dialog)
-    file_el.should_not be_nil
+    expect(file_el).not_to be_nil
     file_el.click
     wait_for_ajaximations
     f('.ui-dialog-buttonset .btn-primary', dialog).click
@@ -127,7 +127,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     f('.upload_new_image_link').click
     wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
     in_frame "wiki_page_body_ifr" do
-      f('#tinymce img').should be_displayed
+      expect(f('#tinymce img')).to be_displayed
     end
 
     submit_form('#new_wiki_page')

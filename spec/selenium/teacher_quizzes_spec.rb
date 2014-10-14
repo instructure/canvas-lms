@@ -21,16 +21,16 @@ describe "quizzes" do
     it "should show a summary of due dates if there are multiple" do
       create_quiz_with_default_due_dates
       get "/courses/#{@course.id}/quizzes"
-      f('.item-group-container .date-available').should_not include_text "Multiple Dates"
+      expect(f('.item-group-container .date-available')).not_to include_text "Multiple Dates"
       add_due_date_override(@quiz)
 
       get "/courses/#{@course.id}/quizzes"
-      f('.item-group-container .date-available').should include_text "Multiple Dates"
+      expect(f('.item-group-container .date-available')).to include_text "Multiple Dates"
       driver.mouse.move_to f('.item-group-container .date-available')
       wait_for_ajaximations
       tooltip = fj('.ui-tooltip:visible')
-      tooltip.should include_text 'New Section'
-      tooltip.should include_text 'Everyone else'
+      expect(tooltip).to include_text 'New Section'
+      expect(tooltip).to include_text 'Everyone else'
     end
 
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
@@ -40,7 +40,7 @@ describe "quizzes" do
         click_save_settings_button
         wait_for_ajax_requests
       end
-      f('#quiz_title').should include_text "Unnamed Quiz"
+      expect(f('#quiz_title')).to include_text "Unnamed Quiz"
     end
 
     it "should create and preview a new quiz" do
@@ -50,18 +50,18 @@ describe "quizzes" do
         wait_for_ajaximations
       end
       #check url
-      driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}
+      expect(driver.current_url).to match %r{/courses/\d+/quizzes/(\d+)\/edit}
       driver.current_url =~ %r{/courses/\d+/quizzes/(\d+)\/edit}
       quiz_id = $1.to_i
-      quiz_id.should be > 0
+      expect(quiz_id).to be > 0
 
       #input name and description then save quiz
       replace_content(f('#quiz_title'), 'new quiz')
       test_text = "new description"
-      keep_trying_until { f('#quiz_description_ifr').should be_displayed }
+      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
       type_in_tiny '#quiz_description', test_text
       in_frame "quiz_description_ifr" do
-        f('#tinymce').should include_text(test_text)
+        expect(f('#tinymce')).to include_text(test_text)
       end
 
       #add a question
@@ -79,7 +79,7 @@ describe "quizzes" do
 
       #check quiz preview
       f('#preview_quiz_button').click
-      f('#questions').should be_present
+      expect(f('#questions')).to be_present
     end
 
     it "should edit a quiz" do
@@ -92,17 +92,17 @@ describe "quizzes" do
       wait_for_ajaximations
 
       test_text = "changed description"
-      keep_trying_until { f('#quiz_description_ifr').should be_displayed }
+      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
       type_in_tiny '#quiz_description', test_text
       in_frame "quiz_description_ifr" do
-        f('#tinymce').should include_text(test_text)
+        expect(f('#tinymce')).to include_text(test_text)
       end
       click_save_settings_button
       wait_for_ajaximations
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
-      f('#main .description').should include_text(test_text)
+      expect(f('#main .description')).to include_text(test_text)
     end
 
     it "should asynchronously load student quiz results" do
@@ -115,7 +115,7 @@ describe "quizzes" do
       f('.al-trigger').click
       f('.quiz_details_link').click
       wait_for_ajaximations
-      f('#quiz_details').should be_displayed
+      expect(f('#quiz_details')).to be_displayed
     end
 
     it "should republish on save" do
@@ -129,29 +129,29 @@ describe "quizzes" do
       end
 
       # Hides SpeedGrader link when unpublished
-      f('.icon-speed-grader').should be_nil
+      expect(f('.icon-speed-grader')).to be_nil
 
-      f('#quiz-publish-link').should_not include_text("Published")
-      f('#quiz-publish-link').should include_text("Publish")
+      expect(f('#quiz-publish-link')).not_to include_text("Published")
+      expect(f('#quiz-publish-link')).to include_text("Publish")
 
-      quiz.versions.length.should == 1
+      expect(quiz.versions.length).to eq 1
       f('#quiz-publish-link').click
       wait_for_ajax_requests
       quiz.reload
-      quiz.versions.length.should == 2
+      expect(quiz.versions.length).to eq 2
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       expect_new_page_load {
-        f('#quiz-draft-state').text.strip.should match accessible_variant_of 'Published'
+        expect(f('#quiz-draft-state').text.strip).to match accessible_variant_of 'Published'
         expect_new_page_load do
           click_save_settings_button
           wait_for_ajax_requests
         end
       }
       quiz.reload
-      quiz.versions.length.should == 3
+      expect(quiz.versions.length).to eq 3
 
       # Shows speedgrader when published
-      f('.icon-speed-grader').should_not be_nil
+      expect(f('.icon-speed-grader')).not_to be_nil
     end
 
     it "should create a new question group" do
@@ -163,7 +163,7 @@ describe "quizzes" do
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
-      group_form.find_element(:css, '.group_display.name').should include_text('new group')
+      expect(group_form.find_element(:css, '.group_display.name')).to include_text('new group')
 
     end
 
@@ -176,9 +176,9 @@ describe "quizzes" do
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
-      group_form.find_element(:css, '.group_display.name').should include_text('new group')
+      expect(group_form.find_element(:css, '.group_display.name')).to include_text('new group')
       click_settings_tab
-      keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "3" }
+      keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "3" }
 
       click_questions_tab
       group_form.find_element(:css, '.edit_group_link').click
@@ -186,9 +186,9 @@ describe "quizzes" do
       group_form.find_element(:name, 'quiz_group[name]').send_keys('renamed')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
       submit_form(group_form)
-      group_form.find_element(:css, '.group_display.name').should include_text('renamed')
+      expect(group_form.find_element(:css, '.group_display.name')).to include_text('renamed')
       click_settings_tab
-      keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "2" }
+      keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
     it "should not let you exceed the question limit" do
@@ -209,7 +209,7 @@ describe "quizzes" do
 
       pick_count.call('1001')
       dismiss_alert
-      pick_count_field.should have_attribute(:value, "1")
+      expect(pick_count_field).to have_attribute(:value, "1")
 
       click_new_question_button # 1 total, ok
       group_form.find_element(:css, '.edit_group_link').click
@@ -220,7 +220,7 @@ describe "quizzes" do
 
       pick_count.call('1000') # 1001 total, bad
       dismiss_alert
-      pick_count_field.should have_attribute(:value, "999")
+      expect(pick_count_field).to have_attribute(:value, "999")
     end
 
     it "should moderate quiz" do
@@ -238,32 +238,32 @@ describe "quizzes" do
       # validates data
       f('#extension_extra_attempts').send_keys('asdf')
       submit_form('#moderate_student_form')
-      f('.attempts_left').text.should == '1'
+      expect(f('.attempts_left').text).to eq '1'
 
       # valid values
       f('#extension_extra_attempts').clear()
       f('#extension_extra_attempts').send_keys('2')
       submit_form('#moderate_student_form')
       wait_for_ajax_requests
-      f('.attempts_left').text.should == '3'
+      expect(f('.attempts_left').text).to eq '3'
     end
 
     it "should indicate when it was last saved" do
       take_quiz do
         indicator = f('#last_saved_indicator')
-        indicator.text.should == 'Not saved'
+        expect(indicator.text).to eq 'Not saved'
         f('.answer .question_input').click
 
         # too fast, this always fails
         #indicator.text.should == 'Saving...'
 
         wait_for_ajax_requests
-        indicator.text.should match(/^Quiz saved at \d+:\d+(pm|am)$/)
+        expect(indicator.text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
       end
     end
 
     it "should validate numerical input data" do
-      pending("fix ExpectationNotMetError: expected: falsey value got: true on error_displayed?.should be_false")
+      skip("fix ExpectationNotMetError: expected: falsey value got: true on error_displayed?.should be_false")
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
@@ -274,24 +274,24 @@ describe "quizzes" do
         input.click
         input.send_keys('asdf')
         wait_for_ajaximations
-        error_displayed?.should be_true
+        expect(error_displayed?).to be_truthy
         input.send_keys(:tab)
         wait_for_ajaximations
         keep_trying_until {
-          input[:value].should be_blank  
+          expect(input[:value]).to be_blank  
         }
 
         input.click
         input.send_keys('1')
         wait_for_ajaximations
-        error_displayed?.should be_false
+        expect(error_displayed?).to be_falsey
         input.send_keys(:tab)
-        input.should have_attribute(:value, "1.0000")
+        expect(input).to have_attribute(:value, "1.0000")
       end
     end
 
     it "should mark dropdown questions as answered" do
-      pending("xvfb issues")
+      skip("xvfb issues")
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -307,7 +307,7 @@ describe "quizzes" do
 
       take_quiz do
         dropdowns = ffj('a.ui-selectmenu.question_input')
-        dropdowns.size.should == 6
+        expect(dropdowns.size).to eq 6
 
         # partially answer each question
         [dropdowns.first, dropdowns.last].each do |d|
@@ -318,7 +318,7 @@ describe "quizzes" do
         end
         # not marked as answered
         keep_trying_until {
-          ff('#question_list .answered').should be_empty
+          expect(ff('#question_list .answered')).to be_empty
         }
 
         # fully answer each question
@@ -331,7 +331,7 @@ describe "quizzes" do
 
         # marked as answer
         keep_trying_until {
-          ff('#question_list .answered').size.should == 2 
+          expect(ff('#question_list .answered').size).to eq 2 
         }
         wait_for_ajaximations
 
@@ -348,10 +348,10 @@ describe "quizzes" do
         # be ready right when the page loads
         keep_trying_until {
           dropdowns = ff('a.ui-selectmenu.question_input')
-          dropdowns.size.should == 6
-          dropdowns.map(&:text).should == %w{orange green east east east east}
+          expect(dropdowns.size).to eq 6
+          expect(dropdowns.map(&:text)).to eq %w{orange green east east east east}
         }
-        ff('#question_list .answered').size.should == 2
+        expect(ff('#question_list .answered').size).to eq 2
       end
     end
 
@@ -393,7 +393,7 @@ describe "quizzes" do
         submission.end_at = Time.now + 20.minutes
         submission.save!
         quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
-        f('.time_running').text.should match /19 Minutes/
+        expect(f('.time_running').text).to match /19 Minutes/
       end
     end
 
@@ -444,17 +444,17 @@ describe "quizzes" do
       # the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
       upload_attachment_answer
-      file_upload_submission_data.should == [file_upload_attachment.id.to_s]
+      expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
       # delete the attachment id
       fj('.delete-attachment').click
       keep_trying_until do
-        fj('.answered').should == nil
+        expect(fj('.answered')).to eq nil
       end
 
       fj('.upload-label').click
       wait_for_ajaximations
       keep_trying_until do
-        file_upload_submission_data.should == [""]
+        expect(file_upload_submission_data).to eq [""]
       end
       upload_attachment_answer
       expect_new_page_load do
@@ -463,16 +463,16 @@ describe "quizzes" do
       end
       wait_for_ajaximations
       attachment = file_upload_attachment
-      fj('.file-upload-box').text.should include attachment.display_name
+      expect(fj('.file-upload-box').text).to include attachment.display_name
       f('#submit_quiz_button').click
       wait_for_ajaximations
       keep_trying_until do
-        fj('.selected_answer').text.should include attachment.display_name
+        expect(fj('.selected_answer').text).to include attachment.display_name
       end
     end
 
     it "should notify a student of extra time given by a moderator" do
-      pending('broken')
+      skip('broken')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -513,7 +513,7 @@ describe "quizzes" do
       submission.save!
       quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
       assert_flash_notice_message /You have been given extra time on this attempt/
-      f('.time_running').text.should match /19 Minutes/
+      expect(f('.time_running').text).to match /19 Minutes/
     end
 
 
@@ -523,7 +523,7 @@ describe "quizzes" do
 
       click_quiz_statistics_button
 
-      f('#content .question_name').should include_text("Question 1")
+      expect(f('#content .question_name')).to include_text("Question 1")
     end
 
     it "should display a link to quiz statistics for a MOOC" do
@@ -532,7 +532,7 @@ describe "quizzes" do
       @course.save!
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      f('#right-side').should include_text('Quiz Statistics')
+      expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
     it "should delete a quiz" do
@@ -545,8 +545,8 @@ describe "quizzes" do
       end
 
       # Confirm that we make it back to the quizzes index page
-      f('#content').should include_text("Course Quizzes")
-      @quiz.reload.should be_deleted
+      expect(f('#content')).to include_text("Course Quizzes")
+      expect(@quiz.reload).to be_deleted
     end
 
     it "can create overrides" do
@@ -572,13 +572,13 @@ describe "quizzes" do
         wait_for_ajax_requests
       end
       overrides = @quiz.reload.assignment_overrides
-      overrides.size.should == 2
+      expect(overrides.size).to eq 2
       default_override = overrides.detect { |o| o.set_id == default_section.id }
-      default_override.due_at.strftime('%b %-d, %y').
-          should == default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.strftime('%b %-d, %y')).
+          to eq default_section_due.to_date.strftime('%b %-d, %y')
       other_override = overrides.detect { |o| o.set_id == other_section.id }
-      other_override.due_at.strftime('%b %-d, %y').
-          should == other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.strftime('%b %-d, %y')).
+          to eq other_section_due.to_date.strftime('%b %-d, %y')
     end
   end
 end

@@ -10,7 +10,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 def import_account_level_outcomes
   keep_trying_until do
     f(".btn-primary").click
-    driver.switch_to.alert.should_not be nil
+    expect(driver.switch_to.alert).not_to be nil
     driver.switch_to.alert.accept
     wait_for_ajaximations
     true
@@ -20,7 +20,7 @@ end
 def traverse_nested_outcomes(outcome)
   #pass an array with each group or outcome in sequence
   outcome.each do |title|
-    ffj(".outcome-level:last .outcome-group .ellipsis")[0].should have_attribute("title", title)
+    expect(ffj(".outcome-level:last .outcome-group .ellipsis")[0]).to have_attribute("title", title)
     f(".ellipsis[title='#{title}']").click
     wait_for_ajaximations
   end
@@ -39,9 +39,9 @@ def state_outcome_setup
   @cm.export_content
   run_jobs
   @cm.reload
-  @cm.old_warnings_format.should == []
-  @cm.migration_settings[:last_error].should be_nil
-  @cm.workflow_state.should == 'imported'
+  expect(@cm.old_warnings_format).to eq []
+  expect(@cm.migration_settings[:last_error]).to be_nil
+  expect(@cm.workflow_state).to eq 'imported'
 end
 
 def context_outcome(context, num_of_outcomes)
@@ -114,23 +114,23 @@ def should_create_a_learning_outcome_with_a_new_rating_root_level
 
   ## expect
   # should show up in directory browser
-  ffj('.outcomes-sidebar .outcome-level:first li.outcome-link').
-      detect { |li| li.text == outcome_name }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:first li.outcome-link').
+      detect { |li| li.text == outcome_name }).not_to be_nil
   # should show outcome in main content window
   # title
-  f(".outcomes-content .title").text.should == outcome_name
+  expect(f(".outcomes-content .title").text).to eq outcome_name
   # description
-  f(".outcomes-content .description").text.should == outcome_description
+  expect(f(".outcomes-content .description").text).to eq outcome_description
   # ratings
   ratings = ffj('table.criterion .rating')
-  ratings.size.should == 4
-  ratings.map { |r| r.text }.should == ["Exceeds Expectations\n5 Points",
+  expect(ratings.size).to eq 4
+  expect(ratings.map { |r| r.text }).to eq ["Exceeds Expectations\n5 Points",
                                         "almost exceeds\n4 Points",
                                         "Meets Expectations\n3 Points",
                                         "Does Not Meet Expectations\n0 Points"]
-  f('table.criterion .total').text.should == "Total Points\n5 Points"
+  expect(f('table.criterion .total').text).to eq "Total Points\n5 Points"
   # db
-  LearningOutcome.where(short_description: outcome_name).first.should be_present
+  expect(LearningOutcome.where(short_description: outcome_name).first).to be_present
 end
 
 def should_create_a_learning_outcome_nested
@@ -166,12 +166,12 @@ def should_create_a_learning_outcome_nested
 
   ## expect
   # should show up in nested directory browser
-  ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link').
-      detect { |li| li.text == outcome_name }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link').
+      detect { |li| li.text == outcome_name }).not_to be_nil
   # should show outcome in main content window
-  f(".outcomes-content .title").text.should == outcome_name
+  expect(f(".outcomes-content .title").text).to eq outcome_name
   # db
-  LearningOutcome.where(short_description: outcome_name).first.should be_present
+  expect(LearningOutcome.where(short_description: outcome_name).first).to be_present
 end
 
 def should_edit_a_learning_outcome_and_delete_a_rating
@@ -200,16 +200,16 @@ def should_edit_a_learning_outcome_and_delete_a_rating
 
 ## expect
 # should be edited in directory browser
-  ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }).not_to be_nil
 # title
-  f(".outcomes-content .title").text.should == edited_title
+  expect(f(".outcomes-content .title").text).to eq edited_title
 # ratings
   ratings = ffj('table.criterion .rating')
-  ratings.size.should == 1
-  ratings.map { |r| r.text }.should == ["Lame\n1 Points"]
-  f('table.criterion .total').text.should == "Total Points\n1 Points"
+  expect(ratings.size).to eq 1
+  expect(ratings.map { |r| r.text }).to eq ["Lame\n1 Points"]
+  expect(f('table.criterion .total').text).to eq "Total Points\n1 Points"
 # db
-  LearningOutcome.where(short_description: edited_title).first.should be_present
+  expect(LearningOutcome.where(short_description: edited_title).first).to be_present
 end
 
 def should_delete_a_learning_outcome
@@ -227,12 +227,12 @@ def should_delete_a_learning_outcome
 
   ## expect
   # should not be showing on page
-  ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
-  f('.outcomes-content .title').text.should == 'Setting up Outcomes'
+  expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+  expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
   # db
-  LearningOutcome.where(id: @outcome).first.workflow_state.should == 'deleted'
+  expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq 'deleted'
   refresh_page # to make sure it was correctly deleted
-  ff('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
+  ff('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
 end
 
 def should_validate_mastery_points
@@ -247,7 +247,7 @@ def should_validate_mastery_points
   wait_for_ajaximations
 
   ## expect
-  f('.error_box').should be_present
+  expect(f('.error_box')).to be_present
 end
 
 def should_validate_short_description_presence
@@ -258,7 +258,7 @@ def should_validate_short_description_presence
   f('.outcome_title').clear
   f('.submit_button').click
   wait_for_ajaximations
-  fj('.error_text div').text.should == "Cannot be blank"
+  expect(fj('.error_text div').text).to eq "Cannot be blank"
 end
 
 def should_validate_short_description_length
@@ -269,7 +269,7 @@ def should_validate_short_description_length
   replace_content f('.outcome_title'), (content)
   f('.submit_button').click
   wait_for_ajaximations
-  fj('.error_text').should be_present
+  expect(fj('.error_text')).to be_present
 end
 
 def should_create_an_outcome_group_root_level
@@ -286,12 +286,12 @@ def should_create_an_outcome_group_root_level
 
   ## expect
   # should show up in directory browser
-  ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == group_title }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == group_title }).not_to be_nil
   # should show outcome in main content window
   # title
-  f(".outcomes-content .title").text.should == group_title
+  expect(f(".outcomes-content .title").text).to eq group_title
   # db
-  LearningOutcomeGroup.where(title: group_title).first.should be_present
+  expect(LearningOutcomeGroup.where(title: group_title).first).to be_present
 end
 
 def should_create_a_learning_outcome_with_a_new_rating_nested
@@ -327,12 +327,12 @@ def should_create_a_learning_outcome_with_a_new_rating_nested
 
   ## expect
   # should show up in nested directory browser
-  ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group').
-      detect { |li| li.text == nested_group_title }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group').
+      detect { |li| li.text == nested_group_title }).not_to be_nil
   # should show group in main content window
-  f(".outcomes-content .title").text.should == nested_group_title
+  expect(f(".outcomes-content .title").text).to eq nested_group_title
   # db
-  LearningOutcomeGroup.where(title: nested_group_title).first.should be_present
+  expect(LearningOutcomeGroup.where(title: nested_group_title).first).to be_present
 end
 
 def should_edit_an_outcome_group
@@ -347,7 +347,7 @@ def should_edit_an_outcome_group
 
   keep_trying_until do
     driver.execute_script("$('.edit_button').click()")
-    fj('.outcomes-content input[name=title]').should be_displayed
+    expect(fj('.outcomes-content input[name=title]')).to be_displayed
   end
 
   replace_content f('.outcomes-content input[name=title]'), edited_title
@@ -356,11 +356,11 @@ def should_edit_an_outcome_group
 
   ## expect
   # should be edited in directory browser
-  ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }.should_not be_nil
+  expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }).not_to be_nil
   # title
-  f(".outcomes-content .title").text.should == edited_title
+  expect(f(".outcomes-content .title").text).to eq edited_title
   # db
-  LearningOutcomeGroup.where(title: edited_title).first.should be_present
+  expect(LearningOutcomeGroup.where(title: edited_title).first).to be_present
 end
 
 def should_delete_an_outcome_group
@@ -378,10 +378,10 @@ def should_delete_an_outcome_group
 
   ## expect
   # should not be showing on page
-  ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
-  fj('.outcomes-content .title').text.should == "Setting up Outcomes"
+  expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+  expect(fj('.outcomes-content .title').text).to eq "Setting up Outcomes"
   # db
-  LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state.should == 'deleted'
+  expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq 'deleted'
   refresh_page # to make sure it was correctly deleted
-  ffj('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
+  ffj('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
 end

@@ -13,7 +13,7 @@ describe GradeSummaryPresenter do
       a2.destroy
 
       get "/courses/#{@course.id}/grades"
-      f('#grades_summary').should be_displayed
+      expect(f('#grades_summary')).to be_displayed
     end
   end
 end

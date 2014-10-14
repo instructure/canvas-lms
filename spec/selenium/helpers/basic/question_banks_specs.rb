@@ -10,16 +10,16 @@ shared_examples_for "question bank basic tests" do
       f(".add_bank_link").click
       wait_for_ajaximations
       question_bank_title = f("#assessment_question_bank_title")
-      question_bank_title.should be_displayed
+      expect(question_bank_title).to be_displayed
       question_bank_title
     end
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
     question_bank = AssessmentQuestionBank.where(title: title).first
-    question_bank.should be_present
-    question_bank.workflow_state.should == "active"
-    f("#question_bank_adding .title").should include_text title
-    question_bank.bookmarked_for?(User.last).should be_true
+    expect(question_bank).to be_present
+    expect(question_bank.workflow_state).to eq "active"
+    expect(f("#question_bank_adding .title")).to include_text title
+    expect(question_bank.bookmarked_for?(User.last)).to be_truthy
     question_bank
   end
 
@@ -27,17 +27,17 @@ shared_examples_for "question bank basic tests" do
     question_bank = add_question_bank
     expect_new_page_load { f(".see_bookmarked_banks").click }
     wait_for_ajaximations
-    f("#question_bank_#{question_bank.id}").should include_text question_bank.title
+    expect(f("#question_bank_#{question_bank.id}")).to include_text question_bank.title
   end
 
   it "should un-bookmark a question bank" do
     question_bank = add_question_bank
-    fj(".bookmark_bank_link img:visible").should have_attribute(:alt, "Bookmark")
+    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark")
     fj(".bookmark_bank_link:visible").click
     wait_for_ajaximations
-    fj(".bookmark_bank_link img:visible").should have_attribute(:alt, "Bookmark_gray")
+    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark_gray")
     question_bank.reload
-    question_bank.bookmarked_for?(User.last).should be_false
+    expect(question_bank.bookmarked_for?(User.last)).to be_falsey
   end
 
   it "should edit a question bank" do
@@ -48,8 +48,8 @@ shared_examples_for "question bank basic tests" do
     f("#assessment_question_bank_title").send_keys(new_title, :return)
     wait_for_ajaximations
     question_bank.reload
-    question_bank.title.should == new_title
-    f("#questions .title").should include_text new_title
+    expect(question_bank.title).to eq new_title
+    expect(f("#questions .title")).to include_text new_title
   end
 
   it "should delete a question bank" do
@@ -59,8 +59,8 @@ shared_examples_for "question bank basic tests" do
     wait_for_ajaximations
     question_bank.reload
     keep_trying_until do
-      question_bank.workflow_state.should == "deleted"
-      f("#questions .title").should be_nil
+      expect(question_bank.workflow_state).to eq "deleted"
+      expect(f("#questions .title")).to be_nil
     end
   end
 end

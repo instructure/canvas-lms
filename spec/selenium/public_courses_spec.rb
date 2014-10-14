@@ -11,9 +11,9 @@ describe "public courses" do
 
   def validate_selector_displayed(selector1, selector2)
     if public_course.feature_enabled?(:draft_state)
-      f(selector1).should be_displayed
+      expect(f(selector1)).to be_displayed
     else
-      f(selector2).should be_displayed
+      expect(f(selector2)).to be_displayed
     end
   end
 
@@ -24,17 +24,17 @@ describe "public courses" do
       public_course.wiki.wiki_pages.create!(:title => title, :body => "bar")
 
       get "/courses/#{public_course.id}/wiki/#{title}"
-      f('.user_content').should_not be_nil
+      expect(f('.user_content')).not_to be_nil
     end
 
     it "should display course files" do
       get "/courses/#{public_course.id}/files"
-      f('#files_structure_list').should be_displayed
+      expect(f('#files_structure_list')).to be_displayed
     end
 
     it "should display course syllabus" do
       get "/courses/#{public_course.id}/assignments/syllabus"
-      f('#course_syllabus').should be_displayed
+      expect(f('#course_syllabus')).to be_displayed
     end
 
     it "should display assignments" do
@@ -62,20 +62,20 @@ describe "public courses" do
       PluginSetting.create!(:name => "wimba", :settings =>
           {"domain" => "wimba.instructure.com"})
       get "/courses/#{public_course.id}/conferences"
-      f('#new-conference-list').should be_displayed
+      expect(f('#new-conference-list')).to be_displayed
     end
 
     #this is currently broken - logged out users should not be able to access this page
     it "should display collaborations list" do
       PluginSetting.new(:name => 'etherpad', :settings => {}).save!
       get "/courses/#{public_course.id}/collaborations"
-      f('#collaborations').should be_displayed
+      expect(f('#collaborations')).to be_displayed
     end
 
     it "should should prompt must be logged in message when accessing permission based pages" do
       get "/grades"
       assert_flash_warning_message /You must be logged in to access this page/
-      driver.current_url.should == app_host + "/login"
+      expect(driver.current_url).to eq app_host + "/login"
     end
 
   end

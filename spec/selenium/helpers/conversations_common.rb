@@ -40,7 +40,7 @@ end
 def browse_menu
   @browser.click
   wait_for_ajaximations(500)
-  keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
+  keep_trying_until { expect(ffj('.autocomplete_menu:visible .list').size).to eq @level }
   wait_for_ajaximations(500)
 end
 
@@ -51,7 +51,7 @@ def browse(*names)
   element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
   element.first.click
   wait_for_ajaximations(500)
-  keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
+  keep_trying_until { expect(ffj('.autocomplete_menu:visible .list').size).to eq @level }
   @elements = nil
 
   if names.present?
@@ -133,7 +133,7 @@ def submit_message_form(opts={})
     wait_for_ajaximations(500)
     fj('.autocomplete_menu .toggleable:visible .toggle').click
     wait_for_ajaximations(500)
-    ff('.token_input ul li').length.should > 0
+    expect(ff('.token_input ul li').length).to be > 0
     fj("#create_message_form input:visible").send_keys("\t")
   end
 
@@ -170,9 +170,9 @@ def submit_message_form(opts={})
     message = ConversationMessage.last
     # whether the message should be visible depends on whether we were appending to an already visible conversation
     if opts[:existing_conversation]
-      f("#message_#{message.id}").should_not be_nil
+      expect(f("#message_#{message.id}")).not_to be_nil
     else
-      f("#message_#{message.id}").should be_nil
+      expect(f("#message_#{message.id}")).to be_nil
     end
     message
   end
@@ -182,7 +182,7 @@ def assert_message_status(status = "sent", text = '')
   wait_for_ajaximations
   keep_trying_until {
     e = ff('#message_status li').last
-    e.text.downcase.should include("#{status} #{text.downcase}") #rescue false
+    expect(e.text.downcase).to include("#{status} #{text.downcase}") #rescue false
   }
 end
 
@@ -214,12 +214,12 @@ def delete_selected_messages(confirm_conversation_deleted = true)
 
   wait_for_ajaximations(500)
   delete = f('#action_delete')
-  delete.should be_displayed
+  expect(delete).to be_displayed
   delete.click
   driver.switch_to.alert.accept
 
   if confirm_conversation_deleted
-    keep_trying_until { get_conversations(false).size.should == orig_size - 1 }
+    keep_trying_until { expect(get_conversations(false).size).to eq orig_size - 1 }
   end
 end
 

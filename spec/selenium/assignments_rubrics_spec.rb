@@ -37,9 +37,9 @@ describe "assignment rubrics" do
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.last
-      rubric.data.first[:points].should == initial_points
-      rubric.data.first[:ratings].first[:points].should == initial_points
-      f('#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
+      expect(rubric.data.first[:points]).to eq initial_points
+      expect(rubric.data.first[:ratings].first[:points]).to eq initial_points
+      expect(f('#rubrics .rubric .rubric_title .displaying .title')).to include_text(rubric_name)
 
       #Commented out because we still want this test to run but this is the part where the bug is
       #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
@@ -65,7 +65,7 @@ describe "assignment rubrics" do
       full_rubric_button =
           keep_trying_until do
             full_rubric_button = fj('.toggle_full_rubric')
-            full_rubric_button.should be_displayed
+            expect(full_rubric_button).to be_displayed
             full_rubric_button
           end
       full_rubric_button.click
@@ -73,7 +73,7 @@ describe "assignment rubrics" do
       f('#rubric_holder .save_rubric_button').click
       wait_for_ajaximations
 
-      f('#rubric_summary_container .rubric_total').text.should == '2.5'
+      expect(f('#rubric_summary_container .rubric_total').text).to eq '2.5'
     end
 
     it "should import rubric to assignment" do
@@ -87,32 +87,32 @@ describe "assignment rubrics" do
       f('.add_rubric_link').click
       f('#rubric_new .editing .find_rubric_link').click
       wait_for_ajax_requests
-      f('#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
+      expect(f('#rubric_dialog_'+@rubric.id.to_s+' .title')).to include_text(@rubric.title)
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
-      f('#rubric_'+@rubric.id.to_s+' .rubric_title .title').should include_text(@rubric.title)
+      expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
     end
 
     it "should not adjust assignment points possible for grading rubric" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f("#assignment_show .points_possible").text.should == '2'
+      expect(f("#assignment_show .points_possible").text).to eq '2'
 
       f('.add_rubric_link').click
       f('#grading_rubric').click
       submit_form('#edit_rubric_form')
       fj('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
       wait_for_ajaximations
-      f('#rubrics span .rubric_total').text.should == '5'
-      f("#assignment_show .points_possible").text.should == '2'
+      expect(f('#rubrics span .rubric_total').text).to eq '5'
+      expect(f("#assignment_show .points_possible").text).to eq '2'
     end
 
     it "should adjust assignment points possible for grading rubric" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f("#assignment_show .points_possible").text.should == '2'
+      expect(f("#assignment_show .points_possible").text).to eq '2'
 
       f('.add_rubric_link').click
       f('#grading_rubric').click
@@ -120,8 +120,8 @@ describe "assignment rubrics" do
       fj('.ui-dialog-buttonset .ui-button:contains("Change")').click
       wait_for_ajaximations
 
-      f('#rubrics span .rubric_total').text.should == '5'
-      f("#assignment_show .points_possible").text.should == '5'
+      expect(f('#rubrics span .rubric_total').text).to eq '5'
+      expect(f("#assignment_show .points_possible").text).to eq '5'
     end
 
     it "should not allow XSS attacks through rubric descriptions" do
@@ -160,8 +160,8 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f("#rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-      f("#rubric_long_description_dialog div.displaying .long_description").
-          text.should == "<b>This text should not be bold</b>"
+      expect(f("#rubric_long_description_dialog div.displaying .long_description").
+          text).to eq "<b>This text should not be bold</b>"
       close_visible_dialog
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -169,9 +169,9 @@ describe "assignment rubrics" do
       f(".toggle_full_rubric").click
       wait_for_ajaximations
       f('#criterion_1 .long_description_link').click
-      keep_trying_until { f('#rubric_long_description_dialog').should be_displayed }
-      f("#rubric_long_description_dialog div.displaying .long_description").
-          text.should == "<b>This text should not be bold</b>"
+      keep_trying_until { expect(f('#rubric_long_description_dialog')).to be_displayed }
+      expect(f("#rubric_long_description_dialog div.displaying .long_description").
+          text).to eq "<b>This text should not be bold</b>"
     end
 
     it "should follow learning outcome ignore_for_scoring" do
@@ -188,12 +188,12 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       f('.assess_submission_link').click
-      f('.total_points_holder .assessing').should include_text "out of 5"
+      expect(f('.total_points_holder .assessing')).to include_text "out of 5"
       f("#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
-      f('.rubric_total').should include_text "5"
+      expect(f('.rubric_total')).to include_text "5"
       f('.save_rubric_button').click
       wait_for_ajaximations
-      f('.grading_value').should have_attribute(:value, '5')
+      expect(f('.grading_value')).to have_attribute(:value, '5')
     end
 
     def mark_rubric_for_grading(rubric, expect_confirmation)
@@ -218,10 +218,10 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
       mark_rubric_for_grading(@rubric, true)
 
-      @association1.reload.use_for_grading.should be_true
-      @association1.rubric.id.should == @rubric.id
-      @association2.reload.use_for_grading.should be_true
-      @association2.rubric.id.should == @rubric.id
+      expect(@association1.reload.use_for_grading).to be_truthy
+      expect(@association1.rubric.id).to eq @rubric.id
+      expect(@association2.reload.use_for_grading).to be_truthy
+      expect(@association2.rubric.id).to eq @rubric.id
     end
   end
 
@@ -238,9 +238,9 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f("#rubrics .rubric_title").text.should == "My Rubric"
+      expect(f("#rubrics .rubric_title").text).to eq "My Rubric"
       f(".criterion_description .long_description_link").click
-      f(".ui-dialog div.long_description").text.should == "This is awesome."
+      expect(f(".ui-dialog div.long_description").text).to eq "This is awesome."
     end
 
     it "should show criterion comments" do
@@ -265,8 +265,8 @@ describe "assignment rubrics" do
       f('.assess_submission_link').click
       # expect
       ee = ff('.criterion_comments')
-      ee.first.should be_displayed
-      ee.last.should_not be_displayed
+      expect(ee.first).to be_displayed
+      expect(ee.last).not_to be_displayed
     end
   end
 
@@ -286,7 +286,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
       }.to change(Rubric, :count).by(1)
       refresh_page
-      f('#rubrics .title').text.should == rubric_name
+      expect(f('#rubrics .title').text).to eq rubric_name
     end
   end
 end

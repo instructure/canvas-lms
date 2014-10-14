@@ -24,9 +24,9 @@ shared_examples_for "external tools tests" do
     wait_for_ajax_requests
    # ContextExternalTool.count.should != 0
     tool = ContextExternalTool.last
-    tool.name.should == name
-    tool.consumer_key.should == key
-    tool.shared_secret.should == secret
+    expect(tool.name).to eq name
+    expect(tool.consumer_key).to eq key
+    expect(tool.shared_secret).to eq secret
     tool_checker tool, opts
   end
 
@@ -34,33 +34,33 @@ shared_examples_for "external tools tests" do
 
     if (opts.include? :xml)
       url = "http://example.com/other_url"
-      tool.url.should == url
-      tool.workflow_state.should == "public"
-      tool.description.should == "Description"
+      expect(tool.url).to eq url
+      expect(tool.workflow_state).to eq "public"
+      expect(tool.description).to eq "Description"
       ContextExternalTool::EXTENSION_TYPES.each do |type|
-        tool.extension_setting(type).should_not be_empty
-        f("#external_tool_#{tool.id} .#{type}").should be_displayed
+        expect(tool.extension_setting(type)).not_to be_empty
+        expect(f("#external_tool_#{tool.id} .#{type}")).to be_displayed
       end
       
     elsif opts.include? :url
-      tool.workflow_state.should == "anonymous"
-      tool.url.should == "http://www.edu-apps.org/tool_redirect?id=youtube"
-      tool.description.should include_text "YouTube videos"
-      tool.has_placement?(:editor_button).should be_true
-      tool.settings.should be_present
-      tool.editor_button.should be_present
-      f("#external_tool_#{tool.id} .edit_tool_link").should be_displayed
+      expect(tool.workflow_state).to eq "anonymous"
+      expect(tool.url).to eq "http://www.edu-apps.org/tool_redirect?id=youtube"
+      expect(tool.description).to include_text "YouTube videos"
+      expect(tool.has_placement?(:editor_button)).to be_truthy
+      expect(tool.settings).to be_present
+      expect(tool.editor_button).to be_present
+      expect(f("#external_tool_#{tool.id} .edit_tool_link")).to be_displayed
 
     else
-      tool.description.should == @description
+      expect(tool.description).to eq @description
       tool.settings.count > 0
       tool.custom_fields.keys.count >0
       custom_hash = {@custom_key => @custom_value}
-      tool.custom_fields.should == custom_hash
+      expect(tool.custom_fields).to eq custom_hash
       if (opts.include? :manual_url)
-        tool.url.should == @manual_url
+        expect(tool.url).to eq @manual_url
       else
-        tool.domain.should == @domain
+        expect(tool.domain).to eq @domain
       end
     end
 
@@ -68,9 +68,9 @@ shared_examples_for "external tools tests" do
 
   def add_manual (opts)
     f("#external_tool_config_type option[value='manual']").click
-    f(".config_type.manual").should be_displayed
-    f("#external_tool_config_url").should_not be_displayed
-    f("#external_tool_config_xml").should_not be_displayed
+    expect(f(".config_type.manual")).to be_displayed
+    expect(f("#external_tool_config_url")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).not_to be_displayed
     @custom_key = "value"
     @custom_value = "custom tool"
     @description = "this is an external tool"
@@ -96,18 +96,18 @@ shared_examples_for "external tools tests" do
   def add_url
     url = "#{app_host}/lti_url"
     f("#external_tool_config_type option[value='by_url']").click
-    f("#external_tool_form .config_type.manual").should_not be_displayed
-    f("#external_tool_config_xml").should_not be_displayed
-    f("#external_tool_config_url").should be_displayed
+    expect(f("#external_tool_form .config_type.manual")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).not_to be_displayed
+    expect(f("#external_tool_config_url")).to be_displayed
     f("#external_tool_config_url").send_keys(url)
   end
 
 
   def add_xml
     f("#external_tool_config_type option[value='by_xml']").click
-    f(".config_type.manual").should_not be_displayed
-    f("#external_tool_config_url").should_not be_displayed
-    f("#external_tool_config_xml").should be_displayed
+    expect(f(".config_type.manual")).not_to be_displayed
+    expect(f("#external_tool_config_url")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).to be_displayed
 
 #XML must be broken up to avoid intermittent selenium failures
     f("#external_tool_config_xml").send_keys <<-XML

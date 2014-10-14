@@ -30,15 +30,15 @@ describe "quizzes students" do
       q = quiz.stored_questions[0]
 
       fj("input[type=radio][value=#{q[:answers][0][:id]}]").click
-      fj("input[type=radio][value=#{q[:answers][0][:id]}]").selected?.should be_true
+      expect(fj("input[type=radio][value=#{q[:answers][0][:id]}]").selected?).to be_truthy
 
       wait_for_js
       driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
 
-      keep_trying_until { f('.quiz-submission .quiz_score .score_value').should be_displayed }
+      keep_trying_until { expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed }
       quiz_sub = @fake_student.reload.submissions.find_by_assignment_id(quiz.assignment.id)
-      quiz_sub.should be_present
-      quiz_sub.workflow_state.should == "graded"
+      expect(quiz_sub).to be_present
+      expect(quiz_sub.workflow_state).to eq "graded"
     end
   end
 end

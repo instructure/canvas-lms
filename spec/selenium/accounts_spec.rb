@@ -14,7 +14,7 @@ describe "account" do
       click_option('#add_auth_select', 'ldap', :value)
       ldap_div = f('#ldap_div')
       ldap_form = f('form.ldap_form')
-      ldap_div.should be_displayed
+      expect(ldap_div).to be_displayed
 
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_host').send_keys('primary.host.example.com')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_port').send_keys('1')
@@ -27,17 +27,17 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_0_change_password_url').send_keys('http://forgot.password.example.com/')
       submit_form('#auth_form')
 
-      keep_trying_until { Account.default.account_authorization_configs.length.should == 1 }
+      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
       config = Account.default.account_authorization_configs.first
-      config.auth_host.should == 'primary.host.example.com'
-      config.auth_port.should == 1
-      config.auth_over_tls.should == 'simple_tls'
-      config.auth_base.should == 'primary base'
-      config.auth_filter.should == 'primary filter'
-      config.auth_username.should == 'primary username'
-      config.auth_decrypted_password.should == 'primary password'
-      config.login_handle_name.should == 'login handle'
-      config.change_password_url.should == 'http://forgot.password.example.com/'
+      expect(config.auth_host).to eq 'primary.host.example.com'
+      expect(config.auth_port).to eq 1
+      expect(config.auth_over_tls).to eq 'simple_tls'
+      expect(config.auth_base).to eq 'primary base'
+      expect(config.auth_filter).to eq 'primary filter'
+      expect(config.auth_username).to eq 'primary username'
+      expect(config.auth_decrypted_password).to eq 'primary password'
+      expect(config.login_handle_name).to eq 'login handle'
+      expect(config.change_password_url).to eq 'http://forgot.password.example.com/'
 
       # now add a secondary ldap config
       f('.edit_auth_link').click
@@ -52,25 +52,25 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
       submit_form('#auth_form')
 
-      keep_trying_until { Account.default.account_authorization_configs.length.should == 2 }
+      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 2 }
       config = Account.default.account_authorization_configs.first
-      config.auth_host.should == 'primary.host.example.com'
-      config.auth_over_tls.should == 'simple_tls'
+      expect(config.auth_host).to eq 'primary.host.example.com'
+      expect(config.auth_over_tls).to eq 'simple_tls'
 
       config = Account.default.account_authorization_configs[1]
-      config.auth_host.should == 'secondary.host.example.com'
-      config.auth_port.should == 2
-      config.auth_over_tls.should == 'start_tls'
-      config.auth_base.should == 'secondary base'
-      config.auth_filter.should == 'secondary filter'
-      config.auth_username.should == 'secondary username'
-      config.auth_decrypted_password.should == 'secondary password'
-      config.login_handle_name.should be_nil
-      config.change_password_url.should be_nil
+      expect(config.auth_host).to eq 'secondary.host.example.com'
+      expect(config.auth_port).to eq 2
+      expect(config.auth_over_tls).to eq 'start_tls'
+      expect(config.auth_base).to eq 'secondary base'
+      expect(config.auth_filter).to eq 'secondary filter'
+      expect(config.auth_username).to eq 'secondary username'
+      expect(config.auth_decrypted_password).to eq 'secondary password'
+      expect(config.login_handle_name).to be_nil
+      expect(config.change_password_url).to be_nil
 
       shown_hosts = ff(".auth_info.auth_host")
-      shown_hosts[0].text.should == "primary.host.example.com"
-      shown_hosts[1].text.should == "secondary.host.example.com"
+      expect(shown_hosts[0].text).to eq "primary.host.example.com"
+      expect(shown_hosts[1].text).to eq "secondary.host.example.com"
 
       # test removing the secondary config
       f('.edit_auth_link').click
@@ -78,7 +78,7 @@ describe "account" do
       ldap_form.find_element(:css, '.remove_secondary_ldap_link').click
       submit_form('#auth_form')
 
-      keep_trying_until { Account.default.account_authorization_configs.length.should == 1 }
+      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
 
       # test removing the entire config
       expect_new_page_load do
@@ -87,28 +87,28 @@ describe "account" do
         driver.switch_to.default_content
       end
 
-      Account.default.account_authorization_configs.length.should == 0
+      expect(Account.default.account_authorization_configs.length).to eq 0
     end
 
     it "should show Login and Email fields in add user dialog for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      dialog.find_elements(:id, "pseudonym_path").length.should == 0
-      dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
+      expect(dialog.find_elements(:id, "pseudonym_path").length).to eq 0
+      expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
 
       Account.default.account_authorization_configs.create(:auth_type => 'cas')
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      dialog.find_element(:id, "pseudonym_path").should be_displayed
-      dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
+      expect(dialog.find_element(:id, "pseudonym_path")).to be_displayed
+      expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
     end
 
     it "should be able to set login labels for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
       click_option('#add_auth_select', 'cas', :value)
-      f("#account_authorization_config_0_login_handle_name").should be_displayed
+      expect(f("#account_authorization_config_0_login_handle_name")).to be_displayed
 
       f("#account_authorization_config_0_auth_base").send_keys("cas.example.com")
       f("#account_authorization_config_0_login_handle_name").send_keys("CAS Username")
@@ -117,20 +117,20 @@ describe "account" do
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:*"
+      expect(dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text).to eq "CAS Username:*"
     end
 
     context "cas" do
       it "should be able to set unknown user url option" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
         click_option('#add_auth_select', 'cas', :value)
-        f("#account_authorization_config_0_login_handle_name").should be_displayed
+        expect(f("#account_authorization_config_0_login_handle_name")).to be_displayed
 
         unknown_user_url = 'https://example.com/unknown_user'
         f("#account_authorization_config_0_unknown_user_url").send_keys(unknown_user_url)
         expect_new_page_load { submit_form('#auth_form') }
 
-        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
       end
     end
 
@@ -142,13 +142,13 @@ describe "account" do
         saml_div = f('#saml_div')
         saml_div.find_element(:css, 'button.element_toggler.btn').click
 
-        f("#account_authorization_config_idp_entity_id").should be_displayed
+        expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
 
         unknown_user_url = 'https://example.com/unknown_user'
         f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
         expect_new_page_load { submit_form('#saml_config__form') }
 
-        Account.default.account_authorization_configs.first.unknown_user_url.should == unknown_user_url
+        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
       end
     end
 
@@ -160,7 +160,7 @@ describe "account" do
       submit_form('#add_course_form')
 
       wait_for_ajaximations
-      f('#add_course_dialog').should_not be_displayed
+      expect(f('#add_course_dialog')).not_to be_displayed
       assert_flash_notice_message /Test Course successfully added/
     end
 
@@ -174,15 +174,15 @@ describe "account" do
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click
-      f('#add_course_form').should be_displayed
+      expect(f('#add_course_form')).to be_displayed
     end
 
     it "should be able to update term dates" do
 
       def verify_displayed_term_dates(term, dates)
         dates.each do |en_type, dates|
-          term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text.should match /#{dates[0]}/
-          term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text.should match /#{dates[1]}/
+          expect(term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text).to match /#{dates[0]}/
+          expect(term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text).to match /#{dates[1]}/
         end
       end
 
@@ -258,7 +258,7 @@ describe "account" do
         start.click
         wait_for_ajax_requests
 
-        debug_info.text.should =~ /Waiting for attempted login/
+        expect(debug_info.text).to match /Waiting for attempted login/
 
         aac.debugging_keys.each_with_index do |key, i|
           aac.debug_set(key, "testvalue#{i}")
@@ -270,15 +270,15 @@ describe "account" do
         debug_info = f("#saml_debug_info")
 
         aac.debugging_keys.each_with_index do |key, i|
-          debug_info.text.should =~ /testvalue#{i}/
+          expect(debug_info.text).to match /testvalue#{i}/
         end
 
         stop.click
         wait_for_ajax_requests
-        aac.debugging?.should == false
+        expect(aac.debugging?).to eq false
 
         aac.debugging_keys.each do |key|
-          aac.debug_get(key).should == nil
+          expect(aac.debug_get(key)).to eq nil
         end
       end
     end
@@ -295,16 +295,16 @@ describe "account" do
       expect_new_page_load { submit_form("#discovery_url_form") }
 
       @account.reload
-      @account.auth_discovery_url.should == auth_url
+      expect(@account.auth_discovery_url).to eq auth_url
 
       f("#discovery_url_config .admin-links button").click
       f("#discovery_url_config .delete_url").click
 
       wait_for_ajax_requests
 
-      f("#discovery_url_input").attribute(:value).should == ''
+      expect(f("#discovery_url_input").attribute(:value)).to eq ''
       @account.reload
-      @account.auth_discovery_url.should == nil
+      expect(@account.auth_discovery_url).to eq nil
     end
   end
 
@@ -333,7 +333,7 @@ describe "account" do
     it "should search for an existing course" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', @course_name)
-      f('#section-tabs-header').should include_text(@course_name)
+      expect(f('#section-tabs-header')).to include_text(@course_name)
     end
 
     it "should correctly autocomplete for courses" do
@@ -342,15 +342,15 @@ describe "account" do
 
       keep_trying_until do
         ui_auto_complete = f('.ui-autocomplete')
-        ui_auto_complete.should be_displayed
+        expect(ui_auto_complete).to be_displayed
       end
 
       elements = ff('.ui-autocomplete li:first-child a div')
-      elements[0].text.should == @course_name
-      elements[1].text.should == 'Default Term'
+      expect(elements[0].text).to eq @course_name
+      expect(elements[1].text).to eq 'Default Term'
       keep_trying_until do
         driver.execute_script("$('.ui-autocomplete li a').hover().click()")
-        driver.current_url.should include("/courses/#{@course.id}")
+        expect(driver.current_url).to include("/courses/#{@course.id}")
       end
     end
 
@@ -358,21 +358,21 @@ describe "account" do
       find_user_form = f('#new_user')
       submit_input(find_user_form, '#user_name', @student_name, false)
       wait_for_ajax_requests
-      f('.users').should include_text(@student_name)
+      expect(f('.users')).to include_text(@student_name)
     end
 
     it "should behave correctly when searching for a course that does not exist" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', 'some random course name that will not exist')
       wait_for_ajax_requests
-      f('#content').should include_text(@error_text)
-      f('#new_user').find_element(:id, 'user_name').text.should be_empty #verifies bug #5133 is fixed
+      expect(f('#content')).to include_text(@error_text)
+      expect(f('#new_user').find_element(:id, 'user_name').text).to be_empty #verifies bug #5133 is fixed
     end
 
     it "should behave correctly when searching for a user that does not exist" do
       find_user_form = f('#new_user')
       submit_input(find_user_form, '#user_name', 'this student name will not exist', false)
-      f('#content').should include_text(@error_text)
+      expect(f('#content')).to include_text(@error_text)
     end
   end
 
@@ -386,7 +386,7 @@ describe "account" do
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
       #verify user details displayed properly
-      f('.accounts .unstyled_list li').should include_text('sub_account')
+      expect(f('.accounts .unstyled_list li')).to include_text('sub_account')
     end
   end
 end

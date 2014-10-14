@@ -34,16 +34,16 @@ describe "admin courses tab" do
     end
 
     it "should search for a user and should go to it" do
-      pending('disabled until we can fix performance')
+      skip('disabled until we can fix performance')
       name = "user_1"
       add_user({:name => name})
       f("#right-side #user_name").send_keys(name)
       ff(".ui-menu-item .ui-corner-all").count > 0
       wait_for_ajax_requests
-      fj(".ui-menu-item .ui-corner-all:visible").should include_text(name)
+      expect(fj(".ui-menu-item .ui-corner-all:visible")).to include_text(name)
       fj(".ui-menu-item .ui-corner-all:visible").click
       wait_for_ajax_requests
-      f("#content h2").should include_text name
+      expect(f("#content h2")).to include_text name
     end
 
     it "should search for a bogus user" do

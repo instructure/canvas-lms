@@ -29,9 +29,9 @@ describe "quizzes question creation with attempts" do
       alert_present?
     end
     alert = driver.switch_to.alert
-    alert.text.should == alert_text
+    expect(alert.text).to eq alert_text
     alert.dismiss
-    fj('#quiz_allowed_attempts').should have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
+    expect(fj('#quiz_allowed_attempts')).to have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
   end
 
   it "should not allow quiz attempts that are entered with letters" do
@@ -53,16 +53,16 @@ describe "quizzes question creation with attempts" do
     f('#limit_attempts_option').click
     replace_content(f('#quiz_allowed_attempts'), attempts)
     f('#quiz_time_limit').click
-    alert_present?.should be_false
-    fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
+    expect(alert_present?).to be_falsey
+    expect(fj('#quiz_allowed_attempts')).to have_attribute('value', attempts) # fj to avoid selenium caching
 
     expect_new_page_load {
       f('.save_quiz_button').click
       wait_for_ajaximations
-      keep_trying_until { f('.header-bar-right').should be_displayed }
+      keep_trying_until { expect(f('.header-bar-right')).to be_displayed }
     }
 
-    Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i
+    expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i
   end
 
 end

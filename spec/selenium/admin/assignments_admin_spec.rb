@@ -20,7 +20,7 @@ describe "assignments" do
       wait_for_ajaximations
 
       f('#sidebar_content .submit_assignment_link').click
-      ff('#submit_google_doc_form').should be_empty
+      expect(ff('#submit_google_doc_form')).to be_empty
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests

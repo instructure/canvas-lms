@@ -30,24 +30,24 @@ describe "quizzes questions" do
       replace_content(question.find_element(:css, 'input[name="question_name"]'), 'edited question')
 
       answers = question.find_elements(:css, ".form_answers > .answer")
-      answers.length.should == 2
+      expect(answers.length).to eq 2
       question.find_element(:css, ".add_answer_link").click
       question.find_element(:css, ".add_answer_link").click
       answers = question.find_elements(:css, ".form_answers > .answer")
-      answers.length.should == 4
+      expect(answers.length).to eq 4
       driver.action.move_to(answers[3]).perform
       answers[3].find_element(:css, ".delete_answer_link").click
       answers = question.find_elements(:css, ".form_answers > div.answer")
-      answers.length.should == 3
+      expect(answers.length).to eq 3
 
       # check that the wiki sidebar is visible
-      f('#editor_tabs .wiki-sidebar-header').should include_text("Insert Content into the Page")
+      expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
 
       submit_form(question)
       question = f("#question_#{quest1.id}")
-      question.find_element(:css, ".question_name").text.should == 'edited question'
+      expect(question.find_element(:css, ".question_name").text).to eq 'edited question'
       f('#show_question_details').click
-      question.find_elements(:css, '.answers .answer').length.should == 3
+      expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
 
     it "should ignore html added in the quiz description" do
@@ -68,20 +68,20 @@ describe "quizzes questions" do
       submit_form(question)
 
       hover_and_click(".edit_question_link")
-      ffj(".question_form:visible .form_answers .answer").size.should == 2
+      expect(ffj(".question_form:visible .form_answers .answer").size).to eq 2
     end
 
     it "should not show Missing Word option in question types dropdown" do
       get "/courses/#{@course.id}/quizzes/new"
 
-      ff("#question_form_template option.missing_word").length.should == 1
+      expect(ff("#question_form_template option.missing_word").length).to eq 1
 
       click_questions_tab
       keep_trying_until {
         f(".add_question .add_question_link").click
         ff("#questions .question_holder").length > 0
       }
-      ff("#questions .question_holder option.missing_word").length.should == 0
+      expect(ff("#questions .question_holder option.missing_word").length).to eq 0
     end
 
     it "should reorder questions with drag and drop" do
@@ -90,8 +90,8 @@ describe "quizzes questions" do
 
       # ensure they are in the right order
       names = ff('.question_name')
-      names[0].text.should == 'first question'
-      names[1].text.should == 'second question'
+      expect(names[0].text).to eq 'first question'
+      expect(names[1].text).to eq 'second question'
 
       load_simulate_js
 
@@ -102,8 +102,8 @@ describe "quizzes questions" do
 
       # verify they were swapped
       names = ff('.question_name')
-      names[0].text.should == 'second question'
-      names[1].text.should == 'first question'
+      expect(names[0].text).to eq 'second question'
+      expect(names[1].text).to eq 'first question'
     end
 
     it "should not show the display details for text questions" do
@@ -117,7 +117,7 @@ describe "quizzes questions" do
       quiz.reload
 
       show_el = f('#show_question_details')
-      show_el.should_not be_displayed
+      expect(show_el).not_to be_displayed
     end
 
     it "should not show the display details for essay questions" do
@@ -131,7 +131,7 @@ describe "quizzes questions" do
       quiz.reload
 
       show_el = f('#show_question_details')
-      show_el.should_not be_displayed
+      expect(show_el).not_to be_displayed
     end
 
     it "should show the display details when questions other than text or essay questions exist" do
@@ -139,14 +139,14 @@ describe "quizzes questions" do
       show_el = f('#show_question_details')
       question = fj(".question_form:visible")
 
-      show_el.should_not be_displayed
+      expect(show_el).not_to be_displayed
 
       click_option('.question_form:visible .question_type', 'Multiple Choice')
       submit_form(question)
       wait_for_ajax_requests
       quiz.reload
 
-      show_el.should be_displayed
+      expect(show_el).to be_displayed
     end
 
     it "should calculate correct quiz question points total" do
@@ -164,23 +164,22 @@ describe "quizzes questions" do
       wait_for_ajax_requests
       quiz = Quizzes::Quiz.last
       quiz.reload
-      quiz.quiz_questions.length.should == @question_count
+      expect(quiz.quiz_questions.length).to eq @question_count
     end
 
     it "should round published quiz points correctly on main quiz page" do
-      pending("bug 7402 - Quiz points not rounding correctly") do
-        q = @course.quizzes.create!(:title => "new quiz")
-        75.times do
-          q.quiz_questions.create!(:question_data => {:name => "Quiz Question 1", :question_type => 'essay_question', :question_text => 'qq1', 'answers' => [], :points_possible => 1.33})
-        end
-        q.generate_quiz_data
-        q.workflow_state = 'available'
-        q.save
-        q.reload
-
-        get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"
-        fj('.summary td:eq(2)').text.should == "99.75%"
+      skip("bug 7402 - Quiz points not rounding correctly")
+      q = @course.quizzes.create!(:title => "new quiz")
+      75.times do
+        q.quiz_questions.create!(:question_data => {:name => "Quiz Question 1", :question_type => 'essay_question', :question_text => 'qq1', 'answers' => [], :points_possible => 1.33})
       end
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save
+      q.reload
+
+      get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"
+      expect(fj('.summary td:eq(2)').text).to eq "99.75%"
     end
 
     it "should round numeric questions the same when created and taking a quiz" do
@@ -222,7 +221,7 @@ describe "quizzes questions" do
       expect_new_page_load {
         f('#submit_quiz_button').click
       }
-      f('.score_value').text.strip.should == '1'
+      expect(f('.score_value').text.strip).to eq '1'
     end
   end
 

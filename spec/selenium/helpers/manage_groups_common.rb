@@ -30,9 +30,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
       form.find_element(:css, "#category_no_groups").click
     end
     submit_form(form)
-    keep_trying_until { find_with_jquery("#add_category_form:visible").should be_nil }
+    keep_trying_until { expect(find_with_jquery("#add_category_form:visible")).to be_nil }
     category = course.group_categories.find_by_name(name)
-    category.should_not be_nil
+    expect(category).not_to be_nil
     keep_trying_until { fj("#category_#{category.id} .student_links:visible") }
     category
   end

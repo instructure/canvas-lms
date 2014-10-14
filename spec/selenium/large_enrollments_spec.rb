@@ -28,7 +28,7 @@ describe "large enrollments", :priority => "2" do
 
     it "should display course homepage" do
       get "/courses/#{@course.id}/"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
     end
 
   end

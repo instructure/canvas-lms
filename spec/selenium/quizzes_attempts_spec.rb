@@ -39,15 +39,15 @@ describe "quizzes attempts" do
 
     4.times do |i|
       keep_trying_until(100) {
-        f("#question_#{quiz.quiz_questions[i].id}").should be_displayed
+        expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed
       }
     end
 
     questions = ff('.display_question')
-    questions[0].should have_class("multiple_choice_question")
-    questions[1].should have_class("multiple_choice_question")
-    questions[2].should have_class("true_false_question")
-    questions[3].should have_class("short_answer_question")
+    expect(questions[0]).to have_class("multiple_choice_question")
+    expect(questions[1]).to have_class("multiple_choice_question")
+    expect(questions[2]).to have_class("true_false_question")
+    expect(questions[3]).to have_class("short_answer_question")
 
     #
     # end of adapted code
@@ -88,17 +88,17 @@ describe "quizzes attempts" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/history?version=1"
 
     # all arrows should have an @id attribute node
-    ffj('.answer_arrow:not([id])').length.should == 0
+    expect(ffj('.answer_arrow:not([id])').length).to eq 0
 
     # the following test cases are intermittent and broken:
 
     # there should be 5x <input /> nodes with an @aria-describedby attribute node
-    ffj('.answer input[aria-describedby]').length.should == 5
+    expect(ffj('.answer input[aria-describedby]').length).to eq 5
 
     # this covers the fill-in-the-blank question edge case where the answers are
     # not input fields, so the @aria-describedby attribute is set on the wrapper
     # element instead
-    ffj('.answers_wrapper[aria-describedby]').length.should == 1
+    expect(ffj('.answers_wrapper[aria-describedby]').length).to eq 1
   end
 
 end

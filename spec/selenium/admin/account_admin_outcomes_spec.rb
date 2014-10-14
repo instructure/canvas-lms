@@ -25,7 +25,7 @@ describe "account admin outcomes" do
         end
 
         it "should edit a learning outcome and delete a rating" do
-          pending('193')
+          skip('193')
           should_edit_a_learning_outcome_and_delete_a_rating
         end
 
@@ -65,10 +65,10 @@ describe "account admin outcomes" do
           f('.find_outcome').click
           wait_for_ajaximations
           groups = ff('.outcome-group')
-          groups.size.should == 2
+          expect(groups.size).to eq 2
           groups.each do |g|
             g.click
-            f('.ui-dialog-buttonpane .btn-primary').should_not be_displayed
+            expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
           end
         end
       end
@@ -100,7 +100,7 @@ describe "account admin outcomes" do
       it "should have state standards available for outcomes through find" do
         state_outcome_setup
         goto_state_outcomes
-        ffj(".outcome-level:last .outcome-group .ellipsis")[0].should have_attribute("title", 'NGA Center/CCSSO')
+        expect(ffj(".outcome-level:last .outcome-group .ellipsis")[0]).to have_attribute("title", 'NGA Center/CCSSO')
       end
 
       it "should import state standards to course groups and all nested outcomes" do
@@ -111,8 +111,8 @@ describe "account admin outcomes" do
         traverse_nested_outcomes(outcome)
         import_account_level_outcomes
         keep_trying_until do
-          ffj(".outcome-level:first .outcome-group .ellipsis")[0].should have_attribute("title", 'Something else')
-          ffj(".outcome-level:last .outcome-link .ellipsis")[0].should have_attribute("title", '1.DD.1')
+          expect(ffj(".outcome-level:first .outcome-group .ellipsis")[0]).to have_attribute("title", 'Something else')
+          expect(ffj(".outcome-level:last .outcome-link .ellipsis")[0]).to have_attribute("title", '1.DD.1')
         end
       end
 
@@ -131,13 +131,13 @@ describe "account admin outcomes" do
 
         keep_trying_until do
           f('.delete_button').click
-          driver.switch_to.alert.should_not be nil
+          expect(driver.switch_to.alert).not_to be nil
           driver.switch_to.alert.accept
           refresh_page
           wait_for_ajaximations
-          ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
+          expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
         end
-        f('.outcomes-content .title').text.should == 'Setting up Outcomes'
+        expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
       end
 
       describe "state standard pagination" do
@@ -157,13 +157,13 @@ describe "account admin outcomes" do
 
           # click on state standards
           top_level_groups = ff(".outcome-level .outcome-group")
-          top_level_groups.count.should == 3
+          expect(top_level_groups.count).to eq 3
           top_level_groups[1].click
           wait_for_ajaximations
 
           # make sure the last one is the Z guy
           keep_trying_until do
-            ffj(".outcome-level:last .outcome-group .ellipsis").last.should have_attribute("title", 'Z is last')
+            expect(ffj(".outcome-level:last .outcome-group .ellipsis").last).to have_attribute("title", 'Z is last')
           end
         end
       end

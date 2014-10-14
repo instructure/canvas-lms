@@ -64,7 +64,7 @@ shared_examples_for "permission tests" do
       f('#account-roles-tab .new-role button').click
       wait_for_ajaximations
 
-      f('#account-roles-tab').should include_text(role_name)
+      expect(f('#account-roles-tab')).to include_text(role_name)
     end
 
     it "adds a new course role" do
@@ -76,7 +76,7 @@ shared_examples_for "permission tests" do
       f('#course-roles-tab .new-role button').click
       wait_for_ajaximations
 
-      f('#course-roles-tab').should include_text(role_name)
+      expect(f('#course-roles-tab')).to include_text(role_name)
     end
   end
 
@@ -95,7 +95,7 @@ shared_examples_for "permission tests" do
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
-        f('#account-roles-tab').should_not include_text(role_name)
+        expect(f('#account-roles-tab')).not_to include_text(role_name)
       end
     end
 
@@ -113,7 +113,7 @@ shared_examples_for "permission tests" do
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
-        f('#course-roles-tab').should_not include_text(role_name)
+        expect(f('#course-roles-tab')).not_to include_text(role_name)
       end
     end
   end
@@ -134,8 +134,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_true
-          role_override.locked.should be_false
+          expect(role_override.enabled).to be_truthy
+          expect(role_override.locked).to be_falsey
         end
       end
 
@@ -144,8 +144,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_true
-          role_override.locked.should be_true
+          expect(role_override.enabled).to be_truthy
+          expect(role_override.locked).to be_truthy
         end
       end
 
@@ -154,8 +154,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_false
-          role_override.locked.should be_false
+          expect(role_override.enabled).to be_falsey
+          expect(role_override.locked).to be_falsey
         end
       end
 
@@ -164,8 +164,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_false
-          role_override.locked.should be_true
+          expect(role_override.enabled).to be_falsey
+          expect(role_override.locked).to be_truthy
         end
       end
 
@@ -174,14 +174,14 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.nil?.should be_false
+          expect(role_override.nil?).to be_falsey
         end
 
         select_default(permission_name, role_name)
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.nil?.should be_true
+          expect(role_override.nil?).to be_truthy
         end
       end
 
@@ -190,8 +190,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.nil?.should be_true
-          role_override.locked.should be_true
+          expect(role_override.enabled.nil?).to be_truthy
+          expect(role_override.locked).to be_truthy
         end
       end
     end
@@ -212,8 +212,8 @@ shared_examples_for "permission tests" do
         keep_trying_until do
 
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_true
-          role_override.locked.should be_false
+          expect(role_override.enabled).to be_truthy
+          expect(role_override.locked).to be_falsey
         end
       end
 
@@ -222,8 +222,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_true
-          role_override.locked.should be_true
+          expect(role_override.enabled).to be_truthy
+          expect(role_override.locked).to be_truthy
         end
       end
 
@@ -232,8 +232,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_false
-          role_override.locked.should be_false
+          expect(role_override.enabled).to be_falsey
+          expect(role_override.locked).to be_falsey
         end
       end
 
@@ -242,8 +242,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.should be_false
-          role_override.locked.should be_true
+          expect(role_override.enabled).to be_falsey
+          expect(role_override.locked).to be_truthy
         end
       end
 
@@ -252,14 +252,14 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.nil?.should be_false
+          expect(role_override.nil?).to be_falsey
         end
 
         select_default(permission_name, role_name)
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.nil?.should be_true
+          expect(role_override.nil?).to be_truthy
         end
       end
 
@@ -268,8 +268,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(enrollment_type: role.name).first
-          role_override.enabled.nil?.should be_true
-          role_override.locked.should be_true
+          expect(role_override.enabled.nil?).to be_truthy
+          expect(role_override.locked).to be_truthy
         end
       end
     end

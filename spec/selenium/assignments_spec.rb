@@ -74,14 +74,14 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       wait_for_ajaximations
 
-      f('#assignment_group_id').should be_displayed
+      expect(f('#assignment_group_id')).to be_displayed
       click_option('#assignment_group_id', second_group.name)
       click_option('#assignment_grading_type', 'Letter Grade')
 
       #check grading levels dialog
       f('.edit_letter_grades_link').click
       wait_for_ajaximations
-      f('#edit_letter_grades_form').should be_displayed
+      expect(f('#edit_letter_grades_form')).to be_displayed
       close_visible_dialog
 
       #check peer reviews option
@@ -102,7 +102,7 @@ describe "assignments" do
 
       #save changes
       submit_assignment_form
-      driver.execute_script("return document.title").should include_text(assignment_name + ' edit')
+      expect(driver.execute_script("return document.title")).to include_text(assignment_name + ' edit')
     end
 
     it "should display assignment on calendar and link to assignment" do
@@ -119,7 +119,7 @@ describe "assignments" do
       wait_for_ajaximations
       f('.more_options_link').click
       wait_for_ajaximations
-      f('#assignment_name')['value'].should include_text(assignment_name)
+      expect(f('#assignment_name')['value']).to include_text(assignment_name)
     end
 
     it "should create an assignment" do
@@ -144,14 +144,14 @@ describe "assignments" do
       wait_for_ajaximations
       keep_trying_until do
         first_group = f('#groups .assignment_group:nth-child(2)')
-        first_group.should include_text('second group')
-        first_group.should include_text(assignment_name)
+        expect(first_group).to include_text('second group')
+        expect(first_group).to include_text(assignment_name)
       end
 
       #click on assignment link
       f("#assignment_#{Assignment.last.id} .title").click
       wait_for_ajaximations
-      f('h1.title').should include_text(assignment_name)
+      expect(f('h1.title')).to include_text(assignment_name)
     end
 
     it "should allow a due date if no course start and end date is set" do
@@ -178,14 +178,14 @@ describe "assignments" do
       wait_for_ajaximations
       keep_trying_until do
         first_group = f('#groups .assignment_group:nth-child(2)')
-        first_group.should include_text('second group')
-        first_group.should include_text(assignment_name)
+        expect(first_group).to include_text('second group')
+        expect(first_group).to include_text(assignment_name)
     end
 
       #click on assignment link
       f("#assignment_#{Assignment.last.id} .title").click
       wait_for_ajaximations
-      f('h1.title').should include_text(assignment_name)
+      expect(f('h1.title')).to include_text(assignment_name)
     end
 
     %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
@@ -201,8 +201,8 @@ describe "assignments" do
         assignment_points_possible = f("#assignment_points_possible")
         replace_content(assignment_points_possible, "5")
         submit_assignment_form
-        f('.title').should include_text(assignment_title)
-        Assignment.find_by_title(assignment_title).grading_type.should == grading_option
+        expect(f('.title')).to include_text(assignment_title)
+        expect(Assignment.find_by_title(assignment_title).grading_type).to eq grading_option
       end
     end
 
@@ -223,20 +223,20 @@ describe "assignments" do
       driver.execute_script "$('.edit_assignment_link').first().hover().click()"
       # Assert input element is hidden to the user, but still present in the
       # form so the due date doesn't get changed to no due date.
-      fj('.add_assignment_form .input-append').attribute('style').
-          should include 'display: none;'
-      f('.vdd_no_edit').text.
-          should == I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
+      expect(fj('.add_assignment_form .input-append').attribute('style')).
+          to include 'display: none;'
+      expect(f('.vdd_no_edit').text).
+          to eq I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
       assignment_title = f("#assignment_title")
       assignment_points_possible = f("#assignment_points_possible")
       replace_content(assignment_title, "VDD Test Assignment Updated")
       replace_content(assignment_points_possible, "100")
       f("#add_assignment_form").submit
       wait_for_ajaximations
-      @assignment.reload.points_possible.should == 100
-      @assignment.title.should == "VDD Test Assignment Updated"
+      expect(@assignment.reload.points_possible).to eq 100
+      expect(@assignment.title).to eq "VDD Test Assignment Updated"
       # Assert the time didn't change
-      @assignment.due_at.strftime('%b %d').should == expected_date
+      expect(@assignment.due_at.strftime('%b %d')).to eq expected_date
     end
 
     it "should create an assignment with more options" do
@@ -254,12 +254,12 @@ describe "assignments" do
         assignment_points_possible = f("#assignment_points_possible")
         replace_content(assignment_points_possible, "5")
         submit_assignment_form
-        @course.assignments.count.should == 1
+        expect(@course.assignments.count).to eq 1
         get "/courses/#{@course.id}/assignments"
-        f('.no_assignments_message').should_not be_displayed
-        f('#groups').should include_text(expected_text)
+        expect(f('.no_assignments_message')).not_to be_displayed
+        expect(f('#groups')).to include_text(expected_text)
         group.reload
-        group.updated_at.to_i.should_not == first_stamp
+        expect(group.updated_at.to_i).not_to eq first_stamp
       end
     end
 
@@ -273,7 +273,7 @@ describe "assignments" do
       click_option('#assignment_group_category_id', 'new', :value)
       fj('.ui-dialog:visible .self_signup_help_link img').click
       wait_for_ajaximations
-      f('#self_signup_help_dialog').should be_displayed
+      expect(f('#self_signup_help_dialog')).to be_displayed
     end
 
 
@@ -292,7 +292,7 @@ describe "assignments" do
 
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      visBoxes.first.text.should == "Please select a group set for this assignment"
+      expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
     end
 
     it "should create an assignment with more options" do
@@ -308,12 +308,12 @@ describe "assignments" do
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
-        @course.assignments.count.should == 1
+        expect(@course.assignments.count).to eq 1
         get "/courses/#{@course.id}/assignments"
-        f('.no_assignments_message').should_not be_displayed
-        f('#groups').should include_text(expected_text)
+        expect(f('.no_assignments_message')).not_to be_displayed
+        expect(f('#groups')).to include_text(expected_text)
         group.reload
-        group.updated_at.to_i.should_not == first_stamp
+        expect(group.updated_at.to_i).not_to eq first_stamp
       end
     end
 
@@ -328,7 +328,7 @@ describe "assignments" do
       yield if block_given?
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for selected grading type"
+      expect(fj('.error_text div').text).to eq "Points possible must be more than 0 for selected grading type"
     end
 
     it "should validate points for percentage grading (> 0)" do
@@ -404,9 +404,9 @@ describe "assignments" do
           replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
         end
 
-        f('.assignment_dates').text.should match /Sep 20, 2012/
+        expect(f('.assignment_dates').text).to match /Sep 20, 2012/
         #some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
-        @frozen_assign.reload.due_at.to_i.should_not == old_due_at.to_i
+        expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
       end
     end
 
@@ -419,8 +419,8 @@ describe "assignments" do
 
       it "should not allow assignment group to be deleted by teacher if assignment group id frozen", :priority => "2" do
         get "/courses/#{@course.id}/assignments"
-        fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link").should be_nil
-        fj("#assignment_#{@frozen_assign.id} .delete_assignment_link").should be_nil
+        expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
+        expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
       end
 
       it "should not be locked for admin", :priority => "2" do
@@ -432,20 +432,20 @@ describe "assignments" do
           # title isn't locked, should allow editing
           f('#assignment_name').send_keys(' edit')
 
-          f('#assignment_group_id').attribute('disabled').should be_nil
-          f('#assignment_peer_reviews').attribute('disabled').should be_nil
-          f('#assignment_description').attribute('disabled').should be_nil
+          expect(f('#assignment_group_id').attribute('disabled')).to be_nil
+          expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
+          expect(f('#assignment_description').attribute('disabled')).to be_nil
           click_option('#assignment_group_id', "other")
         end
 
-        f('h2.title').should include_text(orig_title + ' edit')
-        @frozen_assign.reload.assignment_group.name.should == "other"
+        expect(f('h2.title')).to include_text(orig_title + ' edit')
+        expect(@frozen_assign.reload.assignment_group.name).to eq "other"
       end
 
       it "should not allow assignment group to be deleted by teacher if assignment group id frozen" do
         get "/courses/#{@course.id}/assignments"
-        fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link").should be_nil
-        fj("#assignment_#{@frozen_assign.id} .delete_assignment_link").should be_nil
+        expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
+        expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
       end
 
       it "should not be locked for admin" do
@@ -457,14 +457,14 @@ describe "assignments" do
           # title isn't locked, should allow editing
           f('#assignment_name').send_keys(' edit')
 
-          f('#assignment_group_id').attribute('disabled').should be_nil
-          f('#assignment_peer_reviews').attribute('disabled').should be_nil
-          f('#assignment_description').attribute('disabled').should be_nil
+          expect(f('#assignment_group_id').attribute('disabled')).to be_nil
+          expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
+          expect(f('#assignment_description').attribute('disabled')).to be_nil
           click_option('#assignment_group_id', "other")
         end
 
-        f('h1.title').should include_text(orig_title + ' edit')
-        @frozen_assign.reload.assignment_group.name.should == "other"
+        expect(f('h1.title')).to include_text(orig_title + ' edit')
+        expect(@frozen_assign.reload.assignment_group.name).to eq "other"
       end
     end
 
@@ -485,7 +485,7 @@ describe "assignments" do
         fj('.create_group:visible').click
         wait_for_ajaximations
 
-        ff('.assignment_group .ig-header h2').map(&:text).should include("Second AG")
+        expect(ff('.assignment_group .ig-header h2').map(&:text)).to include("Second AG")
       end    
  
       it "should go to the new assignment page from 'Add Assignment'", :priority => "2" do
@@ -493,7 +493,7 @@ describe "assignments" do
         expect_new_page_load { f('.new_assignment').click }
         wait_for_ajaximations
 
-        f('#edit_assignment_form').should be_present
+        expect(f('#edit_assignment_form')).to be_present
       end
 
       it "should allow quick-adding an assignment to a group", :priority => "2" do
@@ -511,10 +511,10 @@ describe "assignments" do
         wait_for_ajaximations
 
         a = ag.reload.assignments.first
-        a.name.should == "Do this"
-        a.points_possible.should == 13
+        expect(a.name).to eq "Do this"
+        expect(a.points_possible).to eq 13
 
-        f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
+        expect(f("#assignment_group_#{ag.id} .ig-title").text).to match "Do this"
       end
 
       it "should allow quick-adding two assignments to a group (dealing with form re-render)", :priority => "2" do
@@ -537,15 +537,15 @@ describe "assignments" do
           fj("#ag_#{ag.id}_assignment_name").displayed?
         end
 
-        get_value("#ag_#{ag.id}_assignment_name").should == ""
-        get_value("#ag_#{ag.id}_assignment_points").should == "0"
+        expect(get_value("#ag_#{ag.id}_assignment_name")).to eq ""
+        expect(get_value("#ag_#{ag.id}_assignment_points")).to eq "0"
 
         replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
         replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
         fj('.create_assignment:visible').click
         wait_for_ajaximations
 
-        ag.reload.assignments.count.should == 2
+        expect(ag.reload.assignments.count).to eq 2
       end
 
       #Per selenium guidelines, we should not test buttons navigating to a page
@@ -563,9 +563,9 @@ describe "assignments" do
         replace_content(f("#ag_#{ag2.id}_assignment_points"), "13")
         expect_new_page_load { fj('.more_options:visible').click }
 
-        get_value("#assignment_name").should == "Do this"
-        get_value("#assignment_points_possible").should == "13"
-        get_value("#assignment_group_id").should == ag2.id.to_s
+        expect(get_value("#assignment_name")).to eq "Do this"
+        expect(get_value("#assignment_points_possible")).to eq "13"
+        expect(get_value("#assignment_group_id")).to eq ag2.id.to_s
       end
 
       # This should be part of a spec that follows a critical path through
@@ -583,10 +583,10 @@ describe "assignments" do
 
         accept_alert
         wait_for_ajaximations
-        element_exists("#assignment_#{as.id}").should be_false
+        expect(element_exists("#assignment_#{as.id}")).to be_falsey
 
         as.reload
-        as.workflow_state.should == 'deleted'
+        expect(as.workflow_state).to eq 'deleted'
       end
 
       it "should reorder assignments with drag and drop" do
@@ -595,7 +595,7 @@ describe "assignments" do
         4.times do |i|
           as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group => ag)
         end
-        as.collect(&:position).should == [1, 2, 3, 4]
+        expect(as.collect(&:position)).to eq [1, 2, 3, 4]
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
@@ -603,7 +603,7 @@ describe "assignments" do
         wait_for_ajaximations
 
         as.each { |a| a.reload }
-        as.collect(&:position).should == [2, 1, 3, 4]
+        expect(as.collect(&:position)).to eq [2, 1, 3, 4]
       end
 
       context "with modules" do
@@ -620,7 +620,7 @@ describe "assignments" do
         it "should show the new modules sequence footer" do
           get "/courses/#{@course.id}/assignments/#{@a2.id}"
           wait_for_ajaximations
-          f("#sequence_footer .module-sequence-footer").should be_present
+          expect(f("#sequence_footer .module-sequence-footer")).to be_present
         end
       end
 
@@ -634,14 +634,14 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments"
           fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
           wait_for_ajaximations
-          element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group").should be_false
+          expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
         end
 
         it "should not allow deleting a frozen assignment from index page" do
           get "/courses/#{@course.id}/assignments"
           fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
           wait_for_ajaximations
-          element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible").should be_false
+          expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
         end
       end
 
@@ -657,8 +657,8 @@ describe "assignments" do
           wait_for_ajaximations
           f("#assignment_#{@assignment.id} .publish-icon").click
           wait_for_ajaximations
-          @assignment.reload.should be_published
-          keep_trying_until { f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label').should include_text("Published") }
+          expect(@assignment.reload).to be_published
+          keep_trying_until { expect(f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label')).to include_text("Published") }
         end
 
         it "shows submission scores for students on index page" do
@@ -668,8 +668,8 @@ describe "assignments" do
           @assignment.grade_student(@student, grade: 14)
           get "/courses/#{@course.id}/assignments"
           wait_for_ajaximations
-          f("#assignment_#{@assignment.id} .js-score .non-screenreader").
-              text.should match "14/15 pts"
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").
+              text).to match "14/15 pts"
         end
 
         it "should allow publishing from the show page" do
@@ -682,21 +682,21 @@ describe "assignments" do
             )
           end
 
-          speedgrader_hidden?.should == true
+          expect(speedgrader_hidden?).to eq true
 
           f("#assignment_publish_button").click
           wait_for_ajaximations
 
-          @assignment.reload.should be_published
-          f("#assignment_publish_button").text.should match "Published"
-          speedgrader_hidden?.should == false
+          expect(@assignment.reload).to be_published
+          expect(f("#assignment_publish_button").text).to match "Published"
+          expect(speedgrader_hidden?).to eq false
         end
 
         it "should show publishing status on the edit page" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
           wait_for_ajaximations
 
-          f("#edit_assignment_header").text.should match "Not Published"
+          expect(f("#edit_assignment_header").text).to match "Not Published"
         end
 
         context 'with overrides' do
@@ -728,7 +728,7 @@ describe "assignments" do
             wait_for_ajaximations
             keep_trying_until { !@assignment.reload.published? }
 
-            @assignment.reload.active_assignment_overrides.count.should == 1
+            expect(@assignment.reload.active_assignment_overrides.count).to eq 1
           end
 
           it "should not overwrite overrides if published twice from the show page" do
@@ -737,13 +737,13 @@ describe "assignments" do
 
             f("#assignment_publish_button").click
             wait_for_ajaximations
-            @assignment.reload.should be_published
+            expect(@assignment.reload).to be_published
 
             f("#assignment_publish_button").click
             wait_for_ajaximations
-            @assignment.reload.should_not be_published
+            expect(@assignment.reload).not_to be_published
 
-            @assignment.reload.active_assignment_overrides.count.should == 1
+            expect(@assignment.reload.active_assignment_overrides.count).to eq 1
           end
         end
       end
@@ -780,23 +780,23 @@ describe "assignments" do
         gear = f("#assignment_#{plain_assignment.id} .al-trigger")
         gear.click
         link = f("#assignment_#{plain_assignment.id} li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{plain_assignment.id}"
+        expect(link).to be_displayed
+        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{plain_assignment.id}"
 
         gear = f("#assignment_#{topic_assignment.id} .al-trigger")
         gear.click
         link = f("#assignment_#{topic_assignment.id} li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{topic.id}"
+        expect(link).to be_displayed
+        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{topic.id}"
 
         gear = f("#assignment_#{quiz_assignment.id} .al-trigger")
         gear.click
         link = f("#assignment_#{quiz_assignment.id} li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
+        expect(link).to be_displayed
+        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
+        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
       end
 
       it "should show tool launch links in the gear for items on the show page" do
@@ -806,9 +806,9 @@ describe "assignments" do
         gear = f("#assignment_show .al-trigger")
         gear.click
         link = f("#assignment_show li a.menu_tool_link")
-        link.should be_displayed
-        link.text.should match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-        link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
+        expect(link).to be_displayed
+        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:assignment_menu))
+        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
       end
     end
   end

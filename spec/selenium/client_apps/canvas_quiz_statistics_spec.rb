@@ -32,6 +32,6 @@ describe "canvas quiz statistics" do
     wait = Selenium::WebDriver::Wait.new(timeout: 5)
     wait.until { status.text.present? } # require call is async
 
-    status.text.should match('success')
+    expect(status.text).to match('success')
   end
 end

@@ -22,16 +22,16 @@ describe "course sections" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
-    table_rows.count.should == 1
-    table_rows[0].should include_text('2 Active Enrollments')
+    expect(table_rows.count).to eq 1
+    expect(table_rows[0]).to include_text('2 Active Enrollments')
   end
 
   it "should validate the display when only 1 enrollment exists" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
-    table_rows.count.should == 1
-    table_rows[0].should include_text('1 Active Enrollment')
+    expect(table_rows.count).to eq 1
+    expect(table_rows[0]).to include_text('1 Active Enrollment')
   end
 
   it "should display the correct pending enrollments count" do
@@ -40,8 +40,8 @@ describe "course sections" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
-    table_rows.count.should == 2
-    table_rows[0].should include_text('2 Pending Enrollments')
+    expect(table_rows.count).to eq 2
+    expect(table_rows[0]).to include_text('2 Pending Enrollments')
   end
 
   it "should display the correct completed enrollments count" do
@@ -50,8 +50,8 @@ describe "course sections" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
-    table_rows.count.should == 1
-    table_rows[0].should include_text('2 Completed Enrollments')
+    expect(table_rows.count).to eq 1
+    expect(table_rows[0]).to include_text('2 Completed Enrollments')
   end
 
   it "should edit the section" do
@@ -63,6 +63,6 @@ describe "course sections" do
     replace_content(edit_form.find_element(:id, 'course_section_name'), edit_name)
     submit_form(edit_form)
     wait_for_ajaximations
-    f('#section_name').should include_text(edit_name)
+    expect(f('#section_name')).to include_text(edit_name)
   end
 end

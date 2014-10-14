@@ -17,22 +17,22 @@ describe "quizzes question creation" do
     create_multiple_choice_question
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
-    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
+    expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
 
-    question_data[:answers].length.should == 4
-    question_data[:answers][0][:text].should == "Correct Answer"
-    question_data[:answers][0][:weight].should == 100
-    question_data[:answers][1][:text].should == "Wrong Answer #1"
-    question_data[:answers][1][:weight].should == 0
-    question_data[:answers][2][:text].should == "Second Wrong Answer"
-    question_data[:answers][2][:weight].should == 0
-    question_data[:answers][3][:text].should == "Wrongest Answer"
-    question_data[:answers][3][:weight].should == 0
-    question_data[:points_possible].should == 1
-    question_data[:question_type].should == "multiple_choice_question"
-    question_data[:correct_comments].should == "Good job on the question!"
-    question_data[:incorrect_comments].should == "You know what they say - study long study wrong."
-    question_data[:neutral_comments].should == "Pass or fail you are a winner!"
+    expect(question_data[:answers].length).to eq 4
+    expect(question_data[:answers][0][:text]).to eq "Correct Answer"
+    expect(question_data[:answers][0][:weight]).to eq 100
+    expect(question_data[:answers][1][:text]).to eq "Wrong Answer #1"
+    expect(question_data[:answers][1][:weight]).to eq 0
+    expect(question_data[:answers][2][:text]).to eq "Second Wrong Answer"
+    expect(question_data[:answers][2][:weight]).to eq 0
+    expect(question_data[:answers][3][:text]).to eq "Wrongest Answer"
+    expect(question_data[:answers][3][:weight]).to eq 0
+    expect(question_data[:points_possible]).to eq 1
+    expect(question_data[:question_type]).to eq "multiple_choice_question"
+    expect(question_data[:correct_comments]).to eq "Good job on the question!"
+    expect(question_data[:incorrect_comments]).to eq "You know what they say - study long study wrong."
+    expect(question_data[:neutral_comments]).to eq "Pass or fail you are a winner!"
   end
 
 
@@ -40,14 +40,14 @@ describe "quizzes question creation" do
     quiz = @last_quiz
     create_true_false_question
     quiz.reload
-    keep_trying_until { f("#question_#{quiz.quiz_questions[0].id}").should be_displayed }
+    keep_trying_until { expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed }
   end
 
   it "should create a quiz question with a fill in the blank question" do
     quiz = @last_quiz
     create_fill_in_the_blank_question
     quiz.reload
-    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
+    expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
   end
 
   it "should create a quiz question with a fill in multiple blanks question" do
@@ -64,8 +64,8 @@ describe "quizzes question creation" do
     select_box = question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'color1'
-    options[1].text.should == 'color2'
+    expect(options[0].text).to eq 'color1'
+    expect(options[1].text).to eq 'color2'
 
     #input answers for both blank input
     answers = question.find_elements(:css, ".form_answers > .answer")
@@ -85,14 +85,14 @@ describe "quizzes question creation" do
     f('#show_question_details').click
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
     #check select box on finished question
     select_box = finished_question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'color1'
-    options[1].text.should == 'color2'
+    expect(options[0].text).to eq 'color1'
+    expect(options[1].text).to eq 'color2'
   end
 
   it "should create a quiz question with a multiple answers question" do
@@ -114,8 +114,8 @@ describe "quizzes question creation" do
 
     f('#show_question_details').click
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
-    finished_question.find_elements(:css, '.answer.correct_answer').length.should == 2
+    expect(finished_question).to be_displayed
+    expect(finished_question.find_elements(:css, '.answer.correct_answer').length).to eq 2
   end
 
   it "should create a quiz question with a multiple dropdown question" do
@@ -130,8 +130,8 @@ describe "quizzes question creation" do
     select_box = question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'color1'
-    options[1].text.should == 'color2'
+    expect(options[0].text).to eq 'color1'
+    expect(options[1].text).to eq 'color2'
 
     #input answers for both blank input
     answers = question.find_elements(:css, ".form_answers > .answer")
@@ -153,14 +153,14 @@ describe "quizzes question creation" do
     driver.execute_script("$('#show_question_details').click();")
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
     #check select box on finished question
     select_box = finished_question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'color1'
-    options[1].text.should == 'color2'
+    expect(options[0].text).to eq 'color1'
+    expect(options[1].text).to eq 'color2'
   end
 
   it "should create a quiz question with a matching question" do
@@ -186,11 +186,11 @@ describe "quizzes question creation" do
 
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
     finished_question.find_elements(:css, '.answer_match').each_with_index do |filled_answer, i|
-      filled_answer.find_element(:css, '.answer_match_left').should include_text("#{i} left side")
-      filled_answer.find_element(:css, '.answer_match_right').should include_text("#{i} right side")
+      expect(filled_answer.find_element(:css, '.answer_match_left')).to include_text("#{i} left side")
+      expect(filled_answer.find_element(:css, '.answer_match_right')).to include_text("#{i} right side")
     end
   end
 
@@ -214,7 +214,7 @@ describe "quizzes question creation" do
     f('#show_question_details').click
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
   end
 
@@ -235,16 +235,16 @@ describe "quizzes question creation" do
     fj('.combination_count:visible').send_keys('20') # over the limit
     button = fj('button.compute_combinations:visible')
     button.click
-    fj('.combination_count:visible').should have_attribute(:value, "10")
+    expect(fj('.combination_count:visible')).to have_attribute(:value, "10")
     keep_trying_until {
       button.text == 'Generate'
     }
-    ffj('table.combinations:visible tr').size.should == 11 # plus header row
+    expect(ffj('table.combinations:visible tr').size).to eq 11 # plus header row
     submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
-    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
+    expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
   end
 
   it "should create a quiz question with an essay question" do
@@ -259,8 +259,8 @@ describe "quizzes question creation" do
 
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should_not be_nil
-    finished_question.find_element(:css, '.text').should include_text('This is an essay question.')
+    expect(finished_question).not_to be_nil
+    expect(finished_question.find_element(:css, '.text')).to include_text('This is an essay question.')
   end
 
   it "should create a quiz question with a file upload question" do
@@ -270,8 +270,8 @@ describe "quizzes question creation" do
 
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should_not be_nil
-    finished_question.find_element(:css, '.text').should include_text('This is a file upload question.')
+    expect(finished_question).not_to be_nil
+    expect(finished_question.find_element(:css, '.text')).to include_text('This is a file upload question.')
   end
 
   it "should create a quiz question with a text question" do
@@ -286,8 +286,8 @@ describe "quizzes question creation" do
 
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should_not be_nil
-    finished_question.find_element(:css, '.text').should include_text('This is a text question.')
+    expect(finished_question).not_to be_nil
+    expect(finished_question.find_element(:css, '.text')).to include_text('This is a text question.')
   end
 
   it "should create a quiz with a variety of quiz questions" do
@@ -304,12 +304,12 @@ describe "quizzes question creation" do
     refresh_page #making sure the quizzes load up from the database
     click_questions_tab
     3.times do |i|
-      keep_trying_until(100) { f("#question_#{quiz.quiz_questions[i].id}").should be_displayed }
+      keep_trying_until(100) { expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed }
     end
     questions = ff('.display_question')
-    questions[0].should have_class("multiple_choice_question")
-    questions[1].should have_class("true_false_question")
-    questions[2].should have_class("short_answer_question")
+    expect(questions[0]).to have_class("multiple_choice_question")
+    expect(questions[1]).to have_class("true_false_question")
+    expect(questions[2]).to have_class("short_answer_question")
   end
 
   it "should not create an extra, blank, correct answer when you use [answer] as a placeholder" do
@@ -326,7 +326,7 @@ describe "quizzes question creation" do
     select_box = question.find_element(:css, '.blank_id_select')
     select_box.click
     options = select_box.find_elements(:css, 'option')
-    options[0].text.should == 'answer'
+    expect(options[0].text).to eq 'answer'
 
     # input answers for the blank input
     answers = question.find_elements(:css, ".form_answers > .answer")
@@ -344,11 +344,11 @@ describe "quizzes question creation" do
     f('#show_question_details').click
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    expect(finished_question).to be_displayed
 
     # check to make sure extra answers were not generated
-    quiz.quiz_questions.first.question_data["answers"].count.should == 2
-    quiz.quiz_questions.first.question_data["answers"].detect { |a| a["text"] == "" }.should be_nil
+    expect(quiz.quiz_questions.first.question_data["answers"].count).to eq 2
+    expect(quiz.quiz_questions.first.question_data["answers"].detect { |a| a["text"] == "" }).to be_nil
   end
 
   it "respects character limits on short answer questions" do
@@ -371,7 +371,7 @@ describe "quizzes question creation" do
       alert_present?
     end
     alert = driver.switch_to.alert
-    alert.text.should =~ /Answers for fill in the blank questions must be under 80 characters long/
+    expect(alert.text).to match /Answers for fill in the blank questions must be under 80 characters long/
     alert.dismiss
   end
 
@@ -389,9 +389,9 @@ describe "quizzes question creation" do
       drag_question_to_top @quest2.id
       refresh_page
       new_data = get_question_data
-      new_data[0][:id].should == old_data[1][:id]
-      new_data[1][:id].should == old_data[0][:id]
-      new_data[2][:id].should == old_data[2][:id]
+      expect(new_data[0][:id]).to eq old_data[1][:id]
+      expect(new_data[1][:id]).to eq old_data[0][:id]
+      expect(new_data[2][:id]).to eq old_data[2][:id]
     end
 
     it "should add and remove questions to/from a group" do
@@ -407,7 +407,7 @@ describe "quizzes question creation" do
       drag_question_to_top @quest1.id
       refresh_page
       data = get_question_data
-      data[0][:id].should == @quest1.id
+      expect(data[0][:id]).to eq @quest1.id
     end
 
     it "should reorder questions within a group" do
@@ -415,14 +415,14 @@ describe "quizzes question creation" do
       drag_question_into_group @quest1.id, @group.id
       drag_question_into_group @quest2.id, @group.id
       data = get_question_data_for_group @group.id
-      data[0][:id].should == @quest2.id
-      data[1][:id].should == @quest1.id
+      expect(data[0][:id]).to eq @quest2.id
+      expect(data[1][:id]).to eq @quest1.id
 
       drag_question_to_top_of_group @quest1.id, @group.id
       refresh_page
       data = get_question_data_for_group @group.id
-      data[0][:id].should == @quest1.id
-      data[1][:id].should == @quest2.id
+      expect(data[0][:id]).to eq @quest1.id
+      expect(data[1][:id]).to eq @quest2.id
     end
 
     it "should reorder groups and questions" do
@@ -432,9 +432,9 @@ describe "quizzes question creation" do
       drag_group_to_top @group.id
       refresh_page
       new_data = get_question_data
-      new_data[0][:id].should == old_data[2][:id]
-      new_data[1][:id].should == old_data[0][:id]
-      new_data[2][:id].should == old_data[1][:id]
+      expect(new_data[0][:id]).to eq old_data[2][:id]
+      expect(new_data[1][:id]).to eq old_data[0][:id]
+      expect(new_data[2][:id]).to eq old_data[1][:id]
     end
   end
 
@@ -458,19 +458,19 @@ describe "quizzes question creation" do
       type_in_tiny '.answer:eq(3) textarea', 'HTML'
       close_first_html_answer
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
+      expect(html).to eq '<p>HTML</p>'
       submit_form('.question_form')
       refresh_page
       click_questions_tab
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
+      expect(html).to eq '<p>HTML</p>'
     end
 
     def check_for_no_edit_button(option)
       click_option('.question_form:visible .question_type', option)
       driver.execute_script "$('.answer').addClass('hover');"
-      fj('.edit_html:visible').should be_nil
+      expect(fj('.edit_html:visible')).to be_nil
     end
 
     it "should not show the edit html button for question types besides multiple choice and multiple answers" do
@@ -496,7 +496,7 @@ describe "quizzes question creation" do
       driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
       close_first_html_answer
       input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
-      input_length.should == 1
+      expect(input_length).to eq 1
     end
 
     it "should populate the editor and input elements properly" do
@@ -514,13 +514,13 @@ describe "quizzes question creation" do
       # open it up in the editor, make sure the text matches the input
       edit_first_html_answer
       content = driver.execute_script "return $('.answer:eq(3) textarea')._justGetCode()"
-      content.should == '<p>ohai</p>'
+      expect(content).to eq '<p>ohai</p>'
 
       # clear it out, make sure the original input is empty also
       driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
       close_first_html_answer
       value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
-      value.should == ''
+      expect(value).to eq ''
     end
 
     it "should save open html answers when the question is submitted for multiple choice" do
@@ -533,7 +533,7 @@ describe "quizzes question creation" do
       click_questions_tab
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
+      expect(html).to eq '<p>HTML</p>'
     end
 
     it "should save open html answers when the question is submitted for multiple answers" do
@@ -546,7 +546,7 @@ describe "quizzes question creation" do
       click_questions_tab
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
+      expect(html).to eq '<p>HTML</p>'
     end
   end
 
@@ -569,9 +569,9 @@ describe "quizzes question creation" do
         alert_present?
       end
       alert = driver.switch_to.alert
-      alert.text.should == alert_text
+      expect(alert.text).to eq alert_text
       alert.dismiss
-      fj('#quiz_allowed_attempts').should have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
+      expect(fj('#quiz_allowed_attempts')).to have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
     end
 
     it "should not allow quiz attempts that are entered with letters" do
@@ -593,16 +593,16 @@ describe "quizzes question creation" do
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
       f('#quiz_time_limit').click
-      alert_present?.should be_false
-      fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
+      expect(alert_present?).to be_falsey
+      expect(fj('#quiz_allowed_attempts')).to have_attribute('value', attempts) # fj to avoid selenium caching
 
       expect_new_page_load {
         f('.save_quiz_button').click
         wait_for_ajaximations
-        keep_trying_until { f('.admin-links').should be_displayed }
+        keep_trying_until { expect(f('.admin-links')).to be_displayed }
       }
 
-      Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i
+      expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i
     end
   end
 
@@ -617,7 +617,7 @@ describe "quizzes question creation" do
     edit_quiz
     click_questions_tab
     edit_and_save_first_multiple_choice_answer 'instructure!'
-    error_displayed?.should be_false
+    expect(error_displayed?).to be_falsey
 
     refresh_page
     click_questions_tab
@@ -635,14 +635,14 @@ describe "quizzes question creation" do
     edit_first_question
     delete_first_multiple_choice_answer
     save_question
-    error_displayed?.should be_true
+    expect(error_displayed?).to be_truthy
 
     refresh_page
     click_questions_tab
     edit_first_question
     delete_first_multiple_choice_answer
     save_question
-    error_displayed?.should be_true
+    expect(error_displayed?).to be_truthy
   end
 
 
@@ -692,7 +692,7 @@ describe "quizzes question creation" do
       wait_for_ajax_requests
       submit_dialog("#find_question_dialog", '.submit_button')
       wait_for_ajax_requests
-      f('.quiz_group_form').should be_displayed
+      expect(f('.quiz_group_form')).to be_displayed
     end
   end
 end

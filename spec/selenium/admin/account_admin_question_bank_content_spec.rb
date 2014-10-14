@@ -51,17 +51,17 @@ describe "account admin question bank" do
 
   def verify_added_question(name, question_text, chosen_question_type)
     question = AssessmentQuestion.where(name: name).first
-    question.should be_present
+    expect(question).to be_present
     question_data = question.question_data
-    question_data[:question_type].should == chosen_question_type
-    question_data[:question_text].should include question_text
+    expect(question_data[:question_type]).to eq chosen_question_type
+    expect(question_data[:question_text]).to include question_text
     answers = question_data[:answers]
-    answers[0][:weight].should == 100
+    expect(answers[0][:weight]).to eq 100
     (1..3).each do |i|
-      answers[i][:weight].should == 0
+      expect(answers[i][:weight]).to eq 0
     end
-    f("#question_#{question.id}").should include_text name
-    f("#question_#{question.id}").should include_text question_text
+    expect(f("#question_#{question.id}")).to include_text name
+    expect(f("#question_#{question.id}")).to include_text question_text
     question
   end
 
@@ -118,7 +118,7 @@ describe "account admin question bank" do
     answers = ff(".answers #answer_template")
     answers.each_with_index do |answer, i|
       question_answer = @question.question_data[:answers][i][:text]
-      answer.should include_text(question_answer)
+      expect(answer).to include_text(question_answer)
     end
   end
 
@@ -130,16 +130,16 @@ describe "account admin question bank" do
     wait_for_ajaximations
     submit_dialog("#move_question_dialog", '.submit_button')
     wait_for_ajaximations
-    question_bank_2.assessment_questions.where(name: @question.name).first.should be_present
+    expect(question_bank_2.assessment_questions.where(name: @question.name).first).to be_present
   end
 
   it "should bookmark a question bank" do
-    @question_bank.bookmarked_for?(User.last).should be_false
+    expect(@question_bank.bookmarked_for?(User.last)).to be_falsey
     f("#right-side-wrapper .bookmark_bank_link").click
     wait_for_ajaximations
     @question_bank.reload
-    @question_bank.bookmarked_for?(User.last).should be_true
-    f("#right-side .bookmark_bank_link").should include_text "Already Bookmarked"
+    expect(@question_bank.bookmarked_for?(User.last)).to be_truthy
+    expect(f("#right-side .bookmark_bank_link")).to include_text "Already Bookmarked"
   end
 
   it "should edit bank details" do
@@ -150,7 +150,7 @@ describe "account admin question bank" do
     replace_content(question_bank_title, new_title)
     question_bank_title.send_keys(:return)
     wait_for_ajaximations
-    AssessmentQuestionBank.where(title: new_title).first.should be_present
+    expect(AssessmentQuestionBank.where(title: new_title).first).to be_present
   end
 
   it "should delete a question bank" do
@@ -158,7 +158,7 @@ describe "account admin question bank" do
     driver.switch_to.alert.accept
     wait_for_ajaximations
     @question_bank.reload
-    keep_trying_until { @question_bank.workflow_state.should == "deleted" }
+    keep_trying_until { expect(@question_bank.workflow_state).to eq "deleted" }
   end
 
   it "should delete a multiple choice question" do
@@ -167,8 +167,8 @@ describe "account admin question bank" do
     wait_for_ajaximations
     @question.reload
     keep_trying_until do
-      @question.workflow_state.should == "deleted"
-      fj("#questions .question_name").should be_nil
+      expect(@question.workflow_state).to eq "deleted"
+      expect(fj("#questions .question_name")).to be_nil
     end
   end
 
@@ -181,9 +181,9 @@ describe "account admin question bank" do
       f(".move_questions_link").click
       wait_for_ajaximations
       question_list = ffj(".list_question:visible")
-      question_list.count.should == questions.count
+      expect(question_list.count).to eq questions.count
       question_list.each_with_index do |question, i|
-        question.should include_text questions[i].name
+        expect(question).to include_text questions[i].name
         f("#list_question_#{questions[i].id}").click
         wait_for_ajaximations
       end
@@ -192,21 +192,21 @@ describe "account admin question bank" do
 
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.where(title: bank_name).first
-      new_question_bank.should be_present
+      expect(new_question_bank).to be_present
       new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
-      new_questions.should be_present
-      new_questions.should =~ questions
+      expect(new_questions).to be_present
+      expect(new_questions).to match_array questions
     end
 
     it "should move multiple questions to a new bank" do
       new_bank = "new bank 2"
       questions = add_questions_and_move(2)
-      questions.count.should == 3
+      expect(questions.count).to eq 3
       f("#bank_new").click
       f("#new_question_bank_name").send_keys(new_bank)
       submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
-      AssessmentQuestionBank.count.should == 2
+      expect(AssessmentQuestionBank.count).to eq 2
       move_questions_validation(new_bank, questions)
     end
 
@@ -214,8 +214,8 @@ describe "account admin question bank" do
       bank_name = "bank 2"
       question_bank_2 = create_question_bank(bank_name)
       questions = add_questions_and_move
-      questions.count.should == 2
-      f(".bank .bank_name").should include_text bank_name
+      expect(questions.count).to eq 2
+      expect(f(".bank .bank_name")).to include_text bank_name
       f("#question_bank_#{question_bank_2.id}").click
       submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
@@ -233,26 +233,26 @@ describe "account admin question bank" do
       fj('.btn-primary:visible').click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
-      fj("[data-id=#{outcome.id}]:visible").should include_text outcome.short_description
+      expect(fj("[data-id=#{outcome.id}]:visible")).to include_text outcome.short_description
     end
 
     it "should align an outcome" do
       mastery_points, possible_points = @outcome.data[:rubric_criterion].values_at(:mastery_points, :points_possible)
       percentage = mastery_points.to_f / possible_points.to_f
       add_outcome_to_bank(@outcome)
-      fj("[data-id=#{@outcome.id}]:visible").should include_text("60%")
-      @question_bank.reload.learning_outcome_alignments.count.should be > 0
+      expect(fj("[data-id=#{@outcome.id}]:visible")).to include_text("60%")
+      expect(@question_bank.reload.learning_outcome_alignments.count).to be > 0
       learning_outcome_tag = @question_bank.learning_outcome_alignments.where(mastery_score: 0.6).first
-      learning_outcome_tag.should be_present
+      expect(learning_outcome_tag).to be_present
     end
 
     it "should change the outcome set mastery score" do
       f(".add_outcome_link").click
       wait_for_ajax_requests
       add_outcome_to_bank(@outcome, 40)
-      fj("[data-id=#{@outcome.id}]:visible .content").should include_text("mastery at 40%")
+      expect(fj("[data-id=#{@outcome.id}]:visible .content")).to include_text("mastery at 40%")
       learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.where(mastery_score: 0.4).first
-      learning_outcome_tag.should be_present
+      expect(learning_outcome_tag).to be_present
     end
 
     it "should delete an aligned outcome" do
@@ -260,7 +260,7 @@ describe "account admin question bank" do
       fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").should be_nil
+      expect(fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link")).to be_nil
     end
   end
 end

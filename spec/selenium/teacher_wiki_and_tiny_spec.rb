@@ -20,11 +20,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       # add quiz to rce
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      keep_trying_until { accordion.find_element(:link, quiz.title).should be_displayed }
+      keep_trying_until { expect(accordion.find_element(:link, quiz.title)).to be_displayed }
       keep_trying_until do
         accordion.find_element(:link, quiz.title).click
         in_frame "wiki_page_body_ifr" do
-          f('#tinymce').should include_text(quiz.title)
+          expect(f('#tinymce')).to include_text(quiz.title)
         end
       end
 
@@ -33,7 +33,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests
 
-      f('#wiki_body').find_element(:link, quiz.title).should be_displayed
+      expect(f('#wiki_body').find_element(:link, quiz.title)).to be_displayed
     end
 
     it "should add an assignment to the rce" do
@@ -47,17 +47,17 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       #check assignment accordion
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
-      keep_trying_until { accordion.find_element(:link, assignment_name).should be_displayed }
+      keep_trying_until { expect(accordion.find_element(:link, assignment_name)).to be_displayed }
       accordion.find_element(:link, assignment_name).click
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce').should include_text(assignment_name)
+        expect(f('#tinymce')).to include_text(assignment_name)
       end
 
       submit_form('#new_wiki_page')
       wait_for_ajax_requests
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests
-      f('#wiki_body').find_element(:css, "a[title='#{assignment_name}']").should be_displayed
+      expect(f('#wiki_body').find_element(:css, "a[title='#{assignment_name}']")).to be_displayed
     end
 
     ['Only Teachers', 'Teacher and Students', 'Anyone'].each_with_index do |permission, i|
@@ -71,19 +71,19 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         p = create_wiki_page(title, unpublished, edit_roles)
         get "/courses/#{@course.id}/wiki/#{p.title}"
 
-        keep_trying_until { f("#wiki_page_new").should be_displayed }
+        keep_trying_until { expect(f("#wiki_page_new")).to be_displayed }
 
         f('#wiki_page_new .new').click
         f('#right-side #wiki_page_title').send_keys(title2)
         submit_form("#add_wiki_page_form")
 
-        keep_trying_until { f("#wiki_page_editing_roles").should be_displayed }
+        keep_trying_until { expect(f("#wiki_page_editing_roles")).to be_displayed }
 
         click_option("#wiki_page_editing_roles", permission)
         #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
         submit_form("#edit_wiki_page_#{p.id + 1}")
         wait_for_ajaximations
-        @course.wiki.wiki_pages.last.editing_roles.should == validations[i]
+        expect(@course.wiki.wiki_pages.last.editing_roles).to eq validations[i]
       end
     end
 
@@ -98,10 +98,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       get "/courses/#{@course.id}/wiki/#{p.title}"
 
-      keep_trying_until { f("#page_history").should be_displayed }
+      keep_trying_until { expect(f("#page_history")).to be_displayed }
       f('#page_history').click
 
-      ff('a[title]').length.should == 2
+      expect(ff('a[title]').length).to eq 2
     end
 
 
@@ -117,18 +117,18 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       p.update_attributes(:body => "sample")
 
       get "/courses/#{@course.id}/wiki/#{p.title}"
-      keep_trying_until { f("#page_history").should be_displayed }
+      keep_trying_until { expect(f("#page_history")).to be_displayed }
 
       f('#page_history').click
       ff('a[title]')[1].click
 
-      f('#wiki_body').text.should == body
+      expect(f('#wiki_body').text).to eq body
 
       submit_form(".edit_version")
       wait_for_ajax_requests
 
       assert_flash_notice_message /successfully rolled-back/
-      f('#wiki_body').text.should == body
+      expect(f('#wiki_body').text).to eq body
     end
 
     it "should restore the latest version of the page" do
@@ -144,13 +144,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       old_version = p.versions[2].id
 
       get "/courses/#{@course.id}/wiki/#{p.title}/revisions/#{old_version}"
-      keep_trying_until { f('.forward').should be_displayed }
+      keep_trying_until { expect(f('.forward')).to be_displayed }
 
       #button to restore to most recent version
       f('.forward').click
       wait_for_ajax_requests
 
-      f('#wiki_body').text.should == "sample"
+      expect(f('#wiki_body').text).to eq "sample"
     end
 
     it "should take user back to revision history" do
@@ -164,12 +164,12 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       version = p.versions[1].id
 
       get "/courses/#{@course.id}/wiki/#{p.title}/revisions/#{version}"
-      keep_trying_until { f('.history').should be_displayed }
+      keep_trying_until { expect(f('.history')).to be_displayed }
 
       f('.history').click
       wait_for_ajax_requests
 
-      ff('a[title]').length.should == 2
+      expect(ff('a[title]').length).to eq 2
     end
   end
 end
