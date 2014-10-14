@@ -75,6 +75,10 @@ module Api::V1::Assignment
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
+    if !assignment.user_submitted.nil?
+      hash['user_submitted'] = assignment.user_submitted
+    end
+
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)

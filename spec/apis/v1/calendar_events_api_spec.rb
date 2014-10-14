@@ -859,6 +859,24 @@ describe CalendarEventsApiController, type: :request do
       json.first['due_at'].should be_nil
     end
 
+    it 'should mark assignments with user_submitted' do
+      e1 = @course.assignments.create(:title => '1', :due_at => '2012-01-07 12:00:00')
+      e2 = @course.assignments.create(:title => '2', :due_at => '2012-01-08 12:00:00')
+
+      sub = e1.find_or_create_submission(@user)
+      sub.submission_type = 'online_quiz'
+      sub.workflow_state = 'submitted'
+      sub.save!
+
+      json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-06&end_date=2012-01-09&context_codes[]=course_#{@course.id}", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-06', :end_date => '2012-01-09'})
+
+      expect(json.size).to eql 2
+      expect(json[0]['assignment']['user_submitted']).to be_truthy
+      expect(json[1]['assignment']['user_submitted']).to be_falsy
+    end
+
     context 'unpublished assignments' do
       before :once do
         @course1 = @course
