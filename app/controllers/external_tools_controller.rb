@@ -403,6 +403,8 @@ class ExternalToolsController < ApplicationController
     case message_type
       when 'ContentItemSelectionResponse'
         content_item_selection_response(tool, selection_type, create_content_item_response)
+      when 'ContentItemSelectionRequest'
+        content_item_selection_request(tool, selection_type)
       else
         basic_lti_launch_request(tool, selection_type)
     end
@@ -432,7 +434,7 @@ class ExternalToolsController < ApplicationController
     params = default_lti_params.merge(
       {
         #required params
-        lti_message_type: 'ContentItemSelectionResponse',
+        lti_message_type: 'ContentItemSelectionResponse', #todo - final spec is changing this to ContentItemSelection
         lti_version: 'LTI-1p0',
         resource_link_id: Lti::Asset.opaque_identifier_for(@context),
         content_items: content_item_response.to_json,
@@ -465,6 +467,59 @@ class ExternalToolsController < ApplicationController
   end
 
   protected :create_content_item_response
+
+  # Do an official content-item request as specified: http://www.imsglobal.org/LTI/services/ltiCIv1p0pd/ltiCIv1p0pd.html
+  def content_item_selection_request(tool, placement)
+    extra_params = {}
+    return_url = external_content_success_url('external_tool_dialog')
+
+    # choose accepted return types based on placement
+    # todo, make return types configurable at installation?
+    case placement
+      when 'migration_selection'
+        accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
+        return_url = course_content_migrations_url(@context)
+        accept_presentation_document_targets = 'download'
+        extra_params[:accept_copy_advice] = true
+        extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
+      when 'editor_button'
+        accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
+        accept_presentation_document_targets = 'embed,frame,iframe,window'
+      when 'resource_selection'
+        accept_media_types = 'application/vnd.ims.lti.v1.launch+json'
+        accept_presentation_document_targets = 'frame,window'
+      when 'homework_submission'
+        assignment = @context.assignments.active.find(params[:assignment_id])
+        accept_media_types = '*/*'
+        accept_presentation_document_targets = 'none'
+        extra_params[:accept_copy_advice] = true
+        accept_media_types = assignment.allowed_extensions.map{ |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',') if assignment.allowed_extensions.present?
+      else
+        # todo: we _could_, if configured, have any other placements return to the content migration page...
+        raise "Content-Item not supported at this placement"
+    end
+
+    params = default_lti_params.merge({
+        #required params
+        lti_message_type: 'ContentItemSelectionRequest',
+        lti_version: 'LTI-1p0',
+        accept_media_types: accept_media_types,
+        accept_presentation_document_targets: accept_presentation_document_targets,
+        content_item_return_url: return_url,
+        #optional params
+        accept_multiple: false,
+        context_title: @context.name,
+    }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
+
+    lti_launch = Lti::Launch.new
+    lti_launch.resource_url = tool.extension_setting(placement, :url)
+    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
+    lti_launch.link_text = tool.label_for(placement.to_sym)
+    lti_launch.analytics_id = tool.tool_id
+
+    lti_launch
+  end
+  protected :content_item_selection_request
 
   def tool_launch_template(tool, selection_type)
     TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] || TOOL_DISPLAY_TEMPLATES['default']
