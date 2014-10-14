@@ -464,10 +464,7 @@ EOS
 Assignment submission/resubmission
 EOS
     when 'Submission Comment'
-      mt(:submission_comment_description, <<-EOS)
-Assignment submission comment
-
-EOS
+      t(:submission_comment_description, "Assignment submission comment")
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
     when 'Invitation'

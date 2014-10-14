@@ -17,16 +17,6 @@ namespace :i18n do
     case filename
       when /app\/views\/.*\.handlebars\z/
         filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').gsub(/plugins\/([^\/]*)\//, '').underscore.gsub(/\/_?/, '.')
-      when /app\/controllers\//
-        scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
-        scope == 'application.' ? '' : scope
-      when /app\/messages\//
-        filename.gsub(/.*app\/|erb/, '').gsub(/\/_?/, '.')
-      when /app\/models\//
-        scope = filename.gsub(/.*app\/models\/|rb/, '')
-        STI_SUPERCLASSES.include?(scope) ? '' : scope
-      when /app\/views\//
-        filename.gsub(/.*app\/views\/|(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
       else
         ''
     end
@@ -48,9 +38,6 @@ namespace :i18n do
         path
       }.flatten
     end
-
-    STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.split("\n") - ['OpenStruct', 'Tableless']).
-      map{ |name| name.underscore + '.' }
 
     COLOR_ENABLED = ($stdout.tty? rescue false)
     def color(text, color_code)
@@ -77,40 +64,25 @@ namespace :i18n do
       end
     end
 
-    t = Time.now
-
     I18n.available_locales
-    stringifier = proc { |hash, (key, value)|
-      hash[key.to_s] = value.is_a?(Hash) ?
-        value.inject({}, &stringifier) :
-        value
-      hash
-    }
-    @translations = I18n.backend.direct_lookup('en').inject({}, &stringifier)
-
 
     # Ruby
-    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins/*'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
-      reject{ |file| file =~ %r{\A\./(rb-fsevent|db|spec)/} }
-    files &= only if only
-    file_count = files.size
-    rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
-    process_files(files) do |file|
-      source = File.read(file)
-      source = ActionView::Template::Handlers::Erubis.new(source).src if file =~ /\.erb\z/
-
-      # add a magic comment since that's the best way to convince RubyParser
-      # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
-      # see https://github.com/seattlerb/ruby_parser/issues/101
-      # unforunately this means line numbers in error messages are off by one
-      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}", file, 300)
-      rb_extractor.scope = infer_scope(file)
-      rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
-      rb_extractor.process(sexps)
+    def I18nliner.manual_translations
+      I18n.backend.direct_lookup('en')
     end
 
+    require 'i18nliner/commands/check'
+
+    options = {:only => ENV['ONLY']}
+    @command = I18nliner::Commands::Check.run(options)
+    @command.success? or exit 1
+    total_ruby = @command.processors.sum(&:translation_count)
+    @translations = @command.translations
+
+    t = Time.now
 
     # JavaScript
+    file_count = 0
     files = (
       Dir.glob('./public/javascripts/{,**/*/**/}*.js') +
       Dir.glob('./app/views/**/*.erb')
@@ -150,7 +122,7 @@ namespace :i18n do
     end
 
     print "Finished in #{Time.now - t} seconds\n\n"
-    total_strings = rb_extractor.total_unique + js_extractor.total_unique + handlebars_extractor.total_unique
+    total_strings = js_extractor.total_unique + handlebars_extractor.total_unique
     puts send((failure ? :red : :green), "#{file_count} files, #{total_strings} strings, #{@errors.size} failures")
     raise "check command encountered errors" if failure
   end

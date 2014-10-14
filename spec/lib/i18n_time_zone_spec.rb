@@ -31,7 +31,7 @@ describe I18nTimeZone do
   context "#keyify" do
     it "should provide a translation key for valid time zone name" do
       t_key = I18nTimeZone['International Date Line West'].keyify
-      expect(t_key).to eq "#time_zones.international_date_line_west"
+      expect(t_key).to eq "time_zones.international_date_line_west"
     end
   end
 

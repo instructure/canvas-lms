@@ -14,6 +14,8 @@ I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
+I18nliner.infer_interpolation_values = false
+
 if ENV['LOLCALIZE']
   require 'i18n_tasks'
   I18n.send :extend, I18nTasks::Lolcalize
@@ -85,116 +87,53 @@ ActionView::Helpers::FormBuilder.class_eval do
   end
 end
 
-I18n.class_eval do
-  class << self
-    attr_writer :localizer
+I18n.send(:extend, Module.new {
+  attr_writer :localizer
 
-    include ::ActionView::Helpers::TextHelper
-    # if one of the interpolated values is a SafeBuffer (e.g. the result of a
-    # link_to call) or the string itself is, we don't want anything to get
-    # double-escaped when output in the view (since string is not html_safe).
-    # so we escape anything that's not safe prior to interpolation, and make
-    # sure we return a SafeBuffer.
-    def interpolate_hash_with_html_safety_awareness(string, values)
-      if string.html_safe? || values.values.any?{ |v| v.is_a?(ActiveSupport::SafeBuffer) }
-        values.each_pair{ |key, value| values[key] = ERB::Util.h(value) unless value.html_safe? }
-        string = ERB::Util.h(string) unless string.html_safe?
-      end
-      if string.is_a?(ActiveSupport::SafeBuffer) && string.html_safe?
-        string.class.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
-      else
-        interpolate_hash_without_html_safety_awareness(string, values)
-      end
+  # Public: If a localizer has been set, use it to set the locale and then
+  # delete it.
+  #
+  # Returns nothing.
+  def set_locale_with_localizer
+    if @localizer
+      self.locale = @localizer.call
+      @localizer = nil
     end
-
-    alias_method_chain :interpolate_hash, :html_safety_awareness
-
-    # removes left padding from %e / %k / %l
-    def localize_with_whitespace_removal(object, options = {})
-      localize_without_whitespace_removal(object, options).gsub(/\s{2,}/, ' ').strip
-    end
-    alias_method_chain :localize, :whitespace_removal
-
-    # Public: If a localizer has been set, use it to set the locale and then
-    # delete it.
-    #
-    # Returns nothing.
-    def set_locale_with_localizer
-      if @localizer
-        self.locale = @localizer.call
-        @localizer = nil
-      end
-    end
-
-    def translate_with_default_and_count_magic(key, *args)
-      set_locale_with_localizer
-
-      default = args.shift if args.first.is_a?(String) || args.size > 1
-      options = args.shift || {}
-      options[:default] ||= if options[:count]
-        case default
-          when String
-            default =~ /\A[\w\-]+\z/ ? pluralize(options[:count], default) : default
-          when Hash
-            case options[:count]
-              when 0
-                default[:zero]
-              when 1
-                default[:one]
-            end || default[:other]
-          else
-            default
-        end
-      else
-        default
-      end
-
-      begin
-        result = translate_without_default_and_count_magic(key.to_s.sub(/\A#/, ''), options)
-      rescue I18n::MissingInterpolationArgument
-        # if we change an en default and its interpolation logic without
-        # changing its key, we might have broken translations during the
-        # window where we're waiting for updated translations. broken as in
-        # crashy, not just missing. if that's the case, just fall back to
-        # english, rather than asploding
-        raise if (options[:locale] || I18n.locale) == I18n.default_locale
-        return translate_with_default_and_count_magic(key, options.merge(locale: I18n.default_locale))
-      end
-
-      # it's assumed that if you're using any wrappers, you're going
-      # for html output. so the result will be escaped before being
-      # wrapped, then the output tagged as html safe.
-      if wrapper = options[:wrapper]
-        result = I18n.apply_wrappers(result, wrapper)
-      end
-
-      result
-    end
-    alias_method_chain :translate, :default_and_count_magic
-    alias :t :translate
   end
 
-  WRAPPER_REGEXES = {}
+  def translate(*args)
+    set_locale_with_localizer
 
-  def self.apply_wrappers(string, wrappers)
-    string = ERB::Util.h(string) unless string.html_safe?
-    wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
-    wrappers.sort_by { |a| -a.first.length }.each do |sym, replace|
-      regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
-      string = string.gsub(regex, replace)
+    begin
+      super
+    rescue I18n::MissingInterpolationArgument
+      # if we change an en default and its interpolation logic without
+      # changing its key, we might have broken translations during the
+      # window where we're waiting for updated translations. broken as in
+      # crashy, not just missing. if that's the case, just fall back to
+      # english, rather than asploding
+      key, options = I18nliner::CallHelpers.infer_arguments(args)
+      raise if (options[:locale] || locale) == default_locale
+      super(key, options.merge(locale: default_locale))
     end
-    string.html_safe
   end
+  alias :t :translate
 
-  def self.qualified_locale
-    I18n.backend.direct_lookup(I18n.locale.to_s, "qualified_locale") || "en-US"
+  def qualified_locale
+    backend.direct_lookup(locale.to_s, "qualified_locale") || "en-US"
   end
-end
+})
+
+# see also corresponding extractor logic in
+# i18n_extraction/i18nliner_extensions
+require "i18n_extraction/i18nliner_scope_extensions"
 
 ActionView::Template.class_eval do
   def render_with_i18n_scope(view, *args, &block)
     old_i18n_scope = view.i18n_scope
-    view.i18n_scope = @virtual_path.gsub(/\/_?/, '.') if @virtual_path
+    if @virtual_path
+      view.i18n_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
+    end
     render_without_i18n_scope(view, *args, &block)
   ensure
     view.i18n_scope = old_i18n_scope
@@ -204,51 +143,27 @@ end
 
 ActionView::Base.class_eval do
   attr_accessor :i18n_scope
-
-  # can accept either translate(key, default: "default text", option: ...) or
-  # translate(key, "default text", option: ...). when using the former (default
-  # in the options), it's treated as if prepended with a # anchor.
-  def translate(key, *rest)
-    options = rest.extract_options!
-    default_in_options = options.has_key?(:default)
-    default_in_args = !rest.empty?
-    raise ArgumentError, "wrong arity" if rest.size > 1
-    raise ArgumentError, "didn't provide default in args or options" if !default_in_args && !default_in_options
-    raise ArgumentError, "can't provide default in both args and options" if default_in_args && default_in_options
-    default = default_in_options ? options[:default] : rest.first
-    key = key.to_s
-    key = "#{i18n_scope}.#{key}" unless default_in_options || key.sub!(/\A#/, '')
-    I18n.translate(key, default, options)
-  end
-  alias :t :translate
 end
 
 ActionController::Base.class_eval do
-  def translate(key, default, options = {})
-    key = key.to_s
-    key = "#{controller_name}.#{key}" unless key.sub!(/\A#/, '')
-    I18n.translate(key, default, options)
+  def i18n_scope
+    @i18n_scope ||= I18nliner::Scope.new(controller_path.tr('/', '.'))
   end
-  alias :t :translate
 end
 
 ActiveRecord::Base.class_eval do
   include I18nUtilities
   extend I18nUtilities
 
-  def translate(key, default, options = {})
-    self.class.translate(key, default, options)
+  def i18n_scope
+    self.class.i18n_scope
   end
-  alias :t :translate  
+
+  def self.i18n_scope
+    @i18n_scope ||= I18nliner::Scope.new(self.class.name.underscore)
+  end
 
   class << self
-    def translate(key, default, options = {})
-      key = key.to_s
-      key = "#{name.underscore}.#{key}" unless key.sub!(/\A#/, '')
-      I18n.translate(key, default, options)
-    end
-    alias :t :translate
-
     # so that we don't load up the locales until we need them
     LOCALE_LIST = []
     def LOCALE_LIST.include?(item)
@@ -273,10 +188,15 @@ ActiveRecord::Base.class_eval do
 end
 
 ActionMailer::Base.class_eval do
+  def i18n_scope
+    @i18n_scope ||= I18nliner::Scope.new("#{mailer_name}.#{action_name}")
+  end
+
   def translate(key, default, options = {})
-    key = key.to_s
-    key = "#{mailer_name}.#{action_name}.#{key}" unless key.sub!(/\A#/, '')
-    I18n.translate(key, default, options)
+    key, options = I18nliner::CallHelpers.infer_arguments(args)
+    options = inferpolate(options) if I18nliner.infer_interpolation_values
+    options[:i18n_scope] = i18n_scope
+    I18n.translate(key, options)
   end
   alias :t :translate
 end

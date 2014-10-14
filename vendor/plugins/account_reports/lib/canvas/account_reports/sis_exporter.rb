@@ -45,7 +45,7 @@ module Canvas::AccountReports
       end
       @account_report.parameters["extra_text"] << I18n.t(
         'account_reports.sis_exporter.reports',
-        ' Reports: %{files}',
+        'Reports: %{files}',
         :files => files
       )
 
