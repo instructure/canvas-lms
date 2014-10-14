@@ -30,66 +30,66 @@ if Qti.migration_executable
     end
 
     it "should convert the assessments" do
-      @converter.course[:assessments].should == QTI_EXPORT_ASSESSMENT
-      @course.quizzes.count.should == 1
+      expect(@converter.course[:assessments]).to eq QTI_EXPORT_ASSESSMENT
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.title.should == 'Quiz'
-      quiz.quiz_questions.count.should == 10
+      expect(quiz.title).to eq 'Quiz'
+      expect(quiz.quiz_questions.count).to eq 10
     end
 
     it "should convert the questions" do
-      @course_data[:assessment_questions][:assessment_questions].length.should == 10
-      @course.assessment_questions.count.should == 10
+      expect(@course_data[:assessment_questions][:assessment_questions].length).to eq 10
+      expect(@course.assessment_questions.count).to eq 10
     end
 
     it "should create an assessment question bank for the quiz" do
-      @course.assessment_question_banks.count.should == 1
+      expect(@course.assessment_question_banks.count).to eq 1
       bank = @course.assessment_question_banks.first
-      bank.title.should == 'Quiz'
-      bank.assessment_questions.count.should == 10
+      expect(bank.title).to eq 'Quiz'
+      expect(bank.assessment_questions.count).to eq 10
     end
 
     it "should have file paths" do
-      @course_data[:overview_file_path].index("oi/overview.json").should_not be_nil
-      @course_data[:export_folder_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi').should_not be_nil
-      @course_data[:full_export_file_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi/course_export.json').should_not be_nil
+      expect(@course_data[:overview_file_path].index("oi/overview.json")).not_to be_nil
+      expect(@course_data[:export_folder_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi')).not_to be_nil
+      expect(@course_data[:full_export_file_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi/course_export.json')).not_to be_nil
     end
 
     it "should import the included files" do
-      @course.attachments.count.should == 4
+      expect(@course.attachments.count).to eq 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1").full_display_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
-      @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30").full_display_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path.should == "course files/#{dir}/#{@migration.id}/image.png"
+      expect(@course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821").full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      expect(@course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1").full_display_path).to eq "course files/#{dir}/#{@migration.id}/contact info.png"
+      expect(@course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30").full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      expect(@course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path).to eq "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do
       aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
       c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("QUE_1007")
       c_att = @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("QUE_1014")
       c_att = @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("QUE_1053")
       c_att = @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
     end
     
     it "should hide the quiz directory" do
       folder = @course.folders.find_by_name(Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY)
-      folder.hidden?.should be_true
+      expect(folder.hidden?).to be_truthy
     end
     
     it "should use new attachments for imports with same file names" do
@@ -109,13 +109,13 @@ if Qti.migration_executable
       aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
       c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
       # check the second import
       aq = @course.assessment_questions.find_by_migration_id("test2_QUE_1003")
       c_att = @course.attachments.find_by_migration_id("test2_4d348a246af616c7d9a7d403367c1a30")
       att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
-      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
     end
 
   end
