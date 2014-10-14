@@ -70,3 +70,6 @@ define [
         assignment_id: @assignment.id,
         id: @override.id)
       ['PUT', url]
+
+    isCompleted: ->
+      @assignment.user_submitted || (this.isPast() && @assignment.needs_grading_count == 0)

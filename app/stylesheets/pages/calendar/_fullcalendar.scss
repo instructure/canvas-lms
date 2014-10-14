@@ -570,4 +570,7 @@ table.fc-border-separate {
 	}
 	
 	
-
+.calendar__event--completed {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
