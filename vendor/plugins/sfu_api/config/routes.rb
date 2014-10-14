@@ -1,6 +1,5 @@
 CanvasRails::Application.routes.draw do
-    scope :format => 'json', :constraints => { :format => 'json' } do
-
+  scope :format => 'json', :constraints => { :format => 'json' } do
     # non-versioned api urls
     match "sfu/api/course/:sis_id(/:property)" => "api#course", :defaults => { :property => nil }
     match "sfu/api/user/:sfu_id(/:property)"  => "api#user", :defaults => { :property => nil }
@@ -21,6 +20,9 @@ CanvasRails::Application.routes.draw do
     match "sfu/api/v1/amaint/course/:sis_id(/:property)" => "amaint#course_info", :defaults => { :property => nil }
     match "sfu/api/v1/enrollment" => "api#course_enrollment", via: :post
     match "sfu/api/v1/group_memberships/:id/undelete" => "api#undelete_group_membership", via: :put
-    
+  end
+
+  scope :format => 'html', :constraints => { :format => 'html' } do
+    match "sfu/api/v1/adhoc_group_button/:group_id" => "adhoc_group#render_button", via: :get
   end
 end
