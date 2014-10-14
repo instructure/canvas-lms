@@ -54,7 +54,7 @@ class Assignment < ActiveRecord::Base
     :rubric, :context, :grading_standard, :group_category
   ]
 
-  attr_accessor :previous_id, :updating_user, :copying
+  attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
 

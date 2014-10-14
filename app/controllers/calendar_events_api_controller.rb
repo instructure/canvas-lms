@@ -306,6 +306,7 @@ class CalendarEventsApiController < ApplicationController
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
     events = apply_assignment_overrides(events) if @type == :assignment
+    mark_submitted_assignments(@current_user, events) if @type == :assignment
 
     if @errors.empty?
       render :json => events.map { |event| event_json(event, @current_user, session) }
@@ -822,6 +823,15 @@ class CalendarEventsApiController < ApplicationController
     end
 
     events
+  end
+
+  def mark_submitted_assignments(user, assignments)
+    submitted_ids = Submission.where("submission_type IS NOT NULL").
+      where(user_id: user, assignment_id: assignments).
+      pluck(:assignment_id)
+    assignments.each do |assignment|
+      assignment.user_submitted = submitted_ids.include? assignment.id
+    end
   end
 
   def manageable_appointment_group_codes
