@@ -288,7 +288,7 @@ class Quizzes::QuizzesApiController < ApplicationController
                    params[:search_term], params[:page], params[:per_page]
                   ].cache_key
 
-      json = Rails.cache.fetch(cache_key) do
+      value = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
 
@@ -299,15 +299,24 @@ class Quizzes::QuizzesApiController < ApplicationController
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           scope = scope.available
         end
-        json = if accepts_jsonapi?
-          jsonapi_quizzes_json(scope: scope, api_route: api_route)
+
+        if accepts_jsonapi?
+          {
+            json: jsonapi_quizzes_json(scope: scope, api_route: api_route)
+          }
         else
           @quizzes = Api.paginate(scope, self, api_route)
-          quizzes_json(@quizzes, @context, @current_user, session)
+
+          {
+            json: quizzes_json(@quizzes, @context, @current_user, session),
+            link: response.headers["Link"].to_s
+          }
         end
       end
 
-      render json: json
+      response.headers["Link"] = value[:link] if value[:link]
+
+      render json: value[:json]
     end
   end
 
