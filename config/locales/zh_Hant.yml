@@ -5073,14 +5073,6 @@ zh_Hant:
       - Oct
       - Nov
       - Dec
-    day_names: 
-      - Sunday
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
     days: 
       today: 今天
       today_lower: 今天
