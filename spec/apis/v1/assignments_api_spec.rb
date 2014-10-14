@@ -1698,6 +1698,7 @@ describe AssignmentsApiController, type: :request do
           'position' => @topic.position,
           'topic_children' => [],
           'locked' => false,
+          'can_lock' => true,
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,

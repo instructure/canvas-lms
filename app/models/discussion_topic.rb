@@ -551,8 +551,12 @@ class DiscussionTopic < ActiveRecord::Base
     save!
   end
 
+  def can_lock?
+    !(self.assignment.try(:due_at) && self.assignment.due_at > Time.now)
+  end
+
   def lock(opts = {})
-    raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at > Time.now
+    raise "cannot lock before due date" unless can_lock?
     self.locked = true
     save! unless opts[:without_save]
   end
