@@ -425,7 +425,9 @@ class Submission < ActiveRecord::Base
 
   def touch_graders
     if self.assignment && self.user && self.assignment.context.is_a?(Course)
-      User.where(id: self.assignment.context.admins).update_all(updated_at: Time.now.utc)
+      connection.after_transaction_commit do
+        User.where(id: self.assignment.context.admins).update_all(updated_at: Time.now.utc)
+      end
     end
   end
 
