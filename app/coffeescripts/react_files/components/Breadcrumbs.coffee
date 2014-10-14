@@ -73,9 +73,9 @@ define [
       li {},
         Link {
           to: (if isRootCrumb then 'rootFolder' else 'folder')
-          splat: (folder.urlPath() unless isRootCrumb)
+          params: ({splat: folder.urlPath()} unless isRootCrumb)
           # only add title tooltips if there's a chance they could be ellipsized
-          title: (name if @state.maxCrumbWidth < MAX_CRUMB_WIDTH)
+          title: (name if @state.maxCrumbWidth < 500)
         },
           span {
             className: 'ellipsis'

@@ -12,6 +12,8 @@ define [
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
 
+    mixins: [Router.Navigation]
+
     componentDidMount: ->
       new FileBrowserView({
         onlyShowFolders: true,
@@ -29,11 +31,11 @@ define [
 
     onClick: (event, folder) ->
       event.preventDefault()
-      Router.transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+      @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
 
     hrefFor: (folder) ->
-      Router.makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+      @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
 
     expandTillCurrentFolder: (props) ->

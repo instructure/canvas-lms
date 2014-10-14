@@ -10,57 +10,61 @@ define [
 
   module 'ShowFolder',
     setup: ->
-      React.addons.TestUtils.renderIntoDocument(routes)
-      @makeComponent = (props) =>
-        props = _.extend({
-          params: {}
-          query: {}
-          selectedItems: []
-          onResolvePath: ->
-          toggleItemSelected: ->
-          toggleAllSelected: ->
-          areAllItemsSelected: -> false
-          dndOptions:
-            onItemDragStart: ->
-            onItemDragEnterOrOver: ->
-            onItemDragLeaveOrEnd: ->
-            onItemDrop: ->
-        }, props)
-
-        @component = React.renderComponent(ShowFolder(props), $('<div>').appendTo(document.body)[0])
+      @$container = $('<div>').appendTo(document.body)
+      @renderedRoutes = React.renderComponent(routes, @$container[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      React.unmountComponentAtNode(@$container[0])
 
 
-  test 'returns empty div if there is no currentFolder', ->
-    @makeComponent()
-    ok @component.refs.emptyDiv, 'empty div displayed'
-
-  test 'displays empty text if the folder is empty', ->
-    folder = new Folder()
-    folder.files.loadedAll = true
-    folder.folders.loadedAll = true
-
-    @makeComponent(currentFolder:folder)
-    ok @component.refs.folderEmpty, 'displays the empty message'
-
-  test 'when folder are present, FolderChild generates a line item', ->
-    folder = new Folder()
-    folder.folders.add({})
-
-    @makeComponent(currentFolder:folder)
-    ok $('.ef-item-row').length, 'generates an item row'
-
-  asyncTest 'forces update if you update backbone model', ->
-    expect(2)
-    folder = new Folder()
-    @makeComponent(currentFolder:folder)
-    forceUpdateSpy = sinon.spy(@component, 'forceUpdate')
-    folder.folders.trigger('some event')
-    equal folder.folders._events.all[0].callback, @component.debouncedForceUpdate
-    setTimeout ->
-      ok forceUpdateSpy.calledOnce, 'eventually calls force update after some event was triggered on child collection'
-      forceUpdateSpy.restore()
+  asyncTest 'returns empty div if there is no currentFolder', ->
+    expect(1)
+    @renderedRoutes.dispatch '/courses/999/files', =>
+      equal @$container.find('.ef-directory [role="grid"]').length, 0, "doesn't render the grid"
       start()
+
+
+  # asyncTest 'displays empty text if the folder is empty', ->
+  #   expect(1)
+  #   folder = new Folder()
+  #   folder.files.loadedAll = true
+  #   folder.folders.loadedAll = true
+  #   resolvePathPromise = $.Deferred()
+  #   stubbedResolvePath = sinon.stub(Folder, 'resolvePath')
+  #   stubbedResolvePath.withArgs('courses', '999', '').returns(resolvePathPromise)
+
+  #   @renderedRoutes.dispatch '/courses/999/files', =>
+  #     resolvePathPromise.then =>
+  #       equal @$container.find('.ef-directory [role="grid"]').text(), 'This folder is empty'
+  #       stubbedResolvePath.restore()
+  #       start()
+  #     resolvePathPromise.resolve([folder])
+
+
+  # asyncTest 'when folder are present, FolderChild generates a line item', ->
+  #   expect(1)
+  #   folder = new Folder()
+  #   folder.folders.add({})
+  #   resolvePathPromise = $.Deferred()
+  #   stubbedResolvePath = sinon.stub(Folder, 'resolvePath')
+  #   stubbedResolvePath.withArgs('courses', '999', '').returns(resolvePathPromise)
+
+  #   @renderedRoutes.dispatch '/courses/999/files', =>
+  #     resolvePathPromise.then =>
+  #       equal 1, @$container.find('.ef-item-row').length, 'generates an item row'
+  #       stubbedResolvePath.restore()
+  #       start()
+  #     resolvePathPromise.resolve([folder])
+
+  # asyncTest 'forces update if you update backbone model', ->
+  #   expect(2)
+  #   folder = new Folder()
+  #   @makeComponent(currentFolder:folder)
+  #   forceUpdateSpy = sinon.spy(@component, 'forceUpdate')
+  #   folder.folders.trigger('some event')
+  #   equal folder.folders._events.all[0].callback, @component.debouncedForceUpdate
+  #   setTimeout ->
+  #     ok forceUpdateSpy.calledOnce, 'eventually calls force update after some event was triggered on child collection'
+  #     forceUpdateSpy.restore()
+  #     start()
 

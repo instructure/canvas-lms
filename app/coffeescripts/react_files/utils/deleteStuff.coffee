@@ -31,9 +31,12 @@ define [
           force: 'true'
         wait: true
         error: (model, response, options) ->
+          reason = try
+            $.parseJSON(response.responseText)?.message
+
           $.flashError I18n.t 'delete_error', 'Error deleting %{name}: %{reason}',
             name: item.displayName()
-            reason: $.parseJSON(response.responseText)?.message
+            reason: reason
 
     $.when(promises...).then ->
       $.flashMessage(I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count: filesAndFolders.length}))

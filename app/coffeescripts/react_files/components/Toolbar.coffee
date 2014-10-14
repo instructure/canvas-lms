@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'i18n!react_files'
   'react'
   'react-router'
@@ -11,10 +12,12 @@ define [
   './RestrictedDialogForm'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
+
+    mixins: [Router.Navigation]
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
@@ -24,7 +27,7 @@ define [
     onSubmitSearch: (event) ->
       event.preventDefault()
       query = {search_term: @refs.searchTerm.getDOMNode().value}
-      Router.transitionTo 'search', @props.params, query
+      @transitionTo 'search', {}, query
 
     addFolder: (event) ->
       event.preventDefault()

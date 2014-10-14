@@ -57,7 +57,6 @@ define [
       div role: 'grid',
         ColumnHeaders {
           to: 'search'
-          subject: @state.collection
           query: @props.query
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected

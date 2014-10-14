@@ -19,7 +19,7 @@ define [
 
     displayName: 'FilePreview'
 
-    mixins: [React.addons.PureRenderMixin]
+    mixins: [React.addons.PureRenderMixin, ReactRouter.Navigation]
 
     propTypes:
       currentFolder: customPropTypes.folder
@@ -151,7 +151,7 @@ define [
       if (event.keyCode is $.ui.keyCode.RIGHT)
         nextItem = collectionHandler.getNextInRelationTo(@state.otherItems, @state.displayedItem)
 
-      ReactRouter.transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(id: nextItem.id))
+      @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(id: nextItem.id))
 
     getStatusMessage: ->
       'A nice status message ;) ' #TODO: Actually do this..
@@ -177,7 +177,7 @@ define [
         ReactRouter.Link {
           to: @getRouteIdentifier()
           query: (@getNavigationParams(id: goToItem.id) if goToItem)
-          splat: @props.params.splat
+          params: @props.params
           className: 'ef-file-preview-arrow-link'
         },
           div {className: 'ef-file-preview-arrow'},
@@ -197,7 +197,7 @@ define [
         }, 300, 'easeOutQuad')
 
     closeModal: ->
-      ReactRouter.transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
+      @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
 
     render: withReactDOM ->
       ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
@@ -216,7 +216,7 @@ define [
                   a {className: 'ef-file-preview-header-info ef-file-preview-button', href: '#', onClick: @openInfoPanel},
                     i {className: 'icon-info'}
                     I18n.t('file_preview_headerbutton_info', ' Info')
-                  ReactRouter.Link {to: @getRouteIdentifier(), query: @getNavigationParams(except: 'only_preview'), splat: @props.params.splat, className: 'ef-file-preview-header-close ef-file-preview-button'},
+                  ReactRouter.Link {to: @getRouteIdentifier(), query: @getNavigationParams(except: 'only_preview'), params: @props.params, className: 'ef-file-preview-header-close ef-file-preview-button'},
                     i {className: 'icon-end'}
                     I18n.t('file_preview_headerbutton_close', ' Close')
             div {className: 'ef-file-preview-preview grid-row middle-xs'},

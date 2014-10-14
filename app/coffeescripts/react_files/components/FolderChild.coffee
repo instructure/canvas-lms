@@ -100,8 +100,8 @@ define [
           else if @props.model instanceof Folder
             Link {
               to: 'folder'
-              splat: @props.model.urlPath()
               className: 'media'
+              params: {splat: @props.model.urlPath()}
             },
               span className: 'pull-left',
                 FilesystemObjectThumbnail(model: @props.model)

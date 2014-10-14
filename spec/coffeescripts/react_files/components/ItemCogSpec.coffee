@@ -47,16 +47,16 @@ define [
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
 
   test 'deletes model when delete link is pressed', ->
-    sinon.stub($, 'ajax')
+    ajaxSpy = sinon.spy($, 'ajax')
     sinon.stub(window, 'confirm').returns(true)
 
     Simulate.click(@itemCog.refs.deleteLink.getDOMNode())
 
     ok window.confirm.calledOnce, 'confirms before deleting'
-    ok $.ajax.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url'
+    ok ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url'
 
     window.confirm.restore()
-    $.ajax.restore()
+    ajaxSpy.restore()
 
   test 'only shows download button for limited users', ->
     readOnlyItemCog = React.renderComponent(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
