@@ -5096,14 +5096,6 @@ zh:
       show_more: 显示更多
   data_exports: 数据导出
   date: 
-    abbr_day_names: 
-      - Sun
-      - Mon
-      - Tue
-      - Wed
-      - Thu
-      - Fri
-      - Sat
     abbr_month_names: 
       - ~
       - Jan
@@ -5118,14 +5110,6 @@ zh:
       - Oct
       - Nov
       - Dec
-    day_names: 
-      - Sunday
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
     days: 
       today: 今天
       today_lower: 今天
