@@ -22,6 +22,7 @@ rescue LoadError
 end
 
 RSpec.configure do |c|
+  c.raise_errors_for_deprecations!
   c.treat_symbols_as_metadata_keys_with_true_values = true
   c.color = true
 
