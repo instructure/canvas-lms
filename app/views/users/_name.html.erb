@@ -1,7 +1,7 @@
 <% 
   account = @context && (@context.is_a?(Account) ? @context : @context.account)
   managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
-  can_manage_admin_users = managed_accounts
+  can_manage_admin_users = managed_accounts.present?
   account ||= managed_accounts.first
   root_account = account.root_account if account
 %>
@@ -44,7 +44,8 @@
         <th><%= before_label('time_zone', 'Time Zone') %></th>
         <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>
       </tr>
-      <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && !@user.sis_pseudonym_for(@context.root_account) && can_do(@context, @current_user, :manage_students)) %>
+      <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
+      <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && can_do(@context, @current_user, :manage_students) && !@user.sis_pseudonym_for(@context.root_account)) %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
           <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
           <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
