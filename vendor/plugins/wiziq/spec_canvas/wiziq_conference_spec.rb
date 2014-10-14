@@ -28,8 +28,8 @@ describe WiziqConference do
       'presenters' => [{ 'presenter_url' => 'http://example.com/presenter_url', }],
     })
     conference = factory_with_protected_attributes(WiziqConference, :title => "my test conference", :user => @user, :context => @course)
-    conference.admin_join_url(@user,"http://www.instructure.com").should == "http://example.com/presenter_url"
-    conference.conference_key.should == '12345'
+    expect(conference.admin_join_url(@user,"http://www.instructure.com")).to eq "http://example.com/presenter_url"
+    expect(conference.conference_key).to eq '12345'
   end
 
   it "should get presenter url for an existing conference" do
@@ -37,7 +37,7 @@ describe WiziqConference do
       'presenter_url' => 'http://example.com/presenter_url',
     })
     conference = factory_with_protected_attributes(WiziqConference, :title => "my test conference", :user => @user, :context => @course, :conference_key => '12345')
-    conference.admin_join_url(@user,"http://www.instructure.com").should == "http://example.com/presenter_url"
+    expect(conference.admin_join_url(@user,"http://www.instructure.com")).to eq "http://example.com/presenter_url"
   end
 
   it 'should get participant urls and allow re-joining' do
@@ -53,14 +53,14 @@ describe WiziqConference do
       'attendee_url' => 'http://example.com/attendee_url?1',
     })
     conference = factory_with_protected_attributes(WiziqConference, :title => "my test conference", :user => @user, :context => @course, :conference_key => '12345')
-    conference.participant_join_url(@s1,"http://www.instructure.com").should == "http://example.com/attendee_url?1"
-    conference.participant_join_url(@s2,"http://www.instructure.com").should == "http://example.com/attendee_url?2"
-    conference.participant_join_url(@s1,"http://www.instructure.com").should == "http://example.com/attendee_url?1"
+    expect(conference.participant_join_url(@s1,"http://www.instructure.com")).to eq "http://example.com/attendee_url?1"
+    expect(conference.participant_join_url(@s2,"http://www.instructure.com")).to eq "http://example.com/attendee_url?2"
+    expect(conference.participant_join_url(@s1,"http://www.instructure.com")).to eq "http://example.com/attendee_url?1"
   end
 
   it "should confirm valid config" do
-    WiziqConference.new.valid_config?.should be_true
-    WiziqConference.new(:conference_type => "Wiziq").valid_config?.should be_true
+    expect(WiziqConference.new.valid_config?).to be_truthy
+    expect(WiziqConference.new(:conference_type => "Wiziq").valid_config?).to be_truthy
   end
 end
 
