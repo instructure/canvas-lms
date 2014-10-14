@@ -37,6 +37,8 @@ define [
     isUndated: () =>
       @start == null
 
+    isCompleted: -> false
+
     displayTimeString: () -> ""
     readableType: () -> ""
 
@@ -81,6 +83,10 @@ define [
 
     isDueAtMidnight: () ->
       @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() > 30))
+
+    isPast: () ->
+      now = $.fudgeDateForProfileTimezone(new Date)
+      @start && @start < now
 
     copyDataFromObject: (data) ->
       @originalStart = (new Date(@start) if @start)
