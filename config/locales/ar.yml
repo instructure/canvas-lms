@@ -5246,14 +5246,6 @@ ar:
       - Oct
       - Nov
       - Dec
-    day_names: 
-      - Sunday
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
     days: 
       today: اليوم
       today_lower: اليوم
