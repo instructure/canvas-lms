@@ -1151,7 +1151,6 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should insert N/A for non-visible assignments" do
-      pending('fragile')
       csv = @course.gradebook_to_csv(:user => @teacher)
       csv.should_not be_nil
       rows = CSV.parse(csv)
