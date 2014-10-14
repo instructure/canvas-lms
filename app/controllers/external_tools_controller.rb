@@ -340,8 +340,6 @@ class ExternalToolsController < ApplicationController
       case selection_type
       when "course_settings_sub_navigation"
         course_settings_url(@context)
-      when "course_home_sub_navigation"
-        course_content_migrations_url(@context) # TODO: make course_home_sub_navigation more general
       else
         course_url(@context)
       end
