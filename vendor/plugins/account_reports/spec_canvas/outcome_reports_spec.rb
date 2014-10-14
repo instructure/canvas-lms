@@ -103,45 +103,45 @@ describe "Outcome Reports" do
 
       parsed = read_report(@type)
 
-      parsed[0][0].should == @user2.sortable_name
-      parsed[0][1].should == @user2.id.to_s
-      parsed[0][2].should == "user_sis_id_02"
-      parsed[0][3].should == @assignment.title
-      parsed[0][4].should == @assignment.id.to_s
-      parsed[0][5].should == nil
-      parsed[0][6].should == nil
-      parsed[0][7].should == @outcome.short_description
-      parsed[0][8].should == @outcome.id.to_s
-      parsed[0][9].should == nil
-      parsed[0][10].should == nil
-      parsed[0][11].should == @course1.name
-      parsed[0][12].should == @course1.id.to_s
-      parsed[0][13].should == @course1.sis_source_id
-      parsed[0][14].should == @section.name
-      parsed[0][15].should == @section.id.to_s
-      parsed[0][16].should == @section.sis_source_id
-      parsed[0][17].should == "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
+      expect(parsed[0][0]).to eq @user2.sortable_name
+      expect(parsed[0][1]).to eq @user2.id.to_s
+      expect(parsed[0][2]).to eq "user_sis_id_02"
+      expect(parsed[0][3]).to eq @assignment.title
+      expect(parsed[0][4]).to eq @assignment.id.to_s
+      expect(parsed[0][5]).to eq nil
+      expect(parsed[0][6]).to eq nil
+      expect(parsed[0][7]).to eq @outcome.short_description
+      expect(parsed[0][8]).to eq @outcome.id.to_s
+      expect(parsed[0][9]).to eq nil
+      expect(parsed[0][10]).to eq nil
+      expect(parsed[0][11]).to eq @course1.name
+      expect(parsed[0][12]).to eq @course1.id.to_s
+      expect(parsed[0][13]).to eq @course1.sis_source_id
+      expect(parsed[0][14]).to eq @section.name
+      expect(parsed[0][15]).to eq @section.id.to_s
+      expect(parsed[0][16]).to eq @section.sis_source_id
+      expect(parsed[0][17]).to eq "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
 
-      parsed[1][0].should == @user1.sortable_name
-      parsed[1][1].should == @user1.id.to_s
-      parsed[1][2].should == "user_sis_id_01"
-      parsed[1][3].should == @assignment.title
-      parsed[1][4].should == @assignment.id.to_s
-      parsed[1][5].should == @submission.submitted_at.iso8601
-      parsed[1][6].should == @submission.grade.to_s
-      parsed[1][7].should == @outcome.short_description
-      parsed[1][8].should == @outcome.id.to_s
-      parsed[1][9].should == '1'
-      parsed[1][10].should == '2'
-      parsed[1][11].should == @course1.name
-      parsed[1][12].should == @course1.id.to_s
-      parsed[1][13].should == @course1.sis_source_id
-      parsed[1][14].should == @section.name
-      parsed[1][15].should == @section.id.to_s
-      parsed[1][16].should == @section.sis_source_id
-      parsed[1][17].should == "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
+      expect(parsed[1][0]).to eq @user1.sortable_name
+      expect(parsed[1][1]).to eq @user1.id.to_s
+      expect(parsed[1][2]).to eq "user_sis_id_01"
+      expect(parsed[1][3]).to eq @assignment.title
+      expect(parsed[1][4]).to eq @assignment.id.to_s
+      expect(parsed[1][5]).to eq @submission.submitted_at.iso8601
+      expect(parsed[1][6]).to eq @submission.grade.to_s
+      expect(parsed[1][7]).to eq @outcome.short_description
+      expect(parsed[1][8]).to eq @outcome.id.to_s
+      expect(parsed[1][9]).to eq '1'
+      expect(parsed[1][10]).to eq '2'
+      expect(parsed[1][11]).to eq @course1.name
+      expect(parsed[1][12]).to eq @course1.id.to_s
+      expect(parsed[1][13]).to eq @course1.sis_source_id
+      expect(parsed[1][14]).to eq @section.name
+      expect(parsed[1][15]).to eq @section.id.to_s
+      expect(parsed[1][16]).to eq @section.sis_source_id
+      expect(parsed[1][17]).to eq "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
 
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
     end
 
@@ -154,8 +154,8 @@ describe "Outcome Reports" do
       parameters = {}
       parameters["enrollment_term"] = @term1.id
       parsed = read_report(@type, {params: parameters})
-      parsed[0].should == ["No outcomes found"]
-      parsed.length.should == 1
+      expect(parsed[0]).to eq ["No outcomes found"]
+      expect(parsed.length).to eq 1
 
     end
 
@@ -164,8 +164,8 @@ describe "Outcome Reports" do
 
       parameters = {}
       parsed = read_report(@type, {params: parameters, account: sub_account})
-      parsed[0].should == ["No outcomes found"]
-      parsed.length.should == 1
+      expect(parsed[0]).to eq ["No outcomes found"]
+      expect(parsed.length).to eq 1
 
     end
 
@@ -180,7 +180,7 @@ describe "Outcome Reports" do
 
       param = {}
       parsed = read_report(@type, {params: param, account: sub_account})
-      parsed[1].should == [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
+      expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s,
                            @outcome.short_description, @outcome.id.to_s, '1', '2',
@@ -188,13 +188,13 @@ describe "Outcome Reports" do
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
 
-      parsed[0].should == [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
+      expect(parsed[0]).to eq [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
                            @assignment.title, @assignment.id.to_s, nil, nil,
                            @outcome.short_description, @outcome.id.to_s, nil, nil,
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
     end
 
@@ -204,10 +204,10 @@ describe "Outcome Reports" do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      report.parameters["extra_text"].should == "Term: All Terms; Include Deleted Objects: true;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
       parsed = parse_report(report)
 
-      parsed[1].should == [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
+      expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s,
                            @outcome.short_description, @outcome.id.to_s, '1', '2',
@@ -215,13 +215,13 @@ describe "Outcome Reports" do
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
 
-      parsed[0].should == [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
+      expect(parsed[0]).to eq [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
                            @assignment.title, @assignment.id.to_s, nil, nil,
                            @outcome.short_description, @outcome.id.to_s, nil, nil,
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
     end
 
@@ -236,7 +236,7 @@ describe "Outcome Reports" do
       lor.save!
 
       parsed = read_report(@type)
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
     end
   end
 
@@ -248,24 +248,24 @@ describe "Outcome Reports" do
     it "should run the outcome result report" do
       parsed = read_report(@type)
 
-      parsed[0][0].should == @user1.sortable_name
-      parsed[0][1].should == @user1.id.to_s
-      parsed[0][2].should == "user_sis_id_01"
-      parsed[0][3].should == @assignment.title
-      parsed[0][4].should == @assignment.id.to_s
-      parsed[0][5].should == 'assignment'
-      parsed[0][6].should == @submission.submitted_at.iso8601
-      parsed[0][7].should == @submission.grade.to_s
-      parsed[0][8].should == @outcome.short_description
-      parsed[0][9].should == @outcome.id.to_s
-      parsed[0][10].should == '1'
-      parsed[0][11].should == '2'
-      parsed[0][12].should == nil
-      parsed[0][13].should == nil
-      parsed[0][14].should == @course1.name
-      parsed[0][15].should == @course1.id.to_s
-      parsed[0][16].should == @course1.sis_source_id
-      parsed.length.should == 1
+      expect(parsed[0][0]).to eq @user1.sortable_name
+      expect(parsed[0][1]).to eq @user1.id.to_s
+      expect(parsed[0][2]).to eq "user_sis_id_01"
+      expect(parsed[0][3]).to eq @assignment.title
+      expect(parsed[0][4]).to eq @assignment.id.to_s
+      expect(parsed[0][5]).to eq 'assignment'
+      expect(parsed[0][6]).to eq @submission.submitted_at.iso8601
+      expect(parsed[0][7]).to eq @submission.grade.to_s
+      expect(parsed[0][8]).to eq @outcome.short_description
+      expect(parsed[0][9]).to eq @outcome.id.to_s
+      expect(parsed[0][10]).to eq '1'
+      expect(parsed[0][11]).to eq '2'
+      expect(parsed[0][12]).to eq nil
+      expect(parsed[0][13]).to eq nil
+      expect(parsed[0][14]).to eq @course1.name
+      expect(parsed[0][15]).to eq @course1.id.to_s
+      expect(parsed[0][16]).to eq @course1.sis_source_id
+      expect(parsed.length).to eq 1
     end
 
     it "should work with quizzes" do
@@ -292,61 +292,61 @@ describe "Outcome Reports" do
 
       parsed = read_report(@type, {order: [0, 13]})
 
-      parsed[2][0].should == @user1.sortable_name
-      parsed[2][1].should == @user1.id.to_s
-      parsed[2][2].should == "user_sis_id_01"
-      parsed[2][3].should == @assignment.title
-      parsed[2][4].should == @assignment.id.to_s
-      parsed[2][5].should == 'assignment'
-      parsed[2][6].should == @submission.submitted_at.iso8601
-      parsed[2][7].should == @submission.grade.to_s
-      parsed[2][8].should == @outcome.short_description
-      parsed[2][9].should == @outcome.id.to_s
-      parsed[2][10].should == '1'
-      parsed[2][11].should == '2'
-      parsed[2][12].should == nil
-      parsed[2][13].should == nil
-      parsed[2][14].should == @course1.name
-      parsed[2][15].should == @course1.id.to_s
-      parsed[2][16].should == @course1.sis_source_id
+      expect(parsed[2][0]).to eq @user1.sortable_name
+      expect(parsed[2][1]).to eq @user1.id.to_s
+      expect(parsed[2][2]).to eq "user_sis_id_01"
+      expect(parsed[2][3]).to eq @assignment.title
+      expect(parsed[2][4]).to eq @assignment.id.to_s
+      expect(parsed[2][5]).to eq 'assignment'
+      expect(parsed[2][6]).to eq @submission.submitted_at.iso8601
+      expect(parsed[2][7]).to eq @submission.grade.to_s
+      expect(parsed[2][8]).to eq @outcome.short_description
+      expect(parsed[2][9]).to eq @outcome.id.to_s
+      expect(parsed[2][10]).to eq '1'
+      expect(parsed[2][11]).to eq '2'
+      expect(parsed[2][12]).to eq nil
+      expect(parsed[2][13]).to eq nil
+      expect(parsed[2][14]).to eq @course1.name
+      expect(parsed[2][15]).to eq @course1.id.to_s
+      expect(parsed[2][16]).to eq @course1.sis_source_id
 
-      parsed[0][0].should == @user2.sortable_name
-      parsed[0][1].should == @user2.id.to_s
-      parsed[0][2].should == "user_sis_id_02"
-      parsed[0][3].should == quiz.title
-      parsed[0][4].should == quiz.id.to_s
-      parsed[0][5].should == 'quiz'
-      parsed[0][6].should == sub.finished_at.iso8601
-      parsed[0][7].should == sub.score.to_s
-      parsed[0][8].should == outcome.short_description
-      parsed[0][9].should == outcome.id.to_s
-      parsed[0][10].should == '1'
-      parsed[0][11].should == '1'
-      parsed[0][12].should == 'question 1'
-      parsed[0][13].should == q1.assessment_question.id.to_s
-      parsed[0][14].should == @course1.name
-      parsed[0][15].should == @course1.id.to_s
-      parsed[0][16].should == @course1.sis_source_id
+      expect(parsed[0][0]).to eq @user2.sortable_name
+      expect(parsed[0][1]).to eq @user2.id.to_s
+      expect(parsed[0][2]).to eq "user_sis_id_02"
+      expect(parsed[0][3]).to eq quiz.title
+      expect(parsed[0][4]).to eq quiz.id.to_s
+      expect(parsed[0][5]).to eq 'quiz'
+      expect(parsed[0][6]).to eq sub.finished_at.iso8601
+      expect(parsed[0][7]).to eq sub.score.to_s
+      expect(parsed[0][8]).to eq outcome.short_description
+      expect(parsed[0][9]).to eq outcome.id.to_s
+      expect(parsed[0][10]).to eq '1'
+      expect(parsed[0][11]).to eq '1'
+      expect(parsed[0][12]).to eq 'question 1'
+      expect(parsed[0][13]).to eq q1.assessment_question.id.to_s
+      expect(parsed[0][14]).to eq @course1.name
+      expect(parsed[0][15]).to eq @course1.id.to_s
+      expect(parsed[0][16]).to eq @course1.sis_source_id
 
-      parsed[1][0].should == @user2.sortable_name
-      parsed[1][1].should == @user2.id.to_s
-      parsed[1][2].should == "user_sis_id_02"
-      parsed[1][3].should == quiz.title
-      parsed[1][4].should == quiz.id.to_s
-      parsed[1][5].should == 'quiz'
-      parsed[1][6].should == sub.finished_at.iso8601
-      parsed[1][7].should == sub.score.to_s
-      parsed[1][8].should == outcome.short_description
-      parsed[1][9].should == outcome.id.to_s
-      parsed[1][10].should == '1'
-      parsed[1][11].should == '0'
-      parsed[1][12].should == 'question 2'
-      parsed[1][13].should == q2.assessment_question.id.to_s
-      parsed[1][14].should == @course1.name
-      parsed[1][15].should == @course1.id.to_s
-      parsed[1][16].should == @course1.sis_source_id
+      expect(parsed[1][0]).to eq @user2.sortable_name
+      expect(parsed[1][1]).to eq @user2.id.to_s
+      expect(parsed[1][2]).to eq "user_sis_id_02"
+      expect(parsed[1][3]).to eq quiz.title
+      expect(parsed[1][4]).to eq quiz.id.to_s
+      expect(parsed[1][5]).to eq 'quiz'
+      expect(parsed[1][6]).to eq sub.finished_at.iso8601
+      expect(parsed[1][7]).to eq sub.score.to_s
+      expect(parsed[1][8]).to eq outcome.short_description
+      expect(parsed[1][9]).to eq outcome.id.to_s
+      expect(parsed[1][10]).to eq '1'
+      expect(parsed[1][11]).to eq '0'
+      expect(parsed[1][12]).to eq 'question 2'
+      expect(parsed[1][13]).to eq q2.assessment_question.id.to_s
+      expect(parsed[1][14]).to eq @course1.name
+      expect(parsed[1][15]).to eq @course1.id.to_s
+      expect(parsed[1][16]).to eq @course1.sis_source_id
 
-      parsed.length.should == 3
+      expect(parsed.length).to eq 3
 
       # NOTE: remove after data migration of polymorphic relationships having: Quiz
       result = LearningOutcomeResult.where(association_type: 'Quizzes::Quiz').first
@@ -354,26 +354,26 @@ describe "Outcome Reports" do
       result.send(:save_without_callbacks)
 
       parsed = read_report(@type, {order: [0, 13]})
-      parsed[2][5].should == 'assignment'
-      parsed[0][5].should == 'quiz'
-      parsed[1][5].should == 'quiz'
+      expect(parsed[2][5]).to eq 'assignment'
+      expect(parsed[0][5]).to eq 'quiz'
+      expect(parsed[1][5]).to eq 'quiz'
 
       # NOTE: remove after data migration of polymorphic relationships having: QuizSubmission
       result = LearningOutcomeResult.where(artifact_type: 'Quizzes::QuizSubmission').first
       LearningOutcomeResult.where(id: result).update_all(association_type: 'QuizSubmission')
 
       parsed = read_report(@type, {order: [0, 13]})
-      parsed[0][6].should == sub.finished_at.iso8601
-      parsed[0][7].should == sub.score.to_s
-      parsed[1][6].should == sub.finished_at.iso8601
-      parsed[1][7].should == sub.score.to_s
+      expect(parsed[0][6]).to eq sub.finished_at.iso8601
+      expect(parsed[0][7]).to eq sub.score.to_s
+      expect(parsed[1][6]).to eq sub.finished_at.iso8601
+      expect(parsed[1][7]).to eq sub.score.to_s
     end
 
     it 'should include in extra text if option is set' do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      report.parameters["extra_text"].should == "Term: All Terms; Include Deleted Objects: true;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
     end
   end
 end

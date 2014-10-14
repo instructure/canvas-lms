@@ -84,15 +84,15 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["enrollment_term"] = @term1.id
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 3
+      expect(parsed.length).to eq 3
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "active"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "90", "concluded"]
-      parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[2]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
     end
@@ -103,13 +103,13 @@ describe "Default Account Reports" do
       parameters["enrollment_term"] = "sis_term_id:fall12"
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "active"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "90", "concluded"]
-      parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[2]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
     end
@@ -117,21 +117,21 @@ describe "Default Account Reports" do
     it "should run grade export with no parameters" do
 
       parsed = read_report('grade_export_csv', {order: 13})
-      parsed.length.should == 5
+      expect(parsed.length).to eq 5
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "active"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "90", "concluded"]
-      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+      expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "active"]
-      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[3]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
-      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+      expect(parsed[4]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
     end
@@ -141,21 +141,21 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["enrollment_term"] = ""
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 5
+      expect(parsed.length).to eq 5
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "active"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "90", "concluded"]
-      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+      expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "active"]
-      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[3]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
-      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+      expect(parsed[4]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
     end
@@ -168,21 +168,21 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["include_deleted"] = true
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 5
+      expect(parsed.length).to eq 5
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "deleted"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "90", "concluded"]
-      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+      expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "deleted"]
-      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[3]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
-      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+      expect(parsed[4]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "deleted"]
     end
@@ -194,12 +194,12 @@ describe "Default Account Reports" do
 
       parameters = {}
       parsed = read_report('grade_export_csv', {order: 13, account: sub_account, params: parameters})
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
-      parsed[0].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+      expect(parsed[0]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "active"]
-      parsed[1].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+      expect(parsed[1]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
     end
@@ -213,25 +213,25 @@ describe "Default Account Reports" do
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 5
+      expect(parsed.length).to eq 5
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01",
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01",
                            "English 101", @course1.id.to_s, "SIS_COURSE_ID_1",
                            "English 101", @course1.course_sections.first.id.to_s,
                            nil, "Fall", @term1.id.to_s, "fall12", nil, "88", "concluded"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                            "English 101", @course1.id.to_s, "SIS_COURSE_ID_1",
                            "English 101", @course1.course_sections.first.id.to_s,
                            nil, "Fall", @term1.id.to_s, 'fall12', nil, "90", "concluded"]
-      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
+      expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                            "Math 101", @course2.id.to_s, nil, "Math 101",
                            @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "active"]
-      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03",
+      expect(parsed[3]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03",
                            "English 101", @course1.id.to_s, "SIS_COURSE_ID_1",
                            "English 101", @course1.course_sections.first.id.to_s,
                            nil, "Fall", @term1.id.to_s, "fall12", nil, "97", "concluded"]
-      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04",
+      expect(parsed[4]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04",
                            "Math 101", @course2.id.to_s, nil, "Math 101",
                            @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
@@ -247,12 +247,12 @@ describe "Default Account Reports" do
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 2
-      parsed[0].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                            "Math 101", @course2.id.to_s, nil, "Math 101",
                            @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "active"]
-      parsed[1].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04",
+      expect(parsed[1]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04",
                            "Math 101", @course2.id.to_s, nil, "Math 101",
                            @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
@@ -264,18 +264,18 @@ describe "Default Account Reports" do
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
-      parsed.length.should == 4
+      expect(parsed.length).to eq 4
 
-      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+      expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "88", "active"]
-      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+      expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93", "deleted"]
-      parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+      expect(parsed[2]).to eq ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                            @term1.id.to_s, "fall12", nil, "97", "active"]
-      parsed[3].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+      expect(parsed[3]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "99", "active"]
     end
