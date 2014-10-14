@@ -31,7 +31,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "should list the correct number of students", :non_parallel do
+    it "should list the correct number of students", :non_parallel, :priority => "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#x_of_x_students").should include_text("1 of 1")
