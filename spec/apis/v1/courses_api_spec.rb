@@ -2395,4 +2395,34 @@ describe ContentImportsController, type: :request do
       check_counts(1, option)
     end
   end
+
+  it "should create and retrieve link validation results" do
+    course_with_teacher_logged_in(:active_all => true, :name => 'validayshun')
+
+    # shouldn't have started
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to be_empty
+
+    # start
+    json = api_call(:post, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'start_link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to eq({'success' => true})
+
+    # check queued state
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to eq({'state' => 'queued'})
+
+    CourseLinkValidator.any_instance.stubs(:check_course)
+    CourseLinkValidator.any_instance.stubs(:issues).returns(['mock_issue'])
+    run_jobs
+
+    # check results
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+                    { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json['state']).to eq('completed')
+    expect(json['issues']).to eq(['mock_issue'])
+  end
+
 end

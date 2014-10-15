@@ -2097,4 +2097,27 @@ class CoursesController < ApplicationController
   def ping
     render json: {success: true}
   end
+
+  def link_validation
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+
+    if progress = CourseLinkValidator.current_progress(@context)
+      hash = {:state => progress.workflow_state}
+      if !progress.pending? && progress.results
+        hash.merge!(progress.results)
+      end
+      render :json => hash
+    else
+      render :json => {}
+    end
+  end
+
+  def start_link_validation
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+
+    CourseLinkValidator.queue_course(@context)
+    render :json => {:success => true}
+  end
 end

@@ -815,6 +815,9 @@ CanvasRails::Application.routes.draw do
       get  'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
       put  'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
+
+      get 'courses/:course_id/link_validation', action: :link_validation
+      post 'courses/:course_id/link_validation', action: :start_link_validation
     end
 
     scope(controller: :account_notifications) do
