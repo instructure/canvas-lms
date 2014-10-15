@@ -53,6 +53,33 @@ class LtiApiController < ApplicationController
     render :text => e.to_s, :status => 401
   end
 
+  # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
+  #
+  # {
+  #   id: "12345678-1234-5678-1234-567812345678",
+  #   actor: {
+  #     account: {
+  #       homePage: "http://www.instructure.com/",
+  #       name: source_id
+  #     }
+  #   },
+  #   verb: {
+  #     id: "http://adlnet.gov/expapi/verbs/interacted",
+  #     display: {
+  #       "en-US" => "interacted"
+  #     }
+  #   },
+  #   object: {
+  #     id: "http://example.com/"
+  #   },
+  #   result: {
+  #     duration: "PT10M0S"
+  #   }
+  # }
+  #
+  # * actor.account.name must be a source_id
+  # * result.duration must be an ISO 8601 duration
+  # * object.id will be logged as url
   def xapi
     verify_oauth
 
@@ -64,12 +91,26 @@ class LtiApiController < ApplicationController
     course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
 
     duration = params[:result]['duration']
-    seconds = duration.match(/PT(\d+)S/)[1].to_i
+    seconds = Duration.new(duration).to_i
 
-    # TODO: This should create an asset user access and page view as well.
-    course.enrollments.where(:user_id => user).update_all(['total_activity_time = total_activity_time + ?', seconds])
+    course.enrollments.where(:user_id => user).update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
+
+    access = AssetUserAccess.where(user_id: user, asset_code: @tool.asset_string).first_or_initialize
+    access.log(course, group_code: "external_tools", category: "external_tools")
+
+    if PageView.page_views_enabled?
+      PageView.new(user: user, context: course, account: course.account).tap { |p|
+        p.request_id = CanvasUUID.generate
+        p.url = params[:object][:id]
+        # TODO: override 10m cap?
+        p.interaction_seconds = seconds
+      }.save
+    end
 
     return render :text => '', :status => 200
+
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    render :text => e.to_s, :status => 401
   end
 
   def logout_service
