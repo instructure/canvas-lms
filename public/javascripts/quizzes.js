@@ -220,24 +220,24 @@ define([
         id: answer.id,
         match_id: answer.match_id
       };
-      templateData.comments_header = I18n.beforeLabel('comments_on_answer', "Comments, if the user chooses this answer");
-      templateData.short_answer_header = I18n.beforeLabel('possible_answer', "Possible Answer");
+      templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_answer', "Comments, if the user chooses this answer"));
+      templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.possible_answer', "Possible Answer"));
 
       $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_answer', 'Click to enter comments for the student if they choose this answer'));
 
       if (question_type == "essay_question" || question_type == "file_upload_question") {
-        templateData.comments_header = I18n.beforeLabel('comments_on_question', "Comments for this question");
+        templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_question', "Comments for this question"));
       } else if (question_type == "matching_question") {
         templateData.answer_match_left_html = answer.answer_match_left_html;
-        templateData.comments_header = I18n.beforeLabel('comments_on_wrong_match', "Comments if the user gets this match wrong");
+        templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_wrong_match', "Comments if the user gets this match wrong"));
         $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_wrong_match', 'Click to enter comments for the student if they miss this match'));
       } else if (question_type == "missing_word_question") {
-        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
+        templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.answer_text', "Answer text"));
       } else if (question_type == "multiple_choice_question") {
         templateData.answer_html = answer.answer_html;
       } else if (question_type == "multiple_answers_question") {
         templateData.answer_html = answer.answer_html;
-        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
+        templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.answer_text', "Answer text"));
       } else if (question_type == "fill_in_multiple_blanks_question") {
         templateData.blank_id = answer.blank_id;
       } else if (question_type == "multiple_dropdowns_question") {
@@ -577,7 +577,7 @@ define([
         }
 
         if (code) {
-          $text.append(I18n.beforeLabel('other_incorrect_matches', "Other Incorrect Match Options") + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
+          $text.append(I18n.beforeLabel(I18n.t('labels.other_incorrect_matches', "Other Incorrect Match Options")) + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
         }
       }
       $question.find(".blank_id_select").change();
@@ -728,7 +728,7 @@ define([
         $formQuestion.removeClass('selectable');
         $formQuestion.find(".answers_header").hide().end()
           .find(".question_comment").css('display', 'none');
-        $formQuestion.find(".question_header").text(I18n.beforeLabel('message_text', "Message Text"));
+        $formQuestion.find(".question_header").text(I18n.beforeLabel(I18n.t('labels.message_text', "Message Text")));
         $form.find(":input[name='question_points']").val(0);
         result.answer_type = "none";
         result.textValues = [];
@@ -1878,7 +1878,7 @@ define([
         });
       }
       if ($question.hasClass('essay_question') || $question.hasClass('file_upload')) {
-        $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
+        $formQuestion.find(".comments_header").text(I18n.beforeLabel(I18n.t('labels.comments_on_question', "Comments for this question")));
       }
 
       limitTextInputFor($form, question.question_type);

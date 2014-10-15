@@ -18,6 +18,7 @@
 /config/build.js
 /config/environments/*-local.rb
 /config/locales/generated/
+/config/RAILS4
 /db/schema.rb
 /db/*.sqlite*
 /db/*sql
@@ -27,6 +28,7 @@ Gemfile.lock2
 Gemfile.lock3
 Gemfile.lock4
 /log/
+/node_modules
 /public/app/
 /public/assets/
 /public/doc/api/
@@ -35,15 +37,12 @@ Gemfile.lock4
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets_compiled/
-/config/RAILS4
+/spec/javascripts/compiled/
+/spec/javascripts/requirejs_config.js
 /spec/javascripts/runner.html
 /spec/javascripts/tests.js
-/spec/javascripts/compiled/
 /tmp/
 /vendor/plugins/rails_upgrade
-/node_modules
-/spec/javascripts/tests.js
-/spec/javascripts/requirejs_config.js
 
 # generated plugin stuff
 /app/coffeescripts/plugins/
@@ -54,12 +53,12 @@ Gemfile.lock4
 /spec/coffeescripts/plugins/
 /spec/plugins/
 
-# generate client app stuff
+# generated client app stuff
 /public/javascripts/client_apps/
 
-#remove this once we move jqeury into bower
+# remove this once we move jquery into bower
 /public/javascripts/bower/jquery/
 
-[canvas-gems]
+# canvas-gems
 /gems/*/coverage
 /gems/*/tmp

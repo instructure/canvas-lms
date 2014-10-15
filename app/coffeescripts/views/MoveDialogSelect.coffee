@@ -16,7 +16,7 @@ define [
 
     getLabelText: ->
       @labelText or
-      I18n.beforeLabel 'label_place_before', "Place before"
+      I18n.beforeLabel I18n.t('labels.label_place_before', "Place before")
 
     initialize: (options) ->
       super

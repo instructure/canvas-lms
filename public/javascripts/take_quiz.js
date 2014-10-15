@@ -292,7 +292,7 @@ define([
       },
 
       getTimeElapsed: function() {
-        $(".time_header").text(I18n.beforeLabel('time_elapsed', "Time Elapsed"));
+        $(".time_header").text(I18n.beforeLabel(I18n.t('labels.time_elapsed', "Time Elapsed")));
         var now = new Date().getTime();
         var startedAt = Date.parse(quizSubmission.startedAt.text()).getTime();
         return now - startedAt;

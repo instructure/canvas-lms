@@ -571,11 +571,8 @@ I18n.scope.prototype = {
   pluralize: function(count, scope, options) {
     return I18n.pluralize(count, this.resolveScope(scope), options);
   },
-  beforeLabel: function(textOrKey, defaultValue) {
-    if (typeof defaultValue != "undefined") {
-      textOrKey = this.t('labels.' + textOrKey, defaultValue);
-    }
-    return this.t("#before_label_wrapper", "%{text}:", {'text': textOrKey});
+  beforeLabel: function(text) {
+    return this.t("#before_label_wrapper", "%{text}:", {'text': text});
   },
   toTime: function(scope, d) {
     return I18n.toTime(scope, d);

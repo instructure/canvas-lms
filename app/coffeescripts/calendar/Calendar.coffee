@@ -269,13 +269,13 @@ define [
         else
           @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
       screenReaderTitleHint = if event.eventType.match(/assignment/)
-          I18n.t('event_assignment_title', 'Assignment Title: ')
+          I18n.t('event_assignment_title', 'Assignment Title:')
         else
-          I18n.t('event_event_title', 'Event Title: ')
+          I18n.t('event_event_title', 'Event Title:')
 
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
-      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
+      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint} </span>"))
       $element.find('.fc-event-title').toggleClass('calendar__event--completed', event.isCompleted())
       element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true

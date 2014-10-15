@@ -2,17 +2,6 @@ require 'i18n_tasks'
 require 'i18n_extraction'
 
 namespace :i18n do
-  EXCLUDED_JAVASCRIPT_SOURCES = /
-    \A\.\/public\/javascripts\/(
-      i18nObj.js|
-      i18n.js|
-      .*jst\/|
-      translations\/|
-      compiled\/handlebars_helpers.js|
-      tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js)
-    )
-  /x
-
   def infer_scope(filename)
     case filename
       when /app\/views\/.*\.handlebars\z/
@@ -24,6 +13,8 @@ namespace :i18n do
 
   desc "Verifies all translation calls"
   task :check => :environment do
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+
     require 'ya2yaml'
 
     only = if ENV['ONLY']
@@ -66,12 +57,22 @@ namespace :i18n do
 
     I18n.available_locales
 
-    # Ruby
     def I18nliner.manual_translations
       I18n.backend.direct_lookup('en')
     end
 
+
+    puts "\nJS..."
+    system "./gems/canvas_i18nliner/bin/i18nliner export"
+    if $?.exitstatus > 0
+      $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
+      exit $?.exitstatus
+    end
+    js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
+
+    puts "\nRuby..."
     require 'i18nliner/commands/check'
+
 
     options = {:only => ENV['ONLY']}
     @command = I18nliner::Commands::Check.run(options)
@@ -79,32 +80,16 @@ namespace :i18n do
     total_ruby = @command.processors.sum(&:translation_count)
     @translations = @command.translations
 
-    t = Time.now
-
-    # JavaScript
-    file_count = 0
-    files = (
-      Dir.glob('./public/javascripts/{,**/*/**/}*.js') +
-      Dir.glob('./app/views/**/*.erb')
-    )
-    files = files.reject { |file| file =~ EXCLUDED_JAVASCRIPT_SOURCES }
-    files &= only if only
-    js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
-    process_files(files) do |filename|
-      rc = true
-      started_at = Time.now
-      options = { erb: filename =~ /\.erb\z/, filename: filename }
-
-      I18nTasks::Utils.extract_js_scripts(File.read(filename)).each do |script|
-        rc = rc && js_extractor.process(script, options)
-      end
-
-      file_count += 1 if rc
-      puts "#{filename} #{Time.now - started_at}" if Time.now - started_at > 1
-      rc
+    # merge js in
+    js_translations.each do |key, value|
+      @translations[key] = value
     end
 
-    # Handlebars
+    t = Time.now
+
+
+    puts "\nHandlebars..."
+    file_count = 0
     files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     files &= only if only
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
@@ -122,7 +107,7 @@ namespace :i18n do
     end
 
     print "Finished in #{Time.now - t} seconds\n\n"
-    total_strings = js_extractor.total_unique + handlebars_extractor.total_unique
+    total_strings = handlebars_extractor.total_unique
     puts send((failure ? :red : :green), "#{file_count} files, #{total_strings} strings, #{@errors.size} failures")
     raise "check command encountered errors" if failure
   end
@@ -180,12 +165,19 @@ namespace :i18n do
       exit 0
     end
 
-    # Process a single script
-    process_file = lambda do |extractor, file, filename, arg_block|
+    add_translations = lambda do |scope, translations|
+      file_translations[scope] ||= {}
+      locales.each do |locale|
+        file_translations[scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
+      end
+    end
+
+    # Process a single file
+    process_file = lambda do |extractor, filename, arg_block|
       extractor.translations = {}
 
       begin
-        unless extractor.process(file, *arg_block.call(filename))
+        unless extractor.process(File.read(filename), *arg_block.call(filename))
           return
         end
       rescue Exception => e
@@ -196,42 +188,31 @@ namespace :i18n do
       translations = extractor.translations.flatten_keys.keys
 
       unless translations.empty?
-        scope = extractor.scope
-
-        file_translations[scope] ||= {}
-        locales.each do |locale|
-          file_translations[scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
-        end
+        add_translations.call(extractor.scope, translations)
       end
     end
 
-    process_files = lambda do |extractor, files, arg_block, has_precompiled|
-      # Process any number of scripts that may be contained in a single file
+    process_files = lambda do |extractor, files, arg_block|
       files.each do |filename|
-        scripts = if has_precompiled
-          I18nTasks::Utils.extract_js_scripts(File.read(filename))
-        else
-          [ File.read(filename) ]
-        end
-
-        scripts.each do |script|
-          process_file.call(extractor, script, filename, arg_block)
-        end
+        process_file.call(extractor, filename, arg_block)
       end
     end
 
     # JavaScript
-    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').reject do |file|
-      file =~ EXCLUDED_JAVASCRIPT_SOURCES
+    system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
+    if $?.exitstatus > 0
+      $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
+      exit $?.exitstatus
     end
-
-    js_extractor = I18nExtraction::JsExtractor.new
-    process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] }, true)
+    js_scope_key_map = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
+    js_scope_key_map.each do |scope, keys|
+      add_translations.call(scope, keys)
+    end
 
     # Handlebars
     files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
-    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] }, false)
+    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] })
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"

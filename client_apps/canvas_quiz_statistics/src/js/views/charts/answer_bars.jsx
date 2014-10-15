@@ -217,7 +217,7 @@ define(function(require) {
       return (
         <tr key={'answer-'+answer.id}>
           <td scope="col">
-            {I18n.t('audible_answer_position', 'Answer %{position}: ', { position: position+1 })}
+            {I18n.t('audible_answer_position', 'Answer %{position}:', { position: position+1 }) + ' '}
 
             {answer.text + '. ' /* make sure there's a sentence delimiter */}
 

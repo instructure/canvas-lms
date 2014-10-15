@@ -2,15 +2,6 @@ module I18nTasks
   module Utils
     CORE_KEYS = [:date, :time, :number, :datetime, :support]
 
-    # See README for this thing
-    CANVAS_PRECOMPILED_ASSET = /canvas_precompiled_asset:\s*([\S]+)\s*/
-
-    AMD_MODULE_DECL = /define\(/
-    AMD_MODULE_ID = /['"][^'"]+['"]/
-    AMD_MODULE_DEPSTRING = /(
-      #{AMD_MODULE_DECL} (?:#{AMD_MODULE_ID},)?[^\{]+\{
-    )/mx
-
     def self.dump_js(translations, locales = I18n.available_locales)
       # include all locales (even if untranslated) to avoid js errors
       locales.each { |locale| translations[locale.to_s] ||= {} }
@@ -22,37 +13,6 @@ module I18nTasks
           $.extend(true, I18n, {translations: #{translations.to_ordered.to_json}});
         });
       TRANSLATIONS
-    end
-
-    # @return [Array<String>] The script texts.
-    def self.extract_js_scripts(contents)
-      # Process a pre-compiled Canvas JS file (client_apps) by breaking them
-      # down into separate modules and processing each at a time
-      if contents.lines.first =~ CANVAS_PRECOMPILED_ASSET
-        asset_type = $1.strip.downcase
-        case asset_type
-        when 'amd'
-          self.extract_amd_scripts(contents)
-        else
-          raise "Unsupported pre-compiled JS asset type: #{asset_type}"
-        end
-      else
-        [ contents ]
-      end
-    end
-
-    # @private use #extract_js_scripts instead
-    def self.extract_amd_scripts(contents)
-      scripts = []
-
-      fragments = contents.split(AMD_MODULE_DEPSTRING)
-      fragments.each_with_index do |fragment, index|
-        if fragment =~ AMD_MODULE_DECL
-          scripts << "#{fragment}#{fragments[index+1]}".strip
-        end
-      end
-
-      scripts
     end
   end
 end

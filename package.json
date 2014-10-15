@@ -33,6 +33,8 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --browsers Chrome,Firefox,Safari --single-run",
     "compress": "node script/compress.js",
-    "compile-sass": "node script/compile-sass.js"
+    "compile-sass": "node script/compile-sass.js",
+    "preinstall": "script/gem_npm install",
+    "preupdate": "script/gem_npm update"
   }
 }

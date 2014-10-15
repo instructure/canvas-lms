@@ -219,13 +219,13 @@ define [
                     style: {'border-right': '1px solid #8c8c8c'} if @state.showInfoPanel 
                   },
                     i {className: 'icon-download'} #Replace with actual icon
-                    I18n.t('file_preview_headerbutton_download', ' Download')
+                    " " + I18n.t('file_preview_headerbutton_download', 'Download')
                   button {
                     className: if @state.showInfoPanel then 'ef-file-preview-button--active btn-link ef-file-preview-header-info ef-file-preview-button' else 'btn-link ef-file-preview-header-info ef-file-preview-button'                       
                     onClick: @toggle('showInfoPanel')
                   },
                     i {className: 'icon-info'}
-                    I18n.t('file_preview_headerbutton_info', ' Info')
+                    ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
                   ReactRouter.Link {
                     to: @getRouteIdentifier(), 
                     query: @getNavigationParams(except: 'only_preview'), 
@@ -234,7 +234,7 @@ define [
                     style: {'border-left': '1px solid #8c8c8c'} if @state.showInfoPanel 
                   },
                     i {className: 'icon-end'}
-                    I18n.t('file_preview_headerbutton_close', ' Close')
+                    ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
 
           
           div {className: 'ef-file-preview-stretch'},            

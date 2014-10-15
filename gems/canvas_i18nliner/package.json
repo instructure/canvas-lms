@@ -1,0 +1,11 @@
+{
+  "name": "i18nliner-canvas",
+  "description": "i18nliner, canvas style",
+  "private": true,
+  "main": "./js/main",
+  "version": "0.0.1",
+  "dependencies": {
+    "i18nliner": "0.0.14",
+    "minimist": "^1.1.0"
+  }
+}

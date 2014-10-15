@@ -40,7 +40,7 @@ define [
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
-      ag_move_label: I18n.beforeLabel 'assignment_group_move_label', 'Assignment Group'
+      ag_move_label: I18n.beforeLabel I18n.t('labels.assignment_group_move_label', 'Assignment Group')
 
     initialize: ->
       super

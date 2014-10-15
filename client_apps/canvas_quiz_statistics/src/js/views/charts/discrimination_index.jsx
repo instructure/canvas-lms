@@ -201,21 +201,21 @@ define(function(require) {
       tableData = [
         {
           id: 'top',
-          label: I18n.t('audible_top_bracket', 'Top bracket: '),
+          label: I18n.t('audible_top_bracket', 'Top bracket:') + ' ',
           correct: stats.top.correct,
           incorrect: stats.top.total - stats.top.correct,
           correctRatio: Math.round(chartData.ratio[0] * 100)
         },
         {
           id: 'mid',
-          label: I18n.t('audible_middle_bracket', 'Middle bracket: '),
+          label: I18n.t('audible_middle_bracket', 'Middle bracket:') + ' ',
           correct: stats.mid.correct,
           incorrect: stats.mid.total - stats.mid.correct,
           correctRatio: Math.round(chartData.ratio[1] * 100)
         },
         {
           id: 'bot',
-          label: I18n.t('audible_bottom_bracket', 'Bottom bracket: '),
+          label: I18n.t('audible_bottom_bracket', 'Bottom bracket:') + ' ',
           correct: stats.bot.correct,
           incorrect: stats.bot.total - stats.bot.correct,
           correctRatio: Math.round(chartData.ratio[2] * 100)
