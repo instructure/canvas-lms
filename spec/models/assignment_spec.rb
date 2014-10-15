@@ -1170,7 +1170,7 @@ describe Assignment do
       </div>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
       ev = @assignment.to_ics(false)
-      pending("assignment description disabled")
+      skip("assignment description disabled")
       expect(ev.description).to eq "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
       expect(ev.x_alt_desc).to eq html.strip
     end
@@ -1179,7 +1179,7 @@ describe Assignment do
       html = %{<a href="/calendar">Click!</a>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
       ev = @assignment.to_ics(false)
-      pending("assignment description disabled")
+      skip("assignment description disabled")
       expect(ev.description).to eq "[Click!](http://localhost/calendar)"
       expect(ev.x_alt_desc).to eq %{<a href="http://localhost/calendar">Click!</a>}
     end

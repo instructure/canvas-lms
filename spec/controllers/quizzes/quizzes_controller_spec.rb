@@ -1229,7 +1229,7 @@ describe Quizzes::QuizzesController do
     end
 
     context "logged out submissions" do
-      integrate_views
+      render_views
 
       it "should include logged_out users' submissions in a public course" do
         #logged_out user

@@ -77,7 +77,7 @@ describe DiscussionTopicsController do
     end
 
     context "discussion topic with assignment with overrides" do
-      integrate_views
+      render_views
 
       before :once do
         course_topic(:with_assignment => true, :user => @teacher)
