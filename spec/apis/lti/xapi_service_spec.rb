@@ -12,10 +12,11 @@ describe LtiApiController, type: :request do
     tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
+    @token = Lti::XapiService.create_token(@tool, @student, @course)
   end
 
   def make_call(opts = {})
-    opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/xapi"
+    opts['path'] ||= "/api/lti/v1/xapi/#{@token}"
     opts['key'] ||= @tool.consumer_key
     opts['secret'] ||= @tool.shared_secret
     opts['content-type'] ||= 'application/json'
@@ -25,13 +26,6 @@ describe LtiApiController, type: :request do
     post "https://www.example.com#{req.path}",
       req.body,
       { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
-  end
-
-  def source_id
-    @tool.shard.activate do
-      payload = [@tool.id, @course.id, @assignment.id, @student.id].join('-')
-      "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
-    end
   end
 
   it "should require a content-type of application/json" do
@@ -51,7 +45,7 @@ describe LtiApiController, type: :request do
       actor: {
         account: {
           homePage: "http://www.instructure.com/",
-          name: source_id
+          name: '123somemagicguid'
         }
       },
       verb: {

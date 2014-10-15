@@ -60,7 +60,7 @@ class LtiApiController < ApplicationController
   #   actor: {
   #     account: {
   #       homePage: "http://www.instructure.com/",
-  #       name: source_id
+  #       name: "uniquenameofsomekind"
   #     }
   #   },
   #   verb: {
@@ -77,40 +77,21 @@ class LtiApiController < ApplicationController
   #   }
   # }
   #
-  # * actor.account.name must be a source_id
   # * result.duration must be an ISO 8601 duration
   # * object.id will be logged as url
-  def xapi
-    verify_oauth
+  def xapi_service
+    token = Lti::XapiService::Token.parse_and_validate(params[:token])
+    verify_oauth(token.tool)
 
     if request.content_type != "application/json"
       return render :text => '', :status => 415
     end
 
-    source_id = params[:actor]['account']['name']
-    course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-
-    duration = params[:result]['duration']
-    seconds = Duration.new(duration).to_i
-
-    course.enrollments.where(:user_id => user).update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
-
-    access = AssetUserAccess.where(user_id: user, asset_code: @tool.asset_string).first_or_initialize
-    access.log(course, group_code: "external_tools", category: "external_tools")
-
-    if PageView.page_views_enabled?
-      PageView.new(user: user, context: course, account: course.account).tap { |p|
-        p.request_id = CanvasUUID.generate
-        p.url = params[:object][:id]
-        # TODO: override 10m cap?
-        p.interaction_seconds = seconds
-      }.save
-    end
+    Lti::XapiService.log_page_view(token, params)
 
     return render :text => '', :status => 200
-
   rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    render :text => e.to_s, :status => 401
+    return render :text => e, :status => 401
   end
 
   def logout_service

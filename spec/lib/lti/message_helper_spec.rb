@@ -57,11 +57,6 @@ module Lti
         expect(subject.common_variable_substitutions['$Canvas.api.baseUrl'].call).to eq 'https://localhost'
       end
 
-      it 'has substitution for $Canvas.xapi.url' do
-        subject.stubs(:lti_xapi_url).returns('/xapi')
-        expect(subject.common_variable_substitutions['$Canvas.xapi.url'].call).to eq '/xapi'
-      end
-
       it 'has substitution for $Canvas.account.id' do
         account.stubs(:id).returns(12345)
         expect(subject.common_variable_substitutions['$Canvas.account.id']).to eq 12345
@@ -129,6 +124,20 @@ module Lti
           Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
           substitution_helper.stubs(:concluded_lis_roles).returns('learner')
           expect(subject.common_variable_substitutions['$Canvas.membership.concludedRoles'].call).to eq 'learner'
+        end
+      end
+
+      context 'context is a course and there is a user' do
+        before(:each) {
+          subject.domain_root_account = root_account
+          subject.context = course
+          subject.current_user = user
+        }
+
+        it 'has substitution for $Canvas.xapi.url' do
+          Lti::XapiService.stubs(:create_token).returns('abcd')
+          subject.stubs(:lti_xapi_url).returns('/xapi/abcd')
+          expect(subject.common_variable_substitutions['$Canvas.xapi.url'].call).to eq '/xapi/abcd'
         end
       end
 

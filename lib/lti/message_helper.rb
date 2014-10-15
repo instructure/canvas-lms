@@ -29,7 +29,6 @@ module Lti
       substitutions = {
           '$Canvas.api.domain' => -> { HostUrl.context_host(@domain_root_account, request.host) },
           '$Canvas.api.baseUrl' => -> { "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"},
-          '$Canvas.xapi.url' => -> { lti_xapi_url(@tool) },
           '$Canvas.account.id' => account.id,
           '$Canvas.account.name' => account.name,
           '$Canvas.account.sisSourceId' => account.sis_source_id,
@@ -84,6 +83,14 @@ module Lti
         end
 
         substitutions.merge!( '$Canvas.masqueradingUser.id' => logged_in_user.id ) if logged_in_user != @current_user
+      end
+
+      if @current_user && @context.is_a?(Course)
+        substitutions.merge!(
+              {
+                 '$Canvas.xapi.url' => -> { lti_xapi_url(Lti::XapiService.create_token(@tool, @current_user, @context)) }
+              }
+        )
       end
 
       substitutions

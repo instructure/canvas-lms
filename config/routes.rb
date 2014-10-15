@@ -1576,7 +1576,7 @@ CanvasRails::Application.routes.draw do
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"
-    post "tools/:tool_id/xapi", controller: :lti_api, action: :xapi, as: "lti_xapi"
+    post "xapi/:token", controller: :lti_api, action: :xapi_service, as: "lti_xapi"
     post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
   end
 
