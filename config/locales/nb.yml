@@ -7436,7 +7436,7 @@ nb:
         one: "*1* diskusjon"
         other: "*%{count}* diskusjoner"
       x_new_in_peer_reviews: 
-        one: "*%{count}* Fagfellevurderinger"
+        one: "*1* Fagfellevurdering"
         other: "*%{count}* Fagfellevurderinger"
     local: Lokal
     select: 
