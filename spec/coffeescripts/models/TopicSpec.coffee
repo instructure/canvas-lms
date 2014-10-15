@@ -23,4 +23,6 @@ define [
       view: []
       new_entries: [entry]
       unread_entries: []
+      forced_entries: []
+      entry_ratings: {}
     strictEqual data.entries[0].author, participant

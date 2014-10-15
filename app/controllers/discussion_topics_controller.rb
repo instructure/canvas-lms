@@ -216,6 +216,21 @@ require 'atom'
 #           "type": "map",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
+#         },
+#         "allow_rating": {
+#           "description": "Whether or not users can rate entries in this topic.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "only_graders_can_rate": {
+#           "description": "Whether or not grade permissions are required to rate entries.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "sort_by_rating": {
+#           "description": "Whether or not entries should be sorted by rating.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -494,6 +509,12 @@ class DiscussionTopicsController < ApplicationController
             @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
+
+            api_url = lambda do |endpoint, *params|
+              endpoint = "api_v1_context_discussion_#{endpoint}_url"
+              named_context_url(@context, endpoint, @topic, *params)
+            end
+
             env_hash = {
               :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
               :TOPIC => {
@@ -503,28 +524,36 @@ class DiscussionTopicsController < ApplicationController
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
               },
               :PERMISSIONS => {
-                :CAN_REPLY        => @topic.grants_right?(@current_user, session, :reply),       # Can reply
-                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),      # Can attach files on replies
+                # Can reply
+                :CAN_REPLY        => @topic.grants_right?(@current_user, session, :reply),
+                # Can attach files on replies
+                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
+                :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
                 :CAN_READ_REPLIES => @topic.grants_right?(@current_user, :read_replies),
+                # Can moderate their own topics
                 :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                    !@topic.locked_for?(@current_user, :check_policies => true), # Can moderate their own topics
-                :MODERATE         => user_can_moderate                                           # Can moderate any topic
+                                     !@topic.locked_for?(@current_user, :check_policies => true),
+                # Can moderate any topic
+                :MODERATE         => user_can_moderate
               },
-              :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
-              :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
-              :REPLY_URL => named_context_url(@context, :api_v1_context_discussion_add_reply_url, @topic, ':entry_id'),
-              :ROOT_REPLY_URL => named_context_url(@context, :api_v1_context_discussion_add_entry_url, @topic),
-              :DELETE_URL => named_context_url(@context, :api_v1_context_discussion_delete_reply_url, @topic, ':id'),
-              :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
-              :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
-              :MARK_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_unread_url, @topic, ':id'),
-              :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
-              :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
+              :ROOT_URL => api_url.call('topic_view'),
+              :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
+              :REPLY_URL => api_url.call('add_reply', ':entry_id'),
+              :ROOT_REPLY_URL => api_url.call('add_entry'),
+              :DELETE_URL => api_url.call('delete_reply', ':id'),
+              :UPDATE_URL => api_url.call('update_reply', ':id'),
+              :MARK_READ_URL => api_url.call('topic_discussion_entry_mark_read', ':id'),
+              :MARK_UNREAD_URL => api_url.call('topic_discussion_entry_mark_unread', ':id'),
+              :RATE_URL => api_url.call('topic_discussion_entry_rate', ':id'),
+              :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
+              :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
               :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
-              :THREADED => @topic.threaded?
+              :THREADED => @topic.threaded?,
+              :ALLOW_RATING => @topic.allow_rating,
+              :SORT_BY_RATING => @topic.sort_by_rating
             }
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
@@ -686,6 +715,15 @@ class DiscussionTopicsController < ApplicationController
   #   If present, the topic will become a group discussion assigned
   #   to the group.
   #
+  # @argument allow_rating [Boolean]
+  #   If true, users will be allowed to rate entries.
+  #
+  # @argument only_graders_can_rate [Boolean]
+  #   If true, only graders will be allowed to rate entries.
+  #
+  # @argument sort_by_rating [Boolean]
+  #   If true, entries will be sorted by rating.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #         -F title='This will be positioned after Topic #1234' \
@@ -787,7 +825,8 @@ class DiscussionTopicsController < ApplicationController
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement pinned
-                                group_category_id)
+                                group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
+
   def process_discussion_topic(is_new = false)
     @errors = {}
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)

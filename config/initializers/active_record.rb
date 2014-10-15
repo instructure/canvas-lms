@@ -241,13 +241,13 @@ class ActiveRecord::Base
     self.set_serialization_options if self.respond_to?(:set_serialization_options)
 
     except = options.delete(:except) || []
-    except = Array(except)
+    except = Array(except).dup
     except.concat(self.class.serialization_excludes) if self.class.respond_to?(:serialization_excludes)
     except.concat(self.serialization_excludes) if self.respond_to?(:serialization_excludes)
     except.uniq!
 
     methods = options.delete(:methods) || []
-    methods = Array(methods)
+    methods = Array(methods).dup
     methods.concat(self.class.serialization_methods) if self.class.respond_to?(:serialization_methods)
     methods.concat(self.serialization_methods) if self.respond_to?(:serialization_methods)
     methods.uniq!

@@ -962,6 +962,8 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_unread, as: "#{context}_discussion_topic_mark_all_unread"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_read, as: "#{context}_discussion_topic_discussion_entry_mark_read"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_unread, as: "#{context}_discussion_topic_discussion_entry_mark_unread"
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/rating",
+             action: :rate_entry, as: "#{context}_discussion_topic_discussion_entry_rate"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :subscribe_topic, as: "#{context}_discussion_topic_subscribe"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :unsubscribe_topic, as: "#{context}_discussion_topic_unsubscribe"
       end

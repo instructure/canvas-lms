@@ -11,7 +11,7 @@ define [
   'compiled/arr/walk'
   'compiled/arr/erase'
   'jquery.ajaxJSON'
-], (I18n, $, {each}, Backbone, BackoffPoller, walk, erase) ->
+], (I18n, $, {each, extend, values}, Backbone, BackoffPoller, walk, erase) ->
 
   UNKNOWN_AUTHOR =
     avatar_image_url: null
@@ -26,6 +26,7 @@ define [
       new_entries: []
       unread_entries: []
       forced_entries: []
+      entry_ratings: {}
 
     url: ->
       "#{@get 'root_url'}?include_new_entries=1"
@@ -73,6 +74,7 @@ define [
       @flattenParticipants()
       walk @data.view, 'replies', @parseEntry
       each @data.new_entries, @parseNewEntry
+      walk @data.entries, 'replies', @setEntryRoot
       #@maybeRemove entry for id, entry of @flattened
       delete @lastRoot
       @data
@@ -87,42 +89,53 @@ define [
       else
         entry.author = UNKNOWN_AUTHOR
 
-    parseEntry: (entry) =>
-      @flattened[entry.id] = entry
-      parent = @flattened[entry.parent_id]
-      entry.parent = parent
+    setEntryState: (entry) =>
+      entry.parent = @flattened[entry.parent_id]
+
       entry.read_state = 'unread' if entry.id in @data.unread_entries
       entry.forced_read_state = true if entry.id in @data.forced_entries
+      entry.rating = @data.entry_ratings[entry.id]
 
       @setEntryAuthor(entry)
 
       if entry.editor_id?
         entry.editor = @participants[entry.editor_id]
 
+    parseEntry: (entry) =>
+      @setEntryState(entry)
+
+      @flattened[entry.id] = entry
+
+      unless entry.parent
+        @data.entries.push entry
+
+      entry
+
+    parseNewEntry: (entry) =>
+      @setEntryState(entry)
+
+      if oldEntry = @flattened[entry.id]
+        # entry was modified since materialized view was built
+        extend(oldEntry, entry)
+        return
+
+      @flattened[entry.id] = entry
+
+      parent = @flattened[entry.parent_id]
+      entry.parent = parent
+
+      if entry.parent
+        (entry.parent.replies ?= []).push entry
+      else
+        @data.entries.push entry
+
+    setEntryRoot: (entry) =>
       if entry.parent_id?
         entry.root_entry = @lastRoot
         # db field but api doesn't return it, no big deal to add it clientside
         entry.root_entry_id = @lastRoot.id
       else
         @lastRoot = entry
-        @data.entries.push entry
-
-      entry
-
-    parseNewEntry: (entry) =>
-      @flattened[entry.id] = entry
-      parent = @flattened[entry.parent_id]
-
-      @setEntryAuthor(entry)
-
-      if parent?
-        (parent.replies ?= []).push entry
-        entry.parent = parent
-        parent = parent.parent while parent.parent
-        entry.root_entry = parent
-        entry.root_entry_id = parent.id
-      else
-        @data.entries.push entry
 
     maybeRemove: (entry) ->
       if entry.deleted and !entry.replies

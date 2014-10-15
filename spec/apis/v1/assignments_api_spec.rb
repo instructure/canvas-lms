@@ -1998,6 +1998,9 @@ describe AssignmentsApiController, type: :request do
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,
+          'allow_rating' => nil,
+          'only_graders_can_rate' => nil,
+          'sort_by_rating' => nil,
         })
       end
 

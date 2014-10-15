@@ -12,20 +12,23 @@ define [
     # transitioning from threaded to side-comment
     parse: ->
       super
-      flat = {}
-      for id, entry of @flattened when not entry.root_entry_id
-        flat[entry.id] = entry
+
+      for entry in @data.entries
         entry.replies = []
 
       for id, entry of @flattened when entry.root_entry_id
         delete entry.replies
-        parent = flat[entry.root_entry_id]
+        parent = @flattened[entry.root_entry_id]
         parent.replies.push entry
         entry.parent = parent
         entry.parent_id = parent.id
 
-      @data.entries = for id, entry of flat
+      for entry in @data.entries
         entry.replies.sort (a, b) ->
           Date.parse(b.created_at) - Date.parse(a.created_at)
-        entry
+
+        if ENV.DISCUSSION.SORT_BY_RATING
+          entry.replies.sort (a, b) ->
+            (a.rating_sum || 0) - (b.rating_sum || 0)
+
       @data

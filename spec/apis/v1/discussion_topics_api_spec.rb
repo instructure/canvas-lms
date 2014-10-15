@@ -301,6 +301,9 @@ describe DiscussionTopicsController, type: :request do
                   "permissions" => { "delete"=>true, "attach"=>true, "update"=>true },
                   "group_category_id" => nil,
                   "can_group" => true,
+                  "allow_rating" => nil,
+                  "only_graders_can_rate" => nil,
+                  "sort_by_rating" => nil,
       }
     end
 
@@ -1126,6 +1129,9 @@ describe DiscussionTopicsController, type: :request do
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
       "can_group" => true,
+      "allow_rating" => nil,
+      "only_graders_can_rate" => nil,
+      "sort_by_rating" => nil,
     }
     expect(json).to eq expected
   end
@@ -1254,6 +1260,8 @@ describe DiscussionTopicsController, type: :request do
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
         "updated_at" => @entry.updated_at.as_json,
+        "rating_sum" => nil,
+        "rating_count" => nil,
       })
     end
 
@@ -1918,6 +1926,28 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  context "rating" do
+    before(:once) do
+      @topic = create_topic(@course, title: "topic", message: "topic", allow_rating: true)
+      @entry = create_entry(@topic, message: "top-level entry")
+      @reply = create_reply(@entry, message: "first reply")
+    end
+
+    def call_rate_entry(course, topic, entry, rating)
+      raw_api_call(:post,
+                   "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/rating.json",
+                   { controller: 'discussion_topics_api', action: 'rate_entry', format: 'json',
+                     course_id: course.id.to_s, topic_id: topic.id.to_s, entry_id: entry.id.to_s, rating: rating })
+    end
+
+    it "should rate an entry" do
+      student_in_course(active_all: true)
+      call_rate_entry(@course, @topic, @entry, 1)
+      assert_status(204)
+      expect(@entry.rating(@user)).to eq 1
+    end
+  end
+
   context "subscribing" do
     before :once do
       student_in_course(:active_all => true)
@@ -2266,6 +2296,8 @@ describe DiscussionTopicsController, type: :request do
           'message' => 'root1',
           'created_at' => @root1.created_at.as_json,
           'updated_at' => @root1.updated_at.as_json,
+          'rating_sum' => nil,
+          'rating_count' => nil,
         ]
 
         # it's important that these are returned in created_at order
@@ -2277,6 +2309,8 @@ describe DiscussionTopicsController, type: :request do
             'message' => 'reply1',
             'parent_id' => @root1.id,
             'user_id' => @teacher.id,
+            'rating_sum' => nil,
+            'rating_count' => nil,
           },
           {
             'id' => @reply2.id,
@@ -2285,6 +2319,8 @@ describe DiscussionTopicsController, type: :request do
             'message' => 'reply2',
             'parent_id' => @root1.id,
             'user_id' => @teacher.id,
+            'rating_sum' => nil,
+            'rating_count' => nil,
           },
         ]
       ensure

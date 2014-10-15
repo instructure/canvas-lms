@@ -24,12 +24,14 @@ module Api::V1::DiscussionTopics
   include Api::V1::Assignment
 
   # Public: DiscussionTopic fields to serialize.
-  ALLOWED_TOPIC_FIELDS  = %w{id title assignment_id delayed_post_at lock_at
+  ALLOWED_TOPIC_FIELDS  = %w{
+    id title assignment_id delayed_post_at lock_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
-    discussion_type position}
+    discussion_type position allow_rating only_graders_can_rate sort_by_rating
+  }.freeze
 
   # Public: DiscussionTopic methods to serialize.
-  ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count]
+  ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count].freeze
 
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
   #
@@ -141,7 +143,7 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_entry(entry, user, context, session, includes)
-    allowed_fields  = %w{id created_at updated_at parent_id}
+    allowed_fields  = %w{id created_at updated_at parent_id rating_count rating_sum}
     allowed_methods = []
     allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
     allowed_fields << 'user_id'   if !entry.deleted?

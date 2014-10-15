@@ -135,6 +135,31 @@
           {{#t "use_for_grading"}}Graded{{/t}}
         </label>
       {{/if}}
+
+      <label class="checkbox" for="allow_rating">
+        {{checkbox "allow_rating"
+          id="allow_rating"
+          class="element_toggler"
+          checked=allow_rating
+          aria-controls="rating_settings_container"}}
+        {{#t "allow_liking"}}Allow liking{{/t}}
+      </label>
+      <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
+        <label class="checkbox" for="only_graders_can_rate">
+          {{checkbox "only_graders_can_rate"
+            id="only_graders_can_rate"
+            class="element_toggler"
+            checked=only_graders_can_rate}}
+          {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+        </label>
+        <label class="checkbox" for="sort_by_rating">
+          {{checkbox "sort_by_rating"
+            id="sort_by_rating"
+            class="element_toggler"
+            checked=sort_by_rating}}
+          {{#t "sort_by_likes"}}Sort by likes{{/t}}
+        </label>
+      </div>
     </div>
   </div>
   {{/ifAny}}

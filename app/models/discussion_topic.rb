@@ -30,10 +30,12 @@ class DiscussionTopic < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
 
-  attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
+  attr_accessible(
+    :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
-    :group_category
+    :group_category, :allow_rating, :only_graders_can_rate, :sort_by_rating
+  )
   attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
@@ -46,6 +48,8 @@ class DiscussionTopic < ActiveRecord::Base
   attr_readonly :context_id, :context_type, :user_id
 
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
+  has_many :rated_discussion_entries, :class_name => 'DiscussionEntry', :order =>
+    ['COALESCE(parent_id, 0)', 'COALESCE(rating_sum, 0) DESC', :created_at]
   has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
@@ -87,6 +91,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :update_subtopics
   after_save :touch_context
   after_save :schedule_delayed_transitions
+  after_save :update_materialized_view_if_changed
   after_update :clear_streams_if_not_published
   after_create :create_participant
   after_create :create_materialized_view
@@ -141,6 +146,12 @@ class DiscussionTopic < ActiveRecord::Base
     true
   end
 
+  def update_materialized_view_if_changed
+    if self.sort_by_rating_changed?
+      update_materialized_view
+    end
+  end
+
   def schedule_delayed_transitions
     self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
     self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
@@ -174,6 +185,9 @@ class DiscussionTopic < ActiveRecord::Base
           topic.user_id = self.user_id
           topic.discussion_type = self.discussion_type
           topic.workflow_state = self.workflow_state
+          topic.allow_rating = self.allow_rating
+          topic.only_graders_can_rate = self.only_graders_can_rate
+          topic.sort_by_rating = self.sort_by_rating
           topic.save if topic.changed?
           topic
         end
@@ -812,6 +826,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read) }
     can :read
+
+    given do |user, session|
+      self.allow_rating && (!self.only_graders_can_rate ||
+                            self.context.grants_right?(user, session, :manage_grades))
+    end
+    can :rate
   end
 
   def self.context_allows_user_to_create?(context, user, session)
