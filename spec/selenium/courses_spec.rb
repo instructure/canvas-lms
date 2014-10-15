@@ -131,31 +131,29 @@ describe "courses" do
       get "/courses/#{@course.id}/details"
       f("#ui-id-1").click
       form = f("#course_form")
-      expect(f("#course_form .edit_course_link")).to be_displayed
-      form.find_element(:css, ".edit_course_link").click
-      wait_for_ajaximations
+      expect(form).to be_displayed
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
-      form = f("#course_form")
-      expect(form.find_element(:css, ".course_info.storage_quota_mb").text).to eq "10"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
 
       # then try just saving it (without resetting it)
       get "/courses/#{@course.id}/details"
       form = f("#course_form")
-      expect(form.find_element(:css, ".course_info.storage_quota_mb").text).to eq "10"
-      form.find_element(:css, ".edit_course_link").click
-      wait_for_ajaximations
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
-      expect(form.find_element(:css, ".course_info.storage_quota_mb").text).to eq "10"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
 
       # then make sure it's right after a reload
       get "/courses/#{@course.id}/details"
-      form = f("#course_form")
-      expect(form.find_element(:css, ".course_info.storage_quota_mb").text).to eq "10"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
       @course.reload
       expect(@course.storage_quota).to eq 10.megabytes
     end

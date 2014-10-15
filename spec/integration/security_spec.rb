@@ -777,7 +777,7 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
         html = Nokogiri::HTML(response.body)
-        expect(html.css('.edit_course_link')).not_to be_empty
+        expect(html.css('#course_form')).not_to be_empty
         expect(html.css('#tab-navigation')).not_to be_empty
       end
 
@@ -974,8 +974,8 @@ describe "security" do
         expect(response.body).to match /Export Course Content/
         expect(response.body).not_to match /Delete this Course/
         expect(response.body).not_to match /End this Course/
-        expect(html.css('#course_account_id')).to be_empty
-        expect(html.css('#course_enrollment_term_id')).to be_empty
+        expect(html.css('input#course_account_id')).to be_empty
+        expect(html.css('input#course_enrollment_term_id')).to be_empty
 
         delete "/courses/#{@course.id}"
         assert_status(401)

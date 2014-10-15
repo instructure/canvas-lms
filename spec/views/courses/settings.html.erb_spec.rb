@@ -36,7 +36,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      expect(response).to have_tag("span.sis_source_id", @course.sis_source_id)
+      expect(response).to have_tag("span#course_sis_source_id", @course.sis_source_id)
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
 

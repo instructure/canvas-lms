@@ -266,16 +266,6 @@ define([
         handleFragmentType("TeacherEnrollment");
       }
     });
-    $(".edit_course_link").click(function(event) {
-      event.preventDefault();
-      $("#course_form").addClass('editing').find(":text:first").focus().select();
-      $("#course_account_id_lookup").autocomplete({
-        source: $("#course_account_id_url").attr('href'),
-        select: function(event, ui){
-          $("#course_account_id").val(ui.item.id);
-        }
-      });
-    });
     $(".move_course_link").click(function(event) {
       event.preventDefault();
       $("#move_course_dialog").dialog({
@@ -307,7 +297,7 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
-        $(this).loadingImage().removeClass('editing');
+        $(this).loadingImage();
         $(this).find(".readable_license,.account_name,.term_name,.grading_scheme_set").text("...");
         $(this).find(".storage_quota_mb").text(data['course[storage_quota_mb]']);
         $(".course_form_more_options").hide();
@@ -341,11 +331,6 @@ define([
         $(this).formErrors(data);
       }
     })
-    .find(".cancel_button")
-      .click(function() {
-        $course_form.removeClass('editing');
-        $(".course_form_more_options").hide();
-      }).end()
     .find(":text:not(.date_entry)").keycodes('esc', function() {
       $course_form.find(".cancel_button:first").click();
     });

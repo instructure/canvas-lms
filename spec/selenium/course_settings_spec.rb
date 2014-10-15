@@ -19,8 +19,6 @@ describe "course settings" do
       grading_standard_for context
       get "/courses/#{@course.id}/settings"
 
-      f('.edit_course_link').click
-      wait_for_ajaximations
       f('.grading_standard_checkbox').click unless is_checked('.grading_standard_checkbox')
       f('.edit_letter_grades_link').click
       f('.find_grading_standard_link').click
@@ -32,7 +30,8 @@ describe "course settings" do
       submit_form('#course_form')
       wait_for_ajaximations
 
-      expect(f('.grading_scheme_set')).to include_text @standard.title
+      @course.reload
+      expect(@course.grading_standard).to eq(@standard)
     end
 
     it 'should show the correct course status when published' do
@@ -63,12 +62,11 @@ describe "course settings" do
       test_select_standard_for @course.root_account
     end
 
-    it "should toggle more options correclty" do
+    it "should toggle more options correctly" do
       more_options_text = 'more options'
       fewer_options_text = 'fewer options'
       get "/courses/#{@course.id}/settings"
 
-      f('.edit_course_link').click
       more_options_link = f('.course_form_more_options_link')
       expect(more_options_link.text).to eq more_options_text
       more_options_link.click
@@ -87,8 +85,6 @@ describe "course settings" do
       a.settings[:self_enrollment] = 'manually_created'
       a.save!
       get "/courses/#{@course.id}/settings"
-      f('.edit_course_link').click
-      wait_for_ajaximations
       f('.course_form_more_options_link').click
       wait_for_ajaximations
       f('#course_self_enrollment').click
@@ -114,7 +110,6 @@ describe "course settings" do
 
       get "/courses/#{@course.id}/settings"
 
-      f('.edit_course_link').click
       course_form = f('#course_form')
       name_input = course_form.find_element(:id, 'course_name')
       replace_content(name_input, course_name)
@@ -128,10 +123,11 @@ describe "course settings" do
       submit_form(course_form)
       wait_for_ajaximations
 
-      expect(f('.course_info')).to include_text(course_name)
-      expect(f('.course_code')).to include_text(course_code)
-      expect(f('span.locale')).to include_text(locale_text)
-      expect(f('span.time_zone')).to include_text(time_zone_value)
+      @course.reload
+      expect(@course.name).to eq course_name
+      expect(@course.course_code).to eq course_code
+      expect(@course.locale).to eq 'en'
+      expect(@course.time_zone.name).to eq time_zone_value
     end
 
     it "should add a section" do
