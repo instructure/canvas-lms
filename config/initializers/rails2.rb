@@ -124,7 +124,7 @@ ActiveRecord::NamedScope::Scope.class_eval do
     super || klass >= Array
   end
 
-  #remove_method :respond_to_missing?
+  remove_method :respond_to_missing?
 #  def respond_to_missing?(method, include_super)
 #    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
 #    super || @proxy_scope.respond_to_missing?(method, include_super)
