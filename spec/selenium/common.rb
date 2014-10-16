@@ -209,7 +209,16 @@ module SeleniumTestsHelperMethods
     end
   end
 
-# short for find with jquery
+  # short for find with link
+  def fln(link_text, scope = nil)
+    begin
+      (scope || driver).find_element :link, link_text
+    rescue
+      nil
+    end
+  end
+
+  # short for find with jquery
   def fj(selector, scope = nil)
     begin
       find_with_jquery selector, scope
