@@ -171,6 +171,7 @@ describe Attachment do
         canvadocable = canvadocable_attachment_model content_type: "application/blah"
 
         crocodocable.submit_to_canvadocs 1, wants_annotation: true
+        run_jobs
         expect(crocodocable.canvadoc).to be_nil
         expect(crocodocable.crocodoc_document).not_to be_nil
 

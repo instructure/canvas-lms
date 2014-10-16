@@ -1217,7 +1217,13 @@ class Attachment < ActiveRecord::Base
     return if Attachment.skip_3rd_party_submits?
 
     if opts[:wants_annotation] && crocodocable?
-      submit_to_crocodoc(attempt)
+      # get crocodoc off the canvadocs strand
+      # (maybe :wants_annotation was a dumb idea)
+      send_later_enqueue_args :submit_to_crocodoc, {
+        n_strand: 'crocodoc',
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY,
+      }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
       doc.upload
