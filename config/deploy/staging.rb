@@ -8,6 +8,8 @@ role :app, %w{deploy@stagingportal.beyondz.org}
 role :web, %w{deploy@stagingportal.beyondz.org}
 role :db,  %w{deploy@stagingportal.beyondz.org}
 
+set :branch, 'bz-staging'
+
 
 # Extended Server Syntax
 # ======================

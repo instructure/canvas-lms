@@ -38,11 +38,20 @@ set :branch, 'bz-stable'
 
 namespace :deploy do
 
+  desc 'Update application code'
+  task :update do
+    on roles(:app) do |host|
+      within "/var/www/canvas" do
+        execute :git, 'pull', 'origin', fetch(:branch)
+        execute :sudo, 'apachectl', 'graceful'
+      end
+    end
+  end
+
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
-      # Your restart mechanism here, for example:
-      # execute :touch, release_path.join('tmp/restart.txt')
+      execute :sudo, 'apachectl', 'graceful'
     end
   end
 
@@ -56,5 +65,4 @@ namespace :deploy do
       # end
     end
   end
-
 end
