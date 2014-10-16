@@ -517,6 +517,22 @@ ul.group_list
   :padding-left 10px
   :margin-bottom 20px
 
+$wizard-icon-size: 120px
+$wizard-bg-color: $canvas-secondary
+$wizard-highlight-color: $canvas-primary
+
+@keyframes icon-slide-down
+  from
+    transform: scale(0.7)
+  to
+    transform: scale(1)
+
+@keyframes icon-slide-up
+  from
+    transform: translate3d(0,48px,0)
+  to
+    transform: translate3d(0,0,0)
+
 #wizard_box
   :border-bottom 1px solid #aaa
   :z-index 111
@@ -601,6 +617,234 @@ ul.group_list
             :line-height 16px
             :vertical-align text-top
             :color #555
+
+  &.wizard-box--course
+    transition: background 0.3s
+    height: 100%
+    border: none
+    background-size: cover
+
+    @if $use_high_contrast
+      background: rgba(darken($wizard-bg-color, 22%), 0.95)
+    @else
+      background: url("/images/wizard-bg.jpg") no-repeat center center $wizard-bg-color
+    
+    *
+      box-sizing: border-box
+
+    h3
+      padding: 0
+      margin: 0
+      border-bottom-color: rgba($canvas-light, 0.15)
+      font-weight: bold
+
+    .wizard-box__feature-icon
+      
+      display: none
+      
+
+      @include breakpoint(desktop)
+        display: block
+        text-align: center
+        margin: 0
+        margin: -($can-sp*6) 0 $can-sp*2
+        transform: translate3d(0,0,0) scale(0.7)
+        transform-origin: center top
+        animation-duration: 0.5s
+        animation-name: icon-slide-down
+        animation-timing-function: $can-transition
+        animation-fill-mode: forwards
+
+      i[class^=icon-]
+        width: ($wizard-icon-size + $can-sp*4)/2
+        height: ($wizard-icon-size + $can-sp*4)/2
+        background: $canvas-secondary
+        border-radius: 100%
+        font-size: $wizard-icon-size/2
+        &:before
+          font-size: ($wizard-icon-size - $can-sp)/2
+          color: $canvas-light
+          line-height: ($wizard-icon-size + $can-sp*4)/2
+        @include breakpoint(desktop)
+          width: $wizard-icon-size + $can-sp*4
+          height: $wizard-icon-size + $can-sp*4
+          font-size: $wizard-icon-size
+          &:before
+            font-size: $wizard-icon-size - $can-sp
+            line-height: $wizard-icon-size + $can-sp*4
+
+
+    .wizard-box__container
+      height: 100%
+      display: flex
+      flex-direction: column
+      @if $use_high_contrast == false
+        background: linear-gradient(to bottom, rgba($wizard-bg-color,0.75) 0%,rgba(0,0,0,0) 100%)
+
+    .wizard-box__columns
+      display: flex
+      flex-direction: column-reverse
+      flex: 1
+      @include breakpoint(desktop)
+        flex-direction: row
+
+    .wizard-box__close-wizard
+      width: 100%
+
+    .wizard-box__logo
+      padding: $can-sp
+      flex: 0 0 34%
+      @include breakpoint(desktop)
+        flex: 0 0 $can-sp*10
+        padding: $can-sp*2
+      
+      .svg-canvas-logo
+        display: block
+        width: $can-sp*10
+        @include breakpoint(desktop)
+          width: $can-sp*12
+      
+    .wizard_content
+      background: transparent
+      color: $canvas-light
+      padding: 0
+      border: none
+      box-shadow: none
+      height: 100%
+
+      .links
+        display: none
+
+      .wizard_options,
+      .wizard_details
+        float: none
+        width: auto !important
+        height: auto !important
+
+      .wizard_options
+        padding: 0
+        display: flex
+        
+        @if $use_high_contrast
+          background: rgba(black, 0.2)
+        @else
+          background: rgba(desaturate(darken($wizard-bg-color, 11), 2), 0.9)
+        @include breakpoint(desktop)
+          flex-direction: column
+          flex: 0 0 30% 
+
+      .wizard_options_list
+        margin: 0
+        padding: $can-sp
+        flex: 1
+        display: flex
+        flex-direction: column
+        @include breakpoint(desktop)
+          padding: 0
+        .option
+          flex: 1
+          display: flex
+          flex-direction: column
+          align-items: center
+          border-radius: 0
+          font-weight: normal
+          @include breakpoint(desktop)
+            font-size: 15px
+          &.selected
+            background: rgba($canvas-light, 0.1)
+            a.header
+              border-left-color: $canvas-primary
+          &.completed
+            a.header
+              background-image: url("/images/wizard-todo-checked.svg")
+
+          a.header
+            flex: 1
+            display: flex
+            width: 100%
+            align-items: center
+            padding: 8px $can-sp*3 8px $can-sp*3
+            color: $canvas-light
+            text-decoration: none
+            background: url("/images/wizard-todo-unchecked.svg") no-repeat $can-sp 50%
+            background-size: 16px 16px
+            line-height: 1.2
+            border-left: $can-sp/3 solid transparent
+            @include breakpoint(desktop)
+              background-position: $can-sp*2 50%
+              background-size: $can-sp*2 $can-sp*2
+              padding-left: $can-sp*5
+            
+      .wizard_details__layout
+        flex: 2
+        display: flex
+        flex-direction: column
+        align-items: center
+        position: relative
+        @include breakpoint(desktop)
+          align-items: center
+
+      h3.wizard_details__headline
+        font-size: $can-sp*3
+        line-height: 1
+        color: rgba($canvas-light, 0.95)
+        border-bottom: none
+        flex: 0.75
+        align-self: center
+        text-align: center
+        @include breakpoint(mini-tablet)
+          font-size: $can-sp*5
+          letter-spacing: -1px
+          flex: 1
+        @include breakpoint(desktop)
+          font-size: $can-sp*7
+          display: flex
+          width: 100%
+          justify-content: center
+          align-self: auto
+
+      .wizard_details__calltoaction
+        margin-top: $can-sp*2
+
+      .wizard_details__container
+        flex: 3
+        @include breakpoint(desktop)
+          flex: 2
+
+      .wizard_details
+        margin: 0
+        max-height: none !important
+        border: none
+        border-radius: 0
+        text-align: center
+        background: rgba($canvas-light, 0.85)
+        padding: $can-sp*2
+        overflow: visible !important
+        animation-duration: 0.5s
+        animation-name: icon-slide-up
+        animation-timing-function: $can-transition
+        @if $use_high_contrast
+          background: $canvas-light
+          color: desaturate(darken($wizard-bg-color, 25), 2)
+        @else
+          background: rgba($canvas-light, 0.85)
+          color: desaturate(darken($wizard-bg-color, 20), 2)
+        @include breakpoint(tablet)
+          max-width: 600px
+          border-radius: $can-sp/2
+          padding: $can-sp*3
+
+        p
+          line-height: 1.5
+          @include breakpoint(desktop)
+            font-size: 15px
+          &:last-of-type
+            margin-bottom: 0
+
+        a.link
+          padding: $can-sp $can-sp*2
+          background-image: none
+          
 
 #content_tags_dialog
   h3, .h3

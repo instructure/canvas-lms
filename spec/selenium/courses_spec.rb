@@ -83,7 +83,7 @@ describe "courses" do
 
       wizard_box = f("#wizard_box")
       keep_trying_until { expect(wizard_box).to be_displayed }
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
@@ -109,7 +109,7 @@ describe "courses" do
 
       wait_for_ajaximations
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
       wait_for_ajaximations
       expect(wizard_box).not_to be_displayed
       checklist_button = f('.wizard_popup_link')
@@ -118,7 +118,7 @@ describe "courses" do
       wait_for_ajaximations
       expect(checklist_button).not_to be_displayed
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
       wait_for_ajaximations
       expect(wizard_box).not_to be_displayed
       expect(checklist_button).to be_displayed

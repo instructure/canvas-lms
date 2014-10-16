@@ -1,0 +1,237 @@
+/*
+@styleguide Expanding Message Link
+
+A right- or left-aligned link that expands on hover or
+focus to reveal a prompt. Useful for close buttons or
+navigations.
+
+The Expanding Message Link can be expanded via javascript
+by adding the **.ic-Expand-link--active** class to the
+**.ic-Expand-link** element.
+
+```html
+<div class="content-box">
+  <div class="grid-row">
+      <div class="col-xs-6">
+        
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-hamburger ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am the default</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+      
+      <div class="col-xs-6">
+
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link ic-Expand-link--from-right ic-Expand-link--active">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-x ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am aligned right / active</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+  </div>
+</div>
+
+<div class="content-box">
+  <div class="grid-row">
+      <div class="col-xs-6">
+        
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link ic-Expand-link--Primary">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-settings ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am branded w $canvas-primary</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+      
+      <div class="col-xs-6">
+
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link ic-Expand-link--from-right ic-Expand-link--Success">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-check ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am branded w $canvas-success</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+  </div>
+</div>
+
+<div class="content-box">
+  <div class="grid-row">
+      <div class="col-xs-6">
+        
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link ic-Expand-link--Danger">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-warning ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am branded w $canvas-danger</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+      
+      <div class="col-xs-6" style="background: url(http:&#47;&#47;placekitten.com&#47;500&#47;300) no-repeat #333; padding-bottom: 12px;">
+
+        <!-- Begin ic-Expand-link markup!! -->
+        <div class="ic-Expand-link ic-Expand-link--from-right ic-Expand-link--Light">
+          <a href="#" class="close_wizard_link ic-Expand-link__trigger">
+            <div class="ic-Expand-link__layout">
+              <i class="icon-x ic-Expand-link__icon"></i>
+              <span class="ic-Expand-link__text">I am on a dark background</span>
+            </div>
+          </a>
+        </div>
+        <!-- End ic-Expand-link markup!! -->
+
+      </div>
+  </div>
+</div>
+
+
+```
+*/
+
+$ic-Expand-link-size: $can-sp*4;
+
+@mixin ic-Expand-link-branding(
+  $bg-color: rgba($canvas-dark, 0.8), 
+  $bg-color-hover: $canvas-dark, 
+  $text-color: $canvas-light) {
+
+  .ic-Expand-link__trigger {
+    .ic-Expand-link__layout {
+      background: $bg-color;
+      color: $text-color; 
+    }
+    &:hover, &:focus {
+      text-decoration: none;
+      .ic-Expand-link__layout { background: $bg-color-hover; }
+    }  
+  }
+
+  &.ic-Expand-link--from-right {
+    .ic-Expand-link__trigger {
+      &:hover, &:focus { background: $bg-color-hover; }
+    }  
+  }
+
+}
+
+@mixin ic-Expand-link-active-state {
+  transform: translateX(0);
+  .ic-Expand-link__icon { background: rgba(black, 0.15); }   
+}
+
+.ic-Expand-link {
+  * { box-sizing: border-box; }
+      
+  display: flex;
+  overflow: hidden;
+
+  .ic-Expand-link__trigger {
+    transition: all 1s $can-transition;
+    transform: translateX(-100%) translateX($ic-Expand-link-size);
+    text-transform: uppercase;
+    overflow: hidden;
+
+    // HACK because IE10 can't get the transforms right. Once we stop supporting IE10, we can remove this
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      transform: translateX(0);
+    }
+
+    &:hover, &:focus { @include ic-Expand-link-active-state; }
+
+  }
+
+  .ic-Expand-link__layout {
+    position: relative;
+    display: flex;
+    padding: 0 $ic-Expand-link-size 0 0;
+    min-height: $ic-Expand-link-size;
+  }
+        
+  .ic-Expand-link__text {
+    display: flex;
+    align-items: center;
+    padding: $can-sp;
+    line-height: 1.1;
+    min-height: $ic-Expand-link-size;
+  }
+
+  .ic-Expand-link__icon {
+    transition: all 0.3s;
+    width: $ic-Expand-link-size;
+    height: $ic-Expand-link-size;
+    line-height: 1;
+    position: absolute;
+    top: 0; right: 0;
+    text-align: center;
+    &:before {
+      top: $can-sp/2;
+      font-size: $ic-Expand-link-size - $can-sp;
+    }
+  }
+
+  // Adding active class in case the link ever needs to be activated via script
+  &.ic-Expand-link--active {
+    .ic-Expand-link__trigger { @include ic-Expand-link-active-state; }
+  }
+
+  &.ic-Expand-link--from-right {
+    justify-content: flex-end;
+    
+    .ic-Expand-link__trigger {
+      transform: translateX(100%) translateX( -($ic-Expand-link-size) );
+      
+      // HACK because IE10 can't get the transforms right. Once we stop supporting IE10, we can remove this
+      @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+        transform: translateX(0);
+      }
+  
+      &:hover, &:focus { @include ic-Expand-link-active-state; }
+    }
+    
+    .ic-Expand-link__layout { padding: 0 0 0 $ic-Expand-link-size; }
+    .ic-Expand-link__icon { right: auto; left: 0; }
+
+    &.ic-Expand-link--active {
+      .ic-Expand-link__trigger { @include ic-Expand-link-active-state; }
+    }
+      
+  }
+
+  // Branding -- call the mixin with just defaults to establish basic branding
+  @include ic-Expand-link-branding;
+
+  &.ic-Expand-link--Primary { @include ic-Expand-link-branding(rgba($canvas-primary, 0.8),$canvas-primary,$canvas-light); }
+  &.ic-Expand-link--Secondary { @include ic-Expand-link-branding(rgba($canvas-secondary, 0.8),$canvas-secondary,$canvas-light); }
+  &.ic-Expand-link--Success { @include ic-Expand-link-branding(rgba($canvas-success, 0.8),$canvas-success,$canvas-light); }
+  &.ic-Expand-link--Danger { @include ic-Expand-link-branding(rgba($canvas-danger, 0.8),$canvas-danger,$canvas-light); }
+  &.ic-Expand-link--Light { @include ic-Expand-link-branding(rgba($canvas-light, 0.8),$canvas-light,$canvas-dark); }
+
+}
