@@ -101,4 +101,11 @@ describe LtiApiController, type: :request do
 
     after { Setting.set 'enable_page_views', 'false' }
   end
+
+  it "should handle requests without durations" do
+    body = xapi_body
+    body.delete(:result)
+    make_call('body' => body)
+    expect(response).to be_success
+  end
 end

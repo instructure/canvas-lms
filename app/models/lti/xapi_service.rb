@@ -36,10 +36,13 @@ module Lti
       course = token.course
       user = token.user
       tool = token.tool
-      duration = params[:result]['duration']
-      seconds = Duration.new(duration).to_i
+      duration = params[:result] ? params[:result]['duration'] : nil
+      seconds = duration ? Duration.new(duration).to_i : nil
 
-      course.enrollments.where(:user_id => user).update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
+      if duration
+        course.enrollments.where(:user_id => user).
+          update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
+      end
 
       access = AssetUserAccess.where(user_id: user, asset_code: tool.asset_string).first_or_initialize
       access.log(course, group_code: "external_tools", category: "external_tools")

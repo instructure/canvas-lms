@@ -77,8 +77,8 @@ class LtiApiController < ApplicationController
   #   }
   # }
   #
-  # * result.duration must be an ISO 8601 duration
   # * object.id will be logged as url
+  # * result.duration must be an ISO 8601 duration if supplied
   def xapi_service
     token = Lti::XapiService::Token.parse_and_validate(params[:token])
     verify_oauth(token.tool)
