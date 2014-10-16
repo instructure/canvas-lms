@@ -23,9 +23,9 @@ describe 'Delayed::Backed::ActiveRecord::Job' do
     Delayed::Job::Failed.stubs(:create).raises(RuntimeError)
     job = "test".send_later_enqueue_args :reverse, no_delay: true
     job_id = job.id
-    proc { job.fail! }.should raise_error
-    proc { Delayed::Job.find(job_id) }.should raise_error(ActiveRecord::RecordNotFound)
-    Delayed::Job.count.should == 0
+    expect { job.fail! }.to raise_error
+    expect { Delayed::Job.find(job_id) }.to raise_error(ActiveRecord::RecordNotFound)
+    expect(Delayed::Job.count).to eq 0
   end
 
   context "when another worker has worked on a task since the job was found to be available, it" do
@@ -36,12 +36,12 @@ describe 'Delayed::Backed::ActiveRecord::Job' do
 
     it "should not allow a second worker to get exclusive access if already successfully processed by worker1" do
       @job.destroy
-      @job_copy_for_worker_2.lock_exclusively!('worker2').should == false
+      expect(@job_copy_for_worker_2.lock_exclusively!('worker2')).to eq false
     end
 
     it "should not allow a second worker to get exclusive access if failed to be processed by worker1 and run_at time is now in future (due to backing off behaviour)" do
       @job.update_attributes(:attempts => 1, :run_at => 1.day.from_now)
-      @job_copy_for_worker_2.lock_exclusively!('worker2').should == false
+      expect(@job_copy_for_worker_2.lock_exclusively!('worker2')).to eq false
     end
 
     it "should select the next job at random if enabled" do
@@ -55,7 +55,7 @@ describe 'Delayed::Backed::ActiveRecord::Job' do
           job.unlock
           job.save!
         end
-        founds.uniq.size.should > 1
+        expect(founds.uniq.size).to be > 1
       ensure
         Delayed::Job.select_random = false
       end

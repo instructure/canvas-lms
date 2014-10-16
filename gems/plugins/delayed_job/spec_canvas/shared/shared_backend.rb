@@ -8,96 +8,96 @@ shared_examples_for 'a backend' do
   end
 
   it "should set run_at automatically if not set" do
-    Delayed::Job.create(:payload_object => ErrorJob.new).run_at.should_not be_nil
+    expect(Delayed::Job.create(:payload_object => ErrorJob.new).run_at).not_to be_nil
   end
 
   it "should not set run_at automatically if already set" do
     later = Delayed::Job.db_time_now + 5.minutes
-    Delayed::Job.create(:payload_object => ErrorJob.new, :run_at => later).run_at.should be_within(1).of(later)
+    expect(Delayed::Job.create(:payload_object => ErrorJob.new, :run_at => later).run_at).to be_within(1).of(later)
   end
 
   it "should raise ArgumentError when handler doesn't respond_to :perform" do
-    lambda { Delayed::Job.enqueue(Object.new) }.should raise_error(ArgumentError)
+    expect { Delayed::Job.enqueue(Object.new) }.to raise_error(ArgumentError)
   end
 
   it "should increase count after enqueuing items" do
     Delayed::Job.enqueue SimpleJob.new
-    Delayed::Job.jobs_count(:current).should == 1
+    expect(Delayed::Job.jobs_count(:current)).to eq 1
   end
 
   it "should be able to set priority when enqueuing items" do
     @job = Delayed::Job.enqueue SimpleJob.new, :priority => 5
-    @job.priority.should == 5
+    expect(@job.priority).to eq 5
   end
 
   it "should use the default priority when enqueuing items" do
     Delayed::Job.default_priority = 0
     @job = Delayed::Job.enqueue SimpleJob.new
-    @job.priority.should == 0
+    expect(@job.priority).to eq 0
     Delayed::Job.default_priority = 10
     @job = Delayed::Job.enqueue SimpleJob.new
-    @job.priority.should == 10
+    expect(@job.priority).to eq 10
     Delayed::Job.default_priority = 0
   end
 
   it "should be able to set run_at when enqueuing items" do
     later = Delayed::Job.db_time_now + 5.minutes
     @job = Delayed::Job.enqueue SimpleJob.new, :priority => 5, :run_at => later
-    @job.run_at.should be_within(1).of(later)
+    expect(@job.run_at).to be_within(1).of(later)
   end
 
   it "should work with jobs in modules" do
     M::ModuleJob.runs = 0
     job = Delayed::Job.enqueue M::ModuleJob.new
-    lambda { job.invoke_job }.should change { M::ModuleJob.runs }.from(0).to(1)
+    expect { job.invoke_job }.to change { M::ModuleJob.runs }.from(0).to(1)
   end
 
   it "should raise an DeserializationError when the job class is totally unknown" do
     job = Delayed::Job.new :handler => "--- !ruby/object:JobThatDoesNotExist {}"
-    lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
+    expect { job.payload_object.perform }.to raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should try to load the class when it is unknown at the time of the deserialization" do
     job = Delayed::Job.new :handler => "--- !ruby/object:JobThatDoesNotExist {}"
-    lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
+    expect { job.payload_object.perform }.to raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should try include the namespace when loading unknown objects" do
     job = Delayed::Job.new :handler => "--- !ruby/object:Delayed::JobThatDoesNotExist {}"
-    lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
+    expect { job.payload_object.perform }.to raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should also try to load structs when they are unknown (raises TypeError)" do
     job = Delayed::Job.new :handler => "--- !ruby/struct:JobThatDoesNotExist {}"
-    lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
+    expect { job.payload_object.perform }.to raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should try include the namespace when loading unknown structs" do
     job = Delayed::Job.new :handler => "--- !ruby/struct:Delayed::JobThatDoesNotExist {}"
-    lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
+    expect { job.payload_object.perform }.to raise_error(Delayed::Backend::DeserializationError)
   end
   
   describe "find_available" do
     it "should not find failed jobs" do
       @job = create_job :attempts => 50
       @job.fail!
-      Delayed::Job.find_available(5).should_not include(@job)
+      expect(Delayed::Job.find_available(5)).not_to include(@job)
     end
     
     it "should not find jobs scheduled for the future" do
       @job = create_job :run_at => (Delayed::Job.db_time_now + 1.minute)
-      Delayed::Job.find_available(5).should_not include(@job)
+      expect(Delayed::Job.find_available(5)).not_to include(@job)
     end
 
     it "should not find jobs locked by another worker" do
       @job = create_job
-      Delayed::Job.get_and_lock_next_available('other_worker').should == @job
-      Delayed::Job.find_available(5).should_not include(@job)
+      expect(Delayed::Job.get_and_lock_next_available('other_worker')).to eq @job
+      expect(Delayed::Job.find_available(5)).not_to include(@job)
     end
     
     it "should find open jobs" do
       @job = create_job
-      Delayed::Job.find_available(5).should include(@job)
+      expect(Delayed::Job.find_available(5)).to include(@job)
     end
   end
   
@@ -105,31 +105,31 @@ shared_examples_for 'a backend' do
 
     before :each do
       @job = Delayed::Job.create :payload_object => SimpleJob.new
-      Delayed::Job.get_and_lock_next_available('worker1').should == @job
+      expect(Delayed::Job.get_and_lock_next_available('worker1')).to eq @job
     end
 
     it "should not allow a second worker to get exclusive access" do
-      Delayed::Job.get_and_lock_next_available('worker2').should be_nil
+      expect(Delayed::Job.get_and_lock_next_available('worker2')).to be_nil
     end
 
     it "should not be found by another worker" do
-      Delayed::Job.find_available(1).length.should == 0
+      expect(Delayed::Job.find_available(1).length).to eq 0
     end
   end
 
   context "#name" do
     it "should be the class name of the job that was enqueued" do
-      Delayed::Job.create(:payload_object => ErrorJob.new ).name.should == 'ErrorJob'
+      expect(Delayed::Job.create(:payload_object => ErrorJob.new ).name).to eq 'ErrorJob'
     end
 
     it "should be the method that will be called if its a performable method object" do
       @job = Story.send_later_enqueue_args(:create, no_delay: true)
-      @job.name.should == "Story.create"
+      expect(@job.name).to eq "Story.create"
     end
 
     it "should be the instance method that will be called if its a performable method object" do
       @job = Story.create(:text => "...").send_later_enqueue_args(:save, no_delay: true)
-      @job.name.should == 'Story#save'
+      expect(@job.name).to eq 'Story#save'
     end
   end
   
@@ -137,34 +137,34 @@ shared_examples_for 'a backend' do
     it "should fetch jobs ordered by priority" do
       10.times { create_job :priority => rand(10) }
       jobs = Delayed::Job.find_available(10)
-      jobs.size.should == 10
+      expect(jobs.size).to eq 10
       jobs.each_cons(2) do |a, b| 
-        a.priority.should <= b.priority
+        expect(a.priority).to be <= b.priority
       end
     end
 
     it "should not find jobs lower than the given priority" do
       job1 = create_job :priority => 5
       found = Delayed::Job.get_and_lock_next_available('test1', Delayed::Worker.queue, 10, 20)
-      found.should be_nil
+      expect(found).to be_nil
       job2 = create_job :priority => 10
       found = Delayed::Job.get_and_lock_next_available('test1', Delayed::Worker.queue, 10, 20)
-      found.should == job2
+      expect(found).to eq job2
       job3 = create_job :priority => 15
       found = Delayed::Job.get_and_lock_next_available('test2', Delayed::Worker.queue, 10, 20)
-      found.should == job3
+      expect(found).to eq job3
     end
 
     it "should not find jobs higher than the given priority" do
       job1 = create_job :priority => 25
       found = Delayed::Job.get_and_lock_next_available('test1', Delayed::Worker.queue, 10, 20)
-      found.should be_nil
+      expect(found).to be_nil
       job2 = create_job :priority => 20
       found = Delayed::Job.get_and_lock_next_available('test1', Delayed::Worker.queue, 10, 20)
-      found.should == job2
+      expect(found).to eq job2
       job3 = create_job :priority => 15
       found = Delayed::Job.get_and_lock_next_available('test2', Delayed::Worker.queue, 10, 20)
-      found.should == job3
+      expect(found).to eq job3
     end
   end
   
@@ -175,12 +175,12 @@ shared_examples_for 'a backend' do
     
     it "should clear locks for the given worker" do
       Delayed::Job.clear_locks!('worker')
-      Delayed::Job.find_available(5).should include(@job)
+      expect(Delayed::Job.find_available(5)).to include(@job)
     end
     
     it "should not clear locks for other workers" do
       Delayed::Job.clear_locks!('worker1')
-      Delayed::Job.find_available(5).should_not include(@job)
+      expect(Delayed::Job.find_available(5)).not_to include(@job)
     end
   end
   
@@ -191,8 +191,8 @@ shared_examples_for 'a backend' do
 
     it "should clear locks" do
       @job.unlock
-      @job.locked_by.should be_nil
-      @job.locked_at.should be_nil
+      expect(@job.locked_by).to be_nil
+      expect(@job.locked_at).to be_nil
     end
   end
 
@@ -200,112 +200,112 @@ shared_examples_for 'a backend' do
     it "should run strand jobs in strict order" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
-      Delayed::Job.get_and_lock_next_available('w2').should == nil
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job1
+      expect(Delayed::Job.get_and_lock_next_available('w2')).to eq nil
       job1.destroy
       # update time since the failed lock pushed it forward
       job2.run_at = 1.minute.ago
       job2.save!
-      Delayed::Job.get_and_lock_next_available('w3').should == job2
-      Delayed::Job.get_and_lock_next_available('w4').should == nil
+      expect(Delayed::Job.get_and_lock_next_available('w3')).to eq job2
+      expect(Delayed::Job.get_and_lock_next_available('w4')).to eq nil
     end
 
     it "should fail to lock if an earlier job gets locked" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
-      Delayed::Job.find_available(2).should == [job1]
-      Delayed::Job.find_available(2).should == [job1]
+      expect(Delayed::Job.find_available(2)).to eq [job1]
+      expect(Delayed::Job.find_available(2)).to eq [job1]
 
       # job1 gets locked by w1
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job1
 
       # normally w2 would now be able to lock job2, but strands prevent it
-      Delayed::Job.get_and_lock_next_available('w2').should be_nil
+      expect(Delayed::Job.get_and_lock_next_available('w2')).to be_nil
 
       # now job1 is done
       job1.destroy
       # update time since the failed lock pushed it forward
       job2.run_at = 1.minute.ago
       job2.save!
-      Delayed::Job.get_and_lock_next_available('w2').should == job2
+      expect(Delayed::Job.get_and_lock_next_available('w2')).to eq job2
     end
 
     it "should keep strand jobs in order as they are rescheduled" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
       job3 = create_job(:strand => 'myjobs')
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
-      Delayed::Job.find_available(1).should == []
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job1
+      expect(Delayed::Job.find_available(1)).to eq []
       job1.destroy
-      Delayed::Job.find_available(1).should == [job2]
+      expect(Delayed::Job.find_available(1)).to eq [job2]
       # move job2's time forward
       job2.run_at = 1.second.ago
       job2.save!
       job3.run_at = 5.seconds.ago
       job3.save!
       # we should still get job2, not job3
-      Delayed::Job.get_and_lock_next_available('w1').should == job2
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job2
     end
 
     it "should allow to run the next job if a failed job is present" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
       job1.fail!
-      Delayed::Job.get_and_lock_next_available('w1').should == job2
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job2
     end
 
     it "should not interfere with jobs with no strand" do
       jobs = [create_job(:strand => nil), create_job(:strand => 'myjobs')]
       locked = [Delayed::Job.get_and_lock_next_available('w1'),
                 Delayed::Job.get_and_lock_next_available('w2')]
-      jobs.should =~ locked
-      Delayed::Job.get_and_lock_next_available('w3').should == nil
+      expect(jobs).to match_array locked
+      expect(Delayed::Job.get_and_lock_next_available('w3')).to eq nil
     end
 
     it "should not interfere with jobs in other strands" do
       jobs = [create_job(:strand => 'strand1'), create_job(:strand => 'strand2')]
       locked = [Delayed::Job.get_and_lock_next_available('w1'),
                 Delayed::Job.get_and_lock_next_available('w2')]
-      jobs.should =~ locked
-      Delayed::Job.get_and_lock_next_available('w3').should == nil
+      expect(jobs).to match_array locked
+      expect(Delayed::Job.get_and_lock_next_available('w3')).to eq nil
     end
 
     context 'singleton' do
       it "should create if there's no jobs on the strand" do
         @job = create_job(:singleton => 'myjobs')
-        @job.should be_present
-        Delayed::Job.get_and_lock_next_available('w1').should == @job
+        expect(@job).to be_present
+        expect(Delayed::Job.get_and_lock_next_available('w1')).to eq @job
       end
 
       it "should create if there's another job on the strand, but it's running" do
         @job = create_job(:singleton => 'myjobs')
-        @job.should be_present
-        Delayed::Job.get_and_lock_next_available('w1').should == @job
+        expect(@job).to be_present
+        expect(Delayed::Job.get_and_lock_next_available('w1')).to eq @job
 
         @job2 = create_job(:singleton => 'myjobs')
-        @job.should be_present
-        @job2.should_not == @job
+        expect(@job).to be_present
+        expect(@job2).not_to eq @job
       end
 
       it "should not create if there's another non-running job on the strand" do
         @job = create_job(:singleton => 'myjobs')
-        @job.should be_present
+        expect(@job).to be_present
 
         @job2 = create_job(:singleton => 'myjobs')
-        @job2.should == @job
+        expect(@job2).to eq @job
       end
 
       it "should not create if there's a job running and one waiting on the strand" do
         @job = create_job(:singleton => 'myjobs')
-        @job.should be_present
-        Delayed::Job.get_and_lock_next_available('w1').should == @job
+        expect(@job).to be_present
+        expect(Delayed::Job.get_and_lock_next_available('w1')).to eq @job
 
         @job2 = create_job(:singleton => 'myjobs')
-        @job2.should be_present
-        @job2.should_not == @job
+        expect(@job2).to be_present
+        expect(@job2).not_to eq @job
 
         @job3 = create_job(:singleton => 'myjobs')
-        @job3.should == @job2
+        expect(@job3).to eq @job2
       end
     end
 
@@ -313,41 +313,41 @@ shared_examples_for 'a backend' do
       it "should default to 1" do
         Delayed::Job.expects(:rand).never
         job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
-        job.strand.should == "njobs"
+        expect(job.strand).to eq "njobs"
       end
 
       it "should pick a strand randomly out of N" do
         Setting.set("njobs_num_strands", "3")
         Delayed::Job.expects(:rand).with(3).returns(1)
         job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
-        job.strand.should == "njobs:2"
+        expect(job.strand).to eq "njobs:2"
       end
 
       context "with two parameters" do
         it "should use the first param as the setting to read" do
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
-          job.strand.should == "njobs/123"
+          expect(job.strand).to eq "njobs/123"
           Setting.set("njobs_num_strands", "3")
           Delayed::Job.expects(:rand).with(3).returns(1)
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
-          job.strand.should == "njobs/123:2"
+          expect(job.strand).to eq "njobs/123:2"
         end
 
         it "should allow overridding the setting based on the second param" do
           Setting.set("njobs/123_num_strands", "5")
           Delayed::Job.expects(:rand).with(5).returns(3)
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
-          job.strand.should == "njobs/123:4"
+          expect(job.strand).to eq "njobs/123:4"
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "456"])
-          job.strand.should == "njobs/456"
+          expect(job.strand).to eq "njobs/456"
 
           Setting.set("njobs_num_strands", "3")
           Delayed::Job.expects(:rand).with(5).returns(2)
           Delayed::Job.expects(:rand).with(3).returns(1)
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
-          job.strand.should == "njobs/123:3"
+          expect(job.strand).to eq "njobs/123:3"
           job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "456"])
-          job.strand.should == "njobs/456:2"
+          expect(job.strand).to eq "njobs/456:2"
         end
       end
     end
@@ -357,10 +357,10 @@ shared_examples_for 'a backend' do
     it "should hold/unhold jobs" do
       job1 = create_job()
       job1.hold!
-      Delayed::Job.get_and_lock_next_available('w1').should be_nil
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to be_nil
 
       job1.unhold!
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
+      expect(Delayed::Job.get_and_lock_next_available('w1')).to eq job1
     end
   end
 
@@ -376,53 +376,53 @@ shared_examples_for 'a backend' do
     end
 
     it "should schedule jobs if they aren't scheduled yet" do
-      Delayed::Job.jobs_count(:current).should == 0
+      expect(Delayed::Job.jobs_count(:current)).to eq 0
       Delayed::Periodic.perform_audit!
-      Delayed::Job.jobs_count(:current).should == 1
+      expect(Delayed::Job.jobs_count(:current)).to eq 1
       job = Delayed::Job.get_and_lock_next_available('test1')
-      job.tag.should == 'periodic: my SimpleJob'
-      job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
-      job.run_at.should >= @cron_time
-      job.run_at.should <= @cron_time + 6.minutes
-      job.strand.should == job.tag
+      expect(job.tag).to eq 'periodic: my SimpleJob'
+      expect(job.payload_object).to eq Delayed::Periodic.scheduled['my SimpleJob']
+      expect(job.run_at).to be >= @cron_time
+      expect(job.run_at).to be <= @cron_time + 6.minutes
+      expect(job.strand).to eq job.tag
     end
 
     it "should schedule jobs if there are only failed jobs on the queue" do
-      Delayed::Job.jobs_count(:current).should == 0
+      expect(Delayed::Job.jobs_count(:current)).to eq 0
       expect { Delayed::Periodic.perform_audit! }.to change { Delayed::Job.jobs_count(:current) }.by(1)
-      Delayed::Job.jobs_count(:current).should == 1
+      expect(Delayed::Job.jobs_count(:current)).to eq 1
       job = Delayed::Job.get_and_lock_next_available('test1')
       job.fail!
       expect { Delayed::Periodic.perform_audit! }.to change{ Delayed::Job.jobs_count(:current) }.by(1)
     end
 
     it "should not schedule jobs that are already scheduled" do
-      Delayed::Job.jobs_count(:current).should == 0
+      expect(Delayed::Job.jobs_count(:current)).to eq 0
       Delayed::Periodic.perform_audit!
-      Delayed::Job.jobs_count(:current).should == 1
+      expect(Delayed::Job.jobs_count(:current)).to eq 1
       job = Delayed::Job.find_available(1).first
       Delayed::Periodic.perform_audit!
-      Delayed::Job.jobs_count(:current).should == 1
+      expect(Delayed::Job.jobs_count(:current)).to eq 1
       # verify that the same job still exists, it wasn't just replaced with a new one
-      job.should == Delayed::Job.find_available(1).first
+      expect(job).to eq Delayed::Job.find_available(1).first
     end
 
     it "should schedule the next job run after performing" do
       Delayed::Periodic.perform_audit!
-      Delayed::Job.jobs_count(:current).should == 1
+      expect(Delayed::Job.jobs_count(:current)).to eq 1
       job = Delayed::Job.get_and_lock_next_available('test')
       run_job(job)
 
       job = Delayed::Job.get_and_lock_next_available('test1')
-      job.tag.should == 'SimpleJob#perform'
+      expect(job.tag).to eq 'SimpleJob#perform'
 
       next_scheduled = Delayed::Job.get_and_lock_next_available('test2')
-      next_scheduled.tag.should == 'periodic: my SimpleJob'
-      next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
+      expect(next_scheduled.tag).to eq 'periodic: my SimpleJob'
+      expect(next_scheduled.payload_object).to be_is_a(Delayed::Periodic)
     end
 
     it "should reject duplicate named jobs" do
-      proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
+      expect { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.to raise_error(ArgumentError)
     end
 
     it "should handle jobs that are no longer scheduled" do
@@ -431,7 +431,7 @@ shared_examples_for 'a backend' do
       job = Delayed::Job.get_and_lock_next_available('test')
       run_job(job)
       # shouldn't error, and the job should now be deleted
-      Delayed::Job.jobs_count(:current).should == 0
+      expect(Delayed::Job.jobs_count(:current)).to eq 0
     end
 
     it "should allow overriding schedules using periodic_jobs.yml" do
@@ -440,7 +440,7 @@ shared_examples_for 'a backend' do
       Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
         Delayed::Job.enqueue(SimpleJob.new)
       end
-      Delayed::Periodic.scheduled['my ChangedJob'].cron.original.should == '*/10 * * * * *'
+      expect(Delayed::Periodic.scheduled['my ChangedJob'].cron.original).to eq '*/10 * * * * *'
       Delayed::Periodic.audit_overrides!
     end
 
@@ -463,19 +463,19 @@ shared_examples_for 'a backend' do
 
   it "should set in_delayed_job?" do
     job = InDelayedJobTest.send_later_enqueue_args(:check_in_job, no_delay: true)
-    Delayed::Job.in_delayed_job?.should == false
+    expect(Delayed::Job.in_delayed_job?).to eq false
     job.invoke_job
-    Delayed::Job.in_delayed_job?.should == false
+    expect(Delayed::Job.in_delayed_job?).to eq false
   end
 
   it "should fail on job creation if an unsaved AR object is used" do
     story = Story.new :text => "Once upon..."
-    lambda { story.send_later(:text) }.should raise_error
+    expect { story.send_later(:text) }.to raise_error
 
     reader = StoryReader.new
-    lambda { reader.send_later(:read, story) }.should raise_error
+    expect { reader.send_later(:read, story) }.to raise_error
 
-    lambda { [story, 1, story, false].send_later(:first) }.should raise_error
+    expect { [story, 1, story, false].send_later(:first) }.to raise_error
   end
 
   # the sort order of current_jobs and list_jobs depends on the back-end
@@ -495,7 +495,7 @@ shared_examples_for 'a backend' do
     end
 
     it "should return the queued jobs" do
-      Delayed::Job.list_jobs(:current, 100).map(&:id).sort.should == @jobs.map(&:id).sort
+      expect(Delayed::Job.list_jobs(:current, 100).map(&:id).sort).to eq @jobs.map(&:id).sort
     end
 
     it "should paginate the returned jobs" do
@@ -503,22 +503,22 @@ shared_examples_for 'a backend' do
       @returned += Delayed::Job.list_jobs(:current, 3, 0)
       @returned += Delayed::Job.list_jobs(:current, 4, 3)
       @returned += Delayed::Job.list_jobs(:current, 100, 7)
-      @returned.sort_by { |j| j.id }.should == @jobs.sort_by { |j| j.id }
+      expect(@returned.sort_by { |j| j.id }).to eq @jobs.sort_by { |j| j.id }
     end
 
     it "should return other queues" do
-      Delayed::Job.list_jobs(:current, 5, 0, "another").should == [@other_queue_job]
+      expect(Delayed::Job.list_jobs(:current, 5, 0, "another")).to eq [@other_queue_job]
     end
 
     it "should return queue size" do
-      Delayed::Job.jobs_count(:current).should == @jobs.size
-      Delayed::Job.jobs_count(:current, "another").should == 1
-      Delayed::Job.jobs_count(:current, "bogus").should == 0
+      expect(Delayed::Job.jobs_count(:current)).to eq @jobs.size
+      expect(Delayed::Job.jobs_count(:current, "another")).to eq 1
+      expect(Delayed::Job.jobs_count(:current, "bogus")).to eq 0
     end
 
     it "should return strand size" do
-      Delayed::Job.strand_size("test1").should == 2
-      Delayed::Job.strand_size("bogus").should == 0
+      expect(Delayed::Job.strand_size("test1")).to eq 2
+      expect(Delayed::Job.strand_size("bogus")).to eq 0
     end
   end
 
@@ -530,12 +530,12 @@ shared_examples_for 'a backend' do
     create_job
 
     jobs = Delayed::Job.list_jobs(:strand, 3, 0, "test1")
-    jobs.size.should == 3
+    expect(jobs.size).to eq 3
 
     jobs += Delayed::Job.list_jobs(:strand, 3, 3, "test1")
-    jobs.size.should == 4
+    expect(jobs.size).to eq 4
 
-    jobs.sort_by { |j| j.id }.should == strand_jobs.sort_by { |j| j.id }
+    expect(jobs.sort_by { |j| j.id }).to eq strand_jobs.sort_by { |j| j.id }
   end
 
   it "should return the jobs for a tag" do
@@ -548,12 +548,12 @@ shared_examples_for 'a backend' do
     create_job
 
     jobs = Delayed::Job.list_jobs(:tag, 3, 0, "String#to_s")
-    jobs.size.should == 3
+    expect(jobs.size).to eq 3
 
     jobs += Delayed::Job.list_jobs(:tag, 3, 3, "String#to_s")
-    jobs.size.should == 5
+    expect(jobs.size).to eq 5
 
-    jobs.sort_by { |j| j.id }.should == tag_jobs.sort_by { |j| j.id }
+    expect(jobs.sort_by { |j| j.id }).to eq tag_jobs.sort_by { |j| j.id }
   end
 
   describe "running_jobs" do
@@ -566,9 +566,9 @@ shared_examples_for 'a backend' do
       j2 = Delayed::Job.get_and_lock_next_available('w2')
       Delayed::Job.stubs(:db_time_now).returns(5.seconds.ago)
       j3 = Delayed::Job.get_and_lock_next_available('w3')
-      [j1, j2, j3].compact.size.should == 3
+      expect([j1, j2, j3].compact.size).to eq 3
 
-      Delayed::Job.running_jobs.should == [j2, j1, j3]
+      expect(Delayed::Job.running_jobs).to eq [j2, j1, j3]
     end
   end
 
@@ -576,19 +576,19 @@ shared_examples_for 'a backend' do
     it "should find future jobs once their run_at rolls by" do
       Delayed::Job.stubs(:db_time_now).returns(1.hour.ago)
       @job = create_job :run_at => 5.minutes.from_now
-      Delayed::Job.find_available(5).should_not include(@job)
+      expect(Delayed::Job.find_available(5)).not_to include(@job)
       Delayed::Job.stubs(:db_time_now).returns(1.hour.from_now)
-      Delayed::Job.find_available(5).should include(@job)
-      Delayed::Job.get_and_lock_next_available('test').should == @job
+      expect(Delayed::Job.find_available(5)).to include(@job)
+      expect(Delayed::Job.get_and_lock_next_available('test')).to eq @job
     end
 
     it "should return future jobs sorted by their run_at" do
       @j1 = create_job
       @j2 = create_job :run_at => 1.hour.from_now
       @j3 = create_job :run_at => 30.minutes.from_now
-      Delayed::Job.list_jobs(:future, 1).should == [@j3]
-      Delayed::Job.list_jobs(:future, 5).should == [@j3, @j2]
-      Delayed::Job.list_jobs(:future, 1, 1).should == [@j2]
+      expect(Delayed::Job.list_jobs(:future, 1)).to eq [@j3]
+      expect(Delayed::Job.list_jobs(:future, 5)).to eq [@j3, @j2]
+      expect(Delayed::Job.list_jobs(:future, 1, 1)).to eq [@j2]
     end
   end
 
@@ -599,13 +599,13 @@ shared_examples_for 'a backend' do
       jobs = []
       3.times { jobs << create_job(:priority => 3) }
       jobs.sort_by { |j| j.id }
-      Delayed::Job.list_jobs(:failed, 1).should == []
+      expect(Delayed::Job.list_jobs(:failed, 1)).to eq []
       jobs[0].fail!
       jobs[1].fail!
       failed = (Delayed::Job.list_jobs(:failed, 1, 0) + Delayed::Job.list_jobs(:failed, 1, 1)).sort_by { |j| j.id }
-      failed.size.should == 2
-      failed[0].original_job_id.should == jobs[0].id
-      failed[1].original_job_id.should == jobs[1].id
+      expect(failed.size).to eq 2
+      expect(failed[0].original_job_id).to eq jobs[0].id
+      expect(failed[1].original_job_id).to eq jobs[1].id
     end
   end
 
@@ -617,26 +617,26 @@ shared_examples_for 'a backend' do
       end
 
       it "should hold a scope of jobs" do
-        @affected_jobs.all? { |j| j.on_hold? }.should be false
-        @ignored_jobs.any? { |j| j.on_hold? }.should be false
-        Delayed::Job.bulk_update('hold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
+        expect(@affected_jobs.all? { |j| j.on_hold? }).to be false
+        expect(@ignored_jobs.any? { |j| j.on_hold? }).to be false
+        expect(Delayed::Job.bulk_update('hold', :flavor => @flavor, :query => @query)).to eq @affected_jobs.size
 
-        @affected_jobs.all? { |j| Delayed::Job.find(j.id).on_hold? }.should be true
-        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
+        expect(@affected_jobs.all? { |j| Delayed::Job.find(j.id).on_hold? }).to be true
+        expect(@ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }).to be false
       end
 
       it "should un-hold a scope of jobs" do
         pending "fragile on mysql for unknown reasons" if Delayed::Job == Delayed::Backend::ActiveRecord::Job && %w{MySQL Mysql2}.include?(Delayed::Job.connection.adapter_name)
-        Delayed::Job.bulk_update('unhold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
+        expect(Delayed::Job.bulk_update('unhold', :flavor => @flavor, :query => @query)).to eq @affected_jobs.size
 
-        @affected_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
-        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be false
+        expect(@affected_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }).to be false
+        expect(@ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }).to be false
       end
 
       it "should delete a scope of jobs" do
-        Delayed::Job.bulk_update('destroy', :flavor => @flavor, :query => @query).should == @affected_jobs.size
-        @affected_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.should be_blank
-        @ignored_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.size.should == @ignored_jobs.size
+        expect(Delayed::Job.bulk_update('destroy', :flavor => @flavor, :query => @query)).to eq @affected_jobs.size
+        expect(@affected_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact).to be_blank
+        expect(@ignored_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.size).to eq @ignored_jobs.size
       end
     end
 
@@ -698,21 +698,21 @@ shared_examples_for 'a backend' do
       j1 = "test".send_later_enqueue_args(:to_i, :no_delay => true)
       j2 = create_job(:run_at => 2.hours.from_now)
       j3 = "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
-      Delayed::Job.bulk_update('hold', :ids => [j1.id, j2.id]).should == 2
-      Delayed::Job.find(j1.id).on_hold?.should be true
-      Delayed::Job.find(j2.id).on_hold?.should be true
-      Delayed::Job.find(j3.id).on_hold?.should be false
+      expect(Delayed::Job.bulk_update('hold', :ids => [j1.id, j2.id])).to eq 2
+      expect(Delayed::Job.find(j1.id).on_hold?).to be true
+      expect(Delayed::Job.find(j2.id).on_hold?).to be true
+      expect(Delayed::Job.find(j3.id).on_hold?).to be false
 
-      Delayed::Job.bulk_update('unhold', :ids => [j2.id]).should == 1
-      Delayed::Job.find(j1.id).on_hold?.should be true
-      Delayed::Job.find(j2.id).on_hold?.should be false
-      Delayed::Job.find(j3.id).on_hold?.should be false
+      expect(Delayed::Job.bulk_update('unhold', :ids => [j2.id])).to eq 1
+      expect(Delayed::Job.find(j1.id).on_hold?).to be true
+      expect(Delayed::Job.find(j2.id).on_hold?).to be false
+      expect(Delayed::Job.find(j3.id).on_hold?).to be false
     end
 
     it "should delete given job ids" do
       jobs = (0..2).map { create_job }
-      Delayed::Job.bulk_update('destroy', :ids => jobs[0,2].map(&:id)).should == 2
-      jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.should == jobs[2,1]
+      expect(Delayed::Job.bulk_update('destroy', :ids => jobs[0,2].map(&:id))).to eq 2
+      expect(jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact).to eq jobs[2,1]
     end
   end
 
@@ -729,9 +729,9 @@ shared_examples_for 'a backend' do
     end
 
     it "should return a sorted list of popular current tags" do
-      Delayed::Job.tag_counts(:current, 1).should == [{ :tag => "String#to_i", :count => 5 }]
-      Delayed::Job.tag_counts(:current, 1, 1).should == [{ :tag => "String#to_s", :count => 3 }]
-      Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 5 },
+      expect(Delayed::Job.tag_counts(:current, 1)).to eq [{ :tag => "String#to_i", :count => 5 }]
+      expect(Delayed::Job.tag_counts(:current, 1, 1)).to eq [{ :tag => "String#to_s", :count => 3 }]
+      expect(Delayed::Job.tag_counts(:current, 5)).to eq [{ :tag => "String#to_i", :count => 5 },
                                                       { :tag => "String#to_s", :count => 3 },
                                                       { :tag => "String#upcase", :count => 2 },
                                                       { :tag => "String#downcase", :count => 1 }]
@@ -740,15 +740,15 @@ shared_examples_for 'a backend' do
       @future[0].save!
       @future[1].save!
 
-      Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 4 },
+      expect(Delayed::Job.tag_counts(:current, 5)).to eq [{ :tag => "String#to_i", :count => 4 },
                                                       { :tag => "String#downcase", :count => 3 },
                                                       { :tag => "String#upcase", :count => 2 },]
     end
 
     it "should return a sorted list of all popular tags" do
-      Delayed::Job.tag_counts(:all, 1).should == [{ :tag => "String#downcase", :count => 6 }]
-      Delayed::Job.tag_counts(:all, 1, 1).should == [{ :tag => "String#to_i", :count => 5 }]
-      Delayed::Job.tag_counts(:all, 5).should == [{ :tag => "String#downcase", :count => 6 },
+      expect(Delayed::Job.tag_counts(:all, 1)).to eq [{ :tag => "String#downcase", :count => 6 }]
+      expect(Delayed::Job.tag_counts(:all, 1, 1)).to eq [{ :tag => "String#to_i", :count => 5 }]
+      expect(Delayed::Job.tag_counts(:all, 5)).to eq [{ :tag => "String#downcase", :count => 6 },
                                                   { :tag => "String#to_i", :count => 5 },
                                                   { :tag => "String#to_s", :count => 3 },
                                                   { :tag => "String#upcase", :count => 2 },]
@@ -758,7 +758,7 @@ shared_examples_for 'a backend' do
       @future[1].fail!
       @future[2].fail!
 
-      Delayed::Job.tag_counts(:all, 5).should == [{ :tag => "String#to_i", :count => 4 },
+      expect(Delayed::Job.tag_counts(:all, 5)).to eq [{ :tag => "String#to_i", :count => 4 },
                                                   { :tag => "String#downcase", :count => 3 },
                                                   { :tag => "String#upcase", :count => 2 },]
     end
@@ -776,14 +776,14 @@ shared_examples_for 'a backend' do
     job3.create_and_lock!("someoneelse:#{Process.pid}")
     job4.create_and_lock!("Jobworker:notanumber")
 
-    Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 1
+    expect(Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker")).to eq 1
 
-    Delayed::Job.find(job1.id).locked_by.should_not be_nil
-    Delayed::Job.find(job2.id).locked_by.should be_nil
-    Delayed::Job.find(job3.id).locked_by.should_not be_nil
-    Delayed::Job.find(job4.id).locked_by.should_not be_nil
+    expect(Delayed::Job.find(job1.id).locked_by).not_to be_nil
+    expect(Delayed::Job.find(job2.id).locked_by).to be_nil
+    expect(Delayed::Job.find(job3.id).locked_by).not_to be_nil
+    expect(Delayed::Job.find(job4.id).locked_by).not_to be_nil
 
-    Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 0
+    expect(Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker")).to eq 0
   end
 
   it "should unlock orphaned jobs given a pid" do
@@ -800,14 +800,14 @@ shared_examples_for 'a backend' do
     job3.create_and_lock!("someoneelse:#{Process.pid}")
     job4.create_and_lock!("Jobworker:notanumber")
 
-    Delayed::Job.unlock_orphaned_jobs(child_pid2, "Jobworker").should == 0
-    Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 1
+    expect(Delayed::Job.unlock_orphaned_jobs(child_pid2, "Jobworker")).to eq 0
+    expect(Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker")).to eq 1
 
-    Delayed::Job.find(job1.id).locked_by.should_not be_nil
-    Delayed::Job.find(job2.id).locked_by.should be_nil
-    Delayed::Job.find(job3.id).locked_by.should_not be_nil
-    Delayed::Job.find(job4.id).locked_by.should_not be_nil
+    expect(Delayed::Job.find(job1.id).locked_by).not_to be_nil
+    expect(Delayed::Job.find(job2.id).locked_by).to be_nil
+    expect(Delayed::Job.find(job3.id).locked_by).not_to be_nil
+    expect(Delayed::Job.find(job4.id).locked_by).not_to be_nil
 
-    Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 0
+    expect(Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker")).to eq 0
   end
 end

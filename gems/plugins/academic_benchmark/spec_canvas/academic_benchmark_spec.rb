@@ -30,76 +30,76 @@ describe AcademicBenchmark::Converter do
 
   def verify_full_import
     @root_group = LearningOutcomeGroup.global_root_outcome_group
-    @root_group.child_outcome_groups.count.should == 1
+    expect(@root_group.child_outcome_groups.count).to eq 1
     a = @root_group.child_outcome_groups.first
-    a.migration_id.should == "aaaaaaaaaa"
-    a.title.should == "NGA Center/CCSSO"
+    expect(a.migration_id).to eq "aaaaaaaaaa"
+    expect(a.title).to eq "NGA Center/CCSSO"
     b = a.child_outcome_groups.first
-    b.migration_id.should == "bbbbbbbbbbbb"
-    b.title.should == "Common Core State Standards"
+    expect(b.migration_id).to eq "bbbbbbbbbbbb"
+    expect(b.title).to eq "Common Core State Standards"
     c = b.child_outcome_groups.first
-    c.migration_id.should == "cccccccccc"
-    c.title.should == "College- and Career-Readiness Standards and K-12 Mathematics"
+    expect(c.migration_id).to eq "cccccccccc"
+    expect(c.title).to eq "College- and Career-Readiness Standards and K-12 Mathematics"
     d = c.child_outcome_groups.where(migration_id: "ddddddddd").first
-    d.migration_id.should == "ddddddddd"
-    d.title.should == "Kindergarten"
-    d.low_grade.should == "K"
-    d.high_grade.should == "K"
+    expect(d.migration_id).to eq "ddddddddd"
+    expect(d.title).to eq "Kindergarten"
+    expect(d.low_grade).to eq "K"
+    expect(d.high_grade).to eq "K"
     e = d.child_outcome_groups.first
-    e.migration_id.should == "eeeeeeeeeeee"
-    e.title.should == "K.CC - Counting and Cardinality"
-    e.description.should == "Counting and Cardinality"
-    e.low_grade.should == "K"
-    e.high_grade.should == "K"
+    expect(e.migration_id).to eq "eeeeeeeeeeee"
+    expect(e.title).to eq "K.CC - Counting and Cardinality"
+    expect(e.description).to eq "Counting and Cardinality"
+    expect(e.low_grade).to eq "K"
+    expect(e.high_grade).to eq "K"
     f = e.child_outcome_groups.first
-    f.migration_id.should == "ffffffffffffff"
-    f.title.should == "Know number names and the count sequence."
-    f.description.should == "Know number names and the count sequence."
-    f.low_grade.should == "K"
-    f.high_grade.should == "K"
-    f.child_outcome_links.count.should == 3
+    expect(f.migration_id).to eq "ffffffffffffff"
+    expect(f.title).to eq "Know number names and the count sequence."
+    expect(f.description).to eq "Know number names and the count sequence."
+    expect(f.low_grade).to eq "K"
+    expect(f.high_grade).to eq "K"
+    expect(f.child_outcome_links.count).to eq 3
 
     g = LearningOutcome.global.where(migration_id: "ggggggggggggggggg").first
-    g.short_description.should == "K.CC.1"
-    g.description.should == "Count to 100 by ones and by tens."
+    expect(g.short_description).to eq "K.CC.1"
+    expect(g.description).to eq "Count to 100 by ones and by tens."
     g = LearningOutcome.global.where(migration_id: "hhhhhhhhhhhhhhhh").first
-    g.short_description.should == "K.CC.2"
-    g.description.should == "Count forward beginning from a given number within the known sequence (instead of having to begin at 1)."
+    expect(g.short_description).to eq "K.CC.2"
+    expect(g.description).to eq "Count forward beginning from a given number within the known sequence (instead of having to begin at 1)."
     g = LearningOutcome.global.where(migration_id: "iiiiiiiiiiiiiiiii").first
-    g.short_description.should == "K.CC.3"
-    g.description.should == "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
+    expect(g.short_description).to eq "K.CC.3"
+    expect(g.description).to eq "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
 
     j = c.child_outcome_groups.where(migration_id: "jjjjjjjjjjj").first
-    j.migration_id.should == "jjjjjjjjjjj"
-    j.title.should == "First Grade"
-    j.low_grade.should == "1"
-    j.high_grade.should == "1"
+    expect(j.migration_id).to eq "jjjjjjjjjjj"
+    expect(j.title).to eq "First Grade"
+    expect(j.low_grade).to eq "1"
+    expect(j.high_grade).to eq "1"
     k = j.child_outcome_groups.last
-    k.migration_id.should == "kkkkkkkkkkk"
-    k.title.should == "1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé"
-    k.description.should == "zéééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
-    k.low_grade.should == "1"
-    k.high_grade.should == "1"
+    expect(k.migration_id).to eq "kkkkkkkkkkk"
+    expect(k.title).to eq "1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé"
+    expect(k.description).to eq "zéééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+    expect(k.low_grade).to eq "1"
+    expect(k.high_grade).to eq "1"
     l = k.child_outcome_groups.first
-    l.migration_id.should == "lllllllll"
-    l.title.should == "Something else"
-    l.description.should == "Something else"
-    l.low_grade.should == "1"
-    l.high_grade.should == "1"
-    l.child_outcome_links.count.should == 1
+    expect(l.migration_id).to eq "lllllllll"
+    expect(l.title).to eq "Something else"
+    expect(l.description).to eq "Something else"
+    expect(l.low_grade).to eq "1"
+    expect(l.high_grade).to eq "1"
+    expect(l.child_outcome_links.count).to eq 1
 
     m = LearningOutcome.global.where(migration_id: "mmmmmmmmmmm").first
-    m.short_description.should == "1.DD.1"
-    m.description.should == "And something else"
-    m.title.should == "1.DD.1"
+    expect(m.short_description).to eq "1.DD.1"
+    expect(m.description).to eq "And something else"
+    expect(m.title).to eq "1.DD.1"
   end
 
   it "should successfully import the standards" do
     @cm.export_content
     run_jobs
     @cm.reload
-    @cm.migration_issues.count.should == 0
-    @cm.workflow_state.should == 'imported'
+    expect(@cm.migration_issues.count).to eq 0
+    expect(@cm.workflow_state).to eq 'imported'
 
     verify_full_import()
   end
@@ -111,9 +111,9 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
-    @cm.migration_issues.count.should == 1
-    @cm.migration_issues.first.description.should == "User isn't allowed to edit global outcomes"
-    @cm.workflow_state.should == 'failed'
+    expect(@cm.migration_issues.count).to eq 1
+    expect(@cm.migration_issues.first.description).to eq "User isn't allowed to edit global outcomes"
+    expect(@cm.workflow_state).to eq 'failed'
   end
 
   it "should fail if no file or authority set" do
@@ -125,9 +125,9 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
-    @cm.migration_issues.count.should == 1
-    @cm.migration_issues.first.description.should == "No outcome file or authority given"
-    @cm.workflow_state.should == 'failed'
+    expect(@cm.migration_issues.count).to eq 1
+    expect(@cm.migration_issues.first.description).to eq "No outcome file or authority given"
+    expect(@cm.workflow_state).to eq 'failed'
   end
 
   context "using the API" do
@@ -144,13 +144,13 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.migration_issues.count.should == 0
-      @cm.workflow_state.should == 'imported'
+      expect(@cm.migration_issues.count).to eq 0
+      expect(@cm.workflow_state).to eq 'imported'
 
       @root_group = LearningOutcomeGroup.global_root_outcome_group
-      @root_group.child_outcome_groups.count.should == 1
+      expect(@root_group.child_outcome_groups.count).to eq 1
       a = @root_group.child_outcome_groups.first
-      a.migration_id.should == "aaaaaaaaaa"
+      expect(a.migration_id).to eq "aaaaaaaaaa"
     end
 
     it "should fail with no API key" do
@@ -159,9 +159,9 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.migration_issues.count.should == 1
-      @cm.migration_issues.first.description.should == "An API key is required to use Academic Benchmarks"
-      @cm.workflow_state.should == 'failed'
+      expect(@cm.migration_issues.count).to eq 1
+      expect(@cm.migration_issues.first.description).to eq "An API key is required to use Academic Benchmarks"
+      expect(@cm.workflow_state).to eq 'failed'
     end
 
     it "should use the API to get the set data with an authority short code" do
@@ -205,9 +205,9 @@ describe AcademicBenchmark::Converter do
       @cm.reload
 
       er = ErrorReport.last
-      @cm.old_warnings_format.should == [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
-      @cm.migration_settings[:last_error].should be_nil
-      @cm.workflow_state.should == 'imported'
+      expect(@cm.old_warnings_format).to eq [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
+      expect(@cm.migration_settings[:last_error]).to be_nil
+      expect(@cm.workflow_state).to eq 'imported'
     end
 
     it "should pull down the list of available authorities" do

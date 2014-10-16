@@ -54,8 +54,8 @@ describe "Respondus SOAP API", type: :request do
 
   it "should identify the server without user credentials" do
     soap_response = soap_request('IdentifyServer', '', '', '')
-    soap_response.first.should == "Success"
-    soap_response.last.should == %{
+    expect(soap_response.first).to eq "Success"
+    expect(soap_response.last).to eq %{
 Respondus Generic Server API
 Contract version: 1
 Implemented for: Canvas LMS}
@@ -66,7 +66,7 @@ Implemented for: Canvas LMS}
                                  'nobody@example.com', 'asdfasdf',
                                  '',
                                  ['Institution', ''])
-    soap_response.first.should == "Success"
+    expect(soap_response.first).to eq "Success"
   end
 
   it "should reject a user with bad auth" do
@@ -74,7 +74,7 @@ Implemented for: Canvas LMS}
                                  'nobody@example.com', 'hax0r',
                                  '',
                                  ['Institution', ''])
-    soap_response.first.should == "Invalid credentials"
+    expect(soap_response.first).to eq "Invalid credentials"
   end
 
   if Canvas.redis_enabled?
@@ -84,19 +84,19 @@ Implemented for: Canvas LMS}
                                    'nobody@example.com', 'hax0r',
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Invalid credentials"
+      expect(soap_response.first).to eq "Invalid credentials"
       soap_response = soap_request('ValidateAuth',
                                    'nobody@example.com', 'hax0r',
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Invalid credentials"
+      expect(soap_response.first).to eq "Invalid credentials"
       # now use the right credentials, but it'll still fail because max attempts
       # was reached. unfortunately we can't return a more specific error message.
       soap_response = soap_request('ValidateAuth',
                                    'nobody@example.com', 'asdfasdf',
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Invalid credentials"
+      expect(soap_response.first).to eq "Invalid credentials"
     end
   end
 
@@ -110,7 +110,7 @@ Implemented for: Canvas LMS}
                                    'nobody@example.com', 'hax0r',
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Access token required"
+      expect(soap_response.first).to eq "Access token required"
     end
 
     it "should allow using an oauth token for delegated auth" do
@@ -122,15 +122,15 @@ Implemented for: Canvas LMS}
                                    uname, @token.full_token,
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Success"
+      expect(soap_response.first).to eq "Success"
 
       status, details, context, list = soap_request('GetServerItems',
                                                     uname, @token.full_token,
                                                     '', ['itemType', 'course'])
-      status.should == "Success"
+      expect(status).to eq "Success"
       pair = list.item
-      pair.name.should == "value for name"
-      pair.value.should == @course.to_param
+      expect(pair.name).to eq "value for name"
+      expect(pair.value).to eq @course.to_param
 
       # verify that the respondus api session works with token auth
       status, details, context = soap_request('SelectServerItem',
@@ -138,7 +138,7 @@ Implemented for: Canvas LMS}
                                               context, ['itemType', 'course'],
                                               ['itemID', @course.to_param],
                                               ['clearState', ''])
-      status.should == "Success"
+      expect(status).to eq "Success"
     end
 
     it "should continue to allow canvas login for delegated domains, for now" do
@@ -146,7 +146,7 @@ Implemented for: Canvas LMS}
                                    'nobody@example.com', 'asdfasdf',
                                    '',
                                    ['Institution', ''])
-      soap_response.first.should == "Success"
+      expect(soap_response.first).to eq "Success"
     end
   end
 
@@ -161,32 +161,32 @@ Implemented for: Canvas LMS}
                                  'nobody@example.com', 'asdfasdf',
                                  '',
                                  ['Institution', ''])
-    status.should == "Success"
+    expect(status).to eq "Success"
     status, details, context = soap_request('ValidateAuth',
                                  'nobody@example.com', 'asdfasdf',
                                  context,
                                  ['Institution', ''])
-    status.should == "Success"
+    expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
                                  'nobody2@example.com', 'test123',
                                  '',
                                  ['Institution', ''])
-    status.should == "Success"
+    expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
                                  'nobody2@example.com', 'test123',
                                  context,
                                  ['Institution', ''])
-    status.should == "Invalid context"
+    expect(status).to eq "Invalid context"
   end
 
   it "should allow selecting a course" do
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   '', ['itemType', 'course'])
-    status.should == "Success"
+    expect(status).to eq "Success"
     pair = list.item
-    pair.name.should == "value for name"
-    pair.value.should == @course.to_param
+    expect(pair.name).to eq "value for name"
+    expect(pair.value).to eq @course.to_param
 
     # select the course
     status, details, context = soap_request('SelectServerItem',
@@ -194,29 +194,29 @@ Implemented for: Canvas LMS}
                                             context, ['itemType', 'course'],
                                             ['itemID', @course.to_param],
                                             ['clearState', ''])
-    status.should == "Success"
+    expect(status).to eq "Success"
 
     # list the existing quizzes
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   context, ['itemType', 'quiz'])
-    status.should == "Success"
+    expect(status).to eq "Success"
     pair = list.item
-    pair.name.should == "quiz1"
-    pair.value.should == @quiz.to_param
+    expect(pair.name).to eq "quiz1"
+    expect(pair.value).to eq @quiz.to_param
 
     # list the existing question banks
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   context, ['itemType', 'qdb'])
-    status.should == "Success"
+    expect(status).to eq "Success"
     pair = list.item
-    pair.name.should == "questionbank1"
-    pair.value.should == @question_bank.to_param
+    expect(pair.name).to eq "questionbank1"
+    expect(pair.value).to eq @question_bank.to_param
 
     # clear boxin
     data = Marshal.load(Base64.decode64(context.split('--').first))
-    data['selection_state'].should == [ @course.to_param ]
+    expect(data['selection_state']).to eq [ @course.to_param ]
   end
 
   it "should queue QTI quiz uploads for processing" do
@@ -227,7 +227,7 @@ Implemented for: Canvas LMS}
                                             '', ['itemType', 'course'],
                                             ['itemID', @course.to_param],
                                             ['clearState', ''])
-    status.should == "Success"
+    expect(status).to eq "Success"
 
     mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
@@ -241,14 +241,14 @@ Implemented for: Canvas LMS}
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
       ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
       ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
-    status.should == "Success"
+    expect(status).to eq "Success"
 
-    item_id.should == "xyz"
+    expect(item_id).to eq "xyz"
 
     # import root folder should've been created and marked as hidden
     folder = Folder.assert_path(RespondusSoapEndpoint::RespondusAPIPort::ATTACHMENT_FOLDER_NAME,
                                 @course)
-    folder.hidden?.should == true
+    expect(folder.hidden?).to eq true
   end
 
   describe "polling publish" do
@@ -258,7 +258,7 @@ Implemented for: Canvas LMS}
                                               '', ['itemType', 'course'],
                                               ['itemID', @course.to_param],
                                               ['clearState', ''])
-      status.should == "Success"
+      expect(status).to eq "Success"
 
       @mock_migration = ContentMigration.create!(context: @course)
       def @mock_migration.export_content
@@ -271,8 +271,8 @@ Implemented for: Canvas LMS}
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
-      status.should == "Success"
-      item_id.should == 'pending'
+      expect(status).to eq "Success"
+      expect(item_id).to eq 'pending'
       @token = context
     end
 
@@ -281,9 +281,9 @@ Implemented for: Canvas LMS}
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"])
-      status.should == "Success"
-      item_id.should == 'pending'
-      @token.should == context
+      expect(status).to eq "Success"
+      expect(item_id).to eq 'pending'
+      expect(@token).to eq context
 
       @mock_migration.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
       @mock_migration.workflow_state = 'imported'
@@ -292,8 +292,8 @@ Implemented for: Canvas LMS}
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"])
-      status.should == "Success"
-      item_id.should == 'xyz'
+      expect(status).to eq "Success"
+      expect(item_id).to eq 'xyz'
     end
 
     it "should respond with failures asynchronously as well" do
@@ -304,8 +304,8 @@ Implemented for: Canvas LMS}
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"])
-      status.should == "Invalid file data"
-      item_id.should == nil
+      expect(status).to eq "Invalid file data"
+      expect(item_id).to eq nil
     end
   end
 end
