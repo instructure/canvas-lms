@@ -424,7 +424,7 @@ describe PseudonymSessionsController do
       end
 
       context "logging out" do
-        append_before do
+        before do
           controller.stubs(:saml_response).returns(
                   stub('response', @stub_hash)
           )
@@ -432,9 +432,9 @@ describe PseudonymSessionsController do
           controller.request.env['canvas.domain_root_account'] = @account
           get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
 
-          response.should redirect_to(courses_url)
-          session[:saml_unique_id].should == @unique_id
-          session[:saml_aac_id].should == @aac2.id
+          expect(response).to redirect_to(courses_url)
+          expect(session[:saml_unique_id]).to eq @unique_id
+          expect(session[:saml_aac_id]).to eq @aac2.id
         end
 
         context '/destroy' do

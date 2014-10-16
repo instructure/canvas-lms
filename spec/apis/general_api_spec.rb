@@ -60,9 +60,10 @@ describe "API", type: :request do
 
     it "should do attribute filtering if obj responds" do
       course_with_teacher
+      @course.send(:extend, RSpec::Matchers)
       def @course.filter_attributes_for_user(hash, user, session)
-        user.should == self.teachers.first
-        session.should == nil
+        expect(user).to eq self.teachers.first
+        expect(session).to be_nil
         hash.delete('sis_source_id')
       end
       expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name permissions)

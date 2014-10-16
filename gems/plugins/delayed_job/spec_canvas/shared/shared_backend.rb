@@ -456,8 +456,10 @@ shared_examples_for 'a backend' do
   end
 
   module InDelayedJobTest
+    extend RSpec::Matchers
+
     def self.check_in_job
-      Delayed::Job.in_delayed_job?.should == true
+      expect(Delayed::Job.in_delayed_job?).to be true
     end
   end
 

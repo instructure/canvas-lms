@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe LtiApiController, type: :integration do
+describe LtiApiController, type: :request do
   before :once do
     user_with_pseudonym(:username => 'parajsa', :password => 'password1')
     course_with_student(:active_all => true, :user => @user)

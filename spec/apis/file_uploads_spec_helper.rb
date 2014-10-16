@@ -400,24 +400,15 @@ shared_examples_for "file uploads api with quotas" do
   it "should return unsuccessful preflight for files exceeding quota limits" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
-    json = {}
-    begin
-      preflight({ :name => "test.txt", :size => 10.megabytes })
-    rescue => e
-      json = JSON.parse(e.message)
-    end
+    json = preflight({ :name => "test.txt", :size => 10.megabytes }, expected_status: 400)
     expect(json['message']).to eq "file size exceeds quota"
   end
 
   it "should return unsuccessful preflight for files exceeding quota limits (URL uploads)" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
-    json = {}
-    begin
-      preflight({ :name => "test.txt", :size => 10.megabytes, :url => "http://www.example.com/test" })
-    rescue => e
-      json = JSON.parse(e.message)
-    end
+    json = preflight({ :name => "test.txt", :size => 10.megabytes, :url => "http://www.example.com/test" },
+      expected_status: 400)
     expect(json['message']).to eq "file size exceeds quota"
   end
   
@@ -447,12 +438,11 @@ shared_examples_for "file uploads api with quotas" do
     attachment.content_type = 'text/plain'
     attachment.size = 6.megabytes
     attachment.save!
-    json = {}
-    begin
-      api_call(:get, "/api/v1/files/#{attachment.id}/create_success", {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'}, {:uuid => attachment.uuid})
-    rescue => e
-      json = JSON.parse(e.message)
-    end
+    json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success",
+                    {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'},
+                    {:uuid => attachment.uuid},
+                    {},
+                    expected_status: 400)
     expect(json['message']).to eq 'file size exceeds quota limits'
     attachment.reload
     expect(attachment.file_state).to eq 'deleted'

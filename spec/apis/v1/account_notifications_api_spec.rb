@@ -82,17 +82,15 @@ describe 'Account Notification API', type: :request do
 
     it 'should return not authorized for non admin user' do
       user = user_with_managed_pseudonym
-      begin
-        json = api_call_as_user(user, :post, @path, @api_params,
+      api_call_as_user(user, :post, @path, @api_params,
                         { :account_notification_roles => ['StudentEnrollment'],
                           :account_notification => {
                             :subject => 'New global notification',
                             :start_at => @start_at.iso8601,
                             :end_at => @end_at.iso8601,
-                            :message => 'This is a notification'}})
-      rescue => e
-        expect(e.message).to include 'unauthorized'
-      end
+                            :message => 'This is a notification'}},
+                        {},
+                        expected_status: 401)
     end
 
     it 'should return an error for missing required params' do

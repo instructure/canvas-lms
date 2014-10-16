@@ -32,7 +32,7 @@ describe FilePreviewsController do
   it "should require authorization to view the file" do
     attachment_model locked: true
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.status.should == 401
+    expect(response.status).to eq 401
   end
 
   it "should 404 if the file doesn't exist" do
@@ -40,7 +40,7 @@ describe FilePreviewsController do
     file_id = @attachment.id
     @attachment.destroy!
     get :show, course_id: @course.id, file_id: file_id
-    response.status.should == 404
+    expect(response.status).to eq 404
   end
 
   it "should redirect to crododoc_url if available and params[:annotate] is given" do
@@ -48,7 +48,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
     get :show, course_id: @course.id, file_id: @attachment.id, annotate: 1
-    response.should redirect_to @attachment.crocodoc_url
+    expect(response).to redirect_to @attachment.crocodoc_url
   end
 
   it "should redirect to canvadocs_url if available" do
@@ -56,7 +56,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.should redirect_to @attachment.canvadoc_url
+    expect(response).to redirect_to @attachment.canvadoc_url
   end
 
   it "should redirect to a google doc preview if available" do
@@ -64,8 +64,8 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
     attachment_model content_type: 'application/msword'
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.should be_redirect
-    response.location.should =~ %r{\A//docs.google.com/viewer}
+    expect(response).to be_redirect
+    expect(response.location).to match %r{\A//docs.google.com/viewer}
   end
 
   it "should render a download link if no previews are available" do
@@ -75,22 +75,22 @@ describe FilePreviewsController do
     @account.save!
     attachment_model content_type: 'application/msword'
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.status.should == 200
-    response.should render_template 'no_preview'
+    expect(response.status).to eq 200
+    expect(response).to render_template 'no_preview'
   end
 
   it "should render an img element for image types" do
     attachment_model content_type: 'image/png'
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.status.should == 200
-    response.should render_template 'img_preview'
+    expect(response.status).to eq 200
+    expect(response).to render_template 'img_preview'
   end
 
   it "should render a media tag for media types" do
     attachment_model content_type: 'video/mp4'
     get :show, course_id: @course.id, file_id: @attachment.id
-    response.status.should == 200
-    response.should render_template 'media_preview'
+    expect(response.status).to eq 200
+    expect(response).to render_template 'media_preview'
   end
 
   it "should fulfill module completion requirements" do
@@ -100,8 +100,8 @@ describe FilePreviewsController do
     tag = mod.add_item(:id => @attachment.id, :type => 'attachment')
     mod.completion_requirements = { tag.id => {:type => 'must_view'} }
     mod.save!
-    mod.evaluate_for(@user).workflow_state.should == "unlocked"
+    expect(mod.evaluate_for(@user).workflow_state).to eq "unlocked"
     get :show, course_id: @course.id, file_id: @attachment.id
-    mod.evaluate_for(@user).workflow_state.should == "completed"
+    expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
   end
 end

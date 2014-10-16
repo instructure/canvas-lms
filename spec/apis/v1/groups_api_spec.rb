@@ -726,10 +726,12 @@ describe "Groups API", type: :request do
       @user = @member
     end
 
-    def preflight(preflight_params)
+    def preflight(preflight_params, opts = {})
       api_call(:post, "/api/v1/groups/#{@community.id}/files",
         { :controller => "groups", :action => "create_file", :format => "json", :group_id => @community.to_param, },
-        preflight_params)
+        preflight_params,
+        {},
+        opts)
     end
 
     def has_query_exemption?

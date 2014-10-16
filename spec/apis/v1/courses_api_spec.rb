@@ -2061,11 +2061,13 @@ describe CoursesController, type: :request do
       @context = @course
     end
 
-    def preflight(preflight_params)
+    def preflight(preflight_params, opts = {})
       @user = @teacher
       api_call(:post, "/api/v1/courses/#{@course.id}/files",
         { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
-        preflight_params)
+        preflight_params,
+        {},
+        opts)
     end
 
     def has_query_exemption?

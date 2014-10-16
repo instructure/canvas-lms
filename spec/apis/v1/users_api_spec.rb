@@ -1000,10 +1000,12 @@ describe "Users API", type: :request do
     include_examples "file uploads api with folders"
     include_examples "file uploads api with quotas"
 
-    def preflight(preflight_params)
+    def preflight(preflight_params, opts = {})
       api_call(:post, "/api/v1/users/self/files",
         { :controller => "users", :action => "create_file", :format => "json", :user_id => 'self', },
-        preflight_params)
+        preflight_params,
+        {},
+        opts)
     end
 
     def has_query_exemption?
