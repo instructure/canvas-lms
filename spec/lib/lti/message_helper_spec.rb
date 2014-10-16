@@ -125,6 +125,18 @@ module Lti
           substitution_helper.stubs(:concluded_lis_roles).returns('learner')
           expect(subject.common_variable_substitutions['$Canvas.membership.concludedRoles'].call).to eq 'learner'
         end
+
+        it 'has substitution for $Canvas.course.previousContextIds' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:previous_lti_context_ids).returns('abc,xyz')
+          expect(subject.common_variable_substitutions['$Canvas.course.previousContextIds'].call).to eq 'abc,xyz'
+        end
+
+        it 'has substitution for $Canvas.course.previousCourseIds' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:previous_course_ids).returns('1,2')
+          expect(subject.common_variable_substitutions['$Canvas.course.previousCourseIds'].call).to eq '1,2'
+        end
       end
 
       context 'context is a course and there is a user' do

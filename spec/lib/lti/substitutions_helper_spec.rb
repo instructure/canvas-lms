@@ -277,5 +277,44 @@ module Lti
         expect(subject.enrollment_state).to eq ''
       end
     end
+
+    describe '#previous_course_ids_and_context_ids' do
+      before do
+        course.save!
+        @c1 = Course.create!
+        @c1.root_account = root_account
+        @c1.account = account
+        @c1.lti_context_id = 'abc'
+        @c1.save
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c1
+          cm.save!
+        end
+
+        @c2 = Course.create!
+        @c2.root_account = root_account
+        @c2.account = account
+        @c2.save!
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c2
+          cm.save!
+        end
+      end
+
+      it "should return previous canvas course ids" do
+        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
+      end
+
+      it "should return previous lti context_ids" do
+        expect(subject.previous_lti_context_ids).to eq 'abc'
+      end
+    end
+
   end
 end

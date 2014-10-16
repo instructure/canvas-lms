@@ -52,6 +52,8 @@ module Lti
             '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
             #This is a list of IMS LIS roles should have a different key
             '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
+            '$Canvas.course.previousContextIds' => -> { lti_helper.previous_lti_context_ids },
+            '$Canvas.course.previousCourseIds' => -> { lti_helper.previous_course_ids }
           }
         )
       end
