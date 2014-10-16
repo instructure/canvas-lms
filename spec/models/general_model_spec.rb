@@ -23,9 +23,10 @@ class ProtectAttributes
     @target = target
     !(@target.accessible_attributes.nil? && @target.protected_attributes.nil?)
   end
-  def failure_message_for_should
+  def failure_message
     "expected #{@target} to protect attributes"
   end
+#  alias_method :failure_message_for_should, :failure_message
 end
 
 def protect_attributes
