@@ -153,6 +153,14 @@ Rails.application.config.to_prepare do
     def delayed_jobs_shard
       self
     end
+
+    def in_region?(region)
+      true
+    end
+
+    def in_current_region?
+      true
+    end
   end
 
   Delayed::Backend::ActiveRecord::Job.class_eval do
