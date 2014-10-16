@@ -3,4 +3,4 @@
 
 APP_PATH = File.expand_path('../../config/application',  __FILE__)
 require File.expand_path('../../config/boot',  __FILE__)
-require '/home/me/.bundler/ruby/2.1.0/rails-e86daf8ff727/railties/lib/commands'
+require 'rails/commands'
