@@ -342,12 +342,15 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
-      @tag[:publishable] = module_item_publishable?(@tag)
-      @tag[:published] = @tag.published?
-      @tag[:publishable_id] = module_item_publishable_id(@tag)
-      @tag[:unpublishable] = module_item_unpublishable?(@tag)
-      @tag[:graded] = @tag.graded?
-      render :json => @tag
+      json = @tag.as_json
+      json['content_tag'].merge!(
+          publishable: module_item_publishable?(@tag),
+          published: @tag.published?,
+          publishable_id: module_item_publishable_id(@tag),
+          unpublishable:  module_item_unpublishable?(@tag),
+          graded: @tag.graded?
+        )
+      render json: json
     end
   end
   
