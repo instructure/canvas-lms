@@ -23,7 +23,6 @@ end
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
-  c.treat_symbols_as_metadata_keys_with_true_values = true
   c.color = true
 
   c.around(:each) do |example|
@@ -1199,7 +1198,7 @@ RSpec.configure do |config|
       AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
-        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+        skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
     expect(Attachment.s3_storage?).to be true

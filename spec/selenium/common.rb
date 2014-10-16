@@ -626,7 +626,7 @@ shared_examples_for "all selenium tests" do
       begin
         val = yield
         break if val
-      rescue => e
+      rescue Exception => e
         raise if i == seconds - 1
       end
       sleep 1

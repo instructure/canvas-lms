@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 RSpec::configure do |c|
-  c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
-      :file_path => c.escaped_path(%w[spec apis])
-  }
-
   # rspec-rails 3 will no longer automatically infer an example group's spec type
   # from the file location. You can explicitly opt-in to the feature using this
   # config option.

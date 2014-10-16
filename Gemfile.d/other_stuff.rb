@@ -33,7 +33,7 @@ gem 'canvas_connect', '0.3.6'
   gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.15'
 gem 'daemons', '1.1.0'
-gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
+gem 'diff-lcs', '1.2.5', :require => 'diff/lcs'
 
 gem 'ffi', '1.1.5'
 gem 'hairtrigger', '0.2.9'

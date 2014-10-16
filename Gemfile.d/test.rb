@@ -16,8 +16,9 @@ group :test do
       gem 'eventmachine', '1.0.3'
     end
 
-  gem 'rspec', '2.99.0'
-  gem 'rspec-rails', '2.99.0'
+  gem 'rspec', '3.1.0'
+  gem 'rspec-rails', '3.1.0'
+  gem 'rspec-legacy_formatters', '1.0.0'
   gem 'once-ler', '0.0.13'
 
   gem 'sequel', '4.5.0', :require => false
