@@ -166,7 +166,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
-    pending ('PENDING: Bullet')
+    skip ('PENDING: Bullet')
   end
 end
 
