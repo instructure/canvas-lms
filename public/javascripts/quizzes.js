@@ -3140,6 +3140,7 @@ define([
       reorderDom: function(group) {
         var option = this.$form.find("#move_select_question option:selected");
         var place = option.attr('value');
+        var bottom = this.selected.sortable.nextAll('.group_bottom').first();
 
         // move to bottom of the group
         if (place == 'last') {
@@ -3167,19 +3168,20 @@ define([
           beforeItem.before(this.selected.sortable);
         }
 
-        this.reorderDomGroupContent();
+        this.reorderDomGroupContent(bottom);
         this.setQuestionGroupClass(group);
       },
-      reorderDomGroupContent: function() {
+      reorderDomGroupContent: function(bottom) {
         if (this.selected.type != 'group') { return; }
 
-        var items = this.itemsInGroup(this.selected.id);
-        var bottom = items[0].sortable.nextAll('.group_bottom').first();
         var prev = this.selected.sortable;
-        $.each(items, function(i, item) {
-          prev.after(item.sortable);
-          prev = item.sortable;
-        });
+        var items = this.itemsInGroup(this.selected.id);
+        if (items.length) {
+          $.each(items, function(i, item) {
+            prev.after(item.sortable);
+            prev = item.sortable;
+          });
+        }
         prev.after(bottom);
       },
       setQuestionGroupClass: function(group) {
