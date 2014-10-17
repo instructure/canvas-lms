@@ -2,58 +2,9 @@ require 'i18n_tasks'
 require 'i18n_extraction'
 
 namespace :i18n do
-  def infer_scope(filename)
-    case filename
-      when /app\/views\/.*\.handlebars\z/
-        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').gsub(/plugins\/([^\/]*)\//, '').underscore.gsub(/\/_?/, '.')
-      else
-        ''
-    end
-  end
-
   desc "Verifies all translation calls"
   task :check => :environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
-
-    require 'ya2yaml'
-
-    only = if ENV['ONLY']
-      ENV['ONLY'].split(',').map{ |path|
-        path = '**/' + path if path =~ /\*/
-        path = './' + path unless path =~ /\A.?\//
-        if path =~ /\*/
-          path = Dir.glob(path)
-        elsif path !~ /\.(e?rb|js)\z/
-          path = Dir.glob(path + '/**/*')
-        end
-        path
-      }.flatten
-    end
-
-    COLOR_ENABLED = ($stdout.tty? rescue false)
-    def color(text, color_code)
-      COLOR_ENABLED ? "#{color_code}#{text}\e[0m" : text
-    end
-
-    def green(text)
-      color(text, "\e[32m")
-    end
-
-    def red(text)
-      color(text, "\e[31m")
-    end
-
-    @errors = []
-    def process_files(files)
-      files.each do |file|
-        begin
-          print green "." if yield file
-        rescue SyntaxError, StandardError
-          @errors << "#{$!}\n#{file}"
-          print red "F"
-        end
-      end
-    end
 
     I18n.available_locales
 
@@ -62,10 +13,10 @@ namespace :i18n do
     end
 
 
-    puts "\nJS..."
+    puts "\nJS/HBS..."
     system "./gems/canvas_i18nliner/bin/i18nliner export"
     if $?.exitstatus > 0
-      $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
+      $stderr.puts "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
       exit $?.exitstatus
     end
     js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
@@ -73,47 +24,21 @@ namespace :i18n do
     puts "\nRuby..."
     require 'i18nliner/commands/check'
 
-
     options = {:only => ENV['ONLY']}
     @command = I18nliner::Commands::Check.run(options)
     @command.success? or exit 1
-    total_ruby = @command.processors.sum(&:translation_count)
     @translations = @command.translations
 
     # merge js in
     js_translations.each do |key, value|
       @translations[key] = value
     end
-
-    t = Time.now
-
-
-    puts "\nHandlebars..."
-    file_count = 0
-    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
-    files &= only if only
-    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
-    process_files(files) do |file|
-      file_count += 1 if handlebars_extractor.process(File.read(file), infer_scope(file))
-    end
-
-    print "\n\n"
-    failure = @errors.size > 0
-
-    @errors.each_index do |i|
-      puts "#{i+1})"
-      puts red @errors[i]
-      print "\n"
-    end
-
-    print "Finished in #{Time.now - t} seconds\n\n"
-    total_strings = handlebars_extractor.total_unique
-    puts send((failure ? :red : :green), "#{file_count} files, #{total_strings} strings, #{@errors.size} failures")
-    raise "check command encountered errors" if failure
   end
 
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
+    require 'ya2yaml'
+
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
@@ -149,8 +74,6 @@ namespace :i18n do
 
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
-    file_translations = {}
-
     locales = I18n.available_locales - [:en]
     # allow passing of extra, empty locales by including a comma-separated
     # list of abbreviations in the LOCALES environment variable. e.g.
@@ -165,54 +88,12 @@ namespace :i18n do
       exit 0
     end
 
-    add_translations = lambda do |scope, translations|
-      file_translations[scope] ||= {}
-      locales.each do |locale|
-        file_translations[scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
-      end
-    end
-
-    # Process a single file
-    process_file = lambda do |extractor, filename, arg_block|
-      extractor.translations = {}
-
-      begin
-        unless extractor.process(File.read(filename), *arg_block.call(filename))
-          return
-        end
-      rescue Exception => e
-        puts e
-        raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
-      end
-
-      translations = extractor.translations.flatten_keys.keys
-
-      unless translations.empty?
-        add_translations.call(extractor.scope, translations)
-      end
-    end
-
-    process_files = lambda do |extractor, files, arg_block|
-      files.each do |filename|
-        process_file.call(extractor, filename, arg_block)
-      end
-    end
-
-    # JavaScript
     system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
     if $?.exitstatus > 0
       $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
       exit $?.exitstatus
     end
-    js_scope_key_map = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
-    js_scope_key_map.each do |scope, keys|
-      add_translations.call(scope, keys)
-    end
-
-    # Handlebars
-    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
-    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
-    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] })
+    file_translations = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
@@ -222,7 +103,11 @@ namespace :i18n do
       end
     end
 
-    file_translations.each do |scope, translations|
+    file_translations.each do |scope, keys|
+      translations = {}
+      locales.each do |locale|
+        translations.update flat_translations.slice(*keys.map{ |k| k.gsub(/\A/, "#{locale}.") })
+      end
       dump_translations.call(scope, translations.expand_keys)
     end
 

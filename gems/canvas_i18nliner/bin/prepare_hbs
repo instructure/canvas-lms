@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+var readline = require('readline');
+var Handlebars = require('handlebars');
+var ScopedHbsExtractor = require('../js/scoped_hbs_extractor');
+var PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor')['default'];
+
+// make sure necessary overrides are set up (e.g. HbsPreProcessor.normalizeInterpolationKey)
+require("../js/main");
+
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+rl.on('line', function(line) {
+  var data = JSON.parse(line);
+  var path = data.path;
+  var source = data.source;
+
+  try {
+    var translationCount = 0;
+    var ast = Handlebars.parse(source);
+    var extractor = new ScopedHbsExtractor(ast, {path: path});
+    var scope = extractor.scope;
+    PreProcessor.scope = scope;
+    PreProcessor.process(ast);
+    extractor.forEach(function() { translationCount++; });
+
+    var result = Handlebars.precompile(ast);
+    var payload = {template: result, scope: scope, translationCount: translationCount};
+    process.stdout.write(JSON.stringify(payload) + "\n");
+  }
+  catch (e) {
+    e = e.message || e;
+    process.stdout.write(JSON.stringify({error: e}) + "\n");
+  }
+});
+

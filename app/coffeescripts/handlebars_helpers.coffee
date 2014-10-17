@@ -18,17 +18,24 @@ define [
 ], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
-    t : (translationKey, defaultValue, options) ->
+    t : (args..., options) ->
       wrappers = {}
       options = options?.hash ? {}
-      scope = options.scope
-      delete options.scope
       for key, value of options when key.match(/^w\d+$/)
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
-      options = $.extend(options, this) unless this instanceof String or typeof this is 'string'
-      htmlEscape I18n.scoped(scope).t(translationKey, defaultValue, options)
+      options[key] = this[key] for key in this
+      new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
+
+    __i18nliner_escape: (val) ->
+      htmlEscape val
+
+    __i18nliner_safe: (val) ->
+      new htmlEscape.SafeString(val)
+
+    __i18nliner_concat: (args..., options) ->
+      args.join("")
 
     hiddenIf : (condition) -> " display:none; " if condition
 
@@ -42,8 +49,8 @@ define [
       localDatetime = $.datetimeString(datetime)
       titleText = localDatetime
       if ENV and ENV.CONTEXT_TIMEZONE and (ENV.TIMEZONE != ENV.CONTEXT_TIMEZONE)
-        localText = Handlebars.helpers.t('#helpers.local','Local')
-        courseText = Handlebars.helpers.t('#helpers.course', 'Course')
+        localText = I18n.t('#helpers.local','Local')
+        courseText = I18n.t('#helpers.course', 'Course')
         courseDatetime = $.datetimeString(datetime, timezone: ENV.CONTEXT_TIMEZONE)
         if localDatetime != courseDatetime
           titleText = "#{localText}: #{localDatetime}<br>#{courseText}: #{courseDatetime}"

@@ -5,6 +5,8 @@ require "i18nliner/processors/erb_processor"
 require "i18nliner/errors"
 require_relative "i18nliner_scope_extensions"
 
+require "active_support/core_ext/module/aliasing"
+
 module I18nliner
   class HtmlTagsInDefaultTranslationError < ExtractionError; end
   class AmbiguousTranslationKeyError < ExtractionError; end

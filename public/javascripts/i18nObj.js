@@ -8,16 +8,6 @@ define([
 
 I18n.locale = document.documentElement.getAttribute('lang');
 
-I18n.isValidNode = function(obj, node) {
-  // handle names like "foo.bar.baz"
-  var nameParts = node.split('.');
-  for (var j=0; j < nameParts.length; j++) {
-    obj = obj[nameParts[j]];
-    if (typeof obj === 'undefined' || obj === null) return false;
-  }
-  return true;
-};
-
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
   var locales = [I18n.currentLocale()];
@@ -49,39 +39,6 @@ I18n.lookup = function(scope, options) {
   }
 
   return messages;
-};
-
-// i18nliner-js overrides interpolate with a wrapper-and-html-safety-aware
-// version, so we need to override the now-renamed original
-I18n.interpolateWithoutHtmlSafety = function(message, options) {
-  options = this.prepareOptions(options);
-  var matches = message.match(this.PLACEHOLDER);
-
-  if (!matches) {
-    return message;
-  }
-
-  var placeholder, value, name;
-
-  for (var i = 0; placeholder = matches[i]; i++) {
-    name = placeholder.replace(this.PLACEHOLDER, "$1");
-
-    // handle names like "foo.bar.baz"
-    var nameParts = name.split('.');
-    value = options;
-    for (var j=0; j < nameParts.length; j++) {
-      value = value[nameParts[j]];
-    }
-
-    if (!this.isValidNode(options, name)) {
-      value = "[missing " + placeholder + " value]";
-    }
-
-    regex = new RegExp(placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"));
-    message = message.replace(regex, value);
-  }
-
-  return message;
 };
 
 var _localize = I18n.localize;
