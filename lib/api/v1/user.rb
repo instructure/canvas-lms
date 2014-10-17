@@ -48,8 +48,8 @@ module Api::V1::User
           json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
                       :integration_id => sis_pseudonym.integration_id,
                       # TODO: don't send sis_login_id; it's garbage data
-                      :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
-          json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
+                      :sis_login_id => sis_pseudonym.unique_id if sis_pseudonym.grants_right?(current_user, :read_sis)
+          json[:sis_import_id] = sis_pseudonym.sis_batch_id if sis_pseudonym.grants_right?(current_user, :manage_sis)
           json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
         if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))

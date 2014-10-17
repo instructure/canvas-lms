@@ -4,12 +4,12 @@
   <fieldset id="login_information">
     <legend><%= t('titles.logins', 'Login Information') %></legend>
     <table>
-      <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
+      <% pseudonyms = @user.all_active_pseudonyms.select{ |p| can_do(p, @current_user, :read) } + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
-            <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym.account, @current_user, :read_sis)) || can_do(pseudonym, @current_user, :manage_sis)) %>
+            <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym, @current_user, :read_sis)) || can_do(pseudonym, @current_user, :manage_sis)) %>
               <div style="font-size: 0.8em; padding-left: 20px;">
                 <%= before_label('sis_id', 'SIS ID') %> <span id="sis_user_id_<%= pseudonym.id %>" class="sis_user_id"><%= pseudonym.sis_user_id %></span> 
               </div>

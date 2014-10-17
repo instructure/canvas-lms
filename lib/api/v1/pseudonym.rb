@@ -5,7 +5,7 @@ module Api::V1::Pseudonym
 
   def pseudonym_json(pseudonym, current_user, session)
     opts = API_PSEUDONYM_JSON_OPTS
-    opts = opts.reject { |opt| opt == :sis_user_id } unless pseudonym.account.grants_any_right?(current_user, :read_sis, :manage_sis)
+    opts = opts.reject { |opt| opt == :sis_user_id } unless pseudonym.grants_right?(current_user, :read_sis)
     api_json(pseudonym, current_user, session, :only => opts)
   end
 

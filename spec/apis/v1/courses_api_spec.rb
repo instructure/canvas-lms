@@ -1341,8 +1341,8 @@ describe CoursesController, type: :request do
       expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
     end
 
-    it "should include user sis id and login id if can manage_students in the course" do
-      expect(@course1.grants_right?(@me, :manage_students)).to be_truthy
+    it "should include user sis id and login id if can manage_sis in the account" do
+      account_admin_user(user: @me)
       first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
       @course1.enroll_student(first_student).accept!
       first_student.pseudonym.update_attribute(:sis_user_id, 'user2')
@@ -1732,8 +1732,8 @@ describe CoursesController, type: :request do
         expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       end
 
-      it "should include user sis id and login id if can manage_students in the course" do
-        expect(@course1.grants_right?(@me, :manage_students)).to be_truthy
+      it "should include user sis id and login id if can manage_sis in the account" do
+        account_admin_user(user: @me)
         first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
         @course1.enroll_student(first_student).accept!
         first_student.pseudonym.update_attribute(:sis_user_id, 'user2')

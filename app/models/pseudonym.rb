@@ -233,6 +233,12 @@ class Pseudonym < ActiveRecord::Base
   end
 
   set_policy do
+    given do |user|
+      user.try(:id) == self.user_id ||
+      self.account.grants_any_right?(user, :manage_user_logins, :manage_students)
+    end
+    can :read
+
     # an admin can only create and update pseudonyms when they have
     # :manage_user_logins permission on the pseudonym's account, :read
     # permission on the pseudonym's owner, and a superset of hte pseudonym's
@@ -278,7 +284,16 @@ class Pseudonym < ActiveRecord::Base
       self.account.grants_right?(user, :manage_sis) &&
       self.grants_right?(user, :update)
     end
-    can :manage_sis
+    can :manage_sis and can :read_sis
+
+    # an admin can read a pseudonym's SIS ID when they have :read_sis
+    # permission on the pseudonym's account and the pseudonym's owner is
+    # visible to them
+    given do |user|
+      self.account.grants_right?(user, :read_sis) &&
+      self.grants_right?(user, :read)
+    end
+    can :read_sis
 
     # an admin can delete any non-SIS pseudonym that they can update
     given do |user|
