@@ -38,8 +38,8 @@ describe "handlebars" do
         <li>{{#t "protip" type=../type}}Important {{type}} tip:{{/t}} {{this}}</li>
         {{/each}}
       </ol>
-      <p>{{#t "html"}}lemme instructure you some html: if you type {{input}}, you get {{{input}}}{{/t}}</p>
-      <p>{{#t "reversed"}}in other words you get {{{input}}} when you type {{input}}{{/t}}</p>
+      <p>{{#t "html"}}lemme instructure you some html: if you type {{input}}, you get {{{raw_input}}}{{/t}}</p>
+      <p>{{#t "reversed"}}in other words you get {{{raw_input}}} when you type {{input}}{{/t}}</p>
       <p>{{#t "escapage"}}this is {{escaped}}{{/t}}</p>
       <p>{{#t "unescapage"}}this is {{{unescaped}}}{{/t}}</p>
       {{#t "bye"}}welp, see you l8r! dont forget 2 <a href="{{url}}">like us</a> on facebook lol{{/t}}
@@ -51,6 +51,8 @@ describe "handlebars" do
       type: 'yoga',
       items: ['dont forget to stretch!!!'],
       input: '<input>',
+      raw_input: '<input>', # note; this is temporary due to a change in the html-safety implementation.
+                            # once i18nliner-handlebars lands, the old spec will pass
       url: 'http://foo.bar',
       escaped: '<b>escaped</b>',
       unescaped: '<b>unescaped</b>'
@@ -129,7 +131,7 @@ describe "handlebars" do
         <b> Je voudrais un croissant</b>
       </p>
       <p>
-        <i> Yes, that's true, he would </i>
+        <i> Yes, that&#39;s true, he would </i>
       </p>
     HTML
   end

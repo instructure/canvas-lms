@@ -1,22 +1,12 @@
 define([
-  'vendor/i18n',
+  'vendor/i18n_js_extension',
   'jquery',
   'str/htmlEscape',
-  'str/pluralize',
-  'str/escapeRegex',
   'compiled/str/i18nLolcalize',
   'vendor/date' /* Date.parse, Date.UTC */
-], function(I18n, $, htmlEscape, pluralize, escapeRegex, i18nLolcalize) {
-
-// Export globally for tinymce/specs
-window.I18n = I18n;
+], function(I18n, $, htmlEscape, i18nLolcalize) {
 
 I18n.locale = document.documentElement.getAttribute('lang');
-
-// Set the placeholder format. Accepts `%{placeholder}` and %h{placeholder}.
-// %h{placeholder} indicate it is an htmlSafe value, (e.g. an input) and
-// anything not already safe should be html-escaped
-I18n.PLACEHOLDER = /%h?\{(.*?)\}/gm;
 
 I18n.isValidNode = function(obj, node) {
   // handle names like "foo.bar.baz"
@@ -61,23 +51,20 @@ I18n.lookup = function(scope, options) {
   return messages;
 };
 
-I18n.interpolate = function(message, options) {
-  var placeholder, value, name, matches, needsEscaping = false, htmlSafe;
-
+// i18nliner-js overrides interpolate with a wrapper-and-html-safety-aware
+// version, so we need to override the now-renamed original
+I18n.interpolateWithoutHtmlSafety = function(message, options) {
   options = this.prepareOptions(options);
-  if (options.wrapper) {
-    needsEscaping = true;
-    message = this.applyWrappers(message, options.wrapper);
-  }
-  if (options.needsEscaping) {
-    needsEscaping = true;
+  var matches = message.match(this.PLACEHOLDER);
+
+  if (!matches) {
+    return message;
   }
 
-  matches = message.match(this.PLACEHOLDER) || [];
+  var placeholder, value, name;
 
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
-    htmlSafe = (placeholder[1] === 'h'); // e.g. %h{input}
 
     // handle names like "foo.bar.baz"
     var nameParts = name.split('.');
@@ -89,45 +76,12 @@ I18n.interpolate = function(message, options) {
     if (!this.isValidNode(options, name)) {
       value = "[missing " + placeholder + " value]";
     }
-    if (needsEscaping) {
-      if (!value._icHTMLSafe && !htmlSafe) {
-        value = htmlEscape(value);
-      }
-    } else if (value._icHTMLSafe || htmlSafe) {
-      needsEscaping = true;
-      message = htmlEscape(message);
-    }
 
     regex = new RegExp(placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"));
     message = message.replace(regex, value);
   }
 
   return message;
-};
-
-I18n.wrapperRegexes = {};
-
-I18n.applyWrappers = function(string, wrappers) {
-  var keys = [];
-  var key;
-
-  string = htmlEscape(string);
-  if (typeof(wrappers) == "string") {
-    wrappers = {'*': wrappers};
-  }
-  for (key in wrappers) {
-    keys.push(key);
-  }
-  keys.sort().reverse();
-  for (var i=0, l=keys.length; i < l; i++) {
-    key = keys[i];
-    if (!this.wrapperRegexes[key]) {
-      var escapedKey = escapeRegex(key);
-      this.wrapperRegexes[key] = new RegExp(escapedKey + "([^" + escapedKey + "]*)" + escapedKey, "g");
-    }
-    string = string.replace(this.wrapperRegexes[key], wrappers[key]);
-  }
-  return string;
 };
 
 var _localize = I18n.localize;
@@ -261,11 +215,18 @@ I18n.strftime = function(date, format) {
   return f;
 };
 
+I18n.Utils.HtmlSafeString = htmlEscape.SafeString; // this is what we use elsewhere in canvas, so make i18nliner use it too
+I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
+I18n.CallHelpers.normalizeKey = function(key, options) {
+  if (key[0] === '#') {
+    key = key.slice(1);
+    delete options.scope;
+  }
+  return key;
+}
 
-
-var normalizeDefault = function(str) { return str };
 if (window.ENV && window.ENV.lolcalize) {
-  normalizeDefault = i18nLolcalize;
+  I18n.CallHelpers.normalizeDefault = i18nLolcalize;
 }
 
 I18n.scoped = function(scope, callback) {
@@ -279,36 +240,26 @@ I18n.scope = function(scope) {
   this.scope = scope;
 };
 I18n.scope.prototype = {
-  resolveScope: function(key) {
-    if (typeof(key) == "object") {
-      key = key.join(I18n.defaultSeparator);
+  HtmlSafeString: I18n.HtmlSafeString,
+
+  translate: function() {
+    var args = [].slice.call(arguments);
+    var options = args[args.length - 1];
+    if (!(options instanceof Object)) {
+      options = {}
+      args.push(options);
     }
-    if (key[0] == '#') {
-      return key.replace(/^#/, '');
-    } else {
-      return this.scope + I18n.defaultSeparator + key;
-    }
+    options.scope = this.scope;
+    return I18n.translate.apply(I18n, args);
   },
-  translate: function(scope, defaultValue, options) {
-    options = options || {};
-    if (typeof(options.count) != 'undefined' && typeof(defaultValue) == "string" && defaultValue.match(/^[\w\-]+$/)) {
-      defaultValue = pluralize.withCount(options.count, defaultValue);
-    }
-    options.defaultValue = normalizeDefault(defaultValue);
-    return I18n.translate(this.resolveScope(scope), options);
-  },
-  localize: function(scope, value) {
-    return I18n.localize(this.resolveScope(scope), value);
-  },
-  pluralize: function(count, scope, options) {
-    return I18n.pluralize(count, this.resolveScope(scope), options);
+  localize: function(key, date) {
+    if (key[0] === '#') key = key.slice(1);
+    return I18n.localize(key, date);
   },
   beforeLabel: function(text) {
     return this.t("#before_label_wrapper", "%{text}:", {'text': text});
   },
-  lookup: function(scope, options) {
-    return I18n.lookup(this.resolveScope(scope), options);
-  },
+  lookup:       I18n.lookup.bind(I18n),
   toTime:       I18n.toTime.bind(I18n),
   toNumber:     I18n.toNumber.bind(I18n),
   toCurrency:   I18n.toCurrency.bind(I18n),

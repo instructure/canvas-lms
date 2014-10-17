@@ -27,9 +27,8 @@ define [
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
-      options.needsEscaping = true
       options = $.extend(options, this) unless this instanceof String or typeof this is 'string'
-      I18n.scoped(scope).t(translationKey, defaultValue, options)
+      htmlEscape I18n.scoped(scope).t(translationKey, defaultValue, options)
 
     hiddenIf : (condition) -> " display:none; " if condition
 
