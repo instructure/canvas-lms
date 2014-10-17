@@ -405,7 +405,7 @@ class ExternalToolsController < ApplicationController
     message_type = tool.extension_setting(selection_type, 'message_type')
     case message_type
       when 'ContentItemSelectionResponse'
-        content_item_selection_response(tool, selection_type)
+        content_item_selection_response(tool, selection_type, content_item_response)
       else
         basic_lti_launch_request(tool, selection_type)
     end
@@ -436,9 +436,48 @@ class ExternalToolsController < ApplicationController
   end
   protected :basic_lti_launch_request
 
-  def content_item_selection_response(tool, placement)
+  def content_item_selection_response(tool, placement, content_item_response)
+    params = default_lti_params.merge({
+        #required params
+        lti_message_type: 'ContentItemSelectionResponse',
+        lti_version: 'LTI-1p0',
+        resource_link_id: Lti::Asset.opaque_identifier_for(@context),
+        content_items: content_item_response.to_json,
+        launch_presentation_return_url: @return_url,
+        context_title: @context.name,
+        tool_consumer_instance_name: @domain_root_account.name,
+        tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
+    }).merge(tool.substituted_custom_fields(placement, common_variable_substitutions))
+
+    lti_launch = Lti::Launch.new
+    lti_launch.resource_url = tool.extension_setting(placement, :url)
+    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
+    lti_launch.link_text = tool.label_for(placement.to_sym)
+    lti_launch.analytics_id = tool.tool_id
+
+    lti_launch
+  end
+  protected :content_item_selection_response
+
+  def content_item_response
     #contstruct query params for the export endpoint
+    export_type = params["export_type"] || "common_cartridge"
+    content_items = []
+
+    if export_type == "common_cartridge"
+      content_items << content_item_for_common_cartridge
+    end
+
+    {
+        "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement",
+        "@graph" => content_items
+    }
+  end
+  protected :content_item_response
+
+  def content_item_for_common_cartridge
     query_params = {"export_type" => "common_cartridge"}
+
     media_types = []
     [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes].each do |type|
       if params[type]
@@ -465,14 +504,14 @@ class ExternalToolsController < ApplicationController
         tag = @context.context_module_tags.where(id: params[:module_items].first).first
 
         case tag.content
-        when Assignment
-          media_type = 'assignment'
-        when DiscussionTopic
-          media_type = 'discussion_topic'
-        when Quizzes::Quiz
-          media_type = 'quiz'
-        when WikiPage
-          media_type = 'page'
+          when Assignment
+            media_type = 'assignment'
+          when DiscussionTopic
+            media_type = 'discussion_topic'
+          when Quizzes::Quiz
+            media_type = 'quiz'
+          when WikiPage
+            media_type = 'page'
         end
 
         title = tag.title
@@ -480,42 +519,17 @@ class ExternalToolsController < ApplicationController
         title = @context.name
     end
 
-    content_json = {
-        "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement",
-        "@graph" => [
-            {
-                "@type" => "ContentItemPlacement",
-                "placementOf" => {
-                    "@type" => "FileItem",
-                    "@id" => api_v1_course_content_exports_url(@context) + '?' + query_params.to_query,
-                    "mediaType" => "application/vnd.instructure.api.content-exports.#{media_type}",
-                    "title" => title
-                }
-            }
-        ]
+    {
+        "@type" => "ContentItemPlacement",
+        "placementOf" => {
+            "@type" => "FileItem",
+            "@id" => api_v1_course_content_exports_url(@context) + '?' + query_params.to_query,
+            "mediaType" => "application/vnd.instructure.api.content-exports.#{media_type}",
+            "title" => title
+        }
     }
-
-    params = default_lti_params.merge({
-        #required params
-        lti_message_type: 'ContentItemSelectionResponse',
-        lti_version: 'LTI-1p0',
-        resource_link_id: Lti::Asset.opaque_identifier_for(@context),
-        content_items: content_json.to_json,
-        launch_presentation_return_url: @return_url,
-        context_title: @context.name,
-        tool_consumer_instance_name: @domain_root_account.name,
-        tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-    }).merge(tool.substituted_custom_fields(placement, common_variable_substitutions))
-
-    lti_launch = Lti::Launch.new
-    lti_launch.resource_url = tool.extension_setting(placement, :url)
-    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
-    lti_launch.link_text = tool.label_for(placement.to_sym)
-    lti_launch.analytics_id = tool.tool_id
-
-    lti_launch
   end
-  protected :content_item_selection_response
+  protected :content_item_for_common_cartridge
 
   def tool_launch_template(tool, selection_type)
     TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] || TOOL_DISPLAY_TEMPLATES['default']
