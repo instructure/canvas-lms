@@ -454,10 +454,17 @@ class ContextExternalTool < ActiveRecord::Base
   LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
                :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu]
   def self.all_tools_for(context, options={})
-    if LOR_TYPES.include?(options[:type])
-      return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
-          (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    #options[:type] is deprecated, use options[:placements] instead
+    placements =* options[:placements] || options[:type]
+
+    #special LOR feature flag
+    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
+        (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+      valid_placements = placements.select{|placement| !LOR_TYPES.include?(placement.to_sym)}
+      return [] if valid_placements.size == 0 && placements.size > 0
+      placements = valid_placements
     end
+
     contexts = []
     if options[:user]
       contexts << options[:user]
@@ -466,7 +473,7 @@ class ContextExternalTool < ActiveRecord::Base
     return nil if contexts.empty?
 
     scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
-    scope = scope.having_setting(options[:type]) if options[:type]
+    scope = scope.placements(*placements)
     scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
     scope.order(ContextExternalTool.best_unicode_collation_key('name'))
   end
@@ -523,8 +530,9 @@ class ContextExternalTool < ActiveRecord::Base
       where("context_external_tool_placements.placement_type = ?", setting) : scoped }
 
   scope :placements, lambda { |*placements|
-    if placements
-      module_item_sql = if placements.include? 'module_item'
+    if placements.present?
+      placements = placements.map(&:to_sym)
+      module_item_sql = if placements.include? :module_item
                           "(context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "

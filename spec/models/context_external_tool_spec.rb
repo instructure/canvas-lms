@@ -394,6 +394,17 @@ describe ContextExternalTool do
       tools = ContextExternalTool.all_tools_for(@course, selectable: true)
       expect(tools.count).to eq 2
     end
+
+    it 'returns multiple requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      expect(ContextExternalTool.all_tools_for(@course, placements: ['module_item', 'resource_selection']).to_a).to eql([tool1, tool3].sort_by(&:name))
+    end
   end
 
   describe "placements" do

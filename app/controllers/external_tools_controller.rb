@@ -312,16 +312,16 @@ class ExternalToolsController < ApplicationController
         raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")
       end
     else
-      selection_type = params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
-      if find_tool(params[:id], selection_type)
+      placement = params[:placement] || params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
+      if find_tool(params[:id], placement)
 
         log_asset_access(@tool, "external_tools", "external_tools")
 
         @return_url = external_content_success_url('external_tool_redirect')
         @redirect_return = true
 
-        success_url = tool_return_success_url(selection_type)
-        cancel_url = tool_return_cancel_url(selection_type) || success_url
+        success_url = tool_return_success_url(placement)
+        cancel_url = tool_return_cancel_url(placement) || success_url
         js_env(:redirect_return_success_url => success_url,
                :redirect_return_cancel_url => cancel_url)
         js_env(:course_id => @context.id) if @context.is_a?(Course)
@@ -329,8 +329,8 @@ class ExternalToolsController < ApplicationController
         @active_tab = @tool.asset_string
         @show_embedded_chat = false if @tool.tool_id == 'chat'
 
-        @lti_launch = lti_launch(@tool, selection_type)
-        render tool_launch_template(@tool, selection_type)
+        @lti_launch = lti_launch(@tool, placement)
+        render tool_launch_template(@tool, placement)
       end
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
