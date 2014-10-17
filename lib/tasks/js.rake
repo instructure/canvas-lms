@@ -150,7 +150,7 @@ namespace :js do
 
         if File.exists?('./package.json')
           puts "\tRunning 'npm install'..."
-          output = `npm install`
+          output = `npm install` rescue `npm cache clean && npm install`
           unless $?.exitstatus == 0
             puts <<-MESSAGE
             -------------------------------------------------------------------
