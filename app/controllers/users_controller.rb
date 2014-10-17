@@ -859,6 +859,8 @@ class UsersController < ApplicationController
           Diigo::Connection.diigo_get_bookmarks(service, 1)
         when 'skype'
           true
+        when 'yo'
+          true
         else
           raise "Unknown Service"
       end

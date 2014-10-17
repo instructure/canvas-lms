@@ -42,6 +42,16 @@ Canvas::Plugin.register('twitter', nil, {
   :settings_partial => 'plugins/twitter_settings',
   :validator => 'TwitterValidator'
 })
+Canvas::Plugin.register('yo', nil, {
+  :name => lambda{ t :name, 'Yo'},
+  :description => lambda{ t :description, 'Just Yo' },
+  :website => 'http://www.justyo.co',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/yo_settings',
+  :validator => 'YoValidator'
+})
 Canvas::Plugin.register('scribd', nil, {
   :name => lambda{ t :name, 'Scribd' },
   :description => lambda{ t :description, 'Scribd document previews' },

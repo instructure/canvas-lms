@@ -1285,6 +1285,11 @@ class Account < ActiveRecord::Base
         :description => "",
         :expose_to_ui => (Twitter::Connection.config ? :service : false)
       },
+      :yo => {
+        :name => t("account_settings.yo", "Yo"),
+        :description => "",
+        :expose_to_ui => (Canvas::Plugin.find(:yo).try(:enabled?) ? :service : false)
+      },
       :delicious => {
         :name => t("account_settings.delicious", "Delicious"),
         :description => "",

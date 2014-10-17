@@ -35,7 +35,7 @@ class UserService < ActiveRecord::Base
   after_destroy :remove_related_channels
   
   def should_have_communication_channel?
-    [CommunicationChannel::TYPE_FACEBOOK, CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
+    [CommunicationChannel::TYPE_FACEBOOK, CommunicationChannel::TYPE_TWITTER, CommunicationChannel::TYPE_YO].include?(service) && self.user
   end
   
   def assert_relations
@@ -53,14 +53,16 @@ class UserService < ActiveRecord::Base
   end
   
   def remove_related_channels
-    if self.service == CommunicationChannel::TYPE_FACEBOOK && self.user
-      ccs = self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_FACEBOOK)
+    # should this include twitter and yo?
+    if [CommunicationChannel::TYPE_YO, CommunicationChannel::TYPE_FACEBOOK].include?(self.service) && self.user
+      ccs = self.user.communication_channels.where(path_type: self.service)
       ccs.each{|cc| cc.destroy }
     end
     true
   end
   
   def assert_communication_channel
+    # why is twitter getting special treatment?
     self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
   
@@ -145,6 +147,11 @@ class UserService < ActiveRecord::Base
         opts[:service_user_id] = params[:user_name]
         opts[:service_user_name] = params[:user_name]
         opts[:protocol] = "skype"
+      when 'yo'
+        opts[:service_domain] = "justyo.co"
+        opts[:service_user_id] = params[:user_name]
+        opts[:service_user_name] = params[:user_name]
+        opts[:protocol] = "yo"
       else
         raise "Unknown Service Type"
     end
@@ -169,12 +176,14 @@ class UserService < ActiveRecord::Base
       4
     when CommunicationChannel::TYPE_FACEBOOK
       5
-    when 'delicious'
-      7
-    when 'diigo'
-      8
     when 'linked_in'
       6
+    when CommunicationChannel::TYPE_YO
+      7
+    when 'delicious'
+      8
+    when 'diigo'
+      9
     else
       999
     end
@@ -190,6 +199,8 @@ class UserService < ActiveRecord::Base
       t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
     when CommunicationChannel::TYPE_FACEBOOK
       t '#user_service.descriptions.facebook', 'Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups.'
+    when CommunicationChannel::TYPE_YO
+      t '#user_service.descriptions.yo', 'Yo is a single-tap zero character communication tool.'
     when 'delicious'
       t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
     when 'diigo'
@@ -213,6 +224,8 @@ class UserService < ActiveRecord::Base
       'http://twitter.com/signup'
     when CommunicationChannel::TYPE_FACEBOOK
       'http://www.facebook.com'
+    when CommunicationChannel::TYPE_YO
+      'http://www.justyo.co'
     when 'delicious'
       'http://delicious.com/'
     when 'diigo'
@@ -244,6 +257,8 @@ class UserService < ActiveRecord::Base
         "http://www.twitter.com/#{service_user_name}"
       when CommunicationChannel::TYPE_FACEBOOK
         "http://www.facebook.com/profile.php?id=#{service_user_id}"
+      when CommunicationChannel::TYPE_YO
+        "http://www.justyo.co/#{service_user_name}"
       when 'delicious'
         "http://www.delicious.com/#{service_user_name}"
       when 'diigo'
@@ -258,7 +273,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.configured_services
-    [:facebook, :google_docs, :twitter, :linked_in, :diigo]
+    [:facebook, :google_docs, :twitter, :yo, :linked_in, :diigo]
   end
   
   def self.configured_service?(service)

@@ -54,6 +54,7 @@ define [
           when 'push' then I18n.t('communication.push.display', 'Push Notification')
           when 'twitter' then I18n.t('communication.twitter.display', 'Twitter')
           when 'facebook' then I18n.t('communication.facebook.display', 'Facebook')
+          when 'yo' then I18n.t('communication.yo.display', 'Yo')
       # Setup the mappings
       @mappings = new NotificationGroupMappings()
       @$notificationSaveStatus = $('#notifications_save_status')

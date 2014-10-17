@@ -359,6 +359,40 @@ TEXT
           </div>
         </div>
       </li>
+      <li id="unregistered_service_yo" class="service" style="<%= hidden if services.include?("yo") || !feature_and_service_enabled?(:yo) %>">
+        <a href="#" class="btn btn-small"><%= image_tag "yo_icon.png" %> <%= t('links.yo', "Yo") %></a>
+        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_yo', "Yo Login") %>" id="unregistered_service_yo_dialog">
+          <div>
+            <%= image_tag "yo.png", :style => "float: left; padding-right: 5px;" %>
+            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.yo_login', "Yo Login") %></div>
+            <%= mt(:yo_description, <<-TEXT)
+Yo is a single-tap zero character communication tool.
+If you have a Yo account, you can register it here. Then if you allow
+fellow course/group members to see your registered services, they can
+easily connect with your Yo account.
+
+You can also sign up to have notifications sent to your Yo account.
+TEXT
+            %>
+            <div class="clear"></div>
+          </div>
+          <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= f.hidden_field :service, :value => "yo" %>
+            <table class="formtable">
+              <tr>
+                <td><%= f.blabel :user_name, :yo_name, :en => "Yo Name" %></td>
+                <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
+              </tr><tr>
+                <td colspan="2">
+                  <button type="submit" class="btn btn-primary"><%= t('buttons.save_yo_name', "Save Yo Name") %></button>
+                </td>
+              </tr>
+            </table>
+            <% end %>
+          </div>
+        </div>
+      </li>
       <li id="unregistered_service_delicious" class="service" style="<%= hidden if services.include?("delicious") || !service_enabled?(:delicious) %>">
         <a href="#" class="btn btn-small"><%= image_tag "delicious_icon.png" %> <%= t('links.delicious', "Delicious") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.delicious_login', "Delicious Login") %>" id="unregistered_service_delicious_dialog">
