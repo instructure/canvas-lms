@@ -5130,7 +5130,7 @@ fr:
       long_with_weekday: "%A, %B %-d"
       medium: "%e %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %j, %A"
+      medium_with_weekday: "%a %-d %b %Y"
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
