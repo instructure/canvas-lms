@@ -71,12 +71,21 @@ describe Quizzes::QuizSubmission do
     it 'should rectify small amounts of drift (could be caused by JS stalling)' do
       anchor = Time.now
 
-      # subject.stubs(:end_at?).returns(true)
       subject.started_at = anchor
       subject.end_at = anchor + 5.minutes
       subject.finished_at = anchor + 6.minutes
       subject.save
       expect(subject.finished_at).to eq subject.end_at
+    end
+
+    it "should not rectify drift for a submission finished before the end at date" do
+      anchor = Time.now
+
+      subject.started_at = anchor
+      subject.end_at = anchor + 5.minutes
+      subject.finished_at = anchor
+      subject.save
+      expect(subject.finished_at).not_to eq subject.end_at
     end
   end
 

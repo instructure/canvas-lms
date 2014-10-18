@@ -352,7 +352,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # Of course, this is purely guess-work and is not bullet-proof.
   def rectify_finished_at_drift
-    if self.finished_at && self.end_at
+    if self.finished_at && self.end_at && self.finished_at > self.end_at
       drift = self.finished_at - self.end_at
 
       if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD
