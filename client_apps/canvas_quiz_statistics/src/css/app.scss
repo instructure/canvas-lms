@@ -7,15 +7,12 @@
 @import "./ext/qtip";
 
 #canvas-quiz-statistics {
-  border-top: 1px solid #CAD0D7;
+  border-top: 1px solid $borderColor;
   padding: 25px 35px 55px 35px;
 
-  header {
+  header.padded {
+    padding: $whitespace*2 0;
     line-height: 34px;
-
-    &.padded {
-      padding: 20px 0;
-    }
   }
 
   .inline {
@@ -32,24 +29,24 @@
   }
 
   .answer-set-tabs {
-    margin-top: -10px; // negate the margin in the <p /> in the header above
-    margin-bottom: 20px;
+    margin: $whitespace*2 0;
 
     button {
       display: inline-block;
-      color: white;
-      background: $muteTextColor;
+      background: $inactiveBg;
+      color: $inactiveFg;
       font-weight: bold;
       padding: 5px 10px;
       border: none;
       border-radius: 4px;
 
       & + button {
-        margin-left: 5px;
+        margin-left: $whitespace / 2;
       }
 
       &.active, &:hover {
-        background: #2894d1;
+        background: $activeBg;
+        color: $activeFg;
         cursor: pointer;
       }
     }

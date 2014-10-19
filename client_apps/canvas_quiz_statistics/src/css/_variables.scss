@@ -1,3 +1,88 @@
+// $whitespace is a special, and very powerful, layouting variable. It should
+// be used anytime you want to define spacing; whether it is inside an element,
+// or between groups of elements. Using this variable allows us to define a
+// very consistent and "easy-reading" layout.
+//
+// A bit about using this variable effectively:
+//
+// You may/should use multipliers (such as *2) to define visual relationships
+// between elements. For example, two textual elements inside a single
+// <header /> component should be normally separated by 1 $whitespace unit,
+// while the header itself could be separated from other elements by two
+// $whitespace units to "give it more space to breathe" and the user can
+// naturally break the components apart, merely thanks to whitespace.
+//
+// DON'T:
+//
+// - define inconsistent axis padding or margins unless design depicts it, like:
+//   `padding: $whitespace 0;` or `margin: $whitespace*2 $whitespace;`
+// - use this variable with weird multipliers to achieve some 55px spacing
+//   design had decided to put only to the left of the element; use on regular
+//   basis, don't use for "special" elements
+//
+// Further reading to hone your whitespace killer skillz:
+//
+//   - http://blog.teamtreehouse.com/white-space-in-web-design-what-it-is-and-why-you-should-use-it
+//   - http://uxmyths.com/post/2059998441/myth-28-white-space-is-wasted-space
+//   - Google for "whitespace in web design"
+//
+$whitespace: 12px;
+
+$brandColor: $canvas-primary;
+
+// $active and $inactive variables should be used for coloring interactive sets
+// in which elements can be "activated" and the rest would become deactivated,
+// like navigation pills or tabs.
+$activeBg: $brandColor;
+$activeFg: white;
+$inactiveBg: #949494;
+$inactiveFg: white;
+
+// Foreground of elements that are currently disabled.
+$disabledFg: #333;
+
+// Foreground of textual elements that are considered supplementary, or less
+// interesting than siblings.
+$muteFg: #949494;
+
+// A dark shade of grey usually coupled with $highlightColor to highlight a
+// certain element in a set.
+$contrastColor: #2a333b;
+
+// A bright green for drawing attention.
 $highlightColor: #349e67;
-$muteTextColor: #949494;
-$whitespace: 10px;
+
+// You could use this for anything abnormal, or for negative numbers.
+$negativeColor: $canvas-danger;
+
+// An accessible, mid-tone grey.
+$borderColor: #CAD0D7;
+
+// Functional Colors
+// =================
+// This section contains colors that may not be used widely enough to warrant
+// a generic variable.
+//
+// Try to use a semantically clear name for these variables so we know what's
+// going on.
+
+$summaryPercentileChartBarColor: #BEDFF1;
+$activeOrHoverQuestionBoxBg: #f4f4f4;
+
+// Uncomment this if you want to test the app in hi-contrast mode.
+// >>> DO NOT CHECK THIS INTO GIT <<<
+//
+// $use_high_contrast: true;
+
+// Hi-Contrast mode
+// ================
+// If you define or modify a color, make sure it is accessible and/or that you
+// provide an alternative color in the Hi-Contrast sheet.
+//
+// Some tools to help you accessibilize colors:
+//
+//   - http://webaim.org/resources/contrastchecker/
+//   - http://www.dasplankton.de/ContrastA/
+@if $use_high_contrast {
+  @import "./variables_high_contrast";
+}

@@ -9,6 +9,8 @@ define(function(require) {
     },
 
     render: function() {
+      // .detail-section CSS class makes this section controllable by the
+      // "Toggle Details" button
       return(
         <ol className="answer-drilldown detail-section">
           {this.props.answers.map(this.renderAnswer)}
