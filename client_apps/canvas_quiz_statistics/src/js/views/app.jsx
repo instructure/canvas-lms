@@ -12,6 +12,7 @@ define(function(require) {
   var EssayRenderer = require('jsx!./questions/essay');
   var CalculatedRenderer = require('jsx!./questions/calculated');
   var FileUploadRenderer = require('jsx!./questions/file_upload');
+  var ScreenReaderContent = require('jsx!../components/screen_reader_content');
 
   var extend = _.extend;
   var Renderers = {
@@ -49,6 +50,10 @@ define(function(require) {
 
       return(
         <div id="canvas-quiz-statistics">
+          <ScreenReaderContent tagName="h1">
+            {I18n.t('title', 'Quiz Statistics')}
+          </ScreenReaderContent>
+
           <section>
             <Summary
               pointsPossible={quizStatistics.pointsPossible}
@@ -64,9 +69,9 @@ define(function(require) {
 
           <section id="question-statistics-section">
             <header className="padded">
-              <h3 className="section-title inline">
+              <h2 className="section-title inline">
                 {I18n.t('question_breakdown', 'Question Breakdown')}
-              </h3>
+              </h2>
 
               <aside className="all-question-controls pull-right">
                 <ToggleDetailsButton

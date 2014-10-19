@@ -20,7 +20,7 @@ define(function(require) {
     render: function() {
       return (
         <header>
-          <ScreenReaderContent tagName="h4">
+          <ScreenReaderContent tagName="h3">
             {I18n.t('question_header', 'Question %{position}', { position: this.props.position })}
           </ScreenReaderContent>
 

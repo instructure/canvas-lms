@@ -51,9 +51,9 @@ define(function(require) {
       return(
         <div id="summary-statistics">
           <header className="padded">
-            <h3 className="section-title inline">
+            <h2 className="section-title inline">
               {I18n.t('quiz_summary', 'Quiz Summary')}
-            </h3>
+            </h2>
 
             <div className="pull-right">
               {this.props.quizReports.map(this.renderReport)}
