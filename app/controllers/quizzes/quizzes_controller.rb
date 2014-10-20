@@ -30,7 +30,19 @@ class Quizzes::QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [:statistics, :statistics_cqs, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
+  before_filter :require_quiz, :only => [
+    :statistics,
+    :edit,
+    :show,
+    :history,
+    :update,
+    :destroy,
+    :moderate,
+    :read_only,
+    :managed_quiz_data,
+    :submission_versions,
+    :submission_html
+  ]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   after_filter :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -44,7 +56,6 @@ class Quizzes::QuizzesController < ApplicationController
 
   def index
     return unless authorized_action(@context, @current_user, :read)
-    return index_ember if @context.feature_enabled?(:quiz_stats)
     return unless tab_enabled?(@context.class::TAB_QUIZZES)
     return index_legacy unless @context.feature_enabled?(:draft_state)
 
@@ -120,24 +131,6 @@ class Quizzes::QuizzesController < ApplicationController
     log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
   end
 
-  def index_ember
-    js_env(:PERMISSIONS => {
-      :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
-      :manage  => can_do(@context, @current_user, :manage_assignments)
-    },
-    :FLAGS => {
-      :question_banks => feature_enabled?(:question_banks),
-      :quiz_statistics => true,
-      :quiz_moderate   => @context.feature_enabled?(:quiz_moderate),
-      :differentiated_assignments => @context.feature_enabled?(:differentiated_assignments)
-    })
-
-    # headless prevents inception in submission preview
-    setup_headless if params[:headless]
-
-    render action: "fabulous_quizzes"
-  end
-
   # TODO: update non-DS specs to use the DS version and remove this entirely
   # as it is no longer available in the UI
   def index_legacy
@@ -170,20 +163,6 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.feature_enabled?(:quiz_stats) &&
-       @context.feature_enabled?(:draft_state) &&
-       !params.key?(:take)
-
-      ember_url = if params[:preview]
-        ember_urls.course_quiz_preview_url(@quiz.id)
-      else
-        ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
-      end
-
-      redirect_to ember_url
-      return
-    end
-
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
@@ -508,45 +487,42 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
-    if @context.feature_enabled?(:quiz_stats) &&
-       @context.feature_enabled?(:draft_state)
-      redirect_to ember_urls.course_quiz_statistics_url(@quiz.id)
-      return
+    if @context.feature_enabled?(:quiz_stats)
+      return statistics_cqs
     end
 
     if authorized_action(@quiz, @current_user, :read_statistics)
-        respond_to do |format|
-          format.html {
-            all_versions = params[:all_versions] == '1'
-            add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-            add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
+      respond_to do |format|
+        format.html {
+          all_versions = params[:all_versions] == '1'
+          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
 
-            if !@context.large_roster?
-              @statistics = @quiz.statistics(all_versions)
-              user_ids = @statistics[:submission_user_ids]
-              @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
-              #include logged out users
-              @submitted_users += @statistics[:submission_logged_out_users]
-              @users = Hash[
-                @submitted_users.map { |u| [u.id, u] }
-              ]
-            end
+          if !@context.large_roster?
+            @statistics = @quiz.statistics(all_versions)
+            user_ids = @statistics[:submission_user_ids]
+            @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
+            #include logged out users
+            @submitted_users += @statistics[:submission_logged_out_users]
+            @users = Hash[
+              @submitted_users.map { |u| [u.id, u] }
+            ]
+          end
 
-            js_env quiz_reports: Quizzes::QuizStatistics::REPORTS.map { |report_type|
-              report = @quiz.current_statistics_for(report_type, {
-                includes_all_versions: all_versions
-              })
+          js_env quiz_reports: Quizzes::QuizStatistics::REPORTS.map { |report_type|
+            report = @quiz.current_statistics_for(report_type, {
+              includes_all_versions: all_versions
+            })
 
-              Quizzes::QuizReportSerializer.new(report, {
-                controller: self,
-                scope: @current_user,
-                root: false,
-                includes: %w[ file progress ]
-              }).as_json
-            }
+            Quizzes::QuizReportSerializer.new(report, {
+              controller: self,
+              scope: @current_user,
+              root: false,
+              includes: %w[ file progress ]
+            }).as_json
           }
-        end
-
+        }
+      end
     end
   end
 
@@ -555,13 +531,15 @@ class Quizzes::QuizzesController < ApplicationController
       respond_to do |format|
         format.html {
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-          add_crumb(t(:statistics_cqs_crumb, "Statistics CQS"), named_context_url(@context, :context_quiz_statistics_cqs_url, @quiz))
+          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
 
           js_env({
             quiz_url: api_v1_course_quiz_url(@context, @quiz),
             quiz_statistics_url: api_v1_course_quiz_statistics_url(@context, @quiz),
             quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
           })
+
+          render action: "statistics_cqs"
         }
       end
     end
@@ -685,13 +663,6 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def moderate
-    if @context.feature_enabled?(:quiz_moderate) &&
-       @context.feature_enabled?(:quiz_stats) &&
-       @context.feature_enabled?(:draft_state)
-      redirect_to ember_urls.course_quiz_moderate_url(@quiz.id)
-      return
-    end
-
     if authorized_action(@quiz, @current_user, :grade)
       @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
       @students = @all_students
@@ -858,14 +829,6 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def take_quiz
-    if @context.feature_enabled?(:quiz_stats) &&
-       @context.feature_enabled?(:draft_state) &&
-       !quiz_submission_active?
-
-      redirect_to ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
-      return
-    end
-
     return unless quiz_submission_active?
     @show_embedded_chat = false
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
@@ -922,13 +885,6 @@ class Quizzes::QuizzesController < ApplicationController
   def set_download_submission_dialog_title
     js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t('#quizzes.download_all_quiz_file_upload_submissions',
                                                     'Download All Quiz File Upload Submissions')
-  end
-
-  # give us some helper methods for linking to the ember pages
-  def ember_urls
-    @ember_urls ||= CanvasEmberUrl::UrlMappings.new(
-      :course_quizzes => course_quizzes_url
-    )
   end
 
   # Handler for quiz option: one_time_results

@@ -4,6 +4,11 @@ describe "canvas quiz statistics" do
   include_examples "quizzes selenium tests"
 
   before do
+    Account.default.tap do |account|
+      account.enable_feature! :quiz_stats
+      account.save!
+    end
+
     quiz_with_graded_submission([
       {:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'true_false_question'}},
       {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'true_false_question'}}
@@ -13,7 +18,7 @@ describe "canvas quiz statistics" do
   end
 
   it 'should mount' do
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics_cqs"
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
 
     status = driver.execute_script <<-JS
       var mountStatus = document.body.appendChild(document.createElement('div'));

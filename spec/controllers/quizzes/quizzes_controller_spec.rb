@@ -68,12 +68,6 @@ describe Quizzes::QuizzesController do
     @quiz_submission.save!
   end
 
-  def ember_urls
-    CanvasEmberUrl::UrlMappings.new(
-      :course_quizzes => course_quizzes_url
-    )
-  end
-
   before :once do
     Account.default.enable_feature! :draft_state
     course_with_teacher(:active_all => true)
@@ -125,42 +119,6 @@ describe Quizzes::QuizzesController do
       Quizzes::OutstandingQuizSubmissionManager.expects(:grade_by_course)
 
       get 'index', :course_id => @course.id
-    end
-  end
-
-  describe "GET 'index' with quiz stats disabled" do
-    before :each do
-      a = Account.default
-      a.disable_feature! :quiz_stats
-      a.save!
-    end
-
-    it "should render index page" do
-      user_session(@teacher)
-      course_quiz(active = true)
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql false
-      get 'index', :course_id => @course.id
-      assert_response(:success)
-      expect(response).to render_template('index')
-    end
-  end
-
-  describe "GET 'index' with quiz stats enabled" do
-    before :each do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.save!
-    end
-
-    it "should render ember quiz index page" do
-      user_session(@teacher)
-      course_quiz(active = true)
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'index', :course_id => @course.id
-      assert_response(:success)
-      expect(response).to render_template('fabulous_quizzes')
     end
   end
 
@@ -333,7 +291,6 @@ describe Quizzes::QuizzesController do
     end
 
     it "locks results if there is a submission and one_time_results is on" do
-      Account.default.disable_feature! :quiz_stats
       user_session(@student)
 
       course_quiz(true)
@@ -352,7 +309,6 @@ describe Quizzes::QuizzesController do
     end
 
     it "does not attempt to lock results if there is a settings only submission" do
-      Account.default.disable_feature! :quiz_stats
       user_session(@student)
 
       course_quiz(true)
@@ -370,41 +326,6 @@ describe Quizzes::QuizzesController do
 
       expect(response).to be_success
       expect(submission.reload.has_seen_results).to be_nil
-    end
-  end
-
-  describe "GET 'show' with quiz stats enabled" do
-    before :once do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.save!
-
-      course_quiz
-    end
-
-    before :each do
-      user_session(@teacher)
-    end
-
-    it "should redirect to ember quiz stats app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'show', :course_id => @course.id, :id => @quiz.id
-      assert_redirected_to ember_urls.course_quiz_url(@quiz.id)
-    end
-
-    it "should redirect to ember quiz stats app with headless if given" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'show', :course_id => @course.id, :id => @quiz.id, :headless => 1
-      assert_redirected_to ember_urls.course_quiz_url(@quiz.id, headless: 1)
-    end
-
-    it "should redirect to preview ember quiz stats app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'show', :course_id => @course.id, :id => @quiz.id, :preview => 1
-      assert_redirected_to ember_urls.course_quiz_preview_url(@quiz.id)
     end
   end
 
@@ -579,44 +500,6 @@ describe Quizzes::QuizzesController do
       expect(assigns[:submissions]).to eq [@sub1]
     end
   end
-
-  describe "GET 'moderate' with quiz stats enabled" do
-    before :each do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.save!
-
-      user_session(@teacher)
-      course_quiz
-    end
-
-    it "should not redirect to ember moderate app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      assert_response :success
-    end
-  end
-
-  describe "GET 'moderate' with new quiz moderate enabled" do
-    before :each do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.enable_feature! :quiz_moderate
-      a.save!
-
-      user_session(@teacher)
-      course_quiz
-    end
-
-    it "should redirect to ember moderate app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_moderate)).to eql true
-      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      assert_redirected_to ember_urls.course_quiz_moderate_url(@quiz.id)
-    end
-  end
-
 
   describe "POST 'take'" do
     it "should require authorization" do
@@ -1274,7 +1157,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  describe "GET 'statistics' with new quiz stats enabled" do
+  describe "GET 'statistics' with new quiz stats feature flag enabled" do
     before :each do
       a = Account.default
       a.enable_feature! :quiz_stats
@@ -1284,11 +1167,12 @@ describe Quizzes::QuizzesController do
       course_quiz
     end
 
-    it "should redirect to ember quiz stats app" do
+    it "should redirect to the new quiz stats app" do
       a = Account.default
       expect(a.feature_enabled?(:quiz_stats)).to eql true
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      assert_redirected_to ember_urls.course_quiz_statistics_url(@quiz.id)
+      assert_response :success
+      expect(response).to render_template('statistics_cqs')
     end
   end
 

@@ -108,7 +108,6 @@ gem 'broadcast_policy', :path => "gems/broadcast_policy"
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
 gem 'canvas_color', :path => 'gems/canvas_color'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
-gem 'canvas_ember_url', :path => 'gems/canvas_ember_url'
 gem 'canvas_ext', :path => 'gems/canvas_ext'
 gem 'canvas_http', :path => 'gems/canvas_http'
 gem 'canvas_kaltura', :path => 'gems/canvas_kaltura'

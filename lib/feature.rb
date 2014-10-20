@@ -197,16 +197,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'quiz_moderate' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
-      description: -> { I18n.t('new_quiz_moderate_desc', <<-END) },
-When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account.
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      beta: true
-    },
     'student_groups_next' =>
     {
       display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
@@ -271,16 +261,6 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true
-    },
-    'quiz_stats' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
-      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
-Enable the new quiz statistics page for an account.
-END
-      applies_to: 'Course',
-      state: 'allowed',
-      development: true
     },
     'multiple_grading_periods' =>
     {

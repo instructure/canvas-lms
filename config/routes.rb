@@ -305,7 +305,6 @@ CanvasRails::Application.routes.draw do
       get :submission_versions
       get :history
       get :statistics
-      get :statistics_cqs
       get :read_only
       get :submission_html
 
