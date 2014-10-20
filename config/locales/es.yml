@@ -3934,7 +3934,7 @@ es:
     subject: "Mensaje privado"
     subject_specified: "Mensaje privado: %{subject}"
     users_added: 
-      one: "%{current_user} ha incorporado a la conversación a %{list_of_users}"
+      one: "%{current_user} ha incorporado a la conversación a %{user} "
       other: "%{current_user} ha incorporado a la conversación a %{list_of_users}"
   conversation_participant: 
     batch_update_message: 
@@ -4286,6 +4286,7 @@ es:
       sis_source_id: "ID de fuente SIS"
       start_at: "Comienza el"
       storage_quota: "Cuota de almacenamiento"
+      syllabus_body: cuerpo_programaestudios
       tab_configuration: "Configuración de pestañas"
       template_course_id: "ID del curso modelo"
       turnitin_comments: "Comentarios en Turnitin"
