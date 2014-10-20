@@ -834,6 +834,18 @@ ActiveRecord::Relation.class_eval do
     sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
     where(sql, *values.map { |value| [value, value.class.base_class.name] }.flatten)
   end
+
+  def touch_all
+    scope = self
+    now = Time.now.utc
+    if((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
+      personal_space -= 1
+      # truncate to seconds
+      bound = Time.at(now.to_i - personal_space).utc
+      scope = scope.where("updated_at<?", bound)
+    end
+    scope.update_all(updated_at: now)
+  end
 end
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
