@@ -40,8 +40,7 @@ define([
   'media_comments' /* mediaComment */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'vendor/scribd.view' /* scribd */
+  'jqueryui/progressbar' /* /\.progressbar/ */
 ], function(_, INST, I18n, $, htmlEscape) {
 
   if(typeof ENV.contexts === "string"){
@@ -977,7 +976,7 @@ define([
 
           $content.find(".lock_item_link").showIf(!data.currently_locked);
           $content.find(".unlock_item_link").showIf(data.currently_locked);
-          $content.find(".preview_item_link").showIf(data.scribd_doc || data.content_type.match(/image/) || (data.content_type.match(/(video|audio)/) && data.media_entry_id));
+          $content.find(".preview_item_link").showIf(data.content_type.match(/image/) || (data.content_type.match(/(video|audio)/) && data.media_entry_id));
           // Need to be careful on this one... we can't let students turn in a
           // file and then edit it after the fact...
           $content.find(".edit_item_content_link_holder").showIf($content.hasClass('editable_folder_item') && data.context_type != 'User' && ($content.hasClass('text') || $content.hasClass('html') || $content.hasClass('code')));
@@ -1551,7 +1550,7 @@ define([
                   $panel.addClass('panel_locked');
                 } else if (data && data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
                   // show an inline preview
-                  $preview = $("#content_templates .file_scribd_preview").clone(true);
+                  $preview = $("#content_templates .file_preview_container").clone(true);
                   $preview.append("<div id='doc_preview_holder'/>");
                 } else {
                   // show a few more details about the file, preview if possible
@@ -1587,8 +1586,6 @@ define([
                       height: '100%',
                       crocodoc_session_url: data.crocodoc_session_url,
                       canvadoc_session_url: data.canvadoc_session_url,
-                      scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
-                      scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
                       attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id),
                       attachment_scribd_render_url: files.scribdRenderUrl(data.context_string, data.id),
                       attachment_preview_processing: data.workflow_state == 'pending_upload' || data.workflow_state == 'processing'

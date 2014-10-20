@@ -33,6 +33,7 @@ define [
 
     initialize: ->
       @tagId = _.uniqueId 'treenode-'
+      @render = _.debounce(@render)
       @model.on         'all', @render, this
       @model.files.on   'all', @render, this
       @model.folders.on 'all', @render, this
@@ -57,16 +58,26 @@ define [
       
     renderSelf: ->
       @$el.attr @attributes()
-      @$label ||= $("<a class='folderLabel' role='presentation' tabindex='-1' title='#{@title_text()}'/>").prependTo(@$el)
-      $text = $('<span>', {
-        text: @title_text(),
-        click: (event) => @onClick?(event, @model)
-      })
+      @$label ||= do =>
+        @$labelInner = $('<span>').click (event) => @onClick?(event, @model)
+
+        $("""
+          <a
+            class="folderLabel"
+            role="presentation"
+            tabindex="-1"
+          >
+            <i class="icon-mini-arrow-right"></i>
+            <i class="icon-folder"></i>
+          </a>
+        """).append(@$labelInner).prependTo(@$el)
+
+      @$labelInner.text(@title_text())
       @$label
         .attr('href', @href?(@model) || '#')
-        .html($text)
         .toggleClass('expanded', !!@model.isExpanded)
         .toggleClass('loading after', !!@model.isExpanding)
+
 
     renderContents: ->
       if @model.isExpanded

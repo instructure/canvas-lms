@@ -69,6 +69,7 @@ define [
       hasGroupCategoryDisabled:  groupCategoryFrozen || groupCategoryLocked
       gradeIndividuallyDisabled: groupCategoryFrozen
       groupCategoryIdDisabled:   groupCategoryFrozen || groupCategoryLocked
+      differentiatedAssignmentsEnabled: @parentModel.differentiatedAssignmentsEnabled()
 
       sectionLabel: @sectionLabel
       fieldLabel: @fieldLabel

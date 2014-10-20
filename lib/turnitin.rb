@@ -350,7 +350,6 @@ module Turnitin
       if post
         mp = Multipart::Post.new
         query, headers = mp.prepare_query(params)
-        puts query if @testing
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
         res = http.start{|con|
@@ -369,7 +368,6 @@ module Turnitin
           next if value.nil?
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
-        puts requestParams if @testing
         if params[:fcmd] == '1'
           return "https://#{@host}#{@endpoint}?#{requestParams}"
         else
@@ -380,18 +378,19 @@ module Turnitin
           }
         end
       end
-      if @testing
-        puts res.body
-        nil
-      else
-        doc = Nokogiri(res.body) rescue nil
-        if doc && doc.css('rcode') && doc.css('rcode')[0].content.to_i >= 100
-          Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{doc.css('rcode')[0].content}")
-          Rails.logger.error(params.to_json)
-          Rails.logger.error(res.body)
-        end
-        doc
+
+      return nil if @testing
+
+      doc = Nokogiri(res.body)
+      if doc.css('rcode').try(:first).try(:content).try(:to_i) >= 100
+        Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{doc.css('rcode')[0].content}")
+        Rails.logger.error(params.to_json)
+        Rails.logger.error(res.body)
+      elsif doc.css('rcode').empty?
+        Rails.logger.error("Turnitin API error for account_id #{@account_id}: unrecognized repsonse:")
+        Rails.logger.error(res.body)
       end
+      doc
     end
 
     # We store the actual error message we got back from turnitin in the hash

@@ -181,6 +181,10 @@ class NotificationMessageCreator
     messages
   end
 
+  def unretired_policies_for(user)
+    user.notification_policies.where("communication_channels.workflow_state<>'retired'")
+  end
+
   def delayed_policies_for(user, channel=user.email_channel)
     # This condition is weird. Why would not throttling stop sending notifications?
     # Why could an inactive email channel stop us here? We handle that later! And could still send
@@ -190,9 +194,9 @@ class NotificationMessageCreator
     # If any channel has a policy, even policy-less channels don't get the notification based on the
     # notification default frequency. Is that right?
     policies= []
-    user_has_policy = user.notification_policies.for(@notification).exists?
+    user_has_policy = unretired_policies_for(user).for(@notification).exists?
     if user_has_policy
-      policies += user.notification_policies.for(@notification).by(['daily', 'weekly'])
+      policies += unretired_policies_for(user).for(@notification).by(['daily', 'weekly'])
     elsif channel &&
         channel.active? &&
         ['daily', 'weekly'].include?(@notification.default_frequency)

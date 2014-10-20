@@ -157,6 +157,7 @@ JOKE
             add_item_to_export(@course.grading_standard)
           end
         end
+        c.root_account_uuid(@course.root_account.uuid) if @course.root_account
       end
       course_file.close if course_file
       rel_path

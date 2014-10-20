@@ -139,6 +139,13 @@
   *padding-bottom: 7px;
 }
 
+.btn-group > [class*="btn"].active {
+  &:focus {
+    @include button-focus;
+  }
+
+}
+
 .btn-group.open {
 
   // The clickable button for toggling the menu

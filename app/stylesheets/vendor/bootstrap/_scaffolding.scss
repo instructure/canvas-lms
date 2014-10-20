@@ -21,11 +21,20 @@ body {
 
 a {
   color: $linkColor;
-  text-decoration: none;
-}
-a:hover {
-  color: $linkColorHover;
-  text-decoration: underline;
+  
+  &:hover { color: $linkColorHover; }
+  &:focus { @include button-focus; }
+
+  @if $use_high_contrast { 
+    text-decoration: underline;
+    &:hover { text-decoration: none; }
+  }
+
+  @else { 
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
 }
 
 

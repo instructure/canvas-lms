@@ -135,8 +135,10 @@ class Account < ActiveRecord::Base
   include FeatureFlags
 
   def default_locale(recurse = false)
-    read_attribute(:default_locale) ||
-    (recurse && parent_account ? parent_account.default_locale(true) : nil)
+    result = read_attribute(:default_locale)
+    result ||= parent_account.default_locale(true) if recurse && parent_account
+    result = nil unless I18n.locale_available?(result)
+    result
   end
 
   cattr_accessor :account_settings_options
@@ -336,7 +338,7 @@ class Account < ActiveRecord::Base
     end
 
     root = self.root_account
-    existing_account = Account.find_by_root_account_id_and_sis_source_id(root.id, self.sis_source_id)
+    existing_account = Account.where(root_account_id: root, sis_source_id: self.sis_source_id).first
 
     return true if !existing_account || existing_account.id == self.id
 
@@ -498,9 +500,11 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    read_attribute(:default_storage_quota) ||
-      (self.parent_account.default_storage_quota rescue nil) ||
-      Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    Rails.cache.fetch(['default_storage_quota', self].cache_key) do
+      read_attribute(:default_storage_quota) ||
+        (self.parent_account.default_storage_quota rescue nil) ||
+        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    end
   end
 
   def default_storage_quota_mb
@@ -570,31 +574,35 @@ class Account < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
 
-  def account_chain(opts = {})
-    unless @account_chain
-      res = [self]
-      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-        self.shard.activate do
-          res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+  def self.account_chain(starting_account_id)
+    return [] unless starting_account_id
+
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+      chain = Shard.shard_for(starting_account_id).activate do
+        Account.find_by_sql(<<-SQL)
               WITH RECURSIVE t AS (
-                SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+                SELECT * FROM accounts WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
                 SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
               )
               SELECT * FROM t
-            SQL
-        end
-      else
-        account = self
-        while account.parent_account
-          account = account.parent_account
-          res << account
-        end
+        SQL
       end
-      res << self.root_account if !res.map(&:id).include?(self.root_account_id) && !root_account?
-      @account_chain = res.compact
+    else
+      account = Account.find(starting_account_id)
+      chain = [account]
+      while account.parent_account
+        account = account.parent_account
+        chain << account
+      end
     end
+    chain
+  end
+
+  def account_chain(opts = {})
+    @account_chain ||= [self] + Account.account_chain(self.parent_account_id)
     results = @account_chain.dup
+    results << self.root_account if !results.map(&:id).include?(self.root_account_id) && !root_account?
     results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     results
   end
@@ -603,7 +611,7 @@ class Account < ActiveRecord::Base
     # this record hasn't been saved to the db yet, so if the the chain includes
     # this account, it won't point to the new parent yet, and should still be
     # valid
-    if self.parent_account.account_chain_ids.include?(self.id)
+    if self.parent_account.account_chain.include?(self)
       errors.add(:parent_account_id,
                  "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
     end
@@ -641,12 +649,8 @@ class Account < ActiveRecord::Base
     self.account_chain
   end
 
-  def account_chain_ids(opts={})
-    account_chain(opts).map(&:id)
-  end
-
   def membership_for_user(user)
-    self.account_users.find_by_user_id(user && user.id)
+    self.account_users.where(user_id: user).first if user
   end
 
   def available_custom_account_roles
@@ -678,7 +682,7 @@ class Account < ActiveRecord::Base
   end
 
   def get_course_role(role_name)
-    course_role = self.roles.for_courses.not_deleted.find_by_name(role_name)
+    course_role = self.roles.for_courses.not_deleted.where(name: role_name).first
     course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
     course_role
   end
@@ -688,7 +692,7 @@ class Account < ActiveRecord::Base
   end
 
   def find_role(role_name)
-    roles.not_deleted.find_by_name(role_name) || (parent_account && parent_account.find_role(role_name))
+    roles.not_deleted.where(name: role_name).first || (parent_account && parent_account.find_role(role_name))
   end
 
   def account_authorization_config
@@ -820,8 +824,12 @@ class Account < ActiveRecord::Base
     can :read_global_outcomes
 
     # any user with an association to this account can read the outcomes in the account
-    given{ |user| user && self.user_account_associations.find_by_user_id(user.id) }
+    given{ |user| user && self.user_account_associations.where(user_id: user).exists? }
     can :read_outcomes
+
+    # any user with an admin enrollment in one of the courses can read
+    given { |user| user && self.courses.where(:id => user.enrollments.admin.pluck(:course_id)).exists? }
+    can :read
   end
 
   alias_method :destroy!, :destroy
@@ -844,7 +852,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
-      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
+      @default_enrollment_term = self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create
     end
   end
 
@@ -952,7 +960,7 @@ class Account < ActiveRecord::Base
 
   def self.find_cached(id)
     account = Rails.cache.fetch(account_lookup_cache_key(id)) do
-      account = Account.find_by_id(id)
+      account = Account.where(id: id).first
       account.precache if account
       account || :nil
     end
@@ -972,7 +980,7 @@ class Account < ActiveRecord::Base
         special_account_id = Setting.get("#{special_account_type}_account_id", nil)
         if special_account_id && special_account_id != special_account_ids[special_account_type]
           special_account_ids[special_account_type] = special_account_id
-          account = special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+          account = special_accounts[special_account_type] = Account.where(id: special_account_id).first
         end
       end
       if !account && default_account_name
@@ -1063,7 +1071,7 @@ class Account < ActiveRecord::Base
 
   def current_sis_batch
     if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
-      self.sis_batches.find_by_id(current_sis_batch_id)
+      self.sis_batches.where(id: current_sis_batch_id).first
     end
   end
 
@@ -1375,8 +1383,7 @@ class Account < ActiveRecord::Base
       transaction do
         lock!
         acct = manually_created_courses_account_from_settings
-        acct ||= self.sub_accounts.find_by_name(display_name) # for backwards compatibility
-        acct ||= self.sub_accounts.create!(:name => display_name)
+        acct ||= self.sub_accounts.where(name: display_name).first_or_create! # for backwards compatibility
         if acct.id != self.settings[:manually_created_courses_account_id]
           self.settings[:manually_created_courses_account_id] = acct.id
           self.save!
@@ -1388,7 +1395,7 @@ class Account < ActiveRecord::Base
 
   def manually_created_courses_account_from_settings
     acct_id = self.settings[:manually_created_courses_account_id]
-    acct = self.sub_accounts.find_by_id(acct_id) if acct_id.present?
+    acct = self.sub_accounts.where(id: acct_id).first if acct_id.present?
     acct = nil if acct.present? && acct.root_account_id != self.id
     acct
   end

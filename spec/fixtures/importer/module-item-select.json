@@ -1,0 +1,432 @@
+{"file_map": {
+    "idd42dfdb8d1cf5e58e6a09668b592f5e": {
+        "migration_id": "idd42dfdb8d1cf5e58e6a09668b592f5e",
+        "path_name": "file1",
+        "file_name": "file1",
+        "type": "FILE_TYPE"
+    },
+    "i421ccf46e5e490246599efc9a7423f64": {
+        "migration_id": "i421ccf46e5e490246599efc9a7423f64",
+        "path_name": "file2",
+        "file_name": "file2",
+        "type": "FILE_TYPE"
+    }
+}, "wikis": [
+    {
+        "title": "Front Page",
+        "migration_id": "iec66e439cf97396c8d042d1fa3c2d2ee",
+        "editing_roles": "teachers",
+        "notify_of_update": false,
+        "workflow_state": "active",
+        "front_page": true,
+        "text": "\u003cp\u003eWelcome to your new course wiki!\u003c\/p\u003e\r\n\u003cp\u003e\u003ca id=\"\" title=\"Page 1\" href=\"%24WIKI_REFERENCE%24\/pages\/Page%201\"\u003ePage 1\u003c\/a\u003e\u003c\/p\u003e\r\n\u003cp\u003e\u003ca id=\"\" title=\"Page 2\" href=\"%24WIKI_REFERENCE%24\/pages\/Page%202\"\u003ePage 2\u003c\/a\u003e\u003c\/p\u003e",
+        "url_name": "front-page"
+    },
+    {
+        "title": "Page 1",
+        "migration_id": "i33dc99b0f1e2eaf393029aa0ff9b498d",
+        "editing_roles": "teachers",
+        "notify_of_update": false,
+        "workflow_state": "active",
+        "front_page": false,
+        "text": "",
+        "url_name": "page-1"
+    },
+    {
+        "title": "Page 2",
+        "migration_id": "i11afbd372438c7e6cd37e341fcf2df58",
+        "editing_roles": "teachers",
+        "notify_of_update": false,
+        "workflow_state": "active",
+        "front_page": false,
+        "text": "",
+        "url_name": "page-2"
+    }
+], "name": null, "export_folder_path": "\/Users\/jeremy\/canvas-lms\/exports\/cm_144_user_id_1_cc", "course": {
+    "migration_id": "i654068011369aca43297bbdf1d68554b",
+    "title": "Module Item Test",
+    "course_code": "Module",
+    "default_view": "feed",
+    "license": "private",
+    "storage_quota": "524288000",
+    "is_public": false,
+    "allow_student_wiki_edits": false,
+    "allow_student_forum_attachments": false,
+    "allow_student_organized_groups": true,
+    "grading_standard_enabled": false,
+    "start_at": 1409839303000,
+    "syllabus_body": ""
+}, "assignment_groups": [
+    {
+        "migration_id": "ice570520cca024d0210ce0c25985921b",
+        "title": "Assignments",
+        "position": 1,
+        "group_weight": 0.0,
+        "rules": []
+    }
+], "external_tools": [
+    {
+        "description": "Search publicly available YouTube videos. A new icon will show up in your course rich editor letting you search YouTube and click to embed videos in your course material.",
+        "title": "YouTube",
+        "url": "https:\/\/www.edu-apps.org\/lti_public_resources\/?tool_id=youtube",
+        "custom_fields": {},
+        "extensions": [],
+        "privacy_level": "anonymous",
+        "domain": "edu-apps.org",
+        "consumer_key": null,
+        "shared_secret": null,
+        "tool_id": "youtube",
+        "assignment_points_possible": null,
+        "settings": {
+            "resource_selection": {
+                "selection_width": "",
+                "selection_height": ""
+            },
+            "editor_button": {
+                "selection_width": "",
+                "selection_height": ""
+            },
+            "icon_url": "https:\/\/www.edu-apps.org\/assets\/lti_public_resources\/youtube_icon.png"
+        },
+        "migration_id": "i76fd27955fc4c45af74818ed83477ea4"
+    }
+], "external_feeds": [], "grading_standards": [], "learning_outcomes": [], "modules": [
+    {
+        "migration_id": "i2ef97656ba4eb818e23343af83e5a1c2",
+        "workflow_state": "active",
+        "title": "One",
+        "position": 1,
+        "start_at": null,
+        "end_at": null,
+        "unlock_at": null,
+        "require_sequential_progress": false,
+        "items": [
+            {
+                "item_migration_id": "ibbe87c25af971d2977ce74a4a4098a37",
+                "position": 1,
+                "indent": 0,
+                "url": null,
+                "title": "Assignment 1",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Assignment",
+                "linked_resource_id": "i5081fa7128437fc599f6ca652214111e",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "id2a92df82dfaeb923f50522f0e79f6f1",
+                "position": 2,
+                "indent": 0,
+                "url": null,
+                "title": "Quiz 1",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Quizzes::Quiz",
+                "linked_resource_id": "i0f944b0a62b3f92d42260381c2c8906d",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "i67097b969c036bd786f7c27a070e481f",
+                "position": 3,
+                "indent": 0,
+                "url": null,
+                "title": "file1",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Attachment",
+                "linked_resource_id": "idd42dfdb8d1cf5e58e6a09668b592f5e",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "ied3eb21c87fb963f311bf59b29baf113",
+                "position": 4,
+                "indent": 0,
+                "url": null,
+                "title": "Page 1",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "WikiPage",
+                "linked_resource_id": "i33dc99b0f1e2eaf393029aa0ff9b498d",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "i92ca1c12e6f06aa289eb6e2e40b4a006",
+                "position": 5,
+                "indent": 0,
+                "url": null,
+                "title": "Discussion 1",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "DiscussionTopic",
+                "linked_resource_id": "i33dc99b0f1e2eaf393029aa0ff9b498d",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "ie882320ca50853bae13ff08c68f137e2",
+                "position": 6,
+                "indent": 0,
+                "url": "https:\/\/www.edu-apps.org\/lti_public_resources\/launch?driver=youtube\u0026remote_id=XXjlR2OK1kM",
+                "title": "Number 1 and Benford's Law - Numberphile",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "ContextExternalTool",
+                "linked_resource_id": "i33dc99b0f1e2eaf393029aa0ff9b498d",
+                "linked_resource_global_id": null
+            }
+        ],
+        "completion_requirements": [],
+        "prerequisites": []
+    },
+    {
+        "migration_id": "i25beaeb987ff2ee9608ccab30b9f9aa6",
+        "workflow_state": "active",
+        "title": "Two",
+        "position": 2,
+        "start_at": null,
+        "end_at": null,
+        "unlock_at": null,
+        "require_sequential_progress": false,
+        "items": [
+            {
+                "item_migration_id": "i478c7774521e55d9904a71ebca81907d",
+                "position": 1,
+                "indent": 0,
+                "url": null,
+                "title": "Assignment 2",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Assignment",
+                "linked_resource_id": "i852f8d38d28428ad2b3530e4f9017cff",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "if5aa2f13910cc3410ea9a2bfa49d781b",
+                "position": 2,
+                "indent": 0,
+                "url": null,
+                "title": "Quiz 2",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Quizzes::Quiz",
+                "linked_resource_id": "ib9c6f62b6ca21d60b8d2e360725d75d3",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "ie62265aebdc5df1cd4425d75b471ada6",
+                "position": 3,
+                "indent": 0,
+                "url": null,
+                "title": "file2",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "Attachment",
+                "linked_resource_id": "i421ccf46e5e490246599efc9a7423f64",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "i373c09fe08f6b83b21a9df6b7adb18f6",
+                "position": 4,
+                "indent": 0,
+                "url": null,
+                "title": "Page 2",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "WikiPage",
+                "linked_resource_id": "i11afbd372438c7e6cd37e341fcf2df58",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "icf254a7c81e7ff411a758792b2c11e3a",
+                "position": 5,
+                "indent": 0,
+                "url": null,
+                "title": "Discussion 2",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "DiscussionTopic",
+                "linked_resource_id": "i4d8d4467ae30e6fe5a7b1ef42fcbabff",
+                "linked_resource_global_id": null
+            },
+            {
+                "item_migration_id": "i6ebb0ae424689cb6f6ac178320afe053",
+                "position": 6,
+                "indent": 0,
+                "url": "https:\/\/www.edu-apps.org\/lti_public_resources\/launch?driver=youtube\u0026remote_id=5sKah3pJnHI",
+                "title": "Root 2 - Numberphile",
+                "new_tab": false,
+                "workflow_state": "active",
+                "linked_resource_type": "ContextExternalTool",
+                "linked_resource_id": "i76fd27955fc4c45af74818ed83477ea4",
+                "linked_resource_global_id": null
+            }
+        ],
+        "completion_requirements": [],
+        "prerequisites": []
+    }
+], "rubrics": [], "calendar_events": [], "assignments": [
+    {
+        "migration_id": "i5081fa7128437fc599f6ca652214111e",
+        "description": "",
+        "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+        "grading_standard_migration_id": null,
+        "rubric_migration_id": null,
+        "rubric_id": null,
+        "quiz_migration_id": null,
+        "workflow_state": "published",
+        "title": "Assignment 1",
+        "grading_type": "points",
+        "peer_reviews_assigned": false,
+        "peer_reviews": false,
+        "automatic_peer_reviews": false,
+        "muted": false,
+        "position": 1,
+        "peer_review_count": 0
+    },
+    {
+        "migration_id": "i852f8d38d28428ad2b3530e4f9017cff",
+        "description": "",
+        "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+        "grading_standard_migration_id": null,
+        "rubric_migration_id": null,
+        "rubric_id": null,
+        "quiz_migration_id": null,
+        "workflow_state": "published",
+        "title": "Assignment 2",
+        "grading_type": "points",
+        "peer_reviews_assigned": false,
+        "peer_reviews": false,
+        "automatic_peer_reviews": false,
+        "muted": false,
+        "position": 2,
+        "peer_review_count": 0
+    }
+], "discussion_topics": [
+    {
+        "description": "",
+        "title": "Discussion 2",
+        "migration_id": "i4d8d4467ae30e6fe5a7b1ef42fcbabff",
+        "type": "topic",
+        "discussion_type": "side_comment",
+        "pinned": null,
+        "require_initial_post": null,
+        "external_feed_migration_id": null,
+        "attachment_migration_id": null,
+        "posted_at": 1409838873000,
+        "delayed_post_at": null,
+        "position": null,
+        "workflow_state": "active"
+    },
+    {
+        "description": "",
+        "title": "Discussion 1",
+        "migration_id": "ib46e8e8e0cff438f4dff8630a251d777",
+        "type": "topic",
+        "discussion_type": "side_comment",
+        "pinned": null,
+        "require_initial_post": null,
+        "external_feed_migration_id": null,
+        "attachment_migration_id": null,
+        "posted_at": 1409838853000,
+        "delayed_post_at": null,
+        "position": null,
+        "workflow_state": "active"
+    }
+], "all_files_zip": "\/Users\/jeremy\/canvas-lms\/exports\/cm_144_user_id_1_cc\/all_files.zip", "media_tracks": {}, "assessment_questions": {
+    "assessment_questions": [],
+    "preprocessed": true
+}, "assessments": {
+    "assessments": [
+        {
+            "questions": [],
+            "quiz_type": "assignment",
+            "question_count": 0,
+            "title": "Quiz 1",
+            "quiz_name": "Quiz 1",
+            "migration_id": "i0f944b0a62b3f92d42260381c2c8906d",
+            "allowed_attempts": 1,
+            "description": "",
+            "scoring_policy": "keep_highest",
+            "lockdown_browser_monitor_data": "",
+            "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+            "points_possible": 0.0,
+            "lock_at": null,
+            "unlock_at": null,
+            "due_at": null,
+            "show_correct_answers_at": null,
+            "hide_correct_answers_at": null,
+            "time_limit": null,
+            "could_be_locked": true,
+            "anonymous_submissions": false,
+            "show_correct_answers": true,
+            "shuffle_answers": false,
+            "available": true,
+            "cant_go_back": false,
+            "one_question_at_a_time": false,
+            "assignment": {
+                "migration_id": "i111516735a7f5e40b997b8914bac1ea3",
+                "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+                "grading_standard_migration_id": null,
+                "rubric_migration_id": null,
+                "rubric_id": null,
+                "quiz_migration_id": "i0f944b0a62b3f92d42260381c2c8906d",
+                "workflow_state": "published",
+                "title": "Quiz 1",
+                "grading_type": "points",
+                "submission_types": "online_quiz",
+                "peer_reviews_assigned": false,
+                "peer_reviews": false,
+                "automatic_peer_reviews": false,
+                "muted": false,
+                "points_possible": 0.0,
+                "position": 3,
+                "peer_review_count": 0
+            }
+        },
+        {
+            "questions": [],
+            "quiz_type": "assignment",
+            "question_count": 0,
+            "title": "Quiz 2",
+            "quiz_name": "Quiz 2",
+            "migration_id": "ib9c6f62b6ca21d60b8d2e360725d75d3",
+            "allowed_attempts": 1,
+            "description": "",
+            "scoring_policy": "keep_highest",
+            "lockdown_browser_monitor_data": "",
+            "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+            "points_possible": 0.0,
+            "lock_at": null,
+            "unlock_at": null,
+            "due_at": null,
+            "show_correct_answers_at": null,
+            "hide_correct_answers_at": null,
+            "time_limit": null,
+            "could_be_locked": true,
+            "anonymous_submissions": false,
+            "show_correct_answers": true,
+            "shuffle_answers": false,
+            "available": true,
+            "cant_go_back": false,
+            "one_question_at_a_time": false,
+            "assignment": {
+                "migration_id": "ib10ab6e21cb76f3a14065866762cce79",
+                "assignment_group_migration_id": "ice570520cca024d0210ce0c25985921b",
+                "grading_standard_migration_id": null,
+                "rubric_migration_id": null,
+                "rubric_id": null,
+                "quiz_migration_id": "ib9c6f62b6ca21d60b8d2e360725d75d3",
+                "workflow_state": "published",
+                "title": "Quiz 2",
+                "grading_type": "points",
+                "submission_types": "online_quiz",
+                "peer_reviews_assigned": false,
+                "peer_reviews": false,
+                "automatic_peer_reviews": false,
+                "muted": false,
+                "points_possible": 0.0,
+                "position": 4,
+                "peer_review_count": 0
+            }
+        }
+    ]
+}, "assessment_question_banks": [], "full_export_file_path": "\/Users\/jeremy\/canvas-lms\/exports\/cm_144_user_id_1_cc\/course_export.json", "overview_file_path": "\/Users\/jeremy\/canvas-lms\/exports\/cm_144_user_id_1_cc\/overview.json"}

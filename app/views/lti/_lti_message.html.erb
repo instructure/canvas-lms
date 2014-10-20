@@ -12,6 +12,8 @@
     </div>
 <% end %>
 
+<div class="tool_content_wrapper">
+
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"
       method="POST" target=tool_content
@@ -38,7 +40,9 @@
         </div>
     </div>
 </form>
-<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%',
-           :height => '400', allowfullscreen: "true", webkitallowfullscreen: "true", mozallowfullscreen: "true") %>
+<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '100%',
+           allowfullscreen: "true", webkitallowfullscreen: "true", mozallowfullscreen: "true") %>
+
+</div>
 
 <%= render @append_template if @append_template %>

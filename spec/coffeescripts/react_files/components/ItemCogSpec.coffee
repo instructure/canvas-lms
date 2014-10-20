@@ -10,15 +10,39 @@ define [
   module 'ItemCog',
     setup: ->
 
-      sampleProps =
+      @sampleProps = (canManageFiles = false) ->
         model: new Folder(id: 999)
         startEditingName: -> debugger
+        userCanManageFilesForContext: canManageFiles
 
-      @itemCog = React.renderComponent(ItemCog(sampleProps), $('<div>').appendTo('body')[0])
+      @buttonsEnabled = (itemCog, config) ->
+        valid = true
+        for prop of config
+          button = if typeof itemCog.refs[prop] isnt 'undefined' then $(itemCog.refs[prop].getDOMNode()).length else false
+          if (config[prop] is true and !!button) or (config[prop] is false and !button)
+            continue
+          else
+            valid = false
+        valid
+
+      @readOnlyConfig =
+        'download': true
+        'editName': false
+        'restrictedDialog': false
+        'move': false
+        'deleteLink': false
+
+      @manageFilesConfig =
+        'download': true
+        'editName': true
+        'restrictedDialog': true
+        'move': true
+        'deleteLink': true
+
+      @itemCog = React.renderComponent(ItemCog(@sampleProps(true)), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
-
 
   test 'deletes model when delete link is pressed', ->
     sinon.stub($, 'ajax')
@@ -32,12 +56,9 @@ define [
     window.confirm.restore()
     $.ajax.restore()
 
-  test 'clicking restricted dialog opens a dialog', ->
-    sinon.stub(React, 'renderComponent')
-    sinon.spy($.fn, 'dialog')
-    Simulate.click(@itemCog.refs.restrictedDialog.getDOMNode())
+  test 'only shows download button for limited users', ->
+    readOnlyItemCog = React.renderComponent(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
+    ok @buttonsEnabled(readOnlyItemCog, @readOnlyConfig), 'only download button is shown'
 
-    ok $.fn.dialog.calledOnce, 'opens a restricted dialog window'
-    ok React.renderComponent.calledOnce, 'renders a component inside the dialog'
-    $.fn.dialog.restore()
-    React.renderComponent.restore()
+  test 'shows all buttons for users with manage_files permissions', ->
+    ok @buttonsEnabled(@itemCog, @manageConfig), 'all buttons are shown'

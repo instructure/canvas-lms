@@ -1,14 +1,21 @@
 #left-side
   float: left
-  width: $left_side_width
   display: none
 
-#section-tabs .section-tab-hidden a
-  @if $use_high_contrast  
-    color: darken($course-sidenav_list-item--inactive-font-color, 45%)  
-    background: lighten($course-sidenav_list-item--inactive-font-color, 15%)  
-  @else 
-    color: $course-sidenav_list-item--inactive-font-color
+  @if $is-k12
+    width: $left_side_width - 1
+    border-right: 1px solid #ddd
+    border-bottom-color: #ddd
+    padding-bottom: $k12-sp
 
+  @else  
+    width: $left_side_width
+
+#section-tabs .section-tab-hidden a
+  @if $use_high_contrast
+    color: darken($course-sidenav_list-item--inactive-font-color, 45%)
+    background: lighten($course-sidenav_list-item--inactive-font-color, 15%)
+  @else
+    color: $course-sidenav_list-item--inactive-font-color
 
 

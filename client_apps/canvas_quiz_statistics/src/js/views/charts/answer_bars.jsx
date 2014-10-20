@@ -5,7 +5,9 @@ define(function(require) {
   var _ = require('lodash');
   var ChartMixin = require('../../mixins/chart');
   var ChartInspectorMixin = require('../../mixins/components/chart_inspector');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics.answer_bars_chart');
+  var ScreenReaderContent = require('jsx!../../components/screen_reader_content');
+  var Text = require('jsx!../../components/text');
   var round = require('../../util/round');
 
   var mapBy = _.map;
@@ -86,6 +88,8 @@ define(function(require) {
       var svg = d3.select(node)
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
+        .attr('aria-hidden', true)
+        .attr('role', 'presentation')
         .append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -184,6 +188,61 @@ define(function(require) {
     }
   });
 
+  // A table for screen-readers that provides an alternative view of the data.
+  var Table = React.createClass({
+    getDefaultProps: function() {
+      return {
+        answers: []
+      };
+    },
+
+    render: function() {
+      return (
+        <table>
+          <caption>
+            <Text phrase="audible_description">
+              This table contains the number of responses each answer in the
+              question has received.
+            </Text>
+          </caption>
+
+          <tbody>
+            {this.props.answers.map(this.renderEntry)}
+          </tbody>
+        </table>
+      );
+    },
+
+    renderEntry: function(answer, position) {
+      return (
+        <tr key={'answer-'+answer.id}>
+          <td scope="col">
+            {I18n.t('audible_answer_position', 'Answer %{position}: ', { position: position+1 })}
+
+            {answer.text + '. ' /* make sure there's a sentence delimiter */}
+
+            {answer.correct &&
+              <em>
+                {' '}
+                {I18n.t('audible_correct_answer_indicator', 'This is a correct answer.')}
+              </em>
+            }
+          </td>
+
+          <td>
+            {I18n.t('audible_answer_response_count', {
+              zero: 'No responses.',
+              one: 'One response.',
+              other: '%{count} responses.'
+            }, {
+              count: answer.responses
+            })}
+          </td>
+        </tr>
+      );
+    }
+  });
+
   var AnswerBars = React.createClass({
     propTypes: {
     },
@@ -204,9 +263,21 @@ define(function(require) {
         };
       });
 
+      var tableData = this.props.answers.map(function(answer) {
+        return {
+          id: answer.id,
+          text: answer.text,
+          correct: answer.correct,
+          responses: answer.responses
+        }
+      });
+
       return (
         <section className="answer-distribution-section">
           <Chart ref="chart" answers={chartData} onInspect={this.getAnswerTooltip} />
+          <ScreenReaderContent tagName="div">
+            <Table answers={tableData} />
+          </ScreenReaderContent>
 
           <div className="auxiliary" style={{display:'none'}}>
             {this.props.answers.map(this.renderAnswerTooltip)}
@@ -224,7 +295,7 @@ define(function(require) {
           <p>
             <span className="answer-response-ratio">{round(answer.ratio)}%</span>
             <span className="answer-response-count">
-              {I18n.t('response_student_count', {
+              {I18n.t('response_count', {
                 zero: 'Nobody',
                 one: '1 student',
                 other: '%{count} students'

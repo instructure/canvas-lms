@@ -31,7 +31,11 @@ define [
         @dialog.open()
         #focus the close button after one tick (let render happen first)
         setTimeout =>
-          $(@node).parents('.ui-dialog').find('.ui-dialog-titlebar-close').focus()
+          primary = $(_this.node).parent().find('.btn-primary')
+          if primary
+            primary.focus()
+          else
+            $(@node).parents('.ui-dialog').find('.ui-dialog-titlebar-close').focus()
         , 1
       else
         @dialog.close()

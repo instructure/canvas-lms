@@ -17,7 +17,7 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
+  protect_from_forgery :except => [:create, :destroy, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
@@ -67,7 +67,7 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(st.user)
+          @pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(st.user).first
           if @pseudonym
             # Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
@@ -97,7 +97,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @is_saml && !params[:no_auto]
       if params[:account_authorization_config_id]
         raise ActiveRecord::RecordNotFound if params[:account_authorization_config_id] !~ Api::ID_REGEX
-        if aac = @domain_root_account.account_authorization_configs.find_by_id(params[:account_authorization_config_id])
+        if aac = @domain_root_account.account_authorization_configs.where(id: params[:account_authorization_config_id]).first
           initiate_saml_login(request.host_with_port, aac)
         else
           message = t('errors.login_errors.no_config_for_id', "The Canvas account has no authentication configuration with that id")
@@ -203,12 +203,38 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
+  # DELETE /logout
   def destroy
     # Only allow DELETE method for all logout requests except for SAML.
     if saml_response?
       saml_logout
     else
+      # We can't verify the authenticity token for saml, so we do it in
+      # this branch rather than in the before filter.
+      #
+      # This also allows us to show the logout confirmation screen rather than
+      # an error if the token is invalid -- this can happen, for example, if
+      # they log out and back in on a 2nd tab, and then click logout on the 1st
+      # tab.
+      begin
+        return unless verify_authenticity_token
+      rescue ActionController::InvalidAuthenticityToken
+        return redirect_to(logout_url)
+      end
+
       logout_user_action
+    end
+  end
+
+  # GET /logout
+  def logout_confirm
+    # allow GET requests for SAML logout
+    if saml_response?
+      saml_logout
+    elsif !@current_user
+      return redirect_to(login_url)
+    else
+      render
     end
   end
 
@@ -228,7 +254,7 @@ class PseudonymSessionsController < ApplicationController
       increment_saml_stat("logout_attempt")
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
-      if aac = account.account_authorization_configs.find_by_id(session[:saml_aac_id])
+      if aac = account.account_authorization_configs.where(id: session[:saml_aac_id]).first
         settings = aac.saml_settings(request.host_with_port)
         saml_request = Onelogin::Saml::LogOutRequest.new(settings, session)
         forward_url = saml_request.generate_request
@@ -304,7 +330,7 @@ class PseudonymSessionsController < ApplicationController
       response = saml_response(params[:SAMLResponse])
 
       if @domain_root_account.account_authorization_configs.count > 1
-        aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
+        aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: response.issuer).first
         if aac.nil?
           logger.error "Attempted SAML login for #{response.issuer} on account without that IdP"
           destroy_session
@@ -354,7 +380,7 @@ class PseudonymSessionsController < ApplicationController
         aac.debug_set(:is_valid_login_response, 'true') if debugging
 
         if response.success_status?
-          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(unique_id)
+          @pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
@@ -380,7 +406,7 @@ class PseudonymSessionsController < ApplicationController
 
             successful_login(@user, @pseudonym)
           else
-            unknown_user_url = aac.unknown_user_url || login_url(:no_auto => 'true')
+            unknown_user_url = aac.unknown_user_url.presence || login_url(:no_auto => 'true')
             increment_saml_stat("errors.unknown_user")
             message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
             logger.warn message
@@ -433,11 +459,12 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
+  # POST /logout
   def saml_logout
     if saml_response?
       increment_saml_stat("logout_response_received")
       response = saml_logout_response(params[:SAMLResponse])
-      if aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
+      if aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: response.issuer).first
         settings = aac.saml_settings(request.host_with_port)
         response.process(settings)
 
@@ -620,7 +647,7 @@ class PseudonymSessionsController < ApplicationController
       if oauth = session[:oauth2]
         provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
         return oauth2_confirmation_redirect(provider)
-      elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
+      elsif session[:course_uuid] && user && (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
       elsif session[:confirm]
@@ -659,6 +686,7 @@ class PseudonymSessionsController < ApplicationController
   def logout_current_user
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'logout')
+    Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
   end
 

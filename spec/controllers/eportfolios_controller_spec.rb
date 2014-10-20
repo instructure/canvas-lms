@@ -280,4 +280,43 @@ describe EportfoliosController do
       feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
+
+  describe "GET 'export'" do
+    before(:once) do
+      eportfolio
+      @old_zipfile = @portfolio.attachments.build(:display_name => "eportfolio.zip")
+      @old_zipfile.workflow_state = 'to_be_zipped'
+      @old_zipfile.file_state = '0'
+      @old_zipfile.save!
+      Attachment.where(id: @old_zipfile).update_all(created_at: 1.day.ago)
+    end
+
+    it "should hard delete old zips if there are no assiciated attachments" do
+      @portfolio.attachments.count.should == 1
+      @old_zipfile.related_attachments.exists?.should be_false
+
+      user_session(@user)
+      get 'export', :eportfolio_id => @portfolio.id
+
+      @portfolio.reload
+      @portfolio.attachments.count.should == 1
+      @portfolio.attachments.first.id.should_not == @old_zipfile.id
+    end
+
+    it "should soft delete old zips if there are assiciated attachments" do
+      @portfolio.attachments.count.should == 1
+      cloned_att = @old_zipfile.clone_for(@user)
+      cloned_att.workflow_state = 'to_be_zipped'
+      cloned_att.file_state = '0'
+      cloned_att.save!
+      @old_zipfile.reload.related_attachments.exists?.should be_true
+
+      user_session(@user)
+      get 'export', :eportfolio_id => @portfolio.id
+
+      @portfolio.reload
+      @portfolio.attachments.count.should == 2
+      @portfolio.attachments.map(&:file_state).should include "deleted"
+    end
+  end
 end

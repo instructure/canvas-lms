@@ -26,6 +26,7 @@ describe Importers::DiscussionTopicImporter do
         data = get_import_data(system, 'discussion_topic')
         data = data.first
         data = data.with_indifferent_access
+
         context = get_import_context(system)
 
         data[:topics_to_import] = {}
@@ -76,4 +77,17 @@ describe Importers::DiscussionTopicImporter do
     end
   end
 
+  it "should not attach files when no attachment_migration_id is specified" do
+    data = get_import_data('bb8', 'discussion_topic').first.with_indifferent_access
+    context = get_import_context('bb8')
+
+    data[:attachment_migration_id] = nil
+    attachment_model(:context => context) # create a file with no migration id
+
+    data[:topics_to_import] = {data[:migration_id] => true}
+    Importers::DiscussionTopicImporter.import_from_migration(data, context)
+
+    topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
+    topic.attachment.should be_nil
+  end
 end

@@ -1,17 +1,17 @@
 <% jammit_css :conversations_new %>
 <% js_bundle  :conversations_new %>
 <% @body_classes << 'full-width' %>
-
+<h1 class="screenreader-only"><%= t(:page_title_header, "Conversations") %></h1>
 <% content_for :page_title, t('titles.conversations', "Conversations") %>
 
 <div class="conversations">
   <header class="panel">
-    <div class="filters" role="application">
-      <span class="screenreader-only" id="course-filter-description"><%= t(:filter_messages_by_course, "Filter messages by course") %></span>
-      <select class="course-filter" id="course-filter" aria-describedby="course-filter-description"></select>
+    <div class="filters">
+      <span aria-hidden="true" class="screenreader-only" id="course-filter-description"><%= t(:filter_messages_by_course, "Filter messages by course") %></span>
+      <select class="course-filter" id="course-filter" aria-labelledby="course-filter-description"></select>
 
-      <span class="screenreader-only" id="type-filter-description"><%= t(:filter_messages_by_type, "Filter messages by type") %></span>
-      <select class="type-filter show-tick" id="type-filter" aria-describedby="type-filter-description">
+      <span aria-hidden="true" class="screenreader-only" id="type-filter-description"><%= t(:filter_messages_by_type, "Filter messages by type") %></span>
+      <select class="type-filter show-tick" id="type-filter" aria-labelledby="type-filter-description">
         <option value="inbox"><%= t(:inbox, "Inbox") %></option>
         <option value="unread"><%= t(:unread, "Unread") %></option>
         <option value="starred"><%= t(:starred, "Starred") %></option>
@@ -64,7 +64,7 @@
         </button>
       </div>
 
-      <div class="inline-block" role="application">
+      <div class="inline-block">
         <button class="al-trigger btn"
                 id="admin-btn"
                 title="<%= t(:more_options, "More options") %>"

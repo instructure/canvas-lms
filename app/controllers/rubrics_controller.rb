@@ -35,7 +35,7 @@ class RubricsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage)
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome
-      @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
+      @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless @rubric_association
       @actual_rubric = @rubric_association.rubric
     else
@@ -58,14 +58,14 @@ class RubricsController < ApplicationController
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
     if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
-      @association = @context.rubric_associations.find_by_id(params[:rubric_association_id]) if params[:rubric_association_id].present?
+      @association = @context.rubric_associations.where(id: params[:rubric_association_id]).first if params[:rubric_association_id].present?
       @association_object ||= @association.association_object if @association
       params[:rubric_association][:association_object] = @association_object
       params[:rubric_association][:update_if_existing] = params[:action] == 'update'
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       params[:rubric_association][:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
-      @rubric ||= @context.rubrics.find_by_id(params[:id]) if params[:id].present?
+      @rubric ||= @context.rubrics.where(id: params[:id]).first if params[:id].present?
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
       params[:rubric_association][:id] = @association.id if @association
       # Update the rubric if you can
@@ -92,7 +92,7 @@ class RubricsController < ApplicationController
   end
   
   def destroy
-    @rubric = RubricAssociation.find_by_rubric_id_and_context_id_and_context_type(params[:id], @context.id, @context.class.to_s, :include => :rubric).rubric
+    @rubric = RubricAssociation.where(rubric_id: params[:id], context_id: @context, context_type: @context.class.to_s).first.rubric
     if authorized_action(@rubric, @current_user, :delete_associations)
       @rubric.destroy_for(@context)
       render :json => @rubric

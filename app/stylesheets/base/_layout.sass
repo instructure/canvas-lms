@@ -3,18 +3,24 @@
 body, html
   height: 100%
 body
-  @if not $use_high_contrast
-    background-color: #f7f7f7    
   min-width: $min_main_width
 
   @if $use_high_contrast
     background: white
   @else
-    background-color: #efefef
-
+    @if $is-k12
+      background: white
+    @else
+      background-color: #efefef
+  
+    
+  
   &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
+    @if $is-k12
+      .canvas-header
+        display: none !important
     #footer
       display: none
     #wrapper
@@ -74,9 +80,6 @@ body
   a:not([href]), a[href="#"], button:not([type])
     visibility: hidden !important
 
-#wrapper-container
-  // the sole purpose of this div is to make it so the shadow on #wrapper does not cause the page to have scroll bars.
-  overflow: hidden
 #wrapper
   +pie-clearfix
 
@@ -90,6 +93,9 @@ body
   +pie-clearfix
   min-height: 450px
   max-width: $max_main_width
+  @if $is-k12
+    border: none
+    
 
 #content
   padding: 1em
@@ -122,8 +128,6 @@ body
     float: right
     position: absolute
     top: 0
-  #breadcrumbs + #right-side-wrapper
-    margin-top: -28px
   #main
     margin-right: $right_side_width
   #header-inner
@@ -150,39 +154,6 @@ body
 
 // **********************************************************************************
 // end classes applied to body
-
-#breadcrumbs
-  border-bottom: 1px solid #efefef
-  overflow: hidden
-  background-color: #fff
-  ul
-    +reset-list
-    +clearfix
-    margin-left: 10px
-    color: #637178
-    font-size: 12px
-    li
-      float: left
-      height: 27px
-      line-height: 29px
-      padding-left: 12px
-      margin-left: 8px
-      @include bg-image(breadcrumb-chevron, png, no-repeat, 0, 50%, transparent, 5px, 9px)
-      &:first-child
-        background: none
-        padding-left: 0
-        margin-left: 0
-    .home a
-      color: #ccc
-      i
-        margin-right: -5px
-        vertical-align: text-bottom
-        &:before
-          font-size: 12px
-
-  .ellipsis
-    display: inline-block
-
 
 #footer
   color: #5c5c5c

@@ -1,24 +1,23 @@
-define [], ->
+define ['underscore'], (_) ->
   class TurnitinSettings
 
     constructor: (options = {}) ->
-      @sPaperCheck = options.s_paper_check || false
-      @originalityReportVisibility = options.originality_report_visibility ||
-        false
-      @internetCheck = options.internet_check || false
-      @excludeBiblio = options.exclude_biblio || false
-      @excludeQuoted = options.exclude_quoted || false
-      @journalCheck = options.journal_check || false
+      @originalityReportVisibility = options.originality_report_visibility || 'immediate'
+      @sPaperCheck = @normalizeBoolean(options.s_paper_check)
+      @internetCheck = @normalizeBoolean(options.internet_check)
+      @excludeBiblio = @normalizeBoolean(options.exclude_biblio)
+      @excludeQuoted = @normalizeBoolean(options.exclude_quoted)
+      @journalCheck = @normalizeBoolean(options.journal_check)
       @excludeSmallMatchesType = options.exclude_small_matches_type
       @excludeSmallMatchesValue = options.exclude_small_matches_value || 0
       @submitPapersTo =
-        if options.hasOwnProperty('submit_papers_to') then options.submit_papers_to else true
+        if options.hasOwnProperty('submit_papers_to') then @normalizeBoolean(options.submit_papers_to) else true
 
     words: =>
-      if @excludeSmallMatchesType == 'percent' then "" else @excludeSmallMatchesValue
+      if @excludeSmallMatchesType == 'words' then @excludeSmallMatchesValue else ""
 
     percent: =>
-      if @excludeSmallMatchesType == 'words' then "" else @excludeSmallMatchesValue
+      if @excludeSmallMatchesType == 'percent' then @excludeSmallMatchesValue else ""
 
     toJSON: =>
       s_paper_check: @sPaperCheck
@@ -42,3 +41,6 @@ define [], ->
       json.words = @words()
       json.percent = @percent()
       json
+
+    normalizeBoolean: (value) =>
+      _.contains(["1", true, "true", 1], value)

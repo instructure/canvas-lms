@@ -42,8 +42,7 @@ define([
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.ba-tinypubsub',
-  'vendor/scribd.view' /* scribd */
+  'vendor/jquery.ba-tinypubsub'
 ], function(I18nObj, $, EditorAccessibility, INST) {
 
   var enableBookmarking = !!INST.browser.ie;
@@ -167,7 +166,7 @@ define([
       theme_advanced_resizing : true,
       theme_advanced_blockformats : "p,h2,h3,h4,pre",
       theme_advanced_more_colors: false,
-      extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
+      extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox|allowfullscreen|webkitallowfullscreen|mozallowfullscreen]",
       content_css: "/stylesheets_compiled/legacy_normal_contrast/vendor/instructure_style.css,/stylesheets_compiled/legacy_normal_contrast/vendor/tinymce.editor_box.css",
       editor_css: editor_css,
       auto_focus: options.focus ? id : null,

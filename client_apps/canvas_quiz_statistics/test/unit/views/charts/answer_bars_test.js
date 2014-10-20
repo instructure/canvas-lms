@@ -27,7 +27,7 @@ define(function(require) {
       d3.event = { target: rect };
       subject.refs.chart.inspect({ id: '1' });
 
-      expect($('.ui-tooltip-content .answer-distribution-tooltip-content').length).toBe(1,
+      expect($('.qtip .answer-distribution-tooltip-content').length).toBe(1,
         'should show answer details in the tooltip');
     });
   });

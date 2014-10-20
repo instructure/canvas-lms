@@ -20,14 +20,15 @@ class DelayedMessage < ActiveRecord::Base
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
-  belongs_to :notification
+  include NotificationPreloader
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
     'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
     'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
     'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
-    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel']
+    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel',
+    'Alert']
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,
@@ -38,7 +39,7 @@ class DelayedMessage < ActiveRecord::Base
   validates_presence_of :communication_channel_id, :workflow_state
 
   before_save :set_send_at
-  
+
   def summary=(val)
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:summary, val)
@@ -105,7 +106,7 @@ class DelayedMessage < ActiveRecord::Base
   # should be deliverable. After this is run on a list of delayed messages,
   # the regular dispatch process will take place. 
   def self.summarize(delayed_message_ids)
-    delayed_messages = DelayedMessage.includes(:notification).find_all_by_id(delayed_message_ids.uniq).compact
+    delayed_messages = DelayedMessage.where(id: delayed_message_ids.uniq)
     uniqs = {}
     # only include the most recent instance of each notification-context pairing
     delayed_messages.each do |m|
@@ -113,14 +114,14 @@ class DelayedMessage < ActiveRecord::Base
     end
     delayed_messages = uniqs.map{|key, val| val}.compact
     delayed_messages = delayed_messages.sort_by{|dm| [dm.notification.sort_order, dm.notification.category] }
-    first = delayed_messages.detect{|m| m.communication_channel}
+    first = delayed_messages.detect{|m| m.communication_channel && m.communication_channel.active?}
     to = first.communication_channel rescue nil
     return nil unless to
     return nil if delayed_messages.empty?
     user = to.user rescue nil
     context = delayed_messages.select{|m| m.context}.compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
-    notification = Notification.by_name('Summaries')
+    notification = BroadcastPolicy.notification_finder.by_name('Summaries')
     path = HostUrl.outgoing_email_address
     message = to.messages.build(
       :subject => notification.subject,

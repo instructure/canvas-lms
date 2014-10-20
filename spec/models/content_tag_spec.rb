@@ -516,6 +516,70 @@ describe ContentTag do
     end
   end
 
+  describe "visible_to_students_with_da_enabled" do
+    before do
+      course_with_student(active_all: true)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+    end
+    context "assignments" do
+      before do
+        @assignment = @course.assignments.create!(:title => "some assignment", :only_visible_to_overrides => true)
+        @module = @course.context_modules.create!(:name => "module")
+        @tag = @module.add_item({
+          :type => 'assignment',
+          :title => 'some assignment',
+          :id => @assignment.id
+        })
+      end
+      it "returns assignments if there is visibility" do
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+      end
+      it "does not return assignments if there is no visibility" do
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+      end
+    end
+    context "discussions" do
+      def set_up_discussion
+        @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @assignment.submission_types = 'discussion_topic'
+        @assignment.save!
+        @topic.assignment_id = @assignment.id
+        @topic.save!
+      end
+      before do
+        discussion_topic_model(:user => @course.instructors.first, :context => @course)
+        @module = @course.context_modules.create!(:name => "module")
+        @tag = @module.add_item({
+          :type => 'discussion_topic',
+          :title => 'some discussion',
+          :id => @topic.id
+        })
+      end
+      it "returns discussions without attached assignments" do
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+      end
+      it "returns discussions with attached assignments if there is visibility" do
+        set_up_discussion
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+      end
+      it "does not return discussions with attached assignments if there is no visibility" do
+        set_up_discussion
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should_not include(@tag)
+      end
+    end
+    context "other" do
+      it "it properly returns wiki pages" do
+        @page = @course.wiki.wiki_pages.create!(:title => "some page")
+        @module = @course.context_modules.create!(:name => "module")
+        @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
+        ContentTag.visible_to_students_with_da_enabled(@student.id).should include(@tag)
+      end
+    end
+  end
+
   describe "destroy" do
     it "updates completion requirements on its associated ContextModule" do
       course_with_teacher(:active_all => true)

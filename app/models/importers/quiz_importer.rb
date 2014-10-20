@@ -146,11 +146,12 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, question_data=nil, item=nil, allow_update = false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
-      item ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
-      item ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
+      item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       if item && !allow_update
         if item.deleted?
           item.workflow_state = hash[:available] ? 'available' : 'created'
+          item.saved_by = :migration
           item.save
         end
       end
@@ -197,7 +198,7 @@ module Importers
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)
       end
 
-      item.saved_by = :migration if item.new_record?
+      item.saved_by = :migration
       item.save!
 
       if migration
@@ -239,7 +240,7 @@ module Importers
 
       if hash[:assignment]
         if hash[:assignment][:migration_id]
-          item.assignment ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:assignment][:migration_id])
+          item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.new
@@ -263,10 +264,12 @@ module Importers
       end
 
       if hash[:assignment_group_migration_id]
-        if g = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
-          item.assignment_group_id = g.id
+        if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
+          item.assignment_group = g
         end
       end
+
+      item.workflow_state = 'unpublished' if context.feature_enabled?(:draft_state) && !item.assignment
 
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?

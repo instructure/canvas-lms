@@ -39,6 +39,7 @@ describe TabsController, type: :request do
         {
           "id" => "home",
           "html_url" => "/courses/#{@course.id}",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}",
           "position" => 1,
           "visibility" => "public",
           "label" => "Home",
@@ -47,6 +48,7 @@ describe TabsController, type: :request do
         {
           "id" => "announcements",
           "html_url" => "/courses/#{@course.id}/announcements",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/announcements",
           "position" => 2,
           "unused" => true,
           "visibility" => "admins",
@@ -56,6 +58,7 @@ describe TabsController, type: :request do
         {
           "id" => "assignments",
           "html_url" => "/courses/#{@course.id}/assignments",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments",
           "position" => 3,
           "unused" => true,
           "visibility" => "admins",
@@ -65,6 +68,7 @@ describe TabsController, type: :request do
         {
           "id" => "discussions",
           "html_url" => "/courses/#{@course.id}/discussion_topics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/discussion_topics",
           "position" => 4,
           "visibility" => "public",
           "label" => "Discussions",
@@ -73,6 +77,7 @@ describe TabsController, type: :request do
         {
           "id" => "grades",
           "html_url" => "/courses/#{@course.id}/grades",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/grades",
           "position" => 5,
           "visibility" => "public",
           "label" => "Grades",
@@ -81,6 +86,7 @@ describe TabsController, type: :request do
         {
           "id" => "people",
           "html_url" => "/courses/#{@course.id}/users",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/users",
           "position" => 6,
           "visibility" => "public",
           "label" => "People",
@@ -89,6 +95,7 @@ describe TabsController, type: :request do
         {
           "id" => "pages",
           "html_url" => "/courses/#{@course.id}/wiki",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/wiki",
           "position" => 7,
           "unused" => true,
           "visibility" => "admins",
@@ -98,6 +105,7 @@ describe TabsController, type: :request do
         {
           "id" => "files",
           "html_url" => "/courses/#{@course.id}/files",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/files",
           "position" => 8,
           "unused" => true,
           "visibility" => "admins",
@@ -107,6 +115,7 @@ describe TabsController, type: :request do
         {
           "id" => "syllabus",
           "html_url" => "/courses/#{@course.id}/assignments/syllabus",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/syllabus",
           "position" => 9,
           "visibility" => "public",
           "label" => "Syllabus",
@@ -115,6 +124,7 @@ describe TabsController, type: :request do
         {
           "id" => "outcomes",
           "html_url" => "/courses/#{@course.id}/outcomes",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/outcomes",
           "position" => 10,
           "unused" => true,
           "visibility" => "admins",
@@ -124,6 +134,7 @@ describe TabsController, type: :request do
         {
           "id" => "quizzes",
           "html_url" => "/courses/#{@course.id}/quizzes",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/quizzes",
           "position" => 11,
           "unused" => true,
           "visibility" => "admins",
@@ -133,6 +144,7 @@ describe TabsController, type: :request do
         {
           "id" => "modules",
           "html_url" => "/courses/#{@course.id}/modules",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/modules",
           "position" => 12,
           "unused" => true,
           "visibility" => "admins",
@@ -142,6 +154,7 @@ describe TabsController, type: :request do
         {
           "id" => "settings",
           "html_url" => "/courses/#{@course.id}/settings",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
           "position" => 13,
           "visibility" => "admins",
           "label" => "Settings",
@@ -188,6 +201,7 @@ describe TabsController, type: :request do
         {
           "id" => "home",
           "html_url" => "/groups/#{@group.id}",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}",
           "type" => "internal",
           "label" => "Home",
           "position"=>1,
@@ -197,6 +211,7 @@ describe TabsController, type: :request do
           "id" => "announcements",
           "label" => "Announcements",
           "html_url" => "/groups/#{@group.id}/announcements",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/announcements",
           "position"=>2,
           "visibility"=>"public",
           "type" => "internal"
@@ -204,6 +219,7 @@ describe TabsController, type: :request do
         {
           "id" => "pages",
           "html_url" => "/groups/#{@group.id}/wiki",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/wiki",
           "label" => "Pages",
           "position"=>3,
           "visibility"=>"public",
@@ -212,6 +228,7 @@ describe TabsController, type: :request do
         {
           "id" => "people",
           "html_url" => "/groups/#{@group.id}/users",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/users",
           "label" => "People",
           "position"=>4,
           "visibility"=>"public",
@@ -220,6 +237,7 @@ describe TabsController, type: :request do
         {
           "id" => "discussions",
           "html_url" => "/groups/#{@group.id}/discussion_topics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/discussion_topics",
           "label" => "Discussions",
           "position"=>5,
           "visibility"=>"public",
@@ -228,6 +246,7 @@ describe TabsController, type: :request do
         {
           "id" => "files",
           "html_url" => "/groups/#{@group.id}/files",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/files",
           "label" => "Files",
           "position"=>6,
           "visibility"=>"public",

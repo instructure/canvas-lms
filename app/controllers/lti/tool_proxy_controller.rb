@@ -17,13 +17,15 @@
 
 module Lti
   class ToolProxyController < ApplicationController
+    include Lti::ApiServiceHelper
+
     before_filter :require_context, :except => [:show]
     skip_before_filter :require_user, only: [:create, :show]
     skip_before_filter :load_user, only: [:create, :show]
 
     def show
       tool_proxy = ToolProxy.where(guid: params['tool_proxy_guid']).first
-      if tool_proxy && authorized_request?(tool_proxy.shared_secret)
+      if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)
         render json: tool_proxy.raw_data
       else
         render json: {error: 'unauthorized'}, status: :unauthorized
@@ -32,7 +34,7 @@ module Lti
 
     def create
       secret = RegistrationRequestService.retrieve_registration_password(oauth_consumer_key)
-      if authorized_request?(secret)
+      if oauth_authenticated_request?(secret)
         tool_proxy = ToolProxyService.new.process_tool_proxy_json(request.body.read, context, oauth_consumer_key)
         json = {
           "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
@@ -47,14 +49,5 @@ module Lti
       end
     end
 
-    private
-
-    def authorized_request?(secret)
-      OAuth::Signature.build(request, :consumer_secret => secret).verify()
-    end
-
-    def oauth_consumer_key
-      @oauth_consumer_key ||= OAuth::Helper.parse_header(request.authorization)['oauth_consumer_key']
-    end
   end
 end

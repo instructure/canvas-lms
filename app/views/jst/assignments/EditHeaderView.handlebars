@@ -1,3 +1,9 @@
+{{#if name}}
+  <h1 class="screenreader-only">{{name}}</h1>
+{{else}}
+  <h1 class="screenreader-only">{{#t "page_header_title"}}New Assignment{{/t}}</h1>
+{{/if}}
+
 <div class="header-bar-right">
   <div class="header-group-left" role="heading" tabindex="0">
     {{#if published}}
@@ -13,7 +19,7 @@
     {{/if}}
   </div>
   <div class="header-bar-right">
-    <div class="admin-links" role="application">
+    <div class="admin-links">
       <a role="button" class="al-trigger btn" href="#">
         <span class="screenreader-only">{{#t "manage_assignment"}}Manage Assignment{{/t}}</span>
         <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>

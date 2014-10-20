@@ -89,6 +89,8 @@ define [
       '.ac-placeholder'     : '$placeholder'
       '.ac-clear'           : '$clearBtn'
       '.ac-search-btn'      : '$searchBtn'
+      '.ac-results-status'  : '$resultsStatus'
+      '.ac-selected-name'   : '$selectedName'
 
     # Internal: Event map.
     events:
@@ -111,6 +113,8 @@ define [
       super
       # After battling chrome, firefox, and IE this seems to be the best place to
       # inject some hackery to prevent focus/blur issues
+      @parentContexts = []
+      @currentContext = null
       $(document).on("mousedown", @_onDocumentMouseDown.bind(this))
 
       @render() # to initialize els
@@ -136,6 +140,7 @@ define [
               class: classes.join(' ')
               'data-id': @model.id
               'data-people-count': @model.get('user_count')
+              'aria-label': @model.get('name')
               id: "result-#{$.guid++}" # for aria-activedescendant
             attributes['aria-haspopup'] = @model.get('isContext')
             attributes
@@ -266,6 +271,7 @@ define [
         @$input.focus()
         return
 
+      @$inputBox.removeAttr('role')
       @$inputBox.removeClass('focused')
       @$placeholder.css(opacity: 1) unless @tokens.length or @$input.val()
       @_resetContext()
@@ -278,6 +284,7 @@ define [
     # Returns nothing.
     _onInputFocus: (e) ->
       @$inputBox.addClass('focused')
+      @$inputBox.attr('role', 'application')
       @$placeholder.css(opacity: 0)
       unless $(e.target).hasClass('ac-input')
         @$input[0].selectionStart = @$input.val().length
@@ -310,6 +317,7 @@ define [
       if isFinished
         @_drawResults()
       @_fetchResults(true) if @nextRequest
+      @updateStatusMessage(@resultCollection.length)
 
     # Internal: Determine if the current user can send to all users in the course.
     #
@@ -401,6 +409,7 @@ define [
         @currentRequest = @resultCollection.fetch().done(@_onSearchResultLoad)
         @toggleResultList(true)
 
+
     # Internal: Get URL for the current request, caching it as
     #   @nextRequest if needed.
     #
@@ -486,7 +495,9 @@ define [
       if @$resultWrapper.css('display') != 'block'
         return
 
-      e.preventDefault() && e.stopPropagation()
+      e.stopPropagation()
+      e.preventDefault()
+
       @$resultList.find('li.selected:first').removeClass('selected')
 
       currentIndex = if @selectedModel then @resultCollection.indexOf(@selectedModel) else -1
@@ -498,6 +509,7 @@ define [
       $el = @$resultList.find("[data-id=#{@selectedModel.id}]")
       $el.scrollIntoView()
       @$input.attr('aria-activedescendant', $el.addClass('selected').attr('id'))
+      @updateSelectedNameForScreenReaders($el.text());
 
     # Internal: Add the clicked model to the list of tokens.
     #
@@ -637,3 +649,28 @@ define [
       _.each tokens, (token) =>
         @_addToModelCache(token)
         @_addToken(token)
+
+
+    # Internal: Set the status message for screenreaders
+    #
+    #
+    updateStatusMessage: (resultCount) ->
+      # Empty the text
+      @$resultsStatus.text('')
+      # Refill the text
+      @$resultsStatus.text(
+        I18n.t('result_status',
+               "The autocomplete has %{results} entries listed, use the up and down arrow keys" +
+               " to navigate to a listing, then press enter to add the person to the To field.",
+               {results: resultCount}
+              )
+      )
+
+    # Internal: Set selected name for screenreaders
+    #
+    # had to add this for IE :/
+    updateSelectedNameForScreenReaders: (selectedName) ->
+      # Empty the text
+      @$selectedName.text('')
+      # Refill the text
+      @$selectedName.text(selectedName)

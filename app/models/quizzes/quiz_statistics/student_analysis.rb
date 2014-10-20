@@ -290,6 +290,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           else
             row << ((answer_item && answer_item[:text]) || '')
           end
+          row.push(strip_tags(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
         row << submission.submission_data.select { |a| a[:correct] }.length
@@ -385,7 +386,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     strip_html_answers(question)
 
     question[:user_ids] = responses.map { |r| r[:user_id] }
-    question[:response_values] = responses.map { |r| r[:text] }
+    question[:response_values] = responses.map { |r| strip_tags(r[:text].to_s) }
     question[:responses] = responses.size
 
     question = Quizzes::QuizQuestion::Base.from_question_data(question).stats(responses)

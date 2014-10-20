@@ -31,7 +31,7 @@ module BasicLTI
         return false unless tool.id == md[1].to_i
         course = Course.find(md[2])
         assignment = course.assignments.active.find(md[3])
-        user = course.student_enrollments.active.find_by_user_id(md[4]).user
+        user = course.student_enrollments.active.where(user_id: md[4]).first.try(:user)
         tag = assignment.external_tool_tag
         if !tag || tool != ContextExternalTool.find_external_tool(tag.url, course)
           return false # assignment settings have changed, this tool is no longer active

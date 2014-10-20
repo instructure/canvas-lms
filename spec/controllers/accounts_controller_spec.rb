@@ -240,8 +240,8 @@ describe AccountsController do
 
       get 'show', :id => @account.id, :format => 'html'
 
-      assigns[:courses].find {|c| c.id == c1.id }.read_attribute(:student_count).should == c1.student_enrollments.count
-      assigns[:courses].find {|c| c.id == c2.id }.read_attribute(:student_count).should == c2.student_enrollments.count
+      assigns[:courses].find {|c| c.id == c1.id }.student_count.should == c1.student_enrollments.count
+      assigns[:courses].find {|c| c.id == c2.id }.student_count.should == c2.student_enrollments.count
 
     end
   end

@@ -121,7 +121,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
-  # @argument quiz_questions [Array]
+  # @argument quiz_questions [[QuizSubmissionQuestion]]
   #   Set of question IDs and the answer value.
   #
   #   See {Appendix: Question Answer Formats} for the accepted answer formats
@@ -140,6 +140,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #      "answer": 42.0
   #    }]
   #  }
+  #
+  # @returns [QuizSubmissionQuestion]
   def answer
     unless @quiz_submission.grants_right?(@service.participant.user, :update)
       reject! 'you are not allowed to update questions for this quiz submission', 403

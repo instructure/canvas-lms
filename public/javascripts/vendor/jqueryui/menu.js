@@ -264,6 +264,7 @@ $.widget( "ui.menu", {
 		}
 
 		if ( preventDefault ) {
+			event.stopPropagation();
 			event.preventDefault();
 		}
 	},

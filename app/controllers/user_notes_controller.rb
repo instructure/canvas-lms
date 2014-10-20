@@ -49,7 +49,7 @@ class UserNotesController < ApplicationController
   end
 
   def show
-    @user_note = UserNote.find_by_id(params[:id])
+    @user_note = UserNote.where(id: params[:id]).first
     if authorized_action(@user_note, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
@@ -61,8 +61,8 @@ class UserNotesController < ApplicationController
 
   def create
     params[:user_note] = {} unless params[:user_note].is_a? Hash
-    params[:user_note][:user] = User.find_by_id(params[:user_note].delete(:user_id)) if params[:user_note][:user_id]
-    params[:user_note][:user] ||= User.find_by_id(params[:user_id])
+    params[:user_note][:user] = User.where(id: params[:user_note].delete(:user_id)).first if params[:user_note][:user_id]
+    params[:user_note][:user] ||= User.where(id: params[:user_id]).first
     # We want notes to be an html field, but we're only using a plaintext box for now. That's why we're
     # doing the trip to html now, instead of on the way out. This should be removed once the user notes
     # entry form is replaced with the rich text editor.

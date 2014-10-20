@@ -54,7 +54,7 @@ class Assignment < ActiveRecord::Base
     :rubric, :context, :grading_standard, :group_category
   ]
 
-  attr_accessor :previous_id, :updating_user, :copying
+  attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
 
@@ -243,16 +243,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
-      # handle if it has already come due, but has not yet been auto_peer_reviewed
-      if overdue?
-        # do_auto_peer_review
-      elsif due_at
-        self.send_later_enqueue_args(:do_auto_peer_review, {
-          :run_at => due_at,
-          :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-        })
-      end
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+      self.send_later_enqueue_args(:do_auto_peer_review, {
+        :run_at => due_at,
+        :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
+      })
     end
     true
   end
@@ -358,6 +353,8 @@ class Assignment < ActiveRecord::Base
     end
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
+    # have to use peer_reviews_due_at here because it's the column name
+    self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     self.points_possible = nil if self.submission_types == 'not_graded'
   end
   protected :default_values
@@ -392,7 +389,7 @@ class Assignment < ActiveRecord::Base
 
   def update_submissions_later
     if assignment_group_id_changed? && assignment_group_id_was.present?
-      AssignmentGroup.find_by_id(assignment_group_id_was).try(:touch)
+      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.now.utc)
     end
     self.assignment_group.touch if self.assignment_group
     if points_possible_changed?
@@ -412,7 +409,7 @@ class Assignment < ActiveRecord::Base
   def update_quiz_or_discussion_topic
     return true if self.deleted?
     if self.submission_types == "online_quiz" && @saved_by != :quiz
-      quiz = Quizzes::Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
+      quiz = Quizzes::Quiz.where(assignment_id: self).first || self.context.quizzes.build
       quiz.assignment_id = self.id
       quiz.title = self.title
       quiz.description = self.description
@@ -573,10 +570,6 @@ class Assignment < ActiveRecord::Base
     self.quiz.restore(:assignment) if from != :quiz && self.quiz
   end
 
-  def participants
-    self.context.participants
-  end
-
   def participants_with_overridden_due_at
     Assignment.participants_with_overridden_due_at([self])
   end
@@ -594,9 +587,9 @@ class Assignment < ActiveRecord::Base
 
   def students_with_visibility
     if self.differentiated_assignments_applies?
-      context.students.able_to_see_assignment_in_course_with_da(self.id, context.id)
+      context.all_students.able_to_see_assignment_in_course_with_da(self.id, context.id)
     else
-      context.students
+      context.all_students
     end
   end
 
@@ -606,8 +599,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def visible_to_observer?(user)
+    return true if !differentiated_assignments_applies?
     return false unless context.user_has_been_observer?(user)
-    return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
 
     visible_student_ids = students_with_visibility.pluck(:id)
 
@@ -615,7 +608,7 @@ class Assignment < ActiveRecord::Base
 
     # observers can be students as well, so their own assignments must be included
     if user.student_enrollments.where(course_id: self.context_id).any?
-      observed_student_ids << user.id
+      observed_students_ids << user.id
     end
 
     # if the observer doesn't have students, show them published assignments
@@ -891,9 +884,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # Everyone, students, TAs, teachers
   def participants
-    context.participants
+    return context.participants unless differentiated_assignments_applies?
+    participants_with_visibility
+  end
+
+  def participants_with_visibility
+    users = context.participating_admins
+    users += students_with_visibility
+    users.uniq
   end
 
   def set_default_grade(options={})
@@ -956,14 +955,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def multiple_module_actions(student_ids, action, points=nil)
-    students = self.context.students.find_all_by_id(student_ids).compact
+    students = self.context.students.where(id: student_ids)
     students.each do |user|
       self.context_module_action(user, action, points)
     end
   end
 
   def submission_for_student(user)
-    self.submissions.find_or_initialize_by_user_id(user.id)
+    self.submissions.where(user_id: user.id).first_or_initialize
   end
 
   def grade_student(original_student, opts={})
@@ -1065,7 +1064,7 @@ class Assignment < ActiveRecord::Base
             submission.save! if submission.changed?
             submissions << submission
           end
-        rescue ActiveRecord::Base::UniqueConstraintViolation
+        rescue ActiveRecord::RecordNotUnique
           submission = self.submissions.where(user_id: student).first
           raise unless submission
           submissions << submission
@@ -1083,7 +1082,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_asset_for_assessment(association, user_id)
-    user = self.context.users.find_by_id(user_id)
+    user = self.context.users.where(id: user_id).first
     if association.purpose == "grading"
       user ? [self.find_or_create_submission(user), user] : [nil, nil]
     else
@@ -1094,11 +1093,11 @@ class Assignment < ActiveRecord::Base
   # Update at this point is solely used for commenting on the submission
   def update_submission(original_student, opts={})
     raise "Student Required" unless original_student
-    submission = submissions.find_by_user_id(original_student.id)
+    submission = submissions.where(user_id: original_student).first
     res = []
     raise "No submission found for that student" unless submission
     group, students = group_students(original_student)
-    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
+    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.where(id: opts[:user_id]).first
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
@@ -1236,8 +1235,8 @@ class Assignment < ActiveRecord::Base
                       :cached_attachments, :attachments]
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
-                         :display_name, :filename, :mime_class, :scribd_doc,
-                         :scribdable?, :size, :submitter_id, :workflow_state]
+                         :display_name, :filename, :mime_class,
+                         :size, :submitter_id, :workflow_state]
 
     res = as_json(
       :include => {
@@ -1292,7 +1291,7 @@ class Assignment < ActiveRecord::Base
             :only => [:mime_class, :comment_id, :id, :submitter_id ]
           },
         },
-        :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
+        :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
@@ -1309,7 +1308,7 @@ class Assignment < ActiveRecord::Base
                                            version_json['submission']['versioned_attachments'].map! do |a|
                                              a.as_json(
                                                :only => attachment_fields,
-                                               :methods => [:view_inline_ping_url, :scribd_render_url]
+                                               :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
                                                json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
@@ -1394,9 +1393,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
-      group_category.groups.includes(:group_memberships => :user).map { |g|
-        [g.name, g.users]
-      }.map { |group_name, group_students|
+      groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
@@ -1417,6 +1414,17 @@ class Assignment < ActiveRecord::Base
       visible_students_for_speed_grader(user)
     end
   end
+
+  def groups_and_ungrouped(user)
+    groups_and_users = group_category.
+      groups.includes(:group_memberships => :user).
+      map { |g| [g.name, g.users] }
+    users_in_group = groups_and_users.flat_map { |_,users| users }
+    groupless_users = visible_students_for_speed_grader(user) - users_in_group
+    phony_groups = groupless_users.map { |u| [u.name, [u]] }
+    groups_and_users + phony_groups
+  end
+  private :groups_and_ungrouped
 
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes
@@ -1793,10 +1801,10 @@ class Assignment < ActiveRecord::Base
     attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
 
     if user_id
-      user = User.find_by_id(user_id)
-      submission = Submission.find_by_user_id_and_assignment_id(user_id, self.id)
+      user = User.where(id: user_id).first
+      submission = Submission.where(user_id: user_id, assignment_id: self).first
     end
-    attachment = Attachment.find_by_id(attachment_id) if attachment_id
+    attachment = Attachment.where(id: attachment_id).first if attachment_id
 
     if !attachment || !submission
       @ignored_files << fullpath

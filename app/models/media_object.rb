@@ -103,7 +103,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.build_media_objects(data, root_account_id)
-    root_account = Account.find_by_id(root_account_id)
+    root_account = Account.where(id: root_account_id).first
     data[:entries].each do |entry|
       attachment_id = nil
       if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
@@ -117,9 +117,9 @@ class MediaObject < ActiveRecord::Base
         end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
-      attachment = Attachment.find_by_id(attachment_id) if attachment_id
+      attachment = Attachment.where(id: attachment_id).first if attachment_id
       account = root_account || Account.default
-      mo = account.shard.activate { MediaObject.find_or_initialize_by_media_id(entry[:entryId]) }
+      mo = account.shard.activate { MediaObject.where(media_id: entry[:entryId]).first_or_initialize }
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
       if attachment

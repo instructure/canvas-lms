@@ -9,6 +9,9 @@ define(function(require) {
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
   var ShortAnswerRenderer = require('jsx!./questions/short_answer');
   var FillInMultipleBlanksRenderer = require('jsx!./questions/fill_in_multiple_blanks');
+  var EssayRenderer = require('jsx!./questions/essay');
+  var CalculatedRenderer = require('jsx!./questions/calculated');
+  var FileUploadRenderer = require('jsx!./questions/file_upload');
 
   var extend = _.extend;
   var Renderers = {
@@ -20,6 +23,9 @@ define(function(require) {
     'fill_in_multiple_blanks_question': FillInMultipleBlanksRenderer,
     'multiple_dropdowns_question': FillInMultipleBlanksRenderer,
     'matching_question': FillInMultipleBlanksRenderer,
+    'essay_question': EssayRenderer,
+    'calculated_question': CalculatedRenderer,
+    'file_upload_question': FileUploadRenderer,
   };
 
   var Statistics = React.createClass({
@@ -83,6 +89,8 @@ define(function(require) {
         key: 'question-' + question.id,
         participantCount: participantCount,
         expanded: stats.expanded.indexOf(question.id) > -1,
+        speedGraderUrl: stats.speedGraderUrl,
+        quizSubmissionsZipUrl: stats.quizSubmissionsZipUrl,
         onToggleDetails: this.toggleDetails.bind(null, question.id)
       });
 

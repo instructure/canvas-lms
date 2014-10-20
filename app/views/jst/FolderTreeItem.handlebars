@@ -1,4 +1,10 @@
 <a href="#" data-fullsize="{{preview_url}}" role="presentation" tabindex="-1" class="treeFile ellipsis" title="{{display_name}}">
-    <img class="preview-thumbnail" src="{{thumbnail_url}}">
-    {{display_name}}
+  {{#if thumbnail_url}}
+    <span class="preview-thumbnail-holder">
+      <img class="preview-thumbnail" src="{{thumbnail_url}}">
+    </span>
+  {{else}}
+    <i class="icon-document"></i>
+  {{/if}}
+  {{display_name}}
 </a>

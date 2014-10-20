@@ -1,5 +1,7 @@
 define [
   'jquery'
+  'underscore'
+  'timezone'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editCalendarEvent'
@@ -7,7 +9,7 @@ define [
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   'vendor/date'
-], ($, commonEventFactory, TimeBlockList, editCalendarEventTemplate) ->
+], ($, _, tz, commonEventFactory, TimeBlockList, editCalendarEventTemplate) ->
 
   class EditCalendarEventDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -40,18 +42,44 @@ define [
     activate: () =>
       @form.find("select.context_id").change()
 
+    getFormData: =>
+      data = @form.getFormData(object_name: 'calendar_event')
+      data = _.omit(data, 'date', 'start_time', 'end_time')
+
+      date = @form.find('input[name=date]').data('date')
+      if date
+        start_time = @form.find('input[name=start_time]').data('date')
+        start_at = date.toString('yyyy-MM-dd')
+        start_at += start_time.toString(' HH:mm') if start_time
+        data.start_at = tz.parse(start_at)
+
+        end_time = @form.find('input[name=end_time]').data('date')
+        end_at = date.toString('yyyy-MM-dd')
+        end_at += end_time.toString(' HH:mm') if end_time
+        data.end_at = tz.parse(end_at)
+
+      data
+
     moreOptionsClick: (jsEvent) =>
       return if @event.object.parent_event_id
+
       jsEvent.preventDefault()
-      pieces = $(jsEvent.target).attr('href').split("#")
-      data = $("#edit_calendar_event_form").getFormData(object_name: 'calendar_event')
-      params = {}
+      params = return_to: window.location.href
+
+      data = @getFormData()
+
+      # override parsed input with user input (for 'More Options' only)
+      data.start_date = @form.find('input[name=date]').val()
+      data.start_time = @form.find('input[name=start_time]').val()
+      data.end_time = @form.find('input[name=end_time]').val()
+
       if data.title then params['title'] = data.title
       if data.location_name then params['location_name'] = data.location_name
-      if data.date
-        params['start_at'] = "#{data.date} #{data.start_time || ''}"
-        params['end_at'] = "#{data.date} #{data.end_time || ''}"
-      params['return_to'] = window.location.href
+      if data.start_date then params['start_date'] = data.start_date
+      if data.start_time then params['start_time'] = data.start_time
+      if data.end_time then params['end_time'] = data.end_time
+
+      pieces = $(jsEvent.target).attr('href').split("#")
       pieces[0] += "?" + $.param(params)
       window.location.href = pieces.join("#")
 
@@ -119,23 +147,13 @@ define [
     formSubmit: (jsEvent) =>
       jsEvent.preventDefault()
 
-      data = @form.getFormData({ object_name: 'calendar_event' })
-      if data.date
-        start_date = Date.parse "#{data.date} #{data.start_time}"
-        data.end_time ?= data.start_time
-        end_date = Date.parse "#{data.date} #{data.end_time}"
-      else
-        start_date = null
-        end_date = null
-      if data.location_name
-        location_name = data.location_name
-      else
-        location_name = ''
+      data = @getFormData()
+      location_name = data.location_name || ''
 
       params = {
         'calendar_event[title]': data.title ? @event.title
-        'calendar_event[start_at]': if start_date then $.unfudgeDateForProfileTimezone(start_date).toISOString() else ''
-        'calendar_event[end_at]': if end_date then $.unfudgeDateForProfileTimezone(end_date).toISOString() else ''
+        'calendar_event[start_at]': if data.start_at then data.start_at.toISOString() else ''
+        'calendar_event[end_at]': if data.end_at then data.end_at.toISOString() else ''
         'calendar_event[location_name]': location_name
       }
 
@@ -144,16 +162,18 @@ define [
         objectData =
           calendar_event:
             title: params['calendar_event[title]']
-            start_at: if start_date then start_date.toISOString() else null
-            end_at: if end_date then end_date.toISOString() else null
+            start_at: if data.start_at then data.start_at.toISOString() else null
+            end_at: if data.end_at then data.end_at.toISOString() else null
             location_name: location_name
             context_code: @form.find(".context_id").val()
         newEvent = commonEventFactory(objectData, @event.possibleContexts())
         newEvent.save(params)
       else
         @event.title = params['calendar_event[title]']
-        @event.start = start_date
-        @event.end = end_date
+        # I know this seems backward, fudging a date before saving, but the
+        # event gets all out-of-whack if it's not...
+        @event.start = $.fudgeDateForProfileTimezone(data.start_at)
+        @event.end = $.fudgeDateForProfileTimezone(data.end_at)
         @event.location_name = location_name
         @event.save(params)
 

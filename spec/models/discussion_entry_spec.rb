@@ -65,6 +65,9 @@ describe DiscussionEntry do
       @notification_name = "New Discussion Entry"
       n = Notification.create(:name => @notification_name, :category => "TestImmediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+
+      n2 = Notification.create(:name => "Announcement Reply", :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n2, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
     end
 
     it "should send them for course discussion topics" do
@@ -146,11 +149,12 @@ describe DiscussionEntry do
       to_users.should_not include quitter  # because they dropped the class
     end
 
-    it "should not send them for announcements" do
+    it "should send relevent notifications on announcements" do
       topic = @course.announcements.create!(:user => @teacher, :message => "This is an important announcement")
       topic.subscribe(@student)
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
       entry.messages_sent[@notification_name].should be_blank
+      entry.messages_sent["Announcement Reply"].should_not be_blank
     end
 
   end

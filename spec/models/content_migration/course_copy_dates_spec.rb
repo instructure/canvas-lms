@@ -119,6 +119,21 @@ describe ContentMigration do
         new_mod.start_at.should be_nil
         new_mod.end_at.should be_nil
       end
+
+      it "should not create broken assignments from unpublished quizzes in draft state" do
+        @copy_to.enable_feature!(:draft_state)
+
+        options = {
+            :everything => true,
+            :remove_dates => true,
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        @copy_to.assignments.count.should == 1
+      end
     end
 
     context "should copy time correctly across daylight saving shift" do

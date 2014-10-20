@@ -1,7 +1,7 @@
 <% add_crumb t('crumbs.faculty_journal', "Faculty Journal") %>
 <% @active_tab = "faculty-journal" %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
-
+<h1 class="screenreader-only"><%= t :journal_header, "Faculty Journal" %></h1>
 <p><%= @is_course ? t(:details_this_course, "Last Faculty Journal entries for students currently enrolled in this course.") :
        t(:details_a_course, "Last Faculty Journal entries for students currently enrolled in a course.") %></p>
 

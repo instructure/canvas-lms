@@ -36,10 +36,10 @@ describe "Respondus SOAP API", type: :request do
   end
 
   before(:each) do
-    setting = PluginSetting.find_or_create_by_name('qti_converter')
+    setting = PluginSetting.where(name: 'qti_converter').new
     setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({:enabled => 'true'})
     setting.save!
-    setting = PluginSetting.find_or_create_by_name('respondus_soap_endpoint')
+    setting = PluginSetting.where(name: 'respondus_soap_endpoint').new
     setting.settings = {:enabled => 'true'}
     setting.save!
     user_with_pseudonym :active_user => true,

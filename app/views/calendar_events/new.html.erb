@@ -12,8 +12,6 @@
       event_attrs[:sections_url] = context_url(@context, :api_v1_context_sections_url)
     end
     js_env :CALENDAR_EVENT => event_attrs
-    # TODO: we should just do this in the JS
-    js_env :NEW_CALENDAR_EVENT_ATTRIBUTES => params.slice(:start_at, :end_at, :title, :description, :location_name)
 
     js_bundle :edit_calendar_event
     jammit_css :tinymce, :edit_calendar_event_full

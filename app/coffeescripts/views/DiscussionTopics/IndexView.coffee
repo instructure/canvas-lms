@@ -18,6 +18,8 @@ define [
 
     events:
       'click .ig-header .element_toggler': 'toggleDiscussionList'
+      'focus .accessibility-warning': 'handleAccessibilityWarningFocus'
+      'blur .accessibility-warning': 'handleAccessibilityWarningBlur'
       'keydown .ig-header .element_toggler': 'toggleDiscussionList'
       'click .discussion-list': 'toggleDiscussionListWithVo'
       'click #edit_discussions_settings':  'toggleSettingsView'
@@ -49,8 +51,13 @@ define [
         @options.pinnedDiscussionView.collection
       ]
 
+    initialize: ->
+      super
+      @listenTo(@options.pinnedDiscussionView.collection, "add remove", @handleAddRemovePinnedDiscussion)
+
     afterRender: ->
       @$('#discussionsFilter').buttonset()
+      @setAccessibilityWarningState();
 
     activeFilters: ->
       _.select(@filters, (value, key) => value.active)
@@ -91,6 +98,25 @@ define [
         $icon = $currentTarget.find('i')
       return unless $icon.length
       $icon.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
+
+    setAccessibilityWarningState: ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $('.accessibility-warning').show()
+      else
+        $('.accessibility-warning').hide()
+
+    handleAddRemovePinnedDiscussion: ->
+      @setAccessibilityWarningState();
+
+    handleAccessibilityWarningFocus: (e) ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $accessibilityWarning = $(e.currentTarget)
+        $accessibilityWarning.removeClass('screenreader-only')
+
+    handleAccessibilityWarningBlur: (e) ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $accessibilityWarning = $(e.currentTarget)
+        $accessibilityWarning.addClass('screenreader-only')
     
     toggleDiscussionListWithVo: (e) ->
       # if this event bubbled up from somewhere else, do nothing.

@@ -26,3 +26,5 @@ Rack::MiniProfiler.config.tap do |c|
     c.storage = ::Rack::MiniProfiler::FileStore
   end
 end
+
+Rack::MiniProfilerRails.initialize!(Rails.application)

@@ -68,7 +68,7 @@ module Alerts
     end
 
     def self.send_alert(alert, user_ids, student_enrollment)
-      notification = Notification.by_name("Alert")
+      notification = BroadcastPolicy.notification_finder.by_name("Alert")
       notification.create_message(alert, user_ids, {:asset_context => student_enrollment})
     end
   end

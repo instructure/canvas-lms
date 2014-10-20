@@ -31,16 +31,15 @@ module Quizzes::QuizQuestionLinkMigrator
   def self.related_attachment_ids(file_id)
     # find the list of ids of copies of the file from the link
     attachment_ids = [file_id]
-    file = Attachment.find_by_id(file_id)
+    file = Attachment.where(id: file_id).first
     return attachment_ids unless file
-    cloned_item_id = file.cloned_item_id
     if file.cloned_item_id
-      copies = Attachment.find_all_by_cloned_item_id(file.cloned_item_id)
-      attachment_ids.concat(copies.map(&:id))
+      copies = Attachment.where(cloned_item_id: file.cloned_item_id).pluck(:id)
+      attachment_ids.concat(copies)
     end
     root_file_id = file.root_attachment_id || file_id
-    copies = Attachment.find_all_by_root_attachment_id(root_file_id)
-    attachment_ids.concat(copies.map(&:id))
+    copies = Attachment.where(root_attachment_id: root_file_id).pluck(:id)
+    attachment_ids.concat(copies)
     attachment_ids << root_file_id
     return attachment_ids.uniq
   end
@@ -120,7 +119,7 @@ module Quizzes::QuizQuestionLinkMigrator
   def self.migrate_file_links_in_question_data(question_data, context={})
     return unless question_data
     changed = false
-    question = context[:question] || Quizzes::QuizQuestion.find_by_id(question_data[:id], :include => [:quiz, :assessment_question])
+    question = context[:question] || Quizzes::QuizQuestion.includes(:quiz, :assessment_question).where(id: question_data[:id]).first
     return unless question
     quiz = context[:quiz] || question.quiz
     for_each_interesting_field(question_data) do |field|

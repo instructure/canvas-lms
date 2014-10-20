@@ -342,7 +342,7 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:id] = params[:module_item][:content_id]
       if ['Page', 'WikiPage'].include?(item_params[:type])
         if page_url = params[:module_item][:page_url]
-          if wiki_page = @context.wiki.wiki_pages.not_deleted.find_by_url(page_url)
+          if wiki_page = @context.wiki.wiki_pages.not_deleted.where(url: page_url).first
             item_params[:id] = wiki_page.id
           else
             return render :json => {:message => "invalid page_url parameter"}, :status => :bad_request
@@ -427,7 +427,7 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
       if (target_module_id = params[:module_item][:module_id]) && target_module_id.to_i != @tag.context_module_id
-        target_module = @context.context_modules.find_by_id(target_module_id)
+        target_module = @context.context_modules.where(id: target_module_id).first
         return render :json => {:message => "invalid module_id"}, :status => :bad_request unless target_module
         old_module = @context.context_modules.find(@tag.context_module_id)
         @tag.remove_from_list
@@ -526,7 +526,7 @@ class ContextModuleItemsApiController < ApplicationController
       else
         # map wiki page url to id
         if asset_type == 'WikiPage'
-          page = @context.wiki.wiki_pages.not_deleted.find_by_url(asset_id)
+          page = @context.wiki.wiki_pages.not_deleted.where(url: asset_id).first
           asset_id = page.id if page
         else
           asset_id = asset_id.to_i
@@ -534,12 +534,12 @@ class ContextModuleItemsApiController < ApplicationController
 
         # find the associated assignment id, if applicable
         if asset_type == 'Quizzes::Quiz'
-          asset = @context.quizzes.find_by_id(asset_id.to_i)
+          asset = @context.quizzes.where(id: asset_id.to_i).first
           associated_assignment_id = asset.assignment_id if asset
         end
 
         if asset_type == 'DiscussionTopic'
-          asset = @context.send(asset_type.tableize).find_by_id(asset_id.to_i)
+          asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
           associated_assignment_id = asset.assignment_id if asset
         end
 

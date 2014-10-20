@@ -370,6 +370,21 @@ class ContextModulesApiController < ApplicationController
         SearchTermHelper.validate_search_term(params[:search_term])
         opts[:search_term] = params[:search_term]
       end
+
+      if @context.feature_enabled?(:differentiated_assignments) && includes.include?('items')
+        user_ids = (@student || @current_user).id
+
+        if @context.user_has_been_observer?(@student || @current_user)
+          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )
+          user_ids.concat(opts[:observed_student_ids])
+        end
+
+        opts[:assignment_visibilities] = AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, @context.id)
+        opts[:discussion_visibilities] = DiscussionTopic.where(course_id: @context.id).visible_to_students_with_da_enabled(user_ids).pluck(:id)
+        # TODO: uncomment once quiz visibilities view is in master
+        # opts[:quiz_visibilities] = QuizStudentVisibility.visible_quiz_ids_for_user(user_ids, @context.id)
+      end
+
       render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact
     end
   end

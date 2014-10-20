@@ -45,14 +45,14 @@ module Lti
 
       if @context.is_a? Course
         substitutions.merge!(
-            {
-                '$Canvas.course.id' => @context.id,
-                '$Canvas.course.sisSourceId' => @context.sis_source_id,
-                '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
-                '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
-                #This is a list of IMS LIS roles should have a different key
-                '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
-            }
+          {
+            '$Canvas.course.id' => @context.id,
+            '$Canvas.course.sisSourceId' => @context.sis_source_id,
+            '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
+            '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
+            #This is a list of IMS LIS roles should have a different key
+            '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
+          }
         )
       end
 
@@ -69,9 +69,12 @@ module Lti
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
                 '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
-                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' }
+                '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
             }
         )
+        if pseudonym
+          substitutions.merge!({'$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) }})
+        end
       end
 
       substitutions

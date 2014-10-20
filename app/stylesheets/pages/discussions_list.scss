@@ -25,11 +25,11 @@
     float: right;
     padding: 11px 10px 0;
     // 'not-important' styles
-    color: #888888;
+    color: $announcements_disscussion-summary-color;
     font-size: 11px; }
   .discussion-unread-container { width: 56px; }
   .discussion-author { font-size: 10px; }
-  .discussion-summary { font-size: 12px; color: #777; }
+  .discussion-summary { font-size: 12px; color: $announcements_disscussion-summary-color; }
   .discussion-title {
     font-size: 14px;
     line-height: 1;
@@ -157,7 +157,7 @@
   }
 
   &:hover {
-    background: #eef7ff;
+    background: $base-list-item-background--hover;
   }
 
   a {
@@ -299,5 +299,13 @@
       margin: 0;
     }
   }
+}
+
+.accessibility-warning {
+  color: #fff;
+  background: #DC3F3F;
+  border: 1px dashed #fff;
+  font-size: 14px;
+  padding: 2px;
 }
 

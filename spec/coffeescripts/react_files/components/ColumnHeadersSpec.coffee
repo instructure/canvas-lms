@@ -13,7 +13,7 @@ define [
 
   test 'returns object with sort property set from the passed in variable', ->
     sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{}), $('<div>').appendTo('body')[0])
+    @columnHeaders = React.renderComponent(ColumnHeaders(query:{}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
     propertyString = 'some property string'
     queryParams = @columnHeaders.queryParamsFor(propertyString)
 
@@ -24,7 +24,7 @@ define [
 
   test 'toggle order to ascending when property passed in is name and query.order is desc', ->
     sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'desc'}), $('<div>').appendTo('body')[0])
+    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'desc'}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
     propertyString = 'name'
     queryParams = @columnHeaders.queryParamsFor(propertyString)
 
@@ -35,7 +35,7 @@ define [
 
   test 'toggle order to descending when property passed in is not name or query.order is not desc', ->
     sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'asc'}), $('<div>').appendTo('body')[0])
+    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'asc'}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
     propertyString = 'foo'
     queryParams = @columnHeaders.queryParamsFor(propertyString)
 

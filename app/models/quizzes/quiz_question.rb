@@ -201,11 +201,14 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   private
 
   def update_question_regrade(regrade_option, regrade_user)
-    regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id, quiz.version_number) do |qr|
-      qr.user_id = regrade_user.id
+    regrade = Quizzes::QuizRegrade.where(quiz_id: quiz.id, quiz_version: quiz.version_number).first_or_initialize
+    if regrade.new_record?
+      regrade.user = regrade_user
+      regrade.save!
     end
 
-    question_regrade = Quizzes::QuizQuestionRegrade.find_or_initialize_by_quiz_question_id_and_quiz_regrade_id(id, regrade.id)
+    question_regrade = Quizzes::QuizQuestionRegrade.where(quiz_question_id: id, quiz_regrade_id: regrade.id).first_or_initialize
+    question_regrade.quiz_regrade = regrade
     question_regrade.regrade_option = regrade_option
     question_regrade.save!
   end

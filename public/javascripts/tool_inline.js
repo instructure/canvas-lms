@@ -80,14 +80,26 @@ var toolPath = $toolForm.data('tool-path');
 var messageType = $toolForm.data('message-type') || 'tool_launch';
 $.trackEvent(messageType, toolName, toolPath);
 
-//Iframe resize handler
-$(document).ready(function() {
-  if($("#tool_content").length) {
-    $(window).resize(function() {
-      var top = $("#tool_content").offset().top;
-      var height = $(window).height();
-      $("#tool_content").height(height - top);
-    }).triggerHandler('resize');
+// iframe sizing
+window.addEventListener('message', function(e) {
+  try {
+    var message = JSON.parse(e.data);
+    if (message.subject === 'lti.frameResize') {
+      var height = message.height;
+      if (height >= 5000) height = 5000;
+      if (height <= 0) height = 1;
+
+      $('.tool_content_wrapper').height(height).data('height_overridden', true);
+    }
+  } catch(err) {
+    (console.error || console.log)('invalid message received from ', e.origin);
+  }
+});
+
+$(function() {
+  var $tool_content_wrapper = $('.tool_content_wrapper');
+  if (!$tool_content_wrapper.data('height_overridden')) {
+    $tool_content_wrapper.height($('#main').height());
   }
 });
 

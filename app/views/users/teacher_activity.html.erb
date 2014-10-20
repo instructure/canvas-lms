@@ -14,11 +14,11 @@
 </style>
 <% end %>
 
-<h2><%= t('headings.teacher_activity', "Teacher Activity Report for %{teacher}", :teacher => @teacher.name) %></h2>
+<h1><%= t('headings.teacher_activity', "Teacher Activity Report for %{teacher}", :teacher => @teacher.name) %></h1>
 
 <% @courses.each do |course, students| %>
   <% has_user_notes = students.first.try(:key?, :last_user_note) %>
-  <h3><%= course.name %></h3>
+  <h2><%= course.name %></h2>
   <% if students.blank? %>
     <%= t 'no_students', 'There are no students to report on.' %>
   <% else %>

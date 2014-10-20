@@ -39,7 +39,7 @@ module Canvas::Oauth
 
     def key
       return nil unless client_id_is_valid?
-      @key ||= DeveloperKey.find_by_id(@client_id)
+      @key ||= DeveloperKey.where(id: @client_id).first
     end
 
     # Checks to see if a token has already been issued to this client and

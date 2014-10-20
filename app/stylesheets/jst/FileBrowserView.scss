@@ -1,42 +1,35 @@
 @import 'base/environment';
 
-$triangle-edge-size: 5px;
-
 .folderTree {
+  &:focus { outline: none; }
+  font-size: 12px;
   &, ul {
     @include reset-list;
   }
   ul { margin-left: 8px; }
   li a {
-    padding: 1px 7px 1px 35px;
-    display: block;
-    background: url(/images/inst_tree/file_types/page_white.png) no-repeat 13px 3px;
-    position: relative;
-    &.folderLabel {
-      background-image: url(/images/inst_tree/folder.png);
-      &:before{
-        position: absolute;
-        top: $triangle-edge-size;
-        left: 4px;
-        border: solid transparent;
-        border-width: $triangle-edge-size;
-        border-left-color: $button-text-color;
-        content: '';
-      }
-      &.expanded:before{
-        left: 0;
-        top: 7px;
-        border-left-color: transparent;
-        border-top-color: $button-text-color;
-      }
-    }
-
+    padding-bottom: 2px;
+    display: flex;
+    white-space: nowrap;
     &.active { background-color: $activeBG; }
   }
-  .preview-thumbnail {
-    margin-left: -23px;
-    max-width: 200px;
-    height: 30px;
-    vertical-align: middle;
+  .preview-thumbnail-holder {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    padding-right: 6px;
+    .preview-thumbnail {
+      max-width: 100%;
+      max-height: 100%;
+    }
   }
+  .icon-folder:before {
+    font-size: 11px;
+  }
+
+  i[class*=icon-], i[class^=icon-] { color: $base-font-color-dark }
+
+  .icon-mini-arrow-right { transition: transform 0.2s }
+  .expanded .icon-mini-arrow-right { transform: rotate(90deg) }
 }
+

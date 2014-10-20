@@ -45,3 +45,13 @@ def assignment_with_override(opts={})
   @override.save!
   @override
 end
+
+def differentiated_assignment(opts={})
+  @assignment = opts[:assignment] || assignment_model(opts)
+  @assignment.only_visible_to_overrides = true
+  @assignment.save!
+  @override = @assignment.assignment_overrides.build
+  @override.set = opts[:course_section] || @course.default_section
+  @override.save!
+  @override
+end

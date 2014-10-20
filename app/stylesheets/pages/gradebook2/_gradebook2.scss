@@ -567,11 +567,11 @@ $gradebook_checkbox_width: 16px;
 
 .letter-grade-points,
 .gpa-scale-points {
-  opacity: 0.4;
   position: absolute;
   font-size: 11px;
   padding-left: 8px;
   line-height: 19px;
+  color: $gradebook_letter-grade-font;
 }
 
 .final-warning {

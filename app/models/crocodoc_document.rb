@@ -158,15 +158,10 @@ class CrocodocDocument < ActiveRecord::Base
             error_docs = CrocodocDocument.where(:uuid => error_uuids)
             attachment_ids = error_docs.pluck(:attachment_id)
             if Canvadocs.enabled?
-              method = :submit_to_canvadocs
-              strand = "canvadocs"
-            else
-              method = :submit_to_scribd
-              strand = "scribd"
+              Attachment.send_later_enqueue_args :submit_to_canvadocs,
+                {:n_strand => "canvadocs", :max_attempts => 1},
+                attachment_ids
             end
-            Attachment.send_later_enqueue_args method,
-              {:n_strand => strand, :max_attempts => 1},
-              attachment_ids
           end
         end
       end

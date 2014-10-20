@@ -73,8 +73,25 @@ module DashboardHelper
 
     contexts.map do |name, url|
       url = nil if category == 'Conversation'
-      url.present? ? "<a href=\"#{url}\">#{h(name)}</a>" : h(name)
+      url.present? ? "<a href=\"#{url}\" aria-label=\"#{accessibility_category_label(category)}\">#{h(name)}</a>" : h(name)
     end.to_sentence.html_safe
+  end
+
+  def accessibility_category_label(category)
+    case category
+    when "Announcement"
+      return I18n.t('helpers.dashboard_helper.announcement_label', "Visit Course Announcements")
+    when "Conversation"
+      return I18n.t('helpers.dashboard_helper.conversation_label', "Visit Conversations")
+    when "Assignment"
+      return I18n.t('helpers.dashboard_helper.assignment_label', "Visit Course Assignments")
+    when "DiscussionTopic"
+      return I18n.t('helpers.dashboard_helper.discussion_label', "Visit Course Discussions")
+    when "AssessmentRequest"
+      return I18n.t('helpers.dashboard_helper.peer_review_label', "Visit Course Peer Reviews")
+    else
+      raise "Unknown activity category"
+    end
   end
 
   def category_details_label(category)

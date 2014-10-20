@@ -286,7 +286,7 @@ class MessageableUser
 
       # skipping messageability constraints, do I see the user in that specific
       # course, and if so with which enrollment type(s)?
-      if include_course_id && course = Course.find_by_id(include_course_id)
+      if include_course_id && course = Course.where(id: include_course_id).first
         missing_users = users.reject{ |user| user.global_common_courses.keys.include?(course.global_id) }
         if missing_user.present?
           course.shard.activate do
@@ -339,7 +339,7 @@ class MessageableUser
 
       # skipping messageability constraints, do I see the user in that specific
       # group?
-      if include_group_id && group = Group.find_by_id(include_group_id)
+      if include_group_id && group = Group.where(id: include_group_id).first
         missing_users = users.reject{ |user| user.global_common_groups.keys.include?(group.global_id) }
         if missing_users.present?
           group.shard.activate do
@@ -356,7 +356,7 @@ class MessageableUser
     # filters the provided list of users to just those that are participants in
     # the conversation
     def participants_in_conversation(users, conversation_id)
-      conversation = Conversation.find_by_id(conversation_id)
+      conversation = Conversation.where(id: conversation_id).first
       return [] unless conversation
 
       conversation.shard.activate do
@@ -405,7 +405,7 @@ class MessageableUser
     # populated only with the course given.
     def messageable_users_in_course_scope(course_or_id, enrollment_types=nil, options={})
       return unless course_or_id
-      course = course_or_id.is_a?(Course) ? course_or_id : Course.find_by_id(course_or_id)
+      course = course_or_id.is_a?(Course) ? course_or_id : Course.where(id: course_or_id).first
       return unless course
 
       course.shard.activate do
@@ -435,7 +435,7 @@ class MessageableUser
     # populated only with the course of the given section.
     def messageable_users_in_section_scope(section_or_id, enrollment_types=nil, options={})
       return unless section_or_id
-      section = section_or_id.is_a?(CourseSection) ? section_or_id : CourseSection.find_by_id(section_or_id)
+      section = section_or_id.is_a?(CourseSection) ? section_or_id : CourseSection.where(id: section_or_id).first
       return unless section
 
       section.shard.activate do
@@ -465,7 +465,7 @@ class MessageableUser
     # populated only with the group given.
     def messageable_users_in_group_scope(group_or_id, options={})
       return unless group_or_id
-      group = group_or_id.is_a?(Group) ? group_or_id : Group.find_by_id(group_or_id)
+      group = group_or_id.is_a?(Group) ? group_or_id : Group.where(id: group_or_id).first
       return unless group
 
       group.shard.activate do
@@ -825,7 +825,7 @@ class MessageableUser
 
       group_ids = [fully_visible_scope, section_visible_scope].map{ |scope| scope.map(&:group_id) }.flatten.uniq
       if group_ids.present?
-        Group.find_all_by_id(group_ids)
+        Group.where(id: group_ids).to_a
       else
         []
       end

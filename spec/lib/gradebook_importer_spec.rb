@@ -324,6 +324,42 @@ describe GradebookImporter do
       assignment.keys.sort.should eql([:grading_type, :id, :points_possible, :previous_id, :title])
     end
   end
+
+  context "differentiated assignments" do
+    def setup_DA
+      course_with_teacher(draft_state: true, active_all: true, differentiated_assignments: true)
+      @section_one = @course.course_sections.create!(name: 'Section One')
+      @section_two = @course.course_sections.create!(name: 'Section Two')
+
+      @student_one = student_in_section(@section_one)
+      @student_two = student_in_section(@section_two)
+
+      @assignment_one = assignment_model(course: @course, title: "a1")
+      @assignment_two = assignment_model(course: @course, title: "a2")
+
+      differentiated_assignment(assignment: @assignment_one, course_section: @section_one)
+      differentiated_assignment(assignment: @assignment_two, course_section: @section_two)
+    end
+
+    before :once do
+      setup_DA
+      @assignment_one.grade_student(@student_one, :grade => "3")
+      @assignment_two.grade_student(@student_two, :grade => "3")
+    end
+
+    it "should ignore submissions for students without visibility" do
+      importer_with_rows(
+        "Student,ID,Section,a1,a2",
+        ",#{@student_one.id},#{@section_one.id},7,9",
+        ",#{@student_two.id},#{@section_two.id},7,9"
+      )
+      json = @gi.as_json
+      json[:students][0][:submissions][0]["grade"].should == "7"
+      json[:students][0][:submissions][1]["grade"].should == ""
+      json[:students][1][:submissions][0]["grade"].should == ""
+      json[:students][1][:submissions][1]["grade"].should == "9"
+    end
+  end
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)

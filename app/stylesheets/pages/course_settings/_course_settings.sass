@@ -273,8 +273,4 @@ input.move-nav-item-label-spacer
   margin-top: 10px
 
 .drag_and_drop_warning
-  color: #fff
-  background-color: #dc3f3f
-  border: 1px dashed #fff
-  font-size: 12px
-  padding: 1px
+  @include accessibility-prompt($is-link: false)

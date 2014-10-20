@@ -131,7 +131,7 @@ describe ActiveRecord do
 
       it "should count/find correctly with additional where/find scopes" do
         @normal_context.things.find(@thing_a.id).should == @thing_a
-        @normal_context.things.find_by_context_type("Namespaced::ParaNormalContext").should == @thing_b
+        @normal_context.things.where(context_type: "Namespaced::ParaNormalContext").first.should == @thing_b
         scope = @normal_context.things.where(context_type: "Namespaced::ParaNormalContext")
         scope.count.should == 1
         scope.should == [@thing_b]

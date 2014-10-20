@@ -67,7 +67,6 @@ CanvasRails::Application.routes.draw do
       match 'download.:type' => 'files#show', :as => :typed_download, :download => '1'
       match 'preview' => 'files#show', :as => :preview, :preview => '1'
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
-      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       collection do
         get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
@@ -285,7 +284,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
 
 
@@ -548,7 +547,7 @@ CanvasRails::Application.routes.draw do
     end
 
 
-    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
 
 
@@ -607,7 +606,8 @@ CanvasRails::Application.routes.draw do
   match 'login' => 'pseudonym_sessions#new', :as => :login, :via => :get
   match 'login' => 'pseudonym_sessions#create', :via => :post
   match 'logout' => 'pseudonym_sessions#destroy', :as => :logout, :via => :delete
-  match 'logout' => 'pseudonym_sessions#saml_logout', :via => [:get, :post]
+  match 'logout' => 'pseudonym_sessions#saml_logout', :via => :post
+  match 'logout' => 'pseudonym_sessions#logout_confirm', :via => :get
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
   match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]
@@ -739,7 +739,6 @@ CanvasRails::Application.routes.draw do
   resources :assignments, :only => [:index] do
     resources :files, :only => [] do
       match 'inline_view' => 'files#show', :as => :inline_view, :via => :post, :inline => '1'
-      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render, :via => :post
     end
   end
 
@@ -1014,6 +1013,14 @@ CanvasRails::Application.routes.draw do
       et_routes("account")
     end
 
+    scope(controller: 'lti/lti_apps') do
+      def et_routes(context)
+        get "#{context}s/:#{context}_id/lti_apps/launch_definitions", action: :launch_definitions, path_name: "#{context}_launch_definitions"
+      end
+      et_routes("course")
+      et_routes("account")
+    end
+
     scope(:controller => :external_feeds) do
       def ef_routes(context)
         get "#{context}s/:#{context}_id/external_feeds", :action => :index, :path_name => "#{context}_external_feeds"
@@ -1089,6 +1096,7 @@ CanvasRails::Application.routes.draw do
 
     scope(:controller => :accounts) do
       get 'accounts', :action => :index, :path_name => :accounts
+      get 'course_accounts', :action => :course_accounts, :path_name => :course_accounts
       get 'accounts/:id', :action => :show, :path_name => :account
       put 'accounts/:id', :action => :update
       get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
@@ -1587,6 +1595,7 @@ CanvasRails::Application.routes.draw do
     post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
     post "tools/:tool_id/xapi", :controller => :lti_api, :action => :xapi, :path_name => "lti_xapi"
+    post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
   end
 
   ApiRouteSet.draw(self, "/api/lti") do
@@ -1595,7 +1604,13 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/tool_consumer_profile', action: 'show', :as => "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", :controller => 'lti/tool_proxy', :action => :create, :path_name => "create_#{context}_lti_tool_proxy"
     end
+    #Tool Setting Services
+    get "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :show, as: 'show_lti_tool_settings'
+    put "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :update, as: 'update_lti_tool_settings'
+
+    #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", :controller => 'lti/tool_proxy', :action => :show, :path_name => "show_lti_tool_proxy"
+
   end
 
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)

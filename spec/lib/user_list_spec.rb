@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -31,6 +32,12 @@ describe UserList do
     ul.errors.should == [{:address => '@instructure', :details => :unparseable}]
   end
 
+  it "should not fail with unicode names" do
+    ul = UserList.new '"senor molé" <blah@instructure.com>'
+    ul.errors.should == []
+    ul.addresses.map{|x| [x[:name], x[:address]]}.should == [["senor molé", "blah@instructure.com"]]
+  end
+
   it "should find by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
@@ -51,6 +58,18 @@ describe UserList do
     ul.addresses.map{|x| [x[:name], x[:address]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com"],
         ["Last, First", "lastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+  end
+
+  it "should process a list of irregular emails" do
+    ul = UserList.new(%{ Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
+          guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>})
+    ul.addresses.map{|x| [x[:name], x[:address]]}.should eql([
+      ["Shaw \"Ryan\"", "ryankshaw@gmail.com"],
+      ["whoopsies", "stuff@stuff.stuff"],
+      ["guess what my name has an@sign", "blah@gmail.com"],
+      [nil, "derp@derp.depr"]])
     ul.errors.should == []
     ul.duplicate_addresses.should == []
   end

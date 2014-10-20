@@ -71,6 +71,7 @@ require [
     onSelected: (model) =>
       @lastFetch.abort() if @lastFetch
       @header.onModelChange(null, @model)
+      @detail.onModelChange(null, @model)
       @model = model
       messages = @list.selectedMessages
       if messages.length == 0
@@ -78,6 +79,7 @@ require [
         return @detail.render()
       else if messages.length > 1
         delete @detail.model
+        @detail.onModelChange(messages[0], null)
         @detail.render(batch: true)
         @header.onModelChange(messages[0], null)
         @header.toggleReplyBtn(true)
@@ -94,7 +96,7 @@ require [
 
     selectConversation: (model) =>
       @header.onModelChange(model, null)
-      @detail.model = model
+      @detail.onModelChange(model, null)
       @detail.render()
 
     onReply: (message) =>
@@ -233,6 +235,9 @@ require [
       @detail.on('reply',       @onReply)
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
+      @detail.on('star-toggle', @onStarToggle)
+      @detail.on('delete',      @onDelete)
+      @detail.on('archive',     @onArchive)
       $(document).ready(@onPageLoad)
       $(window).keydown(@onKeyDown)
 

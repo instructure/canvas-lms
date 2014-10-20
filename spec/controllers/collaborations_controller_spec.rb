@@ -44,7 +44,7 @@ describe CollaborationsController do
       user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
       GoogleDocs::Connection.any_instance.expects(:verify_access_token).returns(true)
 
       get 'index', :course_id => @course.id
@@ -57,7 +57,7 @@ describe CollaborationsController do
       user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: nil, secret: nil))
+      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: nil, secret: nil)))
 
       get 'index', :course_id => @course.id
 
@@ -69,7 +69,7 @@ describe CollaborationsController do
       user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
       GoogleDocs::Connection.any_instance.expects(:verify_access_token).raises("Error")
 
       get 'index', :course_id => @course.id
@@ -96,7 +96,7 @@ describe CollaborationsController do
 
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
 
       get 'index', :group_id => group.id
       response.should be_success

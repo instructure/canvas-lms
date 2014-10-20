@@ -123,6 +123,11 @@ require 'set'
 #           "example": 81259,
 #           "type": "integer"
 #         },
+#         "enrollment_term_id": {
+#           "description": "the enrollment term associated with the course",
+#           "example": 34,
+#           "type": "integer"
+#         },
 #         "start_at": {
 #           "description": "the start date for the course, if applicable",
 #           "example": "2012-06-01T00:00:00-06:00",
@@ -255,6 +260,7 @@ class CoursesController < ApplicationController
 
   before_filter :require_user, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
+  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -472,6 +478,9 @@ class CoursesController < ApplicationController
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
   #
+  # @argument course[grading_standard_id] [Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
   # @returns Course
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
@@ -522,6 +531,7 @@ class CoursesController < ApplicationController
         if @course.save
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
+          @course.require_assignment_group rescue nil
           # offer updates the workflow state, saving the record without doing validation callbacks
           if api_request? and params[:offer].present?
             @course.offer
@@ -1132,7 +1142,7 @@ class CoursesController < ApplicationController
     end
 
     if session[:accepted_enrollment_uuid].present? &&
-      enrollment = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid])
+      enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first
 
       success = false
       if enrollment.invited?
@@ -1163,7 +1173,7 @@ class CoursesController < ApplicationController
     if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
       params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
 
-      enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited")
+      enrollment = @context.enrollments.where(uuid: session[:enrollment_uuid], workflow_state: "invited").first
     end
 
     # Look for enrollments to matching temporary users
@@ -1244,7 +1254,7 @@ class CoursesController < ApplicationController
     return unless session[:claimed_course_uuids] && session[:claimed_enrollment_uuids]
     if session[:claimed_course_uuids].include?(@context.uuid)
       session[:claimed_enrollment_uuids].each do |uuid|
-        e = @context.enrollments.find_by_uuid(uuid)
+        e = @context.enrollments.where(uuid: uuid).first
         @pending_teacher = e.user if e
       end
     end
@@ -1603,7 +1613,7 @@ class CoursesController < ApplicationController
       if account.grants_right?(@current_user, session, :manage_courses)
         root_account = account.root_account
         enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
-        args[:enrollment_term] = root_account.enrollment_terms.find_by_id(enrollment_term_id) if enrollment_term_id
+        args[:enrollment_term] = root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
       end
       args[:enrollment_term] ||= @context.enrollment_term
       args[:abstract_course] = @context.abstract_course
@@ -1644,9 +1654,86 @@ class CoursesController < ApplicationController
   # @API Update a course
   # Update an existing course.
   #
-  # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
+  # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # Additional arguments available for Courses#update
+  # @argument account_id [Required, Integer]
+  #   The unique ID of the account to create to course under.
+  #
+  # @argument course[name] [String]
+  #   The name of the course. If omitted, the course will be named "Unnamed
+  #   Course."
+  #
+  # @argument course[course_code] [String]
+  #   The course code for the course.
+  #
+  # @argument course[start_at] [DateTime]
+  #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[end_at] [DateTime]
+  #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[license] [String]
+  #   The name of the licensing. Should be one of the following abbreviations
+  #   (a descriptive name is included in parenthesis for reference):
+  #   - 'private' (Private Copyrighted)
+  #   - 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives)
+  #   - 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike)
+  #   - 'cc_by_nc' (CC Attribution Non-Commercial)
+  #   - 'cc_by_nd' (CC Attribution No Derivatives)
+  #   - 'cc_by_sa' (CC Attribution Share Alike)
+  #   - 'cc_by' (CC Attribution)
+  #   - 'public_domain' (Public Domain).
+  #
+  # @argument course[is_public] [Boolean]
+  #   Set to true if course if public.
+  #
+  # @argument course[public_syllabus] [Boolean]
+  #   Set to true to make the course syllabus public.
+  #
+  # @argument course[public_description] [String]
+  #   A publicly visible description of the course.
+  #
+  # @argument course[allow_student_wiki_edits] [Boolean]
+  #   If true, students will be able to modify the course wiki.
+  #
+  # @argument course[allow_wiki_comments] [Boolean]
+  #   If true, course members will be able to comment on wiki pages.
+  #
+  # @argument course[allow_student_forum_attachments] [Boolean]
+  #   If true, students can attach files to forum posts.
+  #
+  # @argument course[open_enrollment] [Boolean]
+  #   Set to true if the course is open enrollment.
+  #
+  # @argument course[self_enrollment] [Boolean]
+  #   Set to true if the course is self enrollment.
+  #
+  # @argument course[restrict_enrollments_to_course_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the
+  #   course.
+  #
+  # @argument course[term_id] [Integer]
+  #   The unique ID of the term to create to course in.
+  #
+  # @argument course[sis_course_id] [String]
+  #   The unique SIS identifier.
+  #
+  # @argument course[integration_id] [String]
+  #   The unique Integration identifier.
+  #
+  # @argument course[hide_final_grades] [Boolean]
+  #   If this option is set to true, the totals in student grades summary will
+  #   be hidden.
+  #
+  # @argument course[apply_assignment_group_weights] [Boolean]
+  #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument offer [Boolean]
+  #   If this option is set to true, the course will be available to students
+  #   immediately.
+  #
+  # @argument course[syllabus_body] [String]
+  #   The syllabus body for the course
   #
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
@@ -1703,7 +1790,7 @@ class CoursesController < ApplicationController
         standard_id = params[:course].delete :grading_standard_id
         if @course.grants_right?(@current_user, session, :manage_grades)
           if standard_id.present?
-            grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
+            grading_standard = GradingStandard.standards_for(@course).where(id: standard_id).first
             @course.grading_standard = grading_standard if grading_standard
           else
             @course.grading_standard = nil
@@ -1919,6 +2006,10 @@ class CoursesController < ApplicationController
     if @current_user.fake_student? && authorized_action(@context, @real_current_user, :use_student_view)
       # destroy the exising student
       @fake_student = @context.student_view_student
+      # but first, remove all existing quiz submissions / submissions
+      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.quiz_submissions.destroy_all
+
       @fake_student.destroy
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
       enter_student_view
@@ -1981,6 +2072,7 @@ class CoursesController < ApplicationController
   def set_urls_and_permissions_for_assignment_index
     permissions = {manage: false}
     js_env({
+      :COURSE_HOME => true,
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
         :course_url => api_v1_course_url(@context),

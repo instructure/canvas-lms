@@ -197,11 +197,11 @@ class Submission < ActiveRecord::Base
     can :read and can :read_grade
 
     given {|user| self.assignment && self.assignment.context && user && self.user &&
-      self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
+      self.assignment.context.observer_enrollments.where(user_id: user, associated_user_id: self.user, workflow_state: 'active').exists? }
     can :read and can :read_comments
 
     given {|user| self.assignment && !self.assignment.muted? && self.assignment.context && user && self.user &&
-      self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active').try(:grants_right?, user, :read_grades) }
+      self.assignment.context.observer_enrollments.where(user_id: user, associated_user_id: self.user, workflow_state: 'active').first.try(:grants_right?, user, :read_grades) }
     can :read_grade
 
     given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
@@ -421,7 +421,9 @@ class Submission < ActiveRecord::Base
 
   def touch_graders
     if self.assignment && self.user && self.assignment.context.is_a?(Course)
-      self.assignment.context.admins.each(&:touch)
+      connection.after_transaction_commit do
+        User.where(id: self.assignment.context.admins).update_all(updated_at: Time.now.utc)
+      end
     end
   end
 
@@ -465,13 +467,13 @@ class Submission < ActiveRecord::Base
     (associations - existing_associations).each{|a| a.destroy }
     unassociated_ids = ids.reject{|id| association_ids.include?(id) }
     return if unassociated_ids.empty?
-    attachments = Attachment.find_all_by_id(unassociated_ids)
+    attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
       if (a.context_type == 'User' && a.context_id == user_id) ||
          (a.context_type == 'Group' && a.context_id == group_id) ||
          (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
          attachment_fake_belongs_to_group(a)
-        aa = self.attachment_associations.find_by_attachment_id(a.id)
+        aa = self.attachment_associations.where(attachment_id: a).first
         aa ||= self.attachment_associations.create(:attachment => a)
       end
     end
@@ -526,8 +528,8 @@ class Submission < ActiveRecord::Base
       raise "Can't create media submission without media object"
     end
     if self.submission_type == 'online_quiz'
-      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_submission_id(self.id) rescue nil
-      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.where(submission_id: self).first
+      self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id: self.user_id, quiz_id: self.assignment.quiz).first rescue nil
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
@@ -613,6 +615,7 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_attachments=(attachments)
+    attachments.compact!
     @versioned_attachments = Array(attachments).select { |a|
       (a.context_type == 'User' && a.context_id == user_id) ||
       (a.context_type == 'Group' && a.context_id == group_id) ||
@@ -779,6 +782,10 @@ class Submission < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 
+  def assignment_visible_to_user?(user)
+    assignment.visible_to_user?(user)
+  end
+
   def needs_regrading?
     graded? && !grade_matches_current_submission?
   end
@@ -924,8 +931,8 @@ class Submission < ActiveRecord::Base
     @assessment_request_count += 1
     user = obj.user rescue nil
     association = self.assignment.rubric_association
-    res = self.assessment_requests.find_or_initialize_by_assessor_asset_id_and_assessor_asset_type_and_assessor_id_and_rubric_association_id(obj.id, obj.class.to_s, user.id, (association ? association.id : nil))
-    res || self.assessment_requests.build(:assessor_asset => obj, :assessor => user, :rubric_association => association)
+    res = self.assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id)).
+      first_or_initialize
     res.user_id = self.user_id
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?
@@ -1015,7 +1022,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters={})
     includes = { :attachments => {}, :quiz_submission => {} }
-    methods = [ :scribdable?, :conversion_status, :scribd_doc, :formatted_body, :submission_history ]
+    methods = [ :formatted_body, :submission_history ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
@@ -1048,10 +1055,13 @@ class Submission < ActiveRecord::Base
     # This should always be called in the context of a delayed job
     return unless CutyCapt.enabled?
 
-    attachment = CutyCapt.snapshot_attachment_for_url(self.url)
-    attachment.context = self
-    attachment.save!
-    attach_screenshot(attachment)
+    if attachment = CutyCapt.snapshot_attachment_for_url(self.url)
+      attachment.context = self
+      attachment.save!
+      attach_screenshot(attachment)
+    else
+      logger.error("Error capturing web snapshot for submission #{self.global_id}")
+    end
   end
 
   def attach_screenshot(attachment)
@@ -1097,7 +1107,7 @@ class Submission < ActiveRecord::Base
     cp = if content_participations.loaded?
            content_participations.detect { |cp| cp.user_id == uid }
          else
-           content_participations.find_by_user_id(uid)
+           content_participations.where(user_id: uid).first
          end
     state = cp.try(:workflow_state)
     return state if state.present?

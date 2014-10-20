@@ -17,7 +17,7 @@
     </div>
 <% end %>
 
-<h2><%= t(:settings_title, "Authentication Settings") %></h2>
+<h1><%= t(:settings_title, "Authentication Settings") %></h1>
 
 <p>
   <%= t(:settings_description, 'In order for a user to authenticate through an external identity provider (IdP),
@@ -47,7 +47,7 @@ using the normal Canvas login procedure. For this account the url would be %{url
   </p>
 <% end %>
 
-<h3><%= t(:current_settings_title, "Current Integration") %></h3>
+<h2><%= t(:current_settings_title, "Current Integration") %></h2>
 
 <%= render :partial => "cas_settings" %>
 <%= render :partial => "ldap_settings" %>

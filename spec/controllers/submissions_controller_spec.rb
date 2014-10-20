@@ -39,6 +39,16 @@ describe SubmissionsController do
       assigns[:submission].url.should eql("http://url")
     end
 
+    it "should reject illegal file extensions from submission" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
+      att = attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => {}
+      response.should be_redirect
+      assigns[:submission].should be_nil
+      flash[:error].should_not be_nil
+    end
+
     it "should use the appropriate group based on the assignment's category and the current user" do
       course_with_student_logged_in(:active_all => true)
       group_category = @course.group_categories.create(:name => "Category")
@@ -68,7 +78,7 @@ describe SubmissionsController do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
+      data2 = fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true)
       post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should_not be_nil
@@ -78,7 +88,7 @@ describe SubmissionsController do
       assigns[:submission].attachments.should_not be_empty
       assigns[:submission].attachments.length.should eql(2)
       assigns[:submission].attachments.map{|a| a.display_name}.should be_include("doc.doc")
-      assigns[:submission].attachments.map{|a| a.display_name}.should be_include("xls.xls")
+      assigns[:submission].attachments.map{|a| a.display_name}.should be_include("txt.txt")
     end
 
     it "should fail but not raise when the submission is invalid" do
@@ -186,7 +196,7 @@ describe SubmissionsController do
         flag.save!
         mock_user_service = mock()
         @user.expects(:user_services).returns(mock_user_service)
-        mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+        mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
       end
 
       it "should not save if domain restriction prevents it" do
@@ -285,7 +295,7 @@ describe SubmissionsController do
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
       data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
+      data2 = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id, :submission => {:comment => "some comment"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should eql(@submission)
@@ -293,7 +303,7 @@ describe SubmissionsController do
       assigns[:submission].submission_comments[0].comment.should eql("some comment")
       assigns[:submission].submission_comments[0].attachments.length.should eql(2)
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("doc.doc")
-      assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("xls.xls")
+      assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("txt.txt")
     end
 
     it "should allow setting 'student_entered_grade'" do
@@ -382,6 +392,25 @@ describe SubmissionsController do
       response.should be_success
 
       assigns[:visible_rubric_assessments].should == [@assessment]
+    end
+
+    it "should redirect download requests with the download_frd parameter" do
+      # This is because the files controller looks for download_frd to indicate a forced download
+      course_with_teacher_logged_in
+      assignment = assignment_model(course: @course)
+      student_in_course
+      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
+      submission = submission_model(
+        course: @course,
+        assignment: assignment,
+        submission_type: "online_upload",
+        attachment_ids: att.id,
+        attachments: [att],
+        user: @student)
+      get 'show', assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id
+
+      response.should be_redirect
+      response.headers["Location"].should match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
     end
   end
 

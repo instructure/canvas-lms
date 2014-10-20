@@ -70,6 +70,10 @@
       tr.syllabus_assignment
         .name a
           :font-weight bold
+          @if $use_high_contrast
+            :text-decoration none
+            &:hover, &:focus
+              :text-decoration underline
 
       td.not_last
         :border-bottom 1px solid #ddd

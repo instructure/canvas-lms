@@ -226,7 +226,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns [Page]
   def index
-    if authorized_action(@context.wiki, @current_user, :read)
+    if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
@@ -465,7 +465,7 @@ class WikiPagesApiController < ApplicationController
   def show_revision
     if params.has_key?(:revision_id)
       permission = :read_revisions
-      revision = @page.versions.find_by_number!(params[:revision_id].to_i)
+      revision = @page.versions.where(number: params[:revision_id].to_i).first!
     else
       permission = :read
       revision = @page.versions.current
@@ -497,7 +497,7 @@ class WikiPagesApiController < ApplicationController
   def revert
     if authorized_action(@page, @current_user, :read_revisions) && authorized_action(@page, @current_user, :update)
       revision_id = params[:revision_id].to_i
-      @revision = @page.versions.find_by_number!(revision_id).model
+      @revision = @page.versions.where(number: revision_id).first!.model
       @page.body = @revision.body
       @page.title = @revision.title
       @page.url = @revision.url
@@ -526,7 +526,7 @@ class WikiPagesApiController < ApplicationController
     @page = if is_front_page_action
       @wiki.front_page
     else
-      @wiki.wiki_pages.not_deleted.find_by_url(url)
+      @wiki.wiki_pages.not_deleted.where(url: url).first
     end
 
     # create a new page if the page was not found

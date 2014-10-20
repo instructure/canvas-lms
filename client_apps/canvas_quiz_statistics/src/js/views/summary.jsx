@@ -7,6 +7,20 @@ define(function(require) {
   var secondsToTime = require('../util/seconds_to_time');
   var round = require('../util/round');
   var formatNumber = require('../util/format_number');
+  var SightedUserContent = require('jsx!../components/sighted_user_content');
+  var ScreenReaderContent = require('jsx!../components/screen_reader_content');
+
+  var Column = React.createClass({
+    render: function() {
+      return (
+        <th scope="col">
+          <SightedUserContent tagName="i" className={this.props.icon + ' inline'} />
+          {' '}
+          {this.props.label}
+        </th>
+      );
+    }
+  });
 
   var Summary = React.createClass({
     getDefaultProps: function() {
@@ -41,34 +55,35 @@ define(function(require) {
               {I18n.t('quiz_summary', 'Quiz Summary')}
             </h3>
 
-            <aside className="pull-right">
+            <div className="pull-right">
               {this.props.quizReports.map(this.renderReport)}
-            </aside>
+            </div>
           </header>
 
           <table className="text-left">
+            <ScreenReaderContent tagName="caption" forceSentenceDelimiter>
+              {I18n.t('table_description',
+                'Summary statistics for all turned in submissions')
+              }
+            </ScreenReaderContent>
+
             <thead>
               <tr>
-                <th>
-                  <i className="icon-quiz-stats-avg"></i>{' '}
-                  {I18n.t('stats_mean', 'Avg Score')}
-                </th>
-                <th>
-                  <i className="icon-quiz-stats-high"></i>{' '}
-                  {I18n.t('stats_high', 'High Score')}
-                </th>
-                <th>
-                  <i className="icon-quiz-stats-low"></i>{' '}
-                  {I18n.t('stats_low', 'Low Score')}
-                </th>
-                <th>
-                  <i className="icon-quiz-stats-deviation"></i>{' '}
-                  {I18n.t('stats_stdev', 'Std. Deviation')}
-                </th>
-                <th>
-                  <i className="icon-quiz-stats-time"></i>{' '}
-                  {I18n.t('stats_avg_time', 'Avg Time')}
-                </th>
+                <Column
+                  icon="icon-quiz-stats-avg"
+                  label={I18n.t('mean', 'Average Score')} />
+                <Column
+                  icon="icon-quiz-stats-high"
+                  label={I18n.t('high_score', 'High Score')} />
+                <Column
+                  icon="icon-quiz-stats-low"
+                  label={I18n.t('low_score', 'Low Score')} />
+                <Column
+                  icon="icon-quiz-stats-deviation"
+                  label={I18n.t('stdev', 'Standard Deviation')} />
+                <Column
+                  icon="icon-quiz-stats-time"
+                  label={I18n.t('avg_time', 'Average Time')} />
               </tr>
             </thead>
 
@@ -80,14 +95,28 @@ define(function(require) {
                 <td>{this.ratioFor(this.props.scoreHigh)}%</td>
                 <td>{this.ratioFor(this.props.scoreLow)}%</td>
                 <td>{formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
-                <td>{secondsToTime(this.props.durationAverage)}</td>
+                <td>
+                  <ScreenReaderContent forceSentenceDelimiter>
+                    {secondsToTime.toReadableString(this.props.durationAverage)}
+                  </ScreenReaderContent>
+                  {/*
+                    try to hide the [HH:]MM:SS timestamp from SR users because
+                    it's not really useful, however this doesn't work in all
+                    modes such as the Speak-All mode (at least on VoiceOver)
+                  */}
+                  <SightedUserContent>
+                    {secondsToTime(this.props.durationAverage)}
+                  </SightedUserContent>
+                </td>
               </tr>
             </tbody>
           </table>
 
           <ScorePercentileChart
             key="chart"
-            scores={this.props.scores} />
+            scores={this.props.scores}
+            scoreAverage={this.props.scoreAverage}
+            pointsPossible={this.props.pointsPossible} />
         </div>
       );
     },

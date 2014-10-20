@@ -16,7 +16,7 @@ define [
         Course: ['due_date', 'grading_policies', 'course_content', 'files', 'announcement', 'announcement_created_by_you', 'announcement_reply', 'grading', 'invitation',
                  'all_submissions', 'late_grading', 'submission_comment']
         Discussions: ['discussion', 'discussion_entry']
-        Communication: ['added_to_conversation', 'conversation_message']
+        Communication: ['added_to_conversation', 'conversation_message', 'conversation_created']
         Scheduling: ['student_appointment_signups', 'appointment_signups', 'appointment_cancelations',
                      'appointment_availability', 'calendar']
         Parent: []

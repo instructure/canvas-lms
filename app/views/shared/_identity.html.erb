@@ -13,6 +13,8 @@
       <li class="user_name"><%= link_to @current_user.short_name, user_profile_path(@current_user) %></li>
     <% end %>
     <% unless @current_user.fake_student? %>
+      <%# K-12 header moves Inbox to main navigation, so only show it here if K-12 feature flag is disabled %>
+      <% if !k12? %>
       <li class="first inbox">
         <a href="<%= conversations_path %>">
           <span><%= t 'links.inbox', "Inbox" %></span>
@@ -22,7 +24,8 @@
           <% end %>
         </a>
       </li>
-    <li><%= link_to t('links.settings', "Settings"), settings_profile_path %></li>
+      <% end %>
+      <li><%= link_to t('links.settings', "Settings"), settings_profile_path %></li>
     <% end %>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>

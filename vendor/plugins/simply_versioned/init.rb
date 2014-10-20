@@ -1,1 +1,0 @@
-require 'simply_versioned'

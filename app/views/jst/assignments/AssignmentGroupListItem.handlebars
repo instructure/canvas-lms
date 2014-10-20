@@ -8,17 +8,31 @@
         </a>
       </span>
     {{/if}}
-    <h2
+    {{#if course_home}}
+      <h3
       class="ig-header-title element_toggler"
       aria-controls="assignment_group_{{id}}_assignments"
       aria-expanded="true"
       aria-label="{{name}} {{toggleMessage}}"
       role="button"
       tabindex="0"
-    >
+      >
       <i class="icon-mini-arrow-down"></i>
       {{name}}
-    </h2>
+      </h3>
+    {{else}}
+      <h2
+      class="ig-header-title element_toggler"
+      aria-controls="assignment_group_{{id}}_assignments"
+      aria-expanded="true"
+      aria-label="{{name}} {{toggleMessage}}"
+      role="button"
+      tabindex="0"
+      >
+      <i class="icon-mini-arrow-down"></i>
+      {{name}}
+      </h2>
+    {{/if}}
 
     <div class="ag-header-controls">
       {{#ifAny showWeight showRules}}
@@ -55,7 +69,7 @@
           <i class="icon-plus"></i>
         </a>
 
-        <div class="inline-block" role="application">
+        <div class="inline-block">
           <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0" role="button">
             <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>

@@ -261,6 +261,10 @@
       border: 1px solid #8c8d8d;
       left: -9999px;
     }
+
+    &:focus {
+      border: 1px solid #333;
+    }
   }
 
   .star-btn {
@@ -274,32 +278,45 @@
       text-decoration: none;
     }
 
+    &:focus {
+      color: #333;
+      text-decoration: none;
+    }
+
     &:focus, &.active {
       left: 0;
     }
 
-    &.active:before {
-      color: #fed676;
-      content: "\2605";
-      position: absolute;
+    &.active {
+      &:before, &:after {
+        position: absolute;
+      }
+      &:before {
+        color: #fed676;
+        content: "\2605";
+      }
+      &:focus {
+        color: #333;
+        &:after {
+          content: "\2606";
+          color: #333;
+          z-index: 5;
+          top: 0; left: 0;
+        }
+      }
     }
   }
 }
 
 .open-message {
-  color: #fff;
-  background: #DC3F3F;
-  border: 1px dashed #fff;
-  font-size: 12px;
-  padding: 2px;
+  @include accessibility-prompt;
   left: -9999px;
   position: absolute;
   &:focus {
-    left: 50%;
-    top: 2px;
-    width: auto;
-    height: auto;
+    left: auto; top: auto;
+    right: 0; bottom: 0;
     z-index: 1;
+    width: auto; height: auto;
   }
 }
 
@@ -311,6 +328,10 @@
 
   &:focus {
     outline: none;
+  }
+
+  .subject {
+    float: left;
   }
 
   .no-messages {
@@ -342,6 +363,12 @@
 
     .label {
       margin-top: 12px;
+    }
+  }
+
+  .message-detail-actions {
+    li {
+      display: inline;
     }
   }
 
@@ -394,7 +421,7 @@
   .date {
     color: #7f7f7f;
     position: absolute;
-    right: 0;
+    right: 10px;
     top: 0;
   }
 
@@ -402,15 +429,17 @@
     right: 9999em;
     position: relative;
     top: 0;
+    margin: 20px 10px 0 8px;
   }
 
   .actions li {
     border: none;
     float: left;
-    margin: 0 0 0 8px;
+    margin:0 0 0 8px;
     padding: 0;
   }
 
+  .message-detail-actions li a,
   .actions li a {
     color: #7f7f7f;
 
@@ -434,9 +463,6 @@
 }
 
 .message-item-view:hover, .message-metadata.hover {
-  .date {
-    right: 9999em;
-  }
 
   .actions {
     display: block;

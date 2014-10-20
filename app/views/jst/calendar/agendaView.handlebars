@@ -13,10 +13,11 @@
               {{#each events}}
                 <li class="agenda-event" data-event-id="{{id}}">
                   <div class="ig-row" tabindex="0" role="button">
-                    <span class="ig-title group_{{contextCode}}">
+                    <span class="ig-title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
                       <span class="screenreader-only">{{readableType}},</span>
                       <i class="icon-{{iconType}}"></i>
                       {{#truncate title 60}}{{/truncate}}
+                      {{#if isCompleted}}<span class="screenreader-only">,(completed),</span>{{/if}}
                     </span>
                     <span class="screenreader-only">,{{contextInfo.name}},</span>
                     <div class="ig-details">

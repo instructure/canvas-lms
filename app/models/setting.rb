@@ -28,24 +28,21 @@ class Setting < ActiveRecord::Base
     if @@cache.has_key?(name)
       @@cache[name]
     else
-      @@cache[name] = Setting.find_or_initialize_by_name(name, :value => default).value
+      @@cache[name] = Setting.where(name: name).first.try(:value) || default
     end
   end
 
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
     @@cache.delete(name)
-    s = Setting.find_or_initialize_by_name(name)
+    s = Setting.where(name: name).first_or_initialize
     s.value = value
     s.save!
   end
   
-  def self.remove(name)
-    Setting.find_by_name(name).destroy rescue nil
-  end
-  
+
   def self.get_or_set(name, new_val)
-    Setting.find_or_create_by_name(name, :value => new_val).value
+    Setting.where(name: name).first_or_create(value: new_val).value
   end
   
   # this cache doesn't get invalidated by other rails processes, obviously, so
@@ -62,7 +59,6 @@ class Setting < ActiveRecord::Base
   
   def self.remove(name)
     @@cache.delete(name)
-    s = Setting.find_by_name(name)
-    s.destroy if s
+    Setting.where(name: name).delete_all
   end
 end

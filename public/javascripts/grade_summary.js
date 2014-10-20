@@ -230,9 +230,15 @@ define([
       event.stopPropagation();
       var $assignment = $(this).parents(".student_assignment"),
           val         = $assignment.find(".original_score").text(),
-          tooltip     = $assignment.data('muted') ?
-            I18n.t('student_mute_notification', 'Instructor is working on grades') :
-            I18n.t('click_to_change', 'Click to test a different score');
+          submission_status = $assignment.find(".submission_status").text();
+      var tooltip;
+      if ($assignment.data('muted')) {
+        tooltip = I18n.t('student_mute_notification', 'Instructor is working on grades');
+      } else if(submission_status == 'pending_review') {
+        tooltip = I18n.t('grading_in_progress', "Instructor is working on grades");
+      } else {
+        tooltip = I18n.t('click_to_change', 'Click to test a different score');
+      }
       $assignment.find(".score").text(val);
       $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
         .find(".score_teaser").text(tooltip).end()
@@ -330,4 +336,3 @@ define([
     }
   }
 });
-

@@ -82,7 +82,7 @@ module StreamItemsHelper
     presenter.stream_item_id = item.id
     presenter.updated_at = item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
     presenter.updated_at ||= item.updated_at
-    presenter.unread = item.data.unread
+    presenter.unread = item.unread
     presenter.path = extract_path(category, item)
     presenter.context = extract_context(category, item)
     presenter.summary = extract_summary(category, item)

@@ -26,6 +26,9 @@ class Course < ActiveRecord::Base
   include HtmlTextHelper
   include TimeZoneHelper
 
+  attr_accessor :teacher_names
+  attr_writer :student_count
+
   attr_accessible :name,
                   :section,
                   :account,
@@ -106,7 +109,7 @@ class Course < ActiveRecord::Base
 
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
-  has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
+  has_many :enrollments, :include => [:user], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy, :inverse_of => :course
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
@@ -303,16 +306,24 @@ class Course < ActiveRecord::Base
 
   def module_items_visible_to(user)
     if self.grants_right?(user, :manage_content)
-      self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+      tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
-      self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
+      tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
+
+    if self.feature_enabled?(:differentiated_assignments)
+      tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self) do |tags, user_ids|
+        tags.visible_to_students_with_da_enabled(user_ids)
+      end
+    end
+
+    tags
   end
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     infer_root_account unless self.root_account_id
-    existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
+    existing_course = self.root_account.all_courses.where(sis_source_id: self.sis_source_id).first
     return true if !existing_course || existing_course.id == self.id
 
     self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
@@ -455,7 +466,7 @@ class Course < ActiveRecord::Base
                       aa.depth = depth
                     end
                   end
-                rescue ActiveRecord::Base::UniqueConstraintViolation
+                rescue ActiveRecord::RecordNotUnique
                   course.course_account_associations.where(course_section_id: section,
                     account_id: account_id).update_all(:depth => depth)
                 end
@@ -621,7 +632,7 @@ class Course < ActiveRecord::Base
     self.shard.activate do
       Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
-        self.instructor_enrollments.active.find_by_user_id(user.id).present?
+        self.instructor_enrollments.active.where(user_id: user).exists?
       end
     end
   end
@@ -630,7 +641,7 @@ class Course < ActiveRecord::Base
     return unless user
     Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
       # active here is !deleted; it still includes concluded, etc.
-      self.admin_enrollments.active.find_by_user_id(user.id).present?
+      self.admin_enrollments.active.where(user_id: user).exists?
     end
   end
 
@@ -638,21 +649,21 @@ class Course < ActiveRecord::Base
     return unless user
     Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
       # active here is !deleted; it still includes concluded, etc.
-      self.observer_enrollments.active.find_by_user_id(user.id).present?
+      self.observer_enrollments.active.where(user_id: user).exists?
     end
   end
 
   def user_has_been_student?(user)
     return unless user
     Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
-      self.all_student_enrollments.find_by_user_id(user.id).present?
+      self.all_student_enrollments.where(user_id: user).exists?
     end
   end
 
   def user_has_no_enrollments?(user)
     return unless user
     Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
-      enrollments.find_by_user_id(user.id).nil?
+      !enrollments.where(user_id: user).exists?
     end
   end
 
@@ -679,7 +690,7 @@ class Course < ActiveRecord::Base
   end
 
   def membership_for_user(user)
-    self.enrollments.find_by_user_id(user && user.id)
+    self.enrollments.where(user_id: user).first if user
   end
 
   def infer_root_account
@@ -896,7 +907,7 @@ class Course < ActiveRecord::Base
   end
 
   def invite_uninvited_students
-    self.enrollments.find_all_by_workflow_state("creation_pending").each do |e|
+    self.enrollments.where(workflow_state: "creation_pending").each do |e|
       e.invite!
     end
   end
@@ -971,7 +982,7 @@ class Course < ActiveRecord::Base
 
   def self.create_unique(uuid=nil, account_id=nil, root_account_id=nil)
     uuid ||= CanvasSlug.generate_securish_uuid
-    course = find_or_initialize_by_uuid(uuid)
+    course = where(uuid: uuid).first_or_initialize
     course = Course.new if course.deleted?
     course.name = self.default_name if course.new_record?
     course.short_name = t('default_short_name', "Course-101") if course.new_record?
@@ -1227,12 +1238,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain(opts = {})
-    self.account.account_chain(opts)
-  end
-
-  def account_chain_ids(opts = {})
-    account_chain(opts).map(&:id)
+  def account_chain
+    @account_chain ||= Account.account_chain(account_id)
   end
 
   def institution_name
@@ -1437,7 +1444,7 @@ class Course < ActiveRecord::Base
       enrollments.each do |enrollment|
         next unless enrollment.computed_final_score
         enrollment_ids << enrollment.id
-        pseudonym_sis_ids = enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).map{|p| p.sis_user_id}
+        pseudonym_sis_ids = enrollment.user.pseudonyms.active.where(account_id: self.root_account_id).pluck(:sis_user_id)
         pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
         pseudonym_sis_ids.each do |pseudonym_sis_id|
           row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id),
@@ -1497,9 +1504,9 @@ class Course < ActiveRecord::Base
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+
     assignments = calc.assignments
     groups = calc.groups
-
 
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
@@ -1561,12 +1568,20 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
+      if da_enabled = feature_enabled?(:differentiated_assignments)
+        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments.map(&:user_id), course_id: id)
+      end
+
       student_enrollments.each do |student_enrollment|
         student = student_enrollment.user
         student_sections = student_section_names[student.id].sort.to_sentence
         student_submissions = assignments.map do |a|
-          submission = submissions[[student.id, a.id]]
-          submission.try(:score)
+          if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+            "N/A"
+          else
+            submission = submissions[[student.id, a.id]]
+            submission.try(:score)
+          end
         end
         #Last Row
         row = [student.last_name_first, student.id]
@@ -1650,6 +1665,10 @@ class Course < ActiveRecord::Base
       end
       if e
         e.already_enrolled = true
+        if e.workflow_state == 'deleted'
+          e.sis_batch_id = nil
+          e.sis_source_id = nil
+        end
         e.attributes = {
           :course_section => section,
           :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state,
@@ -1809,7 +1828,7 @@ class Course < ActiveRecord::Base
   end
 
   def default_section(opts = {})
-    section = course_sections.active.find_by_default_section(true)
+    section = course_sections.active.where(default_section: true).first
     if !section && opts[:include_xlists]
       section = CourseSection.active.where(:nonxlist_course_id => self).order(:id).first
     end
@@ -1899,7 +1918,7 @@ class Course < ActiveRecord::Base
       next(new_url) if supported_types && !supported_types.include?(match.type)
       if match.obj_id
         new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
-        next(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
+        next(new_url) unless rewriter.user_can_view_content? { match.obj_class.where(id: match.obj_id).first }
         if !limit_migrations_to_listed_types || new_id
           new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
         end
@@ -2026,7 +2045,7 @@ class Course < ActiveRecord::Base
               final_new_folders = []
               parent_folder = Folder.root_folders(self).first
               old_folders.each_with_index do |folder, idx|
-                if f = parent_folder.active_sub_folders.find_by_name(folder.name)
+                if f = parent_folder.active_sub_folders.where(name: folder.name).first
                   final_new_folders << f
                 else
                   final_new_folders << new_folders[idx]
@@ -2288,8 +2307,7 @@ class Course < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
-    account_ids = self.account_chain_ids
-    tools += ContextExternalTool.active.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain).to_a
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
@@ -2647,8 +2665,8 @@ class Course < ActiveRecord::Base
   end
 
   def includes_student?(user)
-    return false if user.nil? || user.id.nil?
-    student_enrollments.find_by_user_id(user.id).present?
+    return false if user.nil? || user.new_record?
+    student_enrollments.where(user_id: user).exists?
   end
 
   def update_one(update_params, user, update_source = :manual)
@@ -2695,7 +2713,7 @@ class Course < ActiveRecord::Base
     end
 
     progress_runner.do_batch_update(course_ids) do |course_id|
-      course = account.associated_courses.find_by_id(course_id)
+      course = account.associated_courses.where(id: course_id).first
       raise t('course_not_found', "The course was not found") unless course &&
           (course.workflow_state != 'deleted' || update_params[:event] == 'undelete')
       raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
@@ -2737,5 +2755,9 @@ class Course < ActiveRecord::Base
     else
       self.content_exports.non_admin(user)
     end
+  end
+
+  def student_count
+    read_attribute(:student_count) || @student_count
   end
 end

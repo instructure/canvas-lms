@@ -21,7 +21,7 @@ module Canvas::Migration::Validators::CourseCopyValidator
     if !options || !options[:source_course_id]
       return I18n.t :course_copy_argument_error, 'A course copy requires a source course.'
     end
-    source = Course.find_by_id(options[:source_course_id])
+    source = Course.where(id: options[:source_course_id]).first
     if source
       if !(source.grants_right?(user, :read_as_admin) && source.grants_right?(user, :read))
         return I18n.t :course_copy_not_allowed_error, 'You are not allowed to copy the source course.'

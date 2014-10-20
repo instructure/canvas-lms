@@ -81,8 +81,18 @@ define [
     # For routing in the react app in the browser, we want something that will take that "course files"
     # out. because urls will end up being /courses/2/files/folder/some folder/another
     EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+\/?/
+    filesEnv = null
     urlPath: ->
-      (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
+      relativePath = (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
+      filesEnv ||= require('compiled/react_files/modules/filesEnv') # circular dep
+
+      # when we are viewing all files we need to pad the context_asset_string on the front of the url
+      # so it would be something like /files/folder/users_1/some/sub/folder
+      if filesEnv.showingAllContexts
+        assetString = "#{@get('context_type').toLowerCase()}s_#{@get('context_id')}"
+        relativePath = assetString + '/' + relativePath
+
+      relativePath
 
     @resolvePath = (contextType, contextId, folderPath) ->
       url = "/api/v1/#{contextType}/#{contextId}/folders/by_path#{folderPath}"

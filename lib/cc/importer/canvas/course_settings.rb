@@ -54,7 +54,8 @@ module CC::Importer::Canvas
 
       ['title', 'course_code', 'default_wiki_editing_roles',
        'turnitin_comments', 'default_view', 'license', 'locale',
-       'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref'].each do |string_type|
+       'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref',
+       'root_account_uuid'].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end

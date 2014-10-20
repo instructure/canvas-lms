@@ -6,8 +6,10 @@ environment_configuration(defined?(config) && config) do |config|
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
 
-  # Log error messages when you accidentally call methods on nil.
-  config.whiny_nils = true
+  if CANVAS_RAILS3
+    # Log error messages when you accidentally call methods on nil.
+    config.whiny_nils = true
+  end
 
   # Show full error reports and disable caching
   config.consider_all_requests_local = true
@@ -21,10 +23,11 @@ environment_configuration(defined?(config) && config) do |config|
 
   # initialize cache store. has to eval, not just require, so that it has
   # access to config.
-  eval(File.new(File.dirname(__FILE__) + "/cache_store.rb").read)
+  cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
+  eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 
   # allow debugging only in development environment by default
   #
@@ -48,4 +51,8 @@ environment_configuration(defined?(config) && config) do |config|
   # we use lots of db specific stuff - don't bother trying to dump to ruby
   # (it also takes forever)
   config.active_record.schema_format = :sql
+
+  unless CANVAS_RAILS3
+    config.eager_load = false
+  end
 end

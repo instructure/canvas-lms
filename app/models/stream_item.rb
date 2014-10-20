@@ -35,6 +35,7 @@ class StreamItem < ActiveRecord::Base
 
   attr_accessible :context, :asset
   after_destroy :destroy_stream_item_instances
+  attr_accessor :unread
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
@@ -144,7 +145,6 @@ class StreamItem < ActiveRecord::Base
       end
       if object.attachment
         hash = object.attachment.attributes.slice('id', 'display_name')
-        hash['scribdable?'] = object.attachment.scribdable?
         res[:attachment] = hash
       end
     when Conversation
@@ -309,7 +309,7 @@ class StreamItem < ActiveRecord::Base
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if item = asset.stream_item
-      StreamItemInstance.find_by_user_id_and_stream_item_id(user_id, item.id).try(:update_attribute, :workflow_state, new_state)
+      StreamItemInstance.where(user_id: user_id, stream_item_id: item).first.try(:update_attribute, :workflow_state, new_state)
     end
   end
 

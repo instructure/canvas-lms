@@ -48,7 +48,7 @@ class GroupCategory < ActiveRecord::Base
       record.errors.add attr, t(:name_required, "Name is required")
     elsif GroupCategory.protected_name_for_context?(value, record.context)
       record.errors.add attr, t(:name_reserved, "%{name} is a reserved name.", name: value)
-    elsif record.context && record.context.group_categories.other_than(record).find_by_name(value)
+    elsif record.context && record.context.group_categories.other_than(record).where(name: value).exists?
       record.errors.add attr, t(:name_unavailable, "%{name} is already in use.", name: value)
     elsif value.length > max_len
       record.errors.add attr, t(:name_too_long, "Enter a shorter category name")
@@ -133,7 +133,7 @@ class GroupCategory < ActiveRecord::Base
 
     def role_category_for_context(role, context)
       return unless context and protected_role_for_context?(role, context)
-      category = context.group_categories.find_by_role(role) ||
+      category = context.group_categories.where(role: role).first ||
                  context.group_categories.build(:name => name_for_role(role), :role => role)
       category.save({:validate => false}) if category.new_record?
       category
