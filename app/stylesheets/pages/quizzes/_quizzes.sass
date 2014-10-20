@@ -44,6 +44,9 @@ li.quiz
     font-weight: bold
 
 #quiz_show
+  .btn-published.disabled
+    opacity: 1
+
   .alert
     padding-right: 14px
     .actions
@@ -235,6 +238,9 @@ div#content
         margin: 0 0 8px 0
         position: relative
         opacity: 0.5
+        @if $use_high_contrast
+          opacity: 0.7
+
         &.correct_answer
           :background none
           opacity: 1
@@ -463,7 +469,7 @@ div#content
       :float right
       :font-size 0.9em
       :font-weight bold
-      :color #777
+      :color darken($canvas-neutral, 55)
       :margin-top 0.1em
 
   .text
@@ -1252,6 +1258,9 @@ ul#quiz_versions
   text-align: center
   text-shadow: 0 -1px 0 rgba(#000, 0.5)
 
+  @if $use_high_contrast 
+    background-image: url(/images/answers_sprite_hc.png)
+
   &.correct:before, &.correct:after,
   &.incorrect:before, &.incorrect:after,
   &.info:before, &.info:after
@@ -1261,6 +1270,8 @@ ul#quiz_versions
     height: 27px
     position: absolute
     top: 0
+    @if $use_high_contrast 
+      background-image: url(/images/answers_sprite_hc.png)
 
   &.correct:before, &.incorrect:before, &.info:before
     left: -3px
@@ -1651,7 +1662,7 @@ ul#quiz_versions
     float: left
     margin-left: 24%
     margin-bottom: 0
-    color: #777
+    color: #707070
     font-size: 90%
 
 #speed_update_scores_container
