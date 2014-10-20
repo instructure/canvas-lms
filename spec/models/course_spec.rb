@@ -158,6 +158,17 @@ describe Course do
     expect(@course).to eql(@course2)
   end
 
+  it "should only change the course code using the course name if the code is nil or empty" do
+    @course = Course.create_unique
+    code = @course.course_code
+    @course.name = 'test123'
+    @course.save
+    expect(code).to eql(@course.course_code)
+    @course.course_code = nil
+    @course.save
+    expect(code).to_not eql(@course.course_code)
+  end
+
   it "should throw error for long sis id" do
     #should throw rails validation error instead of db invalid statement error
     @course = Course.create_unique
