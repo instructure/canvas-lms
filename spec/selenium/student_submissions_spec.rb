@@ -97,6 +97,30 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
+    it "should not allow a user to submit a file-submission assignment with an illegal file extension" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ['bash']
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f('.submit_assignment_link').click
+      wait_for_ajaximations
+
+      # Select an assignment that has a wrong file extension
+      filename, fullpath, data = get_file("testfile1.txt")
+      f('.submission_attachment input').send_keys(fullpath)
+
+      # Check that the error is being reported
+      (f('.bad_ext_msg').text() =~ /This\sfile\stype\sis\snot\sallowed/).should be_truthy
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      f('#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
     it "should show as not turned in when submission was auto created in speedgrader" do
       # given
       @assignment.update_attributes(:submission_types => "online_text_entry")
@@ -287,6 +311,58 @@ describe "submissions" do
           f('.details .header').should include_text "Turned In!"
           f('.details .file-big').should include_text "html-editing-test.html"
         end
+      end
+
+      it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension" do
+        FILENAME = "hello-world.sh"
+        FIXTURE_FN = "files/#{FILENAME}"
+
+        local_storage!
+
+        user_with_pseudonym :username => "nobody2@example.com",
+                            :password => "asdfasdf2"
+        course_with_student_logged_in :user => @user
+        create_session @pseudonym, false
+        add_file(fixture_file_upload(FIXTURE_FN, 'application/x-sh'),
+                 @user, FILENAME)
+        File.read(fixture_file_path(FIXTURE_FN))
+        assignment = @course.assignments.create!(:title => 'assignment 1',
+                                                 :name => 'assignment 1',
+                                                 :submission_types => "online_upload",
+                                                 :allowed_extensions => ['txt'])
+        get "/courses/#{@course.id}/assignments/#{assignment.id}"
+        f('.submit_assignment_link').click
+        wait_for_ajaximations
+        f('.toggle_uploaded_files_link').click
+        wait_for_ajaximations
+
+        # traverse the tree
+        begin
+          keep_trying_until do
+            f('#uploaded_files > ul > li.folder > .sign').click
+            wait_for_ajaximations
+            # How does it know which name we're looking for?
+            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+          end
+          f('#uploaded_files > ul > li.folder .file .name').click
+          wait_for_ajaximations
+          f('#submit_file_button').click
+        rescue => err
+          # prevent the confirm dialog that pops up when you navigate away
+          # from the page from showing.
+          # TODO: actually figure out why the spec intermittently fails.
+          driver.execute_script "window.onbeforeunload = null;"
+          raise err
+        end
+
+        # Make sure the flash message is being displayed
+        flash_message_present?(:error).should be_truthy
+
+        # navigate off the page and dismiss the alert box to avoid problems
+        # with other selenium tests
+        f('#section-tabs .home').click
+        driver.switch_to.alert.accept
+        driver.switch_to.default_content
       end
     end
   end

@@ -195,7 +195,7 @@ describe ActiveRecord::Base do
       User.count.should eql @orig_user_count + 1
     end
 
-    it "should run twice if it gets a UniqueConstraintViolation" do
+    it "should run twice if it gets a RecordNotUnique" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
       lambda{
@@ -204,7 +204,7 @@ describe ActiveRecord::Base do
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation) # we don't catch the error the second time
+      }.should raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
       Submission.count.should eql 1
       tries.should eql 2
       User.count.should eql @orig_user_count
@@ -288,7 +288,7 @@ describe ActiveRecord::Base do
 
         u2 = User.new
         u2.id = u.id
-        lambda{ u2.save! }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation)
+        lambda{ u2.save! }.should raise_error(ActiveRecord::RecordNotUnique)
         User.connection.expects(:select).once.returns([])
         User.first
       end
@@ -614,6 +614,13 @@ describe ActiveRecord::Base do
       a.user_account_associations.loaded?.should be_false
       Marshal.dump(a)
       a.user_account_associations.loaded?.should be_false
+    end
+  end
+
+  describe "callbacks" do
+    it "should use default scope" do
+      Account.before_save { Account.scoped.to_sql.should_not =~ /callbacks something/; true }
+      Account.where(name: 'callbacks something').create!
     end
   end
 end

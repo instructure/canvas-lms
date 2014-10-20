@@ -8,6 +8,7 @@ define [
   class KyleMenu
     constructor: (trigger, options) ->
       @$trigger = $(trigger).data('kyleMenu', this)
+      @$ariaMenuWrapper = @$trigger.parent()
       @opts = $.extend(true, {}, KyleMenu.defaults, options)
 
       unless @opts.noButton
@@ -50,11 +51,17 @@ define [
         menuselect: @select
         popupopen: @onOpen
         popupclose: @onClose
+        keydown: @onKeyDown
 
     onOpen: (event) =>
+      @$ariaMenuWrapper.attr 'role', 'application'
       @adjustCarat event
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
+
+
+    onKeyDown: (event) =>
+      @$trigger.focus() unless event.keyCode != 9
 
     open: ->
       @$menu.popup 'open'
@@ -64,18 +71,19 @@ define [
         e.preventDefault()
         el = $target[0]
         event = document.createEvent 'MouseEvent'
-        event.initEvent 'click', true, false
+        event.initEvent 'click', true, true
         el.dispatchEvent event
       @close()
 
     onClose: =>
       @$menu.insertBefore(@$placeholder) if @opts.appendMenuTo
       @$trigger.removeClass 'ui-state-active'
+      @$ariaMenuWrapper.removeAttr 'role'
       @$menu.removeClass "ui-state-open"
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
 
     close: =>
-      @$menu.popup('close').removeClass('ui-state-open')
+      @$menu.hasClass('ui-state-open') && @$menu.popup('close').removeClass('ui-state-open')
 
     keepButtonActive: =>
       @$trigger.addClass('ui-state-active') if @$menu.is('.ui-state-open') && @$trigger.is('.btn, .ui-button')

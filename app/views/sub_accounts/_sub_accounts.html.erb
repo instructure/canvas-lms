@@ -1,6 +1,5 @@
 <% account ||= nil; current_depth ||= 0; depth ||= 1; max_sub_accounts ||= 100; sub_account_count ||= account.try(:sub_account_count); course_count ||= account.try(:course_count) %>
 <% keep_going = current_depth < depth %>
-
 <div id="account_<%= account ? account.id : "blank" %>" class="account" style="<%= hidden unless account %>">
   <div class="header">
     <div class="show_account">

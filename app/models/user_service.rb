@@ -40,7 +40,7 @@ class UserService < ActiveRecord::Base
   
   def assert_relations
     if should_have_communication_channel?
-      cc = self.user.communication_channels.find_or_create_by_path_type(service)
+      cc = self.user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
       cc.workflow_state = 'active'
       cc.path = "#{self.service_user_id}@#{service}.com"
@@ -54,14 +54,14 @@ class UserService < ActiveRecord::Base
   
   def remove_related_channels
     if self.service == CommunicationChannel::TYPE_FACEBOOK && self.user
-      ccs = self.user.communication_channels.find_all_by_path_type(CommunicationChannel::TYPE_FACEBOOK)
+      ccs = self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_FACEBOOK)
       ccs.each{|cc| cc.destroy }
     end
     true
   end
   
   def assert_communication_channel
-    self.touch if should_have_communication_channel? && !self.user.communication_channels.find_by_path_type(CommunicationChannel::TYPE_TWITTER)
+    self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
   
   def infer_defaults
@@ -107,8 +107,7 @@ class UserService < ActiveRecord::Base
     domain = opts[:service_domain] || "google.com"
     service = opts[:service] || "google_docs"
     protocol = opts[:protocol] || "oauth"
-    user_service = UserService.find_by_user_id_and_service_and_protocol(opts[:user].id, service, protocol)
-    user_service ||= opts[:user].user_services.build(:service => service, :protocol => protocol)
+    user_service = opts[:user].user_services.where(service: service, protocol: protocol).first_or_initialize
     user_service.service_domain = domain
     user_service.token = token
     user_service.secret = secret

@@ -14,13 +14,15 @@
 <% jammit_css :quizzes, :tinymce %>
 
 <header class="quiz-header">
-  <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
+  <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>
   <% if @submission.preview? %>
-    <% draft_preview_title = t('headers.draft_preview',
+    <% preview_title = @quiz.published? ? t('headers.published_preview',
+            "This is a preview of the published version of the quiz") : 
+            t('headers.draft_preview',
             "This is a preview of the draft version of the quiz") %>
     <h3>
-      <i class="icon-warning"><span class="screenreader-only"><%= draft_preview_title %></span></i>
-      <%= draft_preview_title %>
+      <i class="icon-warning"><span class="screenreader-only"><%= preview_title %></span></i>
+      <%= preview_title %>
     </h3>
   <% end %>
   <%= before_label(:started, "Started") %>
@@ -29,6 +31,19 @@
   <div id="quiz-instructions" class="user_content">
     <%= user_content(@quiz.description) %>
   </div>
+
+  <% if @quiz.time_limit %>
+    <div class="screenreader-only" role="note">
+      <%= t 'audible_quiz_timer_shortcut_description', <<-DESCRIPTION
+        Note: this is a timed quiz. You may check the remaining time you have
+        at any point while taking the quiz by pressing the keyboard combination
+        SHIFT, ALT, and T...
+
+        Again: SHIFT, ALT, and T...
+        DESCRIPTION
+      %>
+    </div>
+  <% end %>
 </header>
 
 <% js_bundle :take_quiz %>

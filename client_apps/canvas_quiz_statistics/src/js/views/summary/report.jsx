@@ -2,9 +2,10 @@
 define(function(require) {
   var React = require('../../ext/react');
   var $ = require('canvas_packages/jquery');
-  var Tooltip = require('canvas_packages/tooltip');
   var Status = require('jsx!./report/status');
-  var I18n = require('i18n!quiz_reports');
+  var Popup = require('jsx!../../components/popup');
+  var ScreenReaderContent = require('jsx!../../components/screen_reader_content');
+  var Descriptor = require('../../models/quiz_report_descriptor');
 
   var Report = React.createClass({
     mixins: [ React.addons.ActorMixin ],
@@ -29,83 +30,104 @@ define(function(require) {
       };
     },
 
-    componentDidMount: function() {
-      var container = document.createElement('div');
-      var tooltip = $(this.getDOMNode()).tooltip({
-        tooltipClass: 'center bottom vertical',
-        show: false,
-        hide: false,
-        items: $(this.getDOMNode()),
-        position: {
-          my: 'center bottom',
-          at: 'center top'
-        },
-        content: function() {
-          return container;
-        }
-      }).data('tooltip');
-
-      this.setState({
-        statusContainer: container,
-        statusLayer: React.renderComponent(Status(), container),
-        tooltip: tooltip
-      });
-    },
-
     componentDidUpdate: function(prevProps/*, prevState*/) {
-      this.state.statusLayer.setProps(this.props, function() {
-        var tooltip = this.state.tooltip;
-        var $tooltip = tooltip._find($(tooltip.options.items));
-        var $anchor = $(this.getDOMNode());
-
-        tooltip.option('items', $anchor);
-
-        if ($tooltip.length) {
-          $tooltip.position({
-            my: 'center bottom',
-            at: 'center top',
-            of: $anchor
-          });
+      // Restore focus to the generation button which is now the download button
+      if (!prevProps.isGenerated && this.props.isGenerated) {
+        if (this.refs.popup.screenReaderContentHasFocus()) {
+          this.refs.popup.focusAnchor();
         }
-      }.bind(this));
-    },
-
-    componentWillUnmount: function() {
-      this.state.tooltip.destroy();
-      React.unmountComponentAtNode(this.state.statusLayer);
+      }
+      else if (!prevProps.isGenerating && this.props.isGenerating) {
+        if (!this.refs.popup.screenReaderContentHasFocus()) {
+          this.refs.popup.focusScreenReaderContent(true);
+        }
+      }
     },
 
     render: function() {
+      var id = this.props.reportType;
+
       return (
         <div className="report-generator inline">
-          {this.props.isGenerated ?
-            this.renderDownloader() :
-            this.renderGenerator()
-          }
+          <Popup
+            ref="popup"
+            content={Status}
+            isGenerated={this.props.isGenerated}
+            isGenerating={this.props.isGenerating}
+            generatable={this.props.generatable}
+            progress={this.props.progress}
+            file={this.props.file}
+            reactivePositioning
+            anchorSelector=".btn"
+            popupOptions={
+              {
+                show: {
+                  event: 'mouseenter focusin',
+                  delay: 0,
+                  effect: false,
+                  solo: false
+                },
+
+                hide: {
+                  event: 'mouseleave focusout',
+                  delay: 0,
+                  effect: false,
+                  fixed: true,
+                },
+
+                position: {
+                  my: 'bottom center',
+                  at: 'top center'
+                }
+              }
+            }>
+            {this.props.isGenerated ?
+              this.renderDownloader() :
+              this.renderGenerator()
+            }
+          </Popup>
         </div>
       );
     },
 
     renderGenerator: function() {
+      var srLabel = Descriptor.getInteractionLabel(this.props);
+
       return (
         <button
           disabled={!this.props.generatable}
-          onClick={this.onGenerate}
+          onClick={this.generate}
+          onKeyPress={this.generateAndFocusContent}
           className="btn btn-link generate-report">
-          <i className="icon-analytics" /> {this.props.readableType}
+            <ScreenReaderContent children={srLabel} />
+            <span aria-hidden="true">
+              <i className="icon-analytics" /> {this.props.readableType}
+            </span>
         </button>
       );
     },
 
     renderDownloader: function() {
+      var srLabel = Descriptor.getInteractionLabel(this.props);
+
       return(
         <a href={this.props.file.url} className="btn btn-link download-report">
-          <i className="icon-analytics" /> {this.props.readableType}
+          <ScreenReaderContent children={srLabel} />
+
+          <span aria-hidden="true">
+            <i className="icon-analytics" /> {this.props.readableType}
+          </span>
         </a>
       );
     },
 
-    onGenerate: function(e) {
+    generate: function(e) {
+      e.preventDefault();
+
+      this.sendAction('quizReports:generate', this.props.reportType);
+    },
+
+    generateAndFocusContent: function(e) {
       e.preventDefault();
 
       this.sendAction('quizReports:generate', this.props.reportType);

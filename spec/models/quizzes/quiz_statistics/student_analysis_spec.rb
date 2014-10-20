@@ -317,6 +317,39 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     stats.last[9].should == "lolcats,lolrus"
   end
 
+  it 'should strip tags from all student-provided answers' do
+    student_in_course(:active_all => true)
+    q = @course.quizzes.create!
+    q.update_attribute(:published_at, Time.now)
+    q.quiz_questions.create!(question_data: short_answer_question_data)
+    q.quiz_questions.create!(question_data: fill_in_multiple_blanks_question_one_blank_data)
+    q.quiz_questions.create!(question_data: essay_question_data)
+    q.quiz_questions.create!(question_data: numerical_question_data)
+    q.quiz_questions.create!(question_data: calculated_question_data)
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(@student)
+    qs.submission_data = {
+      "question_#{q.quiz_data[0][:id]}" => "<em>short_answer</em>",
+      "question_#{q.quiz_data[1][:id]}_10ca8479f89652b254a5c6ec90ab9ab8" => "<em>fimb</em>",
+      "question_#{q.quiz_data[2][:id]}" => "<em>essay</em>",
+      "question_#{q.quiz_data[3][:id]}" => "<em>numerical</em>",
+      "question_#{q.quiz_data[4][:id]}" => "<em>calculated</em>",
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = CSV.parse(csv({}, q))
+    stats.last[7].should == "short_answer"
+    stats.last[9].should == "fimb"
+    stats.last[11].should == "essay"
+    stats.last[13].should == "numerical"
+
+    # calculated field also includes the values for the variables, something like:
+    #   "x=>4.3,y=>21,calculated"
+    # so we'll match instead
+    stats.last[15].should =~ /,calculated$/
+  end
+
   it 'should not count teacher preview submissions' do
     teacher_in_course(:active_all => true)
     q = @course.quizzes.create!
@@ -356,8 +389,6 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     stats = q.statistics
     stats[:unique_submission_count].should == 0
-
-    puts "Stats: #{stats.to_json}"
   end
 
   describe 'question statistics' do

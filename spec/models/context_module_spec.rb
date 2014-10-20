@@ -161,6 +161,7 @@ describe ContextModule do
     context "when draft state is enabled" do
       before do
         Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
 
       it "adds external tools with a default workflow_state of anonymous" do
@@ -618,6 +619,47 @@ describe ContextModule do
       @submission = @assign.submit_homework(@student, submission_type: 'online_text_entry', body: '42')
       @module.evaluate_for(@student).should be_completed
     end
+
+    context "differentiated assignements" do
+      before do
+        course_module
+        @student_1 = student_in_course(course: @course, active_all: true).user
+        @student_2 = student_in_course(course: @course, active_all: true).user
+
+        @student_1.enrollments.each(&:destroy!)
+        @overriden_section = @course.course_sections.create!(name: "test section")
+        student_in_section(@overriden_section, user: @student_1)
+
+        @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
+        @assign.only_visible_to_overrides = true
+        @assign.save!
+        create_section_override_for_assignment(@assign, {course_section: @overriden_section})
+
+        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
+        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @module.save!
+      end
+
+      context "enabled" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should properly require differentiated assignments" do
+          @module.evaluate_for(@student_1).should be_unlocked
+          @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
+          @module.evaluate_for(@student_1).should be_completed
+          @module.evaluate_for(@student_2).should be_completed
+        end
+      end
+
+      context "disabled" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should properly require all assignments" do
+          @module.evaluate_for(@student_1).should be_unlocked
+          @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
+          @module.evaluate_for(@student_1).should be_completed
+          @module.evaluate_for(@student_2).should be_unlocked
+        end
+      end
+    end
   end
 
   describe "require_sequential_progress" do
@@ -825,6 +867,89 @@ describe ContextModule do
       cm.publish_final_grade?.should be_true
       cm.publish_final_grade = false
       cm.publish_final_grade?.should be_false
+    end
+  end
+
+  describe "content_tags_visible_to" do
+    before do
+      course_module
+      @student_1 = student_in_course(course: @course, active_all: true).user
+      @student_2 = student_in_course(course: @course, active_all: true).user
+
+      @student_1.enrollments.each(&:destroy!)
+      @overriden_section = @course.course_sections.create!(name: "test section")
+      student_in_section(@overriden_section, user: @student_1)
+
+      @assignment = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
+      create_section_override_for_assignment(@assignment, {course_section: @overriden_section})
+
+      @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+    end
+
+    context "differentiated_assignments enabled" do
+      before {@course.enable_feature!(:differentiated_assignments)}
+      it "should properly return differentiated assignments" do
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment).should be_false
+      end
+      it "should properly return unpublished assignments" do
+        @assignment.workflow_state = "unpublished"
+        @assignment.save!
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment).should be_false
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment).should be_false
+      end
+      # if tags are preloaded we shouldn't filter by a scope (as that requires re-fetching the tags)
+      it "should not reload the tags if already loaded" do
+        ContentTag.expects(:visible_to_students_with_da_enabled).never
+        ContextModule.send(:preload_associations, [@module], {:content_tags => :content})
+        @module.content_tags_visible_to(@student_1)
+      end
+      # if tags are not preloaded we should filter by a scope (as will be quicker than filtering an array)
+      it "should filter use a cope to filter content tags if they arent already loaded" do
+        ContentTag.expects(:visible_to_students_with_da_enabled).once
+        @module.content_tags_visible_to(@student_1)
+      end
+      it "should filter differentiated discussions" do
+        discussion_topic_model(:user => @teacher, :context => @course)
+        @discussion_assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @discussion_assignment.submission_types = 'discussion_topic'
+        @discussion_assignment.save!
+        @topic.assignment_id = @discussion_assignment.id
+        @topic.save!
+        create_section_override_for_assignment(@discussion_assignment, {course_section: @overriden_section})
+        @module.add_item({id: @topic.id, type: 'discussion_topic'})
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@topic).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@topic).should be_true
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@topic).should be_false
+      end
+      it "should work for observers" do
+        @observer = User.create
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @overriden_section, :enrollment_state => 'active')
+        @observer_enrollment.update_attribute(:associated_user_id, @student_2.id)
+        @module.content_tags_visible_to(@observer).map(&:content).include?(@assignment).should be_false
+        @observer_enrollment.update_attribute(:associated_user_id, @student_1.id)
+        @module.content_tags_visible_to(@observer).map(&:content).include?(@assignment).should be_true
+      end
+    end
+
+    context "differentiated_assignments disabled" do
+      before {@course.disable_feature!(:differentiated_assignments)}
+      it "should return all published assignments" do
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment).should be_true
+      end
+      it "should not return unpublished assignments" do
+        @assignment.workflow_state = "unpublished"
+        @assignment.save!
+        @module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment).should be_true
+        @module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment).should be_false
+        @module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment).should be_false
+      end
     end
   end
 

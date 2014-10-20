@@ -221,6 +221,10 @@ class Conversation < ActiveRecord::Base
       message.conversation = self
       message.shard = self.shard
 
+      if options[:cc_author]
+        message.cc_author = options[:cc_author]
+      end
+
       # all specified (or implicit) tags, regardless of visibility to individual participants
       users = preload_users_and_context_codes
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1, users) : []
@@ -276,14 +280,15 @@ class Conversation < ActiveRecord::Base
       message.context_type = 'Account'
       message.context_id = options[:root_account_id]
     end
+
     message.asset = options[:asset]
     message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
     message.media_comment = options[:media_comment] if options[:media_comment].present?
     if options[:forwarded_message_ids].present?
-      messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
+      messages = ConversationMessage.where(id: options[:forwarded_message_ids].map(&:to_i))
       conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
       raise "can only forward one conversation at a time" if conversation_ids.size != 1
-      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.find_by_conversation_id(conversation_ids.first)
+      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.where(conversation_id: conversation_ids.first).exists?
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(',')
     end
@@ -470,7 +475,7 @@ class Conversation < ActiveRecord::Base
   def reply_from(opts)
     user = opts.delete(:user)
     message = opts.delete(:text).to_s.strip
-    participant = self.conversation_participants.find_by_user_id(user.id)
+    participant = self.conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if !user
       raise "Only message participants may reply to messages"
@@ -497,7 +502,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.batch_migrate_context_tags!(ids)
-    find_all_by_id(ids).each(&:migrate_context_tags!)
+    where(id: ids).each(&:migrate_context_tags!)
   end
 
   # if the participant list has changed, e.g. we merged user accounts

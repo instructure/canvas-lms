@@ -14,6 +14,8 @@
   {{/if}}
 </div>
 
+<span class="accessibility-warning" tabindex="0"> Warning: for improved accessibility assigning students to groups, please use the Move To Dialog option found in the menu. </span>
+
 <div class="group-category-contents {{#if ENV.IS_LARGE_ROSTER}}group-category-contents-condensed{{/if}}">
   {{#if randomlyAssignStudentsInProgress}}
     <div class="progress-container">
@@ -30,7 +32,7 @@
 
       <div class="row-fluid">
         <div class="span3 unassigned-students">
-          <h3 class="unassigned-users-heading group-heading"></h3>
+          <h2 class="unassigned-users-heading group-heading"></h2>
           <input
             type="text"
             class="filterable-unassigned-users search-query"

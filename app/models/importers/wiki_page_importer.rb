@@ -34,8 +34,8 @@ module Importers
 
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
-      item ||= WikiPage.find_by_wiki_id_and_id(context.wiki.id, hash[:id])
-      item ||= WikiPage.find_by_wiki_id_and_migration_id(context.wiki.id, hash[:migration_id])
+      item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
+      item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
       item ||= context.wiki.wiki_pages.new
       # force the url to be the same as the url_name given, since there are
       # likely other resources in the import that link to that url
@@ -103,7 +103,7 @@ module Importers
         hash[:contents].each do |sub_item|
           sub_item = sub_item.with_indifferent_access
           if ['folder', 'FOLDER_TYPE'].member? sub_item[:type]
-            obj = context.wiki.wiki_pages.find_by_migration_id(sub_item[:migration_id])
+            obj = context.wiki.wiki_pages.where(migration_id: sub_item[:migration_id]).first
             contents += "  <li><a href='/courses/#{context.id}/wiki/#{obj.url}'>#{obj.title}</a></li>\n" if obj
           elsif sub_item[:type] == 'embedded_content'
             if contents && contents.length > 0
@@ -122,22 +122,22 @@ module Importers
           elsif sub_item[:type] == 'linked_resource'
             case sub_item[:linked_resource_type]
               when 'TOC_TYPE'
-                obj = context.context_modules.not_deleted.find_by_migration_id(sub_item[:linked_resource_id])
+                obj = context.context_modules.not_deleted.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/modules'>#{obj.name}</a></li>\n" if obj
               when 'ASSESSMENT_TYPE'
-                obj = context.quizzes.find_by_migration_id(sub_item[:linked_resource_id])
+                obj = context.quizzes.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/quizzes/#{obj.id}'>#{obj.title}</a></li>\n" if obj
               when /PAGE_TYPE|WIKI_TYPE/
-                obj = context.wiki.wiki_pages.find_by_migration_id(sub_item[:linked_resource_id])
+                obj = context.wiki.wiki_pages.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/wiki/#{obj.url}'>#{obj.title}</a></li>\n" if obj
               when 'FILE_TYPE'
-                file = context.attachments.find_by_migration_id(sub_item[:linked_resource_id])
+                file = context.attachments.where(migration_id: sub_item[:linked_resource_id]).first
                 if file
                   name = sub_item[:linked_resource_title] || file.name
                   contents += " <li><a href=\"/courses/#{context.id}/files/#{file.id}/download\">#{name}</a></li>"
                 end
               when 'DISCUSSION_TOPIC_TYPE'
-                obj = context.discussion_topics.find_by_migration_id(sub_item[:linked_resource_id])
+                obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
               when 'URL_TYPE'
                 if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''

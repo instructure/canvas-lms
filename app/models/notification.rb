@@ -54,6 +54,8 @@ class Notification < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
+  after_create { self.class.reset_cache! }
+
   workflow do
     state :active do
       event :deactivate, :transitions_to => :inactive
@@ -65,30 +67,24 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def self.summary_notification
-    by_name('Summaries')
-  end
-
-  def self.notifications
-    @notifications ||= all.index_by(&:name)
-  end
-
   def self.all
-    @all ||= super
+    @all ||= super.to_a.each(&:readonly!)
   end
 
-  def self.by_name(name)
-    if notification = notifications[name]
-      copy = notification.clone
-      copy.id = notification.id
-      copy.send(:remove_instance_variable, :@new_record)
-      copy
-    end
+  def self.find(id, options = {})
+    (@all_by_id ||= all.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 
   def self.reset_cache!
     @all = nil
-    @notifications = nil
+    @all_by_id = nil
+  end
+
+  def duplicate
+    notification = self.clone
+    notification.id = self.id
+    notification.send(:remove_instance_variable, :@new_record)
+    notification
   end
 
   def infer_default_content
@@ -251,6 +247,8 @@ class Notification < ActiveRecord::Base
       FREQ_IMMEDIATELY
     when 'Added To Conversation'
       FREQ_IMMEDIATELY
+    when 'Conversation Created'
+      FREQ_NEVER
     else
       FREQ_DAILY
     end
@@ -312,6 +310,7 @@ class Notification < ActiveRecord::Base
     t 'names.rubric_association_created', 'Rubric Association Created'
     t 'names.conversation_message', 'Conversation Message'
     t 'names.added_to_conversation', 'Added To Conversation'
+    t 'names.conversation_created', 'Conversation Created'
     t 'names.submission_comment', 'Submission Comment'
     t 'names.submission_comment_for_teacher', 'Submission Comment For Teacher'
     t 'names.submission_grade_changed', 'Submission Grade Changed'
@@ -405,6 +404,8 @@ class Notification < ActiveRecord::Base
         t(:conversation_message_display, 'Conversation Message')
       when 'Added To Conversation'
         t(:added_to_conversation_display, 'Added To Conversation')
+      when 'Conversation Created'
+        t(:conversation_created_display, 'Conversations Created By Me')
       when 'Membership Update'
         t(:membership_update_display, 'Membership Update')
       when 'Reminder'
@@ -516,6 +517,8 @@ EOS
       t(:conversation_message_description, 'New Inbox messages')
     when 'Added To Conversation'
       t(:added_to_conversation_description, 'You are added to a conversation')
+    when 'Conversation Created'
+      t(:conversation_created_description, 'You created a conversation')
     when 'Membership Update'
       mt(:membership_update_description, <<-EOS)
 *Admin only: pending enrollment activated*
@@ -546,7 +549,7 @@ EOS
     case category
     when 'All Submissions', 'Late Grading'
       user.teacher_enrollments.count > 0 || user.ta_enrollments.count > 0
-    when 'Added To Conversation', 'Conversation Message'
+    when 'Added To Conversation', 'Conversation Message', 'Conversation Created'
       !user.disabled_inbox?
     else
       true

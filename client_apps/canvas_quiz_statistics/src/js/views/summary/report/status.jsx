@@ -2,11 +2,29 @@
 define(function(require) {
   var React = require('react');
   var I18n = require('i18n!quiz_reports');
-  var DateTimeHelpers = require('../../../util/date_time_helpers');
-  var friendlyDatetime = DateTimeHelpers.friendlyDatetime;
-  var fudgeDateForProfileTimezone = DateTimeHelpers.fudgeDateForProfileTimezone;
+  var Descriptor = require('../../../models/quiz_report_descriptor');
 
   var Status = React.createClass({
+    propTypes: {
+      generatable: React.PropTypes.bool,
+      isGenerated: React.PropTypes.bool,
+
+      file: React.PropTypes.shape({
+        createdAt: React.PropTypes.string,
+      }),
+
+      progress: React.PropTypes.shape({
+        workflowState: React.PropTypes.string,
+        completion: React.PropTypes.number,
+      }),
+    },
+
+    getInitialState: function() {
+      return {
+        justBeenGenerated: false
+      };
+    },
+
     getDefaultProps: function() {
       return {
         generatable: true,
@@ -15,46 +33,38 @@ define(function(require) {
       };
     },
 
-    render: function() {
-      var body, generatedAt;
-
-      if (!this.props.generatable) {
-        body = I18n.t('non_generatable_report_notice',
-          'Report can not be generated for Survey Quizzes.');
-      }
-      else if (this.props.isGenerated) {
-        generatedAt = friendlyDatetime(fudgeDateForProfileTimezone(this.props.file.createdAt));
-
-        body = I18n.t('generated_at', 'Generated at %{date}', {
-          date: generatedAt
+    componentWillReceiveProps: function(nextProps) {
+      if (this.props.isGenerating && nextProps.isGenerated) {
+        this.setState({
+          justBeenGenerated: true
         });
       }
-      else if (this.isGenerating()) {
-        body = this.renderProgress();
-      } else {
-        body = I18n.t('generatable', 'Report has never been generated.');
-      }
+    },
+
+    render: function() {
+      var label = Descriptor.getDetailedStatusLabel(this.props, this.state.justBeenGenerated);
 
       return (
         <div className="quiz-report-status">
-          {body}
+          {this.props.isGenerating ? this.renderProgress(label) : label}
         </div>
       );
     },
 
-    isGenerating: function() {
-      var workflowState = this.props.progress.workflowState;
-      return [ 'queued', 'running' ].indexOf(workflowState) > -1;
-    },
+    renderProgress: function(label) {
+      var completion = this.props.progress.completion;
 
-    renderProgress: function() {
       return (
         <div className="auxiliary">
-          <p>{I18n.t('generating', 'Report is being generated...')}</p>
+          <p>
+            <span className="screenreader-only" children={label} />
+            <span aria-hidden="true">
+              {I18n.t('generating', 'Report is being generated...')}
+            </span>
+          </p>
+
           <div className="progress">
-            <div className="bar" style={{
-              width: (this.props.progress.completion || 0) + '%'
-            }}></div>
+            <div className="bar" style={{ width: (completion || 0) + '%' }} />
           </div>
         </div>
       );

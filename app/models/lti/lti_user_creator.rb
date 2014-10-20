@@ -37,16 +37,8 @@ module Lti
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
       user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
 
-      if @variable_substitutor
-        @variable_substitutor.add_substitution('$Canvas.user.id', user.id)
-        @variable_substitutor.add_substitution('$Canvas.user.sisSourceId', -> { user.sis_source_id })
-        @variable_substitutor.add_substitution('$Canvas.user.loginId', -> { user.login_id })
-        @variable_substitutor.add_substitution('$Canvas.enrollment.enrollmentState', -> { user.enrollment_state })
-        @variable_substitutor.add_substitution('$Canvas.membership.concludedRoles', -> { user.concluded_role_types })
-        @variable_substitutor.add_substitution('$Canvas.membership.roles', -> {
-          (current_course_enrollments.map(&:role) + current_account_enrollments.map(&:readable_type)).uniq.join(',')
-        })
-      end
+      lti_helper = Lti::SubstitutionsHelper.new(@canvas_context, @canvas_root_account, @canvas_user)
+      user.current_roles = lti_helper.current_lis_roles.split(',')
 
       user
     end
@@ -78,13 +70,13 @@ module Lti
     def current_course_enrollments
       return [] unless @canvas_context.is_a?(Course)
 
-      @current_course_enrollments ||= @canvas_user.current_enrollments.find_all_by_course_id(@canvas_context.id)
+      @current_course_enrollments ||= @canvas_user.current_enrollments.where(course_id: @canvas_context).to_a
     end
 
     def current_account_enrollments()
       unless @current_account_enrollments
-        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain_ids.empty?
-          @current_account_enrollments = @canvas_user.account_users.find_all_by_account_id(@canvas_context.account_chain_ids).uniq
+        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
+          @current_account_enrollments = @canvas_user.account_users.find_all_by_account_id(@canvas_context.account_chain).uniq
         else
           @current_account_enrollments = []
         end
@@ -94,7 +86,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @canvas_context.is_a?(Course) ? @canvas_user.concluded_enrollments.find_all_by_course_id(@canvas_context.id) : []
+          @canvas_context.is_a?(Course) ? @canvas_user.concluded_enrollments.where(course_id: @canvas_context).to_a : []
     end
   end
 end

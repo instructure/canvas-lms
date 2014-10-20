@@ -43,8 +43,8 @@ class RequestThrottle
     starting_mem = Canvas.sample_memory()
     starting_cpu = Process.times()
 
-    request = ActionController::Request.new(env)
-    # workaround a rails bug where some ActionController::Request methods blow
+    request = ActionDispatch::Request.new(env)
+    # workaround a rails bug where some ActionDispatch::Request methods blow
     # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
     request.fullpath
 

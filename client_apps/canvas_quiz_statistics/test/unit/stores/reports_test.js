@@ -108,6 +108,7 @@ define(function(require) {
           quiz_reports: [{
             id: '1',
             progress: {
+              workflow_state: K.PROGRESS_ACTIVE,
               url: '/foobar'
             }
           }]
@@ -119,6 +120,7 @@ define(function(require) {
           quiz_reports: [{
             id: '1',
             progress: {
+              workflow_state: K.PROGRESS_ACTIVE,
               url: '/foobar'
             }
           }]
@@ -130,6 +132,7 @@ define(function(require) {
           quiz_reports: [{
             id: '2',
             progress: {
+              workflow_state: K.PROGRESS_ACTIVE,
               url: '/foobar'
             }
           }]
@@ -181,7 +184,7 @@ define(function(require) {
           quiz_reports: [{
             id: '1',
             progress: {
-              workflow_state: 'running',
+              workflow_state: K.PROGRESS_ACTIVE,
               url: '/progress/1'
             }
           }]
@@ -244,6 +247,7 @@ define(function(require) {
             report_type: 'student_analysis',
             progress: {
               id: '1',
+              workflow_state: K.PROGRESS_ACTIVE,
               url: '/progress/1'
             }
           }]

@@ -353,7 +353,7 @@ class ConversationsController < ApplicationController
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
-      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false, :cc_author => true)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   rescue ActiveRecord::RecordInvalid => err
@@ -978,14 +978,14 @@ class ConversationsController < ApplicationController
   def infer_tags
     tags = param_array(:tags).concat(param_array(:recipients)).concat([params[:context_code]])
     tags = SimpleTags.normalize_tags(tags)
-    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
+    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
     @tags = tags.uniq
   end
 
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
     scope = scope.where('message_count>0') unless allow_deleted
-    @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+    @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first
     raise ActiveRecord::RecordNotFound unless @conversation
   end
 

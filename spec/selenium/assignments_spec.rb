@@ -396,6 +396,20 @@ describe "assignments" do
         @course.require_assignment_group
       end
 
+      it "should create a new assignment group" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#addGroup").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_new_name"), "Second AG")
+        fj('.create_group:visible').click
+        wait_for_ajaximations
+
+        ff('.assignment_group .ig-header h2').map(&:text).should include("Second AG")
+      end
+
       #Per selenium guidelines, we should not test buttons navigating to a page
       # We could test that the page loads with the correct info from the params elsewhere
       it "should remember entered settings when 'more options' is pressed" do

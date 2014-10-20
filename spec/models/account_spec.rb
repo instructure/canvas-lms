@@ -975,6 +975,16 @@ describe Account do
         @account3.account_chain.should == [@account3, @account2, @account1]
       end
     end
+
+    it "returns parent accounts in order up the tree" do
+      account1 = Account.create!
+      account2 = account1.sub_accounts.create!
+      account3 = account2.sub_accounts.create!
+      account4 = account3.sub_accounts.create!
+
+      account4.account_chain.should == [account4, account3, account2, account1]
+    end
+
   end
 
   describe "#can_see_admin_tools_tab?" do

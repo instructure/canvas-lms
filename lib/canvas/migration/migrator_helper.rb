@@ -134,10 +134,11 @@ module MigratorHelper
   # Does a JSON export of the courses
   def save_to_file(file_name = nil)
     make_export_dir
-    add_assessment_id_prepend
 
     @course = @course.with_indifferent_access
     Importers::AssessmentQuestionImporter.preprocess_migration_data(@course)
+
+    add_assessment_id_prepend
 
     file_name ||= File.join(@base_export_dir, FULL_COURSE_JSON_FILENAME)
     file_name = File.expand_path(file_name)
@@ -160,6 +161,9 @@ module MigratorHelper
   
   def add_assessment_id_prepend
     if id_prepender && !@settings[:overwrite_quizzes]
+      if @course[:assessment_question_banks]
+        prepend_id_to_assessment_question_banks(@course[:assessment_question_banks])
+      end
       if @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
         prepend_id_to_questions(@course[:assessment_questions][:assessment_questions])
       end
@@ -169,11 +173,18 @@ module MigratorHelper
       end
     end
   end
-  
+
+  def prepend_id_to_assessment_question_banks(banks, prepend_value=nil)
+    banks.each do |b|
+      b[:migration_id] = prepend_id(b[:migration_id], prepend_value)
+    end
+  end
+
   def prepend_id_to_questions(questions, prepend_value=nil)
     questions.each do |q|
-      q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
-      q[:question_bank_id] = prepend_id(q[:question_bank_id], prepend_value) if q[:question_bank_id].present?
+      [:migration_id, :question_bank_id, :question_bank_migration_id, :assessment_question_migration_id].each do |key|
+        q[key] = prepend_id(q[key], prepend_value) if q[key].present?
+      end
     end
   end
   

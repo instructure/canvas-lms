@@ -4,16 +4,6 @@ module Canvas
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
 
-  # defines the behavior when nil or empty array arguments passed into dynamic
-  # finders. The default (:log) logs a warning if the finder is not scoped and
-  # if *all* arguments are nil/[], e.g.
-  #   Thing.find_by_foo_and_bar(nil, nil)       # warning
-  #   Other.find_by_baz([])                     # warning
-  #   Another.find_all_by_a_and_b(123, nil)     # ok
-  #   ThisThing.some_scope.find_by_whatsit(nil) # ok
-  # Set this to :raise to raise an exception.
-  mattr_accessor :dynamic_finder_nil_arguments_error
-
   # defines extensions that could possibly be used, so that specs can move them to the
   # correct schemas for sharding
   mattr_accessor :possible_postgres_extensions
@@ -102,7 +92,7 @@ module Canvas
           config_options = config.symbolize_keys.except(:key, :servers, :database)
           servers = config['servers']
           if servers
-            servers = config['servers'].map { |s| ::Redis::Factory.convert_to_redis_client_options(s).merge(config_options) }
+            servers = config['servers'].map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
             @cache_stores[env] = :redis_store, servers
           end
         when 'memory_store'

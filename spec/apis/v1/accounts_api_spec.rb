@@ -40,6 +40,7 @@ describe "Accounts API", type: :request do
     it "should return the account list" do
       json = api_call(:get, "/api/v1/accounts.json",
                       { :controller => 'accounts', :action => 'index', :format => 'json' })
+
       json.sort_by { |a| a['id'] }.should == [
         {
           'id' => @a1.id,
@@ -66,6 +67,31 @@ describe "Accounts API", type: :request do
           'default_group_storage_quota_mb' => 41,
           'workflow_state' => 'active',
         },
+      ]
+    end
+
+    it "should return accounts found through admin enrollments with the account list (but in limited form)" do
+      course_with_teacher(:user => @user, :account => @a1)
+      course_with_teacher(:user => @user, :account => @a1)# don't find it twice
+      course_with_teacher(:user => @user, :account => @a2)
+
+      json = api_call(:get, "/api/v1/course_accounts",
+                      { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
+      json.sort_by { |a| a['id'] }.should == [
+          {
+              'id' => @a1.id,
+              'name' => 'root',
+              'root_account_id' => nil,
+              'parent_account_id' => nil,
+              'workflow_state' => 'active',
+          },
+          {
+              'id' => @a2.id,
+              'name' => 'subby',
+              'root_account_id' => @a1.id,
+              'parent_account_id' => @a1.id,
+              'workflow_state' => 'active',
+          },
       ]
     end
   end
@@ -158,6 +184,22 @@ describe "Accounts API", type: :request do
           'default_group_storage_quota_mb' => 42,
           'workflow_state' => 'active',
         }
+    end
+
+    it "should return an individual account for a teacher (but in limited form)" do
+      limited = account_model(:name => "limited")
+      course_with_teacher(:user => @user, :account => limited)
+
+      json = api_call(:get, "/api/v1/accounts/#{limited.id}",
+                      { :controller => 'accounts', :action => 'show', :id => limited.to_param, :format => 'json' })
+      json.should ==
+          {
+              'id' => limited.id,
+              'name' => 'limited',
+              'root_account_id' => nil,
+              'parent_account_id' => nil,
+              'workflow_state' => 'active',
+          }
     end
   end
 

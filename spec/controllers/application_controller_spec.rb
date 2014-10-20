@@ -33,7 +33,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("twitter").returns(mock(token: "current_user_token", secret: "current_user_secret"))
+      mock_user_services.expects(:where).with(service: "twitter").returns(stub(first: mock(token: "current_user_token", secret: "current_user_secret")))
 
       Twitter::Connection.expects(:new).with("current_user_token", "current_user_secret")
 
@@ -89,7 +89,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(mock(token: "user_service_token", secret: "user_service_secret"))
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
 
       GoogleDocs::Connection.expects(:new).with("user_service_token", "user_service_secret")
 
@@ -116,7 +116,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(nil)
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: nil))
 
       expect {
         controller.send(:google_docs_connection)
@@ -335,6 +335,39 @@ describe ApplicationController do
       controller.instance_variable_get(:@context).should == @course
       I18n.set_locale_with_localizer # this is what t() triggers
       I18n.locale.to_s.should == "ru"
+    end
+  end
+
+  describe 'rescue_action_in_public' do
+    context 'sharding' do
+      specs_require_sharding
+
+      before do
+        @shard2.activate do
+          @account = account_model
+        end
+      end
+
+      it 'should log error reports to the domain_root_accounts shard' do
+        ErrorReport.stubs(:log_exception).returns(ErrorReport.new)
+        ErrorReport.stubs(:useful_http_env_stuff_from_request).returns({})
+
+        req = mock()
+        req.stubs(:url).returns('url')
+        req.stubs(:headers).returns({})
+        req.stubs(:request_method_symbol).returns(:get)
+        req.stubs(:format).returns('format')
+
+        controller.stubs(:request).returns(req)
+        controller.stubs(:api_request?).returns(false)
+        controller.stubs(:render_rescue_action)
+
+        controller.instance_variable_set(:@domain_root_account, @account)
+
+        @shard2.expects(:activate).twice
+
+        controller.send(:rescue_action_in_public, Exception.new)
+      end
     end
   end
 end

@@ -27,7 +27,7 @@ class ObserverEnrollment < Enrollment
       observer_enrollments = context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user)
       observed_students = {}
       observer_enrollments.each do |e|
-        student_enrollment = StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
+        student_enrollment = StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
         next unless student_enrollment
         student = student_enrollment.user
         observed_students[student] ||= []

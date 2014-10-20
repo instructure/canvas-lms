@@ -281,7 +281,7 @@ module ApplicationHelper
     @section_tabs ||= begin
       if @context
         html = []
-        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key) do
+        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key, expires_in: 1.hour) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
@@ -379,9 +379,9 @@ module ApplicationHelper
     # account_chain_ids is in the order we need to search for tools
     # unfortunately, the db will return an arbitrary one first.
     # so, we pull all the tools (probably will only have one anyway) and look through them here
-    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => tool_id).all
-    @context.account_chain_ids.each do |account_id|
-      tool = tools.find {|t| t.context_id == account_id}
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).all
+    @context.account_chain.each do |account|
+      tool = tools.find {|t| t.context_id == account.id}
       return tool if tool
     end
     nil

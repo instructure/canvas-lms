@@ -1,6 +1,9 @@
 @import "components/main";
 @import "base/layout";
 @import "base/#header";
+@if $is-k12 {
+  @import "base/canvas-header";  
+}
 @import "base/#left-side";
 @import "base/#right-side";
 @import "base/print";

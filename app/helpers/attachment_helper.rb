@@ -27,14 +27,6 @@ module AttachmentHelper
       end
     elsif attachment.canvadocable?
       attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user)
-    elsif attachment.scribdable? && scribd_doc = attachment.scribd_doc
-      begin
-        attrs[:scribd_doc_id] = scribd_doc.doc_id
-        attrs[:scribd_access_key] = scribd_doc.access_key
-        attrs[:public_url] = attachment.authenticated_s3_url
-      rescue => e
-        ErrorReport.log_exception('scribd', e)
-      end
     end
     attrs[:attachment_id] = attachment.id
     attrs[:mimetype] = attachment.mimetype
@@ -45,12 +37,6 @@ module AttachmentHelper
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
-    end
-    if attachment.scribd_doc_missing?
-      url_helper = "#{context_name}_file_scribd_render_url"
-      if self.respond_to?(url_helper)
-        attrs[:attachment_scribd_render_url] = self.send(url_helper, attachment.context, attachment.id)
-      end
     end
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end

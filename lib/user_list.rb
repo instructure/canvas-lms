@@ -70,7 +70,7 @@ class UserList
   def users
     existing = @addresses.select { |a| a[:user_id] }
     existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] } ) do |shard_existing|
-      User.find_all_by_id(shard_existing.map { |a| a[:user_id] })
+      User.where(id: shard_existing.map { |a| a[:user_id] })
     end
 
     non_existing = @addresses.select { |a| !a[:user_id] }
@@ -95,10 +95,9 @@ class UserList
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
       type = :sms
-    elsif path.include?('@') && (address = (Mail::Address.new(path)) rescue nil)
+    elsif path.include?('@') && (email = parse_email(path))
       type = :email
-      name = address.name
-      path = address.address
+      name, path = email
     elsif path =~ Pseudonym.validates_format_of_login_field_options[:with]
       type = :pseudonym
     else
@@ -107,6 +106,23 @@ class UserList
     end
 
     @addresses << { :name => name, :address => path, :type => type }
+  end
+
+  def parse_email(email)
+    case email
+    when /^(["'])(.*?[^\\])\1\s*<(\S+?@\S+?)>/
+      a, b = $2, $3
+      a = a.gsub(/\\(["'])/, '\1')
+      [a, b]
+    when /\s*(.+?)\s*<(\S+?@\S+?)>/
+      [$1, $2]
+    when /<(\S+?@\S+?)>/
+      [nil, $1]
+    when /(\S+?@\S+)/
+      [nil, $1]
+    else
+      nil
+    end
   end
   
   def quote_ends(chars, i)

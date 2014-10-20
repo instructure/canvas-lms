@@ -2,34 +2,24 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/FileUploader'
-  'i18n!upload_progress_view'
-], (React, withReactDOM, FileUploader, I18n) ->
+  './ProgressBar'
+], (React, withReactDOM, FileUploader, ProgressBar) ->
 
-  UploadProgressView = React.createClass
+  UploadProgress = React.createClass
+    displayName: 'UploadProgress'
 
     propTypes:
       uploader: React.PropTypes.instanceOf(FileUploader).isRequired
 
-    getProgressWithLabel: ->
-      "#{@props.uploader.getFileName()} - #{@props.uploader.roundProgress()}%"
-
-    createWidthStyle: ->
-      width: "#{@props.uploader.roundProgress()}%"
-
-    buildSpinner: withReactDOM ->
-      img
-        className: 'upload-progress-view__indeterminate'
-        src:'/images/ajax-loader-black-on-white.gif'
-        alt: I18n.t('processing', 'processing')
+    getLabel: withReactDOM ->
+      span {},
+        i className: 'icon-document'
+        span ref: 'fileName', @props.uploader.getFileName()
 
     render: withReactDOM ->
+      progress = @props.uploader.roundProgress()
       div className: 'upload-progress-view',
         div className: 'upload-progress-view__label',
           div {},
-            @getProgressWithLabel()
-            @buildSpinner() if @props.uploader.roundProgress() == 100
-        div className: 'upload-progress-view__bar-container',
-          div
-            className: 'upload-progress-view__bar'
-            ref: 'bar'
-            style: @createWidthStyle()
+            @getLabel()
+        ProgressBar progress: progress

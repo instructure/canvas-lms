@@ -65,6 +65,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
+        <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>

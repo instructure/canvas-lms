@@ -39,9 +39,11 @@ environment_configuration(defined?(config) && config) do |config|
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Log error messages when you accidentally call methods on nil.
-  # in 1.9, whiny_nils causes a huge performance penalty on tests for some reason
-  config.whiny_nils = false
+  if CANVAS_RAILS3
+    # Log error messages when you accidentally call methods on nil.
+    # in 1.9, whiny_nils causes a huge performance penalty on tests for some reason
+    config.whiny_nils = false
+  end
 
   # Show full error reports and disable caching
   config.consider_all_requests_local = true
@@ -62,7 +64,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.active_record.schema_format = :sql
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 
   config.cache_store = :null_store
 
@@ -71,4 +73,8 @@ environment_configuration(defined?(config) && config) do |config|
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  unless CANVAS_RAILS3
+    config.eager_load = false
+  end
 end

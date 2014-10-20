@@ -205,6 +205,81 @@ describe ContentMigration do
 
       bank.assessment_questions.count.should == 1
     end
+
+    it "should not re-use the question_bank without overwrite_quizzes" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.account_users.create!(user: @user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      # run again
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 2
+      account.assessment_question_banks.each do |bank|
+        bank.title.should == "Unnamed Quiz"
+        bank.assessment_questions.count.should == 1
+      end
+    end
+
+    it "should re-use the question_bank (and everything else) with overwrite_quizzes" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.account_users.create!(user: @user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      cm.migration_settings['overwrite_quizzes'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      # run again
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 1
+      bank = account.assessment_question_banks.first
+      bank.title.should == "Unnamed Quiz"
+
+      bank.assessment_questions.count.should == 1
+    end
   end
 
   it "should identify and import compressed tarball archives" do

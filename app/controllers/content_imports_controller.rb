@@ -67,7 +67,7 @@ class ContentImportsController < ApplicationController
       @context = api_find(Course, params[:course_id])
     end
     if authorized_action(@context, @current_user, :manage_content)
-      cm = ContentMigration.find_by_context_id_and_id(@context.id, params[:id])
+      cm = ContentMigration.where(context_id: @context, id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless cm
 
       respond_to do |format|

@@ -22,7 +22,7 @@ describe DelayedMessage do
   it "should create a new instance given valid attributes" do
     delayed_message_model
   end
-  
+
   context "named scopes" do
     before :once do
       DelayedMessage.delete_all
@@ -32,39 +32,39 @@ describe DelayedMessage do
       delayed_message_model(:frequency => 'daily')
       DelayedMessage.for(:daily).should == [@delayed_message]
     end
-    
+
     it "should scope for :weekly" do
       delayed_message_model(:frequency => 'weekly')
       DelayedMessage.for(:weekly).should == [@delayed_message]
     end
-    
+
     it "should scope for notification" do
       notification_model
       delayed_message_model
       DelayedMessage.for(@notification).should == [@delayed_message]
     end
-    
+
     it "should scope for notification_policy" do
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
       @notification_policy.should be_is_a(NotificationPolicy)
       DelayedMessage.for(@notification_policy).should == [@delayed_message]
     end
-    
+
     it "should scope for communication_channel" do
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
       @communication_channel.should be_is_a(CommunicationChannel)
       DelayedMessage.for(@communication_channel).should == [@delayed_message]
     end
-    
+
     it "should scope for context" do
       delayed_message_model
       @delayed_message.context = assignment_model
       @delayed_message.save!
       DelayedMessage.for(@assignment).should == [@delayed_message]
     end
-    
+
     it "should have a scope to filter by the state" do
       notification = notification_model :name => 'New Stuff'
       delayed_message_model(:workflow_state => 'pending')
@@ -78,21 +78,21 @@ describe DelayedMessage do
       DelayedMessage.in_state(:sent).size.should eql(1)
     end
   end
-  
+
   context "workflow" do
     before :once do
       delayed_message_model
     end
-    
+
     it "should start the workflow with pending" do
       @delayed_message.state.should eql(:pending)
     end
-    
+
     it "should should be able to go to cancelled from pending" do
       @delayed_message.cancel
       @delayed_message.state.should eql(:cancelled)
     end
-    
+
     it "should be able to be sent from pending" do
       @delayed_message.begin_send
       @delayed_message.state.should eql(:sent)
@@ -106,11 +106,21 @@ describe DelayedMessage do
     user.pseudonym.account.should == account
     HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
     HostUrl.stubs(:default_host).returns("test.host")
+    user.communication_channel.confirm!
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
     DelayedMessage.summarize([dm])
     message = Message.last
     message.body.to_s.should_not match(%r{http://test.host/})
     message.body.to_s.should match(%r{http://dm.dummy.test.host/})
+  end
+
+  it 'should return nil if the delayed messages are using a retired communication channel' do
+    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
+    account = Account.create!(:name => 'new acct')
+    user = user_with_pseudonym(:account => account)
+    user.communication_channel.retire!
+    dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
+    DelayedMessage.summarize([dm]).should be_nil
   end
 
   context "sharding" do
@@ -126,6 +136,7 @@ describe DelayedMessage do
         HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
         HostUrl.stubs(:default_host).returns("test.host")
         @cc = user.communication_channel
+        @cc.confirm!
         @dm = DelayedMessage.create!(:summary => "This is a notification", :context => account, :communication_channel => @cc, :notification => notification_model)
       end
       @shard2.activate do

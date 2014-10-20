@@ -245,8 +245,11 @@ body.with-right-side.with-left-side {
 
 .discussion-reply-action {
   @if $use_high_contrast { color: #666; }
-  @else { color: #888; }
-  text-decoration: none;
+  @else {
+    text-decoration: none;
+    color: #888; 
+  }
+  
   &:hover, &:focus {
     text-decoration: none;
     color: #444;

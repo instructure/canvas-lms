@@ -680,4 +680,33 @@ describe SIS::CSV::EnrollmentImporter do
     course = @account.courses.where(sis_source_id: 'test_1').first
     course.teachers.to_a.should be_empty
   end
+
+  it "should link with observer enrollments" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active"
+    )
+    course = Course.find_by_sis_source_id('test_1')
+    course.offer!
+
+    student = Pseudonym.where(:unique_id => "user1").first.user
+
+    observer = user_with_pseudonym(:account => @account)
+    student.observers << observer
+
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,student,,active,"
+    )
+
+    observer.observer_enrollments.count.should == 1
+    e = observer.observer_enrollments.first
+    e.course_id.should == course.id
+    e.associated_user_id.should == student.id
+  end
+
 end

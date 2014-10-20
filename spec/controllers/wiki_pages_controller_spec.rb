@@ -34,6 +34,14 @@ describe WikiPagesController do
       flash[:notice].should match(/That page has been disabled/)
     end
 
+    it "pages index should redirect 'disabled', if disabled by the teacher" do
+      course_with_student_logged_in(:active_all => true)
+      @course.update_attribute(:tab_configuration, [{'id'=>2,'hidden'=>true}])
+      get 'pages_index', :course_id => @course.id
+      response.should be_redirect
+      flash[:notice].should match(/That page has been disabled/)
+    end
+
 
     it "should require authorization" do
       course_with_teacher(:active_all => true)

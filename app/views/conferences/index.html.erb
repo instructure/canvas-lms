@@ -5,6 +5,8 @@
 <% js_bundle(:conferences)  %>
 <% jammit_css(:conferences) %>
 
+<h1 class="screenreader-only"><%= t(:conference_header, 'Conferences')%></h1>
+
 <% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
   <header class="row-fluid">
     <div class="span3 offset9 align-right padding-r">

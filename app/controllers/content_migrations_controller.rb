@@ -484,7 +484,7 @@ class ContentMigrationsController < ApplicationController
       preflight_json = nil
       if params[:pre_attachment]
         @content_migration.workflow_state = 'pre_processing'
-        preflight_json = api_attachment_preflight(@content_migration, request, :params => params[:pre_attachment], :check_quota => true, :do_submit_to_scribd => false, :return_json => true)
+        preflight_json = api_attachment_preflight(@content_migration, request, :params => params[:pre_attachment], :check_quota => true, :return_json => true)
         if preflight_json[:error]
           @content_migration.workflow_state = 'pre_process_error'
         end

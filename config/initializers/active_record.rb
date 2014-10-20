@@ -532,13 +532,6 @@ class ActiveRecord::Base
     end
   end
 
-  module UniqueConstraintViolation
-    def self.===(error)
-      ActiveRecord::StatementInvalid === error &&
-      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql2?::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
-    end
-  end
-
   def self.unique_constraint_retry(retries = 1)
     # runs the block in a (possibly nested) transaction. if a unique constraint
     # violation occurs, it will run it "retries" more times. the nested
@@ -550,7 +543,7 @@ class ActiveRecord::Base
         result = transaction(:requires_new => true) { uncached { yield } }
         connection.clear_query_cache
         return result
-      rescue UniqueConstraintViolation
+      rescue ActiveRecord::RecordNotUnique
       end
     end
     result = transaction(:requires_new => true) { uncached { yield } }
@@ -917,23 +910,25 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   end
 end
 
-ActiveRecord::Persistence.module_eval do
-  def nondefaulted_attribute_names
-    attribute_names.select do |attr|
-      read_attribute(attr) != column_for_attribute(attr).try(:default)
+if CANVAS_RAILS3
+  ActiveRecord::Persistence.module_eval do
+    def nondefaulted_attribute_names
+      attribute_names.select do |attr|
+        read_attribute(attr) != column_for_attribute(attr).try(:default)
+      end
     end
-  end
 
-  def create
-    attributes_values = arel_attributes_values(!id.nil?, true, nondefaulted_attribute_names)
+    def create
+      attributes_values = arel_attributes_values(!id.nil?, true, nondefaulted_attribute_names)
 
-    new_id = self.class.unscoped.insert attributes_values
+      new_id = self.class.unscoped.insert attributes_values
 
-    self.id ||= new_id if self.class.primary_key
+      self.id ||= new_id if self.class.primary_key
 
-    ActiveRecord::IdentityMap.add(self) if ActiveRecord::IdentityMap.enabled?
-    @new_record = false
-    id
+      ActiveRecord::IdentityMap.add(self) if ActiveRecord::IdentityMap.enabled?
+      @new_record = false
+      id
+    end
   end
 end
 
@@ -1645,3 +1640,13 @@ if Rails.version < '4'
     end
   end
 end
+
+module UnscopeCallbacks
+  def run_callbacks(kind)
+    scope = self.class.unscoped
+    scope.default_scoped = true
+    scope.scoping { super }
+  end
+end
+
+ActiveRecord::Base.send(:include, UnscopeCallbacks)

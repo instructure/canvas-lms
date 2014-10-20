@@ -44,7 +44,7 @@ class FileInContext
     
     def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
       display_name ||= File.split(filename).last
-      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(filename))
+      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.filename = explicit_filename if explicit_filename

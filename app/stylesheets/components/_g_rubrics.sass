@@ -15,6 +15,17 @@
 .rubric_container
   :margin-top 20px
 
+  tr.criterion .links
+    position: absolute
+    bottom: 0
+    right: 0
+    i
+      visibility: hidden
+  td.criterion_description:hover, td.rating:hover, .links a:hover, .links a:focus
+    i
+      display: inline-block
+      visibility: visible
+
   .rubric_table
     :border-collapse collapse
     //for some reason, chrome puts a scrollbar on the table in the extended gradebook if it is 100%
@@ -48,12 +59,6 @@
       :position relative
       :font-size 0.9em
 
-    .links
-      :display none
-      :position absolute
-      :bottom 0
-      :right 0
-
     .learning_outcome_flag,.threshold
       display: none
 
@@ -62,9 +67,6 @@
       display: block
       &.empty
         display: none
-
-    &.editinghover .links
-      :display none
 
     .assessment-comments
       :font-size 10px
@@ -79,10 +81,6 @@
         font-size: 0.8em
         display: block
         white-space: nowrap
-    td
-      .links
-        display: none
-        visibility: hidden
       &.points_form
         @include mode-visibility($edit: none, $disp: block, $igno: none)
   tr.criterion.learning_outcome_criterion.ignore_criterion_for_scoring
@@ -108,13 +106,10 @@
         :padding 5px 0
         :position relative
 
-      .links
-        :display none
-        :position absolute
-        :bottom 0
-        :right 0
-
       &.edge_rating .delete_rating_link
+        :display none
+
+      &:last-child .add_rating_link_after
         :display none
 
   @include mode-visibility($edit: none, $disp: block, $igno: none)
@@ -174,8 +169,6 @@
         &.empty
           font-weight: normal
           display: block
-    tr.criterion td.criterion_description:hover .links
-      :display block
 
     table.ratings
       td.add_right
@@ -188,9 +181,6 @@
 
       td.add_column
         :cursor pointer
-
-      td:hover .links
-        :display block
 
   .has-assessments-warning
     :font-size 0.8em

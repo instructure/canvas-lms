@@ -4,6 +4,7 @@ define [
 ], (I18n, React) ->
 
   LoadingIndicator = React.createClass
+    displayName: 'LoadingIndicator'
 
     render: ->
       style = {}

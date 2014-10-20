@@ -250,7 +250,7 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
 
-    it "should redirect when a user is authenticted but is not found in canvas" do
+    it "should redirect when a user is authenticated but is not found in canvas" do
       ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
@@ -264,7 +264,12 @@ describe PseudonymSessionsController do
       controller.expects(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = account
 
-      # Default to Login url
+      # Default to Login url if set to nil or blank
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(login_url(:no_auto => 'true'))
+      session[:saml_unique_id].should be_nil
+
+      account.account_authorization_config.unknown_user_url = ''
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(login_url(:no_auto => 'true'))
       session[:saml_unique_id].should be_nil
@@ -499,6 +504,23 @@ describe PseudonymSessionsController do
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
         response.status.should == 400
+      end
+    end
+
+    context "/logout" do
+      it "should redirect to logout confirmation if the authenticity token is invalid" do
+        controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+        delete 'destroy'
+        response.should be_redirect
+        response['Location'].should =~ %r{/logout}
+      end
+    end
+
+    context "/logout_confirm" do
+      it "should redirect to /login if not logged in" do
+        get 'logout_confirm'
+        response.should be_redirect
+        response['Location'].should =~ %r{/login}
       end
     end
 
@@ -1068,7 +1090,7 @@ describe PseudonymSessionsController do
 
       it "should add the current ip to existing ips" do
         cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
-        ActionController::Request.any_instance.stubs(:remote_ip).returns('ip2')
+        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns('ip2')
         post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should_not be_nil

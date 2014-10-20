@@ -3,13 +3,13 @@
 <% content_for :page_title do %><%= t(:page_title, "SIS Import") %><% end %>
 
 <div>
-  <h2><%= t(:title, "SIS Import") %></h2>
+  <h1><%= t(:title, "SIS Import") %></h1>
 
   <div class="sis_messages" style="<%= hidden %>">
     <div class="ui-state-error sis_error_message" style="padding: 0.5em 1em"></div>
     <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
   </div>
-  
+
   <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
     <%= form_tag account_sis_imports_path(@account.id), :multipart => true, :id => "sis_importer" do %>
       <p class="instruction"><%= mt(:select_file_instructions,
@@ -72,14 +72,14 @@
       <div class="clear"></div>
     <% end %>
   </div>
-  
+
   <div class="progress_bar_holder" style="<%= hidden unless @current_batch && @current_batch.importing? %> margin-top: 10px;">
       <div class="copy_progress"></div>
       <div class="progress_message"><%= t(:import_started_message, "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.") %></div>
   </div>
 
   <div id="import_log_holder" style="<%= hidden %>">
-    <h3><%= t(:import_log_title, "Import Progress Log") %></h3>
+    <h2><%= t(:import_log_title, "Import Progress Log") %></h3>
     <div id="import_log"></div>
   </div>
 
@@ -87,14 +87,14 @@
   <% pending_batch_count -= 1 if @current_batch && @current_batch.created? %>
   <% if pending_batch_count > 0 %>
     <div class="pending_batches" style="margin-top: 20px">
-      <h3><%= t(:pending_batches_title, "Pending Batches") %></h3>
+      <h2><%= t(:pending_batches_title, "Pending Batches") %></h3>
       <p><%= t(:pending_batches_count, { :one => "%{count} batch waiting to be processed.", :other => "%{count} batches waiting to be processed." }, :count => pending_batch_count) %></p>
     </div>
   <% end %>
 
   <% if show_last_batch %>
     <div class="last_batch" style="margin-top: 20px;">
-      <h3><%= t(:last_batch_title, "Last Batch") %></h3>
+      <h2><%= t(:last_batch_title, "Last Batch") %></h3>
       <p><%= t(:started_at_message, "Started: %{started_at}", :started_at => datetime_string(@last_batch.created_at)) %><br/>
         <% if @last_batch.workflow_state == 'imported' %>
           <%= t(:imported_message, "All SIS data was successfully imported.") %>

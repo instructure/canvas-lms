@@ -4,6 +4,7 @@ define(function(require) {
   var d3 = require('d3');
   var ChartMixin = require('../../mixins/chart');
   var round = require('../../util/round');
+  var SightedUserContent = require('jsx!../../components/sighted_user_content');
   var I18n = require('i18n!quiz_statistics');
 
   var CIRCLE = 2 * Math.PI;
@@ -25,6 +26,7 @@ define(function(require) {
       var svg = d3.select(node)
         .attr('width', radius)
         .attr('height', radius)
+        .attr('aria-hidden', true)
         .append('g')
           .attr('transform', 'translate(' + radius + ',' + radius + ')');
 
@@ -82,7 +84,10 @@ define(function(require) {
           {this.transferPropsTo(Chart())}
 
           <div className="auxiliary">
-            <p><strong>{I18n.t('correct_answer', 'Correct answer')}</strong></p>
+            <SightedUserContent tagName="p">
+              <strong>{I18n.t('correct_answer', 'Correct answer')}</strong>
+            </SightedUserContent>
+
             <p>{this.props.label || this.getDefaultLabel()}</p>
           </div>
         </section>

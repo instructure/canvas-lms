@@ -1,9 +1,5 @@
 namespace :db do
   task :nuke => :environment do
-    
-    # this causes any scribd_docs associated with attachments to be deleted from scribd.
-    # that way we are polite and good citizens so to scribd.com
-    # 
     # dont kill db:nuke if it dies with destoying all the attachments.  
     # it probably is just because it tries to delete an attachment who's 
     # file on disk or s3 is no longer there.

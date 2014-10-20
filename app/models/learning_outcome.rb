@@ -61,7 +61,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def align(asset, context, opts={})
-    tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag = self.alignments.where(content_id: asset, content_type: asset.class.to_s, tag_type: 'learning_outcome', context_id: context, context_type: context.class.to_s).first
     tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
     if mastery_type == 'points' || mastery_type == 'points_mastery'
@@ -79,7 +79,7 @@ class LearningOutcome < ActiveRecord::Base
   def reorder_alignments(context, order)
     order_hash = {}
     order.each_with_index{|o, i| order_hash[o.to_i] = i; order_hash[o] = i }
-    tags = self.alignments.find_all_by_context_id_and_context_type_and_tag_type(context.id, context.class.to_s, 'learning_outcome')
+    tags = self.alignments.where(context_id: context, context_type: context.class.to_s, tag_type: 'learning_outcome')
     tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || CanvasSort::Last }
     updates = []
     tags.each_with_index do |tag, idx|
@@ -92,7 +92,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def remove_alignment(asset, context, opts={})
-    tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag = self.alignments.where(content_id: asset, content_type: asset.class.to_s, tag_type: 'learning_outcome', context_id: context, context_type: context.class.to_s).first
     tag.destroy if tag
     tag
   end
@@ -112,7 +112,7 @@ class LearningOutcome < ActiveRecord::Base
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
     unless missing_outcome_ids.empty?
-      LearningOutcome.find_all_by_id(missing_outcome_ids).each do |learning_outcome|
+      LearningOutcome.where(id: missing_outcome_ids).each do |learning_outcome|
         learning_outcome.align(asset, context)
       end
     end
@@ -198,7 +198,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.delete_if_unused(ids)
-    tags = ContentTag.active.find_all_by_content_id_and_content_type(ids, 'LearningOutcome')
+    tags = ContentTag.active.where(content_id: ids, content_type: 'LearningOutcome').to_a
     to_delete = []
     ids.each do |id|
       to_delete << id unless tags.any?{|t| t.content_id == id }

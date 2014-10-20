@@ -3,7 +3,7 @@ module Exporters
     def self.create_user_data_export(user)
       root_folder = Folder.root_folders(user).first
 
-      sub_folder ||= root_folder.sub_folders.active.find_or_initialize_by_name(I18n.t(:data_exports, 'data exports'))
+      sub_folder ||= root_folder.sub_folders.active.where(name: I18n.t(:data_exports, 'data exports')).first_or_initialize
       if sub_folder.new_record?
         sub_folder.context = user
         sub_folder.save!

@@ -384,6 +384,54 @@ describe ContextExternalTool do
       @tools << @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       ContextExternalTool.all_tools_for(@course).to_a.should eql(@tools.sort_by(&:name))
     end
+
+    it "returns all tools that are selectable" do
+      @tools = []
+      @tools << @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tools << @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', not_selectable: true)
+      @tools << @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tools << @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', not_selectable: true)
+      tools = ContextExternalTool.all_tools_for(@course, selectable: true)
+      tools.count.should == 2
+    end
+  end
+
+  describe "placements" do
+
+    it 'returns multiple requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('module_item', 'resource_selection').to_a.should eql([tool1, tool3].sort_by(&:name))
+    end
+
+    it 'it only returns a single requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('resource_selection').to_a.should eql([tool3])
+    end
+
+    it "doesn't return not selectable tools placements for moudle_item" do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.not_selectable = true
+      tool3.save!
+      ContextExternalTool.all_tools_for(@course).placements('module_item').to_a.should eql([tool1])
+    end
+
   end
 
   describe "find_integration_for" do
@@ -585,7 +633,16 @@ describe ContextExternalTool do
         tool.save!
         tool.display_type(:course_navigation).should == 'other_display_type'
       end
+
     end
+  end
+
+  describe "#extension_default_value" do
+
+    it "returns resource_selection when the type is 'resource_slection'" do
+      subject.extension_default_value(:resource_selection, :message_type).should == 'resource_selection'
+    end
+
   end
 
   describe "change_domain" do

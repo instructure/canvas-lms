@@ -52,12 +52,12 @@ module SIS
         parent = nil
         if !parent_account_id.blank?
           parent = @accounts_cache[parent_account_id]
-          parent ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, parent_account_id)
+          parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).first
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
           @accounts_cache[parent.sis_source_id] = parent
         end
 
-        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, account_id)
+        account = @root_account.all_accounts.where(sis_source_id: account_id).first
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
           raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i

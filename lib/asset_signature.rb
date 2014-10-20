@@ -7,17 +7,9 @@ module AssetSignature
   end
 
   def self.find_by_signature(klass, signature)
-
-    #TODO: Remove this after the next release cycle
-    # it's just here for temporary backwards compatibility
-    if signature.to_i.to_s.length == signature.length
-      return klass.find_by_id(signature)
-    end
-    ###############################################
-
     id, hmac = signature.split(DELIMITER, 2)
     return nil unless hmac == generate_hmac(klass, id)
-    klass.find_by_id(id.to_i)
+    klass.where(id: id.to_i).first
   end
 
   private

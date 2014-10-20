@@ -34,10 +34,10 @@
 <% end %>
 
 <% if @query %>
-  <h2><%= t('titles.search_results', 'Search results for "%{search_term}"', :search_term => (params[:user][:name] rescue '')) %></h2>
+  <h1><%= t('titles.search_results', 'Search results for "%{search_term}"', :search_term => (params[:user][:name] rescue '')) %></h1>
   <%= t('no_results_found', "No Results Found") if @users.empty? %>
 <% else %>
-  <h2><%= t('titles.all_users', 'All Users') %></h2>
+  <h1><%= t('titles.all_users', 'All Users') %></h1>
 <% end %>
 
 <%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>

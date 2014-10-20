@@ -276,6 +276,7 @@ define [
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
+      $element.find('.fc-event-title').toggleClass('calendar__event--completed', event.isCompleted())
       element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true
 
@@ -652,7 +653,7 @@ define [
     $styleContainer = $('<div />').appendTo('body')
 
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length, 275)
+      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.SETTINGS.use_high_contrast})
       html = for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{

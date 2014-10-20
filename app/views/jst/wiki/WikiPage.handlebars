@@ -4,7 +4,7 @@
     <div class="header-bar flex-container">
       <div class="header-bar-left header-left-flex">
         {{#if course_home}}
-        <h1 class="course-title ellipsis" title="{{course_title}}">{{course_title}}</h1>
+        <h2 class="course-title ellipsis" title="{{course_title}}">{{course_title}}</h2>
         {{else}}
           {{#if CAN.VIEW_PAGES}}
             <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
@@ -23,7 +23,7 @@
               {{#if published}}
                 <span class='published-status published'>
                   <i class="icon-publish"></i> {{#t 'published_indicator'}}Published{{/t}}
-                </span>    
+                </span>
               {{else}}
                 <span class='published-status unpublished'>
                   <i class="icon-unpublished"></i> {{#t 'unpublished_indicator'}}Not Published{{/t}}
@@ -36,7 +36,7 @@
           <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
         {{/if}}
         {{#if CAN.ACCESS_GEAR_MENU}}
-          <div class="inline-block" role="application">
+          <div class="inline-block">
             <a class="btn al-trigger" tabindex="0" role="button" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>

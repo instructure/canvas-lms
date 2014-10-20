@@ -277,16 +277,9 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
-    if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
-      student_ids = [@current_user.id]
-
-      if @context.user_has_been_observer?(@current_user)
-        observed_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
-        student_ids.concat(observed_student_ids)
-        # if no observed students, dont filter based on section
-        scope = scope.visible_to_students_with_da_enabled(student_ids) if observed_student_ids.any?
-      else
-        scope = scope.visible_to_students_with_da_enabled(student_ids)
+    if @context.feature_enabled?(:differentiated_assignments)
+      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+        scope.visible_to_students_with_da_enabled(user_ids)
       end
     end
 
@@ -585,7 +578,59 @@ class DiscussionTopicsController < ApplicationController
 
   # @API Update a topic
   #
-  # Accepts the same parameters as create
+  # Update an existing discussion topic for the course or group.
+  #
+  # @argument title [String]
+  #
+  # @argument message [String]
+  #
+  # @argument discussion_type [String, "side_comment"|"threaded"]
+  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
+  #
+  # @argument published [Boolean]
+  #   Whether this topic is published (true) or draft state (false). Only
+  #   teachers and TAs have the ability to create draft state topics.
+  #
+  # @argument delayed_post_at [DateTime]
+  #   If a timestamp is given, the topic will not be published until that time.
+  #
+  # @argument lock_at [DateTime]
+  #   If a timestamp is given, the topic will be scheduled to lock at the
+  #   provided timestamp. If the timestamp is in the past, the topic will be
+  #   locked.
+  #
+  # @argument podcast_enabled [Boolean]
+  #   If true, the topic will have an associated podcast feed.
+  #
+  # @argument podcast_has_student_posts [Boolean]
+  #   If true, the podcast will include posts from students as well. Implies
+  #   podcast_enabled.
+  #
+  # @argument require_initial_post [Boolean]
+  #   If true then a user may not respond to other replies until that user has
+  #   made an initial reply. Defaults to false.
+  #
+  # @argument assignment [Assignment]
+  #   To create an assignment discussion, pass the assignment parameters as a
+  #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
+  #   for the available parameters. The name parameter will be ignored, as it's
+  #   taken from the discussion title. If you want to make a discussion that was
+  #   an assignment NOT an assignment, pass set_assignment = false as part of
+  #   the assignment object
+  #
+  # @argument is_announcement [Boolean]
+  #   If true, this topic is an announcement. It will appear in the
+  #   announcement's section rather than the discussions section. This requires
+  #   announcment-posting permissions.
+  #
+  # @argument position_after [String]
+  #   By default, discussions are sorted chronologically by creation date, you
+  #   can pass the id of another topic to have this one show up after the other
+  #   when they are listed.
+  #
+  # @argument group_category_id [Integer]
+  #   If present, the topic will become a group discussion assigned
+  #   to the group.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
@@ -811,7 +856,7 @@ class DiscussionTopicsController < ApplicationController
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
+    return unless discussion_topic_hash.has_key?(:group_category_id) && discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
     if @topic.is_announcement
       @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
       return
@@ -895,7 +940,7 @@ class DiscussionTopicsController < ApplicationController
   def child_topic
     extra_params = {:headless => 1} if params[:headless]
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-    @topic = @context.discussion_topics.find_or_initialize_by_root_topic_id(params[:root_discussion_topic_id])
+    @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
     @topic.message = @root_topic.message
     @topic.title = @root_topic.title
     @topic.assignment_id = @root_topic.assignment_id

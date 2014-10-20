@@ -1,5 +1,5 @@
 group :test do
-  gem 'testbot', :github => 'smeredith0506/testbot'
+  gem 'testbot', :github => 'smeredith0506/testbot', :branch => 'master', :ref => '47fbf057ab40f8a6e24b1ae780c3f1a176621892'
   gem 'simplecov', '0.8.2', :require => false
     gem 'docile', '1.1.3'
   gem 'simplecov-rcov', '0.2.3', :require => false
@@ -20,7 +20,7 @@ group :test do
   gem 'once-ler', '0.0.13'
 
   gem 'sequel', '4.5.0', :require => false
-  gem 'selenium-webdriver', '2.42.0'
+  gem 'selenium-webdriver', '2.43.0'
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
   gem 'webmock', '1.16.1', :require => false

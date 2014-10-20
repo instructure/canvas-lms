@@ -1,3 +1,5 @@
+@import base/environment
+
 // print button for grades summary page
 .print-grades
   float: right
@@ -131,9 +133,9 @@
 #grades_summary th.title .context
   visibility: hidden
   font-size: 0.8em
-  color: #999
   padding-left: 10px
   line-height: 0.5em
+  color: darken($canvas-neutral, 40)
 
   @media print
     visibility: visible

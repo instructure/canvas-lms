@@ -98,7 +98,20 @@ module SeleniumTestsHelperMethods
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
         caps.native_events = native
       end
-      raise('error with how selenium is being setup')
+      driver = nil
+      3.times do |times|
+        begin
+          driver = Selenium::WebDriver.for(
+            :remote,
+            :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+            :desired_capabilities => caps
+          )
+          break
+        rescue Exception => e
+          puts "Error attempting to start remote webdriver: #{e}"
+          raise e if times == 2
+        end
+      end
     end
     driver.manage.timeouts.implicit_wait = 3
     driver

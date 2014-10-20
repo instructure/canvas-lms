@@ -17,11 +17,10 @@
 
 
 <% content_for :right_side do %>
-  <%= render :partial => "screenreader_heading" %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
-
+<h1 class='screenreader-only'><%= t(:page_header_title, "Account Settings") %></h1>
 <% content_for :stylesheets do %>
   <style type="text/css" media="screen">
     fieldset {
@@ -32,8 +31,6 @@
     }
   </style>
 <% end %>
-
-
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
@@ -65,6 +62,7 @@
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
+      <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
         <fieldset id="account_settings" class="">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
@@ -541,7 +539,9 @@ acknowledge that you have read and agreed to the
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_storage_quotas) %>
-    <div id="tab-quotas"></div>
+    <div id="tab-quotas">
+      <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
+    </div>
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
@@ -874,6 +874,7 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
+      <h2 class="screenreader-only"><%= t('headings.sections', "Reports") %></h2>
       <table class="reports">
         <tr class="reports">
           <th class="reports"><%= t 'headers.report_name', 'Name' %></th>

@@ -137,4 +137,8 @@ class PluginSetting < ActiveRecord::Base
   def self.decrypt(text, salt)
     Canvas::Security.decrypt_password(text, salt, 'instructure_plugin_setting')
   end
+
+  def self.find_by_name(name)
+    where(name: name).first
+  end
 end

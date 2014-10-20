@@ -4,7 +4,7 @@
   <% if request.post? && flash[:error] %>
     <div class="error"><%= flash[:error] %></div>
   <% end %>
-  <button type="submit" class="btn btn-primary btn-large"><%= t('login', 'Login') %></button>
+  <button type="submit" class="btn btn-primary btn-large"><%= t('log_in', 'Log In') %></button>
   <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
     <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn btn-large forgot-password' %>
   <% else %>

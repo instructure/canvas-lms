@@ -441,7 +441,7 @@ describe "calendar2" do
         wait_for_ajax_requests
         f("#undated-events-section .element_toggler").click
         f('.fc-event').should be_nil
-        f('.undated_event_title').text.should == "undate me"
+        f('.undated_event_title').text.should include_text("undate me")
       end
 
       it "should change the month" do

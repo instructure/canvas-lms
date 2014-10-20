@@ -574,7 +574,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       if val[:answers]
         val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if val[:matches]
+        val[:matches] = prepare_matches(val) if val[:matches]
       elsif val[:questions] # It's a Quizzes::QuizGroup
         if val[:assessment_question_bank_id]
           # It points to a question bank
@@ -584,7 +584,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           val[:questions].each do |question|
             if question[:answers]
               question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
+              question[:matches] = prepare_matches(question) if question[:matches]
             end
             questions << question
           end
@@ -672,14 +672,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     @submission_questions.each do |q|
       if q[:pick_count] #Quizzes::QuizGroup
         if q[:assessment_question_bank_id]
-          bank = ::AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
+          bank = ::AssessmentQuestionBank.where(id: q[:assessment_question_bank_id]).first if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count], exclude_ids)
             questions = questions.map { |aq| aq.data }
             questions.each do |question|
               if question[:answers]
                 question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
+                question[:matches] = prepare_matches(question) if question[:matches]
               end
               question[:points_possible] = q[:question_points]
               question[:published_at] = q[:published_at]
@@ -757,6 +757,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
+  def prepare_matches(question)
+    if matches = question[:matches]
+      # question matches should always be shuffled, regardless of the
+      # shuffle_answers option
+      matches.sort_by { |m| rand }
+    end
+  end
+
   # Takes the PRE-SAVED version of the quiz and uses it to generate a
   # SAVED version.  That is, gathers the relationship entities from
   # the database and uses them to populate a static version that will
@@ -815,22 +823,22 @@ class Quizzes::Quiz < ActiveRecord::Base
       locked = false
       quiz_for_user = self.overridden_for(user)
       if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
         end
       elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
       elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = l
         end
       elsif item = locked_by_module_item?(user, opts[:deep_check_if_needed])
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         end

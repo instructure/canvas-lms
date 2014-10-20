@@ -35,6 +35,10 @@ $left-offset:  16px;
   text-decoration: none;
 }
 
+.feature-flag .element_toggler:focus {
+  @include button-focus;
+}
+
 .feature-flag .btn {
   min-width: 80px;
 }

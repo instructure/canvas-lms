@@ -33,7 +33,7 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <div class="inline-block" role="application">  
+          <div class="inline-block">
             <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
               <i class="icon-settings"></i>
               <i class="icon-mini-arrow-down"></i>
@@ -68,7 +68,7 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <div class="inline-block" role="application">
+          <div class="inline-block">
             <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
               <i class="icon-settings"></i>
               <i class="icon-mini-arrow-down"></i>
@@ -109,7 +109,7 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <div class="inline-block" role="application">
+          <div class="inline-block">
             <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
               <i class="icon-settings"></i>
               <i class="icon-mini-arrow-down"></i>
@@ -189,6 +189,7 @@ is for items that are not draggable.
     line-height: 20px;
     margin: auto;
     display: inline-block;
+    &:focus { @include button-focus; }
 
     .icon-mini-arrow-down {
       vertical-align: middle;
@@ -224,10 +225,10 @@ is for items that are not draggable.
   border: 1px solid #c1c7cf;
   border-radius: 3px;
   box-shadow: 0 1px 0 #dde0e4;
-  color: #696969;
+  color: $base-font-color--subdued;
 
   a.ig-title {
-    color: #696969;
+    color: $base-font-color--subdued;
     text-decoration: none;
   }
 
@@ -239,11 +240,11 @@ is for items that are not draggable.
   }
 
   &:hover {
-    background-color: #eef7ff;
+    background-color: $base-list-item-background--hover;
   }
 
   &:focus {
-    background-color: #eef7ff;
+    background-color: $base-list-item-background--hover;
   }
 
   &:before {

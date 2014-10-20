@@ -592,8 +592,13 @@ module QuizzesHelper
     submission && submission.score_before_regrade != submission.kept_score
   end
 
-  def answer_title(selected_answer, correct_answer, show_correct_answers)
+  def answer_title(answer, selected_answer, correct_answer, show_correct_answers)
     titles = []
+
+    if selected_answer || correct_answer || show_correct_answers
+      titles << "#{answer}."
+    end
+
     if selected_answer
       titles << I18n.t(:selected_answer, "You selected this answer.")
     end
@@ -602,7 +607,7 @@ module QuizzesHelper
       titles << I18n.t(:correct_answer, "This was the correct answer.")
     end
 
-    title = "title=\"#{titles.join(' ')}\"" if titles.length > 0
+    title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
   end
 
   def show_correct_answers?(quiz=@quiz, user=@current_user, submission=@submission)

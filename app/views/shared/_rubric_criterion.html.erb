@@ -13,9 +13,6 @@
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container">
     <div class="container">
-      <div class="links editing">
-        <a href="#" class="edit_criterion_link hide-till-hover"><i class="icon-edit standalone-icon"></i></a>
-      </div>
       <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
       <span class="description criterion_description_value"><%= description %></span>
       <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
@@ -27,6 +24,9 @@
       <div class="threshold">
         <%= before_label :threshold, "threshold" %>
         <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{criterion.mastery_points rescue 5}</span>}.html_safe %>
+      </div>
+      <div class="links editing">
+        <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit_description', 'Edit criterion description' %></span></a>
       </div>
     </div>
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
@@ -62,14 +62,17 @@
         <% ratings ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
           <% rating = ratings[idx]; rating.edge = (idx == 0 || idx == ratings.length - 1) %>
-          <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>">
+          <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>" tabindex="0">
           <div class="container">
             <div class="description rating_description_value"><%= rating.description %></div>
             <span class="nobr"><%= t :points, "%{points} pts", :points => %{<span class="points">#{rating.points}</span>}.html_safe %></span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <div class="links">
-              <a href="#" class="edit_rating_link no-hover"><i class="icon-edit standalone-icon"></i></a>
-              <a href="#" class="delete_rating_link no-hover"><i class="icon-end standalone-icon"></i></a>
+              <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit', 'Edit rating' %></span></a>
+              <a href="#" class="delete_rating_link"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t 'icons.delete', 'Delete rating' %></span></a>
+
+              <!-- Hidden if last -->
+              <a href="#" class="add_rating_link_after"><i class="icon-add standalone-icon"></i><span class="screenreader-only"><%= t 'icons.add_new_rating_after', 'Add new rating category after current rating' %></span></a>
             </div>
           </div>
           </td>

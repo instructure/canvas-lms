@@ -82,6 +82,7 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
+  text-decoration: none;
   @include buttonBackground($btnBackground, $btnBackgroundHighlight, $grayDark, 0 1px 1px rgba(255,255,255,.75));
   border: 1px solid $btnBorder;
   *border: 0; // Remove the border to prevent IE7's black border on input:focus
@@ -104,9 +105,7 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
   }
 
   // Focus state for keyboard and accessibility
-  &:focus {
-    @include tab-focus();
-  }
+  &:focus { @include button-focus; }
 
   // Active state
   &.active,
@@ -219,6 +218,7 @@ input[type="button"] {
 }
 .btn-primary {
   @include buttonBackground($btnPrimaryBackground, $btnPrimaryBackgroundHighlight);
+  &:focus { @include button-focus($pink); }
 }
 // Warning appears are orange
 .btn-warning {

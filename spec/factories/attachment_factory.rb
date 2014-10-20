@@ -85,13 +85,6 @@ def jpeg_data_frd
   fixture_file_upload(fixture_path, 'image/jpeg', true)
 end
 
-# Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
-def scribdable_attachment_model(opts={})
-  ScribdAPI.stubs(:enabled?).returns(true)
-  scribd_mime_type_model(:extension => 'pdf')
-  attachment_model({:content_type => 'application/pdf'}.merge(opts))
-end
-
 def crocodocable_attachment_model(opts={})
   attachment_model({:content_type => 'application/pdf'}.merge(opts))
 end

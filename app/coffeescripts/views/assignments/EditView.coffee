@@ -174,8 +174,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
-        differentiatedAssignmnetsEnabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
+        differentiatedAssignmentsEnabled: @assignment.differentiatedAssignmentsEnabled()
 
     _attachEditorToDescription: =>
       @$description.editorBox()

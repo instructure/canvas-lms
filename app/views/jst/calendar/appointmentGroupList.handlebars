@@ -3,7 +3,7 @@
     {{#each appointment_groups}}
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>
         {{#if is_manageable}}
-          <div class="admin-links" role="application">
+          <div class="admin-links">
             <button class="al-trigger btn btn-mini">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>

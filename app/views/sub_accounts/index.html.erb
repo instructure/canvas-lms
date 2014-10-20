@@ -9,6 +9,7 @@
 <% jammit_css :sub_accounts %>
 <% js_bundle :sub_accounts %>
 
+<h1 class="screenreader-only"><%= t :page_header_title, 'Sub Accounts' %></h1>
 <div id="sub_account_urls">
   <a href="<%= context_url(@context, :context_sub_account_url, "{{ id }}") %>" class="sub_account_url" style="display: none;">&nbsp;</a>
 </div>

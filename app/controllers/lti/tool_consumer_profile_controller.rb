@@ -24,22 +24,11 @@ module Lti
 
     def show
       uuid = "339b6700-e4cb-47c5-a54f-3ee0064921a9" #Hard coded until we start persisting the tcp
-      profile = Lti::ToolConsumerProfileCreator.new(@account, tool_consumer_profile_url(uuid), tool_proxy_url).create
+      profile = Lti::ToolConsumerProfileCreator.new(@account, tool_consumer_profile_url(uuid), request.domain, context.class.name.downcase).create
       render json: profile.to_json, :content_type => 'application/json'
     end
 
     private
-
-    def tool_proxy_url
-      case context
-        when Course
-          create_course_lti_tool_proxy_url(context)
-        when Account
-          create_account_lti_tool_proxy_url(context)
-        else
-          raise "Unsupported context"
-      end
-    end
 
     def tool_consumer_profile_url(uuid)
       case context

@@ -19,6 +19,7 @@ config[:expire_after] ||= 1.day
 config[:expires] = nil
 config[:logger] = Rails.logger
 session_store = config.delete(:session_store).to_sym
+session_store = :redis_store if session_store == :redis_session_store # deprecated name
 
 case session_store
 when :mem_cache_store
@@ -26,7 +27,7 @@ when :mem_cache_store
   config[:namespace] ||= config[:key]
   servers = config[:memcache_servers] || ConfigFile.load("memcache") || ['localhost:11211']
   config[:cache] ||= MemCache.new(servers, config)
-when :redis_session_store
+when :redis_store
   Bundler.require 'redis'
   config[:key_prefix] ||= config[:key]
   config[:servers] ||= config[:redis_servers] if config[:redis_servers]

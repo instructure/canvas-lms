@@ -1010,17 +1010,28 @@ describe Submission do
       }
     end
 
-    it "includes url submission attachments" do
+    def submission_for_some_user
       student_in_course active_all: true
-      s = @assignment.submit_homework(@student,
-                                      submission_type: "online_url",
-                                      url: "http://example.com")
+      @assignment.submit_homework(@student,
+                                  submission_type: "online_url",
+                                  url: "http://example.com")
+    end
+
+    it "includes url submission attachments" do
+      s = submission_for_some_user
       s.attachment = attachment_model(filename: "screenshot.jpg",
                                       context: @student)
 
       Submission.bulk_load_versioned_attachments([s])
       ensure_attachments_arent_queried
       s.versioned_attachments.should == [s.attachment]
+    end
+
+    it "handles bad data" do
+      s = submission_for_some_user
+      s.update_attribute(:attachment_ids, '99999999')
+      Submission.bulk_load_versioned_attachments([s])
+      s.versioned_attachments.should == []
     end
   end
 
@@ -1051,6 +1062,15 @@ describe Submission do
       AssessmentRequest.any_instance.expects(:send_reminder!).once
       submission1, submission2 = @assignment.submissions
       submission1.assign_assessor(submission2)
+    end
+  end
+
+  describe "#get_web_snapshot" do
+    it "should not blow up if web snapshotting fails" do
+      sub = Submission.new(@valid_attributes)
+      CutyCapt.expects(:enabled?).returns(true)
+      CutyCapt.expects(:snapshot_attachment_for_url).with(sub.url).returns(nil)
+      sub.get_web_snapshot
     end
   end
 end

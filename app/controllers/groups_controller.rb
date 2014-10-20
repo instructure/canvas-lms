@@ -151,7 +151,7 @@ class GroupsController < ApplicationController
   end
 
   def unassigned_members
-    category = @context.group_categories.find_by_id(params[:category_id])
+    category = @context.group_categories.where(id: params[:category_id]).first
     return render :json => {}, :status => :not_found unless category
     page = (params[:page] || 1).to_i rescue 1
     per_page = Api.per_page_for(self, default: 15, max: 100)
@@ -409,7 +409,7 @@ class GroupsController < ApplicationController
     elsif params[:group]
       group_category_id = params[:group].delete :group_category_id
       if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
-        group_category = @context.group_categories.find_by_id(group_category_id)
+        group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
         params[:group][:group_category] = group_category
       else
@@ -477,7 +477,7 @@ class GroupsController < ApplicationController
     find_group
     if !api_request? && params[:group] && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id
-      group_category = @context.group_categories.find_by_id(group_category_id)
+      group_category = @context.group_categories.where(id: group_category_id).first
       return render :json => {}, :status => :bad_request unless group_category
       params[:group][:group_category] = group_category
     end
@@ -485,11 +485,11 @@ class GroupsController < ApplicationController
     attrs.delete :storage_quota_mb unless @group.context.grants_right? @current_user, session, :manage_storage_quotas
 
     if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
-      attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)
+      attrs[:avatar_attachment] = @group.active_images.where(id: avatar_id).first
     end
 
     if attrs[:leader]
-      membership = @group.group_memberships.find_by_user_id(attrs[:leader][:id])
+      membership = @group.group_memberships.where(user_id: attrs[:leader][:id]).first
       return render :json => {}, :status => :bad_request unless membership
       attrs[:leader] = membership.user
     end
@@ -599,7 +599,7 @@ class GroupsController < ApplicationController
   def remove_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
-      @membership = @group.group_memberships.find_by_user_id(params[:user_id])
+      @membership = @group.group_memberships.where(user_id: params[:user_id]).first
       @membership.destroy
       render :json => @membership
     end

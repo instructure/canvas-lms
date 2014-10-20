@@ -11,7 +11,7 @@ def create_notification(values = {})
 end
 
 def create_scribd_mime_type(ext, name)
-  ScribdMimeType.find_or_create_by_extension_and_name(ext, name)
+  ScribdMimeType.where(extension: ext, name: name).first_or_create
 end
 
 namespace :db do
@@ -94,7 +94,7 @@ namespace :db do
       name = filename.split(".")[0]
       unless name[0,1] == "_"
         titled = name.titleize.gsub(/Sms/, 'SMS')
-        puts "No notification found in db for #{name}" unless Notification.find_by_name(titled)
+        puts "No notification found in db for #{name}" unless Notification.where(name: titled).first
       end
     end
     Notification.all.each do |n|
@@ -121,8 +121,8 @@ namespace :db do
 
     def create_admin(email, password)
       begin
-        pseudonym = Account.site_admin.pseudonyms.active.custom_find_by_unique_id(email)
-        pseudonym ||= Account.default.pseudonyms.active.custom_find_by_unique_id(email)
+        pseudonym = Account.site_admin.pseudonyms.active.by_unique_id(email).first
+        pseudonym ||= Account.default.pseudonyms.active.by_unique_id(email).first
         user = pseudonym ? pseudonym.user : User.create!
         user.register! unless user.registered?
         unless pseudonym

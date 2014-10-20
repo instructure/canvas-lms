@@ -19,7 +19,7 @@
 require 'csv'
 
 class GradebookImporter
-  
+
   class NegativeId
     class << self
       def generate
@@ -34,17 +34,21 @@ class GradebookImporter
       @i -= 1
     end
   end
-  
+
   attr_reader :context, :contents, :assignments, :students, :submissions, :missing_assignments, :missing_students
   def initialize(context=nil, contents=nil)
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
     raise ArgumentError, "Must provide CSV contents." unless contents
     @context = context
     @contents = contents
+
+    if @context.feature_enabled?(:differentiated_assignments)
+      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id)
+    end
   end
-  
+
   CSV::Converters[:nil] = lambda{|e| (e.nil? ? e : raise) rescue e}
-  
+
   def parse!
     @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
@@ -153,7 +157,7 @@ class GradebookImporter
     while row.last =~ /Current Score|Current Points|Final Score|Final Points|Final Grade/
       row.pop
     end
-    
+
     row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @all_assignments[id.to_i] if id.present?
@@ -165,13 +169,13 @@ class GradebookImporter
       assignment
     end
   end
-  
+
   def process_pp(row)
     @assignments.each_with_index do |assignment, idx|
       assignment.points_possible = row[idx] if row[idx]
     end
   end
-  
+
   def process_student(row)
     student_id = row[1] # the second column in the csv should have the student_id for each row
     student = @all_students[student_id.to_i] if student_id.present?
@@ -196,18 +200,24 @@ class GradebookImporter
     @missing_student ||= student.new_record?
     student
   end
-  
+
   def process_submissions(row, student)
     l = []
+    student_visibile_assignments = @visible_assignments[student.id] if @visible_assignments
+
     @assignments.each_with_index do |assignment, idx|
-      l << {
-        'grade' => row[idx + @student_columns],
-        'assignment_id' => assignment.new_record? ? assignment.id : assignment.previous_id
+      assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
+      grade = row[idx + @student_columns]
+      grade = '' if @visible_assignments && !student_visibile_assignments.try(:include?, assignment_id)
+      new_submission = {
+        'grade' => grade,
+        'assignment_id' => assignment_id
       }
+      l << new_submission
     end
     student.write_attribute(:submissions, l)
   end
-  
+
   def as_json(options={})
     {
       :students => @students.map { |s| student_to_hash(s) },
@@ -220,7 +230,7 @@ class GradebookImporter
       :unchanged_assignments => @unchanged_assignments
     }
   end
-  
+
   protected
     def add_root_account_to_pseudonym_cache(root_account)
       pseudonyms = root_account.shard.activate do
@@ -241,7 +251,7 @@ class GradebookImporter
         :submissions => user.read_attribute(:submissions)
       }
     end
-    
+
     def assignment_to_hash(assignment)
       {
         :id => assignment.id,
@@ -254,11 +264,11 @@ class GradebookImporter
 
     def valid_context?(context=nil)
       return context && [
-        :students, 
-        :assignments, 
-        :submissions, 
-        :students=, 
-        :assignments=, 
+        :students,
+        :assignments,
+        :submissions,
+        :students=,
+        :assignments=,
         :submissions=
       ].all?{ |m| context.respond_to?(m) }
     end

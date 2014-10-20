@@ -6,11 +6,42 @@
     </li>
     <%- end -%>
     <li id="grades_menu_item" class="menu-item">
-      <%= link_to(t('menu.grades', 'Grades'), :grades, :class=>"menu-item-no-drop") %>
+      <a href="<%= grades_path %>" class="menu-item-no-drop">
+        <% if k12? %>
+          <%= render(:partial => 'shared/svg/svg_icon_grades') %>
+          <div class="menu-item__text">
+        <% end %>
+        <%= t('menu.grades', 'Grades') %>
+        <% if k12? %></div><% end %>
+      </a>
     </li>
     <li id="calendar_menu_item" class="menu-item">
-      <a href="<%= calendar_path %>" class="menu-item-no-drop"><%= t('menu.calendar', 'Calendar') %></a>
+      <a href="<%= calendar_path %>" class="menu-item-no-drop">
+        <% if k12? %>
+          <%= render(:partial => 'shared/svg/svg_icon_calendar') %>
+          <div class="menu-item__text">
+        <% end %>
+        <%= t('menu.calendar', 'Calendar') %>
+        <% if k12? %></div><% end %>
+      </a>
     </li>
+    <%# Inbox menu item currently only for K-12 %>
+    <% if k12? %>
+      <% unless @current_user.fake_student? %>
+        <li id="inbox_menu_item" class="menu-item">
+          <a href="<%= conversations_path %>" class="menu-item-no-drop">
+            <div class="icon-badge-combo">
+              <div class="icon-badge-combo__icon"><%= render(:partial => 'shared/svg/svg_icon_mail') %></div>
+              <% unless @current_user.disabled_inbox? %>
+                <% unread = @current_user.unread_conversations_count %>
+                <span class="icon-badge-combo__badge" <% if unread == 0 %> style="display: none;"<% end %>><%= unread %></span>
+              <% end %>
+            </div>
+            <div class="menu-item__text"><%= t 'links.inbox', "Inbox" %></div>
+          </a>
+        </li>  
+      <% end %>
+    <% end %>
     <%= render(:partial => 'external_tools/global_nav_menu_items') %>
   </ul>
 <% end %>

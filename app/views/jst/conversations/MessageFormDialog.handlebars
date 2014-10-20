@@ -30,7 +30,12 @@
     <div class='message-header'>
       <div class='message-header-row'>
         <div class='message-header-label'>
-          <label for="compose-message-course">{{#t "labels.course"}}Course{{/t}}</label>
+          <label for="compose-message-course">
+            {{#t "labels.course"}}Course{{/t}}
+            <span class="screenreader-only">
+              {{#t "labels.course_required"}}You must select a Course before entering recipients.{{/t}}
+            </span>
+          </label>
         </div>
         <div class='message-header-input'>
           <select id="compose-message-course" name="course"
@@ -38,6 +43,7 @@
                   data-track-action="Edit"
                   data-track-label="Course"
                   class="message_course"
+                  required="true"
                   value="{{course}}">
             <option>{{#t "labels.select_course"}}Select a course{{/t}}</option>
           </select>
@@ -63,7 +69,11 @@
                          aria-activedescendant="ac-result-list"
                          aria-owns="ac-result-list-1"
                          aria-autocomplete="list"
+                         aria-describedby="ac-input-description"
+                         autocomplete="off"
                          role="combobox" />
+                  <span aria-live="polite" class="ac-results-status screenreader-only" id="ac-input-description"></span>
+                  <span aria-live="polite" class="ac-selected-name screenreader-only"></span>
                 </div>
               </div>
 

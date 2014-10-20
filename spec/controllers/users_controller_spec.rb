@@ -95,7 +95,7 @@ describe UsersController do
 
       Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
       mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
-      OauthRequest.expects(:find_by_id).with("123").returns(mock_oauth_request)
+      OauthRequest.expects(:where).with(id: "123").returns(stub(first: mock_oauth_request))
       Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
       UserService.any_instance.expects(:save) do |user_service|
         user_service.id.should == "456"
@@ -888,7 +888,7 @@ describe UsersController do
       user_session(admin)
 
       mock_oauth_request = stub(token: 'token', secret: 'secret', original_host_with_port: 'test.host', user: @user, return_url: '/')
-      OauthRequest.expects(:find_by_token_and_service).with('token', 'google_docs').returns(mock_oauth_request)
+      OauthRequest.expects(:where).with(token: 'token', service: 'google_docs').returns(stub(first: mock_oauth_request))
 
       mock_access_token = stub(token: '123', secret: 'abc')
       GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)

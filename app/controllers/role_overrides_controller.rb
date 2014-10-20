@@ -295,8 +295,7 @@ class RoleOverridesController < ApplicationController
     end
 
     base_role_type = params[:base_role_type] || AccountUser::BASE_ROLE_NAME
-    role = @context.roles.deleted.find_by_name(@role)
-    role ||= @context.roles.build(:name => @role)
+    role = @context.roles.deleted.where(name: @role).first_or_initialize
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
     role.deleted_at = nil
@@ -337,7 +336,7 @@ class RoleOverridesController < ApplicationController
   # @returns Role
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      role = @context.roles.not_deleted.find_by_name!(@role)
+      role = @context.roles.not_deleted.where(name: @role).first!
       role.deactivate!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
@@ -355,7 +354,7 @@ class RoleOverridesController < ApplicationController
   # @returns Role
   def activate_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if course_role = @context.roles.inactive.find_by_name(@role)
+      if course_role = @context.roles.inactive.where(name: @role).first
         course_role.activate!
         render :json => role_json(@context, course_role, @current_user, session)
       else
@@ -464,7 +463,7 @@ class RoleOverridesController < ApplicationController
   def set_permissions_for(role, context, permissions)
     return unless permissions.present?
 
-    if course_role = context.roles.active.find_by_name(role)
+    if course_role = context.roles.active.where(name: role).first
       manageable_permissions = RoleOverride.manageable_permissions(context, course_role.base_role_type)
     else
       manageable_permissions = RoleOverride.manageable_permissions(context)

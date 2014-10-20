@@ -229,7 +229,6 @@ class ContentZipper
     @files_added = true
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
-    zip_attachment.scribd_attempts += 1
     zip_attachment.save!
     filename = "#{folder.context.short_name}-#{folder.name} files"
     make_zip_tmpdir(filename) do |zip_name|
@@ -297,7 +296,6 @@ class ContentZipper
 
   def mark_attachment_as_zipping!(zip_attachment)
     zip_attachment.workflow_state = 'zipping'
-    zip_attachment.scribd_attempts += 1
     zip_attachment.save!
   end
 

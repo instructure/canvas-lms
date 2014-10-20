@@ -98,6 +98,8 @@ define [
       @launchParams = _.pick(options, 'context', 'user') if options.remoteLaunch
 
       @render()
+      @appendAddAttachmentTemplate()
+
       super
       @initializeForm()
       @resizeBody()
@@ -119,6 +121,9 @@ define [
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
+
+      @launchParams = null
+
       @trigger('close')
       if @returnFocusTo
         @returnFocusTo.focus()
@@ -152,7 +157,11 @@ define [
 
     onCourse: (course) =>
       @recipientView.setContext(course, true)
-      @$contextCode.val(if course?.id then course.id else '')
+      if course?.id
+        @$contextCode.val(course.id)
+        @recipientView.disable(false)
+      else
+        @$contextCode.val('')
       @$messageCourseRO.text(if course then course.name else I18n.t('no_course','No course'))
 
     defaultCourse: null
@@ -166,6 +175,7 @@ define [
         disabled: @model?.get('private')
       ).render()
       @recipientView.on('changeToken', @recipientIdsChanged)
+      @recipientView.disable(true) unless _.include(ENV.current_user_roles, 'admin')
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
@@ -179,8 +189,10 @@ define [
           @courseView.setValue(@model.get('context_code'))
         else
           @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+        @recipientView.disable(false)
       else if @launchParams
         @courseView.setValue(@launchParams.context) if @launchParams.context
+        @recipientView.disable(false)
       else
         @courseView.setValue(@defaultCourse)
       if @model
@@ -235,7 +247,7 @@ define [
         contextView.render()
 
       @$fullDialog.on 'click', '.message-body', @handleBodyClick
-      @$fullDialog.on 'click', '.attach-file', preventDefault =>
+      @$fullDialog.on 'click', '.attach-file', =>
         @addAttachment()
       @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
         @removeAttachment($(e.currentTarget))
@@ -326,12 +338,19 @@ define [
       ($attachments.length * $attachments.outerWidth()) > @$attachmentsPane.width()
 
     addAttachment: ->
+      # when you click on the "label" that references the input it automatically open the file input
+      # we're exploiting this to get around the fact that IE won't let you submit the form when you try to
+      # "click" it through the javascript
+
+      $('#file_input').attr('id', _.uniqueId('file_input'))
+      @appendAddAttachmentTemplate()
+      @updateAttachmentOverflow()
+      @focusAddAttachment()
+
+    appendAddAttachmentTemplate: ->
       $attachment = $(addAttachmentTemplate())
       @$attachments.append($attachment)
       $attachment.hide()
-      $attachment.find('input').click()
-      @updateAttachmentOverflow()
-      @focusAddAttachment()
 
     setAttachmentClip: ($attachment) ->
       $name = $attachment.find( $('.attachment-name') )

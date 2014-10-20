@@ -53,15 +53,6 @@ describe "collaborations" do
     end
   end
 
-  # Public: Determine if the given collaborator has been selected.
-  #
-  # user - The collaborator to check.
-  #
-  # Returns a boolean.
-  def collaborator_is_selected?(user)
-    fj(".members-list li[data-id=#{user.id}]").present?
-  end
-
   # Public: Create a new collaboration.
   #
   # type - The type of the collaboration (e.g. "etherpad" or "google_docs")
@@ -143,62 +134,6 @@ describe "collaborations" do
 
           f('#no_collaborations_message').should be_displayed
           Collaboration.order("id DESC").last.should be_deleted
-        end
-
-        it 'should not display the new collaboration form if other collaborations exist' do
-          create_collaboration!(type, title)
-          validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
-        end
-
-        describe '#add_collaboration fragment' do
-          it 'should display the new collaboration form if no collaborations exist' do
-            PluginSetting.create!(:name => type, :settings => {})
-            validate_collaborations(%W{/courses/#{@course.id}/collaborations
-              /courses/#{@course.id}/collaborations#add_collaboration}, true)
-          end
-
-          it 'should hide the new collaboration form if collaborations exist' do
-            create_collaboration!(type, title)
-            validate_collaborations(%W{/courses/#{@course.id}/collaborations
-              /courses/#{@course.id}/collaborations#add_collaboration}, false)
-          end
-        end
-
-        it 'should open the new collaboration form if the last collaboration is deleted' do
-          create_collaboration!(type, title)
-          validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
-          delete_collaboration(@collaboration, type)
-          form_visible?.should be_true
-        end
-
-        it 'should not display the new collaboration form when the penultimate collaboration is deleted' do
-          PluginSetting.create!(:name => type, :settings => {})
-
-          @collaboration1 = Collaboration.typed_collaboration_instance(title)
-          @collaboration1.context = @course
-          @collaboration1.attributes = {:title => "My Collab 1"}
-          @collaboration1.user = @user
-          @collaboration1.save!
-          @collaboration2 = Collaboration.typed_collaboration_instance(title)
-          @collaboration2.context = @course
-          @collaboration2.attributes = {:title => "My Collab 2"}
-          @collaboration2.user = @user
-          @collaboration2.save!
-
-          validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
-          delete_collaboration(@collaboration1, type)
-          form_visible?.should be_false
-          delete_collaboration(@collaboration2, type)
-          form_visible?.should be_true
-        end
-
-        it 'should leave the new collaboration form open when the last collaboration is deleted' do
-          create_collaboration!(type, title)
-          validate_collaborations(%W{/courses/#{@course.id}/collaborations
-                                     /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
-          f('.add_collaboration_link').click
-          delete_collaboration(@collaboration, type)
-          form_visible?.should be_true
         end
 
         it 'should display available collaborators' do

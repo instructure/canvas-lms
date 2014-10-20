@@ -169,7 +169,7 @@ class Folder < ActiveRecord::Base
   end
 
   def clean_up_children
-    Attachment.find_all_by_folder_id(@folder_id).each do |a|
+    Attachment.where(folder_id: @folder_id).each do |a|
       a.destroy
     end
   end
@@ -229,8 +229,8 @@ class Folder < ActiveRecord::Base
       self.cloned_item ||= ClonedItem.create(:original_item => self)
       self.save!
     end
-    existing = context.folders.active.find_by_id(self.id)
-    existing ||= context.folders.active.find_by_cloned_item_id(self.cloned_item_id || 0)
+    existing = context.folders.active.where(id: self).first
+    existing ||= context.folders.active.where(cloned_item_id: self.cloned_item_id || 0).first
     return existing if existing && !options[:overwrite] && !options[:force_copy]
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
@@ -282,7 +282,7 @@ class Folder < ActiveRecord::Base
 
     context.shard.activate do
       Folder.unique_constraint_retry do
-        root_folder = context.folders.active.find_by_parent_folder_id_and_name(nil, name)
+        root_folder = context.folders.active.where(parent_folder_id: nil, name: name).first
         root_folder ||= context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible")
         root_folders = [root_folder]
       end
@@ -309,7 +309,7 @@ class Folder < ActiveRecord::Base
     end
     folders.each do |name|
       sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + '/' + name].join('//')]
-      sub_folder ||= current_folder.sub_folders.active.find_or_initialize_by_name(name)
+      sub_folder ||= current_folder.sub_folders.active.where(name: name).first_or_initialize
       current_folder = sub_folder
       if current_folder.new_record?
         current_folder.context = context
@@ -327,7 +327,7 @@ class Folder < ActiveRecord::Base
   end
 
   def self.unfiled_folder(context)
-    folder = context.folders.find_by_parent_folder_id_and_workflow_state_and_name(Folder.root_folders(context).first.id, 'visible', 'unfiled')
+    folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: 'visible', name: 'unfiled').first
     unless folder
       folder = context.folders.build(:parent_folder => Folder.root_folders(context).first, :name => 'unfiled')
       folder.workflow_state = 'visible'
@@ -343,9 +343,9 @@ class Folder < ActiveRecord::Base
       # TODO i18n
       if context.is_a? Course
         t :course_content_folder_name, 'course content'
-        current_folder = context.folders.active.find_by_full_name("course content")
+        current_folder = context.folders.active.where(full_name: "course content").first
       elsif @context.is_a? User
-        current_folder = context.folders.active.find_by_full_name(MY_FILES_FOLDER_NAME)
+        current_folder = context.folders.active.where(full_name: MY_FILES_FOLDER_NAME).first
       end
     end
   end
@@ -353,7 +353,7 @@ class Folder < ActiveRecord::Base
   def self.find_attachment_in_context_with_path(context, path)
     components = path.split('/')
     component = components.shift
-    context.folders.active.find_all_by_parent_folder_id(nil).each do |folder|
+    context.folders.active.where(parent_folder_id: nil).each do |folder|
       if folder.name == component
         attachment = folder.find_attachment_with_components(components.dup)
         return attachment if attachment
@@ -369,7 +369,7 @@ class Folder < ActiveRecord::Base
       return visible_file_attachments.to_a.find {|a| a.matches_filename?(component) }
     else
       # find a subfolder and recurse (yes, we can have multiple sub-folders w/ the same name)
-      active_sub_folders.find_all_by_name(component).each do |folder|
+      active_sub_folders.where(name: component).each do |folder|
         a = folder.find_attachment_with_components(components.dup)
         return a if a
       end

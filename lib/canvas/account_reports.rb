@@ -121,8 +121,8 @@ module Canvas::AccountReports
   end
 
   def self.message_recipient(account_report, message, csv=nil)
-    notification = Notification.by_name("Report Generated")
-    notification = Notification.by_name("Report Generation Failed") if !csv
+    notification = NotificationFinder.new.by_name("Report Generated")
+    notification = NotificationFinder.new.by_name("Report Generation Failed") if !csv
     attachment = report_attachment(account_report, csv) if csv
     account_report.message = message
     account_report.parameters ||= {}

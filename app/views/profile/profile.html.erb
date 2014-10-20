@@ -30,7 +30,7 @@
 <% if service_enabled?(:avatars) %>
   <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
 <% end %>
-<h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
+<h1 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h1>
 <div class="clear"></div>
 <%= form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">
@@ -433,7 +433,7 @@ TEXT
   </td>
 </tr></table>
 <% end %>
-<h3><%= before_label(:'headers.approved_integrations', "Approved Integrations") %></h3>
+<h2><%= before_label(:'headers.approved_integrations', "Approved Integrations") %></h2>
 <div style="margin-left: 20px;">
   <% if @user.access_tokens.empty? %>
     <div id="no_approved_integrations"><%= t(:no_approved_integrations, <<-TEXT)
@@ -555,7 +555,7 @@ TEXT
   </div>
 </div>
 
-<h3><%= t(:feature_options, 'Feature Options') %></h3>
+<h2 aria-hidden=true><%= t(:feature_options, 'Feature Options') %></h2>
 <div class="feature-flag-wrapper">
   <!-- this is populated by FeatureFlagAdminView -->
 </div>

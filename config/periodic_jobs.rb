@@ -40,20 +40,6 @@ Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
   end
 end
 
-if ScribdAPI.enabled?
-  Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
-    Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
-      Attachment.process_scribd_conversion_statuses
-    end
-  end
-
-  Delayed::Periodic.cron 'Attachment.delete_stale_scribd_docs', '15 11 * * *' do
-    Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
-      Attachment.delete_stale_scribd_docs
-    end
-  end
-end
-
 Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' do
   if Canvas::Crocodoc.config
     Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do

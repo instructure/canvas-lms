@@ -8,7 +8,7 @@
 <% end %>
 
 
-<h2><%= t(:title, "Courses In This Account") %></h2>
+<h1><%= t(:title, "Courses In This Account") %></h1>
 <% if @associated_courses_count > 0 %>
   <% if @term %>
     <h3 style="margin-bottom: 1em;"><%= mt(:subtitle_term, "For the term **%{term}**", :term => @term.name) %></h3>

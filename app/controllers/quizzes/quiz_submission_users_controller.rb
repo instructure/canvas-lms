@@ -15,75 +15,75 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Quizzes
+  # @API Quiz Submission User List
+  # @beta
+  #
+  # List of users who have or haven't submitted for a quiz.
+  #
+  # @argument submitted [Optional, boolean]
+  #   If true, return users who have submitted the quiz. If false, return users
+  #   who have not submitted the quiz. If not present, returns all students for
+  #   the course.
+  #
+  # @argument includes [Optional, array]
+  #   Optional list of resources to include with the response. May include
+  #   a string of the name of the resource. Possible values are:
+  #   "quiz_submissions".
+  #
+  # @returns QuizSubmissionUserList
+  #
+  # @model QuizSubmissionUserList
+  #     {
+  #       "meta": {
+  #         "$ref": "QuizSubmissionUserListMeta",
+  #         "description": "contains meta information (such as pagination) for the list of users"
+  #       },
+  #       "users": {
+  #         "$ref": "User",
+  #         "description": "list of users that match the query"
+  #       }
+  #     }
+  #
+  # @model QuizSubmissionUserListMeta
+  #     {
+  #       "pagination": {
+  #         "$ref": "JSONAPIPagination",
+  #         "description": "contains pagination information for the list of users"
+  #       }
+  #     }
+  #
+  # @model JSONAPIPagination
+  #     {
+  #       "per_page": {
+  #         "type": "integer",
+  #         "description": "number of results per page",
+  #         "example": 10
+  #       },
+  #       "page": {
+  #         "type": "integer",
+  #         "description": "the current page passed as the ?page= parameter",
+  #         "example": 1
+  #       },
+  #       "template": {
+  #         "type": "string",
+  #         "description": "URL template for building out other paged URLs for this endpoint",
+  #         "example": "https://example.instructure.com/api/v1/courses/1/quizzes/1/submission_users?page={page}"
+  #       },
+  #       "page_count": {
+  #         "type": "integer",
+  #         "description": "number of pages for this collection",
+  #         "example": 10
+  #       },
+  #       "count": {
+  #         "type": "integer",
+  #         "description": "total number of items in this collection",
+  #         "example": 100
+  #       }
+  #     }
   class QuizSubmissionUsersController < ::ApplicationController
     include Filters::Quizzes
     before_filter :require_context, :require_quiz
-    # @API List of users who have or haven't submitted for a quiz
-    # @beta
-    #
-    # @argument submitted [Optional, boolean]
-    #   If true, return users who have submitted the quiz. If false, return users
-    #   who have not submitted the quiz. If not present, returns all students for
-    #   the course.
-    #
-    # @argument includes [Optional, array]
-    #   Optional list of resources to include with the response. May include
-    #   a string of the name of the resource. Possible values are:
-    #   "quiz_submissions".
-    #
-    # @returns QuizSubmissionUserList
-    #
-    # @model QuizSubmissionUserList
-    #
-    # {
-    #   "meta": {
-    #     "$ref": "QuizSubmissionUserListMeta",
-    #     "description": "contains meta information (such as pagination) for the list of users"
-    #   },
-    #   "users": {
-    #     "$ref": "User",
-    #     "description": "list of users that match the query"
-    #   }
-    # }
-    #
-    # @model QuizSubmissionUserListMeta
-    #
-    # {
-    #   "pagination": {
-    #     "$ref": "JSONAPIPagination",
-    #     "description": "contains pagination information for the list of users"
-    #   }
-    # }
-    #
-    # @model JSONAPIPagination
-    #
-    # {
-    #   "per_page": {
-    #     "type": "integer",
-    #     "description": "number of results per page",
-    #     "example": 10
-    #   },
-    #   "page": {
-    #     "type": "integer",
-    #     "description": "the current page passed as the ?page= parameter",
-    #     "example": 1
-    #   },
-    #   "template": {
-    #     "type": "string",
-    #     "description": "URL template for building out other paged URLs for this endpoint",
-    #     "example": "https://example.instructure.com/api/v1/courses/1/quizzes/1/submission_users?page={page}"
-    #   },
-    #   "page_count": {
-    #     "type": "integer",
-    #     "description": "number of pages for this collection",
-    #     "example": 10
-    #   },
-    #   "count": {
-    #     "type": "integer",
-    #     "description": "total number of items in this collection",
-    #     "example": 100
-    #   }
-    # }
+    
     def index
       return unless user_has_teacher_level_access?
       @users = index_users

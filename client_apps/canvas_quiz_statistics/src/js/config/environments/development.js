@@ -28,6 +28,8 @@ define(function(require) {
       timeout: 5000
     },
 
+    pollingFrequency: 500,
+
     ajax: $.ajax,
 
     // This assumes you have set up reverse proxying on /api/v1 to Canvas.

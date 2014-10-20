@@ -1,132 +1,64 @@
 @import "base/environment";
 
+$replace-this-with-a-variable-for-focus-bg: hsl(0, 0%, 95%);
+
+$ef-thumbnail-size: 36px;
+
 @mixin hideForPhone {
-  @media (max-width:767px){
+  @media (max-width:800px){
     display: none;
   }
 }
-$border: #e5e4e4;
 
+.permissions-dialog-form{
+  .radio{
+    margin-top: 15px;
+  }
+}
 .form-horizontal{
   .dialog-adapter-form-calendar-label{
     width: 90px;
     margin-left: 0px;
   }
 }
+.dateSelectInput { width: 100px }
+.controls.dateSelectInputContainer{ margin-left: 100px }
 
-.adminCog-download-link{
-  color: black;
-  margin-right: 10px;
-}
-
-.dateSelectInput{
-  width: 100px;
-}
-
-.controls.dateSelectInputContainer{
-  margin-left: 100px;
-}
-.ef-search-container{
-  position: relative;
-  height: 30px;
-  width: 240px;
-  flex: 1 1 0;
-
-  .icon-search{
-    position: absolute;
-    left: 6px;
-    top: 7px;
-    color: #555555;
-    z-index: 1;
-  }
-
-  [type=search]{
-    position: absolute;
-    padding-left: 25px;
-    z-index: 0;
-    top: 0px;
-    right: 0px;
-    left: 0px;
-    bottom: 0px;
-    margin-bottom: 0px;
-  }
-}
 
 .ef-main-buttons{
-  display: flex;
-  justify-content: flex-end;
-  flex: 3 3 0;
-  position: relative;
   .ui-buttonset, .ui-button {
     display: inline-block;
   }
 }
-.ef-selected-items-actions {
-  position: absolute;
-  left: 8px;
-}
-
-.ef-admin-cog{
-  margin-left: 10px;
-}
 
 .ef-header{
-  height: 75px;
-  padding-left: 20px;
-  padding-right: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.ef-breadcrumbs{
-  padding-left: 20px;
-  border-top: 1px solid $border;
-  border-bottom: 1px solid $border;
-  height: 40px;
-  display: flex;
-  align-items: center;
-
-  a {
-    background-color: transparent;
-    background-image: url("/images/breadcrumb-chevron.png");
-    background-repeat: no-repeat;
-    background-position: 0 50%;
-    line-height: 29px;
-    padding-left: 12px;
-    margin-left: 8px;
-
-    &:first-of-type {
-      background: none;
-      padding-left: 0;
-      margin-left: 0;
-    }
-    &.active:link, &.active:visited{
-      color: #999da5;
-    }
+  padding: $base-content-padding $base-content-padding 8px;
+  border-bottom: 1px solid $base-border-color;
+  > * {
+    display: block;
+    margin-bottom: 0
   }
-
+  input[type='search'] {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+  }
 }
 
 .ef-main{
-  min-height: 500px;
+  min-height: 300px;
   display: flex;
 
   .ef-folder-content{
-    border-right: 1px solid #f2f2f2;
+    border-right: 1px solid $base-border-color;
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
     padding: 0px;
 
-    [role=tree]{
-      position: relative;
-      margin: 10px;
+    .folderTree {
+      margin: 10px
     }
-
-    i {
-      color: black;
-    }
-
 
     [aria-selected=true] > .ef-folder-header{
       background-color: #f2f2f2;
@@ -145,6 +77,7 @@ $border: #e5e4e4;
     .ef-folder-list{
       flex: 10 10 0;
       font-size: 12px;
+      overflow: auto;
     }
 
     .ef-folder-totals{
@@ -154,7 +87,7 @@ $border: #e5e4e4;
       flex: 1 1 0;
       height: 30px;
       font-size: 16px;
-      border-top: 1px solid $border;
+      border-top: 1px solid $base-border-color;
       padding-left: 20px;
     }
   }
@@ -169,35 +102,35 @@ $border: #e5e4e4;
 .ef-directory-header{
   display: flex;
   padding: 5px;
-  border-bottom: 1px solid #f2f2f2;
-
-  a{
-    color: black;
-  }
+  border-bottom: 1px solid $base-border-color;
 }
 
+.ef-plain-link, .ef-plain-link:hover { color: $base-font-color-dark; }
 
 
 .ef-item-row{
   display: flex;
   padding: 5px;
   user-select: none; /* so that we can shift-click to select */
+  margin-bottom: 1px;
+  border-radius: 3px;
+  line-height: $ef-thumbnail-size;
 
-  &.ef-item-selected{
-    background-color: #d9edf9;
-  }
+  // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
+  &:hover            { background-color: $base-list-item-background--hover }
+  &.ef-item-selected { background-color: $base-list-item-background--selected }
 
-  .al-trigger {
-    opacity: 0
-  }
-  &:hover .al-trigger,
-  .al-trigger.ui-state-active {
-    opacity: 1
-  }
+  .al-trigger { opacity: 0 }
+  &:hover .al-trigger, .al-trigger.ui-state-active { opacity: 1 }
 
-
-  &:hover{
-    background-color: #d9edf9;
+  .btn-link { border-width: 0 }
+}
+.ef-big-icon {
+  width: $ef-thumbnail-size !important;
+  color: $base-font-color-dark;
+  &:before {
+    font-size: $ef-thumbnail-size - 16px !important;
+    left: 7px;
   }
 }
 
@@ -227,54 +160,139 @@ $border: #e5e4e4;
 
 .ef-links-col{
   display: flex;
-  width: 85px;
+  width: 63px;
 }
-
-.ef-hover-options{
-  .al-trigger{
-    color: black;
-  }
-  margin-left: 14px;
-}
-
 
 
 .ef-thumbnail {
-  width: 45px;
+  width: $ef-thumbnail-size;
+  height: $ef-thumbnail-size;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
 }
 
 .ef-edit-name-form {
   position: relative;
+  margin-bottom: 0;
 }
 .ef-edit-name-cancel {
   position: absolute;
   top: 0;
   right: 0;
 }
+
+.ef-footer {
+  border-top: 1px solid $base-border-color;
+  padding: 0 $base-content-padding;
+  line-height: 33px;
+  .progress-bar__bar-container {
+    width: auto;
+  }
+  .ef-quota-usage {
+    min-width: 330px;
+  }
+}
+
+
 .file-rename-form__form-label {
   float: left;
   margin-top: 5px;
   padding-right: 5px;
 }
-.upload-progress-view__bar-container {
-  height: 3px;
-  margin-bottom: 12px;
-  background: $canvas-neutral;
-  width: 100%;
+.upload-progress-view {
+  padding-top: 25px;
+  clear: both;
 }
 .upload-progress-view__label {
   margin-left: 5px;
   margin-top: 5px;
+  width: 49%;
   color: ensure-contrast(#000, $canvas-secondary);
   font-size: 0.95em;
+  float: left;
 }
-.upload-progress-view__indeterminate{
-  margin-left: 6px;
-  margin-bottom: 2px;
+.progress-bar__bar-container {
+  height: 9px;
+  width: 49%;
+  margin-bottom: 12px;
+  border: solid $canvas-primary 1px;
+  border-radius: 20px;
+  float: right;
+  margin-top: 10px;
+
+  &.almost-done {
+    border: solid $canvas-success 1px;
+  }
 }
-.upload-progress-view__bar {
+.progress-bar__bar {
   position: relative;
   background: $canvas-primary;
   border: none;
-  height: 3px;
+  height: 9px;
+  border-radius: 20px;
+
+  &.almost-done {
+    background: $canvas-success;
+  }
 }
+.current_uploads {
+  border-radius: 10px;
+  border: dashed $canvas-neutral 2px;
+  padding: 10px 10px 40px 10px;
+}
+.current_uploads__uploaders {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.current_uploads__instructions {
+  text-align: center;
+}
+.current_uploads__instructions__close {
+  float: right;
+  color: $canvas-neutral;
+  font-size: -1.8em;
+  pointer: cursor;
+}
+i[class*=current_uploads__instructions__icon-upload]:before {
+  font-size: 100px;
+}
+i[class*=current_uploads__instructions__icon-upload] {
+  color: $canvas-primary;
+  width: 100px;
+  height: 100px;
+}
+.current_uploads__instructions__drag {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.ef-breadcrumb-popover {
+  display: block;
+  left: -9999px;
+  top: 15px;
+  opacity: 0;
+  transition: opacity .2s;
+  width: auto;
+  &.open {
+    left: -23px;
+    opacity: 1;
+  }
+  &.popover > .arrow {
+    left: 53px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+}
+
+
+
+
+
+// Hack, Hack, Hack!
+// to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
+#footer { min-height: 80px }

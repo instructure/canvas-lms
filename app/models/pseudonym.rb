@@ -129,9 +129,8 @@ class Pseudonym < ActiveRecord::Base
     end
   end
 
-  def self.custom_find_by_unique_id(unique_id, which = :first)
-    return nil unless unique_id
-    self.active.by_unique_id(unique_id).find(which)
+  def self.custom_find_by_unique_id(unique_id)
+    self.active.by_unique_id(unique_id).first if unique_id
   end
   
   def set_password_changed
@@ -219,7 +218,7 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless self.sis_user_id
-    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id.to_s)
+    existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
     return true if !existing_pseudo || existing_pseudo.id == self.id
     self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
     false
@@ -445,7 +444,7 @@ class Pseudonym < ActiveRecord::Base
     return unless Canvas.redis_enabled?
     redis_key = "cas_session:#{ticket}"
     if id = Canvas.redis.get(redis_key)
-      pseudonym = Pseudonym.find_by_id(id)
+      pseudonym = Pseudonym.where(id: id).first
       Canvas.redis.del(redis_key)
     end
     pseudonym.try(:reset_persistence_token!)

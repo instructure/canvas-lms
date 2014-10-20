@@ -59,7 +59,7 @@ define(function(require) {
     //>>excludeEnd("production");
 
     render: function() {
-      return <div dangerouslySetInnerHTML={{__html: this.state.markup }} />;
+      return <div aria-role="article" dangerouslySetInnerHTML={{__html: this.state.markup }} />;
     }
   });
 

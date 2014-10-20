@@ -19,7 +19,7 @@
         If no discovery url is configured, the first SAML configuration will be used to attempt to authenticate the user.
         TEXT
         %></p>
-        <div class="admin-links" role="application">
+        <div class="admin-links">
           <button class="al-trigger btn btn-mini">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             <span class="screenreader-only">Manage</span>
@@ -59,7 +59,7 @@
              aria-controls="<%= form_id %>"
              data-hide-while-target-shown=true
              <%= hidden(true) if config.new_record? %>>
-          <div class="admin-links" role="application">
+          <div class="admin-links">
             <button class="al-trigger btn btn-mini">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <span class="screenreader-only">Manage</span>
@@ -242,7 +242,7 @@
 
 
   <div class="debugging">
-      <h3 style="margin-top: 10px"><%= t(:saml_debugging, "Debugging") %></h3>
+      <h2 style="margin-top: 10px"><%= t(:saml_debugging, "Debugging") %></h2>
 
       <div id="saml_debug_console">
         <p>

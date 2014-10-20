@@ -25,15 +25,18 @@ module Importers
       hash = hash.with_indifferent_access
       outcome = nil
       if !item && hash[:external_identifier]
-        if hash[:is_global_outcome]
-          outcome = LearningOutcome.active.find_by_id_and_context_id(hash[:external_identifier], nil)
-        else
-          outcome = context.available_outcome(hash[:external_identifier])
-        end
+        unless migration.cross_institution?
+          if hash[:is_global_outcome]
+            outcome = LearningOutcome.active.where(id: hash[:external_identifier], context_id: nil).first
+          else
+            outcome = context.available_outcome(hash[:external_identifier])
+          end
 
-        if outcome
-          # Help prevent linking to the wrong outcome if copying into a different install of canvas
-          outcome = nil if outcome.short_description != hash[:title]
+          if outcome
+            # Help prevent linking to the wrong outcome if copying into a different install of canvas
+            # (using older migration packages that lack the root account uuid)
+            outcome = nil if outcome.short_description != hash[:title]
+          end
         end
 
         if !outcome
@@ -47,15 +50,15 @@ module Importers
             # import from vendor with global outcomes
             context = nil
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-            item ||= LearningOutcome.global.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
-            item ||= LearningOutcome.global.find_by_vendor_guid(hash[:vendor_guid]) if hash[:vendor_guid]
+            item ||= LearningOutcome.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id] && !migration.cross_institution?
+            item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
             migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
             return
           end
         else
-          item ||= LearningOutcome.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.new
           item.context = context
         end
@@ -90,9 +93,9 @@ module Importers
 
           case alignment[:content_type]
           when 'Assignment'
-            asset = Assignment.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, alignment[:content_id])
+            asset = Assignment.where(context_id: context, context_type: context.class.to_s, migration_id: alignment[:content_id]).first
           when 'AssessmentQuestionBank'
-            asset = AssessmentQuestionBank.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, alignment[:content_id])
+            asset = AssessmentQuestionBank.where(context_id: context, context_type: context.class.to_s, migration_id: alignment[:content_id]).first
           end
 
           if asset

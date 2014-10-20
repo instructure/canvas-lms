@@ -55,7 +55,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def self.unfiled_for_context(context)
-    context.assessment_question_banks.find_by_title_and_workflow_state(default_unfiled_title, 'active') || context.assessment_question_banks.create(:title => default_unfiled_title) rescue nil
+    context.assessment_question_banks.where(title: default_unfiled_title, workflow_state: 'active').first_or_create rescue nil
   end
 
   def cached_context_short_name
@@ -81,7 +81,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     if alignments.empty?
       outcomes = []
     else
-      outcomes = context.linked_learning_outcomes.find_all_by_id(alignments.keys.map(&:to_i))
+      outcomes = context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
     end
 
     # delete alignments that aren't in the list anymore
@@ -110,7 +110,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def bookmark_for(user, do_bookmark=true)
     if do_bookmark
-      question_bank_user = self.assessment_question_bank_users.find_by_user_id(user.id)
+      question_bank_user = self.assessment_question_bank_users.where(user_id: user).first
       question_bank_user ||= self.assessment_question_bank_users.create(:user => user)
     else
       AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
@@ -118,13 +118,13 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def bookmarked_for?(user)
-    user && self.assessment_question_bank_users.map(&:user_id).include?(user.id)
+    user && self.assessment_question_bank_users.where(user_id: user).exists?
   end
 
   def select_for_submission(count, exclude_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).shuffle[0...count]
-    ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids).shuffle
+    ids.empty? ? [] : AssessmentQuestion.where(id: ids).shuffle
   end
 
   alias_method :destroy!, :destroy

@@ -98,15 +98,22 @@ describe Announcement do
 
       notification_name = "New Announcement"
       n = Notification.create(:name => notification_name, :category => "TestImmediately")
+      n2 = Notification.create(:name => "Announcement Created By You", :category => "TestImmediately")
+
+      channel = @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email")
+      channel.confirm
+
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")
+      NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
 
       @context = @course
-      announcement_model
+      announcement_model(:user => @teacher)
 
       to_users = @a.messages_sent[notification_name].map(&:user)
       to_users.should include(@student)
       to_users.should include(@observer)
+      @a.messages_sent["Announcement Created By You"].map(&:user).should include(@teacher)
     end
   end
 end

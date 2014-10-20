@@ -2,4 +2,5 @@
   content_for :page_title, join_title(@page.title.to_s, @context.name)
   js_bundle :wiki_page_show
 %>
+<h1 class="screenreader-only"><%= @page.title %></h1>
 <div id="wiki_page_show"></div>

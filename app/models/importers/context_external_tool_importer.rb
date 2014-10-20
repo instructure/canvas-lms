@@ -27,7 +27,7 @@ module Importers
         return item
       end
 
-      item ||= ContextExternalTool.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+      item ||= ContextExternalTool.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.context_external_tools.new
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]

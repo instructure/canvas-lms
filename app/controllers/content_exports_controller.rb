@@ -36,7 +36,7 @@ class ContentExportsController < ApplicationController
   end
 
   def show
-    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first
       render_export(export)
     else
       render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
@@ -76,7 +76,7 @@ class ContentExportsController < ApplicationController
   end
 
   def destroy
-    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first
       export.destroy
       render :json => {:success=>'true'}
     else

@@ -1,6 +1,12 @@
-<h1 class="screenreader-only">
-  {{#t "assignments"}}Assignments{{/t}}
-</h1>
+{{#if course_home}}
+  <h2 class="screenreader-only">
+    {{#t "assignments"}}Assignments{{/t}}
+  </h2>
+{{else}}
+  <h1 class="screenreader-only">
+    {{#t "assignments"}}Assignments{{/t}}
+  </h1>
+{{/if}}
 
 <div class="header-bar">
   <div class="header-bar-left form-inline">

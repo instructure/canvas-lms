@@ -88,56 +88,52 @@ describe "LTI integration tests" do
     adapter.prepare_tool_launch(return_url, custom_substitutions: {'$Canvas.api.domain' => root_account.domain})
     post_payload = adapter.generate_post_payload
 
-    expected_tool_settings = {
-        'oauth_consumer_key' => canvas_tool.consumer_key,
-        'oauth_version' => '1.0',
-        'context_id' => canvas_tool.opaque_identifier_for(canvas_course),
-        'context_label' => canvas_course.course_code,
-        'context_title' => canvas_course.name,
-        'custom_canvas_enrollment_state' => 'active',
-        'custom_canvas_api_domain' => root_account.domain,
-        'custom_canvas_course_id' => canvas_course.id.to_s,
-        'custom_canvas_user_id' => canvas_user.id.to_s,
-        'custom_canvas_user_login_id' => pseudonym.unique_id,
-        'custom_variable_canvas_api_domain' => root_account.domain,
-        'custom_variable_canvas_assignment_id' => '$Canvas.assignment.id',
-        'custom_variable_canvas_assignment_points_possible' => '$Canvas.assignment.pointsPossible',
-        'custom_variable_canvas_assignment_title' => '$Canvas.assignment.title',
-        'custom_variable_canvas_course_id' => canvas_course.id.to_s,
-        'custom_variable_canvas_enrollment_enrollment_state' => 'active',
-        'custom_variable_canvas_membership_concluded_roles' => 'Learner',
-        'custom_variable_canvas_user_id' => canvas_user.id.to_s,
-        'custom_variable_canvas_user_login_id' => pseudonym.unique_id,
-        'custom_variable_person_address_timezone' => 'my/zone',
-        'custom_variable_person_name_family' => canvas_user.last_name,
-        'custom_variable_person_name_full' => canvas_user.name,
-        'custom_variable_person_name_given' => canvas_user.first_name,
-        'launch_presentation_document_target' => 'iframe',
-        'launch_presentation_locale' => 'en',
-        'launch_presentation_return_url' => '/return/url',
-        'lis_course_offering_sourcedid' => canvas_course.sis_source_id,
-        'lis_person_contact_email_primary' => canvas_user.email,
-        'lis_person_name_family' => canvas_user.last_name,
-        'lis_person_name_full' => canvas_user.name,
-        'lis_person_name_given' => canvas_user.first_name,
-        'lis_person_sourcedid' => pseudonym.sis_user_id,
-        'lti_message_type' => 'basic-lti-launch-request',
-        'lti_version' => 'LTI-1p0',
-        'oauth_callback' => 'about:blank',
-        'resource_link_id' => canvas_tool.opaque_identifier_for(canvas_course),
-        'resource_link_title' => canvas_tool.name,
-        'roles' => 'Instructor,urn:lti:role:ims/lis/TeachingAssistant',
-        'ext_roles' => "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User",
-        'tool_consumer_info_product_family_code' => 'canvas',
-        'tool_consumer_info_version' => 'cloud',
-        'tool_consumer_instance_contact_email' => HostUrl.outgoing_email_address,
-        'tool_consumer_instance_guid' => root_account.lti_guid,
-        'tool_consumer_instance_name' => root_account.name,
-        'user_id' => canvas_tool.opaque_identifier_for(canvas_user),
-        'user_image' => canvas_user.avatar_url,
-    }
-
-    post_payload.should include(expected_tool_settings)
+    post_payload['oauth_consumer_key'].should == canvas_tool.consumer_key
+    post_payload['oauth_version'].should == '1.0'
+    post_payload['context_id'].should == canvas_tool.opaque_identifier_for(canvas_course)
+    post_payload['context_label'].should == canvas_course.course_code
+    post_payload['context_title'].should == canvas_course.name
+    post_payload['custom_canvas_enrollment_state'].should == '$Canvas.enrollment.enrollmentState'
+    post_payload['custom_canvas_api_domain'].should == root_account.domain
+    post_payload['custom_canvas_course_id'].should == canvas_course.id.to_s
+    post_payload['custom_canvas_user_id'].should == '$Canvas.user.id'
+    post_payload['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
+    post_payload['custom_variable_canvas_api_domain'].should == root_account.domain
+    post_payload['custom_variable_canvas_assignment_id'].should == '$Canvas.assignment.id'
+    post_payload['custom_variable_canvas_assignment_points_possible'].should == '$Canvas.assignment.pointsPossible'
+    post_payload['custom_variable_canvas_assignment_title'].should == '$Canvas.assignment.title'
+    post_payload['custom_variable_canvas_course_id'].should == canvas_course.id.to_s
+    post_payload['custom_variable_canvas_enrollment_enrollment_state'].should == '$Canvas.enrollment.enrollmentState'
+    post_payload['custom_variable_canvas_membership_concluded_roles'].should == '$Canvas.membership.concludedRoles'
+    post_payload['custom_variable_canvas_user_id'].should == '$Canvas.user.id'
+    post_payload['custom_variable_canvas_user_login_id'].should == '$Canvas.user.loginId'
+    post_payload['custom_variable_person_address_timezone'].should == 'my/zone'
+    post_payload['custom_variable_person_name_family'].should == canvas_user.last_name
+    post_payload['custom_variable_person_name_full'].should == canvas_user.name
+    post_payload['custom_variable_person_name_given'].should == canvas_user.first_name
+    post_payload['launch_presentation_document_target'].should == 'iframe'
+    post_payload['launch_presentation_locale'].should == 'en'
+    post_payload['launch_presentation_return_url'].should == '/return/url'
+    post_payload['lis_course_offering_sourcedid'].should == canvas_course.sis_source_id
+    post_payload['lis_person_contact_email_primary'].should == canvas_user.email
+    post_payload['lis_person_name_family'].should == canvas_user.last_name
+    post_payload['lis_person_name_full'].should == canvas_user.name
+    post_payload['lis_person_name_given'].should == canvas_user.first_name
+    post_payload['lis_person_sourcedid'].should == pseudonym.sis_user_id
+    post_payload['lti_message_type'].should == 'basic-lti-launch-request'
+    post_payload['lti_version'].should == 'LTI-1p0'
+    post_payload['oauth_callback'].should == 'about:blank'
+    post_payload['resource_link_id'].should == canvas_tool.opaque_identifier_for(canvas_course)
+    post_payload['resource_link_title'].should == canvas_tool.name
+    post_payload['roles'].should == 'urn:lti:role:ims/lis/TeachingAssistant,Instructor'
+    post_payload['ext_roles'].should == "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User"
+    post_payload['tool_consumer_info_product_family_code'].should == 'canvas'
+    post_payload['tool_consumer_info_version'].should == 'cloud'
+    post_payload['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
+    post_payload['tool_consumer_instance_guid'].should == root_account.lti_guid
+    post_payload['tool_consumer_instance_name'].should == root_account.name
+    post_payload['user_id'].should == canvas_tool.opaque_identifier_for(canvas_user)
+    post_payload['user_image'].should == canvas_user.avatar_url
   end
 
   describe "legacy integration tests" do
@@ -166,8 +162,8 @@ describe "LTI integration tests" do
       hash['context_id'].should == @tool.opaque_identifier_for(@course)
       hash['context_title'].should == @course.name
       hash['context_label'].should == @course.course_code
-      hash['custom_canvas_user_id'].should == @user.id.to_s
-      hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
+      hash['custom_canvas_user_id'].should == '$Canvas.user.id'
+      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
       hash['custom_canvas_course_id'].should == @course.id.to_s
       hash['custom_canvas_api_domain'].should == '$Canvas.api.domain'
       hash['lis_course_offering_sourcedid'].should == 'coursesis'
@@ -210,8 +206,8 @@ describe "LTI integration tests" do
 
       hash['custom_canvas_account_id'].should == sub_account.id.to_s
       hash['custom_canvas_account_sis_id'].should == 'accountsis'
-      hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
-      hash['custom_variable_canvas_membership_concluded_roles'].should == LtiOutbound::LTIRoles::System::NONE
+      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
+      hash['custom_variable_canvas_membership_concluded_roles'].should == "$Canvas.membership.concludedRoles"
     end
 
     it "should add account and user info in launch data for user profile launch" do
@@ -228,7 +224,7 @@ describe "LTI integration tests" do
       hash['custom_canvas_account_id'] = sub_account.id.to_s
       hash['custom_canvas_account_sis_id'] = 'accountsis'
       hash['lis_person_sourcedid'].should == 'testfun'
-      hash['custom_canvas_user_id'].should == @user.id.to_s
+      hash['custom_canvas_user_id'].should == '$Canvas.user.id'
       hash['tool_consumer_instance_guid'].should == sub_account.root_account.lti_guid
     end
 
@@ -340,7 +336,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      hash['custom_canvas_user_login_id'].should == user.pseudonyms.first.unique_id
+      hash['custom_canvas_user_login_id'].should == '$Canvas.user.loginId'
     end
 
     it "should include text if set" do

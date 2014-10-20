@@ -37,7 +37,11 @@ define(function(require) {
       }
 
       return(
-        <button title={label} onClick={this.props.onClick} className="btn">
+        <button
+          title={label}
+          onClick={this.props.onClick}
+          className="btn"
+          aria-live="polite">
           <ScreenReaderContent children={label} />
 
           {isExpanded ?

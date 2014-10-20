@@ -15,6 +15,7 @@
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
+<h1 class="screenreader-only"><%= t(:page_title_header, "Calendar") %></h1>
 
 <% content_for :auto_discovery do %>
   <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>

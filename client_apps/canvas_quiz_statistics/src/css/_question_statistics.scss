@@ -35,7 +35,7 @@
   }
 
   aside {
-    button {
+    button, a {
       opacity: 0;
     }
 
@@ -52,8 +52,10 @@
 
   // Make sure the control buttons are visible when we hover over the question
   // box or we reach them by keyboard.
-  aside button:focus,
+  aside :focus,
+  &:hover aside a,
   &:hover aside button,
+  &.with-details aside a,
   &.with-details aside button {
     opacity: 1
   }
