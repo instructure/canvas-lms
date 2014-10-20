@@ -2238,6 +2238,10 @@ tr:
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 .zip dışarı aktarma dosyası"
   bb_name: "Blackboard Dönüştürücü"
+  better_file_browsing_description: |-
+      Yeni, daha basit ve kullanımı kolay dosya arama arayüzü. Bu özelliği ders düzeyinde etkinleştirirseniz,
+      dersteki tüm kullanıcılar yeni arayüzü görebilirler. Kullanıcılar kişisel dosya sayfasına ('/files') gittiklerinde
+      bunun görünmesini istiyorsanız, kullanıcıların üyesi oldukları hesap türünde etkinleştirmelisiniz.
   big_blue_button_conference: 
     conference_is_recorded: "Bu konferans kaydedilmektedir."
     recording_setting: Kaydediliyor
@@ -3122,6 +3126,7 @@ tr:
         download_user_export: "%{date} tarihinden Dışarı Kullanıcı Verisi Aktarımı: *İndirmek için buraya tıklayın*"
       message: 
         export_started: "Aktarma işlemi başladı. Büyük dersler için bu biraz zaman alabilir. *Sayfayı terkedebilirsiniz* aktarım tamamlandığında bilgilendirme epostası alacaksınız."
+      no_submissions: "Şu anda dışarı aktaracak gönderiniz bulunmamakta."
       user_data_exports: "Kullanıcı Verisi Aktarımları"
     labels: 
       new_export: "Yeni Dışa Aktarım:"
@@ -3185,6 +3190,7 @@ tr:
   content_migration: 
     bad_attachment: "Dosya yükleme işlemi başarısız."
     errors: 
+      cannot_shift_and_remove: "Aynı anda shift_dates ve remove_dates belirlenemez"
       import_error: "İçeri Aktarma Hatası:"
     missing_content_links_message: "Şu referanslar çözülemedi:"
     missing_content_links_title: "Alınan içerikte eksik bağlantılar bulundu"
@@ -3599,6 +3605,7 @@ tr:
           before_students_view: "Öğrenciler bu modülü görmeden önce"
         new_tab: "Yeni sekmede yükle"
         publish_final_grade: "modül tamamlandığında öğrenci final notlarını yayınla"
+        require_sequential_progress: "öğrenciler bu modülde gerekli öğeleri sıra ile takip etmeli "
         sort_by: Sırala
         title: Başlık
         unlock_at: "Kilidi Kaldır"
@@ -3712,6 +3719,7 @@ tr:
           before_students_view: "Öğrenciler bu modülü görmeden önce"
         new_tab: "Yeni sekmede yükle"
         publish_final_grade: "Modül tamamlandığında öğrenci final notlarını yayınla"
+        require_sequential_progress: "öğrenciler bu modülde gerekli öğeleri sıra ile takip etmeli "
         sort_by: Sırala
         title: Başlık
         unlock_at: "Kilidi Kaldır"
@@ -3728,6 +3736,7 @@ tr:
       module: modül
       module_details: "Modüller sıralı bir şekilde gösterilmektedir bu yüzden yalnızca aşağıdaki %{name} modüller ön koşul olarak belirlenebilir."
       module_name: "Modül Adı"
+      modules_keyboard_hint_updated: "Uyarı: Modülleri (veya Modül öğelerini) yeniden sıralamada daha gelişmiş bir erişim için lütfen menüdeki Diyaloğa Taşı seçeneğini kullanın. "
       move_module: 
         after: Sonra
         before: Önce
@@ -3818,6 +3827,7 @@ tr:
           student_progress: "Bu Modüldeki Öğrenci Durumunu Gör"
       manager_module: "Modülü Yönet"
       module_will_unlock_at: "*%{unlock_date}* tarihine kadar kilitlidir"
+      modules_keyboard_drag_and_drop: "Uyarı: Modülleri (veya Modül öğelerini) yeniden sıralamada daha gelişmiş bir erişim için lütfen menüdeki Diyaloğa Taşı seçeneğini kullanın. "
       progression_complete_count: "*%{count}* Tamam"
       progression_started_count: "*%{count}* Devam ediyor"
       reorder_modules: "Modülleri yeniden sıralamak için sürükleyin"
@@ -3953,6 +3963,7 @@ tr:
     url_show: 
       new_tab: "Bu sitenin yeni tarayıcı penceresinde açılması gerekiyor."
       open_url_button: "%{title} 'ı yeni pencerede aç"
+      tool_insecure_warning: "Güvenli bir site (canvas) içinden güvensiz bir içeriğe erişmeye çalışıyorsunuz. Bazı internet tarayıcıları bu içeriğin yüklenmesine izin vermeyebilir."
   context_modules_api: 
     invalid_position: "Geçersiz konum"
   conversation_dialog: 
@@ -4105,6 +4116,7 @@ tr:
         add_to_faculty_journal: "Öğretim Üyesi Kayıt girişi olarak ekle"
         attachments: "Dosya Ekleri"
         course: Ders
+        course_required: "Alıcıları girmeden önce bir ders seçmelisiniz."
         select_course: "Ders seçiniz"
         subject: Konu
         to: Kime
@@ -4471,6 +4483,7 @@ tr:
               
               Bu dersi sahiplenmek için lütfen **oturum açın** ya da ***kayıt olun***.
         files: "Dosyalar sekmesi, ders slaytları, örnek belgeleri ve yardımcı materyaller gibi öğrencilerinizin indirmek isteyeceği herşeyin paylaşıldığı yer. Canvas ile dosyalarınızı yüklemek ve düzenlemek kolay. Nasıl yapılacağını göstereceğiz."
+        home2: "İnsanlar bu dersi ziyaret ettiklerinde bu sayfayı görecekler. Bu sayfayı bir etkinlik akışını, ders modüllerinin listesini, bir ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde yapılandırabilirsiniz. Varsayılan olarak ders etkinlik akışı gösterilmektedir. Değiştirmek için tıklayın %{choose_home_page}."
         import: "Başka bir öğrenme yönetim sistemi kullanıyorsanız buradaki malzemelerinizi Canvas'a taşımak isteyebilirsiniz. İçeriğinizi Canvas'a kolayca aktarma sürecini birlikte yapalım."
         navigation: "Varsayılan olarak bir dersteki tüm bağlantılar etkindir. Öğrenciler içeriği olmayan bölümlere olan bağlatıları göremezler. Örneğin, herhangi bir kısa sınav oluşturmamışsanız, kısa sınav bağlantısını göremezler. Öğrencilerinizin erişmesini istemediğiniz ders bölümlerindeki bu bağlantıları etkisiz kılabilir veya sıralayabilirsiniz."
         publish: 
@@ -7749,6 +7762,7 @@ tr:
       new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
       new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
       new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
+      tool_insecure_warning: "Güvenli bir site (canvas) içinden güvensiz bir içeriğe erişmeye çalışıyorsunuz. Bazı internet tarayıcıları bu içeriğin yüklenmesine izin vermeyebilir."
   lti2: 
     register_tool: "Kayıt Aracı"
   m2c_file_description: "Moodle 1.9/2.x"
