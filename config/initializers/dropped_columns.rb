@@ -33,7 +33,7 @@ class ActiveRecord::Base
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at section_organization_name long_section_code account_id section_code),
     'courses' => %w(section hidden_tabs sis_name sis_course_code hashtag allow_student_assignment_edits publish_grades_immediately),
     'discussion_topics' => %w(authorization_list_id),
-    'enrollment_terms' => %w(sis_data sis_name),
+    'enrollment_terms' => %w(sis_data sis_name ignore_term_date_restrictions),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections),
     'failed_jobs' => %w(original_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
