@@ -80,7 +80,35 @@ var toolPath = $toolForm.data('tool-path');
 var messageType = $toolForm.data('message-type') || 'tool_launch';
 $.trackEvent(messageType, toolName, toolPath);
 
-// iframe sizing
+//Iframe resize handler
+var min_tool_height;
+var $tool_content_wrapper;
+
+function tool_content_wrapper() {
+  return $tool_content_wrapper || $('.tool_content_wrapper');
+}
+
+var resize_tool_content_wrapper = function(height) {
+  var tool_height = min_tool_height || 450;
+  tool_content_wrapper().height(tool_height > height ? tool_height : height);
+}
+
+$(function() {
+  var $window = $(window);
+  min_tool_height = $('#main').height();
+  $tool_content_wrapper = $('.tool_content_wrapper');
+
+  if ($tool_content_wrapper.length) {
+    $window.resize(function () {
+      if (!$tool_content_wrapper.data('height_overridden')) {
+        var top = $tool_content_wrapper.offset().top;
+        var height = $window.height();
+        resize_tool_content_wrapper(height - top);
+      }
+    }).triggerHandler('resize');
+  }
+});
+
 window.addEventListener('message', function(e) {
   try {
     var message = JSON.parse(e.data);
@@ -89,17 +117,11 @@ window.addEventListener('message', function(e) {
       if (height >= 5000) height = 5000;
       if (height <= 0) height = 1;
 
-      $('.tool_content_wrapper').height(height).data('height_overridden', true);
+      tool_content_wrapper().data('height_overridden', true);
+      resize_tool_content_wrapper(height);
     }
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
-  }
-});
-
-$(function() {
-  var $tool_content_wrapper = $('.tool_content_wrapper');
-  if (!$tool_content_wrapper.data('height_overridden')) {
-    $tool_content_wrapper.height($('#main').height());
   }
 });
 
