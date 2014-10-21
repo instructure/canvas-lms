@@ -775,7 +775,7 @@ describe "external tools" do
       in_frame('tool_content') do
         frameResize(372)
       end
-      expect(f('#tool_content').size.height).to eq(372)
+      expect(f('#tool_content').size.height).to eq(450)
 
       in_frame('tool_content') do
         frameResize(851)
