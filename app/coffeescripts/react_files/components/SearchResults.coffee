@@ -58,6 +58,7 @@ define [
         ColumnHeaders {
           to: 'search'
           query: @props.query
+          params: @props.params
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
         }

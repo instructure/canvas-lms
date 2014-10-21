@@ -91,6 +91,7 @@ define [
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')
           query: @props.query
+          params: @props.params
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
           splat: @props.params.splat

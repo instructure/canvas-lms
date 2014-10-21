@@ -114,7 +114,7 @@ define [
           Router.Link  {
               to: @getPreviewRoute()
               query: @getPreviewQuery()
-              splat: @props.currentFolder?.urlPath()
+              params: {splat: @props.currentFolder?.urlPath()}
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
               'data-tooltip': ''

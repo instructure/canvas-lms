@@ -21,7 +21,7 @@ define [
       @props.otherItems.map (file) =>
         li {className: 'ef-file-preview-footer-list-item', key: file.id},
           figure {className: 'ef-file-preview-footer-item'},
-            ReactRouter.Link {to: @props.to, splat: @props.splat, query: @props.query(file.id)},
+            ReactRouter.Link {to: @props.to, params: {splat: @props.splat}, query: @props.query(file.id)},
             div {
               className: if file.displayName() is @props.displayedItem?.displayName() then 'ef-file-preview-footer-image ef-file-preview-footer-active' else 'ef-file-preview-footer-image'
               style: {'background-image': 'url(' + file.get('thumbnail_url') + ')'}
