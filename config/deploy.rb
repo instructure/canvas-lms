@@ -10,7 +10,7 @@ set :branch, 'bz-master'
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
 # Default deploy_to directory is /var/www/my_app
-# set :deploy_to, '/var/www/my_app'
+set :deploy_to, '/var/www/canvas'
 
 # Default value for :scm is :git
 # set :scm, :git
@@ -41,7 +41,7 @@ namespace :deploy do
   desc 'Update application code'
   task :update do
     on roles(:app) do |host|
-      within "/var/www/canvas" do
+      within fetch(:deploy_to) do
         execute :git, 'pull', 'origin', fetch(:branch)
         execute :sudo, 'apachectl', 'graceful'
       end

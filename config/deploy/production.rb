@@ -8,6 +8,7 @@ role :app, %w{deploy@portal.beyondz.org}
 role :web, %w{deploy@portal.beyondz.org}
 role :db,  %w{deploy@portal.beyondz.org}
 
+set :deploy_to, '/var/canvas'
 
 # Extended Server Syntax
 # ======================
