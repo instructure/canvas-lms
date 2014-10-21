@@ -1120,6 +1120,11 @@ zh_Hant:
         one: "%{file_size} *來自 %{count} 個檔案*"
         other: "%{file_size} *來自 %{count} 個檔案*"
       uploaded_file_storage_header: 已上傳的檔案儲存空間
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: 可能無法準確在本報告中反映帶有靜音式任務的課程。
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2577,6 +2582,7 @@ zh_Hant:
     messages_sent: 已傳送的訊息
     missing_due_date_dialog: 
       buttons: 
+        continue: 繼續
         goBack: 返回
         noDueDate: 無截止日期
       modal: 
@@ -4019,30 +4025,13 @@ zh_Hant:
       unstar_conversation: 刪除交談的星號
     message_deleted: 郵件已刪除！
     message_detail: 
+      delete: " "
+      forward: 轉寄
+      message_actions: 郵件操作
+      more_options: 更多選項
       no_subject: 無主旨
-    message_form: 
-      buttons: 
-        reply: 回覆
-        reply_all: 全部回覆
-        send_message: 傳送
-      headings: 
-        new_message: 新郵件
-      inbox_actions: 
-        add_people: 新增人員
-      labels: 
-        add_to_faculty_journal: 作為教職員日誌條目新增
-        group_conversation: 這是一個群組交談。參與者將會看到所有人的回覆
-        message: 郵件：
-        to: 至：
-      links: 
-        add_attachment: 附加
-        media_comment: 記錄
-      media_comment: 媒體註解
-      titles: 
-        add_attachment: 新增附件
-        media_comment: 已記錄的媒體註解
-        record_media_comment: 錄製音訊或視頻註解
-        remove_media_comment: 移除媒體註解
+      reply: 回覆
+      reply_all: 全部回覆
     message_form_dialog: 
       body: 本文
       headings: 
@@ -4093,7 +4082,6 @@ zh_Hant:
     other_recipients: 
       one: "以及 %{count} 個其他"
       other: "以及 %{count} 個其他"
-    search_category: "搜尋 %{category}"
     star: 加星號
     star_conversation: 為交談加星號
     titles: 
@@ -4108,6 +4096,9 @@ zh_Hant:
     batch_update_message: 
       one: "%{count} 門課程已處理"
       other: "%{count} 門課程已處理"
+    course_format: 
+      not_set: 未設定
+      online: 線上
     course_not_found: 找不到該課程
     csv: 
       comments: 註解
@@ -4688,6 +4679,7 @@ zh_Hant:
         allow_student_organized_groups: 讓學生組織自己的群組
         conclude_at: 結束
         course_code: 課程代碼
+        course_format: 格式
         course_lock_all_announcements: 停用關於宣告的註解
         course_name: 名稱
         course_section_name: 新增新章節
@@ -5003,8 +4995,6 @@ zh_Hant:
       student: 
         count: 錯誤的學生數
         ratio: 錯誤的學生比例
-  current_uploads: 
-    close: 關閉
   curve_grades_dialog: 
     average_score: 平均分數
     buttons: 
@@ -6190,6 +6180,11 @@ zh_Hant:
     post_grades: "公佈成績至 SIS"
     student_groups: 新學生群組頁面
     student_outcome_gradebook: 學生學習精通成績冊
+  file_preview: 
+    file_preview_headerbutton_close: 關閉
+    file_preview_hide: 隱藏
+    file_preview_infotable_name: 名稱
+    file_preview_show: 顯示
   file_rename_form: 
     back: 返回
     change: 更改
@@ -6232,6 +6227,7 @@ zh_Hant:
       uploading_zip: "上傳 zip 檔案時發生錯誤。"
     fields: 
       file: 檔案
+    files_page_title: 檔案
     full_index: 
       alts: 
         file_locked: 已鎖定
@@ -6411,6 +6407,7 @@ zh_Hant:
       no_students_in_groups_close: "抱歉，此任務的提交件不能在 Speedgrader 中評分，因為沒有指定的使用者。請指定使用者到該群組，然後再試一次。按一下『確定』以關閉此視窗。"
       no_students_in_section: 找不到該章節的任何學生，切換回去以顯示所有章節。
     buttons: 
+      dialog_buttons: 取消
       saving_settings: 正在儲存設定...
       submit_comment: 提交註解
       submitting: 正在提交...
@@ -6442,7 +6439,6 @@ zh_Hant:
     student: 學生
     student_mute_notification: 導師正在進行評分
     titles: 
-      click_to_record: 按一下麥克風以記錄您的註解
       dropped_assignment_no_total: 在總的計算中不會考慮此任務
       hypothetical_score: 这是「假設分析」分数
     turnitin: 
@@ -6686,7 +6682,6 @@ zh_Hant:
         out_of: 超出
         score: 分數
       icons: 
-        rubric_results: 查看題目結果
         turnitin_results: "查看 Turnitin 結果"
       labels: 
         final_grade_hidden: 總分計算已被停用
@@ -7138,6 +7133,11 @@ zh_Hant:
         assign_user_to_group: 指派使用者至此群組
         assign_user_to_group_name: "指派使用者至群組 %{name}"
         no_groups_created: 需要在可以新增使用者之前建立群組。
+      auto_leadership_controls: 
+        auto_first_group_leader: 設定第一個加入的學生為群組領導者
+        auto_group_leader: 自动指派学生群組領導者
+        auto_random_group_leader: 設定一個隨機学生為群組領導者
+        leadership: 領導
       edit_group_assignment: 
         all_available_groups_full: 所有可用群組都滿了。
         all_groups_full_suggestion: 要麼更改群組限值，要麼新增更多的群組。
@@ -7162,15 +7162,11 @@ zh_Hant:
         search_users: 搜尋使用者
       group_category_create: 
         allow_self_signup: 允許自行註冊
-        auto_first_group_leader: 設定第一個加入的學生為群組領導者
-        auto_group_leader: 自动指派学生群組領導者
-        auto_random_group_leader: 設定一個隨機学生為群組領導者
         cancel: 取消
         create_groups: "現在建立 %h{num_groups} 個群組"
         create_groups_manually: 我將手動建立群組
         group_set_name: 群組集合名稱
         group_structure: 群組結構
-        leadership: 領導
         leave_group_limit_blank: 為無限制留空
         limit_group_size: "限制群組為 %h{group_limit} 個成員"
         require_same_section: 要求群組成員必須在同一個章節
@@ -7741,7 +7737,6 @@ zh_Hant:
       media_contribution: 媒體貢獻
       play_comment: 播放媒體註解
       record_upload_media_comment: 記錄/上傳媒體註解
-    track_uploaded_successfully: 音軌已成功上傳，重新整理以查看。
     upload: 上傳
     uploading: 正在上傳...
   menu: 
@@ -9986,6 +9981,14 @@ zh_Hant:
     : 否
     ? "yes"
     : 是
+  orbis_report_header_assignment_id: "任務 ID"
+  orbis_report_header_assignment_title: 任務標題
+  orbis_report_header_canvas_course_id: "課程 ID"
+  orbis_report_header_course_name: 課程名稱
+  orbis_report_header_course_sis_id: "課程 SIS ID"
+  orbis_report_header_points_possible: 可能的點
+  orbis_report_header_student_name: 學生姓名
+  orbis_report_header_submission_score: 提交分數
   outcome_groups: 
     invalid_file: 無效的成果群組檔案
   outcome_groups_api: 
@@ -11796,14 +11799,11 @@ zh_Hant:
           save: 儲存
         end_quiz_reference_time_current_end: 當前結束時間
         end_quiz_reference_time_now: 現在
-        end_quiz_when: "自 %{reference_time} 結束測驗 %{n} 分鐘"
         extended_quiz_time_explanation: 可以就其當前的測驗嘗試給這個學生更多的時間。您想給他們多少時間？
         finished_in: "在 %{duration} 內完成"
-        global_extra_attempts: "每個人都已獲得 %{n}"
         headers: 
           attempt: 嘗試
           attempts_left: 剩餘嘗試次數
-          extended_quiz_time: 延長測驗時間
           score: 分數
           student: 學生
           student_extensions: 學生延期
@@ -11812,15 +11812,14 @@ zh_Hant:
         labels: 
           ending: 結束
           extra_attempts: 額外的嘗試
-          extra_time_per_attempt: 每次嘗試的額外時間
           manually_unlock: 手動解除鎖定測驗以進行下一次嘗試
           reset_has_seen_results: 讓學生再看一次結果
           started: 已開始
         minutes: 分鐘
         moderate_page_title: "%{title}：中等"
         page_title: 中等測驗
-        student_gets_extra_time: "*%{student_name}* **就每次嘗試獲得 %{extra_time} 的額外分鐘**"
         student_n: "學生 %{n}"
+        submitting: 正在提交...
         titles: 
           change_user_extensions: 更改使用者延期
           manually_unlocked: 手動解除鎖定
@@ -12335,8 +12334,6 @@ zh_Hant:
   react_files: 
     add_folder: 新增資料夾
     cancel: 取消
-    confirm_delete: "是否確定要刪除 %{name}？"
-    confirm_delete_selected: "是否確定要刪除這 %{count} 個項目？"
     count_items_selected: "%{count} 個項目已選定"
     created_at_short: 已建立
     delete: " "
@@ -12350,6 +12347,7 @@ zh_Hant:
         three_chars: "在搜尋方塊中至少輸入 3 個字母。"
         your_search: "您的搜尋『%{search_term}』沒有找到相符的檔案。"
     files: 檔案
+    files_heading: 檔案
     folder: 資料夾
     labels: 
       select: 選擇此項目
@@ -12437,8 +12435,7 @@ zh_Hant:
       cancel: 取消
       update: 更新
     label: 
-      availableFrom: 自
-      availableUntil: 直到
+      availableUntil: 鎖定，直至
     options: 
       publish: 
         description: 發佈
