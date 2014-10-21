@@ -204,4 +204,22 @@ describe "Feature.register" do
       expect(Feature.definitions['dev_feature']).to be_nil
     end
   end
+
+  let(:t_hidden_in_prod_feature_hash) do
+    t_feature_hash.merge(state: 'hidden_in_prod')
+  end
+
+  describe 'hidden_in_prod' do
+    it "should register as 'allowed' in a test environment" do
+      Feature.register({dev_feature: t_hidden_in_prod_feature_hash})
+      expect(Feature.definitions['dev_feature']).to be_allowed
+    end
+
+    it "should register as 'hidden' in production" do
+      Rails.env.stubs(:test?).returns(false)
+      Rails.env.stubs(:production?).returns(true)
+      Feature.register({dev_feature: t_hidden_in_prod_feature_hash})
+      expect(Feature.definitions['dev_feature']).to be_hidden
+    end
+  end
 end
