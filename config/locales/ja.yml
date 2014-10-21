@@ -1133,6 +1133,11 @@ ja:
         one: "%{file_size} *(%{count} 個のファイル)*"
         other: "%{file_size} *(%{count} 個のファイル)*"
       uploaded_file_storage_header: "アップロード先ファイル ストレージ"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: このレポートでは、課題がミュートになっているコースのスコアが正確に反映されていない可能性があります。
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2598,6 +2603,7 @@ ja:
     messages_sent: 送信済みメッセージ
     missing_due_date_dialog: 
       buttons: 
+        continue: 続行
         goBack: 戻る
         noDueDate: 期日なし
       modal: 
@@ -4063,30 +4069,13 @@ ja:
       unstar_conversation: 会話からスターを削除
     message_deleted: メッセージが削除されました!
     message_detail: 
+      delete: 削除
+      forward: 早送り
+      message_actions: "メッセージ アクション"
+      more_options: その他のオプション
       no_subject: 件名なし
-    message_form: 
-      buttons: 
-        reply: 返信
-        reply_all: すべてに返信
-        send_message: 送信
-      headings: 
-        new_message: 新しいメッセージ
-      inbox_actions: 
-        add_people: メンバーの追加
-      labels: 
-        add_to_faculty_journal: 講師日誌へのエントリとして追加
-        group_conversation: これはグループ会話です。参加者には全員の返信内容が表示されます
-        message: "メッセージ:"
-        to: "至:"
-      links: 
-        add_attachment: 添付
-        media_comment: 記録
-      media_comment: "メディア コメント"
-      titles: 
-        add_attachment: 添付ファイルの追加
-        media_comment: "記録されたメディア コメント"
-        record_media_comment: "オーディオまたはビデオ コメントを記録する"
-        remove_media_comment: "メディア コメントを削除する"
+      reply: 返信
+      reply_all: すべてに返信
     message_form_dialog: 
       body: 本文
       headings: 
@@ -4137,7 +4126,6 @@ ja:
     other_recipients: 
       one: "およびその他 %{count} 件"
       other: "およびその他 %{count} 件"
-    search_category: "%{category} の検索"
     star: スター
     star_conversation: 会話にスターを付ける
     titles: 
@@ -4152,6 +4140,9 @@ ja:
     batch_update_message: 
       one: "%{count} 個のコースが処理されました"
       other: "%{count} 個のコースが処理されました"
+    course_format: 
+      not_set: 設定されていません
+      online: オンライン
     course_not_found: コースが見つかりませんでした
     csv: 
       comments: コメント
@@ -4732,6 +4723,7 @@ ja:
         allow_student_organized_groups: 受講生が独自のグループを組織できるようにする
         conclude_at: 終了日時
         course_code: "コース コード"
+        course_format: 形式
         course_lock_all_announcements: アナウンスへのコメントを無効にする
         course_name: 名前
         course_section_name: 新しいセクションの追加
@@ -5049,8 +5041,6 @@ ja:
       student: 
         count: 不正解の受講生数
         ratio: 受講生の不正解率
-  current_uploads: 
-    close: 閉じる
   curve_grades_dialog: 
     average_score: 平均スコア
     buttons: 
@@ -6270,6 +6260,13 @@ ja:
     post_grades: "成績表を SIS に投稿"
     student_groups: "新しい受講生グループ ページ"
     student_outcome_gradebook: 受講生の学習達成度の成績表
+  file_preview: 
+    file_preview_headerbutton_close: 閉じる
+    file_preview_hide: 非表示
+    file_preview_infotable_datecreated: 作成日
+    file_preview_infotable_name: 名前
+    file_preview_infotable_status: 状況
+    file_preview_show: 表示
   file_rename_form: 
     back: 戻る
     change: 変更
@@ -6312,6 +6309,7 @@ ja:
       uploading_zip: "zip ファイルをアップロードする際にエラーが発生しました。"
     fields: 
       file: ファイル
+    files_page_title: ファイル
     full_index: 
       alts: 
         file_locked: ロックされています
@@ -6497,6 +6495,7 @@ ja:
       no_students_in_groups_close: "割り当てられているユーザがいないため、この課題の提出物は SpeedGrader で採点できません。このグループ セットにユーザを割り当ててから、もう一度試してください。[OK] をクリックしてこのウィンドウを閉じます。"
       no_students_in_section: そのセクションには受講生が見つかりませんでした。全セクション表示に戻ります。
     buttons: 
+      dialog_buttons: キャンセル
       saving_settings: 設定を変更しています...
       submit_comment: コメントの提出
       submitting: 提出しています...
@@ -6529,7 +6528,6 @@ ja:
     student: 受講生
     student_mute_notification: インストラクタが採点中です
     titles: 
-      click_to_record: マイクをクリックしてコメントを記録
       dropped_assignment_no_total: この課題は、合計の計算で考慮されません
       hypothetical_score: "これは what-if (仮の事態を想定した) スコアです"
     turnitin: 
@@ -6773,7 +6771,6 @@ ja:
         out_of: 配点
         score: スコア
       icons: 
-        rubric_results: 注釈の結果を参照
         turnitin_results: "Turnitin の結果を参照"
       labels: 
         final_grade_hidden: 合計の計算が無効になっています
@@ -7225,6 +7222,11 @@ ja:
         assign_user_to_group: このグループにユーザを割り当て
         assign_user_to_group_name: "ユーザをグループ %{name} に割り当て"
         no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
+      auto_leadership_controls: 
+        auto_first_group_leader: "最初の受講生をグループ リーダーとして参加するように設定"
+        auto_group_leader: "自動的に受講生グループ リーダーを割り当て"
+        auto_random_group_leader: "受講生をランダムにグループ リーダーに設定"
+        leadership: リーダー
       edit_group_assignment: 
         all_available_groups_full: 利用可能などのグループにも空きがありません。
         all_groups_full_suggestion: グループの定員を変更するか、グループを追加してください。
@@ -7249,15 +7251,11 @@ ja:
         search_users: ユーザの検索
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
-        auto_first_group_leader: "最初の受講生をグループ リーダーとして参加するように設定"
-        auto_group_leader: "自動的に受講生グループ リーダーを割り当て"
-        auto_random_group_leader: "受講生をランダムにグループ リーダーに設定"
         cancel: キャンセル
         create_groups: "%h{num_groups} つのグループを今すぐ作成"
         create_groups_manually: グループを手動で作成します
         group_set_name: "グループ セット名"
         group_structure: グループの構造
-        leadership: リーダー
         leave_group_limit_blank: 制限がない場合は空白のまま
         limit_group_size: "グループの定員: %h{group_limit} 人"
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
@@ -7834,7 +7832,6 @@ ja:
       media_contribution: メディア投稿
       play_comment: "メディア コメントの再生"
       record_upload_media_comment: "メディア コメントの記録/アップロード"
-    track_uploaded_successfully: トラックは正常にアップロードされました。表示するには更新してください。
     upload: アップロード
     uploading: アップロードしています...
   menu: 
@@ -10153,6 +10150,14 @@ ja:
     : いいえ
     ? "yes"
     : はい
+  orbis_report_header_assignment_id: "課題 ID"
+  orbis_report_header_assignment_title: 課題のタイトル
+  orbis_report_header_canvas_course_id: "コース ID"
+  orbis_report_header_course_name: コース名
+  orbis_report_header_course_sis_id: "コース SIS ID"
+  orbis_report_header_points_possible: 配点
+  orbis_report_header_student_name: 受講生名
+  orbis_report_header_submission_score: 提出物のスコア
   outcome_groups: 
     invalid_file: "無効な成果グループ ファイルです"
   outcome_groups_api: 
@@ -12007,14 +12012,11 @@ ja:
           save: 保存
         end_quiz_reference_time_current_end: 現在の終了時刻
         end_quiz_reference_time_now: 今すぐ
-        end_quiz_when: "%{reference_time} から %{n} 分でクイズを終了します。"
         extended_quiz_time_explanation: この受講生に対して、現在行われているクイズの制限時間を延長することができます。どのくらい延長しますか?
         finished_in: "%{duration} で完了しました"
-        global_extra_attempts: "全員が既に %{n} を獲得しています"
         headers: 
           attempt: 試行回数
           attempts_left: 残りの試行回数
-          extended_quiz_time: クイズの時間延長
           score: スコア
           student: 受講生
           student_extensions: 受講生の延長時間
@@ -12023,15 +12025,14 @@ ja:
         labels: 
           ending: 終了
           extra_attempts: 追加の試行回数
-          extra_time_per_attempt: すべての試行に対する延長時間
           manually_unlock: 次回試行に備え、このクイズを手動でロック解除する
           reset_has_seen_results: 受講生にもう一度結果を表示
           started: 開始しました
         minutes: 分
         moderate_page_title: "%{title}: 管理"
         page_title: クイズの管理
-        student_gets_extra_time: "*%{student_name}* は **試行 1 回につき %{extra_time} 分の延長時間を獲得しました**"
         student_n: "受講生 %{n}"
+        submitting: 提出しています...
         titles: 
           change_user_extensions: ユーザの延長時間の変更
           manually_unlocked: 手動でロック解除済み
@@ -12546,8 +12547,6 @@ ja:
   react_files: 
     add_folder: フォルダの追加
     cancel: キャンセル
-    confirm_delete: "%{name} を削除してもよろしいですか?"
-    confirm_delete_selected: "これらの %{count} 個のアイテムを削除してもよろしいですか?"
     count_items_selected: "%{count} 個のアイテムが選択されました"
     created_at: 作成日
     created_at_short: 作成日時
@@ -12562,6 +12561,7 @@ ja:
         three_chars: "検索ボックスには 3 文字以上を入力してください。"
         your_search: "「%{search_term}」での検索に一致するファイルはありませんでした。"
     files: ファイル
+    files_heading: ファイル
     folder: フォルダ
     labels: 
       select: このアイテムを選択
@@ -12649,8 +12649,7 @@ ja:
       cancel: キャンセル
       update: 更新
     label: 
-      availableFrom: 変更前
-      availableUntil: 次の日時まで
+      availableUntil: ロック終了時刻
     options: 
       publish: 
         description: 公開
