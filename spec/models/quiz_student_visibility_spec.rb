@@ -78,11 +78,13 @@ describe "differentiated_assignments" do
   def ensure_user_does_not_see_quiz
     visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
     expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
+    expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).not_to include(@quiz.id)
   end
 
   def ensure_user_sees_quiz
     visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
     expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
+    expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@quiz.id)
   end
 
   context "table" do

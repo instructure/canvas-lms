@@ -196,7 +196,7 @@ describe DiscussionTopic do
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
 
-        @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: true)
         @assignment.submission_types = 'discussion_topic'
         @assignment.save!
         @topic.assignment_id = @assignment.id
@@ -253,6 +253,48 @@ describe DiscussionTopic do
           end
         end
       end
+    end
+  end
+
+  def discussion_with_assignment(opts={})
+    assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: !!opts[:only_visible_to_overrides])
+    assignment.submission_types = 'discussion_topic'
+    assignment.save!
+    topic = assignment.discussion_topic
+    topic.save!
+    [topic, assignment]
+  end
+
+  context "visible_ids_by_user" do
+    before :once do
+      @course = course(:active_course => true)
+      discussion_topic_model(:user => @teacher)
+      @topic_without_assignment = @topic
+      @course_section = @course.course_sections.create
+      @student1, @student2, @student3 = create_users(3, return_type: :record)
+
+      @topic_with_assignment_and_only_vis, @assignment = discussion_with_assignment(only_visible_to_overrides: true)
+      @topic_with_assignment_and_visible_to_all, @assignment2 = discussion_with_assignment(only_visible_to_overrides: false)
+      @topic_with_override_for_section_with_no_students, @assignment3 = discussion_with_assignment(only_visible_to_overrides: true)
+      @topic_with_no_override, @assignment4 = discussion_with_assignment(only_visible_to_overrides: true)
+
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      @section2 = @course.course_sections.create!(name: "second test section")
+      student_in_section(@section, user: @student1)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+      create_section_override_for_assignment(@assignment3, {course_section: @section2})
+      @course.enable_feature!(:differentiated_assignments)
+      @course.reload
+      @vis_hash = DiscussionTopic.visible_ids_by_user(course_id: @course.id, user_id: [@student1, @student2, @student3].map(&:id))
+    end
+
+    it "should return both topics for a student with an override" do
+      expect(@vis_hash[@student1.id].sort).to eq [@topic_without_assignment.id, @topic_with_assignment_and_only_vis.id, @topic_with_assignment_and_visible_to_all.id].sort
+    end
+
+    it "should not return differentiated topics to a student with no overrides" do
+      expect(@vis_hash[@student2.id].sort).to eq [@topic_without_assignment.id, @topic_with_assignment_and_visible_to_all.id].sort
     end
   end
 

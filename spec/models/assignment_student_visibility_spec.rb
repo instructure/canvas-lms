@@ -81,11 +81,13 @@ describe "differentiated_assignments" do
   def ensure_user_does_not_see_assignment
     visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
     expect(visibile_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
+    expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).not_to include(@assignment.id)
   end
 
   def ensure_user_sees_assignment
     visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
     expect(visibile_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+    expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@assignment.id)
   end
 
   context "table" do

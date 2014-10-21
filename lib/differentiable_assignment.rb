@@ -38,7 +38,7 @@ module DifferentiableAssignment
   # will filter for observers with observed students but not for observers without observed students
   def self.filter(collection, user, context, opts={}, &filter_block)
     return collection if !user || (opts[:is_teacher] != false && context.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments))
-    return filter_block.call(collection, [user.id]) unless context.user_has_been_observer?(user)
+    return filter_block.call(collection, [user.id]) if opts[:ignore_observer_logic] || !context.user_has_been_observer?(user)
 
     observed_student_ids = opts[:observed_student_ids] || ObserverEnrollment.observed_student_ids(context, user)
     user_ids = [user.id].concat(observed_student_ids)

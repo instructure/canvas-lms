@@ -133,8 +133,11 @@ class ContextModuleProgression < ActiveRecord::Base
     tags_hash = nil
     calc = CompletedRequirementCalculator.new(self.requirements_met || [])
     completion_requirements.each do |req|
+      # for an observer/student user we don't want to filter based on the normal observer logic,
+      # instead return vis for student enrollment only -> hence ignore_observer_logic below
+
       # create the hash inside the loop in case the completion_requirements is empty (performance)
-      tags_hash ||= context_module.content_tags_visible_to(self.user).index_by(&:id)
+      tags_hash ||= context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
 
       tag = tags_hash[req[:id]]
       next unless tag
@@ -266,7 +269,9 @@ class ContextModuleProgression < ActiveRecord::Base
     completion_requirements = context_module.completion_requirements || []
     requirements_met = self.requirements_met || []
 
-    context_module.content_tags_visible_to(self.user).each do |tag|
+    # for an observer/student combo user we don't want to filter based on the
+    # normal observer logic, instead return vis for student enrollment only
+    context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).each do |tag|
       self.current_position = tag.position if tag.position
       all_met = completion_requirements.select{|r| r[:id] == tag.id }.all? do |req|
         requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }

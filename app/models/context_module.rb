@@ -52,9 +52,17 @@ class ContextModule < ActiveRecord::Base
 
   def evaluate_all_progressions
     current_column = 'context_module_progressions.current'
-    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false)
-    current_scope.find_each(batch_size: 100) do |progression|
-      progression.evaluate!
+    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false).includes(:user)
+
+    current_scope.find_in_batches(batch_size: 100) do |progressions|
+      cache_visibilities_for_students(progressions.map(&:user_id)) if differentiated_assignments_enabled?
+
+      progressions.each do |progression|
+        progression.context_module = self
+        progression.evaluate!
+      end
+
+      clear_cached_visibilities if differentiated_assignments_enabled?
     end
   end
 
@@ -287,39 +295,25 @@ class ContextModule < ActiveRecord::Base
   end
 
   def content_tags_visible_to(user, opts={})
-    opts[:tags_loaded] = self.content_tags.loaded?
-    tags = if opts[:tags_loaded]
-      if self.grants_right?(user, :update)
-        self.content_tags.select{|tag| tag.workflow_state != 'deleted'}
-      else
-        self.content_tags.select{|tag| tag.workflow_state == 'active'}
-      end
-    else
-      if self.grants_right?(user, :update)
-        self.content_tags.not_deleted
-      else
-        self.content_tags.active
-      end
-    end
+    @content_tags_visible_to ||= {}
+    @content_tags_visible_to[user.try(:id)] ||= begin
+      is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :update)
+      tags = is_teacher ? cached_not_deleted_tags : cached_active_tags
 
-    if !self.grants_right?(user, :update) && self.context.feature_enabled?(:differentiated_assignments) && user
-      opts[:is_teacher]= false
-      tags = filter_tags_for_da(tags, user, opts)
-    end
+      if !is_teacher && differentiated_assignments_enabled? && user
+        opts[:is_teacher]= false
+        tags = filter_tags_for_da(tags, user, opts)
+      end
 
-    tags
+      tags
+    end
   end
 
   def filter_tags_for_da(tags, user, opts={})
-
-    scope_filter = Proc.new{|tags, user_ids, course_id, opts|
-      tags.visible_to_students_in_course_with_da(user_ids, course_id)
-    }
-
-    array_filter = Proc.new{|tags, user_ids, course_id, opts|
-      visible_assignments = opts[:assignment_visibilities] || AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
-      visible_discussions = opts[:discussion_visibilities] || DiscussionTopic.visible_to_students_in_course_with_da(user_ids, course_id).pluck(:id)
-      visible_quizzes = opts[:quiz_visibilities] || Quizzes::QuizStudentVisibility.where(user_id: user_ids, course_id: course_id).pluck(:quiz_id)
+    filter = Proc.new{|tags, user_ids, course_id, opts|
+      visible_assignments = opts[:assignment_visibilities] || assignment_visibilities_for_users(user_ids)
+      visible_discussions = opts[:discussion_visibilities] || discussion_visibilities_for_users(user_ids)
+      visible_quizzes = opts[:quiz_visibilities] || quiz_visibilities_for_users(user_ids)
       tags.select{|tag|
         case tag.content_type;
         when 'Assignment'; visible_assignments.include?(tag.content_id);
@@ -329,13 +323,30 @@ class ContextModule < ActiveRecord::Base
       }
     }
 
-    filter = opts[:tags_loaded] ? array_filter : scope_filter
-
     tags = DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
       filter.call(tags, user_ids, self.context_id, opts)
     end
 
     tags
+  end
+
+  def reload
+    clear_cached_lookups
+    super
+  end
+
+  def clear_cached_lookups
+    @cached_active_tags = nil
+    @cached_not_deleted_tags = nil
+    @content_tags_visible_to = nil
+  end
+
+  def cached_active_tags
+    @cached_active_tags ||= self.content_tags.active.reload
+  end
+
+  def cached_not_deleted_tags
+    @cached_not_deleted_tags ||= self.content_tags.not_deleted.reload
   end
 
   def add_item(params, added_item=nil, opts={})
@@ -597,5 +608,43 @@ class ContextModule < ActiveRecord::Base
       callbacks << lambda { |user| context.publish_final_grades(user, user.id) }
     end
     callbacks
+  end
+
+  def differentiated_assignments_enabled?
+    @differentiated_assignments_enabled ||= context.feature_enabled?(:differentiated_assignments)
+  end
+
+  def clear_cached_visibilities
+    @content_tags_visible_to = nil
+    @assignment_visibilities_by_user = nil
+    @discussion_visibilities_by_user = nil
+    @quiz_visibilities_by_user = nil
+    @differentiated_assignments_enabled = nil
+  end
+
+  # call this method before filtering content tags for many users
+  # this will avoid an N+1 query when finding individual visibilities
+  def cache_visibilities_for_students(student_ids)
+    raise "don't call this method without differentiated_assignments enabled" unless differentiated_assignments_enabled?
+    @assignment_visibilities_by_user ||= AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_ids, course_id: [context.id])
+    @discussion_visibilities_by_user ||= DiscussionTopic.visible_ids_by_user(user_id: student_ids, course_id: [context.id])
+    @quiz_visibilities_by_user ||= Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: student_ids, course_id: [context.id])
+  end
+
+  # *_visibilities_for_users are preferably used with cache_visibilities_for_students
+  # when called in batches
+  def assignment_visibilities_for_users(user_ids)
+    assignment_visibilities_by_user = @assignment_visibilities_by_user || AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: user_ids, course_id: [context.id])
+    user_ids.flat_map{|id| assignment_visibilities_by_user[id]}
+  end
+
+  def discussion_visibilities_for_users(user_ids)
+    discussion_visibilities_by_user = @discussion_visibilities_by_user || DiscussionTopic.visible_ids_by_user(user_id: user_ids, course_id: [context.id])
+    user_ids.flat_map{|id| discussion_visibilities_by_user[id]}
+  end
+
+  def quiz_visibilities_for_users(user_ids)
+    quiz_visibilities_by_user = @quiz_visibilities_by_user || Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: user_ids, course_id: [context.id])
+    user_ids.flat_map{|id| quiz_visibilities_by_user[id]}
   end
 end

@@ -272,4 +272,41 @@ describe ContextModule do
       end
     end
   end
+
+  describe "cache_visibilities_for_students" do
+    it "should load visibilities for each model" do
+      AssignmentStudentVisibility.expects(:visible_assignment_ids_in_course_by_user).returns({}).once
+      DiscussionTopic.expects(:visible_ids_by_user).returns({}).once
+      Quizzes::QuizStudentVisibility.expects(:visible_quiz_ids_in_course_by_user).returns({}).once
+      course_module
+      @module.assignment_visibilities_for_users([2])
+      @module.discussion_visibilities_for_users([2])
+      @module.quiz_visibilities_for_users([2])
+    end
+  end
+
+  describe "object_visibilities_for_user" do
+    it "should load visibilities for each model" do
+      course_module
+      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
+      @course.enable_feature!(:differentiated_assignments)
+
+      @module = ContextModule.find(@module.id) #clear cache of visibilities
+
+      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
+      expect(user_visibilites).to eq [@assignment.id]
+    end
+
+    it "should load visibilities for each model with cache" do
+      course_module
+      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
+      @course.enable_feature!(:differentiated_assignments)
+
+      @module = ContextModule.find(@module.id) #clear old cache of visibilities
+      @module.cache_visibilities_for_students([@user.id]) #make updated cache
+
+      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
+      expect(user_visibilites).to eq [@assignment.id]
+    end
+  end
 end
