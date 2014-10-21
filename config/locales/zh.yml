@@ -1133,6 +1133,11 @@ zh:
         one: "*%{count} 个文件*的 %{file_size} "
         other: "*%{count} 个文件*的 %{file_size} "
       uploaded_file_storage_header: 已上传的文件存储
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: 包含屏蔽作业的课程可能无法在此报告中准确反映分数。
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2598,6 +2603,7 @@ zh:
     messages_sent: 消息已发送
     missing_due_date_dialog: 
       buttons: 
+        continue: 继续
         goBack: 返回
         noDueDate: 无截止时间
       modal: 
@@ -4062,30 +4068,13 @@ zh:
       unstar_conversation: 取消标记会话
     message_deleted: 消息已删除！
     message_detail: 
+      delete: 删除
+      forward: 转发
+      message_actions: 消息操作
+      more_options: 更多可更多选项
       no_subject: 无主题
-    message_form: 
-      buttons: 
-        reply: 回复
-        reply_all: 全部回复
-        send_message: 发送
-      headings: 
-        new_message: 新消息
-      inbox_actions: 
-        add_people: 添加人员
-      labels: 
-        add_to_faculty_journal: 添加为教师日志条目
-        group_conversation: 这是小组会话。参与者将会看到所有人的回复
-        message: "消息:"
-        to: "发送至:"
-      links: 
-        add_attachment: 附件
-        media_comment: 录制
-      media_comment: 媒体评论
-      titles: 
-        add_attachment: 添加附件
-        media_comment: 已录制媒体评论
-        record_media_comment: 录制音频或视频评论
-        remove_media_comment: 移除媒体评论
+      reply: 回复
+      reply_all: 全部回复
     message_form_dialog: 
       body: 正文
       headings: 
@@ -4136,7 +4125,6 @@ zh:
     other_recipients: 
       one: "以及其它 %{count} 门课程"
       other: "以及其它 %{count} 门课程"
-    search_category: "搜索 %{category}"
     star: 标记
     star_conversation: 标记会话
     titles: 
@@ -4151,6 +4139,9 @@ zh:
     batch_update_message: 
       one: "已处理 %{count} 个课程"
       other: "已处理 %{count} 个课程"
+    course_format: 
+      not_set: 未设置
+      online: 在线
     course_not_found: 该课程未找到
     csv: 
       comments: 评论
@@ -4731,6 +4722,7 @@ zh:
         allow_student_organized_groups: 允许学生组织自己的小组
         conclude_at: 结束
         course_code: 课程代码
+        course_format: 格式
         course_lock_all_announcements: 禁止评论通告
         course_name: 姓名
         course_section_name: 新增班级
@@ -5048,8 +5040,6 @@ zh:
       student: 
         count: 出错的学生人数
         ratio: 出错的学生比率
-  current_uploads: 
-    close: 关闭
   curve_grades_dialog: 
     average_score: 平均分数
     buttons: 
@@ -6253,6 +6243,13 @@ zh:
     post_grades: "发布评分到 SIS"
     student_groups: 新学生组页面
     student_outcome_gradebook: 学生学习掌握程度评分册
+  file_preview: 
+    file_preview_headerbutton_close: 关闭
+    file_preview_hide: 隐藏
+    file_preview_infotable_datecreated: 创建日期
+    file_preview_infotable_name: 名称
+    file_preview_infotable_status: 状态
+    file_preview_show: 显示
   file_rename_form: 
     back: 返回
     change: 更改
@@ -6295,6 +6292,7 @@ zh:
       uploading_zip: "上传 zip 文件时出错。"
     fields: 
       file: 文件
+    files_page_title: 文件
     full_index: 
       alts: 
         file_locked: 已锁定
@@ -6480,6 +6478,7 @@ zh:
       no_students_in_groups_close: 很抱歉，此次提交的作业无法在快速评分器中计分，因为没有分配的用户。请将用户分配到此小组集，然后重试。单击"确定"返回此窗口。
       no_students_in_section: 在该班级中找不到任何学生，请返回以显示所有班级。
     buttons: 
+      dialog_buttons: 取消
       saving_settings: 正在保存设置...
       submit_comment: 提交评论
       submitting: 正在提交...
@@ -6513,7 +6512,6 @@ zh:
     student: 学生
     student_mute_notification: 教师正在进行评分
     titles: 
-      click_to_record: 单击麦克风录制您的评论
       dropped_assignment_no_total: 此作业将不会列入总分计算
       hypothetical_score: 这是假设分数
     turnitin: 
@@ -6757,7 +6755,6 @@ zh:
         out_of: 满分
         score: 分数
       icons: 
-        rubric_results: 查看评分标准结果
         turnitin_results: "查看 Turnitin 答案"
       labels: 
         final_grade_hidden: 总分计算已禁用
@@ -7208,6 +7205,11 @@ zh:
         assign_user_to_group: 将用户分配到此小组
         assign_user_to_group_name: "将用户分配到小组 %{name}"
         no_groups_created: 在用户添加小组之前需要创建小组。
+      auto_leadership_controls: 
+        auto_first_group_leader: 将第一个加入的学生设置为组长
+        auto_group_leader: 自动指定一个学生组长
+        auto_random_group_leader: 将一个随机的学生设置为组长
+        leadership: 领导
       edit_group_assignment: 
         all_available_groups_full: 所有可用小组已满。
         all_groups_full_suggestion: 更改小组限制或添加更多小组。
@@ -7232,15 +7234,11 @@ zh:
         search_users: 搜索用户
       group_category_create: 
         allow_self_signup: 允许自行注册
-        auto_first_group_leader: 将第一个加入的学生设置为组长
-        auto_group_leader: 自动指定一个学生组长
-        auto_random_group_leader: 将一个随机的学生设置为组长
         cancel: 取消
         create_groups: "立即创建 %h{num_groups} 个小组"
         create_groups_manually: 我将手动创建小组
         group_set_name: 小组集名称
         group_structure: 小组结构
-        leadership: 领导
         leave_group_limit_blank: 留为空白以便没有限制
         limit_group_size: "小组仅限 %h{group_limit} 个成员"
         require_same_section: 要求小组成员在相同的班级中
@@ -7819,7 +7817,6 @@ zh:
       media_contribution: 媒体参与
       play_comment: 播放媒体评论
       record_upload_media_comment: 录制/上传媒体评论
-    track_uploaded_successfully: 轨道已成功上载，刷新即可看到。
     upload: 上传
     uploading: 正在上传...
   menu: 
@@ -10135,6 +10132,15 @@ zh:
     : 否
     ? "yes"
     : 是
+  orbis_report_header_assignment_id: "作业 id"
+  orbis_report_header_assignment_title: 作业标题
+  orbis_report_header_canvas_course_id: "课程 id"
+  orbis_report_header_course_name: 课程名称
+  orbis_report_header_course_sis_id: "课程 sis id"
+  orbis_report_header_points_possible: 满分
+  orbis_report_header_student_canvas_id: "Canvas 用户 id"
+  orbis_report_header_student_name: 学生姓名
+  orbis_report_header_submission_score: 提交项分数
   outcome_groups: 
     invalid_file: 无效的成果组文件
   outcome_groups_api: 
@@ -12019,14 +12025,11 @@ zh:
           save: 保存
         end_quiz_reference_time_current_end: 当前结束时间
         end_quiz_reference_time_now: 立即
-        end_quiz_when: "%{reference_time} 过 %{n} 分钟结束测验。"
         extended_quiz_time_explanation: 您可以为此学生提供有关其当前测验尝试的额外时间。您想要为其提供多长时间?
         finished_in: "在 %{duration} 内完成"
-        global_extra_attempts: "所有人均已获得 %{n}"
         headers: 
           attempt: 尝试
           attempts_left: 剩余尝试次数
-          extended_quiz_time: 延长测验时间
           score: 分数
           student: 学生
           student_extensions: 学生延时
@@ -12035,15 +12038,14 @@ zh:
         labels: 
           ending: 正在结束
           extra_attempts: 额外尝试次数
-          extra_time_per_attempt: 每次尝试的额外时间
           manually_unlock: 手动解锁测验以进行下次尝试
           reset_has_seen_results: 让学生再一次看到结果
           started: 已开始
         minutes: 分钟
         moderate_page_title: "%{title}：调整"
         page_title: 调整测验
-        student_gets_extra_time: "*%{student_name}* **每次尝试获取 %{extra_time} 分钟的额外时间**"
         student_n: "学生 %{n}"
+        submitting: 正在提交...
         titles: 
           change_user_extensions: 更改用户延时
           manually_unlocked: 手动解锁
@@ -12558,8 +12560,6 @@ zh:
   react_files: 
     add_folder: 添加文件夹
     cancel: 取消
-    confirm_delete: "是否确定要删除 %{name}？"
-    confirm_delete_selected: "是否确定要删除这 %{count} 个项目？"
     count_items_selected: "已选择 %{count} 个项目"
     created_at: 创建日期
     created_at_short: 已创建
@@ -12574,6 +12574,7 @@ zh:
         three_chars: "在搜索框中输入至少 3 个字母。"
         your_search: "您搜索的 - \"%{search_term}\" - 不匹配任何文件。"
     files: 文件
+    files_heading: 文件
     folder: 文件夹
     labels: 
       select: 选择此项目
@@ -12661,8 +12662,7 @@ zh:
       cancel: 取消
       update: 更新
     label: 
-      availableFrom: 从
-      availableUntil: 截止时间
+      availableUntil: 锁定结束时间
     options: 
       publish: 
         description: 发布
