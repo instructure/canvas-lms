@@ -21,7 +21,7 @@
       aria-label=searchAriaLabel
       }}
     </div>
-    {{#ic-lazy-list data=groups href=groupsUrl}}
+    {{#groups-lazy-list data=groups href=groupsUrl}}
     {{#each sortedGroups itemController="group" }}
     <div {{bind-attr class=":accordion :student-groups :content-box showBody isMember"}} {{bind-attr id=sgid}}>
       <div class="student-group-header clearfix" {{action 'toggleBody'}}>
@@ -78,6 +78,6 @@
       </div>
     </div>
     {{/each}}
-    {{/ic-lazy-list}}
+    {{/groups-lazy-list}}
   </div>
 </div>
