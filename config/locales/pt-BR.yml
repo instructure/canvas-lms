@@ -1134,6 +1134,11 @@ pt-BR:
         one: "%{file_size} *de um arquivo*"
         other: "%{file_size} *de %{count} arquivos*"
       uploaded_file_storage_header: "Armazenamento de arquivos enviados por upload"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "Cursos com tarefas silenciadas podem não refletir pontuações de forma precisa neste relatório."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2599,6 +2604,7 @@ pt-BR:
     messages_sent: "Mensagens enviadas"
     missing_due_date_dialog: 
       buttons: 
+        continue: Continuar
         goBack: Voltar
         noDueDate: "Sem data de entrega"
       modal: 
@@ -4064,30 +4070,13 @@ pt-BR:
       unstar_conversation: "Remover conversa dos favoritos"
     message_deleted: "Mensagem excluída!"
     message_detail: 
+      delete: Excluir
+      forward: Encaminhar
+      message_actions: "Ações de mensagem"
+      more_options: "Mais opções"
       no_subject: "Nenhum assunto"
-    message_form: 
-      buttons: 
-        reply: Responder
-        reply_all: "Responder a todos"
-        send_message: Enviar
-      headings: 
-        new_message: "Nova mensagem"
-      inbox_actions: 
-        add_people: "Adicionar pessoas"
-      labels: 
-        add_to_faculty_journal: "Adicionar como uma entrada do Diário da Faculdade"
-        group_conversation: "Esta é uma conversa em grupo. Os participantes verão as respostas de todos"
-        message: "Mensagem:"
-        to: "Para:"
-      links: 
-        add_attachment: Anexar
-        media_comment: Gravar
-      media_comment: "Conteúdo de mídia"
-      titles: 
-        add_attachment: "Adicionar um anexo"
-        media_comment: "Comentário de mídia gravado"
-        record_media_comment: "Gravar um comentário de áudio ou vídeo"
-        remove_media_comment: "Remover comentário de mídia"
+      reply: Responder
+      reply_all: "Responder a todos"
     message_form_dialog: 
       body: Corpo
       headings: 
@@ -4138,7 +4127,6 @@ pt-BR:
     other_recipients: 
       one: "e 1 outro"
       other: "e %{count} outros"
-    search_category: "Pesquisar %{category}"
     star: "Adicionar aos favoritos"
     star_conversation: "Adicionar conversa aos favoritos"
     titles: 
@@ -4153,6 +4141,9 @@ pt-BR:
     batch_update_message: 
       one: "1 curso processado"
       other: "%{count} cursos processados"
+    course_format: 
+      not_set: "Não definido"
+      online: Online
     course_not_found: "O curso não foi encontrado"
     csv: 
       comments: Comentários
@@ -4732,6 +4723,7 @@ pt-BR:
         allow_student_organized_groups: "Permitir aos alunos organizar seus próprios grupos"
         conclude_at: Termina
         course_code: "Código do curso"
+        course_format: Formato
         course_lock_all_announcements: "Desativar comentários nos anúncios"
         course_name: Nome
         course_section_name: "Adicionar uma nova turma"
@@ -5051,8 +5043,6 @@ pt-BR:
       student: 
         count: "Contagem de alunos errados"
         ratio: "Proporção de alunos errados"
-  current_uploads: 
-    close: fechar
   curve_grades_dialog: 
     average_score: "Pontuação média"
     buttons: 
@@ -6272,6 +6262,13 @@ pt-BR:
     post_grades: "Postar notas no SIS"
     student_groups: "Página de novos grupos de alunos"
     student_outcome_gradebook: "Livro de notas de domínio da aprendizagem do aluno"
+  file_preview: 
+    file_preview_headerbutton_close: Fechar
+    file_preview_hide: Ocultar
+    file_preview_infotable_datecreated: "Data de criação"
+    file_preview_infotable_name: Nome
+    file_preview_infotable_status: Status
+    file_preview_show: Exibir
   file_rename_form: 
     back: Voltar
     change: Alterar
@@ -6314,6 +6311,7 @@ pt-BR:
       uploading_zip: "Houve erros durante o upload do arquivo zip."
     fields: 
       file: Arquivo
+    files_page_title: Arquivos
     full_index: 
       alts: 
         file_locked: travado
@@ -6499,6 +6497,7 @@ pt-BR:
       no_students_in_groups_close: "Desculpe-nos. Os envios para esta tarefa não podem ser avaliados no Speedgrader, pois não existe nenhum usuário atribuído. Atribua usuários a este conjunto de grupos e tente novamente. Clique em \"OK\" para fechar esta janela."
       no_students_in_section: "Não foi possível encontrar alunos nesta seção, retornando para a exibição de todas as seções."
     buttons: 
+      dialog_buttons: Cancelar
       saving_settings: "Salvando configurações..."
       submit_comment: "Enviar comentário"
       submitting: Enviando...
@@ -6532,7 +6531,6 @@ pt-BR:
     student: Aluno
     student_mute_notification: "O instrutor está trabalhando na avaliação"
     titles: 
-      click_to_record: "Clique no microfone para gravar seus comentários"
       dropped_assignment_no_total: "Esta tarefa não será considerada no cálculo total"
       hypothetical_score: "Esta é uma pontuação \"e se\""
     turnitin: 
@@ -6776,7 +6774,6 @@ pt-BR:
         out_of: De
         score: Pontuação
       icons: 
-        rubric_results: "Consultar resultados de protocolo"
         turnitin_results: "Consultar resultados do Turnitin"
       labels: 
         final_grade_hidden: "O cálculo de totais foi desativado"
@@ -7233,6 +7230,11 @@ pt-BR:
         assign_user_to_group: "Atribuir usuário a este grupo"
         assign_user_to_group_name: "Atribuir usuário ao grupo %{name}"
         no_groups_created: "Os grupos precisam ser criados antes que os usuários possam ser adicionados"
+      auto_leadership_controls: 
+        auto_first_group_leader: "Definir primeiro aluno a participar como líder do grupo"
+        auto_group_leader: "Designar automaticamente um líder de grupo de alunos"
+        auto_random_group_leader: "Definir um aluno aleatório como líder do grupo"
+        leadership: Liderança
       edit_group_assignment: 
         all_available_groups_full: "Todos os grupos disponíveis estão cheios"
         all_groups_full_suggestion: "Alterar os limites de grupo ou adicionar mais grupos."
@@ -7257,15 +7259,11 @@ pt-BR:
         search_users: "Pesquisar usuários"
       group_category_create: 
         allow_self_signup: "Permitir auto-inscrição"
-        auto_first_group_leader: "Definir primeiro aluno a participar como líder do grupo"
-        auto_group_leader: "Designar automaticamente um líder de grupo de alunos"
-        auto_random_group_leader: "Definir um aluno aleatório como líder do grupo"
         cancel: Cancelar
         create_groups: "Criar %h{num_groups} grupos agora"
         create_groups_manually: "Eu vou criar os grupos manualmente"
         group_set_name: "Nome do conjunto de grupo"
         group_structure: "Estrutura do grupo"
-        leadership: Liderança
         leave_group_limit_blank: "Deixar em branco para sem limite"
         limit_group_size: "Limitar grupos a %h{group_limit} membros"
         require_same_section: "Os membros do grupo devem estar na mesma seção"
@@ -7840,7 +7838,6 @@ pt-BR:
       media_contribution: "Contribuição de mídia"
       play_comment: "Reproduzir comentário em mídia"
       record_upload_media_comment: "Gravação/Upload de comentário em mídia"
-    track_uploaded_successfully: "Rastreamento atualizado com sucesso. Recarregue a página para vê-lo."
     upload: Upload
     uploading: "Fazendo upload..."
   menu: 
@@ -10164,6 +10161,14 @@ pt-BR:
     : Não
     ? "yes"
     : Sim
+  orbis_report_header_assignment_id: "id da avaliação"
+  orbis_report_header_assignment_title: "título da avaliação"
+  orbis_report_header_canvas_course_id: "id do curso"
+  orbis_report_header_course_name: "nome do curso"
+  orbis_report_header_course_sis_id: "id do sis do curso"
+  orbis_report_header_points_possible: "pontos possíveis"
+  orbis_report_header_student_name: "nome do aluno"
+  orbis_report_header_submission_score: "pontuação do envio"
   outcome_groups: 
     invalid_file: "Arquivo de grupo de resultado inválido"
   outcome_groups_api: 
@@ -12054,14 +12059,11 @@ pt-BR:
           save: Salvar
         end_quiz_reference_time_current_end: "a hora de término atual"
         end_quiz_reference_time_now: agora
-        end_quiz_when: "Finalizar o teste %{n} minutos a partir das %{reference_time}."
         extended_quiz_time_explanation: "Você pode fornecer mais tempo aos alunos na tentativa de teste atual. Quanto tempo gostaria de dar a eles?"
         finished_in: "finalizado em %{duration}"
-        global_extra_attempts: "todos recebem já %{n}"
         headers: 
           attempt: Tentativa
           attempts_left: "Tentativas restantes"
-          extended_quiz_time: "Estender o tempo do teste"
           score: Pontuação
           student: Aluno
           student_extensions: "Extensões do aluno"
@@ -12070,15 +12072,14 @@ pt-BR:
         labels: 
           ending: Finalizando
           extra_attempts: "Tentativas extra"
-          extra_time_per_attempt: "Tempo extra em cada tentativa"
           manually_unlock: "Destravar manualmente o questionário para a próxima tentativa"
           reset_has_seen_results: "Deixar o aluno ver os resultados mais uma vez"
           started: Iniciado
         minutes: minutos
         moderate_page_title: "%{title}: moderado"
         page_title: "Teste moderado"
-        student_gets_extra_time: "*%{student_name}* **obtém %{extra_time} minutos extra em cada tentativa**"
         student_n: "Aluno %{n}"
+        submitting: Enviando...
         titles: 
           change_user_extensions: "Alterar extensões do usuário"
           manually_unlocked: "Destravado manualmente"
@@ -12593,8 +12594,6 @@ pt-BR:
   react_files: 
     add_folder: "Adicionar pasta"
     cancel: Cancelar
-    confirm_delete: "Tem certeza que deseja excluir  %{name}?"
-    confirm_delete_selected: "Tem certeza que deseja excluir esses %{count} itens?"
     count_items_selected: "%{count} itens selecionados"
     created_at: "Data de criação"
     created_at_short: Criado
@@ -12609,6 +12608,7 @@ pt-BR:
         three_chars: "Insira pelos menos três letras na caixa de pesquisa."
         your_search: "Sua pesquisa - \"%{search_term}\" - não correspondeu a nenhum arquivo."
     files: Arquivos
+    files_heading: Arquivos
     folder: Pasta
     labels: 
       select: "Selecionar um item"
@@ -12696,8 +12696,7 @@ pt-BR:
       cancel: Cancelar
       update: Atualizar
     label: 
-      availableFrom: De
-      availableUntil: Até
+      availableUntil: "Travar até"
     options: 
       publish: 
         description: Publicar
