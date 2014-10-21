@@ -1134,6 +1134,11 @@ nb:
         one: "%{file_size} *fra en fil*"
         other: "%{file_size} *fra %{count} filer*"
       uploaded_file_storage_header: "Lagring opplastede filer"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "For kurs med skjulte oppgaver vises muligens resultatene i denne rapporten ikke korrekt."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2599,6 +2604,7 @@ nb:
     messages_sent: "Beskjeder er sendt"
     missing_due_date_dialog: 
       buttons: 
+        continue: Fortsett
         goBack: Tilbake
         noDueDate: "Ingen frist"
       modal: 
@@ -4064,30 +4070,13 @@ nb:
       unstar_conversation: "Fjern stjernemerking fra samtalen"
     message_deleted: "Melding slettet!"
     message_detail: 
+      delete: Slette
+      forward: Videresend
+      message_actions: "Handlinger for beskjed"
+      more_options: "Flere alternativer"
       no_subject: "Intet emne"
-    message_form: 
-      buttons: 
-        reply: Svar
-        reply_all: "Svar til alle"
-        send_message: Send
-      headings: 
-        new_message: "Ny melding"
-      inbox_actions: 
-        add_people: "Legg til personer"
-      labels: 
-        add_to_faculty_journal: "Legg til som innlegg i faglærerprotokollen"
-        group_conversation: "Dette er en gruppesamtale. Deltakere vil se hverandres svar"
-        message: "Beskjed:"
-        to: "Til:"
-      links: 
-        add_attachment: "Legg ved"
-        media_comment: "Spill inn"
-      media_comment: Mediekommentar
-      titles: 
-        add_attachment: "Legg til et vedlegg"
-        media_comment: "Innspilt mediekommentar"
-        record_media_comment: "Spill inn en lyd- eller videokommentar"
-        remove_media_comment: "Fjern mediekommentar"
+      reply: Svar
+      reply_all: "Svar til alle"
     message_form_dialog: 
       body: Tekst
       headings: 
@@ -4138,7 +4127,6 @@ nb:
     other_recipients: 
       one: "og 1 annen"
       other: "og %{count} andre"
-    search_category: "Søk %{category}"
     star: "Merk med stjerne"
     star_conversation: "Merk samtalen med stjerne"
     titles: 
@@ -4153,6 +4141,9 @@ nb:
     batch_update_message: 
       one: "1 kurs prosessert"
       other: "%{count} kurs prosessert"
+    course_format: 
+      not_set: "Ikke satt"
+      online: Online
     course_not_found: "Kurset ble ikke funnet"
     csv: 
       comments: Kommentarer
@@ -4733,6 +4724,7 @@ nb:
         allow_student_organized_groups: "La studentene organisere sine egne grupper"
         conclude_at: Slutter
         course_code: Kurskode
+        course_format: Format
         course_lock_all_announcements: "Slå av kommentarer på kunngjøringer"
         course_name: Navn
         course_section_name: "Legg til en ny klasse"
@@ -5052,8 +5044,6 @@ nb:
       student: 
         count: "Feil studentantall"
         ratio: "Feil studentratio"
-  current_uploads: 
-    close: lukk
   curve_grades_dialog: 
     average_score: "Gjennomsnittlig resultat"
     buttons: 
@@ -6263,6 +6253,11 @@ nb:
     post_grades: "Send karakterer til SIS"
     student_groups: "Ny side for studentgrupper"
     student_outcome_gradebook: "Karakterbok for studentens mestringsbaserte læring"
+  file_preview: 
+    file_preview_headerbutton_close: Lukk
+    file_preview_hide: Skjul
+    file_preview_infotable_name: Navn
+    file_preview_show: Vis
   file_rename_form: 
     back: Tilbake
     change: Endre
@@ -6305,6 +6300,7 @@ nb:
       uploading_zip: "Feil oppsto under opplasting av zipfilen."
     fields: 
       file: Fil
+    files_page_title: Filer
     full_index: 
       alts: 
         file_locked: låst
@@ -6490,6 +6486,7 @@ nb:
       no_students_in_groups_close: "Beklager, innleveringer for denne oppgaven kan ikke rettes i Speedgrader fordi det ikke er noen tildelte brukere. Vennligst tilordne brukere til denne gruppen og prøv igjen. Klikk \"OK\" for å gå tilbake."
       no_students_in_section: "Kunne ikke finne noen studenter i den klassen, viser i stedet alle klasser."
     buttons: 
+      dialog_buttons: Avbryt
       saving_settings: "Lagrer innstillinger..."
       submit_comment: "Send inn kommentar"
       submitting: "Sender inn..."
@@ -6523,7 +6520,6 @@ nb:
     student: Student
     student_mute_notification: "Læreren arbeider med karakterene"
     titles: 
-      click_to_record: "Klikk på mikrofonen for å gjøre opptak av dine kommentarer"
       dropped_assignment_no_total: "Denne oppgaven vurderes ikke som en del av helheten"
       hypothetical_score: "Dette er et hva-hvis-resultat"
     turnitin: 
@@ -6767,7 +6763,6 @@ nb:
         out_of: av
         score: Resultat
       icons: 
-        rubric_results: "Se resultater for vurderingsveiledning"
         turnitin_results: "Se Turnitin-resultater"
       labels: 
         final_grade_hidden: "Beregning av totalen er ikke mulig"
@@ -7225,6 +7220,11 @@ nb:
         assign_user_to_group: "Tildel bruker til denne gruppen"
         assign_user_to_group_name: "Tildel bruker til gruppe %{name}"
         no_groups_created: "Grupper må opprettes før brukere kan legges til."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Sett første student som blir med som gruppeleder"
+        auto_group_leader: "Tildel en student som gruppeleder automatisk"
+        auto_random_group_leader: "Sett en tilfeldig student som gruppeleder"
+        leadership: Lederskap
       edit_group_assignment: 
         all_available_groups_full: "Alle tilgjengelige grupper er fulle."
         all_groups_full_suggestion: "Endre gruppegrensen eller legg til flere grupper."
@@ -7249,15 +7249,11 @@ nb:
         search_users: "Søk blant brukere"
       group_category_create: 
         allow_self_signup: "Tillat egenpåmelding"
-        auto_first_group_leader: "Sett første student som blir med som gruppeleder"
-        auto_group_leader: "Tildel en student som gruppeleder automatisk"
-        auto_random_group_leader: "Sett en tilfeldig student som gruppeleder"
         cancel: Avbryt
         create_groups: "Opprett %h{num_groups} grupper nå"
         create_groups_manually: "Jeg vil opprette grupper manuelt"
         group_set_name: Gruppesettnavn
         group_structure: Gruppestruktur
-        leadership: Lederskap
         leave_group_limit_blank: "La være tom for ingen grense"
         limit_group_size: "Begrens grupper til %h{group_limit} medlemmer"
         require_same_section: "Gruppemedlemmer må være i samme klasse"
@@ -7836,7 +7832,6 @@ nb:
       media_contribution: Mediebidrag
       play_comment: "Spill av mediekommentar"
       record_upload_media_comment: "Gjør opptak av/Last opp mediekommentar"
-    track_uploaded_successfully: "Spor opplastet. Last siden på nytt for å se det."
     upload: "Last opp"
     uploading: "Laster opp..."
   menu: 
@@ -10151,6 +10146,15 @@ nb:
     : Nei
     ? "yes"
     : Ja
+  orbis_report_header_assignment_id: "oppgave id"
+  orbis_report_header_assignment_title: "oppgave navn"
+  orbis_report_header_canvas_course_id: "kurs id"
+  orbis_report_header_course_name: kursnavn
+  orbis_report_header_course_sis_id: "kurs sis id"
+  orbis_report_header_points_possible: "poeng oppnåelig"
+  orbis_report_header_student_canvas_id: "canvas bruker id"
+  orbis_report_header_student_name: studentnavn
+  orbis_report_header_submission_score: innleveringsresultat
   outcome_groups: 
     invalid_file: "Ugyldig resultatgruppefil"
   outcome_groups_api: 
@@ -12003,14 +12007,11 @@ nb:
           save: Lagre
         end_quiz_reference_time_current_end: "gjeldende slutt-tid"
         end_quiz_reference_time_now: nå
-        end_quiz_when: "Avslutt prøven %{n} minutter etter %{reference_time}."
         extended_quiz_time_explanation: "Du kan gi denne studenten mer tid på nåværende prøveforsøk. Hvor mye tid vil du gi ham/henne?"
         finished_in: "fullført på %{duration}"
-        global_extra_attempts: "alle får %{n} allerede"
         headers: 
           attempt: Forsøk
           attempts_left: "Forsøk igjen"
-          extended_quiz_time: "Forleng tiden på prøven"
           score: Resultat
           student: Student
           student_extensions: Studenttillegg
@@ -12019,15 +12020,14 @@ nb:
         labels: 
           ending: Slutter
           extra_attempts: "Ekstra forsøk"
-          extra_time_per_attempt: "Ekstra tid på hvert forsøk"
           manually_unlock: "Lås opp prøven manuelt for neste forsøk"
           reset_has_seen_results: "La elevene se resultater en gang til"
           started: Startet
         minutes: minutter
         moderate_page_title: "%{title}: Moderer"
         page_title: "Moderer prøven"
-        student_gets_extra_time: "*%{student_name}* **får %{extra_time} ekstra minutter på hvert forsøk**"
         student_n: "Student %{n}"
+        submitting: "Sender inn..."
         titles: 
           change_user_extensions: "Endre brukertillegg"
           manually_unlocked: "Manuelt låst opp"
@@ -12542,8 +12542,6 @@ nb:
   react_files: 
     add_folder: "Legg til mappe"
     cancel: Avbryt
-    confirm_delete: "Er du sikker på at du vil slette %{name}?"
-    confirm_delete_selected: "Er du sikker på at du vil slette disse %{count} elementer?"
     count_items_selected: "%{count} elementer valgt"
     created_at_short: Opprettet
     delete: Slette
@@ -12557,6 +12555,7 @@ nb:
         three_chars: "Angi minst 3 bokstaver i søkeboksen."
         your_search: "Søket ditt - \"%{search_term}\" - stemte ikke med noen filer."
     files: Filer
+    files_heading: Filer
     folder: Mappe
     labels: 
       select: "Velg denne varen"
@@ -12644,8 +12643,7 @@ nb:
       cancel: Avbryt
       update: Oppdater
     label: 
-      availableFrom: Fra
-      availableUntil: Til
+      availableUntil: "Lås til"
     options: 
       publish: 
         description: Publiser
