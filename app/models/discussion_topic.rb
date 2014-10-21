@@ -487,6 +487,30 @@ class DiscussionTopic < ActiveRecord::Base
   alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
 
+  def self.visible_ids_by_user(opts)
+    # pluck id, assignment_id, and user_id from discussions joined with the SQL view
+    plucked_visibilities = pluck_discussion_visibilities(opts).group_by{|r| r["user_id"]}
+    # discussions with no user_id are visible to all, so add them into every students hash at the end
+    ids_of_discussions_visible_to_all = (plucked_visibilities.delete(nil) || []).map{|r| r["id"]}.uniq
+    # format to be hash of user_id's with array of discussion_ids: {1 => [2,3,4], 2 => [2,4]}
+    opts[:user_id].reduce({}) do |vis_hash, student_id|
+      vis_hash[student_id] = begin
+        ids_from_pluck = (plucked_visibilities[student_id.to_s] || []).map{|r| r["id"]}
+        ids_from_pluck.concat(ids_of_discussions_visible_to_all).map(&:to_i)
+      end
+      vis_hash
+    end
+  end
+
+  def self.pluck_discussion_visibilities(opts)
+    # once on Rails 4 change this to a multi-column pluck
+    # and clean up reformatting in visible_ids_by_user
+    connection.select_all(
+      self.visible_to_students_in_course_with_da(opts[:user_id],opts[:course_id]).
+        select(["discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id"])
+    )
+  end
+
   def should_lock_yet
     # not assignment or vdd aware! only use this to check the topic's own field!
     # you should be checking other lock statuses in addition to this one

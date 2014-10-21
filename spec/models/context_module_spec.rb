@@ -439,6 +439,7 @@ describe ContextModule do
       @module2.update_attribute(:require_sequential_progress, true)
       expect(@module2.available_for?(@user, :tag => @tag2)).to be_falsey
       expect(@module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true)).to be_falsey
+
       @module.update_attribute(:require_sequential_progress, true)
       expect(@module2.available_for?(@user, :tag => @tag2)).to be_falsey
       expect(@module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true)).to be_falsey
@@ -642,17 +643,18 @@ describe ContextModule do
       end
 
       context "enabled" do
-        before {@course.enable_feature!(:differentiated_assignments)}
+        before {@course.enable_feature!(:differentiated_assignments);@module.reload}
         it "should properly require differentiated assignments" do
           expect(@module.evaluate_for(@student_1)).to be_unlocked
           @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
+          @module.reload
           expect(@module.evaluate_for(@student_1)).to be_completed
           expect(@module.evaluate_for(@student_2)).to be_completed
         end
       end
 
       context "disabled" do
-        before {@course.disable_feature!(:differentiated_assignments)}
+        before {@course.disable_feature!(:differentiated_assignments);@module.reload}
         it "should properly require all assignments" do
           expect(@module.evaluate_for(@student_1)).to be_unlocked
           @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
@@ -887,10 +889,11 @@ describe ContextModule do
       create_section_override_for_assignment(@assignment, {course_section: @overriden_section})
 
       @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+      @module.reload
     end
 
     context "differentiated_assignments enabled" do
-      before {@course.enable_feature!(:differentiated_assignments)}
+      before {@course.enable_feature!(:differentiated_assignments);@module.reload}
       it "should properly return differentiated assignments" do
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
@@ -899,19 +902,14 @@ describe ContextModule do
       it "should properly return unpublished assignments" do
         @assignment.workflow_state = "unpublished"
         @assignment.save!
+        @module.reload
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_falsey
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
-      # if tags are preloaded we shouldn't filter by a scope (as that requires re-fetching the tags)
       it "should not reload the tags if already loaded" do
         ContentTag.expects(:visible_to_students_in_course_with_da).never
         ActiveRecord::Associations::Preloader.new(@module, content_tags: :content).run
-        @module.content_tags_visible_to(@student_1)
-      end
-      # if tags are not preloaded we should filter by a scope (as will be quicker than filtering an array)
-      it "should filter use a cope to filter content tags if they arent already loaded" do
-        ContentTag.expects(:visible_to_students_in_course_with_da).once
         @module.content_tags_visible_to(@student_1)
       end
       it "should filter differentiated discussions" do
@@ -949,12 +947,13 @@ describe ContextModule do
         @observer_enrollment.update_attribute(:associated_user_id, @student_2.id)
         expect(@module.content_tags_visible_to(@observer).map(&:content).include?(@assignment)).to be_falsey
         @observer_enrollment.update_attribute(:associated_user_id, @student_1.id)
+        @module.reload
         expect(@module.content_tags_visible_to(@observer).map(&:content).include?(@assignment)).to be_truthy
       end
     end
 
     context "differentiated_assignments disabled" do
-      before {@course.disable_feature!(:differentiated_assignments)}
+      before {@course.disable_feature!(:differentiated_assignments);@module.reload}
       it "should return all published assignments" do
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
@@ -963,6 +962,7 @@ describe ContextModule do
       it "should not return unpublished assignments" do
         @assignment.workflow_state = "unpublished"
         @assignment.save!
+        @module.reload
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_falsey
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
