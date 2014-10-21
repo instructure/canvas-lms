@@ -1159,6 +1159,11 @@ ar:
         two: "%{file_size} *من %{count} من الملفات*"
         zero: "%{file_size} *من %{count} من الملفات*"
       uploaded_file_storage_header: "تخزين الملف الذي تم تحميله"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "المساقات ذات المهام التي بدون إعلامات قد لا تعكس الدرجات بدقة في هذا التقرير."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2666,6 +2671,7 @@ ar:
     messages_sent: "تم إرسال الرسالة"
     missing_due_date_dialog: 
       buttons: 
+        continue: متابعة
         goBack: عودة
         noDueDate: "لا يوجد تاريخ استحقاق"
       modal: 
@@ -4145,30 +4151,13 @@ ar:
       unstar_conversation: "إزالة النجمة من محادثة"
     message_deleted: "تم حذف الرسالة!"
     message_detail: 
+      delete: حذف
+      forward: "إعادة توجيه"
+      message_actions: "إجراءات الرسالة"
+      more_options: "مزيد من الخيارات"
       no_subject: "لا يوجد موضوع"
-    message_form: 
-      buttons: 
-        reply: رد
-        reply_all: "رد على الكل"
-        send_message: إرسال
-      headings: 
-        new_message: "رسالة جديدة"
-      inbox_actions: 
-        add_people: "إضافة أشخاص"
-      labels: 
-        add_to_faculty_journal: "إضافة إدخال دفتر الكلية"
-        group_conversation: "هذه محادثة مجموعة. سيشاهد المشاركون ردود كل الأشخاص"
-        message: "الرسالة:"
-        to: "إلى:"
-      links: 
-        add_attachment: إرفاق
-        media_comment: تسجيل
-      media_comment: "تعليق الوسائط"
-      titles: 
-        add_attachment: "إضافة مرفق"
-        media_comment: "تعليق وسائط تم تسجيله"
-        record_media_comment: "تسجيل تعليق صوتي أو فيديو"
-        remove_media_comment: "إزالة تعليق الوسائط"
+      reply: رد
+      reply_all: "رد على الكل"
     message_form_dialog: 
       body: النص
       headings: 
@@ -4227,7 +4216,6 @@ ar:
       other: "و %{count} آخرين"
       two: "و %{count} آخرين"
       zero: "و %{count} آخرين"
-    search_category: "بحث في %{category}"
     star: "وضع نجمة"
     star_conversation: "وضع نجمة على محادثة"
     titles: 
@@ -4246,6 +4234,9 @@ ar:
       other: "تمت معالجة %{count} مساقات"
       two: "تمت معالجة مساقين"
       zero: "لم تتم معالجة أي مساق"
+    course_format: 
+      not_set: "غير معيّن"
+      online: "عبر الإنترنت"
     course_not_found: "لم يتم العثور على المساق"
     csv: 
       comments: التعليقات
@@ -4834,6 +4825,7 @@ ar:
         allow_student_organized_groups: "السماح للطلاب بتنظيم المجموعات الخاصة بهم"
         conclude_at: انتهى
         course_code: "كود المساق"
+        course_format: التنسيق
         course_lock_all_announcements: "تعطيل التعليقات على الإعلانات"
         course_name: الاسم
         course_section_name: "إضافة قسم جديد"
@@ -5157,8 +5149,6 @@ ar:
       student: 
         count: "عدد الطلاب خاطئ"
         ratio: "نسبة الطلاب خاطئة"
-  current_uploads: 
-    close: إغلاق
   curve_grades_dialog: 
     average_score: "متوسط الدرجات"
     buttons: 
@@ -6484,6 +6474,13 @@ ar:
     post_grades: "نشر الدرجات في SIS"
     student_groups: "صفحة جديدة لمجموعات الطلاب"
     student_outcome_gradebook: "دفتر درجات إتقان التعلم للطلاب"
+  file_preview: 
+    file_preview_headerbutton_close: إغلاق
+    file_preview_hide: إخفاء
+    file_preview_infotable_datecreated: "تم إنشاء التاريخ"
+    file_preview_infotable_name: الاسم
+    file_preview_infotable_status: الحالة
+    file_preview_show: إظهار
   file_rename_form: 
     back: عودة
     change: تغيير
@@ -6526,6 +6523,7 @@ ar:
       uploading_zip: "حدثت أخطاء أثناء تحميل الملف المضغوط."
     fields: 
       file: ملف
+    files_page_title: الملفات
     full_index: 
       alts: 
         file_locked: "تم التأمين"
@@ -6713,6 +6711,7 @@ ar:
       no_students_in_groups_close: "عذرًا، لا يمكن تقييم عمليات إرسال هذه المهمة في Speedgrader لعدم وجود مستخدمين معينين. الرجاء تعيين مستخدمين لهذه الفئة من المجموعات وإعادة المحاولة. انقر فوق 'موافق' لإغلاق هذه النافذة."
       no_students_in_section: "تعذر العثور على أي طالب في هذا القسم، يتم التراجع وإظهار كل الأقسام."
     buttons: 
+      dialog_buttons: "إلغاء الأمر"
       saving_settings: "جارٍ حفظ الإعدادات..."
       submit_comment: "إرسال تعليق"
       submitting: "جارٍ الإرسال..."
@@ -6746,7 +6745,6 @@ ar:
     student: الطالب
     student_mute_notification: "يعمل المعلم في الدرجات"
     titles: 
-      click_to_record: "انقر فوق الميكروفون لتسجيل التعليقات"
       dropped_assignment_no_total: "لن يتم اعتبار هذه المهمة ضمن الحساب الإجمالي"
       hypothetical_score: "هذا مجموع نقاط ماذا لو"
     turnitin: 
@@ -7006,7 +7004,6 @@ ar:
         out_of: من
         score: الدرجة
       icons: 
-        rubric_results: "عرض نتائج العنوان"
         turnitin_results: "عرض نتائج Turnitin"
       labels: 
         final_grade_hidden: "تم تعطيل حساب الإجماليات"
@@ -7483,6 +7480,11 @@ ar:
         assign_user_to_group: "تعيين المستخدم إلى هذه المجموعة"
         assign_user_to_group_name: "تعيين المستخدم إلى المجموعة %{name}"
         no_groups_created: "يجب إنشاء المجموعات قبل إضافة المستخدمين."
+      auto_leadership_controls: 
+        auto_first_group_leader: "تعيين أول طالب للانضمام كقائد للمجموعة"
+        auto_group_leader: "تعيين قائد مجموعة الطلاب تلقائيًا"
+        auto_random_group_leader: "تعيين طالب عشوائي كقائد للمجموعة"
+        leadership: القيادة
       edit_group_assignment: 
         all_available_groups_full: "كل المجموعات المتاحة ممتلئة."
         all_groups_full_suggestion: "يجب إما تغيير حدود المجموعة أو إضافة مزيد من المجموعات."
@@ -7507,15 +7509,11 @@ ar:
         search_users: "البحث عن مستخدمين"
       group_category_create: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
-        auto_first_group_leader: "تعيين أول طالب للانضمام كقائد للمجموعة"
-        auto_group_leader: "تعيين قائد مجموعة الطلاب تلقائيًا"
-        auto_random_group_leader: "تعيين طالب عشوائي كقائد للمجموعة"
         cancel: إلغاء
         create_groups: "إنشاء %h{num_groups} مجموعة/مجموعات الآن"
         create_groups_manually: "سأقوم بإنشاء مجموعات يدويًا"
         group_set_name: "اسم مجموعة المجموعات"
         group_structure: "هيكل المجموعة"
-        leadership: القيادة
         leave_group_limit_blank: "اتركه فارغًا لعدم وجود حد"
         limit_group_size: "قصر المجموعات على %h{group_limit} من الأعضاء"
         require_same_section: "يلزم وجود أفراد المجموعة في نفس القسم"
@@ -8121,7 +8119,6 @@ ar:
       media_contribution: "مساهمة الوسائط"
       play_comment: "تشغيل تعليق الوسائط"
       record_upload_media_comment: "تسجيل/تحميل تعليق الوسائط"
-    track_uploaded_successfully: "تم تحميل المقطع بنجاح، قم بالتحديث لعرضه."
     upload: تحميل
     uploading: "جارٍ التحميل..."
   menu: 
@@ -10504,6 +10501,15 @@ ar:
     : لا
     ? "yes"
     : نعم
+  orbis_report_header_assignment_id: "معرف المهمة"
+  orbis_report_header_assignment_title: "عنوان المهمة"
+  orbis_report_header_canvas_course_id: "معرف المساق"
+  orbis_report_header_course_name: "اسم المساق"
+  orbis_report_header_course_sis_id: "معرف sis للمساق"
+  orbis_report_header_points_possible: "النقاط الممكنة"
+  orbis_report_header_student_canvas_id: "معرف مستخدم Canvas"
+  orbis_report_header_student_name: "اسم الطالب"
+  orbis_report_header_submission_score: "درجة الإرسال"
   outcome_groups: 
     invalid_file: "ملف مجموعة النتائج غير صالح"
   outcome_groups_api: 
@@ -12410,14 +12416,11 @@ ar:
           save: حفظ
         end_quiz_reference_time_current_end: "وقت الإنهاء الحالي"
         end_quiz_reference_time_now: الآن
-        end_quiz_when: "إنهاء الاختبار %{n} دقيقة (دقائق) من %{reference_time}."
         extended_quiz_time_explanation: "يمكنك إعطاء هذا المستخدم وقتًا إضافيًا بخصوص محاولة الاختبار الحالية. فكم من الوقت تود إعطاءه؟"
         finished_in: "تم الانتهاء في %{duration}"
-        global_extra_attempts: "يحصل كل شخص على %{n} بالفعل"
         headers: 
           attempt: المحاولة
           attempts_left: "المحاولات المتبقية"
-          extended_quiz_time: "تمديد وقت الاختبار"
           score: الدرجة
           student: الطالب
           student_extensions: "تمديدات للطالب"
@@ -12426,15 +12429,14 @@ ar:
         labels: 
           ending: الإنهاء
           extra_attempts: "المحاولات الإضافية"
-          extra_time_per_attempt: "الوقت الإضافي في كل محاولة"
           manually_unlock: "إلغاء تأمين الاختبار يدويًا للمحاولة التالية"
           reset_has_seen_results: "دع الطلاب يشاهدون النتائج مرة أخرى"
           started: "تم البدء"
         minutes: دقائق
         moderate_page_title: "%{title}: متوسط"
         page_title: "اختبار متوسط"
-        student_gets_extra_time: "*%{student_name}* **يحصل على %{extra_time} دقيقة (دقائق) إضافية على كل محاولة**"
         student_n: "طالب %{n}"
+        submitting: "جارٍ الإرسال..."
         titles: 
           change_user_extensions: "تغيير امتدادات المستخدم"
           manually_unlocked: "تم إلغاء التأمين يدويًا"
@@ -13045,8 +13047,6 @@ ar:
   react_files: 
     add_folder: "إضافة مجلد"
     cancel: "إلغاء الأمر"
-    confirm_delete: "هل تريد حذف %{name} بالتأكيد؟"
-    confirm_delete_selected: "هل تريد حذف %{count} من العناصر بالتأكيد؟"
     count_items_selected: "تم تحديد %{count} من العناصر "
     created_at: "تم إنشاء التاريخ"
     created_at_short: "تاريخ الإنشاء"
@@ -13061,6 +13061,7 @@ ar:
         three_chars: "أدخل 3 حروف على الأقل في مربع البحث."
         your_search: "لا يطابق بحثك - \"%{search_term}\" - أية ملفات."
     files: الملفات
+    files_heading: الملفات
     folder: المجلد
     labels: 
       select: "تحديد هذا العنصر"
@@ -13168,8 +13169,7 @@ ar:
       cancel: "إلغاء الأمر"
       update: تحديث
     label: 
-      availableFrom: من
-      availableUntil: حتى
+      availableUntil: "تأمين حتى"
     options: 
       publish: 
         description: نشر
