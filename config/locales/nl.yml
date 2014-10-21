@@ -1131,6 +1131,11 @@ nl:
         one: "%{file_size} *van een bestand*"
         other: "%{file_size} *van %{count} bestanden*"
       uploaded_file_storage_header: "Opslag van geüploadede bestanden"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "Cursussen met verborgen opdrachten tonen wellicht geen nauwkeurige scores in dit rapport."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2590,6 +2595,7 @@ nl:
     messages_sent: "Berichten verzonden"
     missing_due_date_dialog: 
       buttons: 
+        continue: Doorgaan
         goBack: "Terug gaan"
         noDueDate: "Geen inleverdatum"
       modal: 
@@ -4041,30 +4047,13 @@ nl:
       unstar_conversation: "Ster van gesprek verwijderen"
     message_deleted: "Bericht verwijderd!"
     message_detail: 
+      delete: Verwijderen
+      forward: Doorsturen
+      message_actions: "Opties voor berichten"
+      more_options: "Meer opties"
       no_subject: "Geen onderwerp"
-    message_form: 
-      buttons: 
-        reply: Antwoorden
-        reply_all: "Allen beantwoorden"
-        send_message: Versturen
-      headings: 
-        new_message: "Nieuw bericht"
-      inbox_actions: 
-        add_people: "Personen toevoegen"
-      labels: 
-        add_to_faculty_journal: "Aan faculteitsnieuws toevoegen"
-        group_conversation: "Dit is een groepsgesprek. Deelnemers zullen alle antwoorden zien."
-        message: "Bericht:"
-        to: "Aan:"
-      links: 
-        add_attachment: Bijvoegen
-        media_comment: Opnemen
-      media_comment: Media-opmerking
-      titles: 
-        add_attachment: "Een bijlage toevoegen"
-        media_comment: "Opgenomen media-opmerking"
-        record_media_comment: "Audio- of video-opmerking opnemen"
-        remove_media_comment: "Media-opmerking verwijderen"
+      reply: Antwoorden
+      reply_all: "Allen beantwoorden"
     message_form_dialog: 
       body: Inhoud
       headings: 
@@ -4115,7 +4104,6 @@ nl:
     other_recipients: 
       one: "en 1 andere"
       other: "en %{count} anderen"
-    search_category: "Zoeken %{category}"
     star: Ster
     star_conversation: "Gesprek met ster"
     titles: 
@@ -4130,6 +4118,9 @@ nl:
     batch_update_message: 
       one: "1 cursus verwerkt"
       other: "%{count} cursussen verwerkt"
+    course_format: 
+      not_set: "Niet ingesteld"
+      online: Online
     course_not_found: "De cursus is niet gevonden"
     csv: 
       comments: Opmerkingen
@@ -4710,6 +4701,7 @@ nl:
         allow_student_organized_groups: "Toestaan dat cursisten hun eigen groepen indelen"
         conclude_at: Eindigt
         course_code: Cursuscode
+        course_format: Formaat
         course_lock_all_announcements: "Opmerkingen op aankondigingen uitschakelen"
         course_name: Naam
         course_section_name: "Een nieuwe sectie toevoegen"
@@ -5027,8 +5019,6 @@ nl:
       student: 
         count: "Verkeerd aantal cursisten"
         ratio: "Verkeerde cursistratio"
-  current_uploads: 
-    close: sluiten
   curve_grades_dialog: 
     average_score: "Gemiddelde score"
     buttons: 
@@ -6241,6 +6231,12 @@ nl:
     post_grades: "Cijfers op SIS posten"
     student_groups: "Pagina met nieuwe groepen cursisten"
     student_outcome_gradebook: "Cijferlijst bekwaam leren cursisten"
+  file_preview: 
+    file_preview_headerbutton_close: Sluiten
+    file_preview_hide: Verbergen
+    file_preview_infotable_name: Naam
+    file_preview_infotable_status: Status
+    file_preview_show: Tonen
   file_rename_form: 
     back: Terug
     change: Veranderen
@@ -6283,6 +6279,7 @@ nl:
       uploading_zip: "Er zijn fouten opgetreden tijdens het uploaden van het zipbestand."
     fields: 
       file: Bestand
+    files_page_title: Bestanden
     full_index: 
       alts: 
         file_locked: vergrendeld
@@ -6464,6 +6461,7 @@ nl:
       no_students_in_groups_close: "Sorry, inzendingen voor deze opdracht kunnen niet in Speedgrader beoordeeld worden, omdat er geen toegewezen gebruikers zijn. Wijs gebruikers aan deze groep toe en robeer opnieuw. Op OK klikken om het venster te sluiten."
       no_students_in_section: "Kan geen enkele cursist  in deze sectie vinden,  teruggaan om alle secties te tonen."
     buttons: 
+      dialog_buttons: Annuleren
       saving_settings: "Bezig met opslaan van instellingen..."
       submit_comment: "Opmerking inleveren"
       submitting: "Bezig met inzenden..."
@@ -6497,7 +6495,6 @@ nl:
     student: Cursist
     student_mute_notification: "Cursusleider is bezig met nakijken"
     titles: 
-      click_to_record: "Op de microfoon klikken om jouw opmerkingen op te nemen"
       dropped_assignment_no_total: "Deze opdracht telt niet mee voor het totaal cijfer"
       hypothetical_score: "Dit is een wat-als-score"
     turnitin: 
@@ -6741,7 +6738,6 @@ nl:
         out_of: Van
         score: Score
       icons: 
-        rubric_results: "Rubricresultaten zien"
         turnitin_results: "Turnitin-resultaten zien"
       labels: 
         final_grade_hidden: "Het berekenen van totalen is uitgeschakeld"
@@ -7195,6 +7191,11 @@ nl:
         assign_user_to_group: "Gebruiker aan deze groep toewijzen"
         assign_user_to_group_name: "Gebruiker aan groep %{name} toevoegen "
         no_groups_created: "Groepen dienen gemaakt te worden voordat gebruikers toegewezen kunnen worden."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Eerste cursist als groepsleider aanstellen "
+        auto_group_leader: "Een cursist automatisch aanstellen als groepsleider"
+        auto_random_group_leader: "Willekeurige cursist als groepsleider aanstellen"
+        leadership: Leiderschap
       edit_group_assignment: 
         all_available_groups_full: "Alle beschikbare groepen zijn vol."
         all_groups_full_suggestion: "Ofwel groepslimieten wijzigen of meer groepen toevoegen."
@@ -7219,15 +7220,11 @@ nl:
         search_users: "Gebruikers zoeken"
       group_category_create: 
         allow_self_signup: "Zelfinschrijving toestaan"
-        auto_first_group_leader: "Eerste cursist als groepsleider aanstellen "
-        auto_group_leader: "Een cursist automatisch aanstellen als groepsleider"
-        auto_random_group_leader: "Willekeurige cursist als groepsleider aanstellen"
         cancel: Annuleren
         create_groups: " %h{num_groups} groepen nu maken"
         create_groups_manually: "Ik zal groepen handmatig maken"
         group_set_name: "Naam van groepsreeks"
         group_structure: Groepsstructuur
-        leadership: Leiderschap
         leave_group_limit_blank: "Leeglaten voor geen limiet"
         limit_group_size: "Groepen beperken tot %h{group_limit} leden"
         require_same_section: "Vereisen dat groepsleden in dezelfde sectie moeten zitten"
@@ -7807,7 +7804,6 @@ nl:
       media_contribution: Mediabijdrage
       play_comment: "Media-opmerking afspelen"
       record_upload_media_comment: "Media-opmerking opnemen/uploaden"
-    track_uploaded_successfully: "Track is succesvol geüpload, vernieuwen om het te zien."
     upload: Uploaden
     uploading: "Bezig met uploaden..."
   menu: 
@@ -10120,6 +10116,14 @@ nl:
     : Nee
     ? "yes"
     : Ja
+  orbis_report_header_assignment_id: "id voor opdracht"
+  orbis_report_header_assignment_title: "titel van opdracht"
+  orbis_report_header_canvas_course_id: cursus-id
+  orbis_report_header_course_name: cursusnaam
+  orbis_report_header_course_sis_id: "cursus sis-id"
+  orbis_report_header_points_possible: "punten mogelijk"
+  orbis_report_header_student_name: "naam van cursist"
+  orbis_report_header_submission_score: "score van inzending"
   outcome_groups: 
     invalid_file: "Ongeldig bestand over leerresultaat voor groep"
   outcome_groups_api: 
@@ -11979,14 +11983,11 @@ nl:
           save: Opslaan
         end_quiz_reference_time_current_end: "de huidige eindtijd"
         end_quiz_reference_time_now: nu
-        end_quiz_when: "De toets %{n} minuten beëindigen van %{reference_time}."
         extended_quiz_time_explanation: "Je kunt deze cursist extra tijd geven voor hun huidige toetspoging. Hoeveel tijd wil je hem/haar geven?"
         finished_in: "voltooid in %{duration}"
-        global_extra_attempts: "iedereen krijgt al %{n}"
         headers: 
           attempt: Poging
           attempts_left: "Pogingen over"
-          extended_quiz_time: "Toetstijd verlengen"
           score: Score
           student: Cursist
           student_extensions: "Verlengingen voor cursist"
@@ -11995,15 +11996,14 @@ nl:
         labels: 
           ending: "Wordt beëindigd"
           extra_attempts: "Extra pogingen"
-          extra_time_per_attempt: "Extra tijd voor elke poging"
           manually_unlock: "De toets handmatig ontgrendelen voor de volgende poging"
           reset_has_seen_results: "Laat aan de cursist de resultaten nog eenmaal zien"
           started: Gestart
         minutes: minuten
         moderate_page_title: "%{title}: Overzien"
         page_title: "Toets overzien"
-        student_gets_extra_time: "*%{student_name}* **krijgt %{extra_time} extra tijd bij iedere poging**"
         student_n: "Cursist %{n}"
+        submitting: "Bezig met inleveren..."
         titles: 
           change_user_extensions: "Verlengingen voor gebruiker wijzigen"
           manually_unlocked: "Handmatig ontgrendeld"
@@ -12518,8 +12518,6 @@ nl:
   react_files: 
     add_folder: "Map toevoegen"
     cancel: Annuleren
-    confirm_delete: "Weet je zeker dat je %{name} wilt verwijderen?"
-    confirm_delete_selected: "Weet je zeker dat je deze %{count} items wilt verwijderen? "
     count_items_selected: "%{count} geselecteerde items"
     created_at_short: Gemaakt
     delete: Verwijderen
@@ -12533,6 +12531,7 @@ nl:
         three_chars: "Minstens 3 letters in het zoekvak invoeren."
         your_search: "Jouw zoekopdracht  - \"%{search_term}\" - heeft geen passende bestanden."
     files: Bestanden
+    files_heading: Bestanden
     folder: Map
     labels: 
       select: "Dit item selecteren"
@@ -12620,8 +12619,7 @@ nl:
       cancel: Annuleren
       update: Bijwerken
     label: 
-      availableFrom: Van
-      availableUntil: Tot
+      availableUntil: "Vergrendelen tot"
     options: 
       publish: 
         description: Publiceren
