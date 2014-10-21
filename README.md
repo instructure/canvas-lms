@@ -128,8 +128,6 @@ $ bundle exec cap staging deploy:update
 from the canvas folder and it should work to update code from our github repo. If you get a "remote disconnect", double check the ssh-agent setup and environment variables.
 
 
-
-
 The rest is just the original Canvas README contents:
 
 
