@@ -839,6 +839,18 @@ describe CoursesController do
       expect(response).to be_redirect
       expect(response.location).to match(%r{/courses/#{@course2.id}})
     end
+
+    it "should not redirect to the xlisted course if the enrollment is deleted" do
+      user_session(@student)
+      @course1 = @course
+      @course2 = course(:active_all => true)
+      @course1.default_section.crosslist_to_course(@course2, :run_jobs_immediately => true)
+      @user.enrollments.destroy_all
+
+      get 'show', :id => @course1.id
+      expect(response.status).to eq 401
+    end
+
   end
 
   describe "POST 'unenroll_user'" do

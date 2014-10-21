@@ -1275,7 +1275,7 @@ class CoursesController < ApplicationController
 
   def check_for_xlist
     return false unless @current_user.present? && @context_enrollment.blank?
-    xlist_enrollment = @current_user.enrollments.joins(:course_section).
+    xlist_enrollment = @current_user.enrollments.active.joins(:course_section).
       where(:course_sections => { :nonxlist_course_id => @context }).first
     if xlist_enrollment.present?
       redirect_params = {}
