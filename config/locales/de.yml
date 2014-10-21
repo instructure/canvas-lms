@@ -1124,6 +1124,11 @@ de:
         one: "%{file_size} *aus einer Datei*"
         other: "%{file_size} *aus %{count} Dateien*"
       uploaded_file_storage_header: "Speicher für hochgeladene Dateien"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "Kurse mit stummgeschalteten Aufgaben geben die Noten in diesem Bericht unter Umständen nicht richtig wieder."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2585,6 +2590,7 @@ de:
     messages_sent: "Nachricht gesendet"
     missing_due_date_dialog: 
       buttons: 
+        continue: Fortfahren
         goBack: Zurück
         noDueDate: "Kein Abgabetermin"
       modal: 
@@ -4036,30 +4042,13 @@ de:
       unstar_conversation: "Sternmarkierung für Konversation entfernen"
     message_deleted: "Nachricht gelöscht!"
     message_detail: 
+      delete: Löschen
+      forward: Weiterleiten
+      message_actions: Nachrichtenaktionen
+      more_options: "Weitere Optionen"
       no_subject: "Kein Betreff"
-    message_form: 
-      buttons: 
-        reply: Antworten
-        reply_all: "Allen antworten"
-        send_message: Senden
-      headings: 
-        new_message: "Neue Nachricht"
-      inbox_actions: 
-        add_people: "Personen hinzufügen"
-      labels: 
-        add_to_faculty_journal: "Als Fakultätsjournaleintrag hinzufügen"
-        group_conversation: "Dies ist eine Gruppenkonversation. Die Teilnehmer sehen die Antworten aller anderen Teilnehmer"
-        message: "Nachricht:"
-        to: "An:"
-      links: 
-        add_attachment: Anhängen
-        media_comment: Aufzeichnen
-      media_comment: Multimediakommentar
-      titles: 
-        add_attachment: "Einen Dateianhang hinzufügen"
-        media_comment: "Aufgezeichneter Multimediakommentar"
-        record_media_comment: "Audio- oder Videokommentar aufzeichnen"
-        remove_media_comment: "Multimediakommentar entfernen"
+      reply: Antworten
+      reply_all: "Allen antworten"
     message_form_dialog: 
       body: Text
       headings: 
@@ -4110,7 +4099,6 @@ de:
     other_recipients: 
       one: "und 1 weitere/r"
       other: "und %{count} weitere"
-    search_category: "%{category} durchsuchen"
     star: "Mit Stern markieren"
     star_conversation: "Konversation mit Stern markieren"
     titles: 
@@ -4125,6 +4113,9 @@ de:
     batch_update_message: 
       one: "1 Kurs verarbeitet"
       other: "%{count} Kurse verarbeitet"
+    course_format: 
+      not_set: "Nicht definiert"
+      online: Online
     course_not_found: "Der Kurs wurde nicht gefunden"
     csv: 
       comments: Kommentare
@@ -4703,6 +4694,7 @@ de:
         allow_student_organized_groups: "Studenten das Organisieren eigener Gruppen erlauben"
         conclude_at: Ende
         course_code: Kurs-code
+        course_format: Format
         course_lock_all_announcements: "Kommentare zu Ankündigungen deaktivieren"
         course_name: Name
         course_section_name: "Neuen Kursabschnitt hinzufügen"
@@ -5020,8 +5012,6 @@ de:
       student: 
         count: "Falsche Anzahl Studenten"
         ratio: "Falsches Studentenverhältnis"
-  current_uploads: 
-    close: Schließen
   curve_grades_dialog: 
     average_score: Punktedurchschnitt
     buttons: 
@@ -6239,6 +6229,13 @@ de:
     post_grades: "Noten in SIS veröffentlichen"
     student_groups: "Neue Seite für Studentengruppen"
     student_outcome_gradebook: "Notenbuch für Leistungsziel erreicht für Studenten"
+  file_preview: 
+    file_preview_headerbutton_close: Schließen
+    file_preview_hide: Ausblenden
+    file_preview_infotable_datecreated: Erstellungsdatum
+    file_preview_infotable_name: Name
+    file_preview_infotable_status: Status
+    file_preview_show: Anzeigen
   file_rename_form: 
     back: Zurück
     change: Ändern
@@ -6281,6 +6278,7 @@ de:
       uploading_zip: "Beim Hochladen der Zip-datei ist ein Fehler aufgetreten."
     fields: 
       file: Datei
+    files_page_title: Dateien
     full_index: 
       alts: 
         file_locked: gesperrt
@@ -6466,6 +6464,7 @@ de:
       no_students_in_groups_close: "Einreichungen für diese Aufgabe können leider nicht mit SpeedGrader benotet werden, da keine zugewiesenen Benutzer vorhanden sind. Bitte weisen Sie diesem Gruppensatz Benutzer zu, und versuchen Sie es erneut. Klicken Sie auf \"OK\", um das Fenster zu schließen."
       no_students_in_section: "Es wurden keine Studenten in diesem Kursabschnitt gefunden, Rückkehr zur Anzeige aller Kursabschnitte."
     buttons: 
+      dialog_buttons: Abbrechen
       saving_settings: "Einstellungen werden gespeichert..."
       submit_comment: "Kommentar absenden"
       submitting: "Wird abgesandt..."
@@ -6497,7 +6496,6 @@ de:
     student: Student
     student_mute_notification: "Dozent arbeitet zurzeit an der Benotung"
     titles: 
-      click_to_record: "Klicken Sie auf das Mikrofon, um Ihre Kommentare aufzuzeichnen"
       dropped_assignment_no_total: "Diese Aufgabe fließt nicht in die Gesamtpunktzahl ein"
       hypothetical_score: "Dies ist ein hypothetischer Punktestand"
     turnitin: 
@@ -6741,7 +6739,6 @@ de:
         out_of: "Von insgesamt"
         score: Bewertung
       icons: 
-        rubric_results: "Rubrik-Ergebnisse anzeigen"
         turnitin_results: "Turnitin-Ergebnisse anzeigen"
       labels: 
         final_grade_hidden: "Die Berechnung der Gesamtbewertung ist deaktiviert"
@@ -7190,6 +7187,11 @@ de:
         assign_user_to_group: "Benutzer dieser Gruppe zuweisen"
         assign_user_to_group_name: "Benutzer der Gruppe %{name} zuweisen"
         no_groups_created: "Vor dem Hinzufügen von Benutzern müssen Gruppen erstellt werden."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Ersten Studenten, der Mitglied wird, als Gruppenleiter festlegen"
+        auto_group_leader: "Studentengruppenleiten automatisch zuweisen"
+        auto_random_group_leader: "Beliebigen Studenten als Gruppenleiter festlegen"
+        leadership: Leitung
       edit_group_assignment: 
         all_available_groups_full: "Alle verfügbaren Gruppen sind voll."
         all_groups_full_suggestion: "Ändern Sie die Gruppenlimits, oder fügen Sie mehr Gruppen hinzu."
@@ -7214,15 +7216,11 @@ de:
         search_users: "Benutzer durchsuchen"
       group_category_create: 
         allow_self_signup: "Selbstregistrierung zulassen"
-        auto_first_group_leader: "Ersten Studenten, der Mitglied wird, als Gruppenleiter festlegen"
-        auto_group_leader: "Studentengruppenleiten automatisch zuweisen"
-        auto_random_group_leader: "Beliebigen Studenten als Gruppenleiter festlegen"
         cancel: Abbrechen
         create_groups: "Jetzt %h{num_groups} Gruppen erstellen"
         create_groups_manually: "Ich erstelle Gruppen manuell"
         group_set_name: "Name des Gruppensatzes"
         group_structure: Gruppenstruktur
-        leadership: Leitung
         leave_group_limit_blank: "Leer lassen, um kein Limit anzugeben"
         limit_group_size: "Gruppen auf %h{group_limit} Mitglieder beschränken"
         require_same_section: "Festlegen, dass Gruppenmitglieder zum selben Abschnitt gehören müssen"
@@ -7803,7 +7801,6 @@ de:
       media_contribution: Multimedia-beitrag
       play_comment: "Multimediakommentar wiedergeben"
       record_upload_media_comment: "Multimediakommentar aufzeichnen/hochladen"
-    track_uploaded_successfully: "Titel erfolgreich hochgeladen. Zum Anzeigen aktualisieren"
     upload: Hochladen
     uploading: "Wird hochgeladen..."
   menu: 
@@ -10093,6 +10090,15 @@ de:
     : Nein
     ? "yes"
     : Ja
+  orbis_report_header_assignment_id: Aufgaben-ID
+  orbis_report_header_assignment_title: Aufgabentitel
+  orbis_report_header_canvas_course_id: Kurs-ID
+  orbis_report_header_course_name: Kursname
+  orbis_report_header_course_sis_id: "SIS-ID für Kurs"
+  orbis_report_header_points_possible: "mögliche Punkte "
+  orbis_report_header_student_canvas_id: Canvas-Benutzer-ID
+  orbis_report_header_student_name: "Name des Studenten"
+  orbis_report_header_submission_score: "Punktzahl für Einsendung"
   outcome_groups: 
     invalid_file: "Ungültige Resultatsgruppen-datei"
   outcome_groups_api: 
@@ -11945,14 +11951,11 @@ de:
           save: Speichern
         end_quiz_reference_time_current_end: "derzeitiges Zeitlimit"
         end_quiz_reference_time_now: jetzt
-        end_quiz_when: "Beenden Sie das Quiz %{n} Minuten nach %{reference_time}."
         extended_quiz_time_explanation: "Sie können diesem Studenten mehr Zeit für seinen derzeitigen Quizversuch einräumen. Wie viel Zeit möchten Sie ihm geben?"
         finished_in: "abgeschlossen in %{duration}"
-        global_extra_attempts: "alle erhalten bereits %{n}"
         headers: 
           attempt: Versuch
           attempts_left: "Verbleibende Versuche"
-          extended_quiz_time: "Zeitlimit für Quiz verlängern"
           score: Punktzahl
           student: Student
           student_extensions: "Zeitlimiterverlängerungen für Studenten"
@@ -11961,15 +11964,14 @@ de:
         labels: 
           ending: Endet
           extra_attempts: "Zusätzliche Versuche"
-          extra_time_per_attempt: "Zusätzliche Zeit pro Versuch"
           manually_unlock: "Quiz für den nächsten Versuch manuell freigeben"
           reset_has_seen_results: "Den Studenten die Ergebnisse noch einmal anzeigen"
           started: Begonnen
         minutes: Minuten
         moderate_page_title: "%{title}: Moderieren"
         page_title: "Quiz moderieren"
-        student_gets_extra_time: "*%{student_name}* **erhält %{extra_time} zusätzliche Minuten für jeden Versuch**"
         student_n: "Student %{n}"
+        submitting: "Wird abgesandt..."
         titles: 
           change_user_extensions: "Benutzer-Zeitlimitverlängerungen ändern"
           manually_unlocked: "Manuell freigegeben"
@@ -12484,8 +12486,6 @@ de:
   react_files: 
     add_folder: "Ordner hinzufügen"
     cancel: Abbrechen
-    confirm_delete: "Möchten Sie %{name} wirklich löschen?"
-    confirm_delete_selected: "Möchten Sie diese %{count} Elemente wirklich löschen?"
     count_items_selected: "%{count} Elemente ausgewählt"
     created_at: Erstellungsdatum
     created_at_short: Erstellt
@@ -12500,6 +12500,7 @@ de:
         three_chars: "Geben Sie mindestens 3 Buchstaben in das Suchfeld ein."
         your_search: "Bei Ihrer Suche - \"%{search_term}\" - wurden keine übereinstimmenden Dateien gefunden."
     files: Dateien
+    files_heading: Dateien
     folder: Ordner
     labels: 
       select: "Dieses Element auswählen"
@@ -12587,8 +12588,7 @@ de:
       cancel: Abbrechen
       update: Aktualisieren
     label: 
-      availableFrom: Von
-      availableUntil: Bis
+      availableUntil: "Sperren bis"
     options: 
       publish: 
         description: Veröffentlichen
