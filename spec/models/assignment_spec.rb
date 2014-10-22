@@ -433,6 +433,13 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
+    it "should handle percent grades with nil points possible" do
+      @assignment.grading_type = "percent"
+      @assignment.points_possible = nil
+      grade = @assignment.score_to_grade(5.0)
+      expect(grade).to eql('5%')
+    end
+
     it "should give a grade to extra credit assignments" do
       @assignment.grading_type = 'points'
       @assignment.points_possible = 0.0
