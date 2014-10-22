@@ -23,34 +23,6 @@ describe GradingPeriod do
     @grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
   end
 
-  it "should respond to course_id" do
-    expect(@grading_period).to respond_to(:course_id)
-  end
-
-  it "should respond to account_id" do
-    expect(@grading_period).to respond_to(:account_id)
-  end
-
-  it "should respond to weight" do
-    expect(@grading_period).to respond_to(:weight)
-  end
-
-  it "should respond to start_date" do
-    expect(@grading_period).to respond_to(:start_date)
-  end
-
-  it "should respond to end_date" do
-    expect(@grading_period).to respond_to(:end_date)
-  end
-
-  it "should respond to course" do
-    expect(@grading_period).to respond_to(:course)
-  end
-
-  it "should respond to account" do
-    expect(@grading_period).to respond_to(:account)
-  end
-
   context "associations" do
     it "should belong to a course" do
       association = GradingPeriod.reflect_on_association(:course)

@@ -1,5 +1,5 @@
 class GradingPeriod < ActiveRecord::Base
-  attr_accessible :course, :account, :weight, :start_date, :end_date
+  attr_accessible :weight, :start_date, :end_date, :title
 
   belongs_to :course
   belongs_to :account

@@ -55,6 +55,7 @@ describe GradingPeriodsController, type: :request do
         expect(period).to have_key('weight')
         expect(period).to have_key('start_date')
         expect(period).to have_key('end_date')
+        expect(period).to have_key('title')
       end
     end
 
@@ -70,7 +71,8 @@ describe GradingPeriodsController, type: :request do
   describe 'GET show' do
     before :once do
       now = Time.zone.now
-      @grading_period = @account.grading_periods.create!(weight: 50, start_date: 1.month.since(now), end_date: 2.month.since(now))
+      @grading_period = @account.grading_periods.create!(weight: 50, start_date: 1.month.since(now), end_date: 2.month.since(now),
+        title: "Grading Period Title")
     end
 
     def get_show(raw = false, data = {})
@@ -90,6 +92,7 @@ describe GradingPeriodsController, type: :request do
       expect(period['id']).to eq(@grading_period.id.to_s)
       expect(period['account_id']).to eq(@account.id.to_s)
       expect(period['weight']).to eq(@grading_period.weight)
+      expect(period['title']).to eq(@grading_period.title)
     end
   end
 
