@@ -81,8 +81,8 @@ var messageType = $toolForm.data('message-type') || 'tool_launch';
 $.trackEvent(messageType, toolName, toolPath);
 
 //Iframe resize handler
-var min_tool_height;
 var $tool_content_wrapper;
+var min_tool_height, canvas_chrome_height;
 
 function tool_content_wrapper() {
   return $tool_content_wrapper || $('.tool_content_wrapper');
@@ -95,15 +95,15 @@ var resize_tool_content_wrapper = function(height) {
 
 $(function() {
   var $window = $(window);
-  min_tool_height = $('#main').height();
   $tool_content_wrapper = $('.tool_content_wrapper');
+
+  min_tool_height = $('#main').height();
+  canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height();
 
   if ($tool_content_wrapper.length) {
     $window.resize(function () {
       if (!$tool_content_wrapper.data('height_overridden')) {
-        var top = $tool_content_wrapper.offset().top;
-        var height = $window.height();
-        resize_tool_content_wrapper(height - top);
+        resize_tool_content_wrapper($window.height() - canvas_chrome_height);
       }
     }).triggerHandler('resize');
   }
