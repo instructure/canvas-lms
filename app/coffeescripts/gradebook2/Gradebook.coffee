@@ -537,8 +537,9 @@ define [
         assignment = @assignments[submission.assignment_id]
         if !assignment?
           @staticCellFormatter(row, col, '')
-        else if submission.workflow_state == 'pending_review'
-          (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
+        # reverted until Quiz Icon pending review workflow_state thing is resolved
+        #else if submission.workflow_state == 'pending_review'
+        #  (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
         else
           if assignment.grading_type == 'points' && assignment.points_possible
             SubmissionCell.out_of.formatter(row, col, submission, assignment)
