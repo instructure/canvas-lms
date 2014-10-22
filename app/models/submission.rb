@@ -344,7 +344,7 @@ class Submission < ActiveRecord::Base
 
   TURNITIN_RETRY = 5
   def submit_to_turnitin(attempt=0)
-    return unless self.context.turnitin_settings
+    return unless turnitinable? && self.context.turnitin_settings
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     reset_turnitin_assets
 
@@ -394,6 +394,8 @@ class Submission < ActiveRecord::Base
       self.attachments.select{ |a| a.turnitinable? }
     elsif self.submission_type == 'online_text_entry'
       [self]
+    else
+      []
     end
   end
 
