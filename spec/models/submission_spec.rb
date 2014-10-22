@@ -499,6 +499,12 @@ describe Submission do
         expect(@submission.turnitin_data[@submission.asset_string][:status]).to eq 'scored'
         expect(@submission.turnitin_data["other_asset"][:status]).to eq 'scored'
       end
+
+      it "should not blow up if submission_type has changed when job runs" do
+        @submission.submission_type = 'online_url'
+        @submission.context.expects(:turnitin_settings).never
+        expect { @submission.submit_to_turnitin }.not_to raise_error
+      end
     end
 
     describe "group" do
