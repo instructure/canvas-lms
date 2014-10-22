@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
   has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
           :conditions => enrollment_conditions(:current_and_concluded), :readonly => false
 
-  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')"
+  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :multishard => true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -1668,7 +1668,7 @@ class User < ActiveRecord::Base
   def cached_not_ended_enrollments
     self.shard.activate do
       @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
-        self.not_ended_enrollments.with_each_shard
+        self.not_ended_enrollments.to_a
       end
     end
   end

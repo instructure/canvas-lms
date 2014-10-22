@@ -710,8 +710,7 @@ class CoursesController < ApplicationController
         # enrollments course for has_grade_permissions?
         ActiveRecord::Associations::Preloader.new(users,
                                                   { :not_ended_enrollments => :course },
-                  :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard).run
+                  :conditions => ['enrollments.course_id = ?', @context.id]).run
       end
       render :json => users.map { |u|
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
@@ -761,8 +760,7 @@ class CoursesController < ApplicationController
         # enrollments course for has_grade_permissions?
         ActiveRecord::Associations::Preloader.new(users,
                                                   {:not_ended_enrollments => :course},
-                  :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard).run
+                  :conditions => ['enrollments.course_id = ?', @context.id]).run
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
