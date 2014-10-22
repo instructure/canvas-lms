@@ -62,7 +62,7 @@ define([
       txt = txt.substring(0, txt.length - 2);
     }
     INST.errorCount += 1;
-    
+
     // doing this old-school in case something happend where jquery is not loaded.
     var img = document.createElement('img');
     img.src = INST.errorURL + txt;
@@ -102,14 +102,12 @@ define([
       if (error === 'abort') return;
       var status = "0";
       var text = I18n.t('no_text', "No text");
-      var json_data = {};
       try {
         status = request.status;
         text = request.responseText;
-        json_data = $.parseJSON(text);
       } catch(e) {}
       $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-        if (json_data && json_data.status == 'unauthenticated') {
+        if ($.ajaxJSON.isUnauthenticated(request)) {
           var message = I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity.")
           message += "<br\/><a href='/login' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
           $.flashError(message, 30000);
@@ -124,7 +122,7 @@ define([
         var i = $obj[0];
         if(!i) { return; }
         var d = i.contentDocument || 
-                (i.contentWindow && i.contentWindow.document) || 
+                (i.contentWindow && i.contentWindow.document) ||
                 window.frames[$obj.attr('id')].document;
         var $body = $(d).find("body");
         $body.html($("<h1 />").text(I18n.t('error_heading', 'Ajax Error: %{status_code}', {status_code: status})));
@@ -158,8 +156,8 @@ define([
                   "&URL="        + escape(data.url || "unknown") +
                   "&Page="       + escape(location.href) +
                   "&Method="     + escape(data.submit_type || "unknown") +
-                  "&UserName="   + escape(username) + 
-                  "&Platform="   + escape(navigator.platform) + 
+                  "&UserName="   + escape(username) +
+                  "&Platform="   + escape(navigator.platform) +
                   "&UserAgent="  + escape(navigator.userAgent) +
                   "&Params="     + escape(data.params || "unknown");
         $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + INST.ajaxErrorURL + txt.substring(0, 2000) + "' />");
