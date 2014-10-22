@@ -1148,11 +1148,7 @@ class ApplicationController < ActionController::Base
     end
     return if @page || !@page_name
 
-    if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s).first ||
-              @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s.to_url).first ||
-              @wiki.wiki_pages.not_deleted.where(id: @page_name.to_i).first
-    end
+    @page = @wiki.find_page(@page_name) if params[:action] != 'create'
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
