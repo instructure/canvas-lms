@@ -5,6 +5,7 @@
   "main": "./js/main",
   "version": "0.0.1",
   "dependencies": {
+    "ember-template-compiler": "1.4.0",
     "handlebars": "1.3.0",
     "i18nliner": "0.0.15",
     "i18nliner-handlebars": "0.0.11",

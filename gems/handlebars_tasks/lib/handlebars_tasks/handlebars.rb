@@ -1,10 +1,12 @@
 require 'fileutils'
+require 'handlebars_tasks/template_precompiler'
 
 # Precompiles handlebars templates into JavaScript function strings
 module HandlebarsTasks
   class Handlebars
 
     class << self
+      include HandlebarsTasks::TemplatePrecompiler
 
       # Recursively compiles a source directory of .handlebars templates into a
       # destination directory. Immitates the node.js bin script at
@@ -78,7 +80,7 @@ module HandlebarsTasks
           dependencies << "jst/#{require_path}"
         end
 
-        data = prepare_template(id, source)
+        data = precompile_template(id, source)
         dependencies << "i18n!#{data["scope"]}" if data["translationCount"] > 0
 
         <<-JS
@@ -90,15 +92,6 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies},
   return templates['#{id}'];
 });
         JS
-      end
-
-      def prepare_template(path, source)
-        require 'json'
-        payload = {path: path, source: source}.to_json
-        compiler.puts payload
-        result = JSON.parse(compiler.readline)
-        raise result["error"] if result["error"]
-        result
       end
 
       def get_css(file_path)
@@ -113,11 +106,6 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies},
       end
 
       protected
-
-      # Returns the HBS preprocessor/compiler
-      def compiler
-        Thread.current[:hbs_compiler] ||= IO.popen("./gems/canvas_i18nliner/bin/prepare_hbs", "r+")
-      end
 
       def find_partial_deps(template)
         # finds partials like: {{>foo bar}} and {{>[foo/bar] baz}}

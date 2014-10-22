@@ -2,6 +2,7 @@
 
 var readline = require('readline');
 var Handlebars = require('handlebars');
+var EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
 var ScopedHbsExtractor = require('../js/scoped_hbs_extractor');
 var PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor')['default'];
 
@@ -28,7 +29,8 @@ rl.on('line', function(line) {
     PreProcessor.process(ast);
     extractor.forEach(function() { translationCount++; });
 
-    var result = Handlebars.precompile(ast);
+    var precompiler = data.ember ? EmberHandlebars : Handlebars;
+    var result = precompiler.precompile(ast).toString();
     var payload = {template: result, scope: scope, translationCount: translationCount};
     process.stdout.write(JSON.stringify(payload) + "\n");
   }

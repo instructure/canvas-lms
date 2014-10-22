@@ -14,8 +14,8 @@ var glob = require("glob");
 // explict subdirs, to work around perf issues
 // https://github.com/jenseng/i18nliner-js/issues/7
 JsProcessor.prototype.directories = ["public/javascripts"];
-HbsProcessor.prototype.directories = ["app/views/jst"];
-HbsProcessor.prototype.defaultPattern = "**/*.handlebars";
+HbsProcessor.prototype.directories = ["app/views/jst", "app/coffeescripts/ember"];
+HbsProcessor.prototype.defaultPattern = ["*.hbs", "*.handlebars"];
 
 require("./scoped_hbs_pre_processor");
 var ScopedI18nJsExtractor = require("./scoped_i18n_js_extractor");
@@ -24,10 +24,10 @@ var ScopedTranslationHash = require("./scoped_translation_hash");
 
 // remove path stuff we don't want in the scope
 var pathRegex = new RegExp(
-  "^" + HbsProcessor.prototype.directories[0] + "(/plugins/[^/]+)?/"
+  "^(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/"
 );
 ScopedHbsExtractor.prototype.normalizePath = function(path) {
-  return path.replace(pathRegex, "");
+  return path.replace(pathRegex, "").replace(/^([^\/]+\/)templates\//, '$1');
 };
 
 var GenerateJs = require("./generate_js");
