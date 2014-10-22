@@ -126,6 +126,19 @@ define([
     return null;
   };
 
+  $.ajaxJSON.isUnauthenticated = function(xhr) {
+    if (xhr.status != 401) {
+      return false;
+    }
+
+    var json_data = {};
+    try {
+      json_data = $.parseJSON(text);
+    } catch(e) {}
+
+    return json_data.status == 'unauthenticated';
+  };
+
   // Defines a default error for all ajax requests.  Will always be called
   // in the development environment, and as a last-ditch error catching
   // otherwise.  See "ajax_errors.js"
@@ -135,7 +148,7 @@ define([
       var inProduction = (INST.environment == "production");
       var unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) != -1);
       var ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) != -1);
-      if((!inProduction || unhandled || request.status == 401) && !ignore) {
+      if((!inProduction || unhandled || $.ajaxJSON.isUnauthenitcated(request)) && !ignore) {
         $.ajaxJSON.unhandledXHRs = $.grep($.ajaxJSON.unhandledXHRs, function(xhr, i) {
           return xhr != request;
         });
