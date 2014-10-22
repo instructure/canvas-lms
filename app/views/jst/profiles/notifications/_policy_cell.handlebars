@@ -1,7 +1,7 @@
 <td class='comm-event-option' data-selection='{{selected.code}}' data-category='{{category}}' data-channelId='{{channelId}}'>
   <div class='comm-event-option-contents'>
     <div class='event-option-selection'>
-      <a href="#" class='change-selection'>
+      <a href="#" class='change-selection' aria-hidden="true">
         <i class="{{selected.icon}}"></i> <span class='img-text'>{{selected.text}}</span>
         {{#if touch}}
         <i class="{{selected.icon}}"></i>
@@ -16,10 +16,10 @@
         {{/each}}
       </select>
     {{else}}
-      <div class="btn-group-was event-option-buttons">
+      <div class="btn-group-was event-option-buttons screenreader-only">
         {{#each allButtons}}
         <input type="radio" class="{{code}}-button frequency" id="{{id}}" name="{{coordinate}}" title="{{title}}" data-value='{{code}}' {{#if active}}checked='checked'{{/if}}>
-        <label for="{{id}}" class="{{code}}-label" data-tooltip title="{{title}}" ><i class="{{icon}}"></i></label>
+        <label for="{{id}}" class="{{code}}-label" data-tooltip title="{{title}}" ><i class="{{icon}}"></i><span class="screenreader-only">{{title}}</span></label>
         {{/each}}
       </div>
     {{/if}}
