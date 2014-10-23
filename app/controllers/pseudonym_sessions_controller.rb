@@ -206,7 +206,7 @@ class PseudonymSessionsController < ApplicationController
   # DELETE /logout
   def destroy
     # Only allow DELETE method for all logout requests except for SAML.
-    if saml_response?
+    if saml_response? || saml_request?
       saml_logout
     else
       # We can't verify the authenticity token for saml, so we do it in
@@ -229,7 +229,7 @@ class PseudonymSessionsController < ApplicationController
   # GET /logout
   def logout_confirm
     # allow GET requests for SAML logout
-    if saml_response?
+    if saml_response? || saml_request?
       saml_logout
     elsif !@current_user
       return redirect_to(login_url)
@@ -256,19 +256,24 @@ class PseudonymSessionsController < ApplicationController
       # once logged out it'll be redirected to here again
       if aac = account.account_authorization_configs.where(id: session[:saml_aac_id]).first
         settings = aac.saml_settings(request.host_with_port)
-        saml_request = Onelogin::Saml::LogOutRequest.new(settings, session)
-        forward_url = saml_request.generate_request
+
+        saml_request = Onelogin::Saml::LogoutRequest::generate(
+          session[:name_qualifier],
+          session[:name_id],
+          session[:session_index],
+          settings
+        )
 
         if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
-          aac.debug_set(:logout_request_id, request.id)
-          aac.debug_set(:logout_to_idp_url, forward_url)
-          aac.debug_set(:logout_to_idp_xml, saml_request.request_xml)
+          aac.debug_set(:logout_request_id, saml_request.id)
+          aac.debug_set(:logout_to_idp_url, saml_request.forward_url)
+          aac.debug_set(:logout_to_idp_xml, saml_request.xml)
           aac.debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
         end
 
         logout_current_user
         session[:delegated_message] = message if message
-        redirect_to(forward_url)
+        redirect_to(saml_request.forward_url)
         return
       else
         logout_current_user
@@ -327,7 +332,7 @@ class PseudonymSessionsController < ApplicationController
       end
 
       increment_saml_stat('login_response_received')
-      response = saml_response(params[:SAMLResponse])
+      response = Onelogin::Saml::Response.new(params[:SAMLResponse])
 
       if @domain_root_account.account_authorization_configs.count > 1
         aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: response.issuer).first
@@ -463,23 +468,56 @@ class PseudonymSessionsController < ApplicationController
   def saml_logout
     if saml_response?
       increment_saml_stat("logout_response_received")
-      response = saml_logout_response(params[:SAMLResponse])
-      if aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: response.issuer).first
+      saml_response = Onelogin::Saml::LogoutResponse::parse(params[:SAMLResponse])
+      if aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: saml_response.issuer).first
         settings = aac.saml_settings(request.host_with_port)
-        response.process(settings)
+        saml_response.process(settings)
 
-        if aac.debugging? && aac.debug_get(:logout_request_id) == response.in_response_to
+        if aac.debugging? && aac.debug_get(:logout_request_id) == saml_response.in_response_to
           aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
-          aac.debug_set(:idp_logout_response_xml_encrypted, response.xml)
-          aac.debug_set(:idp_logout_in_response_to, response.in_response_to)
-          aac.debug_set(:idp_logout_destination, response.destination)
-          aac.debug_set(:debugging, t('debug.logout_redirect_from_idp', "Received LogoutResponse from IdP"))
+          aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
+          aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
+          aac.debug_set(:idp_logout_response_destination, saml_response.destination)
+          aac.debug_set(:debugging, t('debug.logout_response_redirect_from_idp', "Received LogoutResponse from IdP"))
         end
       end
       logout_user_action
     elsif saml_request?
-      # TODO: Validate SAMLRequest parameter
-      logout_user_action
+      increment_saml_stat("logout_request_received")
+      saml_request = Onelogin::Saml::LogoutRequest::parse(params[:SAMLRequest])
+      if aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: saml_request.issuer).first
+        settings = aac.saml_settings(request.host_with_port)
+        saml_request.process(settings)
+
+        if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
+          aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
+          aac.debug_set(:idp_logout_request_xml_encrypted, saml_request.request_xml)
+          aac.debug_set(:idp_logout_request_name_id, saml_request.name_id)
+          aac.debug_set(:idp_logout_request_session_index, saml_request.session_index)
+          aac.debug_set(:idp_logout_request_destination, saml_request.destination)
+          aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
+        end
+
+        settings.relay_state = params[:RelayState]
+        saml_response = Onelogin::Saml::LogoutResponse::generate(saml_request.id, settings)
+
+        # Seperate the debugging out because we want it to log the request even if the response dies.
+        if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
+          aac.debug_set(:idp_logout_request_encoded, saml_response.base64_assertion)
+          aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
+          aac.debug_set(:idp_logout_response_status_code, saml_response.status_code)
+          aac.debug_set(:idp_logout_response_status_message, saml_response.status_message)
+          aac.debug_set(:idp_logout_response_destination, saml_response.destination)
+          aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
+          aac.debug_set(:debugging, t('debug.logout_response_redirect_to_idp', "Sending LogoutResponse to IdP"))
+        end
+
+        logout_current_user
+        session[:delegated_message] = Onelogin::Saml::LogoutResponse::STATUS_MESSAGE
+        redirect_to(saml_response.forward_url)
+      else
+        logout_user_action
+      end
     else
       @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
       respond_to do |format|
@@ -499,18 +537,6 @@ class PseudonymSessionsController < ApplicationController
 
   def saml_request?
     saml_configured? && params[:SAMLRequest]
-  end
-
-  def saml_response(raw_response, settings=nil)
-    response = Onelogin::Saml::Response.new(raw_response, settings)
-    response.logger = logger
-    response
-  end
-
-  def saml_logout_response(raw_response, settings=nil)
-    response = Onelogin::Saml::LogoutResponse.new(raw_response, settings)
-    response.logger = logger
-    response
   end
 
   def forbid_on_files_domain
