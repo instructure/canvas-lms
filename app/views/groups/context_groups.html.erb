@@ -2,6 +2,7 @@
 
 <% if !@context.is_a?(Account) && @context.root_account.feature_enabled?(:student_groups_next)  %>
   <% js_env :course_id => @context.id %>
+  <% js_env :STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE =>  @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups && can_do(@context.groups.scoped.new, @current_user, :create) %>
   <% js_bundle :student_groups %>
 <% else %>
 

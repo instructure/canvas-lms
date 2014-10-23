@@ -1,5 +1,5 @@
 <div class='pull-right group-categories-actions'>
-  <button class="btn btn-primary add_group_link" aria-controls="testdialog" {{action 'newGroup'}} >
+  <button {{bind-attr class="studentCanOrganizeGroupsForCourse::hide :btn :btn-primary :add_group_link"}} aria-controls="testdialog" {{action 'newGroup'}} >
     <i class='icon-plus' aria-label="new"></i> {{#t 'group'}}Group{{/t}}
   </button>
 </div>
