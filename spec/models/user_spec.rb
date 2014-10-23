@@ -2317,7 +2317,8 @@ describe User do
     end
 
     it "should limit the number of returned assignments" do
-      assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id} })
+      # since we're bulk inserting, the assignments_needing_grading callback doesn't happen, so we manually populate it
+      assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id, needs_grading_count: 1} })
       create_records(Submission, assignment_ids.map{ |id| {assignment_id: id, user_id: @studentB.id, body: "hello", workflow_state: "submitted", submission_type: 'online_text_entry'} })
       expect(@teacher.assignments_needing_grading.size).to eq 15
     end

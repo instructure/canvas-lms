@@ -1,6 +1,6 @@
 module DataFixup::ResetUngradedCounts
   def self.run
-    Assignment.find_ids_in_batches do |ids|
+    Assignment.find_ids_in_batches(batch_size: 100) do |ids|
       Assignment.connection.execute(Assignment.send(:sanitize_sql_array, [<<-SQL, ids]))
         UPDATE assignments SET needs_grading_count = COALESCE((
           SELECT COUNT(DISTINCT s.id)
