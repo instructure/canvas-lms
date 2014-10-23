@@ -1169,7 +1169,7 @@ class ApplicationController < ActionController::Base
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
-      redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url, url_params)
+      redirect_to named_context_url(context, :context_named_page_url, tag.content.url, url_params)
     elsif tag.content_type == 'Attachment'
       redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
     elsif tag.content_type_quiz?
