@@ -20,10 +20,10 @@ define([
   'compiled/models/File',
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
-  'quiz_timing',
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'compiled/views/quizzes/LDBLoginPopup',
+  'worker!compiled/workers/quizzes/quiz_taking_police',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
@@ -35,7 +35,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView, File, I18n, $, timing, autoBlurActiveInput, _, LDBLoginPopup) {
+], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _, LDBLoginPopup, QuizTakingPolice) {
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
@@ -656,7 +656,23 @@ define([
       });
     }, 2000);
 
-    setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
+    if (QuizTakingPolice) {
+      var quizTakingPolice = new QuizTakingPolice();
+
+      quizTakingPolice.addEventListener('message', function(e) {
+        if (e.data === 'stopwatchTick') {
+          quizSubmission.updateTime();
+        }
+      });
+
+      quizTakingPolice.postMessage({
+        code: 'startStopwatch',
+        frequency: quizSubmission.clockInterval
+      });
+    }
+    else {
+      setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
+    }
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
 
@@ -709,4 +725,29 @@ define([
 
     showDeauthorizedDialog = _.bind(ldbLoginPopup.exec, ldbLoginPopup);
   }
+
+  $(function() {
+    var KC_T = 84;
+    var $timeRunningTimeRemaining = $(".time_running,.time_remaining");
+
+    // we'll use this buffer to read our updates, then we won't have to steal
+    // the user's focus or cursor away, and it will still read instantly thanks
+    // to [aria-live="assertive"]!
+    //
+    // 100% win
+    var $timer = $('<div />', {
+      'class': 'screenreader-only',
+      'aria-role': 'note',
+      'aria-live': 'assertive',
+      'aria-atomic': 'true',
+      'aria-relevant': 'additions'
+    }).appendTo(document.body);
+
+    $(document).on('keydown.timer_quickjump', function readTimeLeft(e) {
+      if (e.altKey && (e.shiftKey || e.ctrlKey) && e.which === KC_T) {
+        e.preventDefault();
+        $timer.text($timeRunningTimeRemaining.text());
+      }
+    });
+  });
 });

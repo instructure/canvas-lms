@@ -365,6 +365,23 @@ describe PseudonymsController do
       @pseudonym1.valid_password?('qwerty1').should be_true
       @pseudonym1.valid_password?('bobob').should be_false
     end
+
+    it "should be able to change SIS with only :manage_sis permissions" do
+      account1 = Account.new
+      account1.settings[:admins_can_change_passwords] = false
+      account1.save!
+      user_with_pseudonym(:active_all => 1, :username => 'user@example.com', :password => 'qwerty1', :account => account1)
+      @user1 = @user
+      @pseudonym1 = @pseudonym
+
+      user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwerty2')
+      account_admin_user_with_role_changes(user: @user, account: account1, membership_type: 'sis_only', role_changes: { manage_sis: true, manage_user_logins: true })
+      user_session(@user, @pseudonym)
+
+      post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :sis_user_id => 'sis1' }
+      response.should be_success
+      @pseudonym1.reload.sis_user_id.should == 'sis1'
+    end
   end
 
   context "sharding" do

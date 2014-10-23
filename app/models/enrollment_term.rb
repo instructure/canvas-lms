@@ -89,8 +89,7 @@ class EnrollmentTerm < ActiveRecord::Base
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
-      override = self.enrollment_dates_overrides.find_by_enrollment_type(enrollment_type)
-      override ||= self.enrollment_dates_overrides.build(:enrollment_type => enrollment_type)
+      override = self.enrollment_dates_overrides.where(enrollment_type: enrollment_type).first_or_initialize
       # preload the reverse association - VERY IMPORTANT so that @touched_enrollments is shared
       override.enrollment_term = self
       override.start_at = values[:start_at]

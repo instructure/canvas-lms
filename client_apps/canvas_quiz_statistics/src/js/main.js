@@ -5,6 +5,10 @@ requirejs.config({
     '*': {
       'underscore': 'lodash',
       'canvas_packages': '../../vendor/packages',
+    },
+
+    'qtip': {
+      'jquery': '../../vendor/packages/jquery'
     }
   },
 
@@ -17,6 +21,7 @@ requirejs.config({
     // ========================================================================
     // CQS dependencies
     'rsvp': '../../vendor/js/rsvp.min',
+    'qtip': '../../vendor/js/jquery.qtip',
     // ========================================================================
 
     // ========================================================================

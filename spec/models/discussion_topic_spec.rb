@@ -1090,6 +1090,11 @@ describe DiscussionTopic do
       @topic.child_topics.first.subscription_hold(@student, nil, nil).should eql(:not_in_group)
     end
 
+    it "should handle nil user case" do
+      group_discussion_assignment
+      @topic.child_topics.first.subscription_hold(nil, nil, nil).should be_nil
+    end
+
     it "should not subscribe the author if there is a hold" do
       group_discussion_assignment
       @topic.user = @teacher

@@ -48,4 +48,31 @@ describe AccountsController do
 
   end
 
+  context "section tabs" do
+    it "should change in response to role override changes" do
+      enable_cache do
+        # cache permissions and tabs for a user
+        @account = Account.default
+        account_admin_user account: @account
+        user_session @admin
+        Timecop.freeze(61.minutes.ago) do
+          get "/accounts/#{@account.id}"
+          response.should be_ok
+          doc = Nokogiri::HTML(response.body)
+          doc.at_css('#section-tabs .section .outcomes').should_not be_nil
+        end
+
+        # change a permission on the user's role
+        @account.role_overrides.create! enrollment_type: 'AccountAdmin', permission: 'manage_outcomes',
+                                        enabled: false
+
+        # ensure the change is reflected once the user's cached permissions expire
+        get "/accounts/#{@account.id}"
+        response.should be_ok
+        doc = Nokogiri::HTML(response.body)
+        doc.at_css('#section-tabs .section .outcomes').should be_nil
+      end
+    end
+  end
+
 end

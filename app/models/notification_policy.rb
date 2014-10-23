@@ -17,8 +17,8 @@
 #
 
 class NotificationPolicy < ActiveRecord::Base
-  
-  belongs_to :notification
+
+  include NotificationPreloader
   belongs_to :communication_channel
   has_many :delayed_messages
 
@@ -139,7 +139,7 @@ class NotificationPolicy < ActiveRecord::Base
   # and/or updates it
   def self.find_or_update_for(communication_channel, notification_name, frequency = nil)
     notification_name = notification_name.titleize
-    notification = Notification.by_name(notification_name)
+    notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     raise ActiveRecord::RecordNotFound unless notification
     communication_channel.shard.activate do
       unique_constraint_retry do
@@ -178,7 +178,7 @@ class NotificationPolicy < ActiveRecord::Base
                              'never'
                            end
             np.save!
-          rescue ActiveRecord::Base::UniqueConstraintViolation
+          rescue ActiveRecord::RecordNotUnique
             np = nil
             raise ActiveRecord::Rollback
           end

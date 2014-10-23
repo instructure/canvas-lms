@@ -25,9 +25,9 @@ define(function(require) {
       it('should show a progress bar', function() {
         setProps({
           generatable: true,
+          isGenerating: true,
           progress: {
             completion: 0,
-            workflowState: 'running'
           }
         });
 
@@ -37,9 +37,9 @@ define(function(require) {
       it('should fill up the progress bar', function() {
         setProps({
           generatable: true,
+          isGenerating: true,
           progress: {
             completion: 0,
-            workflowState: 'running'
           }
         });
 
@@ -47,7 +47,6 @@ define(function(require) {
 
         setProps({
           progress: {
-            workflowState: 'running',
             completion: 25
           }
         });
@@ -67,7 +66,7 @@ define(function(require) {
           progress: {}
         });
 
-        expect(subject.getDOMNode().innerText).toMatch('Generated at .* 2013');
+        expect(subject.getDOMNode().innerText).toMatch('Generated: .* 2013');
       });
     });
   });

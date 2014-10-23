@@ -50,7 +50,6 @@ define [
     getFormValues: =>
       values = @$el.find('form').toJSON()
       if @$excludeSmallMatches.prop 'checked'
-        values.exclude_small_matches_type = @$excludeSmallMatchesType.val()
         if values.exclude_small_matches_type is 'words'
           values.exclude_small_matches_value = values.words
         else

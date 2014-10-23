@@ -19,14 +19,14 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:groups_to_import] && !hash[:groups_to_import][hash[:migration_id]]
-      item ||= Group.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
-      item ||= Group.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+      item ||= Group.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
+      item ||= Group.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.groups.new
       migration.add_imported_item(item) if migration
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
       item.group_category = hash[:group_category].present? ?
-          context.group_categories.find_or_initialize_by_name(hash[:group_category]) :
+          context.group_categories.where(name: hash[:group_category]).first_or_initialize :
           GroupCategory.imported_for(context)
 
       item.save!

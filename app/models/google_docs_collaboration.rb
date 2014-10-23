@@ -49,7 +49,7 @@ class GoogleDocsCollaboration < Collaboration
   
   def user_can_access_document_type?(user)
     if self.user && user
-      google_services = user.user_services.find_all_by_service_domain("google.com").to_a
+      google_services = user.user_services.where(service_domain: "google.com").to_a
       !!google_services.find{|s| s.service_user_id}
     else
       false
@@ -58,9 +58,9 @@ class GoogleDocsCollaboration < Collaboration
   
   def authorize_user(user)
     return unless self.document_id
-    google_services = user.user_services.find_all_by_service_domain("google.com").to_a
+    google_services = user.user_services.where(service_domain: "google.com").to_a
     service_user_id = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
-    collaborator = self.collaborators.find_by_user_id(user.id)
+    collaborator = self.collaborators.where(user_id: user).first
     if collaborator && collaborator.authorized_service_user_id != service_user_id
       google_docs = google_docs_for_user
       google_docs.acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
@@ -97,7 +97,7 @@ class GoogleDocsCollaboration < Collaboration
   private
   def google_docs_for_user
     service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', self.user].cache_key) do
-      service = self.user.user_services.find_by_service("google_docs")
+      service = self.user.user_services.where(service: "google_docs").first
       service && [service.token, service.secret]
     end
     raise GoogleDocs::NoTokenError unless service_token && service_secret

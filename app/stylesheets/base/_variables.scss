@@ -67,7 +67,7 @@
   // this passes by itself with a 4.93 ratio
   // in case you're wondering where $use_high_contrast is
 
-  $canvas-neutral:                  #bbb;
+  $canvas-neutral:                  hsl(0,0,90%);
   @if $use_high_contrast { $canvas-neutral: #6d6d6d; }
 
   $canvas-action:                   #ba3fa5;
@@ -122,22 +122,38 @@
 
 $eportfolio-name--disabled: #777;
 @if $use_high_contrast {$eportfolio-name--disabled: #686868;}
+
+// in these variables, "content" refers specifically to the #content div,
+// which is the main white page in between the left and right columns
+$base-content-background-color: $canvas-light;
+$base-content-padding: 15px;
+
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
+$base-font-color--subdued: #696969;
+$base-border-color: $canvas-neutral;
+$base-list-item-background--hover: #eef7ff;
+$base-list-item-background--selected: #d9edf9;
 
-// These variables control the active and hover   
-// states we have on the global left-hand sidenav in Canvas   
+$announcements_disscussion-summary-color: $canvas-dark;
 
-$course-sidenav_list-item--bg-color: #fff;  
-@if $use_high_contrast {$course-sidenav_list-item--bg-color: #333;}   
+$gradebook_letter-grade-font: lighten($canvas-dark, 8%);
 
-$course-sidenav_list-item--active-font-color: #0099e0;  
-@if $use_high_contrast {$course-sidenav_list-item--active-font-color: #fff;}  
+// These variables control the active and hover
+// states we have on the global left-hand sidenav in Canvas
 
-$course-sidenav_list-item--inactive-font-color: #ccc;   
+$course-sidenav_list-item--bg-color: #fff;
+@if $use_high_contrast {$course-sidenav_list-item--bg-color: #333;}
 
-$course-sidenav_list-item--hover-bg-color: #0099e0;   
+$course-sidenav_list-item--active-font-color: #0099e0;
+@if $use_high_contrast {$course-sidenav_list-item--active-font-color: #fff;}
+
+$course-sidenav_list-item--inactive-font-color: #ccc;
+
+$course-sidenav_list-item--hover-bg-color: #0099e0;
 @if $use_high_contrast {$course-sidenav_list-item--hover-bg-color: #333;}
+
+
 
 // Legacy Variables
 //=======================
@@ -208,6 +224,17 @@ $activeBG:                      #d6ecfc;
 
 $masquerade-link-color: #ffa500;
 
+// Canvas K-12 brand color and global spacing variables
+@if $is-k12 {
+  $brand-k12: #2a89e8;
+  $brand-k12-dark: darken(desaturate($brand-k12, 21), 15);
+  $k12-sp: 12px;
+  $k12-header-primary-height: $k12-sp*8;
+  $k12-header-secondary-height: $k12-sp*4;
+  $k12-header-text: white;
+  $k12-transition: cubic-bezier(0,1,0.5,1);  
+}
+
 // Font Sizes
 $h1-font-size: 23px;
 $h2-font-size: 14px;
@@ -218,5 +245,9 @@ $spacing-width: 20px;
 $wellBackground: #e8ecef;
 
 // override bootstrap green buttons
-$green: #34832b !default;
+@if $is-k12 { $green: #25bc34; }
+@else { $green: #34832b !default; }
+
+// override bootstrap orange color for k-12
+@if $is-k12 { $orange: #f55e22; }
 

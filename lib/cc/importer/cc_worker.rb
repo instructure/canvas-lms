@@ -17,7 +17,7 @@
 #
 class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
   def perform(cm=nil)
-    cm ||= ContentMigration.find_by_id migration_id
+    cm ||= ContentMigration.where(id: migration_id).first
     cm.job_progress.start unless cm.skip_job_progress
     begin
       cm.update_conversion_progress(1)

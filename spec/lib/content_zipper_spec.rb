@@ -288,13 +288,11 @@ describe ContentZipper do
 
   describe "mark_attachment_as_zipping!" do
 
-    it "marks the workflow state as zipping and updates scribd attempts" do
+    it "marks the workflow state as zipping" do
       attachment = Attachment.new display_name: 'jenkins.ppt'
-      attachment.scribd_attempts = 0
       attachment.expects(:save!).once
       ContentZipper.new.mark_attachment_as_zipping!(attachment)
       attachment.should be_zipping
-      attachment.scribd_attempts.should == 1
     end
   end
 

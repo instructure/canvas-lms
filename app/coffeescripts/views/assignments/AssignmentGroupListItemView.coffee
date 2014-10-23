@@ -157,6 +157,7 @@ define [
       canMove = @model.collection.length > 1
 
       attributes = _.extend(data, {
+        course_home: ENV.COURSE_HOME
         canMove: canMove
         showRules: @model.hasRules()
         rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })

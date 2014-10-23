@@ -11,7 +11,7 @@ module DataFixup::MigrateIgnores
             ignore.created_at = Time.parse(details[:set])
             ignore.user = user
             ignore.save!
-          rescue ActiveRecord::Base::UniqueConstraintViolation
+          rescue ActiveRecord::RecordNotUnique
           end
         end
       end

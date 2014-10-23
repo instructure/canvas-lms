@@ -99,9 +99,13 @@ module Importers
         item.workflow_state = 'active'
       end
 
-      item.attachment           = context.attachments.where(migration_id: options[:attachment_migration_id]).first
-      item.external_feed        = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
-      item.assignment           = fetch_assignment
+      if options[:attachment_migration_id].present?
+        item.attachment = context.attachments.where(migration_id: options[:attachment_migration_id]).first
+      end
+      if options[:external_feed_migration_id].present?
+        item.external_feed = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
+      end
+      item.assignment = fetch_assignment
 
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])

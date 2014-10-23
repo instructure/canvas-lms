@@ -760,6 +760,28 @@ describe "external tools" do
       end
     end
 
+    def frameResize(height)
+      script = <<-SCRIPT
+        parent.postMessage(JSON.stringify({subject: 'lti.frameResize', height: #{height}}), '*');
+      SCRIPT
+      driver.execute_script(script)
+    end
+
+    it 'resizes the iframe when receiving resize messages' do
+      @tool.course_navigation = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+
+      in_frame('tool_content') do
+        frameResize(372)
+      end
+      f('#tool_content').size.height.should eq(372)
+
+      in_frame('tool_content') do
+        frameResize(851)
+      end
+      f('#tool_content').size.height.should eq(851)
+    end
   end
 
   describe 'content migration launch through full-width redirect' do

@@ -149,8 +149,8 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         begin
-          puts "\tRunning 'npm install --production'..."
-          output = `npm install --production`
+          puts "\tRunning 'npm install'..."
+          output = `npm install`
           unless $?.exitstatus == 0
             puts <<-MESSAGE
             -------------------------------------------------------------------
@@ -164,8 +164,8 @@ namespace :js do
         end
 
         begin
-          puts "\tRunning 'npm run build --production'..."
-          output = `npm run build --production`
+          puts "\tRunning 'npm run build'..."
+          output = `npm run build`
           unless $?.exitstatus == 0
             puts <<-MESSAGE
             -------------------------------------------------------------------

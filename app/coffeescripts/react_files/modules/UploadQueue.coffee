@@ -1,6 +1,7 @@
 define [
   './FileUploader'
-], (FileUploader) ->
+  './ZipUploader'
+], (FileUploader, ZipUploader) ->
 
   class UploadQueue
     _uploading: false
@@ -26,13 +27,16 @@ define [
     onUploadProgress: (percent, file) =>
       @onChange()
 
-    createUploader: (fileOptions, folder) ->
-      f = new FileUploader(fileOptions, folder)
+    createUploader: (fileOptions, folder, contextId, contextType) ->
+      if fileOptions.expandZip
+        f = new ZipUploader(fileOptions, folder, contextId, contextType)
+      else
+        f = new FileUploader(fileOptions, folder)
       f.onProgress = @onUploadProgress
       f
 
-    enqueue: (fileOptions, folder) ->
-      uploader = @createUploader(fileOptions, folder)
+    enqueue: (fileOptions, folder, contextId, contextType) ->
+      uploader = @createUploader(fileOptions, folder, contextId, contextType)
       @_queue.push uploader
       @attemptNextUpload()
 

@@ -33,7 +33,7 @@ class CalendarsController < ApplicationController
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX
-      event = CalendarEvent.find_by_id(params[:event_id])
+      event = CalendarEvent.where(id: params[:event_id]).first
       event = nil if event && event.start_at.nil?
       @active_event_id = event.id if event
     end
@@ -74,7 +74,7 @@ class CalendarsController < ApplicationController
     @selected_contexts = params[:include_contexts].split(",") if params[:include_contexts]
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
-    if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.find_by_id(params[:event_id])) && event.start_at
+    if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
       @active_event_id = event.id
       @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
     end

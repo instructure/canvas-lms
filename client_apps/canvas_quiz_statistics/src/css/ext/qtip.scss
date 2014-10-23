@@ -1,0 +1,38 @@
+@import "vendor/bootstrap/mixins";
+
+/* Default tooltip style */
+.qtip-default {
+  border-width: 1px;
+  border-style: solid;
+  border-color: $tooltipArrowColor;
+  @include border-radius($baseBorderRadius);
+
+  background-color: $tooltipBackground;
+  color: $tooltipColor;
+  @include opacity(80);
+
+  .qtip-titlebar { // TODO: port from jQueryUI dialog
+    background-color: #FFEF93;
+
+    .qtip-close {
+      border-color: #AAA;
+      color: #111;
+    }
+  }
+
+  padding: 2px 8px 3px;
+  max-width: 240px;
+
+  .qtip-content {
+    text-align: center;
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .qtip-icon { // TODO: port from jQueryUI dialog
+    border-color: #CCC;
+    background: #F1F1F1;
+    color: #777;
+  }
+}
+

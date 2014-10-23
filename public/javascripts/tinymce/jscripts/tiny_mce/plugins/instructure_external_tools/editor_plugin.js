@@ -114,7 +114,10 @@ define([
               } else if(data.return_type == 'iframe') {
                 var html = $("<div/>").append($("<iframe/>", {
                   src: data.url,
-                  title: data.title
+                  title: data.title,
+                  allowfullscreen: "true",
+                  webkitallowfullscreen: "true",
+                  mozallowfullscreen: "true"
                 }).css({
                   width: data.width,
                   height: data.height

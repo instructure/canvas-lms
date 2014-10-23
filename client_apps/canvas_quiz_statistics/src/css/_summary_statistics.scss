@@ -5,10 +5,6 @@
   .report-generator {
     position: relative;
 
-    .auxiliary {
-      display: none;
-    }
-
     &+ .report-generator {
       margin-left: $whitespace;
     }

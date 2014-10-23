@@ -136,4 +136,23 @@ describe "Importing modules" do
     mod.content_tags.count.should == 1
   end
 
+  it "should select module items for import" do
+    data = get_import_data('', 'module-item-select')
+    context = get_import_context
+    migration = @course.content_migrations.create!
+    migration.migration_settings[:migration_ids_to_import] = {:copy => {:context_modules => {'i2ef97656ba4eb818e23343af83e5a1c2' => '1'}}}
+    Importers::ContextModuleImporter.select_linked_module_items(data, migration)
+    migration.import_object?('assignments', 'i5081fa7128437fc599f6ca652214111e').should be_truthy
+    migration.import_object?('assignments', 'i852f8d38d28428ad2b3530e4f9017cff').should be_falsy
+    migration.import_object?('quizzes', 'i0f944b0a62b3f92d42260381c2c8906d').should be_truthy
+    migration.import_object?('quizzes', 'ib9c6f62b6ca21d60b8d2e360725d75d3').should be_falsy
+    migration.import_object?('attachments', 'idd42dfdb8d1cf5e58e6a09668b592f5e').should be_truthy
+    migration.import_object?('attachments', 'i421ccf46e5e490246599efc9a7423f64').should be_falsy
+    migration.import_object?('wiki_pages', 'i33dc99b0f1e2eaf393029aa0ff9b498d').should be_truthy
+    migration.import_object?('wiki_pages', 'i11afbd372438c7e6cd37e341fcf2df58').should be_falsy
+    migration.import_object?('discussion_topics', 'i33dc99b0f1e2eaf393029aa0ff9b498d').should be_truthy
+    migration.import_object?('discussion_topics', 'i4d8d4467ae30e6fe5a7b1ef42fcbabff').should be_falsy
+    migration.import_object?('context_external_tools', 'i33dc99b0f1e2eaf393029aa0ff9b498d').should be_truthy
+  end
+
 end

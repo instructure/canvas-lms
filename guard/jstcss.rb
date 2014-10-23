@@ -24,7 +24,7 @@ module Guard
     end
 
     def touch_handlebars_file(sass_path)
-      hbs_path = path.sub('stylesheets', 'views').sub(/\.([^\.]*)\z/, '.handlebars')
+      hbs_path = sass_path.sub('stylesheets', 'views').sub(/\.([^\.]*)\z/, '.handlebars')
       FileUtils.touch(hbs_path) if File.exist?(hbs_path)
     end
 

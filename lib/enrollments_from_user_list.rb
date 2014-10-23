@@ -30,7 +30,7 @@ class EnrollmentsFromUserList
     @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
     @role_name = opts[:role_name]
     @limit = opts[:limit]
-    @section = (opts[:course_section_id].present? ? @course.course_sections.active.find_by_id(opts[:course_section_id].to_i) : nil) || @course.default_section
+    @section = (opts[:course_section_id].present? ? @course.course_sections.active.where(id: opts[:course_section_id].to_i).first : nil) || @course.default_section
     @limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     @enrolled_users = {}
   end

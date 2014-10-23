@@ -119,36 +119,6 @@ describe "default plugins" do
     settings[:secret_key].should == 'asdf'
   end
 
-  it "should allow configuring scribd plugin" do
-    settings = Canvas::Plugin.find(:scribd).try(:settings)
-    settings.should be_nil
-
-    ScribdAPI.stubs(:config_check).returns("Bad check")
-    get "/plugins/scribd"
-
-    multiple_accounts_select
-    f("#plugin_setting_disabled").click
-
-    f("#settings_api_key").send_keys("asdf")
-    f("#settings_secret_key").send_keys("asdf")
-    keep_trying_until {
-      submit_form('#new_plugin_setting')
-      wait_for_ajaximations
-      assert_flash_error_message /There was an error/
-    }
-
-    ScribdAPI.stubs(:config_check).returns(nil)
-    submit_form('#new_plugin_setting')
-    wait_for_ajax_requests
-
-    assert_flash_notice_message /successfully updated/
-
-    settings = Canvas::Plugin.find(:scribd).try(:settings)
-    settings.should_not be_nil
-    settings[:api_key].should == 'asdf'
-    settings[:secret_key].should == 'asdf'
-  end
-
   def multiple_accounts_select
     if !f("#plugin_setting_disabled").displayed?
       f("#accounts_select option:nth-child(2)").click

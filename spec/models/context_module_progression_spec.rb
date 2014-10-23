@@ -110,6 +110,8 @@ describe ContextModuleProgression do
     end
 
     context 'does not evaluate' do
+      before { module_progression.evaluated_at = Time.now }
+
       it 'when current' do
         module_progression.evaluate
 
@@ -141,6 +143,13 @@ describe ContextModuleProgression do
 
       it 'when current, but the module has since unlocked' do
         @module.unlock_at = 1.minute.ago
+        module_progression.evaluate
+
+        module_progression.workflow_state.should_not == 'bogus'
+      end
+
+      it 'when current, but the module has been updated' do
+        module_progression.evaluated_at = 1.minute.ago
         module_progression.evaluate
 
         module_progression.workflow_state.should_not == 'bogus'

@@ -53,7 +53,7 @@ class RubricAssessment < ActiveRecord::Base
 
   def update_outcomes_for_assessment(outcome_ids=[])
     return if outcome_ids.empty?
-    alignments = self.rubric_association.association_object.learning_outcome_alignments.find_all_by_learning_outcome_id(outcome_ids)
+    alignments = self.rubric_association.association_object.learning_outcome_alignments.where(learning_outcome_id: outcome_ids)
     (self.data || []).each do |rating|
       if rating[:learning_outcome_id]
         alignments.each do |alignment|
@@ -70,7 +70,8 @@ class RubricAssessment < ActiveRecord::Base
     # of the assessment's associated object.
     result = alignment.learning_outcome_results.
       for_association(rubric_association).
-      find_or_initialize_by_user_id(user.id)
+      where(user_id: user.id).
+      first_or_initialize
 
     # force the context and artifact
     result.artifact = self
@@ -123,7 +124,7 @@ class RubricAssessment < ActiveRecord::Base
 
   def update_assessment_requests
     requests = self.assessment_requests
-    requests += self.rubric_association.assessment_requests.find_all_by_assessor_id_and_asset_id_and_asset_type(self.assessor_id, self.artifact_id, self.artifact_type)
+    requests += self.rubric_association.assessment_requests.where(assessor_id: self.assessor_id, asset_id: self.artifact_id, asset_type: self.artifact_type)
     requests.each { |a|
       a.attributes = {:rubric_assessment => self, :assessor => self.assessor}
       a.complete

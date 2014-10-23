@@ -75,7 +75,8 @@ define [
       submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
 
-      opts.classes += ' no_grade_yet ' unless opts.submission.grade
+      opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
+      innerContents = null if opts.submission.workflow_state == 'pending_review'
       innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
 
       if turnitin = extractData(opts.submission)
@@ -219,4 +220,3 @@ define [
   class SubmissionCell.points extends SubmissionCell
 
   SubmissionCell
-

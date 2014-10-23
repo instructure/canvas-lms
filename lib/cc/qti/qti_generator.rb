@@ -291,7 +291,7 @@ module CC
         pick_count = group['pick_count'].to_i
         chosen = 0
         if group[:assessment_question_bank_id]
-          if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
+          if bank = @course.assessment_question_banks.where(id: group[:assessment_question_bank_id]).first
             bank.assessment_questions.each do |question|
               # try adding questions until the pick count is reached
               chosen += 1 if add_cc_question(node, question)
@@ -319,9 +319,9 @@ module CC
               bank = nil
 
               if group[:assessment_question_bank_id]
-                if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
+                if bank = @course.assessment_question_banks.where(id: group[:assessment_question_bank_id]).first
                   sel_node.sourcebank_ref create_key(bank)
-                elsif bank = AssessmentQuestionBank.find_by_id(group[:assessment_question_bank_id])
+                elsif bank = AssessmentQuestionBank.where(id: group[:assessment_question_bank_id]).first
                   sel_node.sourcebank_ref bank.id
                   is_external = true
                 end

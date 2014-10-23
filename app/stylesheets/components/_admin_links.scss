@@ -12,7 +12,7 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 ### Toolbar Cog (button + cog)
 
 ```html
-<div role="application">
+<div>
   <a class="al-trigger btn" role="button" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>
@@ -35,7 +35,7 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 ### Content cog
 
 ```html
-<div role="application">
+<div>
   <a class="al-trigger al-trigger-gray" role="button" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>

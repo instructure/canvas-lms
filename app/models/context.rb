@@ -212,11 +212,14 @@ module Context
     return nil unless klass
     res = nil
     if klass == WikiPage
-      res = context.wiki.wiki_pages.find_by_id(id)
+      res = context.wiki.wiki_pages.where(id: id).first
     elsif (klass.column_names & ['context_id', 'context_type']).length == 2
-      res = klass.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, id)
-    else
+      res = klass.where(context_id: context, context_type: context.class.to_s, id: id).first
+    elsif klass == Attachment
       res = klass.find_by_id(id)
+      res = nil if context && res && res.context != context
+    else
+      res = klass.where(id: id).first
       res = nil if context && res && res.respond_to?(:context) && res.context != context
     end
     res

@@ -431,7 +431,6 @@ define([
           }
         }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
         $module.removeClass('dont_remove');
-        $form.find(":text:visible:first").focus().select();
       },
       hideEditModule: function(remove) {
         var $module = $("#add_context_module_form").data('current_module'); //.parents(".context_module");
@@ -677,6 +676,7 @@ define([
 
     $("#add_context_module_form").formSubmit({
       object_name: 'context_module',
+      required: ['name'],
       processData: function(data) {
         var prereqs = [];
         $(this).find(".prerequisites_list .criteria_list .criterion").each(function() {
@@ -728,8 +728,8 @@ define([
               el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
           }
-          fixLink('h2.collapse_module_link', 'href');
-          fixLink('h2.expand_module_link', 'href');
+          fixLink('span.collapse_module_link', 'href');
+          fixLink('span.expand_module_link', 'href');
           fixLink('.reorder_items_url', 'href');
           fixLink('.add_module_item_link', 'rel');
           var publishData = {
@@ -1018,7 +1018,8 @@ define([
 
     $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
-      $(event.currentTarget).blur();
+      var $trigger = $(event.currentTarget);
+      $trigger.blur();
       var $module = $(this).closest(".context_module");
       if($module.hasClass('collapsed_module')) {
         $module.find(".expand_module_link").triggerHandler('click', function() {
@@ -1034,6 +1035,9 @@ define([
         options.height = 550;
         options.width = 770;
         options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': module.name});
+        options.close = function () {
+          $trigger.focus();
+        };
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
@@ -1387,7 +1391,7 @@ define([
     modules.refreshProgressions();
     modules.updateAssignmentData();
 
-    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click', function(event, goSlow) {
+    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();
       var expandCallback = null;
       if(goSlow && $.isFunction(goSlow)) {
@@ -1404,9 +1408,14 @@ define([
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);
+            // Makes sure the resulting item has focus.
+            $module.find(".collapse_module_link").focus();
+
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);
+            // Makes sure the resulting item has focus.
+            $module.find(".expand_module_link").focus();
           }
           if(expandCallback && $.isFunction(expandCallback)) {
             expandCallback();
@@ -1418,6 +1427,7 @@ define([
         } else {
           $module.find(".content").slideToggle(callback);
         }
+
       }
       if(reload_entries || goSlow) {
         $module.loadingImage();
@@ -1460,6 +1470,7 @@ define([
       if(collapse == '1' || !reload_entries) {
         toggle();
       }
+
     });
     $(".refresh_progressions_link").click(function(event) {
       event.preventDefault();

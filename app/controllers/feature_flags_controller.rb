@@ -63,13 +63,13 @@
 #           "type": "boolean"
 #         },
 #         "beta": {
-#           "description": "Whether the feature is a beta feature",
-#           "example": false,
+#           "description": "Whether the feature is a beta feature. If true, the feature may not be fully polished and may be subject to change in the future.",
+#           "example": true,
 #           "type": "boolean"
 #         },
 #         "development": {
-#           "description": "Whether the feature is in development",
-#           "example": true,
+#           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
+#           "example": false,
 #           "type": "boolean"
 #         },
 #         "release_notes_url": {
@@ -295,7 +295,7 @@ class FeatureFlagsController < ApplicationController
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
-      flag = @context.feature_flags.find_by_feature!(params[:feature])
+      flag = @context.feature_flags.where(feature: params[:feature]).first!
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context, @current_user)
       flag.destroy
       render json: feature_flag_json(flag, @context, @current_user, session)

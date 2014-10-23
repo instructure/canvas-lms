@@ -26,6 +26,7 @@ define(function() {
       'question_text',
       'responses',
       'answers',
+      'position',
 
       // multiple-choice & true/false
       'answered_student_count',
@@ -43,6 +44,10 @@ define(function() {
 
       // FIMB, Multiple-Dropdowns, Matching
       'answer_sets',
+
+      // Essay
+      'full_credit',
+      'point_distribution',
     ],
 
     POINT_BISERIAL_ATTRS: [
@@ -78,5 +83,7 @@ define(function() {
     PROGRESS_ACTIVE: 'running',
     PROGRESS_COMPLETE: 'completed',
     PROGRESS_FAILED: 'failed',
+
+    KC_RETURN: 13
   };
 });

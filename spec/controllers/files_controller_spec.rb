@@ -350,32 +350,14 @@ describe FilesController do
       @attachment.reload.last_inline_view.should > 1.minute.ago
     end
 
-    it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
+    it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
       user_session(@student)
       file_in_a_module
-      @file.scribd_doc = Scribd::Document.new
-      @file.save!
+      Attachment.any_instance.stubs(:canvadocable?).returns true
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@student).state.should eql(:completed)
       @file.reload.last_inline_view.should > 1.minute.ago
-    end
-
-    it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data (meaning it got viewed in scribd inline) and google docs preview is disabled" do
-      user_session(@student)
-      file_in_a_module
-      @file.scribd_doc = nil
-      @file.save!
-
-      # turn off google docs previews for this acccount so we can isolate testing just scribd.
-      account = Account.default
-      account.disable_service(:google_docs_previews)
-      account.save!
-
-      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
-      @module.reload
-      @module.evaluate_for(@student).state.should eql(:unlocked)
-      @file.reload.last_inline_view.should be_nil
     end
 
     it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -417,42 +399,6 @@ describe FilesController do
       response.should be_redirect
     end
 
-    describe "scribd_doc" do
-      before :once do
-        @file = attachment_model(:scribd_doc => Scribd::Document.new, :uploaded_data => stub_png_data)
-      end
-
-      before :each do
-        user_session(@student)
-      end
-
-      it "should be included if :download is allowed" do
-        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
-        json_parse['attachment']['scribd_doc'].should be_present
-      end
-
-      it "should not be included if locked" do
-        @file.lock_at = 1.month.ago
-        @file.save!
-        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
-        json_parse['attachment']['scribd_doc'].should be_blank
-      end
-
-      it "should not be included for locked attachments with a root_attachment" do
-        @file.lock_at = 1.month.ago
-        @file.save!
-        course2 = course(:active_all => true)
-        course2.enroll_student(@student).accept!
-        file2 = @file.clone_for(course2)
-        file2.save!
-        file2.scribd_doc.should be_present
-        file2.locked_for?(@student).should be_true
-
-        get 'show', :course_id => course2.id, :id => file2.id, :format => 'json'
-        json_parse['attachment']['scribd_doc'].should be_blank
-      end
-    end
-
     describe "canvadoc_session_url" do
       before do
         user_session(@student)
@@ -472,7 +418,6 @@ describe FilesController do
         json_parse['attachment']['canvadoc_session_url'].should be_nil
       end
     end
-
   end
 
   describe "GET 'show_relative'" do
@@ -581,8 +526,9 @@ describe FilesController do
     end
 
     it "should replace content and update user_id" do
-      user_session(@teacher)
-      new_content = fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
+      course_with_teacher_logged_in(:active_all => true)
+      course_file
+      new_content = default_uploaded_data
       put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:uploaded_data => new_content}
       response.should be_redirect
       assigns[:attachment].should eql(@file)

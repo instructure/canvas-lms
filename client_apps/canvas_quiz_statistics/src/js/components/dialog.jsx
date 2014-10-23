@@ -4,6 +4,7 @@ define(function(require) {
   var jQueryUIDialog = require('canvas_packages/jqueryui/dialog');
   var $ = require('canvas_packages/jquery');
   var _ = require('lodash');
+  var K = require('../constants');
   var omit = _.omit;
 
   /**
@@ -112,7 +113,45 @@ define(function(require) {
        * @property {Number} [width=300]
        * How wide the dialog should start out, in pixels.
        */
-      width: React.PropTypes.number
+      width: React.PropTypes.number,
+
+      /**
+       * @property {Boolean} [autoOpen=false]
+       * Dialog option. When true, the dialog will open as soon as this
+       * component is mounted.
+       */
+      autoOpen: React.PropTypes.bool,
+
+      /**
+       * @property {Boolean} [keyboardAccessible=true]
+       *
+       * If this is on, the toggle button will be tabbable (reached using TAB)
+       * and will intercept RETURN keypresses to show the dialog.
+       *
+       * Recommended!
+       */
+      keyboardAccessible: React.PropTypes.bool,
+
+      /**
+       * @property {String} [role="button"]
+       * The ARIA role of the dialog toggle.
+       */
+      role: React.PropTypes.string,
+
+      /**
+       * @property {String} aria-label
+       *
+       * A string to provide to screen-readers to tell the user that pressing
+       * this element will launch a specific dialog.
+       *
+       * A good example of a message:
+       *
+       *     "Learn more about the Discrimination Index."
+       *
+       * That, coupled with a role of "button" will help the user understand
+       * what the toggle element really is.
+       */
+      "aria-label": React.PropTypes.string,
     },
 
     getInitialState: function() {
@@ -128,8 +167,10 @@ define(function(require) {
         children: [],
         autoOpen: false,
         tagName: 'div',
+        role: 'button',
         title: null,
-        width: 300
+        width: 300,
+        keyboardAccessible: true
       };
     },
 
@@ -157,14 +198,25 @@ define(function(require) {
       return (
         <tag
           onClick={this.toggle}
+          onKeyPress={this.openOnReturn}
           className={this.props.className}
-          children={this.props.children} />
+          children={this.props.children}
+          role={this.props.role}
+          aria-label={this.props['aria-label']}
+          tabIndex={this.props.keyboardAccessible ? "0" : undefined} />
       );
     },
 
     /** Open the dialog */
     open: function() {
       this.__send('open');
+    },
+
+    openOnReturn: function(e) {
+      if (this.props.keyboardAccessible && e.which === K.KC_RETURN) {
+        e.preventDefault();
+        this.open();
+      }
     },
 
     /** Close the dialog */
@@ -231,7 +283,11 @@ define(function(require) {
     },
 
     __getContentProps: function(props) {
-      return omit(props, [ 'className', 'tagName', 'content', 'children' ]);
+      return omit(props, [
+        'className', 'tagName', 'content', 'children',
+        'width', 'title', 'autoOpen',
+        'aria-label', 'role', 'keyboardAccessible'
+      ]);
     }
   });
 

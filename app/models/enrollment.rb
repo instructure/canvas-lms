@@ -20,7 +20,7 @@ class Enrollment < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :course, :touch => true
+  belongs_to :course, :touch => true, :inverse_of => :enrollments
   belongs_to :course_section
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
@@ -153,8 +153,7 @@ class Enrollment < ActiveRecord::Base
   scope :admin, -> {
     select(:course_id).
         joins(:course).
-        where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
-              AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
+        where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
 
   scope :of_admin_type, -> { where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment']) }
 
@@ -303,7 +302,7 @@ class Enrollment < ActiveRecord::Base
       # way for any other sections to be common between them. alternatively,
       # we have just deleted the user's enrollment in the group's course.
       # remove the leaving user from the group to keep the group happy
-      membership = group.group_memberships.find_by_user_id(self.user_id)
+      membership = group.group_memberships.where(user_id: self.user_id).first
       membership.destroy if membership
     end
   end
@@ -858,7 +857,7 @@ class Enrollment < ActiveRecord::Base
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 
-    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
+    given { |user| course.observer_enrollments.where(user_id: user, associated_user_id: self.user_id).exists? }
     can :read and can :read_grades
 
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
@@ -947,7 +946,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.course_user_state(course, uuid)
     Rails.cache.fetch(['user_state', course, uuid].cache_key) do
-      enrollment = course.enrollments.find_by_uuid(uuid)
+      enrollment = course.enrollments.where(uuid: uuid).first
       if enrollment
         {
           :enrollment_state => enrollment.workflow_state,
@@ -1014,37 +1013,6 @@ class Enrollment < ActiveRecord::Base
       @sis_user_id = sis_source_id_parts[0]
     end
     @sis_user_id
-  end
-
-  def record_last_activity_threshold
-    Setting.get('enrollment_last_activity_at_threshold', 2.minutes).to_i
-  end
-
-  def record_total_activity_threshold
-    Setting.get('enrollment_total_activity_time_threshold', 10.minutes).to_i
-  end
-
-  def record_recent_activity_worthwhile?(as_of, threshold)
-    last_activity_at.nil? || (as_of - last_activity_at >= threshold)
-  end
-
-  def increment_total_activity?(as_of, last_threshold, total_threshold)
-    !last_activity_at.nil? &&
-      (as_of - last_activity_at >= last_threshold) &&
-      (as_of - last_activity_at < total_threshold)
-  end
-
-  def record_recent_activity(as_of = Time.zone.now,
-                             last_threshold = record_last_activity_threshold,
-                             total_threshold = record_total_activity_threshold)
-    return unless record_recent_activity_worthwhile?(as_of, last_threshold)
-    if increment_total_activity?(as_of, last_threshold, total_threshold)
-      self.total_activity_time += (as_of - self.last_activity_at).to_i
-      self.class.where(:id => self).update_all(:total_activity_time => total_activity_time, :last_activity_at => as_of)
-    else
-      self.class.where(:id => self).update_all(:last_activity_at => as_of)
-    end
-    self.last_activity_at = as_of
   end
 
   def total_activity_time

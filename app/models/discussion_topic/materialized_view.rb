@@ -38,12 +38,12 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     discussion_topic.shard.activate do
       # first try to pull the view from the slave. we can't just do this in the
       # unique_constraint_retry since it begins a transaction.
-      view = Shackles.activate(:slave) { self.find_by_discussion_topic_id(discussion_topic.id) }
+      view = Shackles.activate(:slave) { self.where(discussion_topic_id: discussion_topic).first }
       if !view
         # if the view wasn't found, drop into the unique_constraint_retry
         # transaction loop on master.
         unique_constraint_retry do
-          view = self.find_by_discussion_topic_id(discussion_topic.id) ||
+          view = self.where(discussion_topic_id: discussion_topic).first ||
             self.create!(:discussion_topic => discussion_topic)
         end
       end

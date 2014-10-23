@@ -6,9 +6,7 @@ module Lti
     let(:root_account) { mock('root account', lti_guid: 'my_guid') }
     let(:account) { mock('account', root_account: root_account) }
     let(:tcp_url) {'http://example.instructure.com/tcp/uuid'}
-    # let(:root_account) {mock('root account').stubs(:lti_guid).returns('my_guid')}
-    # let(:account) {mock('account').stubs(:root_account).returns(root_account)}
-    subject { ToolConsumerProfileCreator.new(account, tcp_url, 'http://tool-consumer.com/tp/reg') }
+    subject { ToolConsumerProfileCreator.new(account, tcp_url, 'example.instructure.com', 'account') }
 
     describe '#create' do
 
@@ -51,7 +49,7 @@ module Lti
         profile = subject.create
         reg_srv = profile.service_offered.find {|srv| srv.id.include? 'ToolProxy.collection'}
         reg_srv.id.should == "#{tcp_url}#ToolProxy.collection"
-        reg_srv.endpoint.should == 'http://tool-consumer.com/tp/reg'
+        reg_srv.endpoint.should == 'https://example.instructure.com/api/lti/accounts/{account_id}/tool_proxy'
         reg_srv.type.should == 'RestService'
         reg_srv.format.should == ["application/vnd.ims.lti.v2.toolproxy+json"]
         reg_srv.action.should include 'POST'

@@ -150,11 +150,11 @@ class EportfoliosController < ApplicationController
     zip_filename = "eportfolio.zip"
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
-      @attachments = @portfolio.attachments.find_all_by_display_name(zip_filename).select{|a| ['to_be_zipped', 'zipping', 'zipped', 'unattached'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
+      @attachments = @portfolio.attachments.not_deleted.where(display_name: zip_filename, workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).order(:created_at).to_a
       @attachment = @attachments.pop
-      @attachments.each{|a| a.destroy! }
+      @attachments.each{|a| a.related_attachments.exists? ? a.destroy : a.destroy! }
       if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@portfolio.eportfolio_entries.map{|s| s.updated_at}.compact.max || @attachment.created_at))
-        @attachment.destroy!
+        @attachment.related_attachments.exists? ? @attachment.destroy : @attachment.destroy!
         @attachment = nil
       end
 

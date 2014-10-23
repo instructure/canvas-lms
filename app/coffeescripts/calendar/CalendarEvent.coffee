@@ -23,8 +23,8 @@ define [
       filtered
 
     _hasValidInputs: (o) ->
-      # has a date, and either has both a start and end time or neither
-      o.start_date && (!!o.start_time == !!o.end_time)
+      # has a start_at or has a date and either has both a start and end time or neither
+      (!!o.start_at) || (o.start_date && (!!o.start_time == !!o.end_time))
 
     toJSON: ->
       {calendar_event: @_filterAttributes(super)}

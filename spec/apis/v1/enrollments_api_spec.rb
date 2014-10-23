@@ -646,8 +646,9 @@ describe EnrollmentsApiController, type: :request do
 
       it "should show last_activity_at and total_activity_time for student enrollment" do
         enrollment = @course.student_enrollments.first
-        enrollment.record_recent_activity(Time.zone.now - 5.minutes)
-        enrollment.record_recent_activity(Time.zone.now)
+        recent_activity = Enrollment::RecentActivity.new(enrollment)
+        recent_activity.record!(Time.zone.now - 5.minutes)
+        recent_activity.record!(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|

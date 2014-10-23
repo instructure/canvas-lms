@@ -41,6 +41,13 @@ define [
         @progress?.poll()
         @render()
 
+      # Render the progress bar if workflow_state changes to running
+      @progress.on 'change:workflow_state', (event) => 
+        @renderProgressBar() if @progress.get('workflow_state') == "running"
+
+      # When progress is complete, update
+      @progress.on 'complete', (event) => @updateMigrationModel()
+
     toJSON: -> 
       json = super
       json.display_name = @displayName()
@@ -88,20 +95,14 @@ define [
 
       this
 
-    # A complete event is triggered after a migration is completed. The migration model needs
-    # to be updated so you have the number of issues and it know's what to do next. 
+    # Render the initial progress bar after it renders, if its in a running state
     #
     # @expects void
     # @api backbone override
 
     afterRender: -> 
-      # This is ugly :( a refector would be nice someday
       if @model.get('workflow_state') == "running"
         @renderProgressBar() if @progress.get('workflow_state') == "running"
-        @progress.on 'change:workflow_state', (event) => 
-          @renderProgressBar() if @progress.get('workflow_state') == "running"
-
-      @progress.on 'complete', (event) => @updateMigrationModel()
 
     # Create a new progress bar with the @progress model. Replace the changable html 
     # with this progress information. 

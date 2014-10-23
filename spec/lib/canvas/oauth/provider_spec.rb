@@ -5,7 +5,7 @@ module Canvas::Oauth
     let(:provider) { Provider.new('123') }
 
     def stub_dev_key(key)
-      DeveloperKey.stubs(:find_by_id).returns(key)
+      DeveloperKey.stubs(:where).returns(stub(first: key))
     end
 
     describe 'initialization' do

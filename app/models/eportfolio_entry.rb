@@ -80,7 +80,7 @@ class EportfolioEntry < ActiveRecord::Base
     res = []
     content_sections.each do |section|
       if section["attachment_id"].present? && section["section_type"] == "attachment"
-        res << (self.eportfolio.user.all_attachments.find_by_id(section["attachment_id"]) rescue nil)
+        res << (self.eportfolio.user.all_attachments.where(id: section["attachment_id"]).first rescue nil)
       end
     end
     res.compact
@@ -90,7 +90,7 @@ class EportfolioEntry < ActiveRecord::Base
     res = []
     content_sections.each do |section|
       if section["submission_id"].present? && section["section_type"] == "submission"
-        res << (self.eportfolio.user.submissions.find_by_id(section["submission_id"]) rescue nil)
+        res << (self.eportfolio.user.submissions.where(id: section["submission_id"]).first rescue nil)
       end
     end
     res.compact
@@ -107,16 +107,16 @@ class EportfolioEntry < ActiveRecord::Base
         new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
         new_obj = nil if new_obj[:content].empty?
       elsif obj[:section_type] == 'submission'
-        submission = eportfolio.user.submissions.find_by_id(obj[:submission_id]) if obj[:submission_id].present?
+        submission = eportfolio.user.submissions.where(id: obj[:submission_id]).exists? if obj[:submission_id].present?
         if submission
-          new_obj[:submission_id] = submission.id
+          new_obj[:submission_id] = obj[:submission_id].to_i
         else
           new_obj = nil
         end
       elsif obj[:section_type] == 'attachment'
-        attachment = eportfolio.user.attachments.active.find_by_id(obj[:attachment_id]) if obj[:attachment_id].present?
+        attachment = eportfolio.user.attachments.active.where(id: obj[:attachment_id]).exists? if obj[:attachment_id].present?
         if attachment
-          new_obj[:attachment_id] = attachment.id
+          new_obj[:attachment_id] = obj[:attachment_id].to_i
         else
           new_obj = nil
         end

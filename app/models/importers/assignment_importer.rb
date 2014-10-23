@@ -29,8 +29,8 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil, quiz=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
-      item ||= Assignment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= Assignment.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
+      item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.new #new(:context => context)
       item.title = hash[:title]
       item.migration_id = hash[:migration_id]
@@ -107,7 +107,7 @@ module Importers
       new_record = item.new_record?
 
       rubric = nil
-      rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id]) if hash[:rubric_migration_id]
+      rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
       rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
       if rubric
         assoc = rubric.associate_with(item, context, :purpose => 'grading')
@@ -123,13 +123,13 @@ module Importers
         item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
       end
       if hash[:grading_standard_migration_id]
-        gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
+        gs = context.grading_standards.where(migration_id: hash[:grading_standard_migration_id]).first
         item.grading_standard = gs if gs
       end
       if quiz
         item.quiz = quiz
       elsif hash[:quiz_migration_id]
-        if q = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
+        if q = context.quizzes.where(migration_id: hash[:quiz_migration_id]).first
           if !item.quiz || item.quiz.id == q.id
             # the quiz is published because it has an assignment
             q.assignment = item
@@ -143,16 +143,16 @@ module Importers
         item.saved_by = :quiz
       end
       if hash[:assignment_group_migration_id]
-        item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
+        item.assignment_group = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
       end
-      item.assignment_group ||= context.assignment_groups.find_or_create_by_name(t :imported_assignments_group, "Imported Assignments")
+      item.assignment_group ||= context.assignment_groups.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
       hash[:due_at] ||= hash[:due_date]
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
         item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
       end
 
-      [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+      [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count, :muted

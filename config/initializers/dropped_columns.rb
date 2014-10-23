@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,9 +22,9 @@ class ActiveRecord::Base
     'accounts' => %w(type sis_name account_code authentication_type ldap_host ldap_domain),
     'account_authorization_configs' => %w(auth_uid),
     'access_tokens' => %w(token),
-    'asset_user_accesses' => %w(asset_access_stat_id),
+    'asset_user_accesses' => %w(asset_access_stat_id interaction_seconds progress count),
     'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent previously_published before_quiz_submission_types),
-    'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at scribd_account_id scribd_user),
+    'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts cached_scribd_thumbnail),
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_exports' => %w(course_id),
     'content_tags' => %w(sequence_position context_module_association_id),
@@ -59,11 +59,11 @@ class ActiveRecord::Base
     self.reset_column_information_without_remove_dropped_columns
   end
 
-  def self.instantiate_with_remove_dropped_columns(record)
+  def self.instantiate_with_remove_dropped_columns(attributes, *args)
     (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
-      record.delete(attr)
+      attributes.delete(attr)
     end unless self.respond_to?(:tableless?)
-    instantiate_without_remove_dropped_columns(record)
+    instantiate_without_remove_dropped_columns(attributes, *args)
   end
 
   class << self

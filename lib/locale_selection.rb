@@ -13,24 +13,29 @@ module LocaleSelection
       context = context.context
     end
 
-    if context && context.is_a?(Course) && context.locale
-      context.locale
-    elsif user && user.locale
-      user.locale
-    elsif session_locale
-      session_locale
-    elsif context && context.is_a?(Course) && context.account && (account_locale = context.account.default_locale(true))
-      account_locale
-    elsif context && context.is_a?(Account) && (account_locale = context.default_locale(true))
-      account_locale
-    elsif root_account && root_account.default_locale
-      root_account.default_locale
-    elsif accept_language && locale = infer_browser_locale(accept_language, I18n.available_locales)
-      user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
-      locale
-    elsif user && user.browser_locale
-      user.browser_locale
-    end || I18n.default_locale.to_s
+    sources = [
+      -> { context.locale if context.try(:is_a?, Course) },
+      -> { user.locale if user && user.locale },
+      -> { session_locale if session_locale },
+      -> { context.account.try(:default_locale, true) if context.try(:is_a?, Course) },
+      -> { context.default_locale(true) if context.try(:is_a?, Account) },
+      -> { root_account.try(:default_locale) },
+      -> {
+        if accept_language && locale = infer_browser_locale(accept_language, I18n.available_locales)
+          user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
+          locale
+        end
+         },
+      -> { user.try(:browser_locale) },
+      -> { I18n.default_locale.to_s }
+          ]
+
+    sources.each do |source|
+      locale = source.call
+      locale = nil unless I18n.locale_available?(locale)
+      return locale if locale
+    end
+    nil
   end
 
   QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/

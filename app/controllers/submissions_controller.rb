@@ -236,22 +236,17 @@ class SubmissionsController < ApplicationController
       @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
-    @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
+    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first rescue nil
     if authorized_action(@submission, @current_user, :read)
-
-      if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
-        respond_to do |format|
-          flash[:error] = t 'notices.submission_not_availible', "The assignment you requested is no longer availible to your course section. Prior submissions will not count towards your grade."
-          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-        end
-        return
-      end
-
       respond_to do |format|
         json_handled = false
         if params[:preview]
           if params[:version] && !@assignment.quiz
             @submission = @submission.submission_history[params[:version].to_i]
+          end
+
+          if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
+            flash[:notice] = t 'notices.submission_doesnt_count', "This assignment will no longer count towards your grade."
           end
 
           @headers = false
@@ -277,16 +272,19 @@ class SubmissionsController < ApplicationController
           else
             @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
             prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
-            @attachment ||= Attachment.find_by_id(prior_attachment_id) if prior_attachment_id
-            @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
+            @attachment ||= Attachment.where(id: prior_attachment_id).first if prior_attachment_id
+            @attachment ||= @submission.attachments.where(id: params[:download]).first if params[:download].present?
             @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
           end
           raise ActiveRecord::RecordNotFound unless @attachment
           format.html {
+            download_params = { verifier: @attachment.uuid, inline: params[:inline] }
+            download_params[:download_frd] = true if !download_params[:inline]
+
             if @attachment.context == @submission || @attachment.context == @assignment
-              redirect_to(file_download_url(@attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+              redirect_to(file_download_url(@attachment, download_params))
             else
-              redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+              redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, download_params))
             end
           }
           json_handled = true
@@ -414,17 +412,27 @@ class SubmissionsController < ApplicationController
       attachment_ids = attachment_ids.select(&:present?)
       params[:submission][:attachments] = []
       attachment_ids.each do |id|
-        params[:submission][:attachments] << @current_user.attachments.active.find_by_id(id) if @current_user
-        params[:submission][:attachments] << @group.attachments.active.find_by_id(id) if @group
+        params[:submission][:attachments] << @current_user.attachments.active.where(id: id).first if @current_user
+        params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
         params[:submission][:attachments].compact!
       end
       if !api_request? && params[:attachments] && params[:submission][:submission_type] == 'online_upload'
         # check that the attachments are in allowed formats. we do this here
         # so the attachments don't get saved and possibly uploaded to
         # S3, etc. if they're invalid.
+
+        # Legacy check that uses uploaded_data with a fake path when the user chooses a file to upload
         if @assignment.allowed_extensions.present? && params[:attachments].any? {|i, a|
             !a[:uploaded_data].empty? &&
             !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+          }
+          flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+          return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+        end
+
+        # New check that covers previously uploaded files
+        if @assignment.allowed_extensions.present? && params[:submission][:attachments].any? {|a|
+              !@assignment.allowed_extensions.include?((a.after_extension || '').downcase)
           }
           flash[:error] = t('errors.invalid_file_type', "Invalid file type")
           return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
@@ -545,7 +553,7 @@ class SubmissionsController < ApplicationController
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
+    @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
       url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
@@ -563,7 +571,7 @@ class SubmissionsController < ApplicationController
 
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
+      @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
       @submission.resubmit_to_turnitin
       respond_to do |format|
         format.html {
@@ -598,7 +606,7 @@ class SubmissionsController < ApplicationController
         params[:submission][:comment_attachments] = attachments#.map{|a| a.id}.join(",")
       end
       unless @submission.grants_right?(@current_user, session, :submit)
-        @request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) if @current_user
+        @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
         params[:submission] = {
           :comment => params[:submission][:comment],
           :comment_attachments => params[:submission][:comment_attachments],

@@ -7,7 +7,7 @@ define(function(require) {
       subject.add(fixture, { parse: true });
 
       expect(subject.length).toBe(1);
-      expect(subject.first().get('id')).toBe('200');
+      expect(subject.first().get('id')).toBe('267');
     });
   });
 });

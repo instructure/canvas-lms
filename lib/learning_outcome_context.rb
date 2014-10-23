@@ -20,13 +20,13 @@ module LearningOutcomeContext
     # of the context's associated accounts.
     def available_outcome(outcome_id, opts={})
       if opts[:allow_global]
-        outcome = LearningOutcome.global.find_by_id(outcome_id)
+        outcome = LearningOutcome.global.where(id: outcome_id).first
         return outcome if outcome
       end
 
       outcome =
-        linked_learning_outcomes.find_by_id(outcome_id) ||
-        created_learning_outcomes.find_by_id(outcome_id)
+        linked_learning_outcomes.where(id: outcome_id).first ||
+        created_learning_outcomes.where(id: outcome_id).first
       return outcome if outcome
 
       unless opts[:recurse] == false

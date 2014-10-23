@@ -22,7 +22,7 @@ module IncomingMail
       secure_id, original_message_id = parse_tag(tag)
       raise IncomingMail::Errors::SilentIgnore unless original_message_id
 
-      original_message = Message.find_by_id(original_message_id)
+      original_message = Message.where(id: original_message_id).first
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
@@ -69,7 +69,7 @@ module IncomingMail
       outgoing_message_delivered = false
 
       original_message.shard.activate do
-        comch = CommunicationChannel.active.find_by_path_and_path_type(incoming_from, 'email')
+        comch = CommunicationChannel.active.where(path: incoming_from, path_type: 'email').first
         outgoing_message.communication_channel = comch
         outgoing_message.user = comch.try(:user)
         if outgoing_message.communication_channel

@@ -186,7 +186,7 @@
       </div>
     </div>
   </li>
-  <li class="file_scribd_preview">
+  <li class="file_preview_container">
   </li>
   <li class="file_image_preview" style="text-align: center; margin-top: 10px;">
     <a href="#" class="no-hover"><img src="" alt="<%= t 'alts.file_preview', 'preview' %>" title=""/></a>
@@ -256,7 +256,6 @@
     <a href="<%= root_url %>/zip_file_imports" class="<%= context.asset_string %>_zip_import_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_zip_file_import_url, "{{ id }}", :format => :json) %>" class="<%= context.asset_string %>_zip_import_status_url" style="display: none;">&nbsp;</a>
     <a href="<%= context_url(context, :context_file_inline_view_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_inline_view_attachment_url">&nbsp;</a>
-    <a href="<%= context_url(context, :context_file_scribd_render_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_scribd_render_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_import_files_url) rescue '#' %>" class="<%= context.asset_string %>_import_url">&nbsp;</a>
   <% end %>
 </div>

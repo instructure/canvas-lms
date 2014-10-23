@@ -193,6 +193,24 @@
 #       }
 #     }
 #
+# @model NeedsGradingCount
+#     {
+#       "id": "NeedsGradingCount",
+#       "description": "Used by Assignment model",
+#       "properties": {
+#         "section_id": {
+#           "description": "The section ID",
+#           "example": "123456",
+#           "type": "string"
+#         },
+#         "needs_grading_count": {
+#           "description": "Number of submissions that need grading",
+#           "example": 5,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
 # @model Assignment
 #     {
 #       "id": "Assignment",
@@ -318,7 +336,8 @@
 #             {"section_id":"123456","needs_grading_count":5},
 #             {"section_id":"654321","needs_grading_count":0}
 #           ],
-#           "type": "array"
+#           "type": "array",
+#           "items": { "$ref": "NeedsGradingCount" }
 #         },
 #         "position": {
 #           "description": "the sorting order of the assignment in the group",
@@ -507,17 +526,9 @@ class AssignmentsApiController < ApplicationController
         scope = scope.published
       end
 
-      if @context.feature_enabled?(:differentiated_assignments) && !@context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
-        student_ids = [@current_user.id]
-
-        if @context.user_has_been_observer?(@current_user)
-          observed_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
-          student_ids.concat(observed_student_ids)
-          # if observer has no students, let them see any assignments already in the scope
-          # otherwise, filter assignments by observed student visibilities
-          scope = scope.visible_to_student_in_course_with_da(student_ids, @context.id) if observed_student_ids.any?
-        else
-          scope = scope.visible_to_student_in_course_with_da(student_ids, @context.id)
+      if @context.feature_enabled?(:differentiated_assignments)
+        scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
+          scope.visible_to_student_in_course_with_da(user_ids, @context.id)
         end
       end
 

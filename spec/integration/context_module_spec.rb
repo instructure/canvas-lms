@@ -234,4 +234,38 @@ describe ContextModule do
       end
     end
   end
+
+  describe "caching" do
+    it "should cache the view separately for each time zone" do
+      enable_cache do
+        Account.default.enable_feature! :draft_state
+        course active_all: true
+
+        mod = @course.context_modules.create!
+        mod.unlock_at = Time.utc(2014, 12, 25, 12, 0)
+        mod.save!
+
+        teacher1 = teacher_in_course(active_all: true).user
+        teacher1.time_zone = 'America/Los_Angeles'
+        teacher1.save!
+
+        teacher2 = teacher_in_course(active_all: true).user
+        teacher2.time_zone = 'America/New_York'
+        teacher2.save!
+
+        user_session teacher1
+        get "/courses/#{@course.id}/modules"
+        response.should be_success
+        body1 = Nokogiri::HTML(response.body)
+
+        user_session teacher2
+        get "/courses/#{@course.id}/modules"
+        response.should be_success
+        body2 = Nokogiri::HTML(response.body)
+
+        body1.at_css("#context_module_content_#{mod.id} .unlock_details").text.should =~ /4am/
+        body2.at_css("#context_module_content_#{mod.id} .unlock_details").text.should =~ /7am/
+      end
+    end
+  end
 end

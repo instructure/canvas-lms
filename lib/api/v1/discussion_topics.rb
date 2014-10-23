@@ -104,7 +104,8 @@ module Api::V1::DiscussionTopics
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
       attachments: attachments, published: topic.published?, can_unpublish: topic.can_unpublish?,
-      locked: topic.locked?, author: user_display_json(topic.user, topic.context),
+      locked: topic.locked?, can_lock: topic.can_lock?,
+      author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
       group_category_id: topic.legacy_group_category_id, can_group: topic.can_group? }
   end

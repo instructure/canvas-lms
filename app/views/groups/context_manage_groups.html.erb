@@ -178,7 +178,7 @@
     <div id="tabs_loading_wrapper" style="display: none;">
       <div style="text-align: left; <%= hidden unless @categories.empty? %>" id="no_groups_message">
         <% if @context.is_a?(Account) %>
-          <h2><%= t 'headings.account_groups', "Account-level Student Groups" %></h2>
+          <h1><%= t 'headings.account_groups', "Account-level Student Groups" %></h1>
           <p><%= t 'account_group_explanation', <<-TEXT
           Account-level student groups are a good way to group students without being
           tied to a specific course. Every student group gets their own calendar, discussion 
@@ -187,14 +187,14 @@
           TEXT
           %></p>
         <% else %>
-          <h2><%= t 'headings.course_groups', "Student Groups" %></h2>
+          <h1><%= t 'headings.course_groups', "Student Groups" %></h1>
           <p><%= t 'course_group_explanation', <<-TEXT
           Student groups are a useful way to organize students for things like group projects or 
           papers.  Every student group gets their own calendar, discussion board and collaboration
           tools so they can organize themselves and work together more effectively.
           TEXT
           %></p>
-    
+
           <p><%= t 'group_assignment_instructions', <<-TEXT
           You can randomly assign students to groups of a specific size, or manually
           create and organize the groups.  Once your groups are created, you can set assignments
@@ -203,7 +203,7 @@
           TEXT
           %></p>
         <% end %>
-    
+
         <p><%= t "get_started_info", "To get started, click the \"Make a New Set of Groups\" link to the right." %></p>
       </div>
       <div id="group_tabs" style="<%= hidden if @categories.empty? %>;">

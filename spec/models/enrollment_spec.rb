@@ -1522,43 +1522,6 @@ describe Enrollment do
     end
   end
 
-  describe "record_recent_activity" do
-    before(:once) { course_with_student(:active_all => 1) }
-    it "should record on the first call (last_activity_at is nil)" do
-      @enrollment.last_activity_at.should be_nil
-      @enrollment.record_recent_activity
-      @enrollment.last_activity_at.should_not be_nil
-    end
-
-    it "should not record anything within the time threshold" do
-      @enrollment.last_activity_at.should be_nil
-      now = Time.zone.now
-      @enrollment.record_recent_activity(now)
-      @enrollment.record_recent_activity(now + 1.minutes)
-      @enrollment.last_activity_at.to_s.should == now.to_s
-    end
-
-    it "should record again after the threshold is done" do
-      @enrollment.last_activity_at.should be_nil
-      now = Time.zone.now
-      @enrollment.record_recent_activity(now)
-      @enrollment.record_recent_activity(now + 11.minutes)
-      @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
-    end
-
-    it "should update total_activity_time within the time threshold" do
-      @enrollment.total_activity_time.should == 0
-      now = Time.zone.now
-      @enrollment.record_recent_activity(now)
-      @enrollment.record_recent_activity(now + 1.minutes)
-      @enrollment.total_activity_time.should == 0
-      @enrollment.record_recent_activity(now + 3.minutes)
-      @enrollment.total_activity_time.should == 3.minutes.to_i
-      @enrollment.record_recent_activity(now + 30.minutes)
-      @enrollment.total_activity_time.should == 3.minutes.to_i
-    end
-  end
-
   describe "updating cached due dates" do
     before :once do
       course_with_student

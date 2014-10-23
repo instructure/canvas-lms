@@ -319,7 +319,7 @@ class CommunicationChannel < ActiveRecord::Base
   workflow do
     state :unconfirmed do
       event :confirm, :transitions_to => :active do
-        self.set_confirmation_code(true)
+        self.set_confirmation_code
       end
       event :retire, :transitions_to => :retired
     end
@@ -425,5 +425,10 @@ class CommunicationChannel < ActiveRecord::Base
         channel.update_attribute(:bounce_count, channel.bounce_count + 1)
       end
     end
+  end
+
+  def self.find_by_confirmation_code(code)
+    where(confirmation_code: code).first
+
   end
 end

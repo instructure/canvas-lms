@@ -17,6 +17,12 @@
     - name: Added To Conversation
       delay_for: 0
 
+- category: Conversation Created
+  notifications:
+    - name: Conversation Created
+      delay_for: 0
+
+
 - category: Alert
   notifications:
     - name: Alert

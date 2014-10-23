@@ -66,7 +66,7 @@ class PseudonymsController < ApplicationController
         @ccs += CommunicationChannel.email.by_path(email).all
       end
       if @domain_root_account
-        @domain_root_account.pseudonyms.active.custom_find_by_unique_id(email, :all).each do |p|
+        @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
           cc ||= p.user.communication_channel rescue nil
           @ccs << cc
@@ -98,7 +98,7 @@ class PseudonymsController < ApplicationController
 
   def confirm_change_password
     @pseudonym = Pseudonym.find(params[:pseudonym_id])
-    @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
+    @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce]).first
     @cc = nil if @pseudonym.managed_password?
     @headers = false
     # Allow unregistered users to change password.  How else can they come back later
@@ -115,7 +115,7 @@ class PseudonymsController < ApplicationController
 
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    if @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
+    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce]).first
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]

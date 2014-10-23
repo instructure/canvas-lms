@@ -47,8 +47,7 @@ module SIS
         raise ImportError, "No name given for term #{term_id}" if name.blank?
         raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
 
-        term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
-        term ||= @root_account.enrollment_terms.new
+        term = @root_account.enrollment_terms.where(sis_source_id: term_id).first_or_initialize
 
         # only update the name on new records, and ones that haven't been
         # changed since the last sis import
@@ -57,7 +56,6 @@ module SIS
         end
 
         term.integration_id = integration_id
-        term.sis_source_id = term_id
         term.sis_batch_id = @batch.id if @batch
         if status =~ /active/i
           term.workflow_state = 'active'

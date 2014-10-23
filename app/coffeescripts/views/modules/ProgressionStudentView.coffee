@@ -47,7 +47,7 @@ define [
         itemView: ProgressionModuleView
         template: collectionTemplate
         student: @model.attributes
-        student_link: "<a href='#{studentUrl}'>#{@model.get('name')}</a>"
+        studentUrl: studentUrl
         autoFetch: true
 
       @progressions.render()

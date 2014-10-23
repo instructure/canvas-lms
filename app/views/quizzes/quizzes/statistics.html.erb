@@ -125,6 +125,7 @@ tr.question td .number_answer.correct_answer {
 }
 </style>
 <% end %>
+
 <% content_for :right_side do %>
   <% if !@context.large_roster? %>
     <h2><%= @quiz.survey? ?
@@ -189,7 +190,7 @@ tr.question td .number_answer.correct_answer {
 <% end %>
 
 <% if !@context.large_roster? %>
-  <h2><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h2>
+  <h1><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h1>
   <table id="statistics">
   <% @statistics[:questions].each do |question_type, data| %>
     <% if question_type == 'group' %>

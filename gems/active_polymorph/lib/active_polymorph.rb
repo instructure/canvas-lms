@@ -66,7 +66,9 @@ module ActiveRecord
           scope = scope.where(table[key].eq(owner[foreign_key]))
 
           if reflection.type
-            scope = scope.where(table.name => {table[reflection.type].name => owner.class.polymorphic_names})
+            types = owner.class.polymorphic_names
+            types = types.first if types.length == 1
+            scope = scope.where(table.name => {table[reflection.type].name => types})
           end
 
           conditions.each do |condition|
@@ -82,6 +84,7 @@ module ActiveRecord
 
           if reflection.type
             types = chain[i + 1].klass.polymorphic_names
+            types = types.first if types.length == 1
             constraint = constraint.and(table.name => {table[reflection.type].name => types})
           end
 

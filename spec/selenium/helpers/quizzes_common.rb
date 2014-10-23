@@ -1,7 +1,21 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative "../common"
 
 shared_examples_for "quizzes selenium tests" do
   include_examples "in-process server selenium tests"
+
+  def create_quiz_with_default_due_dates
+    due_at = Time.zone.now
+    unlock_at = Time.zone.now.advance(days:-2)
+    lock_at = Time.zone.now.advance(days:4)
+    @context = @course
+    @quiz = quiz_model
+    @quiz.generate_quiz_data
+    @quiz.due_at = due_at
+    @quiz.lock_at = lock_at
+    @quiz.unlock_at = unlock_at
+    @quiz.save!
+    @quiz
+  end
 
   def create_multiple_choice_question
     question = fj(".question_form:visible")
@@ -93,8 +107,11 @@ shared_examples_for "quizzes selenium tests" do
     @q = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
-    answers = [{'id' => 1}, {'id' => 2}, {'id' => 3}]
+
+    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+
     @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+
     @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
     yield bank, @q if block_given?
 
@@ -368,7 +385,7 @@ shared_examples_for "quizzes selenium tests" do
   # ActiveRecord id `group_id`
   def drag_question_into_group(question_id, group_id)
     move_to_question question_id
-    source = "#question_#{question_id} .move_icon"
+    source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id}"
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -391,7 +408,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a question with ActiveRecord id of `id` to the top of the list
   def drag_question_to_top(id)
     move_to_question id
-    source = "#question_#{id} .move_icon"
+    source = "#question_#{id} .draggable-handle"
     target = '#questions > *'
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -401,7 +418,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a group with ActiveRecord id of `id` to the top of the question list
   def drag_group_to_top(id)
     move_to_group id
-    source = "#group_top_#{id} .move_icon"
+    source = "#group_top_#{id} .draggable-handle"
     target = '#questions > *'
     js_drag_and_drop source, target
     wait_for_ajax_requests
@@ -411,7 +428,7 @@ shared_examples_for "quizzes selenium tests" do
   # Drags a question to the top of the group
   def drag_question_to_top_of_group(question_id, group_id)
     move_to_question question_id
-    source = "#question_#{question_id} .move_icon"
+    source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end

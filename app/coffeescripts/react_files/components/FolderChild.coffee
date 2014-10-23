@@ -10,11 +10,11 @@ define [
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
   './PublishCloud'
-  '../utils/downloadStuffAsAZip'
-], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud, downloadStuffAsAZip) ->
+], (I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault, PublishCloud) ->
 
 
   FolderChild = React.createClass
+    displayName: 'FolderChild'
 
     mixins: [BackboneMixin('model')],
 
@@ -41,58 +41,84 @@ define [
 
 
     render: withReactDOM ->
-      div className:"ef-item-row #{'ef-item-selected' if @props.isSelected}", onClick: @props.toggleSelected,
-        label className: 'screenreader-only',
-          input type: 'checkbox', defaultChecked: @props.isSelected, onChange: @props.toggleSelected,
+      div {
+        onClick: @props.toggleSelected
+        className: "ef-item-row #{'ef-item-selected' if @props.isSelected}"
+        role: 'row'
+        'aria-selected': @props.isSelected
+      },
+        label className: 'screenreader-only', role: 'gridcell',
+          input {
+            type: 'checkbox'
+            className: 'multiselectable-toggler'
+            checked: @props.isSelected
+            onChange: ->
+          }
           I18n.t('labels.select', 'Select This Item')
-        div className:'ef-name-col',
+
+        div className:'ef-name-col ellipsis', role: 'rowheader',
           if @state.editing
             form className: 'ef-edit-name-form', onSubmit: preventDefault(@saveNameEdit),
               input({
-                type:'text',
-                ref:'newName',
-                className: 'input-block-level',
-                placeholder: I18n.t('name', 'Name'),
+                type:'text'
+                ref:'newName'
+                className: 'input-block-level'
+                placeholder: I18n.t('name', 'Name')
+                'aria-label': I18n.t('folder_name', 'Folder Name')
                 defaultValue: @props.model.displayName()
                 onKeyUp: (event) => @cancelEditingName() if event.keyCode is 27
               }),
-              button type: 'button', className: 'btn btn-link ef-edit-name-cancel', onClick: @cancelEditingName,
+              button {
+                type: 'button'
+                className: 'btn btn-link ef-edit-name-cancel'
+                'aria-label': I18n.t('cancel', 'Cancel')
+                onClick: @cancelEditingName
+              },
                 i className: 'icon-x'
           else if @props.model instanceof Folder
-            Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
-              i className:'icon-folder',
-              @props.model.get('name')
+            Link {
+              to: 'folder'
+              splat: @props.model.urlPath()
+              className: 'media'
+            },
+              span className: 'pull-left',
+                i className: 'icon-folder media-object ef-big-icon'
+              span className: 'media-body',
+                @props.model.displayName()
           else
-            a href: @props.model.get('url'),
-              if @props.model.get('thumbnail_url')
-                img src: @props.model.get('thumbnail_url'), className:'ef-thumbnail', alt:''
-              else
-                i className:'icon-document'
-              @props.model.get('display_name')
+            a href: @props.model.get('url'), className: 'media',
+              span className: 'pull-left',
+                if @props.model.get('thumbnail_url')
+                  span
+                    className: 'media-object ef-thumbnail'
+                    style:
+                      backgroundImage: "url('#{ @props.model.get('thumbnail_url') }')"
+                else
+                  i className:'icon-document media-object ef-big-icon'
+              span className: 'media-body',
+                @props.model.displayName()
 
-        div className:'ef-date-created-col',
-          FriendlyDatetime datetime: @props.model.get('created_at'),
-        div className:'ef-date-modified-col',
-          FriendlyDatetime datetime: @props.model.get('updated_at'),
-        div className:'ef-modified-by-col',
-          a href: @props.model.get('user')?.html_url,
-            @props.model.get('user')?.display_name,
-        div className:'ef-size-col',
-          friendlyBytes(@props.model.get('size')),
-        div( {className:'ef-links-col'},
-          PublishCloud(model: @props.model),
+        div className: 'screenreader-only', role: 'gridcell',
+          if @props.model instanceof Folder
+            I18n.t('folder', 'Folder')
+          else
+            @props.model.get('content-type')
 
-          a (if @props.model instanceof Folder
-              href: '#'
-              onClick: preventDefault =>
-                downloadStuffAsAZip([@props.model], {
-                  contextType: @props.params.contextType
-                  contextId: @props.params.contextId
-                })
-            else
-              href: @props.model.get('url')
-            ),
-            i className:'icon-download'
 
-          ItemCog(model: @props.model, startEditingName: @startEditingName)
-        )
+        div className:'ef-date-created-col', role: 'gridcell',
+          FriendlyDatetime datetime: @props.model.get('created_at')
+
+        div className:'ef-date-modified-col', role: 'gridcell',
+          FriendlyDatetime datetime: @props.model.get('updated_at')
+
+        div className:'ef-modified-by-col ellipsis', role: 'gridcell',
+          a href: @props.model.get('user')?.html_url, className: 'ef-plain-link',
+            @props.model.get('user')?.display_name
+
+        div className:'ef-size-col', role: 'gridcell',
+          friendlyBytes(@props.model.get('size'))
+
+        div className: 'ef-links-col', role: 'gridcell',
+          if @props.userCanManageFilesForContext
+            PublishCloud(model: @props.model, ref: 'publishButton')
+          ItemCog(model: @props.model, startEditingName: @startEditingName, userCanManageFilesForContext: @props.userCanManageFilesForContext)

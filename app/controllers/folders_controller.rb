@@ -216,7 +216,7 @@ class FoldersController < ApplicationController
           else
             @folder.visible_file_attachments.not_hidden.not_locked.by_position_then_display_name
           end
-          files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc, :filename, :workflow_state]}
+          files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :filename, :workflow_state]}
           folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
           sub_folders_scope = @folder.active_sub_folders
           unless can_manage_files
@@ -342,7 +342,7 @@ class FoldersController < ApplicationController
           folder_params[:parent_folder] = @context.folders.active.find(parent_folder_id)
         end
         if @folder.update_attributes(folder_params)
-          if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder)
+          if !@folder.parent_folder_id || !@context.folders.where(id: @folder).first
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save
           end
@@ -435,10 +435,10 @@ class FoldersController < ApplicationController
 
     @folder = @context.folders.build(folder_params)
     if authorized_action(@folder, @current_user, :create)
-      if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder.parent_folder_id)
+      if !@folder.parent_folder_id || !@context.folders.where(id: @folder.parent_folder_id).first
         @folder.parent_folder_id = Folder.unfiled_folder(@context).id
       end
-      if source_folder_id.present? && (source_folder = Folder.find_by_id(source_folder_id)) && source_folder.grants_right?(@current_user, session, :read)
+      if source_folder_id.present? && (source_folder = Folder.where(id: source_folder_id).first) && source_folder.grants_right?(@current_user, session, :read)
         @folder = source_folder.clone_for(@context, @folder, {:everything => true})
       end
       respond_to do |format|

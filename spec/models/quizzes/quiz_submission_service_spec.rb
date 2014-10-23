@@ -100,7 +100,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should regenerate when possible' do
-          participant.stubs(:find_quiz_submission).returns { retriable_qs }
+          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: retriable_qs) }
 
           expect do
             subject.create quiz
@@ -108,7 +108,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should not regenerate if the QS is not retriable' do
-          participant.stubs(:find_quiz_submission).returns { unretriable_qs }
+          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: unretriable_qs) }
 
           expect do
             subject.create quiz

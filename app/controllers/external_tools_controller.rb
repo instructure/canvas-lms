@@ -179,7 +179,7 @@ class ExternalToolsController < ApplicationController
           return
         end
 
-        assignment = @context.assignments.find_by_id(params[:assignment_id])
+        assignment = @context.assignments.where(id: params[:assignment_id]).first
         unless assignment
           @context.errors.add(:assignment_id, 'The assignment was not found in this course')
           render :json => @context.errors, :status => :bad_request
@@ -312,7 +312,7 @@ class ExternalToolsController < ApplicationController
   #      }
   def show
     if api_request?
-      if tool = @context.context_external_tools.active.find_by_id(params[:external_tool_id])
+      if tool = @context.context_external_tools.active.where(id: params[:external_tool_id]).first
         render :json => external_tool_json(tool, @context, @current_user, session)
       else
         raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")

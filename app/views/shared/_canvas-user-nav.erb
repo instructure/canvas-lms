@@ -1,0 +1,9 @@
+<div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
+  <% if (identity = (yield :identity).presence) %>
+    <%= identity %>
+  <% else %>
+    <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
+      <%= render(:partial => 'shared/identity') %>
+    <%- end -%>
+  <% end %>
+</div>

@@ -35,7 +35,7 @@ class RubricAssessmentsController < ApplicationController
   
   def update
     @association = @context.rubric_associations.find(params[:rubric_association_id])
-    @assessment = @association.rubric_assessments.find_by_id(params[:id])
+    @assessment = @association.rubric_assessments.where(id: params[:id]).first
     @association_object = @association.association_object
 
     # only check if there's no @assessment object, since that's the only time

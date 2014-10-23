@@ -93,8 +93,8 @@ class ExternalFeed < ActiveRecord::Base
   def add_entry(item, feed, feed_type)
     if feed_type == :rss
       uuid = (item.respond_to?(:guid) && item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_url(item.link)
+      entry = self.external_feed_entries.where(uuid: uuid).first
+      entry ||= self.external_feed_entries.where(url: item.link).first
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -125,8 +125,8 @@ class ExternalFeed < ActiveRecord::Base
       )
     elsif feed_type == :atom
       uuid = item.id || Digest::MD5.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_url(item.links.alternate.to_s)
+      entry = self.external_feed_entries.where(uuid: uuid).first
+      entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -162,8 +162,8 @@ class ExternalFeed < ActiveRecord::Base
         :uuid => uuid
       )
     elsif feed_type == :ical
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_title_and_url(item.summary, item.url)
+      entry = self.external_feed_entries.where(uuid: uuid).first
+      entry ||= self.external_feed_entries.where(title: item.summary, url: item.url).first
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"

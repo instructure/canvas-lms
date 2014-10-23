@@ -253,7 +253,7 @@ describe Api do
       users = 0.upto(9).map{|x| user}
       result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, limit: 5)
       result.count.should == 5
-      result.each { |user| users.include?(user).should be_true }
+      result.each { |user| users.include?(user).should be_truthy}
     end
 
     it "should not hit the database if no valid conditions were found" do
@@ -460,7 +460,7 @@ describe Api do
     it 'should find the appropriate sis mapping' do
       [Course, EnrollmentTerm, User, Account, CourseSection].each do |collection|
         Api.sis_find_sis_mapping_for_collection(collection).should == Api::SIS_MAPPINGS[collection.table_name]
-        Api::SIS_MAPPINGS[collection.table_name].is_a?(Hash).should be_true
+        Api::SIS_MAPPINGS[collection.table_name].is_a?(Hash).should be_truthy
       end
     end
 
@@ -748,7 +748,7 @@ describe Api do
         :first => 1,
         :last => 10,
       })
-      links.all?{ |l| l =~ /www.example.com\/\?/ }.should be_true
+      links.all?{ |l| l =~ /www.example.com\/\?/ }.should be_truthy
       links.find{ |l| l.match(/rel="current"/)}.should =~ /page=8&per_page=10>/
       links.find{ |l| l.match(/rel="next"/)}.should =~ /page=4&per_page=10>/
       links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=10>/

@@ -105,6 +105,10 @@ class ConversationMessage < ActiveRecord::Base
     p.dispatch :added_to_conversation
     p.to { self.new_recipients }
     p.whenever {|record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added}
+
+    p.dispatch :conversation_created
+    p.to { [self.author] }
+    p.whenever {|record| record.cc_author && ((record.just_created || @re_send_message) && !record.generated && !record.submission)}
   end
 
   on_create_send_to_streams do
@@ -143,7 +147,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def attachment_ids=(ids)
-    self.attachments = author.conversation_attachments_folder.attachments.find_all_by_id(ids.map(&:to_i))
+    self.attachments = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).to_a
     write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
@@ -222,7 +226,7 @@ class ConversationMessage < ActiveRecord::Base
   def format_event_message
     case event_data[:event_type]
     when :users_added
-      user_names = User.find_all_by_id(event_data[:user_ids], :order => "id").map(&:short_name)
+      user_names = User.where(id: event_data[:user_ids]).order(:id).select([:name, :short_name]).map(&:short_name)
       EventFormatter.users_added(author.short_name, user_names)
     end
   end
@@ -242,6 +246,9 @@ class ConversationMessage < ActiveRecord::Base
       recipient.user_notes.create(:creator => author, :title => title, :note => note)
     end
   end
+
+
+  attr_accessor :cc_author
 
   def author_short_name_with_shared_contexts(recipient)
     if conversation.context
@@ -278,7 +285,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.find_all_by_id(forwarded_message_ids.split(','), :order => 'created_at DESC')} || []
+    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
   end
 
   def all_forwarded_messages

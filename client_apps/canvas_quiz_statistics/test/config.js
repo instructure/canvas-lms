@@ -24,13 +24,13 @@ requirejs.config({
     'jasmine_react',
     'jasmine_rsvp',
     'jasmine_xhr',
+    // this script actually starts the tests, must be the last one:
+    'test/boot'
   ],
 
-  waitSeconds: 1,
+  waitSeconds: 5,
 
   callback: function() {
-    this.__TESTING__ = true;
-
     // Avoid infinite loop in the pretty printer when trying to print objects with
     // circular references.
     jasmine.MAX_PRETTY_PRINT_DEPTH = 3;
@@ -40,7 +40,5 @@ requirejs.config({
     // the app before any of the specs are run.
     this.launchTests = this.launchTest;
     this.launchTest = function() {};
-
-    require([ 'test/boot' ], function() {});
   }
 });

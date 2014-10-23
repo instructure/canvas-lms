@@ -18,15 +18,23 @@
 
 module Lti
   class MessageHandler< ActiveRecord::Base
+    attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource_handler, :links
+    attr_readonly :created_at
 
-    attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource
-
-    belongs_to :resource, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
+    belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
+    has_many :links, :class_name => 'Lti::LtiLink'
 
     serialize :capabilities
     serialize :parameters
 
-    validates_presence_of :message_type, :resource, :launch_path
+    validates_presence_of :message_type, :resource_handler, :launch_path
+
+    scope :by_message_types, lambda { |*message_types| where('lti_message_handlers.message_type IN (?)', message_types) }
+
+    scope :for_context, lambda { |context|
+      tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      joins(:resource_handler).where('lti_resource_handlers.tool_proxy_id' => tool_proxies)
+    }
 
   end
 end

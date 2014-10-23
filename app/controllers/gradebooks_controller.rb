@@ -112,8 +112,8 @@ class GradebooksController < ApplicationController
   end
 
   def attendance
-    @enrollment = @context.all_student_enrollments.find_by_user_id(params[:user_id]) if params[:user_id].present?
-    @enrollment ||= @context.all_student_enrollments.find_by_user_id(@current_user.id) if !@context.grants_right?(@current_user, session, :manage_grades)
+    @enrollment = @context.all_student_enrollments.where(user_id: params[:user_id]).first if params[:user_id].present?
+    @enrollment ||= @context.all_student_enrollments.where(user_id: @current_user).first if !@context.grants_right?(@current_user, session, :manage_grades)
     add_crumb t(:crumb, 'Attendance')
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
       @assignments = @context.assignments.active.where(:submission_types => 'attendance').all

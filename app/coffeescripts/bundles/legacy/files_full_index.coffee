@@ -7,7 +7,6 @@ require [
   "jquery.instructure_date_and_time",
   "jqueryui/dialog",
   "jqueryui/progressbar",
-  "vendor/scribd.view"
 ], (INST, I18n, $, htmlEscape) ->
   INST.downloadFolderFiles = (url) ->
     cancelled = false

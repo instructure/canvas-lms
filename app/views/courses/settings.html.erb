@@ -442,9 +442,10 @@ TEXT
   <% if can_do @context, @current_user, :update %>
 
   <div id="tab-navigation">
+    <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>
     <div class="screenreader-only drag_and_drop_warning" tabindex="0">
       <%= t('nav_items_keyboard_drag_and_drop',
-      'Warning: For improved accessibility, please use the Move To Dialog option found in the menu.') %>
+      'Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu.') %>
     </div>
 
     <% keyboard_navigation([
@@ -470,7 +471,7 @@ TEXT
               tabindex="0"
           >
             <%= tab[:label] %>
-            <div role="application" class="admin-links">
+            <div class="admin-links">
               <a class="al-trigger al-trigger-gray" role="button" href="#">
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
@@ -506,7 +507,7 @@ TEXT
               tabindex="0"
           >
             <%= tab[:label] %>
-            <div role="application" class="admin-links">
+            <div class="admin-links">
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
                   <i class="icon-settings"></i>
                   <i class="icon-mini-arrow-down"></i>

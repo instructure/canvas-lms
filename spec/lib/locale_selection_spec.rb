@@ -141,6 +141,16 @@ describe LocaleSelection do
       ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('de')
     end
 
+    it "should ignore bogus locales" do
+      @root_account.update_attribute(:default_locale, 'es')
+      @account.update_attribute(:default_locale, 'fr')
+      @user.stubs(:locale).returns('bogus')
+
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('es')
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('fr')
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('fr')
+    end
+
     it "should infer the locale from the course" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')

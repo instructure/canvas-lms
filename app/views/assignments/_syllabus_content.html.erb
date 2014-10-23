@@ -2,12 +2,12 @@
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
-<% if !course_home %>
+<% if course_home %>
+  <h2><%= @context.name %></h2>
+  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
+<% else %>
   <div style="float: right;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
   <h1><%= t 'titles.course_syllabus', "Course Syllabus" %></h1>
-<% else %>
-  <div class="h2" role="heading" aria-level="1"><%= @context.name %></div>
-  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
   <%= user_content(@syllabus_body) %>

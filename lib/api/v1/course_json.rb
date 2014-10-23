@@ -1,7 +1,7 @@
 module Api::V1
   class CourseJson
 
-    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view)
+    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view enrollment_term_id)
 
     INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body',
                          :url => 'html_url', :description => 'public_description', :permissions => "permissions" }

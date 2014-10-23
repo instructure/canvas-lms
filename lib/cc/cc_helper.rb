@@ -178,7 +178,7 @@ module CCHelper
           if @course && match.obj_class == Attachment
             obj = @course.attachments.find_by_id(match.obj_id)
           else
-            obj = match.obj_class.find_by_id(match.obj_id)
+            obj = match.obj_class.where(id: match.obj_id).first
           end
           next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
           folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
@@ -196,9 +196,9 @@ module CCHelper
         # WikiPagesController allows loosely-matching URLs; fix them before exporting
         if match.obj_id.present?
           url_or_title = match.obj_id
-          page = @course.wiki.wiki_pages.deleted_last.find_by_url(url_or_title) ||
-                 @course.wiki.wiki_pages.deleted_last.find_by_url(url_or_title.to_url) ||
-                 @course.wiki.wiki_pages.find_by_id(url_or_title.to_i)
+          page = @course.wiki.wiki_pages.deleted_last.where(url: url_or_title).first ||
+                 @course.wiki.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
+                 @course.wiki.wiki_pages.where(id: url_or_title.to_i).first
         end
         if page
           "#{WIKI_TOKEN}/#{match.type}/#{page.url}"
@@ -216,7 +216,7 @@ module CCHelper
       @rewriter.set_default_handler do |match|
         new_url = match.url
         if match.obj_id && match.obj_class
-          obj = match.obj_class.find_by_id(match.obj_id)
+          obj = match.obj_class.where(id: match.obj_id).first
           if obj && @rewriter.user_can_view_content?(obj)
             # for all other types,
             # create a migration id for the object, and use that as the new link

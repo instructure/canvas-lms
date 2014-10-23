@@ -46,10 +46,10 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
         @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
       else
-        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user.present?
+        @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
         @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
@@ -79,9 +79,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     @quiz = require_quiz
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
       else
-        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
+        @submission = @quiz.quiz_submissions.where(user_id: @current_user).first
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           if params[:action] == 'record_answer'
             flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
@@ -132,7 +132,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @student = @context.students.find_by_id(params[:user_id])
+    @student = @context.students.where(id: params[:user_id]).first
     @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student || @current_user, nil, 'settings_only')
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0

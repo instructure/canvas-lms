@@ -60,6 +60,12 @@ define([], function() {
     loadOnStartup: true,
 
     /**
+     * @cfg {Number} pollingFrequency
+     * Milliseconds to wait before polling the completion of progress objects.
+     */
+    pollingFrequency: 1000,
+
+    /**
      * Error emitter. Default behavior is to log the error message to the
      * console.
      *

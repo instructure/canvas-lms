@@ -130,7 +130,7 @@ module CanvasSanitize #:nodoc:
           'col' => ['span', 'width'],
           'colgroup' => ['span', 'width'],
           'img' => ['align', 'alt', 'height', 'src', 'width'],
-          'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox', 'allowfullscreen'],
+          'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox', 'allowfullscreen','webkitallowfullscreen','mozallowfullscreen'],
           'ol' => ['start', 'type'],
           'q' => ['cite'],
           'table' => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules', 'dir', 'lang'],

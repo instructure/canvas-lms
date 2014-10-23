@@ -88,8 +88,8 @@ describe "account admin outcomes" do
         @cm.user = @user
         @cm.save!
 
-        @level_0_browse = File.join(File.dirname(__FILE__) + "/../../../vendor/plugins/academic_benchmark/spec_canvas/fixtures", 'example.json')
-        @authority_list = File.join(File.dirname(__FILE__) + "/../../../vendor/plugins/academic_benchmark/spec_canvas/fixtures", 'auth_list.json')
+        @level_0_browse = File.join(File.dirname(__FILE__) + "/../../../gems/plugins/academic_benchmark/spec_canvas/fixtures", 'example.json')
+        @authority_list = File.join(File.dirname(__FILE__) + "/../../../gems/plugins/academic_benchmark/spec_canvas/fixtures", 'auth_list.json')
         File.open(@level_0_browse, 'r') do |file|
           @att = Attachment.create!(:filename => 'standards.json', :display_name => 'standards.json', :uploaded_data => file, :context => @cm)
         end

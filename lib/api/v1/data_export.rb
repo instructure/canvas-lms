@@ -26,8 +26,9 @@ module DataExportsApi
     def data_export_json(data_export, user, session, includes = [])
       json = api_json(data_export, user, session, :only => %w(id created_at workflow_state))
       # TODO update once we have support for more granular contexts than just Account
-      json["account"] = account_json(::Account.find_by_id(data_export.context_id), user, session, includes) if includes.include?(:account)
-      json["user"] = user_json(User.find_by_id(data_export.user_id), user, session, includes, Account.find_by_id(data_export.context_id)) if includes.include?(:user)
+      account = ::Account.where(id: data_export.context_id).first unless (includes & [:account, :user]).empty?
+      json["account"] = account_json(account, user, session, includes) if includes.include?(:account)
+      json["user"] = user_json(User.where(id: data_export.user_id).first, user, session, includes, account) if includes.include?(:user)
       json
     end
 

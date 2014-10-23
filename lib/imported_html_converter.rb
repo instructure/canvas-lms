@@ -50,13 +50,13 @@ class ImportedHtmlConverter
             #todo: refactor migration systems to use new $CANVAS...$ flags
             #todo: FLAG UNFOUND REFERENCES TO re-attempt in second loop?
             if wiki_migration_id = $1
-              if linked_wiki = context.wiki.wiki_pages.find_by_migration_id(wiki_migration_id)
+              if linked_wiki = context.wiki.wiki_pages.where(migration_id: wiki_migration_id).first
                 new_url = "#{course_path}/wiki/#{linked_wiki.url}"
               end
             end
           elsif val =~ /discussion_topic_migration_id=(.*)/
             if topic_migration_id = $1
-              if linked_topic = context.discussion_topics.find_by_migration_id(topic_migration_id)
+              if linked_topic = context.discussion_topics.where(migration_id: topic_migration_id).first
                 new_url = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
               end
             end
@@ -73,11 +73,11 @@ class ImportedHtmlConverter
             if type == 'pages'
               new_url = "#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}"
             elsif type == 'attachments'
-              if att = context.attachments.find_by_migration_id(migration_id)
+              if att = context.attachments.where(migration_id: migration_id).first
                 new_url = URI::escape("#{course_path}/files/#{att.id}/preview")
               end
-            elsif context.respond_to?(type) && context.send(type).respond_to?(:find_by_migration_id)
-              if object = context.send(type).find_by_migration_id(migration_id)
+            elsif context.respond_to?(type) && context.send(type).respond_to?(:where)
+              if object = context.send(type).where(migration_id: migration_id).first
                 new_url = URI::escape("#{course_path}/#{type_for_url}/#{object.id}")
               end
             end
@@ -178,7 +178,7 @@ class ImportedHtmlConverter
       mig_id ||= context.attachment_path_id_lookup_lower[alt_rel_path.downcase]
     end
     
-    mig_id && context.attachments.find_by_migration_id(mig_id)
+    mig_id && context.attachments.where(migration_id: mig_id).first
   end
 
   def self.replace_relative_file_url(rel_path, context)
@@ -219,7 +219,7 @@ class ImportedHtmlConverter
     if context.respond_to?(:attachment_path_id_lookup) &&
       context.attachment_path_id_lookup &&
         context.attachment_path_id_lookup[rel_path]
-      file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
+      file = context.attachments.where(migration_id: context.attachment_path_id_lookup[rel_path]).first
       if file && file.media_object
         media_id = file.media_object.media_id
         node['id'] = "media_comment_#{media_id}"

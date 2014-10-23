@@ -64,7 +64,7 @@
 }
 </style>
 <% end %>
-<h2><%= t('headings.registered_services', %{Registered Services}) %></h2>
+<h1><%= t('headings.registered_services', %{Registered Services}) %></h1>
 <a href="<%= settings_profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
 <p>
   <%= t 'help.user_services', %{If other members choose, they can let you see which outside services they've linked to their Canvas account.  This can make it easier to coordinate group projects and also link up outside of class.} %>
@@ -88,7 +88,7 @@
 <% @services_hash.sort_by{|t, s| UserService.sort_position(t) }.each do |service_type, services| %>
 <% service_example = services.first %>
 <a name="service_<%= service_type %>"></a>
-<h3 class="service_type"><%= image_tag "#{service_type}_icon.png", :alt => "" %><%= service_type.titleize %></h3>
+<h2 class="service_type"><%= image_tag "#{service_type}_icon.png", :alt => "" %><%= service_type.titleize %></h2>
 <div class="short_description"><%= UserService.short_description(service_type) %></div>
 <ul class="user_list">
 <% services.uniq(&:user_id).each do |service| %>

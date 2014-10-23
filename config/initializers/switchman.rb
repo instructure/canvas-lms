@@ -42,7 +42,7 @@ Rails.application.config.to_prepare do
     if default.is_a?(self)
       settings = ActiveRecord::AttributeMethods::Serialization::Attribute.new(serialized_attributes['settings'],
                                                                    default.read_attribute('settings'),
-                                                                   :serialized).unserialize
+                                                                   :serialized).unserialized_value
       default.settings = settings
     end
 

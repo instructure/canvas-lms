@@ -370,7 +370,7 @@ class DiscussionEntry < ActiveRecord::Base
       if self.user
         my_entry_participant = self.discussion_entry_participants.create(:user => self.user, :workflow_state => "read")
 
-        topic_participant = self.discussion_topic.discussion_topic_participants.find_by_user_id(self.user.id)
+        topic_participant = self.discussion_topic.discussion_topic_participants.where(user_id: self.user).first
         if topic_participant.blank?
           new_count = self.discussion_topic.default_unread_count - 1
           topic_participant = self.discussion_topic.discussion_topic_participants.create(:user => self.user,

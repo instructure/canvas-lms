@@ -91,7 +91,7 @@ module AuthenticationMethods
 
     if !@current_pseudonym
       if @policy_pseudonym_id
-        @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
+        @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
       elsif @pseudonym_session = PseudonymSession.find
         @current_pseudonym = @pseudonym_session.record
 
@@ -125,7 +125,7 @@ module AuthenticationMethods
         # just using an app session
         # this basic auth support is deprecated and marked for removal in 2012
         if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
-          Shard.birth.activate { @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) }
+          Shard.birth.activate { @developer_key = DeveloperKey.where(api_key: params[:api_key]).first }
         end
         @developer_key ||
           request.get? ||
@@ -147,7 +147,7 @@ module AuthenticationMethods
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
       request_become_user = nil
       if params[:become_user_id]
-        request_become_user = User.find_by_id(params[:become_user_id])
+        request_become_user = User.where(id: params[:become_user_id]).first
       elsif params.keys.include?('me')
         request_become_user = @current_user
       elsif params.keys.include?('become_teacher')

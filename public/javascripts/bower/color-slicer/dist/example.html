@@ -21,11 +21,12 @@ var generate = function() {
   var lightness = parseInt(document.getElementById('lightness').value, 10);
   var chroma = parseInt(document.getElementById('chroma').value, 10);
   var bright = document.getElementById('bright').checked;
+  var unsafe = document.getElementById('unsafe').checked;
 
   document.body.style.color = bright ? '#fff' : '#000';
   document.body.style.backgroundColor = bright ? '#000' : '#fff';
 
-  var colors = colorSlicer.getLchColors(count, start, {l: lightness, c: chroma, bright: bright});
+  var colors = colorSlicer.getLchColors(count, start, {l: lightness, c: chroma, bright: bright, unsafe: unsafe});
   var output = document.getElementById('output');
   output.innerHTML = '';
   for (var i = 0; i < colors.length; i++) {
@@ -59,6 +60,7 @@ window.addEventListener('load', function() {
     <div><label>Lightness <input id="lightness" /></label></div>
     <div><label>Chroma <input id="chroma" /></label></div>
     <div><label><input id="bright" type="checkbox" /> Bright</label></div>
+    <div><label><input id="unsafe" type="checkbox" /> Unsafe</label></div>
   </fieldset>
 </form>
 <ol id="output">
