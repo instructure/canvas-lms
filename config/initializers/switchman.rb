@@ -92,7 +92,7 @@ Rails.application.config.to_prepare do
 
     scope :in_region, ->(region) do
       servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
-      if Shard.default.database_server.config[:region] == region
+      if servers.include?(Shard.default.database_server.id)
         where("database_server_id IN (?) OR database_server_id IS NULL", servers)
       else
         where(database_server_id: servers)
