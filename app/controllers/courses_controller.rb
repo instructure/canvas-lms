@@ -701,15 +701,9 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-<<<<<<< HEAD
-        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
-                  :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard)
-=======
         ActiveRecord::Associations::Preloader.new(users,
                                                   { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id]).run
->>>>>>> a190fe6... bump switchman
       end
       render :json => users.map { |u|
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
