@@ -12,14 +12,15 @@ define [
   class FolderTreeView extends Backbone.View
 
     tagName: 'li'
-    
+
     @optionProperty 'nestingLevel'
     @optionProperty 'onlyShowFolders'
     @optionProperty 'onClick'
     @optionProperty 'dndOptions'
     @optionProperty 'href'
+    @optionProperty 'focusStyleClass'
+    @optionProperty 'selectedStyleClass'
 
-    
     defaults:
       nestingLevel: 1
 
@@ -31,6 +32,7 @@ define [
 
     events:
       'click .folderLabel': 'toggle'
+      'selectItem .folderLabel': 'selectItem'
 
     initialize: ->
       @tagId = _.uniqueId 'treenode-'
@@ -54,13 +56,21 @@ define [
       @model.toggle({onlyShowFolders: @onlyShowFolders})
       @$el.attr(@attributes())
 
+    selectItem: (event) ->
+      $span = $(event.target).find('span')
+      $span.trigger('click')
+
     title_text: ->
       @model.get('custom_name') || @model.get('name')
-      
+
     renderSelf: ->
       @$el.attr @attributes()
       @$label ||= do =>
-        @$labelInner = $('<span>').click (event) => @onClick?(event, @model)
+        @$labelInner = $('<span>').click (event) =>
+          if (@selectedStyleClass)
+            $('.' + _this.selectedStyleClass).each((key, element) => $(element).removeClass(@selectedStyleClass))
+            $(event.target).addClass(@selectedStyleClass)
+          @onClick?(event, @model)
 
         $label = $("""
           <a
@@ -92,6 +102,9 @@ define [
         .toggleClass('expanded', !!@model.isExpanded)
         .toggleClass('loading after', !!@model.isExpanding)
 
+      # Let's this work well with file browsers like New Files
+      if (@selectedStyleClass)
+        @$label.toggleClass(@selectedStyleClass, window.location.pathname is @href?(@model))
 
     renderContents: ->
       if @model.isExpanded
@@ -106,6 +119,8 @@ define [
               onClick: @onClick
               dndOptions: @dndOptions
               href: @href
+              focusStyleClass: @focusStyleClass
+              selectedStyleClass: @selectedStyleClass
             tagName: 'li'
             className: 'folders'
             template: collectionTemplate

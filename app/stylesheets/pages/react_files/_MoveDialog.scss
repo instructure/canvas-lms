@@ -1,0 +1,9 @@
+.MoveDialog__folderItem--selected {
+  background-color: $base-list-item-background--selected
+}
+
+.MoveDialog__folderItem--focused {
+  & > .folderLabel {
+    background-color: $base-list-item-background--hover
+  }
+}

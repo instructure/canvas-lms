@@ -12,7 +12,7 @@ define [
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
 
-    mixins: [Router.Navigation]
+    mixins: [Router.Navigation, Router.ActiveState]
 
     componentDidMount: ->
       new FileBrowserView({
@@ -21,6 +21,8 @@ define [
         onClick: @onClick
         dndOptions: @props.dndOptions
         href: @hrefFor
+        focusStyleClass: @focusStyleClass
+        selectedStyleClass: @selectedStyleClass
       }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode())
       @expandTillCurrentFolder(@props)
 
@@ -31,11 +33,18 @@ define [
 
     onClick: (event, folder) ->
       event.preventDefault()
+      $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
+      $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
       @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
 
     hrefFor: (folder) ->
       @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+
+
+
+    focusStyleClass: 'FolderTree__folderItem--focused'
+    selectedStyleClass: 'FolderTree__folderItem--selected'
 
 
     expandTillCurrentFolder: (props) ->
