@@ -90,7 +90,8 @@ class Submission < ActiveRecord::Base
     where("submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course)
   }
 
-  def self.needs_grading_conditions(prefix = nil)
+  # see #needs_grading?
+  def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
       AND (submissions.workflow_state = 'pending_review'
@@ -100,8 +101,23 @@ class Submission < ActiveRecord::Base
       )
     SQL
     conditions.gsub!(/\s+/, ' ')
-    conditions.gsub!("submissions.", prefix + ".") if prefix
     conditions
+  end
+
+  # see .needs_grading_conditions
+  def needs_grading?(was = false)
+    suffix = was ? "_was" : ""
+
+    !send("submission_type#{suffix}").nil? &&
+    (send("workflow_state#{suffix}") == 'pending_review' ||
+      (send("workflow_state#{suffix}") == 'submitted' &&
+        (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
+      )
+    )
+  end
+
+  def needs_grading_changed?
+    needs_grading? != needs_grading?(:was)
   end
 
   scope :needs_grading, -> { where(needs_grading_conditions) }
@@ -134,36 +150,25 @@ class Submission < ActiveRecord::Base
     !!(self.grader_id && self.grader_id < 0)
   end
 
-  def self.needs_grading_trigger_sql
-    # every database uses a different construct for a current UTC timestamp...
-    default_sql = <<-SQL
+  def adjust_needs_grading_count(mode = :increment)
+    amount = mode == :increment ? 1 : -1
+    connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, assignment_id: assignment_id, user_id: user_id}])
       UPDATE assignments
-      SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
-      WHERE id = NEW.assignment_id
+      SET needs_grading_count = needs_grading_count + :amount, updated_at = :now
+      WHERE id = :assignment_id
       AND context_type = 'Course'
-      AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
+      AND EXISTS (SELECT 1 FROM enrollments WHERE #{Enrollment.active_student_conditions} AND user_id = :user_id AND course_id = assignments.context_id)
       SQL
-
     # TODO: add this to the SQL above when DA is on for everybody
-    # and don't forget to run `rake db:generate_trigger_migration`
     # and remove NeedsGradingCountQuery#manual_count
     # AND EXISTS(SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
-
-    { :default    => default_sql.gsub("{{now}}", "now()"),
-      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
-      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
-      :mysql      => default_sql.gsub("{{now}}", "utc_timestamp()") }
   end
 
-  trigger.after(:insert) do |t|
-    t.where("#{needs_grading_conditions("NEW")}") do
-      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
-    end
-  end
-
-  trigger.after(:update) do |t|
-    t.where("(#{needs_grading_conditions("NEW")}) <> (#{needs_grading_conditions("OLD")})") do
-      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"]}]
+  after_create :update_needs_grading_count, if: :needs_grading?
+  after_update :update_needs_grading_count, if: :needs_grading_changed?
+  def update_needs_grading_count
+    connection.after_transaction_commit do
+      adjust_needs_grading_count(needs_grading? ? :increment : :decrement)
     end
   end
 
