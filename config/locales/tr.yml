@@ -4412,7 +4412,7 @@ tr:
         one: "1 ödevin notlandırılması gerek"
         other: "%{count} ödevin notlandırılması gerek"
       no_peer_review_due_date: "bitiş: Bitiş Tarihi Yok"
-      peer_review_due_date: "neden: %{peer_review_due_at}"
+      peer_review_due_date: "teslim tarihi: %{peer_review_due_at}"
       points_possible: "%{points_possible} üzerinden"
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4703,7 +4703,7 @@ tr:
         move_course: "Dersi Taşı"
         update_course: "Ders Detaylarını Güncelle"
       course_conclude_at_warning_message: "Ders, gece yarısı sonlanacak şekilde ayarlanmış. Yani, önceki gün dersin aktif olduğu son gündür."
-      course_conclude_at_warning_title: "Kurs Geceyarısı Sona Erecek"
+      course_conclude_at_warning_title: "Ders Geceyarısı Sona Erecek"
       course_open_enrollment: "Bu derse herkesin kayıt olması etkinleştirildi. Öğrencilerle *%{url}* bağlantısını paylaşırsanız kendileri kaydolabilirler. Alternatif olarak *%{url2}* adresinde hesap oluşturup şu giriş kodunu kullanabilirler: *%{code}*"
       course_open_enrollment_without_code: "Bu derste açık kayıt olma etkindir. Öğrencilerle şu URL'yi paylaşırsanız kendi kendilerine derse kayıt olabilirler: *%{url}*"
       course_overrides_term: "Herhangi bir dönem hazır ayarının üzerine yazılacaktır."
@@ -6302,7 +6302,7 @@ tr:
     file_preview_hide: Gizle
     file_preview_infotable_datecreated: "Tarih Oluşturuldu"
     file_preview_infotable_datemodified: "Tarih Değiştirildi"
-    file_preview_infotable_kind: Çeşit
+    file_preview_infotable_kind: Tür
     file_preview_infotable_modifiedby: "Tarafından Değiştirildi"
     file_preview_infotable_name: İsim
     file_preview_infotable_size: Büyüklük
@@ -6983,7 +6983,7 @@ tr:
       new_assessment_option: "[Yeni Ödev]"
       no_annotation: "Bu belge için açıklama mevcut değil"
       not_newest_notice: "Not: Bu en güncel gönderim değil"
-      page_header_title: "Hızlı Değerlendirme"
+      page_header_title: Speedgrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "gönderim durumuna göre (notlandırılması gerek, gönderilmemiş vb.)"
@@ -7488,15 +7488,15 @@ tr:
     course: Ders
     dashboard_helper: 
       announcement_details: "Duyuru Ayrıntıları"
-      announcement_label: "Kurs Duyurularını Ziyaret Et"
+      announcement_label: "Ders Duyurularını Ziyaret Et"
       assignment_details: "Ödev Ayrıntıları"
-      assignment_label: "Kurs Sınavlarını Ziyaret Et"
+      assignment_label: "Ders Ödevlerini Ziyaret Et"
       conversation_details: "Karşılıklı Konuşma Ayrıntıları"
       conversation_label: "Konuşmaları Ziyaret Et"
       discussion_details: "Tartışma Ayrıntıları"
-      discussion_label: "Kurs Tartışmalarını Ziyaret Et"
-      peer_review_details: "Eş Değerlendirme Detayları"
-      peer_review_label: "Kurs Eş Değerlendirmelerini Ziyaret Et"
+      discussion_label: "Ders Tartışmalarını Ziyaret Et"
+      peer_review_details: "Akran Değerlendirme Detayları"
+      peer_review_label: "Ders Akran Değerlendirmelerini Ziyaret Et"
       x_more: "%{x} daha fazla..."
       x_new_in_announcements: 
         one: "*1* Duyuru"
@@ -7511,8 +7511,8 @@ tr:
         one: "*1* Tartışma"
         other: "*%{count}* Tartışma"
       x_new_in_peer_reviews: 
-        one: "*1* Eş Değerlendirmesi"
-        other: "*%{count}* Eş Değerlendirmesi"
+        one: "*1* Akran Değerlendirmesi"
+        other: "*%{count}* Akran Değerlendirmesi"
     local: Yerel
     select: 
       prompt: "Lütfen seçiniz"
@@ -7740,7 +7740,7 @@ tr:
     menu: 
       view_all_accounts: "Tüm hesapları göster"
       view_all_groups: "Tüm grupları görüntüle"
-      view_all_or_customize: "Tümünü Gör veya Yapılandır"
+      view_all_or_customize: "Tümünü Göster veya Yapılandır"
     mobile_auth: 
       log_in_to_canvas: "Canvas'ta Oturum Aç"
   learning_mastery_gradebook_description: |-
@@ -8071,7 +8071,7 @@ tr:
         html: 
           attached_file: "Ekli Dosya"
           download: indir
-          link: "Duyuruları Gör"
+          link: "Duyuruları Göster"
         labels: 
           file_included: "Dosya Dahil Edildi"
       facebook: 
@@ -8718,24 +8718,24 @@ tr:
           audio_comment: "Bu mesaj medya yorumu içermektedir. Dinlemek veya cevaplamak için, bağlantıya tıklayınız:"
           download: indir
           reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
-          subject: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
+          subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
           unknown_user: "Bilinmeyen Kullanıcı"
           view_message: "Bu mesajı karşılıklı konuşmalarda gör"
         reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
-        subject: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
+        subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         unknown_user: "Bilinmeyen Kullanıcı"
         view_message: "Bu mesajı karşılıklı konuşmalarda gör"
       facebook: 
-        body: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
+        body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         link_text: "Mesajı Gör"
         unknown_user: "Bilinmeyen Kullanıcı"
       sms: 
-        body: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
+        body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         more_info: "Daha fazla bilgi için %{url}"
         unknown_user: "Bilinmeyen Kullanıcı"
       summary: 
-        body: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
-        subject: "%{user_name}, size Canvas üzerinden bir mesaj gönderdi."
+        body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
+        subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         unknown_user: "Bilinmeyen Kullanıcı"
       twitter: 
         tweet: "Canvas Uyarısı - %{user_name} kullanıcısından mesaj."
@@ -10017,7 +10017,7 @@ tr:
     announcement_created_by_you_description: |-
         * Tarafınızdan oluşturulan Duyurular
         * Oluşturduğunuz duyurulara verilen cevaplar
-    announcement_created_by_you_display: "Duyuru Sizin Tarafınızdan Oluşturuldu"
+    announcement_created_by_you_display: "Tarafınızdan Oluşturulan Duyuru"
     announcement_description: "Dersinizdeki Yeni Duyurular"
     announcement_display: Duyuru
     appointment_availability_description: |-
@@ -10056,7 +10056,7 @@ tr:
       student_appointment_signups: "Öğrenci Randevu Oturumları"
       submission_comment: "Gönderi Yorumu"
     conversation_created_description: "Bir sohbet oluşturdunuz"
-    conversation_created_display: "Benim Tarafımdan Oluşturulan Konuşmalar"
+    conversation_created_display: "Tarafımdan Oluşturulan Konuşmalar"
     conversation_message_description: "Yeni Gelen Mesajlar"
     conversation_message_display: "Sohbet Mesajları"
     course_content_description: |-
@@ -10116,7 +10116,7 @@ tr:
       account_user_registration: "Kullanıcı Hesabı Kayıdı"
       added_to_conversation: "Karşılıklı Konuşmalara Eklendi"
       alert: Uyarı
-      announcement_created_by_you: "Sizin Tarafınızdan Oluşturulan Duyurular"
+      announcement_created_by_you: "Tarafınızdan Oluşturulan Duyurular"
       announcement_reply: "Duyuru Cevabı"
       appointment_canceled_by_user: "Randevu Kullanıcı Tarafından İptal Edildi"
       appointment_deleted_for_user: "Randevu Kullanıcı Tarafından Silindi"
@@ -10269,7 +10269,7 @@ tr:
     : Evet
   orbis_report_header_assignment_id: "ödev id'si"
   orbis_report_header_assignment_title: "ödev başlığı"
-  orbis_report_header_canvas_course_id: "kurs id"
+  orbis_report_header_canvas_course_id: "ders id"
   orbis_report_header_course_name: "ders adı"
   orbis_report_header_course_sis_id: "ders sis id"
   orbis_report_header_date_submitted: "gönderilen tarih"
@@ -11572,15 +11572,15 @@ tr:
     generated: "Rapor hazırlandı."
     generated_at: "%{date}'da oluşturuldu"
     generating: "Rapor oluşturuluyor..."
-    generation_failed: "Bazı şeyler yanlış gitti, lütfen tekrar deneyin."
+    generation_failed: "Bazı hatalar oluştu, lütfen tekrar deneyin."
     item_analysis: "Öğe Analizi"
     no_answer: "Cevap Yok"
     sort_by_position: "Konuma Göre Sırala"
     stats_error: 
-      image_alt: "Sınav istatistikleri henüz bulunamadı."
+      image_alt: "Sınav istatistikleri henüz kullanılabilir değil."
     student_analysis: "Öğrenci Analizi"
     unknown: 
-      header: "Bazı şeyler yanlış gitti."
+      header: "Bazı sorunlar oluştu."
   quiz_statistics_route: 
     quiz_statistics: İstatistikler
   quiz_submission_arrows: 
@@ -11588,7 +11588,7 @@ tr:
       correct: Doğru!
       correct_answers: "Doğru Cevaplar"
       incorrect: Yanlış
-      partial: Kısmi
+      partial: Kısmen
       right: "Doğru Cevap"
       unanswered: Cevaplanmamış
       you_answered: "Sizin Cevabınız"
