@@ -276,27 +276,6 @@ Mocha::Mock.class_eval do
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, ActiveSupport::Cache::NullStore].each do |store|
-  store.class_eval do
-    def write_with_serialization_check(name, value, options = nil)
-      Marshal.dump(value)
-      write_without_serialization_check(name, value, options)
-    end
-
-    alias_method_chain :write, :serialization_check
-  end
-end
-
-ActiveSupport::Cache::NullStore.class_eval do
-  def fetch_with_serialization_check(name, options = {}, &block)
-    result = fetch_without_serialization_check(name, options, &block)
-    Marshal.dump(result) if result
-    result
-  end
-
-  alias_method_chain :fetch, :serialization_check
-end
-
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
