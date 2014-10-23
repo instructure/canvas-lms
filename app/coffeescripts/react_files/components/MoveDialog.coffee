@@ -4,10 +4,11 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/views/FileBrowserView'
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-], (I18n, $, React, withReactDOM, preventDefault, FileBrowserView, customPropTypes, moveStuff) ->
+], (I18n, $, React, withReactDOM, preventDefault, TreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -29,8 +30,13 @@ define [
         item: @props.thingsToMove[0]?.displayName()
       })
 
-      new FileBrowserView({
+      rootFoldersFinder = new RootFoldersFinder({
+        rootFoldersToShow: @props.rootFoldersToShow
+      })
+
+      new TreeBrowserView({
         onlyShowFolders: true,
+        rootModelsFinder: rootFoldersFinder
         rootFoldersToShow: @props.rootFoldersToShow
         onClick: @onSelectFolder
         focusStyleClass: 'MoveDialog__folderItem--focused'

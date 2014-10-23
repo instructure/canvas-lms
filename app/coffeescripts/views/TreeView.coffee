@@ -3,13 +3,12 @@ define [
   'jquery'
   'underscore'
   'compiled/fn/preventDefault'
-  'compiled/models/Folder'
   'compiled/views/PaginatedCollectionView'
-  'compiled/views/FileItemView'
-  'jst/FolderTreeCollection'
-], (Backbone, $, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
+  'compiled/views/TreeItemView'
+  'jst/TreeCollection'
+], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate) ->
 
-  class FolderTreeView extends Backbone.View
+  class TreeView extends Backbone.View
 
     tagName: 'li'
 
@@ -110,9 +109,9 @@ define [
       if @model.isExpanded
         unless @$folderContents
           @$folderContents = $("<ul role='group' class='folderContents'/>").appendTo(@$el)
-          foldersView = new PaginatedCollectionView(
+          subtreesView = new PaginatedCollectionView(
             collection: @model.folders
-            itemView: FolderTreeView
+            itemView: TreeView
             itemViewOptions:
               nestingLevel: @nestingLevel+1
               onlyShowFolders: @onlyShowFolders
@@ -126,18 +125,18 @@ define [
             template: collectionTemplate
             scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
           )
-          @$folderContents.append(foldersView.render().el)
+          @$folderContents.append(subtreesView.render().el)
           unless @onlyShowFolders
-            filesView = new PaginatedCollectionView(
+            itemsView = new PaginatedCollectionView(
               collection: @model.files
-              itemView: FileItemView
+              itemView: TreeItemView
               itemViewOptions: {nestingLevel: @nestingLevel+1}
               tagName: 'li'
               className: 'files'
               template: collectionTemplate
               scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
             )
-            @$folderContents.append(filesView.render().el)
+            @$folderContents.append(itemsView.render().el)
         @$('> .folderContents').removeClass('hidden')
       else
         @$('> .folderContents').addClass('hidden')
