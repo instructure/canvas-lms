@@ -57,54 +57,68 @@ class Enrollment < ActiveRecord::Base
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
-  def self.active_student_conditions(prefix = 'enrollments')
-    "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
+  # see #active_student?
+  def self.active_student_conditions
+    "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active')"
   end
 
-  def self.active_student_subselect(conditions)
-    "EXISTS (SELECT 1 FROM enrollments WHERE #{conditions} AND #{active_student_conditions} LIMIT 1)"
+  # see .active_student_conditions
+  def active_student?(was = false)
+    suffix = was ? "_was" : ""
+
+    %w[StudentEnrollment StudentViewEnrollment].include?(send("type#{suffix}")) &&
+      send("workflow_state#{suffix}") == "active"
   end
 
-  def self.needs_grading_trigger_sql
-    no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
-    default_sql = <<-SQL
-      UPDATE assignments SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
-      WHERE context_id = NEW.course_id
-      AND context_type = 'Course'
-      AND EXISTS (
-        SELECT 1
-        FROM submissions
-        WHERE user_id = NEW.user_id
-        AND assignment_id = assignments.id
-        AND (#{Submission.needs_grading_conditions})
-                LIMIT 1
-      )
-      AND #{no_other_enrollments_sql};
-      SQL
+  def active_student_changed?
+    active_student? != active_student?(:was)
+  end
 
-    # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
-    # also, every database uses a different construct for a current UTC timestamp
-    { :default    => default_sql.gsub("{{now}}", "now()"),
-      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
-      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
-      :mysql => <<-MYSQL }
-        IF #{no_other_enrollments_sql} THEN
-          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, assignments.updated_at = utc_timestamp()
-          WHERE context_id = NEW.course_id
+  def adjust_needs_grading_count(mode = :increment)
+    amount = mode == :increment ? 1 : -1
+
+    other_enrollments_conditions = sanitize_sql([
+      "#{Enrollment.active_student_conditions} AND (user_id = :user_id AND course_id = :course_id AND id <> :id",
+      {user_id: user_id, course_id: course_id, id: id}
+    ])
+
+    if ['MySQL', 'Mysql2'].include?(connection.adapter_name)
+      # IN (...) subselects perform poorly in mysql, plus we want to avoid
+      #locking rows in other tables
+      unless Enrollment.where(other_enrollments_conditions).pluck(:id).first
+        connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + :amount, assignments.updated_at = :now
+          WHERE context_id = :course_id
             AND context_type = 'Course'
             AND assignments.id = submissions.assignment_id
-            AND submissions.user_id = NEW.user_id
+            AND submissions.user_id = :user_id
             AND (#{Submission.needs_grading_conditions});
-        END IF;
-      MYSQL
+         SQL
+      end
+    else
+      connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
+        UPDATE assignments SET needs_grading_count = needs_grading_count + :amount, updated_at = :now
+        WHERE context_id = :course_id
+        AND context_type = 'Course'
+        AND EXISTS (
+          SELECT 1
+          FROM submissions
+          WHERE user_id = :user_id
+          AND assignment_id = assignments.id
+          AND (#{Submission.needs_grading_conditions})
+          LIMIT 1
+        )
+        AND NOT EXISTS (SELECT 1 FROM enrollments WHERE #{other_enrollments_conditions}))
+      SQL
+    end
   end
 
-  trigger.after(:insert).where(active_student_conditions('NEW')) do
-    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
-  end
-
-  trigger.after(:update).where("#{active_student_conditions('NEW')} <> #{active_student_conditions('OLD')}") do
-    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END"]}]
+  after_create :update_needs_grading_count, if: :active_student?
+  after_update :update_needs_grading_count, if: :active_student_changed?
+  def update_needs_grading_count
+    connection.after_transaction_commit do
+      adjust_needs_grading_count(active_student? ? :increment : :decrement)
+    end
   end
 
   include StickySisFields

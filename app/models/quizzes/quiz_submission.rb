@@ -65,8 +65,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
   # has graded the essays.
-  trigger.after(:update).where("NEW.submission_id IS NOT NULL AND OLD.workflow_state <> NEW.workflow_state AND NEW.workflow_state = 'complete'") do
-    "UPDATE submissions SET workflow_state = 'graded' WHERE id = NEW.submission_id"
+  after_update :grade_submission!, if: :just_completed?
+
+  def just_completed?
+    submission_id? && workflow_state_changed? && completed?
+  end
+
+  def grade_submission!
+    submission.update_attribute(:workflow_state, "graded")
   end
 
   serialize :quiz_data
