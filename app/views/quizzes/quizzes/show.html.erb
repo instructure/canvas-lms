@@ -450,8 +450,13 @@
     </div>
 
     <% if @quiz.available? %>
-
-      <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
+      <% if @quiz.context.soft_concluded? %>
+        <div class="alert alert-danger lock_explanation" role="alert">
+          <%= t(:course_concluded_notice,
+            "This quiz is no longer available as the course had been concluded.")
+          %>
+        </div>
+      <% elsif !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
         <% if @locked && !can_do(@quiz, @current_user, :update) %>
           <div class="lock_explanation">
             <%= lock_explanation(@locked_reason, 'quiz', @context) %>

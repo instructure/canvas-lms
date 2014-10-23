@@ -885,7 +885,9 @@ class Quizzes::QuizzesController < ApplicationController
     return false if @locked
     return false unless authorized_action(@quiz, @current_user, :submit)
     return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
+
     quiz_access_code_key = @quiz.access_code_key_for_user(@current_user)
+
     if @quiz.access_code.present? && params[:access_code] == @quiz.access_code
       session[quiz_access_code_key] = true
     end
@@ -894,6 +896,8 @@ class Quizzes::QuizzesController < ApplicationController
       false
     elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       render :action => 'invalid_ip'
+      false
+    elsif @context.soft_concluded?
       false
     else
       true
