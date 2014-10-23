@@ -44,9 +44,10 @@ define [
             a (if @props.model instanceof Folder
               href: '#'
               onClick: wrap(downloadStuffAsAZip)
+              ref: 'download'
             else
               href: @props.model.get('url')
-            ref: 'download'
+              ref: 'download'
             ),
               I18n.t('download', 'Download')
           if @props.userCanManageFilesForContext
