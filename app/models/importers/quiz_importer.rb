@@ -275,7 +275,9 @@ module Importers
         end
       end
 
-      item.workflow_state = 'unpublished' if context.feature_enabled?(:draft_state) && !item.assignment
+      if context.feature_enabled?(:draft_state) && item.for_assignment? && !item.assignment
+        item.workflow_state = 'unpublished'
+      end
 
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?

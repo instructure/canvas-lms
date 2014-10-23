@@ -64,7 +64,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_to.quizzes.map(&:title).sort).to eq ["published quiz", "unpublished quiz"]
-      expect(@copy_to.assignments.map(&:title).sort).to eq ["published quiz"]
+      expect(@copy_to.assignments.map(&:title).sort).to eq ["published quiz", "unpublished quiz"]
       expect(@copy_to.context_module_tags.map(&:title).sort).to eq ["published quiz", "unpublished quiz"]
 
       expect(@copy_to.quizzes.where(title: "published quiz").first).not_to be_unpublished
@@ -90,7 +90,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_to.quizzes.map(&:title).sort).to eq ["edited published quiz", "edited unpublished quiz"]
-      expect(@copy_to.assignments.map(&:title).sort).to eq ["edited published quiz"]
+      expect(@copy_to.assignments.map(&:title).sort).to eq ["edited published quiz", "edited unpublished quiz"]
       expect(@copy_to.context_module_tags.map(&:title).sort).to eq ["edited published quiz", "edited unpublished quiz"]
 
       expect(@copy_to.quizzes.where(title: "edited published quiz").first).not_to be_unpublished
@@ -126,7 +126,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_to.quizzes.map(&:title).sort).to eq ["published quiz", "published quiz", "unpublished quiz", "unpublished quiz"]
-      expect(@copy_to.assignments.map(&:title).sort).to eq ["published quiz", "published quiz"]
+      expect(@copy_to.assignments.map(&:title).sort).to eq ["published quiz", "published quiz", "unpublished quiz", "unpublished quiz"]
       expect(@copy_to.context_module_tags.map(&:title).sort).to eq ["published quiz", "published quiz", "unpublished quiz", "unpublished quiz"]
     end
 
@@ -218,26 +218,22 @@ describe ContentMigration do
       g = @copy_from.assignment_groups.create!(:name => "new group")
       asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)
       asmnt_pub = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
-      asmnt_pub.workflow_state = 'available'
-      asmnt_pub.save!
+      asmnt_pub.publish!
       graded_survey_unpub = @copy_from.quizzes.create!(:title => "graded survey unpub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
       graded_survey_pub = @copy_from.quizzes.create(:title => "grade survey pub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
-      graded_survey_pub.workflow_state = 'available'
-      graded_survey_pub.save!
+      graded_survey_pub.publish!
       survey_unpub = @copy_from.quizzes.create!(:title => "survey unpub", :quiz_type => "survey")
       survey_pub = @copy_from.quizzes.create(:title => "survey pub", :quiz_type => "survey")
-      survey_pub.workflow_state = 'available'
-      survey_pub.save!
+      survey_pub.publish!
       practice_unpub = @copy_from.quizzes.create!(:title => "practice unpub", :quiz_type => "practice_quiz")
       practice_pub = @copy_from.quizzes.create(:title => "practice pub", :quiz_type => "practice_quiz")
-      practice_pub.workflow_state = 'available'
-      practice_pub.save!
+      practice_pub.publish!
 
       run_course_copy
 
       [asmnt_unpub, asmnt_pub, graded_survey_unpub, graded_survey_pub, survey_pub, survey_unpub, practice_unpub, practice_pub].each do |orig|
         q = @copy_to.quizzes.where(migration_id: mig_id(orig)).first
-        expect("#{q.title} - #{q.workflow_state}").to eq "#{orig.title} - #{orig.workflow_state}" # titles in there to help identify what type failed
+        expect("#{q.title} - #{q.published?}").to eq "#{orig.title} - #{orig.published?}" # titles in there to help identify what type failed
         expect(q.quiz_type).to eq orig.quiz_type
       end
     end
