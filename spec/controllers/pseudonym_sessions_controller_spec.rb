@@ -225,8 +225,15 @@ describe PseudonymSessionsController do
       @pseudonym.account = account2
       @pseudonym.save!
 
-      controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+      Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response', {
+          :is_valid? => true,
+          :success_status? => true,
+          :name_id => unique_id,
+          :name_qualifier => nil,
+          :session_index => nil,
+          :process => nil
+        })
       )
 
       controller.request.env['canvas.domain_root_account'] = account1
@@ -237,10 +244,6 @@ describe PseudonymSessionsController do
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
       session.clear
-
-      controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
-      )
 
       controller.request.env['canvas.domain_root_account'] = account2
       get 'saml_consume', :SAMLResponse => "bar"
@@ -254,8 +257,15 @@ describe PseudonymSessionsController do
 
       account = account_with_saml
 
-      controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+      Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response', {
+          :is_valid? => true,
+          :success_status? => true,
+          :name_id => unique_id,
+          :name_qualifier => nil,
+          :session_index => nil,
+          :process => nil
+        })
       )
 
       # We dont want to log them out of everything.
@@ -294,12 +304,20 @@ describe PseudonymSessionsController do
         aac2.log_out_url = "https://example.com/idp1/slo"
         @account.account_authorization_configs << aac2
 
-        @stub_hash = {:issuer => aac2.idp_entity_id, :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil, :process => nil}
+        @stub_hash = {
+          :issuer => aac2.idp_entity_id,
+          :is_valid? => true,
+          :success_status? => true,
+          :name_id => @unique_id,
+          :name_qualifier => nil,
+          :session_index => nil,
+          :process => nil
+        }
       end
 
       it "should saml_consume login with multiple authorization configs" do
-        controller.stubs(:saml_response).returns(
-            stub('response', @stub_hash)
+        Onelogin::Saml::Response.stubs(:new).returns(
+          stub('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
@@ -308,8 +326,8 @@ describe PseudonymSessionsController do
       end
 
       it "should saml_logout with multiple authorization configs" do
-        controller.stubs(:saml_logout_response).returns(
-            stub('response', @stub_hash)
+        Onelogin::Saml::LogoutResponse.stubs(:parse).returns(
+          stub('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
@@ -340,10 +358,9 @@ describe PseudonymSessionsController do
 
       context "/saml_consume" do
         def get_consume
-          controller.stubs(:saml_response).returns(
-                  stub('response', @stub_hash)
+          Onelogin::Saml::Response.stubs(:new).returns(
+            stub('response', @stub_hash)
           )
-
           controller.request.env['canvas.domain_root_account'] = @account
           get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
         end
@@ -425,10 +442,9 @@ describe PseudonymSessionsController do
 
       context "logging out" do
         before do
-          controller.stubs(:saml_response).returns(
-                  stub('response', @stub_hash)
+          Onelogin::Saml::Response.stubs(:new).returns(
+            stub('response', @stub_hash)
           )
-
           controller.request.env['canvas.domain_root_account'] = @account
           get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
 
@@ -454,13 +470,31 @@ describe PseudonymSessionsController do
         end
 
         context '/saml_logout' do
-          def get_saml_logout
-            controller.stubs(:saml_logout_response).returns(
-                    stub('response', @stub_hash)
+          def get_saml_response_logout
+            Onelogin::Saml::LogoutResponse.stubs(:parse).returns(
+              stub('response', @stub_hash)
             )
 
             controller.request.env['canvas.domain_root_account'] = @account
             get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
+          end
+
+          def get_saml_request_logout
+            @stub_hash[:id] = '_42'
+
+            Onelogin::Saml::LogoutRequest.stubs(:parse).returns(
+              stub('request', @stub_hash)
+            )
+
+            @stub_hash[:in_response_to] = @stub_hash[:id]
+            @stub_hash[:forward_url] = 'https://example.com/idp2/slo?SAMLResponse=saml_response'
+
+            Onelogin::Saml::LogoutResponse.stubs(:generate).returns(
+              stub('response', @stub_hash)
+            )
+
+            controller.request.env['canvas.domain_root_account'] = @account
+            get 'saml_logout', :SAMLRequest => "foo"
           end
 
           it "should find the correct AAC" do
@@ -468,16 +502,25 @@ describe PseudonymSessionsController do
             @aac2.any_instantiation.expects(:saml_settings).at_least_once
             controller.expects(:logout_user_action)
 
-            get_saml_logout
+            get_saml_response_logout
           end
 
-          it "should still logout if AAC config not found" do
+          it "should still logout if AAC config not found with SAMLResponse" do
             @aac1.any_instantiation.expects(:saml_settings).never
             @aac2.any_instantiation.expects(:saml_settings).never
             controller.expects(:logout_user_action)
 
             @stub_hash[:issuer] = "nobody eh"
-            get_saml_logout
+            get_saml_response_logout
+          end
+
+          it "should still logout if AAC config not found with SAMLRequest" do
+            @aac1.any_instantiation.expects(:saml_settings).never
+            @aac2.any_instantiation.expects(:saml_settings).never
+            controller.expects(:logout_user_action)
+
+            @stub_hash[:issuer] = "nobody eh"
+            get_saml_request_logout
           end
 
           it "should return bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
@@ -486,11 +529,10 @@ describe PseudonymSessionsController do
             expect(response.status).to eq 400
           end
 
-          it "should logout with a SAMLResponse or SAMLRequest parameter" do
-            controller.expects(:logout_user_action).once
-            controller.expects(:saml_logout_response).never
-            controller.request.env['canvas.domain_root_account'] = @account
-            get 'saml_logout', :SAMLRequest => "foo", :RelayState => "/courses"
+          it "should redirect a response to idp on logout with a SAMLRequest parameter" do
+            controller.expects(:logout_current_user)
+            get_saml_request_logout
+            expect(response).to redirect_to(@stub_hash[:forward_url])
           end
         end
       end
@@ -538,11 +580,18 @@ describe PseudonymSessionsController do
         @aac.login_attribute = 'eduPersonPrincipalName_stripped'
         @aac.save
 
-        controller.stubs(:saml_response).returns(
-          stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil, :process => nil,
+        Onelogin::Saml::Response.stubs(:new).returns(
+          stub('response', {
+            :is_valid? => true,
+            :success_status? => true,
+            :name_id => nil,
+            :name_qualifier => nil,
+            :session_index => nil,
+            :process => nil,
             :saml_attributes => {
               'eduPersonPrincipalName' => "#{@unique_id}@example.edu"
-            })
+            }
+          })
         )
 
         controller.request.env['canvas.domain_root_account'] = @account
@@ -555,8 +604,15 @@ describe PseudonymSessionsController do
         @aac.login_attribute = nil
         @aac.save
 
-        controller.stubs(:saml_response).returns(
-          stub('response', :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+        Onelogin::Saml::Response.stubs(:new).returns(
+          stub('response', {
+            :is_valid? => true,
+            :success_status? => true,
+            :name_id => @unique_id,
+            :name_qualifier => nil,
+            :session_index => nil,
+            :process => nil
+          })
         )
 
         controller.request.env['canvas.domain_root_account'] = @account
@@ -578,11 +634,18 @@ describe PseudonymSessionsController do
       @pseudonym.account = account
       @pseudonym.save!
 
-      controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil, :process => nil,
+      Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response', {
+          :is_valid? => true,
+          :success_status? => true,
+          :name_id => nil,
+          :name_qualifier => nil,
+          :session_index => nil,
+          :process => nil,
           :saml_attributes => {
             'eduPersonPrincipalName' => "#{unique_id}@example.edu"
-          })
+          }
+        })
       )
 
       controller.request.env['canvas.domain_root_account'] = account
@@ -599,8 +662,15 @@ describe PseudonymSessionsController do
       @pseudonym.account = account
       @pseudonym.save!
 
-      controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+      Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response', {
+          :is_valid? => true,
+          :success_status? => true,
+          :name_id => unique_id,
+          :name_qualifier => nil,
+          :session_index => nil,
+          :process => nil
+        })
       )
 
       controller.request.env['canvas.domain_root_account'] = account
