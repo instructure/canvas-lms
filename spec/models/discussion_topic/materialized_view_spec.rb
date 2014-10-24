@@ -76,7 +76,7 @@ describe DiscussionTopic::MaterializedView do
     # verify the api_user_content functionality in a non-request context
     html_message = json[0]['replies'][1]['message']
     html = Nokogiri::HTML::DocumentFragment.parse(html_message)
-    expect(html.at_css('a')['href']).to eq "http://localhost/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
+    expect(html.at_css('a')['href']).to eq "http://localhost/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
     expect(html.at_css('video')['src']).to eq "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
     # the deleted entry will be marked deleted and have no summary

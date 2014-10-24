@@ -402,7 +402,8 @@ module Api
                   context.attachments.find_by_id(match.obj_id)
                 end
       end
-      next unless obj && rewriter.user_can_view_content?(obj)
+
+      next unless obj && obj.grants_right?(user, nil, :download)
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:verifier => obj.uuid, :only_path => true}

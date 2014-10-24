@@ -2169,7 +2169,7 @@ describe DiscussionTopicsController, type: :request do
       message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
 
       a_tag = message.css("p a").first
-      expect(a_tag["href"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
+      expect(a_tag["href"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
       expect(a_tag["data-api-endpoint"]).to eq "http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}"
       expect(a_tag["data-api-returntype"]).to eq "File"
       expect(a_tag.inner_text).to eq "This is a file link"
