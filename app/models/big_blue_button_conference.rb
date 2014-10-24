@@ -86,6 +86,11 @@ class BigBlueButtonConference < WebConference
 	super
   end
 
+  def destroy
+    end_meeting(self.conference_key)
+	super
+  end
+
   private
 
   def retouch?
