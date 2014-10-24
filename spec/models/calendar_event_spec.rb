@@ -209,6 +209,29 @@ describe CalendarEvent do
         expect(ev.x_alt_desc).to eq @event.description
       end
 
+      it "should not add verifiers to files unless course or attachment is public" do
+        attachment_model(:context => course)
+        html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
+        ev = @event.to_ics(false)
+        expect(ev.description).to_not include("verifier")
+
+        @attachment.file_state = 'public'
+        @attachment.save!
+
+        ev = @event.to_ics(false)
+        expect(ev.description).to include("verifier")
+
+        @attachment.file_state = 'hidden'
+        @attachment.save!
+        @course.offer
+        @course.is_public = true
+        @course.save!
+
+        ev = @event.to_ics(false)
+        expect(ev.description).to include("verifier")
+      end
+
       it "should add a course code to the summary of an event that has a course as an effective_context" do
         course_model
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
