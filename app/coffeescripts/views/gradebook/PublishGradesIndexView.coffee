@@ -5,8 +5,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'jst/publish_grades/IndexView'
-  'jst/publish_grades/NoAssignmentsSearch'
+  'jst/assignments/IndexView'
+  'jst/assignments/NoAssignmentsSearch'
   'compiled/views/publish_grades/AssignmentKeyBindingsMixin'
 ], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin) ->
   class PublishGradesIndexView extends Backbone.View
