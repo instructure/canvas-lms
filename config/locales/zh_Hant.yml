@@ -5041,14 +5041,6 @@ zh_Hant:
       show_more: 顯示更多
   data_exports: 資料匯出
   date: 
-    abbr_day_names: 
-      - Sun
-      - Mon
-      - Tue
-      - Wed
-      - Thu
-      - Fri
-      - Sat
     abbr_month_names: 
       - ~
       - Jan
