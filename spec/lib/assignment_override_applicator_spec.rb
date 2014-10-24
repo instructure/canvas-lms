@@ -595,6 +595,7 @@ describe AssignmentOverrideApplicator do
         context "without draft states" do
           it "skips versions of the override that have nil for an assignment version" do
             student_in_course
+            set_course_draft_state
             expected_time = Time.zone.now
             quiz = @course.quizzes.create! :title => "VDD Quiz", :quiz_type => 'assignment'
             section = @course.course_sections.create! :name => "title"
@@ -613,9 +614,8 @@ describe AssignmentOverrideApplicator do
             override.save!
             quiz.publish!
             override = quiz.reload.assignment.assignment_overrides.first
-            expect(override.versions.length).to eq 2
+            expect(override.versions.length).to eq 1
             expect(override.versions[0].model.assignment_version).not_to be_nil
-            expect(override.versions[1].model.assignment_version).to be_nil
             # Assert that it won't call the "<=" method on nil
             expect do
               overrides = AssignmentOverrideApplicator.

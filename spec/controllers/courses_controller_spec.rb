@@ -475,6 +475,7 @@ describe CoursesController do
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
+      controller.instance_variable_set(:@js_env, nil)
       get 'show', :id => @course.id
       assert_status(401)
       expect(assigns[:unauthorized_reason]).to eq :unpublished
@@ -523,6 +524,7 @@ describe CoursesController do
       a.save!
 
       controller.instance_variable_set(:@context_all_permissions, nil)
+      controller.instance_variable_set(:@js_env, nil)
 
       get 'show', :id => @course.id
       expect(response).to be_success
@@ -672,6 +674,7 @@ describe CoursesController do
         @course.workflow_state = 'claimed'
         @course.save!
 
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
         assert_status(401)
         expect(assigns[:unauthorized_message]).not_to be_nil
@@ -739,6 +742,7 @@ describe CoursesController do
         @enrollment.reload
         expect(@enrollment).to be_invited
 
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course.id # invitation should be in the session now
         expect(response).to be_success
         expect(assigns[:pending_enrollment]).to eq @enrollment
@@ -780,6 +784,7 @@ describe CoursesController do
         permissions_key = session[:permissions_key]
 
         controller.instance_variable_set(:@pending_enrollment, nil)
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course2.id
         expect(response).to be_success
         expect(assigns[:pending_enrollment]).to eq @enrollment2

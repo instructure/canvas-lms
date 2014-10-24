@@ -185,10 +185,13 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @wiki.destroy
         @announcement.destroy
         @topic.destroy
-        assignment_model.destroy
-        quiz_model.destroy
-        calendar_event_model.destroy
-        rubric_model.destroy
+
+        @course.require_assignment_group
+        @course.assignments.create!(:name => "blah").destroy
+        @course.assignment_groups.create!(:name => "blah").destroy
+        @course.quizzes.create!(:name => "blah").destroy
+        @course.calendar_events.create!(:name => "blah").destroy
+        @course.rubrics.create!(:name => "blah").destroy
       end
 
       it "should ignore in top-level list" do
@@ -202,7 +205,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         expect(@formatter.get_content_list('attachments').length).to eq 0
         expect(@formatter.get_content_list('discussion_topics').length).to eq 0
         expect(@formatter.get_content_list('announcements').length).to eq 0
-        expect(@formatter.get_content_list('assignments').length).to eq 0
+
+        expect(@formatter.get_content_list('assignments').length).to eq 1 # the default assignment group
+        expect(@formatter.get_content_list('assignments').first[:sub_items]).to be_blank
+
         expect(@formatter.get_content_list('quizzes').length).to eq 0
         expect(@formatter.get_content_list('calendar_events').length).to eq 0
         expect(@formatter.get_content_list('rubrics').length).to eq 0

@@ -124,6 +124,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should make a basic topic" do
+      set_course_draft_state
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>" })
@@ -131,7 +132,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
       expect(@topic.threaded?).to be_falsey
-      expect(@topic.published?).to be_truthy
+      expect(@topic.published?).to be_falsey
       expect(@topic.post_delayed?).to be_falsey
       expect(@topic.podcast_enabled?).to be_falsey
       expect(@topic.podcast_has_student_posts?).to be_falsey
@@ -159,18 +160,19 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should create a topic with all the bells and whistles" do
+      set_course_draft_state
       post_at = 1.month.from_now
       lock_at = 2.months.from_now
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded",
+               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :published => true,
                  :delayed_post_at => post_at.as_json, :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
       expect(@topic.threaded?).to eq true
       expect(@topic.post_delayed?).to eq true
-      expect(@topic.published?).to @topic.draft_state_enabled? ? be_truthy : be_falsey
+      expect(@topic.published?).to be_truthy
       expect(@topic.delayed_post_at.to_i).to eq post_at.to_i
       expect(@topic.lock_at.to_i).to eq lock_at.to_i
       expect(@topic.podcast_enabled?).to eq true
@@ -1979,6 +1981,7 @@ describe DiscussionTopicsController, type: :request do
     it "should hold when the user isn't in a group set" do
       teacher_in_course(:active_all => true)
       group_discussion_assignment
+      @topic.publish if @topic.unpublished?
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
                       { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
       expect(json[0]['subscription_hold']).to  eql('not_in_group_set')
@@ -1987,6 +1990,7 @@ describe DiscussionTopicsController, type: :request do
     it "should hold when the user isn't in a group" do
       teacher_in_course(:active_all => true)
       group_discussion_assignment
+      @topic.publish if @topic.unpublished?
       child = @topic.child_topics.first
       group = child.context
       json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics",
@@ -2310,6 +2314,7 @@ def create_topic(context, opts={})
   topic = context.discussion_topics.build(opts)
   topic.attachment = attachment if attachment
   topic.save!
+  topic.publish if topic.unpublished?
   topic
 end
 

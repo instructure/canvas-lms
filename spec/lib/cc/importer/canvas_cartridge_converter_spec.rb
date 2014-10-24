@@ -602,7 +602,7 @@ describe "Canvas Cartridge importing" do
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
-      <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
+      <a href=\"/courses/%s/#{@copy_to.wiki.path}/assignments\">Assignments wiki link</a>
       <a href=\"/courses/%s/modules\">Modules</a>
       <a href=\"/courses/%s/modules/%s\">some module</a>
       <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
