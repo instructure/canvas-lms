@@ -40,7 +40,6 @@ describe ExternalToolsController do
   before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
-
   end
 
   describe "GET 'show'" do
@@ -200,6 +199,22 @@ describe ExternalToolsController do
         expect(params).to include "select%5Bassignments%5D%5B%5D=6"
         expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.course'
         expect(placement['placementOf']['title']).to eq 'a course'
+      end
+    end
+
+    context 'basic-lti-launch-request' do
+      it "launches account tools for non-admins" do
+        user_session(@teacher)
+        tool = @course.account.context_external_tools.new(:name => "bob",
+                                                          :consumer_key => "bob",
+                                                          :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.account_navigation = { enabled: true }
+        tool.save!
+
+        get :show, :account_id => @course.account.id, id: tool.id
+
+        expect(response).to be_success
       end
     end
   end
