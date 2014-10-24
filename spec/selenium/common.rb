@@ -748,6 +748,10 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(input['onchange']) if input['onchange']
   end
 
+  def get_options(selector, scope=nil)
+    Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
+  end
+
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
     select = Selenium::WebDriver::Support::Select.new(element)
