@@ -68,7 +68,7 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     # inheritance check instead of #get_context?
-    @grading_periods = @context.grading_periods.order('start_date')
+    @grading_periods = @context.grading_periods.active.order('start_date')
     json, meta = paginate_for(@grading_periods)
 
     if authorized_action(@context, @current_user, :read)
@@ -87,7 +87,7 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    @grading_period = @context.grading_periods.find(params[:id])
+    @grading_period = @context.grading_periods.active.find(params[:id])
 
     if authorized_action(@grading_period, @current_user, :read)
       render json: serialize_jsonapi(@grading_period)
@@ -145,7 +145,7 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def update
-    @grading_period = GradingPeriod.find(params[:id])
+    @grading_period = GradingPeriod.active.find(params[:id])
     grading_period_params = params[:grading_periods][0]
 
     if authorized_action(@grading_period, @current_user, :update)
@@ -162,7 +162,7 @@ class GradingPeriodsController < ApplicationController
   #
   # <b>204 No Content</b> response code is returned if the deletion was successful.
   def destroy
-    @grading_period = GradingPeriod.find(params[:id])
+    @grading_period = GradingPeriod.active.find(params[:id])
 
     if authorized_action(@grading_period, @current_user, :delete)
       @grading_period.destroy

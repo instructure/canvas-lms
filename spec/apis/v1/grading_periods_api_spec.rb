@@ -29,9 +29,10 @@ describe GradingPeriodsController, type: :request do
   describe 'GET index' do
     before :once do
       now = Time.zone.now
-      2.times do |n|
+      gps = 3.times.map do |n|
         @account.grading_periods.create!(weight: 50, start_date: n.month.since(now), end_date: (n+1).month.since(now))
       end
+      gps.last.destroy
     end
 
     def get_index(raw = false, data = {}, headers = {})
@@ -85,7 +86,6 @@ describe GradingPeriodsController, type: :request do
       }, data)
     end
 
-
     it "retrieves the grading period specified" do
       json = get_show
       period = json['grading_periods'].first
@@ -93,6 +93,12 @@ describe GradingPeriodsController, type: :request do
       expect(period['account_id']).to eq(@account.id.to_s)
       expect(period['weight']).to eq(@grading_period.weight)
       expect(period['title']).to eq(@grading_period.title)
+    end
+
+    it "doesn't return deleted grading periods" do
+      @grading_period.destroy
+      get_show(true)
+      expect(response.status).to eq 404
     end
   end
 
@@ -134,6 +140,12 @@ describe GradingPeriodsController, type: :request do
       put_update(weight: 80)
       expect(@grading_period.reload.weight).to eq(80)
     end
+
+    it "doesn't update deleted grading periods" do
+      @grading_period.destroy
+      put_update({weight: 80}, true)
+      expect(response.status).to eq 404
+    end
   end
 
   describe 'DELETE destroy' do
@@ -155,7 +167,7 @@ describe GradingPeriodsController, type: :request do
       delete_destroy
 
       expect(response.code).to eq '204'
-      expect(GradingPeriod.where(id: @grading_period)).not_to exist
+      expect(GradingPeriod.where(id: @grading_period).first).to be_deleted
     end
   end
 end

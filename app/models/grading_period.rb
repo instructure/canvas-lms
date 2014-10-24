@@ -1,5 +1,6 @@
 class GradingPeriod < ActiveRecord::Base
   attr_accessible :weight, :start_date, :end_date, :title
+  include Workflow
 
   belongs_to :course
   belongs_to :account
@@ -23,6 +24,17 @@ class GradingPeriod < ActiveRecord::Base
 
   end
 
+  workflow do
+    state :active
+    state :deleted
+  end
+
+  scope :active, -> { where workflow_state: "active" }
+
+  alias_method :destroy!, :destroy
+  def destroy
+    update_attribute :workflow_state, "deleted"
+  end
 
   def validate_dates
     if self.start_date && self.end_date
