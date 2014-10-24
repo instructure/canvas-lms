@@ -106,13 +106,22 @@ chown deploy authorized_keys
 chmod 600 authorized_keys
 
 
-Also, in /var/www/canvas, we will want to make sure it is all set up correctly for our repo:
+Also, in /var/canvas, we will want to make sure it is all set up correctly for our repo:
 
 git remote -v
 
-If it doesn't show beyond-z, fit it with:
-git remote set-url origin https://github.com/beyond-z/canvas-lms.git
+If it doesn't show beyond-z, fix it with:
+git remote set-url origin git@github.com:beyond-z/canvas-lms.git
 
+Also check
+git config user.name
+
+If it isn't set, run:
+
+git config user.email 'tech@beyondz.org'
+git config user.name 'Beyond Z'
+
+so it doesn't complain about a missing identity when you add a new user.
 
 Lastly, we want to make a restart script that the deploy user can run for automatic apache restarting:
 
