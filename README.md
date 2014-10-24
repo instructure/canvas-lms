@@ -111,7 +111,7 @@ Also, in /var/www/canvas, we will want to make sure it is all set up correctly f
 git remote -v
 
 If it doesn't show beyond-z, fit it with:
-git remote set-url origin https://github.com/beyond-z/canvas-lms.git
+git remote set-url origin git@github.com:beyond-z/canvas-lms.git
 
 
 Lastly, we want to make a restart script that the deploy user can run for automatic apache restarting:
