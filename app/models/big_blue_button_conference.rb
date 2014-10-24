@@ -81,6 +81,11 @@ class BigBlueButtonConference < WebConference
     end
   end
 
+  def close
+    end_meeting(self.conference_key)
+	super
+  end
+
   private
 
   def retouch?
@@ -103,6 +108,14 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
+  end
+
+  def end_meeting(meeting_id)
+    response = send_request(:end, {
+      :meetingID => meeting_id,
+      :password => settings[(type == :user ? :user_key : :admin_key)]
+      })
+    response[:ended] if response
   end
 
   def fetch_recordings
