@@ -862,6 +862,7 @@ pl:
         report_last_run: "Ostatnie uruchomienie"
         report_name: Nazwa
       headings: 
+        quotas: "Przydziały konta"
         sections: Raporty
         settings: "Ustawienia konta"
       help_link_available_to_all_admins: Administratorzy
@@ -880,6 +881,7 @@ pl:
         allow_invitation_previews: "Podgląd zaproszeń"
         allow_sending_scores_in_emails: "Uczestnicy mogą zgłosić chęć otrzymywania drogą mailową wiadomości z uzyskanymi wynikami punktowymi"
         allow_sis_import: "Importy danych SIS"
+        author_email_in_notifications: "Pokaż adres e-mail osoby wysyłającej do powiadomień interakcji użytkownika"
         canvas_authentication: "Uwierzytelnianie Canvas"
         default_language: "Język domyślny"
         default_time_zone: "Domyślna strefa czasowa"
@@ -1119,6 +1121,7 @@ pl:
       media_file_storage_header: "Magazyn plików multimedialnych"
       none_message: "Brak wyników do wyświetlenia"
       over_time_link: "z okresu"
+      page_header_title: "Statystyka konta"
       page_title: "Statystyki dla %{account}"
       recently_created_courses_title: "Ostatnio utworzone kursy"
       recently_ended_courses_title: "Ostatnio zakończone kursy"
@@ -1243,6 +1246,7 @@ pl:
     error_heading: "Błąd programu Ajax: %{status_code}"
     errors: 
       connection_lost: "Utracono połączenie z %{host}.  Sprawdź połączenie z Internetem i spróbuj ponownie."
+      logged_out: "Uczestnik nie jest teraz zalogowany, prawdopodobnie z powodu długiego okresu nieaktywności."
       unhandled: "Niestety! Ostatnie żądanie nie zostało zrealizowane."
     links: 
       details: "informacje szczegółowe..."
@@ -1380,6 +1384,7 @@ pl:
       quota_exceeded_group: "Przekroczony przydział magazynowania dla grupy"
       quota_exceeded_user: "Przekroczony przydział magazynowania dla użytkownika"
       student_view_unauthorized: "Nie masz dostępu do tej funkcjonalności w widoku uczestnika."
+      submission_unauthorized: "Nie można przejść do przesłanego zadania."
       unauthorized: 
         not_started_yet: "Kurs, do którego próbujesz uzyskać dostęp, nie rozpoczął się jeszcze. Rozpocznie się %{date}."
         unpublished: "Ten kurs nie został jeszcze opublikowany przez instruktora."
@@ -1816,6 +1821,7 @@ pl:
         points: Punkty
       view_grading_scheme: "Pokaż schemat oceniania"
     group_category_selector: 
+      differentiated_groups_warning: "Z powodu zróżnicowanych zadań dla grupy mogą pojawiać się nieoczekiwane wyniki."
       grade_group_students_individually: "Wystaw oceny indywidualnie"
       group_assignment_header: "Zadanie grupowe"
       group_category_locked_explanation: "Uczestnicy przesłali już zadanie domowe, więc nie można dokonać zmiany ustawień grupy."
@@ -1917,6 +1923,7 @@ pl:
     non_number: "Należy wpisać liczbę"
     notices: 
       assignment_delete: "To zadanie zostało usunięte"
+      assignment_not_available: "Wybrane zadanie nie jest dostępne w tej sekcji kursu."
       created: "Zadanie zostało pomyślnie utworzone."
       updated: "Zadanie zostało pomyślnie zaktualizowane."
     number_of_assignments: 
@@ -2254,10 +2261,15 @@ pl:
   bookmark_service: 
     default_title: "Brak tytułu"
   broccoli_cloud: 
+    hidden_title: "Ukryte. Dostępne za pomocą łącza"
     label: 
+      hidden: "Ukryte. Dostępne za pomocą łącza"
       published: Opublikowano
       unpublished: Nieopublikowane
     published_title: Opublikowano
+    restricted_title: "Dostępne od %{from_date} do %{until_date}"
+    title: 
+      permissions: "Uprawnienia do edycji posiada %{name}"
     unpublished_title: Nieopublikowane
   bulk_course_migration: 
     export_failed: "Wystąpił błąd podczas eksportowania kursu o identyfikatorze bb_lcid %{id} z Blackboard."
@@ -2616,6 +2628,8 @@ pl:
         noDueDate: "Brak terminu dostarczenia"
       modal: 
         chooseDueDate: "Czy chcesz wrócić i wybrać termin oddania?"
+        goBackToInclude: "Czy chcesz wrócić, aby uwzględnić:"
+        notAllSectionsAssigned: "Nie do wszystkich sekcji zostanie przypisany ten element."
     no_groups: "Nie znaleziono grup"
     no_users: "Nie znaleziono uzytkowników"
     ok: OK
@@ -3308,6 +3322,7 @@ pl:
       question_bank: 
         aria_new_label: "Utwórz nowy bank pytań"
         create_new_question: "-- Utwórz nowy bank pytań --"
+        default_question_bank_label: "Domyślny bank pytań"
         question_bank_placeholder: "„Nazwa banku pytań”"
         question_bank_placeholder_aria: "„Podaj nową nazwę banku pytań”"
         question_bank_title: "Nowa nazwa banku pytań"
@@ -3730,6 +3745,7 @@ pl:
       module: moduł
       module_details: "Moduły są wyświetlane w kolejności, dlatego tylko moduły, które znajdują się powyżej %{name} można ustawić jako warunki."
       module_name: "Nazwa modułu"
+      modules_keyboard_hint_updated: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
       move_module: 
         after: Po
         before: Przed
@@ -3820,6 +3836,7 @@ pl:
           student_progress: "Zobacz postęp uczestnika dla tego modułu"
       manager_module: "Zarządzaj modułem"
       module_will_unlock_at: "Zostanie odblokowany *%{unlock_date}*"
+      modules_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
       progression_complete_count: "*Zakończono %{count}*"
       progression_started_count: "*%{count}* w toku"
       reorder_modules: "Przeciągnij, aby zmienić kolejność modułów"
@@ -4093,6 +4110,7 @@ pl:
         add_to_faculty_journal: "Dodaj jako wpis do dziennika wydziałowego"
         attachments: Załączniki
         course: Kurs
+        course_required: "Przed wpisaniem odbiorców należy wybrać kurs."
         select_course: "Wybierz kurs"
         subject: Temat
         to: Do
@@ -4134,6 +4152,7 @@ pl:
       few: "i %{count} inne"
       one: "i 1 inna"
       other: "i %{count} innych"
+    result_status: "W autouzupełnianiu zawarto %{results} wpisów. Użyj strzałek do góry i w dół w celu nawigacji po liście, następnie naciśnij Enter, aby dodać osobę do pola Do."
     star: "Oznaczone gwiazdą"
     star_conversation: "Oznacz konwersację gwiazdką"
     titles: 
@@ -4151,6 +4170,7 @@ pl:
       other: "%{count} przetworzonych kursów"
     course_format: 
       not_set: Nieustawione
+      on_campus: "W kampusie"
       online: On-line
     course_not_found: "Nie odnaleziono kursu"
     csv: 
@@ -4190,6 +4210,8 @@ pl:
       unpublished: Nieopublikowane
       unpublished_with_message: "Nieopublikowane: %{message}"
     missing_name: "Kurs bez nazwy"
+    student_summary: 
+      not_sorted: "Nie posortowano tabeli podsumowującej uczestnika"
     student_view_student_name: "Testuj uczestnika"
     wiki_permissions: 
       all: Wszyscy
@@ -4775,6 +4797,7 @@ pl:
         after: Po
         before: Przed
         or: LUB
+      nav_items_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności elementów nawigacji kursu, skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
       no_date: "Nie ustawiono daty"
       no_language_preference: "Nie zdefiniowano (konfigurowane przez użytkownika, domyślnie ustawiono %{language})"
       none: Brak
@@ -5539,6 +5562,7 @@ pl:
       loading_replies: "Ładowanie odpowiedzi..."
       lock_topic: "Temat zablokowany"
       locked: "Do tematu nie można dodawać komentarzy"
+      manage_announcement: "Zarządzaj ogłoszeniem"
       manage_discussion: "Zarządzaj dyskusją"
       mark_all_as_read: "Oznacz wszystko jako przeczytane"
       mark_all_as_unread: "Oznacz wszystko jako nieprzeczytane"
@@ -5735,6 +5759,7 @@ pl:
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Moduły ponownie zapisane w systemie Ember. Użyto macierzystej opcji Przeciągnij i upuść API w celu przeciągania elementów z lokalizacji zewnętrznych."
+  enable_multiple_grading_periods: "Włącz wielokrotne zarządzanie okresem rozliczeniowym na koncie administratora i użyj tej opcji w dzienniczku."
   enrollment: 
     default_course_name: Kurs
     default_email: "Brak adresu e-mail"
@@ -6071,6 +6096,7 @@ pl:
     required: Wymagany
     sis_id_in_use: "Identyfikator SIS \"%{sis_id}\" jest już używany"
     unsaved_changes: "Nie zapisano wszystkich zmian."
+    wrong_file_extension: "Nie można przesłać zadania z wybranym plikiem o rozszerzeniu \"%{extension}\""
   external_content: 
     cancel: 
       canceling: "Trwa anulowanie..."
@@ -6281,6 +6307,7 @@ pl:
     differentiated_assignments: "Zadania zróżnicowane"
     differentiated_assignments_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
         Canvas Success Manager. "
+    differentiated_assignments_course_disable_warning: "Wyłączenie zróżnicowanych zadań spowoduje, że uczestnicy będą widzieć wszystkie opublikowane zadania."
     draft_state: "Wersja robocza"
     draft_state_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
         Canvas Success Manager. "
@@ -6294,14 +6321,18 @@ pl:
     k12: "Specjalne funkcje w systemie K-12"
     learning_mastery_gradebook: "Dzienniczek nauki poziomu biegłości"
     lor: "Zewnętrzne narzędzia LOR"
+    multiple_grading_periods: "Wiele okresów rozliczeniowych"
     new_quiz_moderate: "Strona zarządzanego, nowego testu"
     new_quiz_statistics: "Strona ze statystyką nowego testu"
     new_styles: "Użyj nowych stylów"
     post_grades: "Wyślij oceny do SIS"
     student_groups: "Strona z nowymi grupami uczestników"
     student_outcome_gradebook: "Dzienniczek nauki poziomu biegłości uczestnika"
+  file_browser_view: 
+    folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać zaznaczony element."
   file_preview: 
     file_preview_headerbutton_close: Zamknij
+    file_preview_headerbutton_download: Pobierz
     file_preview_hide: Ukryj
     file_preview_infotable_datecreated: "Data utworzenia"
     file_preview_infotable_name: Nazwa
@@ -12719,6 +12750,7 @@ pl:
     created_at_short: Utworzono
     delete: Usuń
     deleted_items_successfully: "Pomyślnie usunięto następującą liczbę elementów: %{count}"
+    download: Pobierz
     edit_name: "Edytuj nazwę"
     errors: 
       no_match: 
