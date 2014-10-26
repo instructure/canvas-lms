@@ -22,7 +22,7 @@ define [
 
     permissions_data: ->
       has_actions: @get('permissions')['edit'] || @get('permissions')['delete']
-      show_end: @get('permissions')['initiate'] && @get('started_at') && @get('long_running')
+      show_end: @get('permissions')['initiate'] && @get('started_at')
 
     schedule_data: ->
       scheduled: 'scheduled_date' of @get('user_settings')

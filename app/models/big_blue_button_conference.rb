@@ -91,6 +91,32 @@ class BigBlueButtonConference < WebConference
 	super
   end
 
+  set_policy do
+    given { |user, session| self.users.include?(user) && self.context.grants_right?(user, session, :read) }
+    can :read and can :join
+
+    given { |user, session| self.users.include?(user) && self.context.grants_right?(user, session, :read) && long_running? && active? }
+    can :resume
+
+    given { |user| (self.respond_to?(:is_public) && self.is_public rescue false) }
+    can :read and can :join
+
+    given { |user, session| self.context.grants_right?(user, session, :create_conferences) }
+    can :create
+
+    given { |user, session| user && user.id == self.user_id && self.context.grants_right?(user, session, :create_conferences) }
+    can :initiate
+
+    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
+    can :read and can :join and can :initiate and can :create and can :delete
+
+    given { |user, session| context.grants_right?(user, session, :manage_content) && !finished? }
+    can :update
+
+    given { |user, session| context.grants_right?(user, session, :manage_content) && active? }
+    can :close
+  end
+
   private
 
   def retouch?
