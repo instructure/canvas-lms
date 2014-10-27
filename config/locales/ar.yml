@@ -879,6 +879,7 @@ ar:
         report_last_run: "آخر تشغيل"
         report_name: الاسم
       headings: 
+        quotas: "حصص الحساب"
         sections: التقارير
         settings: "إعدادات الحساب"
       help_link_available_to_all_admins: المسؤولون
@@ -897,6 +898,7 @@ ar:
         allow_invitation_previews: "معاينات الدعوة"
         allow_sending_scores_in_emails: "يمكن للطلاب الاشتراك في تلقي مجموعات النقاط عبر إعلامات بريد إلكتروني"
         allow_sis_import: "عمليات استيراد SIS"
+        author_email_in_notifications: "إظهار عنوان البريد الإلكتروني للمرسل لإعلامات تفاعل المستخدم"
         canvas_authentication: "مصادقة Canvas"
         default_language: "اللغة الافتراضية"
         default_time_zone: "المنطقة الزمنيّة الافتراضية"
@@ -1144,6 +1146,7 @@ ar:
       media_file_storage_header: "تخزين ملف الوسائط"
       none_message: "لا يوجد شيء لعرضه"
       over_time_link: "بمرور الوقت"
+      page_header_title: "إحصائيات الحساب"
       page_title: "إحصاءات خاصة بـ %{account}"
       recently_created_courses_title: "مساقات تم إنشاؤها مؤخرًا"
       recently_ended_courses_title: "مساقات تم إنهاؤها مؤخرًا"
@@ -1274,6 +1277,7 @@ ar:
     error_heading: "خطأ Ajax: %{status_code}"
     errors: 
       connection_lost: "تم فقد الاتصال بـ %{host}.  يُرجى التأكد من اتصالك بالإنترنت وحاول من جديد."
+      logged_out: "أنت غير مسجل الدخول حاليًا، قد يكون السبب في هذا هو فترة عدم النشاط الطويلة."
       unhandled: "للأسف! لم يعمل الطلب الأخير."
     links: 
       details: تفاصيل...
@@ -1414,6 +1418,7 @@ ar:
       quota_exceeded_group: "تم تجاوز حصة تخزين المجموعة"
       quota_exceeded_user: "تم تجاوز حصة تخزين المستخدم"
       student_view_unauthorized: "لا يمكنك الوصول إلى هذه الوظيفة في عرض الطالب."
+      submission_unauthorized: "لا يمكنك الوصول إلى هذا الإرسال."
       unauthorized: 
         not_started_yet: "المساق الذي تحاول الوصول إليه لم يبدأ بعد.   سوف يبدأ %{date}."
         unpublished: "هذا المساق لم يتم نشره من قِبل المعلم بعد."
@@ -1868,6 +1873,7 @@ ar:
         points: النقاط
       view_grading_scheme: "عرض نظام تقييم الدرجات"
     group_category_selector: 
+      differentiated_groups_warning: "قد تثمر مهام المجموعات المتفاضلة عن نتائج غير متوقعة."
       grade_group_students_individually: "تعيين الدرجات لكل طالب على حدة"
       group_assignment_header: "تعيين المجموعة"
       group_category_locked_explanation: "لقد أرسل الطلاب الواجب المنزلي الخاص بهذه المهمة بالفعل، لذا لا يمكن تغيير إعدادات المجموعة."
@@ -1969,6 +1975,7 @@ ar:
     non_number: "يجب استخدام رقم"
     notices: 
       assignment_delete: "تم حذف هذه المهمة"
+      assignment_not_available: "المهمة التي طلبتها غير متوفرة في قسم الدورة التدريبية الخاص بك."
       created: "تم إنشاء المهمة بنجاح."
       updated: "تم تحديث المهمة بنجاح."
     number_of_assignments: 
@@ -2311,10 +2318,15 @@ ar:
   bookmark_service: 
     default_title: "بلا عنوان"
   broccoli_cloud: 
+    hidden_title: "تم الإخفاء. متوفر مع ارتباط"
     label: 
+      hidden: "تم الإخفاء. متوفر مع ارتباط"
       published: منشور
       unpublished: "غير منشور"
     published_title: منشور
+    restricted_title: "متوفر من %{from_date} حتى %{until_date}"
+    title: 
+      permissions: "أذونات التحرير لصالح: %{name}"
     unpublished_title: "غير منشور"
   bulk_course_migration: 
     export_failed: "حدث خطأ أثناء تصدير المساق ذي المعرف bb_lcid %{id} من Blackboard"
@@ -2676,6 +2688,8 @@ ar:
         noDueDate: "لا يوجد تاريخ استحقاق"
       modal: 
         chooseDueDate: "هل تريد العودة للسابق وتحديد تاريخ استحقاق؟"
+        goBackToInclude: "هل ترغب في الرجوع لتضمين:"
+        notAllSectionsAssigned: "لن يتم تعيين جميع الأقسام إلى هذا العنصر."
     no_groups: "لم يتم العثور على مجموعات"
     no_users: "لم يتم العثور على مستخدمين"
     ok: موافق
@@ -3378,6 +3392,7 @@ ar:
       question_bank: 
         aria_new_label: "إنشاء بنك أسئلة جديد"
         create_new_question: "-- إنشاء بنك أسئلة جديد --"
+        default_question_bank_label: "السؤال الافتراضي فارغ"
         question_bank_placeholder: "\"اسم بنك الأسئلة\""
         question_bank_placeholder_aria: "\"إدخال اسم بنك الأسئلة الجديد\""
         question_bank_title: "اسم بنك الأسئلة الجديد"
@@ -3800,6 +3815,7 @@ ar:
       module: الوحدة
       module_details: "يتم عرض الوحدات بترتيب تسلسلي، لذلك يمكن فقط ضبط الوحدات أعلاه %{name} كمتطلبات أساسية."
       module_name: "اسم الوحدة"
+      modules_keyboard_hint_updated: "تحذير: لتحسين إمكانية الوصول في إعادة ترتيب الوحدات (أو عناصر الوحدات)، يرجى استخدام الخيار \"نقل إلى مربع الحوار\" الموجود في القائمة."
       move_module: 
         after: بعد
         before: قبل
@@ -3890,6 +3906,7 @@ ar:
           student_progress: "مشاهدة تقدم الطلاب لهذه الوحدة"
       manager_module: "إدارة الوحدة"
       module_will_unlock_at: "سيتم إلغاء التأمين *%{unlock_date}*"
+      modules_keyboard_drag_and_drop: "تحذير: لتحسين إمكانية الوصول في إعادة ترتيب الوحدات (أو عناصر الوحدات)، يرجى استخدام الخيار \"نقل إلى مربع الحوار\" الموجود في القائمة."
       progression_complete_count: "*%{count}* مكتمل"
       progression_started_count: "*%{count}* قيد التقدم"
       reorder_modules: "سحب الوحدات لإعادة ترتيبها"
@@ -4169,6 +4186,7 @@ ar:
         add_to_faculty_journal: "إضافة كإدخال دفتر الكلية"
         attachments: المرفقات
         course: المساق
+        course_required: "يجب تحديد دورة تدريبية قبل إدخال المستلمين."
         select_course: "تحديد مساق"
         subject: الموضوع
         to: إلى
@@ -4216,6 +4234,7 @@ ar:
       other: "و %{count} آخرين"
       two: "و %{count} آخرين"
       zero: "و %{count} آخرين"
+    result_status: "تضم وظيفة الإكمال التلقائي %{results} إدخالات، استخدم مفتاحي السهمين لأعلى ولأسفل للانتقال إلى قائمة، ثم اضغط على إدخال لإضافة الشخص إلى حقل \"إلى\"."
     star: "وضع نجمة"
     star_conversation: "وضع نجمة على محادثة"
     titles: 
@@ -4236,6 +4255,7 @@ ar:
       zero: "لم تتم معالجة أي مساق"
     course_format: 
       not_set: "غير معيّن"
+      on_campus: "في الحرم الجامعي"
       online: "عبر الإنترنت"
     course_not_found: "لم يتم العثور على المساق"
     csv: 
@@ -4275,6 +4295,8 @@ ar:
       unpublished: "غير منشور"
       unpublished_with_message: "غير منشورة: %{message}"
     missing_name: "مساق بدون اسم"
+    student_summary: 
+      not_sorted: "لم يتم فرز جدول ملخص الطالب"
     student_view_student_name: "اختبار الطالب"
     wiki_permissions: 
       all: "أي شخص"
@@ -4866,6 +4888,7 @@ ar:
         after: بعد
         before: قبل
         or: أو
+      nav_items_keyboard_drag_and_drop: "تحذير: لتحسين إمكانية الوصول في إعادة ترتيب عناصر التنقل في الدورة التدريبية، يرجى استخدام الخيار \"نقل إلى مربع الحوار\" الموجود في القائمة."
       no_date: "لم يتم تعيين التاريخ"
       no_language_preference: "غير معيّن (قابل للتكوين بواسطة المستخدم، افتراضي على %{language})"
       none: بلا
