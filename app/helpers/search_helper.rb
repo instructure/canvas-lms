@@ -88,7 +88,10 @@ module SearchHelper
         visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), true)
         sections = visibility == :sections ? context.sections_visible_to(@current_user) : context.course_sections
         add_sections.call sections
-        add_groups.call context.groups
+        add_groups.call context.groups.active
+      elsif context.is_a?(CourseSection)
+        add_courses.call [context.course], :current
+        add_sections.call context.course.sections_visible_to(@current_user, [context])
       else
         add_courses.call @current_user.concluded_courses.with_each_shard, :concluded
         add_courses.call @current_user.courses.with_each_shard, :current

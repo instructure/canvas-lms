@@ -813,6 +813,17 @@ ar:
           section_id: 
             field: "معرف القسم"
     settings: 
+      about_google_docs: |-
+          تتيح معاينات Google Docs للمستخدمين عرض المستندات من
+          داخل Canvas دون الحاجة إلى تنزيلها وفتح البرنامج المناسب
+          (مثل Word أو Excel).
+          
+          في حالة تمكين خدمة Scribd في هذا الحساب، فسيحاول Canvas
+          استخدامها لعرض المعاينة. وإذا لم يكن ممكنًا معاينة المستند
+          في Scribd أو لم يقم المستخدم بتثبيت مشغل Flash 
+          (مثل iPad/iPhone)، فسيعود Canvas إلى استخدام معاينات
+          Google Docs إذا كانت ممكنة. باستخدام هذه الخدمة فإنك تقر
+          بأنك قرأت [شروط استخدام Google Docs Viewer](%{terms_url}) وتوافق عليها.
       about_google_docs_tooltip: "نبذة حول معاينات Google Docs"
       account_admins_title: "مسؤولو الحساب"
       account_quotas: 
@@ -1007,6 +1018,7 @@ ar:
       tab_quotas: الحصص
       tab_reports: التقارير
       tab_settings: إعدادات
+      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin_comments_help: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       turnitin_pledge_help: "يجب أن يضع الطلاب علامة اختيار أمام الخانة التي تفيد بأنهم يوافقون على هذا التعهد"
       turnitin_settings_title: "إعدادات Turnitin"
@@ -4889,6 +4901,7 @@ ar:
         edit_navigation: "تحرير تنقل المساق"
       tooltips: 
         cannot_unpublish_course: "لا يمكنك إلغاء نشر هذا المساق في حالة وجود عمليات إرسال تم تقدير درجاتها للطلاب"
+      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       view_grading_scheme: "عرض نظام التقييم"
       wiki_editing_roles: "يستطيع إنشاء صفحات wiki للمساق وإعادة تسميتها وتحريرها بشكل افتراضي"

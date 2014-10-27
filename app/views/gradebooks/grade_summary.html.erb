@@ -163,7 +163,8 @@
                 <span class="tooltip_text score_teaser">
                   <% if assignment.muted? %>
                     <%= t(:student_mute_notification, "Instructor is working on grades") %>
-                  <% elsif submission && submission.workflow_state == 'pending_review' %>
+                    <%-# Comment out this until it is ready for primetime with the DB additions %>
+                  <% elsif false #submission && submission.workflow_state == 'pending_review' %>
                     <%= t(:grading_in_progress, "Instructor is working on grades") %>
                   <% elsif assignment.special_class %>
                     <%= t(:total, "Total") %>
@@ -180,7 +181,8 @@
                 <span class="screenreader-only" role="link">
                   <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
                 </span>
-                <% if submission && submission.workflow_state == 'pending_review' %>
+                <%-# Comment out this until it is ready for primetime with the DB additions %>
+                <% if false #submission && submission.workflow_state == 'pending_review' %>
                   <span class="screenreader-only"><%=t(:grading_in_progress, "Instructor is working on grades")%></span>
                 <% end %>
                 <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>

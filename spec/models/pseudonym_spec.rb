@@ -333,6 +333,46 @@ describe Pseudonym do
     end
   end
 
+  context 'cas' do
+    let!(:cas_ticket) { CanvasUuid::Uuid.generate_securish_uuid }
+    let!(:redis_key) { "cas_session:#{cas_ticket}" }
+
+    before(:once) do
+      user_with_pseudonym
+
+      Canvas.redis.stubs(:redis_enabled?).returns(true)
+      Canvas.redis.stubs(:ttl).returns(1.day)
+    end
+
+    it 'should claim a cas ticket' do
+      Canvas.redis.expects(:expire).with(redis_key, 1.day).returns(false).once
+      Canvas.redis.expects(:set).with(redis_key, @pseudonym.global_id, { ex: 1.day, nx: true }).once
+      @pseudonym.claim_cas_ticket(cas_ticket)
+    end
+
+    it 'should refresh a cas ticket' do
+      Canvas.redis.expects(:expire).with(redis_key, 1.day).returns(true).once
+      Canvas.redis.expects(:setex).never
+      @pseudonym.claim_cas_ticket(cas_ticket)
+    end
+
+    it 'should check cas ticket expiration' do
+      Canvas.redis.expects(:get).with(redis_key).returns(@pseudonym.global_id.to_s)
+      expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_falsey
+
+      Canvas.redis.expects(:get).with(redis_key).returns(Pseudonym::CAS_TICKET_EXPIRED)
+      expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_truthy
+    end
+
+    it 'should expire a cas ticket' do
+      Canvas.redis.expects(:getset).once.returns(@pseudonym.global_id.to_s)
+      expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_truthy
+
+      Canvas.redis.expects(:getset).once.returns(Pseudonym::CAS_TICKET_EXPIRED)
+      expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_falsey
+    end
+  end
+
   describe '#verify_unique_sis_user_id' do
 
     it 'is true if there is no sis_user_id' do

@@ -701,9 +701,9 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
-                  :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard)
+        ActiveRecord::Associations::Preloader.new(users,
+                                                  { :not_ended_enrollments => :course },
+                  :conditions => ['enrollments.course_id = ?', @context.id]).run
       end
       render :json => users.map { |u|
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
@@ -751,9 +751,9 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        User.send(:preload_associations, users, {:not_ended_enrollments => :course},
-                  :conditions => ['enrollments.course_id = ?', @context.id],
-                  :shard => @context.shard)
+        ActiveRecord::Associations::Preloader.new(users,
+                                                  {:not_ended_enrollments => :course},
+                  :conditions => ['enrollments.course_id = ?', @context.id]).run
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
