@@ -47,7 +47,7 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference is being recorded.") : ""
+      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference may be recorded.") : ""
     }) or return nil
     @conference_active = true
     save
@@ -112,15 +112,15 @@ class BigBlueButtonConference < WebConference
     can :create
 
     given { |user, session| user && user.id == self.user_id && self.context.grants_right?(user, session, :create_conferences) }
-    can :initiate
+    can :initiate and can :create and can :delete
 
     given { |user, session| self.context.grants_right?(user, session, :manage_content) }
     can :read and can :join and can :initiate and can :create and can :delete
 
-    given { |user, session| context.grants_right?(user, session, :manage_content) && !finished? }
+    given { |user, session| context.grants_right?(user, session, :create_conferences) && !finished? }
     can :update
 
-    given { |user, session| context.grants_right?(user, session, :manage_content) && active? }
+    given { |user, session| context.grants_right?(user, session, :create_conferences) && active? }
     can :close
   end
 
