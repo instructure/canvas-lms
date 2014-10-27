@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 describe "discussions" do
   include_examples "in-process server selenium tests"
 
-  let(:course) { course_model.tap(&:offer!) }
+  let(:course) { course_model.tap{|course| course.offer!; set_course_draft_state(:course => course)} }
   let(:default_section) { course.default_section }
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:section_student) do
@@ -110,20 +110,6 @@ describe "discussions" do
 
       context "with blank pages fetched from server" do
         it "should display empty version of view if there are no topics" do
-          get url
-          wait_for_ajaximations
-          ff('.no-content').each { |div| expect(div).to be_displayed }
-        end
-
-        it "should display empty version of view if all pages are empty" do
-          (1..15).each do |n|
-            course.discussion_topics.create!({
-                                               :title => "general topic #{n}",
-                                               :discussion_type => 'side_comment',
-                                               :delayed_post_at => 5.days.from_now,
-                                             })
-          end
-
           get url
           wait_for_ajaximations
           ff('.no-content').each { |div| expect(div).to be_displayed }

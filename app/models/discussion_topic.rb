@@ -790,7 +790,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
     given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
-    can :update and can :delete and can :read
+    can :update and can :delete and can :read and can :attach
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
     can :update
