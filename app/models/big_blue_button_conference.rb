@@ -81,14 +81,23 @@ class BigBlueButtonConference < WebConference
     end
   end
 
+  def delete_recordings
+    fetch_recordings.map do |recording|
+      delete_recording recording[:recordID]
+    end
+  end
+
   def close
-    end_meeting(self.conference_key)
-	super
+    end_meeting
+    super
   end
 
   def destroy
-    end_meeting(self.conference_key)
-	super
+    end_meeting
+    if settings[:record]
+      delete_recordings
+    end
+    super
   end
 
   set_policy do
@@ -141,9 +150,9 @@ class BigBlueButtonConference < WebConference
       :userID => user.id
   end
 
-  def end_meeting(meeting_id)
+  def end_meeting
     response = send_request(:end, {
-      :meetingID => meeting_id,
+      :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)]
       })
     response[:ended] if response
