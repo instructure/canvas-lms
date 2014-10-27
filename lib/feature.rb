@@ -63,7 +63,10 @@ class Feature
     display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
     description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-    state: 'allowed',     # or 'off' or 'on' or 'hidden'
+    state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+                          # - 'hidden' means the feature must be set by a site admin before it will be visible
+                          #   (in that context and below) to other users
+                          # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
     root_opt_in: false,   # if true, 'allowed' features in source or site admin
                           # will be inherited in "off" state by root accounts
     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
