@@ -117,6 +117,7 @@ define [
               params: {splat: @props.currentFolder?.urlPath()}
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
+              'aria-label': I18n.t('view', 'View')
               'data-tooltip': ''
             },
             i className: 'icon-search'
