@@ -1569,46 +1569,49 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
-      if da_enabled = feature_enabled?(:differentiated_assignments)
-        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments.map(&:user_id), course_id: id)
-      end
+      student_enrollments.each_slice(100) do |student_enrollments_batch|
 
-      student_enrollments.each do |student_enrollment|
-        student = student_enrollment.user
-        student_sections = student_section_names[student.id].sort.to_sentence
-        student_submissions = assignments.map do |a|
-          if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
-            "N/A"
-          else
-            submission = submissions[[student.id, a.id]]
-            submission.try(:score)
+        if da_enabled = feature_enabled?(:differentiated_assignments)
+          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments_batch.map(&:user_id), course_id: id)
+        end
+
+        student_enrollments_batch.each do |student_enrollment|
+          student = student_enrollment.user
+          student_sections = student_section_names[student.id].sort.to_sentence
+          student_submissions = assignments.map do |a|
+            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+              "N/A"
+            else
+              submission = submissions[[student.id, a.id]]
+              submission.try(:score)
+            end
           end
-        end
-        #Last Row
-        row = [student.last_name_first, student.id]
-        if options[:include_sis_id]
-          pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
-          row << pseudonym.try(:sis_user_id)
-          pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
-          row << pseudonym.try(:unique_id)
-          row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
-        end
+          #Last Row
+          row = [student.last_name_first, student.id]
+          if options[:include_sis_id]
+            pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
+            row << pseudonym.try(:sis_user_id)
+            pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
+            row << pseudonym.try(:unique_id)
+            row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
+          end
 
-        row << student_sections
-        row.concat(student_submissions)
+          row << student_sections
+          row.concat(student_submissions)
 
-        (current_info, current_group_info),
-          (final_info, final_group_info) = grades.shift
-        groups.each do |g|
-          row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
-          row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+          (current_info, current_group_info),
+            (final_info, final_group_info) = grades.shift
+          groups.each do |g|
+            row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
+            row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+          end
+          row << current_info[:total] << final_info[:total] if include_points
+          row << current_info[:grade] << final_info[:grade]
+          if self.grading_standard_enabled?
+            row << score_to_grade(final_info[:grade])
+          end
+          csv << row
         end
-        row << current_info[:total] << final_info[:total] if include_points
-        row << current_info[:grade] << final_info[:grade]
-        if self.grading_standard_enabled?
-          row << score_to_grade(final_info[:grade])
-        end
-        csv << row
       end
     end
   end

@@ -77,30 +77,34 @@ class GradebookUploadsController < ApplicationController
           assignment_map[a.id] = a
         end
 
-        if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @students.map{|s| s["previous_id"].to_i})
-        end
+        @submissions ||= []
+        @students.each_slice(100) do |students|
 
-        @submissions = @students.inject([]) do |list, student_record|
-          student_record['submissions'].each do |submission_record|
-            assignment_id = new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i
-            user_id = student_record['previous_id'].to_i
-            new_submission = {
-              :assignment_id => assignment_id,
-              :user_id => user_id,
-              :grade => submission_record['grade']
-            }
-            if da_enabled
-              if visible_assignments[user_id].include?(assignment_id)
-                list << new_submission
-              else
-                logger.info "Assignment: #{assignment_map[assignment_id].title} for student: #{student_record['name']} was not updated because it is not assigned to that student."
-              end
-            else
-              list << new_submission
-            end
+          if da_enabled = @context.feature_enabled?(:differentiated_assignments)
+            visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: students.map{|s| s["previous_id"].to_i})
           end
-          list
+
+          students.inject(@submissions) do |list, student_record|
+            student_record['submissions'].each do |submission_record|
+              assignment_id = new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i
+              user_id = student_record['previous_id'].to_i
+              new_submission = {
+                :assignment_id => assignment_id,
+                :user_id => user_id,
+                :grade => submission_record['grade']
+              }
+              if da_enabled
+                if visible_assignments[user_id].include?(assignment_id)
+                  list << new_submission
+                else
+                  logger.info "Assignment: #{assignment_map[assignment_id].title} for student: #{student_record['name']} was not updated because it is not assigned to that student."
+                end
+              else
+                list << new_submission
+              end
+            end
+            list
+          end
         end
 
         all_submissions = {}
