@@ -866,6 +866,7 @@ pt-BR:
         report_last_run: "Última execução"
         report_name: Nome
       headings: 
+        quotas: "Cotas da conta"
         sections: Relatórios
         settings: "Configurações de conta"
       help_link_available_to_all_admins: Administradores
@@ -884,6 +885,7 @@ pt-BR:
         allow_invitation_previews: "Pré-visualizações de convite"
         allow_sending_scores_in_emails: "Os alunos podem optar por receber as pontuações em notificações de email"
         allow_sis_import: "Importações do SIS"
+        author_email_in_notifications: "Mostrar o endereço de email do emissor para Notificações de interação de usuário"
         canvas_authentication: "Autenticação Canvas"
         default_language: "Idioma padrão"
         default_time_zone: "Fuso horário padrão"
@@ -1123,6 +1125,7 @@ pt-BR:
       media_file_storage_header: "Armazenamento de arquivos de mídia"
       none_message: "Nada a exibir"
       over_time_link: "ao longo do tempo"
+      page_header_title: "Estatísticas da conta"
       page_title: "Estatísticas para %{account}"
       recently_created_courses_title: "Cursos criados recentemente"
       recently_ended_courses_title: "Cursos encerrados recentemente"
@@ -1245,6 +1248,7 @@ pt-BR:
     error_heading: "Erro Ajax: %{status_code}"
     errors: 
       connection_lost: "A conexão com %{host} foi perdida. Verifique se você está conectado com a Internet e tente novamente."
+      logged_out: "Você não está registrado atualmente, talvez por um período grande de inatividade."
       unhandled: "Oops! A última solicitação não funcionou."
     links: 
       details: detalhes...
@@ -1381,6 +1385,7 @@ pt-BR:
       quota_exceeded_group: "Cota de armazenamento de grupo excedida"
       quota_exceeded_user: "Cota de armazenamento de usuário excedida"
       student_view_unauthorized: "Essa funcionalidade não pode ser visualizada no modo visualização do aluno"
+      submission_unauthorized: "Impossível acessar esse envio."
       unauthorized: 
         not_started_yet: "O curso que você está tentando acessar ainda não começou. Ele começará em %{date}."
         unpublished: "Esse curso ainda não foi publicado pelo professor"
@@ -1812,6 +1817,7 @@ pt-BR:
         points: Pontos
       view_grading_scheme: "Exibir esquema de classificação"
     group_category_selector: 
+      differentiated_groups_warning: "Tarefas de grupo diferenciado podem gerar resultados inesperados."
       grade_group_students_individually: "Atribuir notas para cada aluno individualmente"
       group_assignment_header: "Tarefa em grupo"
       group_category_locked_explanation: "Os alunos já enviaram o trabalho de casa dessa tarefa, por isso não é possível alterar as configurações do grupo."
@@ -1913,6 +1919,7 @@ pt-BR:
     non_number: "Você deve usar um número"
     notices: 
       assignment_delete: "Esta tarefa foi excluída"
+      assignment_not_available: "A tarefa solicitada não está disponível para sua seção do curso."
       created: "Tarefa criada com sucesso."
       updated: "Tarefa atualizada com sucesso."
     number_of_assignments: 
@@ -2248,10 +2255,15 @@ pt-BR:
   bookmark_service: 
     default_title: "Sem título"
   broccoli_cloud: 
+    hidden_title: "Secreto. Disponível em um link"
     label: 
+      hidden: "Secreto. Disponível em um link."
       published: Publicado
       unpublished: "Não publicado"
     published_title: Publicado
+    restricted_title: "Disponível de %{from_date} até %{until_date}"
+    title: 
+      permissions: "Editar permissões para: %{name}"
     unpublished_title: "Não publicado"
   bulk_course_migration: 
     export_failed: "Ocorreu um erro ao exportar o curso com bb_lcid %{id} do Blackboard"
@@ -2609,6 +2621,8 @@ pt-BR:
         noDueDate: "Sem data de entrega"
       modal: 
         chooseDueDate: "Você deseja voltar e selecionar uma data de entrega?"
+        goBackToInclude: "Você gostaria de voltar para incluir:"
+        notAllSectionsAssigned: "Nem todas as seções terão esse item atribuído."
     no_groups: "Nenhum grupo encontrado"
     no_users: "Nenhum usuário encontrado"
     ok: OK
@@ -3305,6 +3319,7 @@ pt-BR:
       question_bank: 
         aria_new_label: "Criar um novo banco de perguntas"
         create_new_question: "-- Criar um novo banco de perguntas --"
+        default_question_bank_label: "Banco de perguntas padrão"
         question_bank_placeholder: "\"Nome do banco de perguntas\""
         question_bank_placeholder_aria: "\"Inserir novo nome de banco de perguntas\""
         question_bank_title: "Nome do novo banco de perguntas"
@@ -3727,6 +3742,7 @@ pt-BR:
       module: módulo
       module_details: "Os módulos são exibidos em ordem sequencial; assim, somente os módulos acima de %{name} podem ser definidos como prerrequisitos."
       module_name: "Nome de módulo"
+      modules_keyboard_hint_updated: "Aviso: para melhorar a acessibilidade ao reclassificar os Módulos (ou itens de Módulo), use a opção de diálogo Mover para localizada no menu."
       move_module: 
         after: Depois
         before: Antes
@@ -3817,6 +3833,7 @@ pt-BR:
           student_progress: "Ver o progresso do aluno neste módulo"
       manager_module: "Gerenciar módulo"
       module_will_unlock_at: "Será desbloqueado em *%{unlock_date}*"
+      modules_keyboard_drag_and_drop: "Aviso: para acessibilidade avançada ao reclassificar Módulos (ou itens de Módulo), use a opção de diálogo Mover para localizado no menu. "
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em andamento"
       reorder_modules: "Arrastar para reordenar os módulos"
@@ -4088,6 +4105,7 @@ pt-BR:
         add_to_faculty_journal: "Adicionar como uma entrada do Diário da Faculdade"
         attachments: Anexos
         course: Curso
+        course_required: "Você deve selecionar um Curso antes de inserir destinatários."
         select_course: "Selecionar um curso"
         subject: Assunto
         to: Para
@@ -4127,6 +4145,7 @@ pt-BR:
     other_recipients: 
       one: "e 1 outro"
       other: "e %{count} outros"
+    result_status: "A conclusão automática tem %{results} entradas listadas, use as teclas de seta para cima e para baixo para navegar para uma listagem, depois pressione para adicionar pessoa ao campo Para."
     star: "Adicionar aos favoritos"
     star_conversation: "Adicionar conversa aos favoritos"
     titles: 
@@ -4143,6 +4162,7 @@ pt-BR:
       other: "%{count} cursos processados"
     course_format: 
       not_set: "Não definido"
+      on_campus: "No campus"
       online: Online
     course_not_found: "O curso não foi encontrado"
     csv: 
@@ -4182,6 +4202,8 @@ pt-BR:
       unpublished: "Não publicado"
       unpublished_with_message: "Não publicado: %{message}"
     missing_name: "Curso sem nome"
+    student_summary: 
+      not_sorted: "Tabela de resumo de aluno não classificada"
     student_view_student_name: "Testar estudante"
     wiki_permissions: 
       all: "Qualquer pessoa"
@@ -4764,6 +4786,7 @@ pt-BR:
         after: Depois
         before: Antes
         or: OU
+      nav_items_keyboard_drag_and_drop: "Aviso: para melhorar a acessibilidade ao reclassificar os elementos de Navegação do curso, use a opção de diálogo Mover para localizada no menu."
       no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo usuário, padrão em %{language})"
       none: Nenhum
@@ -5503,6 +5526,7 @@ pt-BR:
       loading_replies: "Carregando respostas..."
       lock_topic: "Fechar para comentários"
       locked: "Este tópico está fechado para comentários"
+      manage_announcement: "Gerenciar anúncio"
       manage_discussion: "Gerenciar discussão"
       mark_all_as_read: "Marcar tudo como lido"
       mark_all_as_unread: "Marcar tudo como não lido"
@@ -5697,6 +5721,7 @@ pt-BR:
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Módulos regravados em Ember. Usa a API nativa de arrastar e soltar para permitir arrastar de locais externos."
+  enable_multiple_grading_periods: "Habilitar gerenciamento de vários períodos de pontuação no administrador de conta e usar no Livro de notas."
   enrollment: 
     default_course_name: Curso
     default_email: "Sem email"
@@ -6031,6 +6056,7 @@ pt-BR:
     required: Obrigatório
     sis_id_in_use: "ID do SIS \"%{sis_id}\" já está em uso"
     unsaved_changes: "Você tem alterações não salvas"
+    wrong_file_extension: "O arquivo selecionado com extensão \"%{extension}\", não está autorizado para envio"
   external_content: 
     cancel: 
       canceling: Cancelando...
@@ -6242,6 +6268,7 @@ pt-BR:
     differentiated_assignments_account_disable_warning: |-
         O desligamento deste recurso impactará os cursos existentes. Para assistência a desativar este recurso, entre em contato com
         seu Gerente de Sucesso Canvas.
+    differentiated_assignments_course_disable_warning: "Desativar tarefas diferenciadas tornará todas as tarefas publicadas visíveis a todos os alunos."
     draft_state: "Estado de rascunho"
     draft_state_account_disable_warning: |-
         O desligamento deste recurso impactará os cursos existentes. Para assistência a desativar este recurso, entre em contato com
@@ -6256,23 +6283,38 @@ pt-BR:
     k12: "Recursos específicos do K-12"
     learning_mastery_gradebook: "Livro de Notas de Domínio do Aprendizado"
     lor: "Ferramentas externas LOR"
+    multiple_grading_periods: "Vários períodos de pontuação"
     new_quiz_moderate: "Nova página moderada do teste"
     new_quiz_statistics: "Página de novas estatísticas do teste"
     new_styles: "Use novos estilos"
     post_grades: "Postar notas no SIS"
     student_groups: "Página de novos grupos de alunos"
     student_outcome_gradebook: "Livro de notas de domínio da aprendizagem do aluno"
+  file_browser_view: 
+    folder_tree_instructions: "Use as teclas de seta para cima e para baixo para navegar pela árvore. Pressione à direita para expandir as pastas, à esquerda para reduzir e enter para escolher o item selecionado."
   file_preview: 
     file_preview_headerbutton_close: Fechar
+    file_preview_headerbutton_download: Baixar
+    file_preview_headerbutton_info: Informações
     file_preview_hide: Ocultar
     file_preview_infotable_datecreated: "Data de criação"
+    file_preview_infotable_datemodified: "Data modificada"
+    file_preview_infotable_kind: Tipo
+    file_preview_infotable_modifiedby: "Modificado por"
     file_preview_infotable_name: Nome
+    file_preview_infotable_size: Tamanho
     file_preview_infotable_status: Status
     file_preview_show: Exibir
+  file_previews: 
+    no_preview: 
+      file_previews: 
+        download_file: "Baixar *nome de arquivo*"
+        no_preview_available: "Nenhuma visualização disponível para esse arquivo."
   file_rename_form: 
     back: Voltar
     change: Alterar
     change_name: "Alterar nome"
+    message: "Um item denominado \"%{name}\" já existe nesse local. Deseja substituir o arquivo existente?"
     name: Nome
     prompt: "Alterar \"%{name}\" para"
     rename_title: Copiar
@@ -6293,6 +6335,7 @@ pt-BR:
     content_folder: 
       titles: 
         edit_and_move_instructions: "Clique para editar, arraste para mover para outra pasta"
+    could_not_find_file: "Esse arquivo foi excluído"
     errors: 
       empty_file: "Este arquivo está vazio.  Faça upload de um arquivo diferente."
       extracting: "Houve erros durante a extração do arquivo zip.  Tente novamente."
@@ -6409,6 +6452,7 @@ pt-BR:
       uploading_files: 
         one: "Fazendo upload de 1 arquivo..."
         other: "Fazendo upload de %{count} arquivos..."
+    my_files: "Meus arquivos"
     new: 
       buttons: 
         create: Criar
@@ -6496,6 +6540,8 @@ pt-BR:
       no_students_in_groups_back: "Desculpe-nos. Os envios para esta tarefa não podem ser avaliados no Speedgrader, pois não existe nenhum usuário atribuído. Atribua usuários a este conjunto de grupos e tente novamente. Clique em \"OK\" para voltar."
       no_students_in_groups_close: "Desculpe-nos. Os envios para esta tarefa não podem ser avaliados no Speedgrader, pois não existe nenhum usuário atribuído. Atribua usuários a este conjunto de grupos e tente novamente. Clique em \"OK\" para fechar esta janela."
       no_students_in_section: "Não foi possível encontrar alunos nesta seção, retornando para a exibição de todas as seções."
+    allow_message: "Clique no botão\"Permitir\" para começar a gravação."
+    begin_record_prompt: "Clique no botão \"Gravar\" para começar."
     buttons: 
       dialog_buttons: Cancelar
       saving_settings: "Salvando configurações..."
@@ -6510,6 +6556,11 @@ pt-BR:
           
            %{users}
           Continue anyway?
+    crocodoc_expiring: "Sua sessão Crocodoc logo expirará.  Recarregue a janela para evitar perder qualquer trabalho."
+    dialog_button: 
+      aria_record: "Clique para gravar"
+      aria_record_reset: "Clique para gravar"
+      aria_stop: "Toque em \"Parar\" para finalizar a gravação."
     edit_view_rubric: "Exibir protocolo"
     errors: 
       select_an_option: "Selecione uma opção"
@@ -6520,17 +6571,22 @@ pt-BR:
     grading_in_progress: "O instrutor está trabalhando na avaliação"
     group: Grupo
     hide_all_details_button: "Ocultar todos os detalhes"
+    mic_blocked_message: "A permissão para usar microfone está bloqueada. Para alterar, vá para chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Silenciar tarefa"
     new_assessment: "[Nova avaliação]"
     no_submission_time: "Sem hora de envio"
+    nodetect_message: "Nenhuma voz foi detectada. É necessário ajustar as configurações do microfone."
     not_graded: "não avaliado"
     not_submitted: "não enviado"
     nth_student: "Aluno %{n}"
     portion_graded: "%{x} / %{y} Avaliado"
+    recording_expired_message: "O reconhecimento de voz expirou por não haver atividade. Clique no botão \"Parar\" para usar o texto atual no comentário ou em \"Cancelar\" para descartar."
+    recording_message: Gravando...
     show_all_details_button: "Exibir todos os detalhes"
     student: Aluno
     student_mute_notification: "O instrutor está trabalhando na avaliação"
     titles: 
+      click_to_record: "Voz para texto"
       dropped_assignment_no_total: "Esta tarefa não será considerada no cálculo total"
       hypothetical_score: "Esta é uma pontuação \"e se\""
     turnitin: 
@@ -6924,6 +6980,7 @@ pt-BR:
       new_assessment_option: "[Nova avaliação]"
       no_annotation: "As anotações não estão disponíveis para este documento"
       not_newest_notice: "Observação: Este não é o envio mais recente"
+      page_header_title: Speedgrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "por status de envio (precisa ser avaliado, não enviado, etc)"
@@ -6986,6 +7043,9 @@ pt-BR:
     out_of: "(de %{points})"
     out_of_nil: "Nenhum ponto possível"
     out_of_with_score: "(%{score} de %{points})"
+  grading_period: 
+    errors: 
+      invalid_grading_period_end_date: "A data de encerramento do período de pontuação precede a data de início"
   grading_standard: 
     unknown_grading_details: "Detalhes desconhecidos"
   grading_standards: 
@@ -7424,10 +7484,15 @@ pt-BR:
     course: Curso
     dashboard_helper: 
       announcement_details: "Detalhes do anúncio"
+      announcement_label: "Visite anúncios do curso"
       assignment_details: "Detalhes da tarefa"
+      assignment_label: "Visitar anúncios do curso"
       conversation_details: "Detalhes da conversa"
+      conversation_label: "Visitar conversas"
       discussion_details: "Detalhes da discussão"
+      discussion_label: "Visitar discussões do curso"
       peer_review_details: "Detalhes da Revisão por colegas"
+      peer_review_label: "Visitar revisões por colegas do curso "
       x_more: "%{x} mais..."
       x_new_in_announcements: 
         one: "*1* anúncio"
@@ -7481,6 +7546,7 @@ pt-BR:
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam ser definidos nas Configurações do Curso."
   importers/context_module_importer: 
+    foreign_lti_tool: "A Ferramenta externa da conta para o item do módulo \"%{title}\" deve ser configurada para que o item possa ser ativado"
     migration_module_item_type: "Item do módulo"
   importers/course_content_importer: 
     account_grading_standard_warning: "Não foi possível localizar o padrão de pontuação da conta para o curso."
@@ -12599,6 +12665,7 @@ pt-BR:
     created_at_short: Criado
     delete: Excluir
     deleted_items_successfully: "%{count} itens excluídos com sucesso"
+    download: Baixar
     edit_name: "Editar nome"
     errors: 
       no_match: 
@@ -12610,9 +12677,11 @@ pt-BR:
     files: Arquivos
     files_heading: Arquivos
     folder: Pasta
+    kind: Tipo
     labels: 
       select: "Selecionar um item"
     loading_more_results: "Carregando mais resultados..."
+    modified_by: "Modificado por"
     move: Mover
     move_question: 
       one: "Where would you like to move %{item}?"
@@ -12628,7 +12697,9 @@ pt-BR:
     search_for_files: "Pesquisar arquivos"
     select_all: "Selecionar tudo"
     settings: Configurações
+    size: Tamanho
     this_folder_is_empty: "Esta pasta está vazia"
+    updated_at: "Data modificada"
     usage_details: "%{quota_used} de %{quota}"
     view: Exibir
   recent_student: 
