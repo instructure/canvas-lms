@@ -9,7 +9,7 @@
 # Periodic jobs default to low priority. You can override this in the arguments
 # passed to Delayed::Periodic.cron
 
-Rails.configuration.to_prepare do
+Rails.configuration.after_initialize do
   if Rails.configuration.session_store == ActiveRecord::SessionStore
     expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
     expire_after ||= 1.day
