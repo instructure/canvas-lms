@@ -19,6 +19,7 @@ describe "assignments" do
     before (:each) do
       @due_date = Time.now.utc + 2.days
       course_with_student_logged_in
+      set_course_draft_state
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
@@ -27,14 +28,14 @@ describe "assignments" do
 
     it "should not sort undated assignments first and it should order them by title" do
       get "/courses/#{@course.id}/assignments"
-      titles = ff('.title')
+      titles = ff('.ig-title')
       expect(titles[2].text).to eq @second_assignment.title
       expect(titles[3].text).to eq @third_assignment.title
     end
 
     it "should order upcoming assignments starting with first due" do
       get "/courses/#{@course.id}/assignments"
-      titles = ff('.title')
+      titles = ff('.ig-title')
       expect(titles[0].text).to eq @fourth_assignment.title
       expect(titles[1].text).to eq @assignment.title
     end
@@ -139,10 +140,10 @@ describe "assignments" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
       driver.current_url
       get "/courses/#{@course.id}/assignments"
-      expect(ffj('.assignment_list:visible').last).to include_text(due_date_assignment.title)
+      expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
       refresh_page # to show the updated assignment
-      expect(ffj('.assignment_list:visible').first).to include_text(due_date_assignment.title)
+      expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
 
     it "should validate an assignment created with the type of discussion" do
