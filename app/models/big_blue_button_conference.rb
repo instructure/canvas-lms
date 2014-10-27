@@ -81,7 +81,7 @@ class BigBlueButtonConference < WebConference
     end
   end
 
-  def delete_recordings
+  def delete_all_recordings
     fetch_recordings.map do |recording|
       delete_recording recording[:recordID]
     end
@@ -94,9 +94,7 @@ class BigBlueButtonConference < WebConference
 
   def destroy
     end_meeting
-    if settings[:record]
-      delete_recordings
-    end
+    delete_all_recordings
     super
   end
 
