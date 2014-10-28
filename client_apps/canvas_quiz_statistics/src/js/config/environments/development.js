@@ -16,10 +16,6 @@ define(function(require) {
     DEBUG.update = app.update;
   });
 
-  DEBUG.expose('react', 'React');
-  DEBUG.expose('util/round', 'round');
-  DEBUG.expose('stores/statistics', 'statisticsStore');
-
   Root.DEBUG = DEBUG;
   Root.d = DEBUG;
 

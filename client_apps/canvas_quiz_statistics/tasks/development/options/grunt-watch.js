@@ -13,7 +13,7 @@ module.exports = {
 
   compiled_css: {
     files: 'dist/*.css',
-    tasks: [ 'noop', 'notify:css' ],
+    tasks: [ 'noop' ],
     options: {
       livereload: {
         port: 9224
