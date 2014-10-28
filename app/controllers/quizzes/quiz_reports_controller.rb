@@ -140,29 +140,38 @@ class Quizzes::QuizReportsController < ApplicationController
   #   Whether the output should include documents for the file and/or progress
   #   objects associated with this report. (Note: JSON-API only)
   #
+  # *Responses*
+  #
+  # * <code>400 Bad Request</code> if the specified report type is invalid
+  # * <code>409 Conflict</code> if a quiz report of the specified type is already being
+  #   generated
+  #
   # @returns QuizReport
   def create
     authorized_action(@quiz, @current_user, :read_statistics)
 
     p = if accepts_jsonapi?
-      (params[:quiz_reports] || [])[0] || {}
+      Array(params[:quiz_reports]).first
     else
-      params[:quiz_report] || {}
-    end
+      params[:quiz_report]
+    end || {}
 
     unless Quizzes::QuizStatistics::REPORTS.include?(p[:report_type])
-      return render({
-        json: { errors: { report_type: "invalid" } },
-        status: :bad_request
-      })
+      reject! 'invalid quiz report type', 400
     end
 
-    stats = @quiz.statistics_csv(p[:report_type], {
-      async: true,
+    statistics = @quiz.current_statistics_for(p[:report_type], {
       includes_all_versions: value_to_boolean(p[:includes_all_versions])
     })
 
-    expose stats, backward_compatible_includes
+    if statistics.generating_csv?
+      reject! 'report is already being generated', 409
+    end
+
+    statistics.abort_csv_generation if statistics.csv_generation_failed?
+    statistics.generate_csv_in_background
+
+    expose statistics, backward_compatible_includes
   end
 
   # @API Get a quiz report
@@ -177,6 +186,46 @@ class Quizzes::QuizReportsController < ApplicationController
   def show
     if authorized_action(@quiz, @current_user, :read_statistics)
       expose @quiz.quiz_statistics.find(params[:id]), backward_compatible_includes
+    end
+  end
+
+  # @API Abort the generation of a report, or remove a previously generated one
+  # @beta
+  #
+  # This API allows you to cancel a previous request you issued for a report to
+  # be generated. Or in the case of an already generated report, you'd like to
+  # remove it, perhaps to generate it another time with an updated version that
+  # provides new features.
+  #
+  # You must check the report's generation status before attempting to use this
+  # interface. See the "workflow_state" property of the QuizReport's Progress
+  # object for more information. Only when the progress reports itself in a
+  # "queued" state can the generation be aborted.
+  #
+  # *Responses*
+  #
+  # - <code>204 No Content</code> if your request was accepted
+  # - <code>422 Unprocessable Entity</code> if the report is not being generated
+  #   or can not be aborted at this stage
+  def abort
+    if authorized_action(@quiz, @current_user, :read_statistics)
+      statistics = @quiz.quiz_statistics.find(params[:id])
+
+      # case 1: remove a generated report:
+      if statistics.csv_attachment.present?
+        statistics.csv_attachment.destroy!
+        # progress will be present only if the CSV was generated asynchronously
+        statistics.progress.destroy if statistics.progress.present?
+      # case 2: abort the generation process if we can:
+      elsif !statistics.progress.present?
+        reject! 'report is not being generated', 422
+      elsif !statistics.csv_generation_abortable?
+        reject! 'report generation can not be aborted', 422
+      else
+        statistics.abort_csv_generation
+      end
+
+      head :no_content
     end
   end
 

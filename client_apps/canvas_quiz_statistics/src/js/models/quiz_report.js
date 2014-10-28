@@ -18,7 +18,7 @@ define(function(require) {
       attrs.progress = pickAndNormalize(payload.progress, K.PROGRESS_ATTRS);
       attrs.file = pickAndNormalize(payload.file, K.ATTACHMENT_ATTRS);
       attrs.isGenerated = !!(attrs.file && attrs.file.url);
-      attrs.isGenerating = !!(attrs.progress && isGenerating(attrs));
+      attrs.isGenerating = !attrs.isGenerated && !!(attrs.progress && isGenerating(attrs));
 
       return attrs;
     }

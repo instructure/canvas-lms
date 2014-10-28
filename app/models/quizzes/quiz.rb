@@ -1007,7 +1007,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     quiz_stats_opts = {
       :report_type => report_type,
-      :includes_all_versions => options[:includes_all_versions],
+      :includes_all_versions => !!options[:includes_all_versions],
       :anonymous => anonymous_submissions?
     }
 

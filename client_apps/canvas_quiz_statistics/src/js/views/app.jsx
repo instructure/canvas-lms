@@ -4,6 +4,7 @@ define(function(require) {
   var Summary = require('jsx!./summary');
   var I18n = require('i18n!quiz_statistics');
   var _ = require('lodash');
+  var Notifications = require('jsx!./notifications');
   var ToggleDetailsButton = require('jsx!./questions/toggle_details_button');
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
@@ -39,6 +40,8 @@ define(function(require) {
           submissionStatistics: {},
           questionStatistics: [],
         },
+
+        notifications: []
       };
     },
 
@@ -52,6 +55,8 @@ define(function(require) {
           <ScreenReaderContent tagName="h1">
             {I18n.t('title', 'Quiz Statistics')}
           </ScreenReaderContent>
+
+          <Notifications notifications={this.props.notifications} />
 
           <section>
             <Summary

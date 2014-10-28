@@ -174,10 +174,24 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   def attachment_csv(answer)
     return "" unless answer && answer[:attachment_ids]
     @attachments[answer[:attachment_ids].first.to_i].display_name
+
+    # TODO: this method is buggy:
+    # uncomment the following and remove the original implementation above once
+    # we get CNVS-16525 in; this is currently the only way I can reliably
+    # trigger failures in a CSV generation job which we need to test the patch.
+    #
+    # return "" unless answer && answer[:attachment_ids].present?
+    #
+    # attachment = @attachments[answer[:attachment_ids].first.to_i]
+    #
+    # if attachment.present?
+    #   attachment.display_name
+    # else
+    #   ''
+    # end
   end
 
   def to_csv
-    start_progress
     include_root_accounts = quiz.context.root_account.trust_exists?
     csv = CSV.generate do |csv|
       context = quiz.context

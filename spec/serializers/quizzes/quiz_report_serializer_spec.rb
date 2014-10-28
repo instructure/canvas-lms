@@ -22,8 +22,7 @@ shared_examples_for 'QuizReportSerializer Associations' do
   end
 
   it 'should embed its progress when present' do
-    statistics.start_progress
-    statistics.reload
+    statistics.generate_csv_in_background
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
       controller: controller,
@@ -133,8 +132,7 @@ describe Quizzes::QuizReportSerializer do
     end
 
     it 'should include the progress_url' do
-      statistics.start_progress
-      statistics.reload
+      statistics.generate_csv_in_background
 
       expect(json['progress_url']).to eq(
         "http://example.com/api/v1/progress/#{statistics.progress.id}"

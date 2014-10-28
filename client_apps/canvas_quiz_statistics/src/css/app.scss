@@ -8,8 +8,11 @@
 @import "./components/ic_spinner";
 
 #canvas-quiz-statistics {
-  border-top: 1px solid $borderColor;
   padding: 25px 35px 55px 35px;
+
+  a:not(:disabled) {
+    cursor: pointer;
+  }
 
   header.padded {
     padding: $whitespace*2 0;
@@ -72,5 +75,31 @@
 
   .sighted-user-content[hidden] {
     display: inherit;
+  }
+
+  #notifications {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    $dismiss-width: 60px;
+    padding-right: $dismiss-width + $whitespace;
+
+    li {
+      position: relative;
+    }
+
+    .notification {
+      vertical-align: middle;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .dismiss-notification {
+      display: inline-block;
+      position: relative;
+      margin-left: -50px;
+      right: -60px;
+      top: -10px;
+    }
   }
 }

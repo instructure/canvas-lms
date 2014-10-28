@@ -74,7 +74,6 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
   def to_csv
     @csv ||=
       CSV.generate do |csv|
-      start_progress
       stats = summary_stats_for_quiz
       headers = [
         I18n.t('csv.question.id', 'Question Id'),

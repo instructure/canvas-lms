@@ -61,8 +61,8 @@ module Quizzes
     def filter(keys)
       super.select do |key|
         case key
-        when :progress_url then !accepts_jsonapi? && progress_active?
-        when :progress then progress_active? && including?('progress')
+        when :progress_url then !accepts_jsonapi? && has_progress?
+        when :progress then has_progress? && including?('progress')
         when :attachment then has_attachment? && including?('file')
         else true
         end
@@ -88,8 +88,8 @@ module Quizzes
       attachment.present?
     end
 
-    def progress_active?
-      object.progress && object.progress.pending?
+    def has_progress?
+      object.progress.present?
     end
 
     def including?(document)
