@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -319,6 +319,11 @@ class UsersController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
+  #
+  #  @example_request
+  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<sis_user_id> \
+  #       -X GET \
+  #       -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
   def index
