@@ -32,7 +32,7 @@ define([
   'compiled/views/calendar/MissingDateDialogView',
   'compiled/editor/MultipleChoiceToggle',
   'compiled/str/TextHelper',
-  'compiled/views/quizzes/editor/KeyboardShortcuts',
+  'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,

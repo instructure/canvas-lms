@@ -1,9 +1,9 @@
 define [
   'underscore'
-  'i18n!quizzes.editor.keyboard_shortcuts'
+  'i18n!editor.keyboard_shortcuts'
   'jquery'
   'Backbone'
-  'jst/quizzes/editor/KeyboardShortcuts'
+  'jst/editor/KeyboardShortcuts'
 ], (_, I18n, $, Backbone, Template) ->
   ZERO_KEYCODES = [
     48 # regular 0
@@ -11,8 +11,7 @@ define [
   ]
 
   ##
-  # A dialog that lists available keybindings for TinyMCE in the Quizzes
-  # sections.
+  # A dialog that lists available keybindings for TinyMCE.
   #
   # The dialog can be launched by pressing ALT+0, or by clicking a little ? icon
   # in the editor action bar.
