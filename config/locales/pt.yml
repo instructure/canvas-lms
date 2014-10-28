@@ -863,7 +863,7 @@ pt:
         report_last_run: "Última execução"
         report_name: Nome
       headings: 
-        quotas: "Quotas de contas"
+        quotas: "Quotas de conta"
         sections: Relatórios
         settings: "Definições de conta"
       help_link_available_to_all_admins: Administradores
@@ -1122,7 +1122,7 @@ pt:
       media_file_storage_header: "Armazenamento de arquivos de mídia"
       none_message: "Nada a exibir"
       over_time_link: "ao longo do tempo"
-      page_header_title: "Estatísticas de contas"
+      page_header_title: "Estatísticas de conta"
       page_title: "Estatísticas para %{account}"
       recently_created_courses_title: "Disciplinas criadas recentemente"
       recently_ended_courses_title: "Disciplinas terminadas recentemente"
@@ -1138,7 +1138,7 @@ pt:
       account_reports: 
         orbis: 
           parameters: 
-            note: "Disciplinas com tarefas silenciadas podem não refletir corretamente os resultados neste relatório."
+            note: "Disciplinas com tarefas silenciadas podem não refletir corretamente as pontuações neste relatório."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -4741,7 +4741,7 @@ pt:
         allow_student_organized_groups: "Permitir que os alunos organizem os seus próprios grupos"
         conclude_at: Termina
         course_code: "Código da disciplina"
-        course_format: Formatar
+        course_format: Formato
         course_lock_all_announcements: "Desativar comentários em anúncios"
         course_name: Nome
         course_section_name: "Adicionar uma nova seção"
@@ -6292,8 +6292,8 @@ pt:
     file_preview_infotable_modifiedby: "Modificado por"
     file_preview_infotable_name: Nome
     file_preview_infotable_size: Tamanho
-    file_preview_infotable_status: Status
-    file_preview_show: Exibir
+    file_preview_infotable_status: Estado
+    file_preview_show: Mostrar
   file_previews: 
     no_preview: 
       file_previews: 
@@ -8054,7 +8054,7 @@ pt:
           download: descarregar
           link: "Ver anúncio"
         labels: 
-          file_included: "Arquivo incluído"
+          file_included: "Ficheiro incluído"
       facebook: 
         body: "Criou o seguinte anúncio: %{title}, %{course}"
       sms: 
@@ -8702,7 +8702,7 @@ pt:
         view_message: "Ver esta mensagem em Conversas"
       facebook: 
         body: "%{user_name}, acabou de enviar uma mensagem no Canvas."
-        link_text: "Exibir mensagem"
+        link_text: "Ver mensagem"
         unknown_user: "Utilizador desconhecido"
       sms: 
         body: "%{user_name}, acabou de enviar uma mensagem no Canvas:"
@@ -8713,7 +8713,7 @@ pt:
         subject: "%{user_name}, acabou de enviar uma mensagem no Canvas."
         unknown_user: "Utilizador desconhecido"
       twitter: 
-        tweet: "Alerta do Canvas - mensagem de %{user_name}."
+        tweet: "Alerta do Canvas - Mensagem de %{user_name}."
     conversation_message: 
       email: 
         attached_files: "Arquivos anexados:"
@@ -12194,7 +12194,7 @@ pt:
           one: "*%{student_name}* **obtém 1 minuto adicional em cada tentativa**"
           other: "*%{student_name}* **obtém %{count} minutos adicionais em cada tentativa**"
         student_n: "Aluno %{n}"
-        submitting: Enviando...
+        submitting: "A enviar..."
         titles: 
           change_user_extensions: "Alterar extensões do utilizador"
           extra_attempts: "tentativas adicionais"
@@ -12855,14 +12855,14 @@ pt:
       update: Atualizar
     label: 
       availableFrom: "Bloquear a partir de"
-      availableUntil: "Travar até"
+      availableUntil: "Bloquear até"
     options: 
       hiddenInput: 
         description: "Apenas disponível para os alunos com ligação. Não é visível nos ficheiros dos alunos."
       publish: 
         description: Publicar
       restrictedAccess: 
-        description: "Acesso restringido."
+        description: "Acesso restrito"
       unpublish: 
         description: "Anular publicação"
     options_2: 
