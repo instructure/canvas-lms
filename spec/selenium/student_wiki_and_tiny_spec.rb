@@ -7,6 +7,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     before(:each) do
       course_with_student_logged_in
+      set_course_draft_state
     end
 
     def set_notification_policy
@@ -28,7 +29,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       edit_roles = "members"
 
       create_wiki_page(title, hfs, edit_roles)
-      get "/courses/#{@course.id}/wiki/#{title}"
+      get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
       expect(f('.ui-state-error')).to include_text(expected_error)
@@ -41,10 +42,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       edit_roles = "teachers"
 
       create_wiki_page(title, hfs, edit_roles)
-      get "/courses/#{@course.id}/wiki/#{title}"
+      get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f('.edit_link')).to be_nil
+      expect(f('a.edit-wiki')).to be_nil
     end
 
     it "should allow students to edit wiki if any option but teachers is selected" do
@@ -54,10 +55,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       create_wiki_page(title, hfs, edit_roles)
 
-      get "/courses/#{@course.id}/wiki/#{title}"
+      get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f('.edit_link')).to be_displayed
+      expect(f('a.edit-wiki')).to be_displayed
 
       #vars for 2nd wiki page with different permissions
       title2 = "test_page2"
@@ -65,10 +66,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       create_wiki_page(title2, hfs, edit_roles2)
 
-      get "/courses/#{@course.id}/wiki/#{title2}"
+      get "/courses/#{@course.id}/pages/#{title2}"
       wait_for_ajax_requests
 
-      expect(f('.edit_link')).to be_displayed
+      expect(f('a.edit-wiki')).to be_displayed
     end
 
     it "should notify users when wiki page gets changed" do
