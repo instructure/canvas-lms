@@ -43,7 +43,7 @@ pl:
     no_permissions: "Użytkownik nie ma pozwolenia, żeby edytować wyniki globalne"
     no_perms: "Użytkownik nie ma pozwolenia, żeby edytować wyniki globalne"
     plugin_settings: 
-      api_url_description: "(e.g. %{url})"
+      api_url_description: "(np. %{url})"
       common_core_guid: "(np. %{guid})"
       description: "Wymagany jest dostęp do konta [Academic Benchmark](%{url})."
       labels: 
@@ -881,7 +881,7 @@ pl:
         allow_invitation_previews: "Podgląd zaproszeń"
         allow_sending_scores_in_emails: "Uczestnicy mogą zgłosić chęć otrzymywania drogą mailową wiadomości z uzyskanymi wynikami punktowymi"
         allow_sis_import: "Importy danych SIS"
-        author_email_in_notifications: "Pokaż adres e-mail osoby wysyłającej do powiadomień interakcji użytkownika"
+        author_email_in_notifications: "Pokaż adres e-mail osoby wysyłającej w powiadomieniach interakcji użytkownika"
         canvas_authentication: "Uwierzytelnianie Canvas"
         default_language: "Język domyślny"
         default_time_zone: "Domyślna strefa czasowa"
@@ -2269,8 +2269,8 @@ pl:
     published_title: Opublikowano
     restricted_title: "Dostępne od %{from_date} do %{until_date}"
     title: 
-      permissions: "Uprawnienia do edycji posiada %{name}"
-    unpublished_title: Nieopublikowane
+      permissions: "Uprawnienia do edycji posiada: %{name}"
+    unpublished_title: Nieopublikowano
   bulk_course_migration: 
     export_failed: "Wystąpił błąd podczas eksportowania kursu o identyfikatorze bb_lcid %{id} z Blackboard."
     export_failed_no_id: "Wystąpił błąd podczas importowania kursu"
@@ -4169,7 +4169,7 @@ pl:
       one: "1 przetworzony kurs"
       other: "%{count} przetworzonych kursów"
     course_format: 
-      not_set: Nieustawione
+      not_set: "Nie ustawiono"
       on_campus: "W kampusie"
       online: On-line
     course_not_found: "Nie odnaleziono kursu"
@@ -6305,7 +6305,7 @@ pl:
     allow_opt_out_of_inbox: "Pozwól uczestnikom wypisać się ze skrzynki"
     better_file_browsing: "Lepsze przeglądanie pliku"
     differentiated_assignments: "Zadania zróżnicowane"
-    differentiated_assignments_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
+    differentiated_assignments_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z\n\
         Canvas Success Manager. "
     differentiated_assignments_course_disable_warning: "Wyłączenie zróżnicowanych zadań spowoduje, że uczestnicy będą widzieć wszystkie opublikowane zadania."
     draft_state: "Wersja robocza"
@@ -7534,7 +7534,7 @@ pl:
     course: Kurs
     dashboard_helper: 
       announcement_details: "Informacje szczegółowe dotyczące ogłoszenia"
-      announcement_label: "Przejdź do  ogłoszeń do kursu"
+      announcement_label: "Przejdź do ogłoszeń do kursu"
       assignment_details: "Szczegółowe informacje dot. zadania"
       assignment_label: "Sprawdź zadania do kursu"
       conversation_details: "Informacje szczegółowe dotyczące rozmowy"
@@ -8790,8 +8790,8 @@ pl:
         audio_comment: "Ten komunikat zawiera komentarze multimedialne, Aby odsłuchać lub powtórzyć, kliknij poniższe łącze:"
         html: 
           attached_files: "Dołączone pliki:"
-          audio_comment: "Ten komunikat zawiera komentarze multimedialne, Aby odsłuchać lub powtórzyć, kliknij poniższe łącze:"
-          download: pobieranie
+          audio_comment: "Ten komunikat zawiera komentarze multimedialne. Aby odsłuchać lub powtórzyć, kliknij poniższe łącze:"
+          download: pobierz
           reply_to_conversation_message: "Możesz odpowiedzieć na ten komunikat w systemie Canvas, odpowiadając bezpośrednio na tego e-maila."
           subject: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas."
           unknown_user: "Nieznany użytkownik"
@@ -8805,7 +8805,7 @@ pl:
         link_text: "Pokaż wiadomość"
         unknown_user: "Nieznany użytkownik"
       sms: 
-        body: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas."
+        body: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas:"
         more_info: "Więcej informacji pod adresem %{url}"
         unknown_user: "Nieznany użytkownik"
       summary: 
@@ -10028,7 +10028,7 @@ pl:
         published: Opublikowane
     post_grades_dialog_title: "Wyślij oceny do SIS"
     progression_module_collection: 
-      module_progress_for: "Postęp uczestnika w module dla uczestnika *%{student.name}*"
+      module_progress_for: "Postęp w module dla uczestnika *%{student.name}*"
       module_progress_for_student: "Postęp uczestnika w module dla %{student.name}"
       no_modules_found: "Nie znaleziono modułów"
     progression_module_view: 
@@ -10090,6 +10090,9 @@ pl:
         ⏎
         Przesłanie/ponowne przesłanie zadania
     all_submissions_display: "Wszystkie dostarczone zadania"
+    announcement_created_by_you_description: |-
+        * Utworzone ogłoszenia
+        * Odpowiedzi na utworzone ogłoszenia
     announcement_created_by_you_display: "Utworzone ogłoszenie"
     announcement_description: "Nowe ogłoszenie w kursie"
     announcement_display: Ogłoszenie
@@ -10506,7 +10509,7 @@ pl:
     due_date_before_course_start: "Termin dostarczenia musi byc wyznaczony po dacie rozpoczęcia kursu"
     everyone: Wszyscy
     everyone_else: "Wszyscy pozostali"
-    lock_date_after_course_end: "Data zablokowania musi byc wyznaczona przed datą zakończenia kursu"
+    lock_date_after_course_end: "Data zablokowania musi być wyznaczona przed datą zakończenia kursu"
     lock_date_before_due_date: "Data zablokowania nie może być ustawiona przed terminem dostarczenia"
     overrides: 
       everyone: Wszyscy
@@ -11247,8 +11250,8 @@ pl:
       cancel: Anuluj
       details: 
         log_out: "Czy na pewno chcesz się wylogować z systemu Canvas?"
-      log_out: Wylogowanie
-      page_title: Wylogowanie
+      log_out: Wyloguj
+      page_title: Wyloguj
     mobile_login: 
       back_to_login: "Powrót do Logowania"
       buttons: 
@@ -12277,7 +12280,7 @@ pl:
       moderate: 
         add_time: "Dodaj godzinę"
         attempts: próby
-        autosubmit_link_description: "Sprawdź niedokończone, przesłane testy"
+        autosubmit_link_description: "Sprawdź niedokończone testy, które zostały przesłane"
         buttons: 
           change_extensions_for_selected_students: "Zmień rozszerzenia dla %{n} wybranych uczestników"
           extend_time: "Wydłuż czas"
@@ -12328,7 +12331,7 @@ pl:
           select_user: "Wybierz użytkownika %{user}"
       move_handle: 
         move_to: "Przenieś do..."
-        quiz_move_to_accessibility_warning: "Ten element jest bardziej dostępna opcją dla zmieniania kolejności metodą przeciągnij i upuść."
+        quiz_move_to_accessibility_warning: "Ten element jest bardziej przystępną opcją podczas zmieniania kolejności metodą przeciągnij i upuść."
       move_question: 
         cancel: Anuluj
         move_item: "Przenieś element"
@@ -12409,7 +12412,7 @@ pl:
         has_submissions_already: "Niektórzy uczestnicy już napisali lub właśnie piszą ten test"
         less_than_allotted_time: "Użytkownik rozpoczął pisanie testu na krótko przed jego zakończeniem i dlatego nie będzie miał pełnego wymiaru czasu na jego napisanie."
         no_submission_for_user: "Użytkownik nie przesłał jeszcze żadnych zadań"
-        quiz_not_availible: "Nie masz dostepu do żądanego testu."
+        quiz_not_availible: "Nie masz dostępu do żądanego testu."
         quiz_updated: "Test został pomyślnie zaktualizowany"
         quizzes_published: 
           few: "%{count} quizy opublikowano z powodzeniem!"
@@ -12872,13 +12875,26 @@ pl:
     upload_warning: "Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać."
   react_files: 
     add_folder: "Dodaj folder"
+    all_my_files: "Wszystkie moje pliki"
     cancel: Anuluj
+    cancel_button: 
+      label: "Anuluj przekazywanie %{fileName} "
+    confirm_delete: 
+      few: "Czy na pewno chcesz usunąć te %{count} elementy?"
+      one: "Czy na pewno chcesz usunąć element %{name}?"
+      other: "Czy na pewno chcesz usunąć tych %{count} elementów?"
+    confirm_delete_with_contents: 
+      few: "Czy na pewno chcesz usunąć te %{count} elementy i wszystko co się w nich znajuje?"
+      one: "Czy na pewno chcesz usunąć element o nazwie %{name}? Nie jest pusty, więc wszystko co się w nim znajduje zostanie również usunięte."
+      other: "Czy na pewno chcesz usunąć tych %{count} elementów i wszystko co się w nich znajduje?"
     count_items_selected: "Wybrano następującą liczbę elementów: %{count}"
     created_at: "Data utworzenia"
     created_at_short: Utworzono
     delete: Usuń
+    delete_error: "Błąd podczas usuwania nazwy %{name}: powód %{reason}"
     deleted_items_successfully: "Pomyślnie usunięto następującą liczbę elementów: %{count}"
     download: Pobierz
+    download_as_zip: "Pobierz w formacie Zip"
     edit_name: "Edytuj nazwę"
     errors: 
       no_match: 
@@ -12887,9 +12903,13 @@ pl:
         suggestions: "Sugestie:"
         three_chars: "Wpisz co najmniej 3 litery w polu wyszukiwania."
         your_search: "Podany wpis, \"%{search_term}\", nie odpowiada żadnym plikom."
+    file_list: "Lista pliku"
     files: Pliki
     files_heading: Pliki
+    files_toolbar: "Pasek narzędzi do pracy z plikami"
     folder: Folder
+    folder_browsing_tree: "Przeglądanie folderu"
+    folder_name: "Nazwa folderu"
     kind: Typ
     labels: 
       select: "Wybierz ten element"
@@ -12910,11 +12930,17 @@ pl:
     progress_message: "Przygotowanie do pobierania: ukończono %{percent}%"
     restrict_access: "Ogranicz dostęp"
     search_for_files: "Wyszukaj pliki"
+    search_results_for: "wyszukaj rezultaty dla \"%{search_term}\""
     select_all: "Zaznacz wszystko"
     settings: Ustawienia
     size: Rozmiar
+    sorted_ascending: "Sortowane rosnąco"
+    sorted_desending: "Sortowane malejąco"
     this_folder_is_empty: "Folder jest pusty"
+    title: 
+      permissions: "Uprawnienia do edycji %{count} elementów"
     updated_at: "Data modyfikacji"
+    updated_at_short: Zmodyfikowano
     usage_details: "%{quota_used} z %{quota}"
     view: Pokaż
   recent_student: 
@@ -12985,10 +13011,15 @@ pl:
       cancel: Anuluj
       update: Aktualizuj
     label: 
+      availableFrom: "Zablokuj od"
       availableUntil: "Zablokuj do"
     options: 
+      hiddenInput: 
+        description: "Dostępne jedynie dla uczestników posiadających łącze. Nie jest widoczne w plikach uczestnika."
       publish: 
         description: Publikuj
+      restrictedAccess: 
+        description: "Ograniczony dostęp"
       unpublish: 
         description: "Cofnij publikowanie"
     options_2: 
@@ -13768,7 +13799,11 @@ pl:
         custom_comments_area: "Obszar służy oceniającemu do umieszczania komentarzy dotyczących tego kryterium."
       full_marks: "Pełne oceny"
       icons: 
+        add_new_rating_after: "Dodaj nową punktację po bieżącej"
         additional_comments: "Komentarze dodatkowe"
+        delete: "Usuń punktację"
+        edit: "Edytuj punktację"
+        edit_description: "Edytuj opis danego kryterium"
       instructor_comments: "Komentarz instruktora"
       labels: 
         long_description: "Długi opis"
@@ -14175,6 +14210,9 @@ pl:
       w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
       , a postęp uczestników jest wyświetlony jako wynik numeryczny i przydzielony do kategorii biegły/
       w okolicach biegłości/wymagający poprawy.
+  student_summary: 
+    student_summary_table_ascending: "Tabela podsumowująca uczestnika jest posortowana rosnąco według %{sortText}"
+    student_summary_table_descending: "Tabela podsumowująca uczestnika jest posortowana malejąco według %{sortText}"
   students_with_no_submissions_title: "Uczestnicy bez przesłanych zadań"
   sub_accounts: 
     alerts: 
@@ -14187,6 +14225,7 @@ pl:
       one: "1 Kurs"
       other: " %{count} Kursów"
     index: 
+      page_header_title: Podkonta
       titles: 
         sub_accounts: Podkonta
     sub_accounts: 
@@ -14260,6 +14299,8 @@ pl:
     finished_redirecting: "Zakończono!  Trwa przekierowanie do pliku…"
     gathering_files: "Gromadzenie plików (%{progress})..."
     gathering_files_progress: "Gromadzenie plików (%{progress})..."
+    notices: 
+      submission_doesnt_count: "Zadanie nie będzie już wliczane do oceny."
     resubmitted_to_turnitin: "Z powodzeniem wysłano ponownie do programu Turnitin."
     see_attached_files: "Zobacz dołączone pliki"
     show: 
@@ -14670,6 +14711,8 @@ pl:
   unused_courses_title: "Nieużywane kursy"
   upload_button: 
     upload: Przekaż
+  upload_drop_zone: 
+    drop_to_upload: "Upuść elementy, aby przekazać"
   user: 
     default_user_name: Użytkownik
     errors: 
@@ -14952,6 +14995,7 @@ pl:
           będzie to wyglądało tak, jakby wykonał je dany użytkownik. Jednak w dzienniku inspekcji zostanie odnotowane,
           że to naprawdę**Ty** podejmujesz te czynności w imieniu użytkownika.
       masquerade_as: "Podszyj się pod %{user_name}"
+      page_title_header: "Podszyj się pod użytkownika"
     merge: 
       login_to_merge_different_account: "Aby połączyć konto użytkownika %{current_user_name} (%{current_user_email}) z innym kontem, należy zalogować się do nowego konta:"
       merge_definition: "Z różnych powodów jeden użytkownik może mieć dwie nazwy logowania zamiast jednej. Jeśli tak się stanie, można połączyć je w jedną nazwę logowania i scalić informacje w nich zawarte."
@@ -15036,6 +15080,7 @@ pl:
       links: 
         message_user: "Wyślij wiadomość do użytkownika %{user}"
       none_yet: "Na razie brak."
+      page_header_title: "Profil użytkownika"
       page_views: "Liczba wyświetleń strony"
       see_outcomes: "Wyświetl wyniki dla użytkownika %{user}"
     teacher_activity: 
@@ -15273,6 +15318,8 @@ pl:
         page_edited_while_viewing: "Po wyświetleniu przez Ciebie tej strony została ona zaktualizowana przez kogoś innego. [Kliknij tutaj, aby ponownie załadować stronę.](%{link})"
         page_edited_while_viewing_detailed: "Po pierwszym załadowaniu przez Ciebie tej strony ktoś inny ją edytował, jeśli teraz prześlesz zastąpisz dokonane zmiany. Możliwe jest ponowne załadowanie strony i wprowadzenie zmian od nowa, aby upewnić się, że nie usuniesz wyników cudzej pracy."
       welcome_message: "Witamy na stronie typu Wiki poświęconej kursowi"
+    edit_page: 
+      page_header_title: "Edytuj stronę %{page_name}"
     errors: 
       cannot_delete_front_page: "Nie masz uprawnień, aby usunąć pierwszą stronę."
     front_page: "Pierwsza strona"
@@ -15355,4 +15402,9 @@ pl:
       uploading_complete: "Przesyłanie zakończone!"
     zip_import_filename: "zip_import_%{id}.zip"
   zip_file_name: "plik .zip"
+  zip_file_options_form: 
+    expand: "Rozwiń to"
+    message: "Czy chcesz rozwinąć zawartość \"%{fileName}\" do obecnego folderu, czy przekazać plik zip w bieżącej formie?"
+    upload: "Przekaż go"
+    zip_options: "Opcje dotyczące pliku w formacie zip"
   zip_no_folder_error: "Nie można odnaleźć określonego folderu w tym kursie."
