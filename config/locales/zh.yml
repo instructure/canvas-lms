@@ -1124,7 +1124,7 @@ zh:
       media_file_storage_header: 媒体文件存储
       none_message: 无项目可显示
       over_time_link: 超时
-      page_header_title: 帐户统计信息
+      page_header_title: 帐户统计
       page_title: "%{account} 的统计"
       recently_created_courses_title: 最近创建的课程
       recently_ended_courses_title: 最近结束的课程
@@ -2260,9 +2260,9 @@ zh:
       published: 已发布
       unpublished: 已取消发布
     published_title: 已发布
-    restricted_title: "从 %{from_date} 到 %{until_date} 提供"
+    restricted_title: "从 %{from_date} 到 %{until_date} 可用"
     title: 
-      permissions: "编辑此人员的权限：%{name}"
+      permissions: "此人员的编辑权限：%{name}"
     unpublished_title: 已取消发布
   bulk_course_migration: 
     export_failed: "从 Blackboard 导出 bb_lcid 为 %{id} 的课程时出现错误"
@@ -3740,7 +3740,7 @@ zh:
       module: 单元
       module_details: "单元按顺序显示，因此只有显示在 %{name} 上方的单元可以设置为先修课程。"
       module_name: 模块名称
-      modules_keyboard_hint_updated: 警告：为改善重新排序的单元（或单元项目）的可访问性，请使用位于菜单中的“移动到对话框”选项。
+      modules_keyboard_hint_updated: 警告：为改进重新排序的单元（或单元项目）的可访问性，请使用位于菜单中的“移动到对话框”选项。
       move_module: 
         after: 之后
         before: 之前
@@ -3831,7 +3831,7 @@ zh:
           student_progress: 查看学生学习此单元的进度
       manager_module: 管理单元
       module_will_unlock_at: "解锁日期 *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: 警告：为改善重新排序的单元（或单元项目）的可访问性，请使用位于菜单中的“移动到对话框”选项。
+      modules_keyboard_drag_and_drop: 警告：为改进重新排序的单元（或单元项目）的可访问性，请使用位于菜单中的“移动到对话框”选项。
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 进行中"
       reorder_modules: 拖动以重新排序单元
@@ -4058,7 +4058,7 @@ zh:
       mark_as_read: 标记为已读
       mark_as_unread: 标记为未读
       more_options: 更多可更多选项
-      page_title_header: 会话
+      page_title_header: 对话
       reply: 回复
       reply_all: 全部回复
       search_by_user: 按用户搜索
@@ -4087,8 +4087,8 @@ zh:
     message_detail: 
       delete: 删除
       forward: 转发
-      message_actions: 消息操作
-      more_options: 更多可更多选项
+      message_actions: 邮件操作
+      more_options: 更多选项
       no_subject: 无主题
       reply: 回复
       reply_all: 全部回复
@@ -4143,7 +4143,7 @@ zh:
     other_recipients: 
       one: "以及其它 %{count} 门课程"
       other: "以及其它 %{count} 门课程"
-    result_status: "自动完成功能列出了 %{results} 个条目，请使用向上和向下箭头键导航到列表，然后按 Enter 将该人员添加到“收件人”字段。"
+    result_status: "自动完成功能列出了 %{results} 个条目，请使用上下箭头键导航到列表，然后按 Enter 将该人员添加到“收件人”字段。"
     star: 标记
     star_conversation: 标记会话
     titles: 
@@ -4785,7 +4785,7 @@ zh:
         after: 之后
         before: 之前
         or: 或
-      nav_items_keyboard_drag_and_drop: 警告：为改善重新排序的课程导航元素的可访问性，请使用位于菜单中的“移动到对话框”选项。
+      nav_items_keyboard_drag_and_drop: 警告：为改进重新排序的课程导航元素的可访问性，请使用位于菜单中的“移动到对话框”选项。
       no_date: 未设置日期
       no_language_preference: "未设置（用户可配置，默认使用 %{language}）"
       none: 无
@@ -5420,7 +5420,7 @@ zh:
       include_replies_in_podcast_feed: 在播客动态消息中包括回复
       only_visible_to_overrides_note: "注意：此讨论 *仅* 对下面指定的章节显示："
       options: 可选功能
-      page_header_title: 新建讨论
+      page_header_title: 新讨论
       points_possible: 最高得分
       post_at: 发布时间
       save: 保存
@@ -6053,7 +6053,7 @@ zh:
     required: 必需
     sis_id_in_use: "学号 \"%{sis_id}\" 已在使用中"
     unsaved_changes: 您有未保存的更改。
-    wrong_file_extension: "您所选择的扩展名为 \"%{extension}\" 的文件不允许进行提交"
+    wrong_file_extension: "您所选的扩展名为 \"%{extension}\" 的文件不允许进行提交"
   external_content: 
     cancel: 
       canceling: 正在取消...
@@ -8068,10 +8068,10 @@ zh:
     announcement_reply: 
       email: 
         body: "%{user} 在通告上发布了一条新评论：%{course} 的 %{discussion_topic}："
-        discussion_entry_reply_message: 使用下面的链接加入会话，或者通过直接回复此邮件进行评论。
+        discussion_entry_reply_message: 使用下面的链接加入对话，或者通过回复此邮件进行评论。
         html: 
           body: "%{user} 在通告上发布了一条新评论：%{course} 的 %{discussion_topic}："
-          discussion_entry_reply_message: 使用下面的链接加入会话，或者通过直接回复此邮件进行评论。
+          discussion_entry_reply_message: 使用下面的链接加入对话，或者通过回复此邮件进行评论。
           link: 单击此处可加入查看通告
           subject: "通告 %{discussion_topic} 上的新评论：%{course}"
         subject: "通告 %{discussion_topic} 上的新评论：%{course}"
@@ -8510,7 +8510,7 @@ zh:
     assignment_locked_at: "此作业锁定于 %{at}。"
     assignment_locked_module: "此作业是单元 *%{module}* 的一部分，尚未解锁。"
     assignment_locked_until: "此作业锁定至 %{date}。"
-    assignment_module_time_locked: "此作业属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    assignment_module_time_locked: "此作业属于单元 *%{module}*，该单元锁定至 %{time}。"
     assignment_resubmitted: 
       email: 
         html: 
@@ -8691,35 +8691,35 @@ zh:
     content_locked_at: "此内容锁定于 %{at}。"
     content_locked_module: "此内容是单元 *%{module}* 的一部分，尚未解锁。"
     content_locked_until: "此内容锁定至 %{date}。"
-    content_module_time_locked: "此内容属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    content_module_time_locked: "此内容属于单元 *%{module}*，该单元锁定至 %{time}。"
     content_unpublished_module: 此内容是未发布单元的一部分，尚未可用。
     conversation_created: 
       email: 
-        attached_files: "附件文件:"
+        attached_files: 附件文件：
         audio_comment: 此邮件包括媒体评论。要收听或回复，请单击下面的链接：
         html: 
-          attached_files: "附件文件:"
+          attached_files: 附件文件：
           audio_comment: 此邮件包括媒体评论。要收听或回复，请单击下面的链接：
           download: 下载
-          reply_to_conversation_message: "您可以通过直接回复此邮件在 Canvas 中回复此邮件。"
-          subject: "%{user_name}，您刚刚在 Canvas 中发送了一条消息。"
+          reply_to_conversation_message: "您可以通过直接回复此电子邮件在 Canvas 中回复此邮件。"
+          subject: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
           unknown_user: 未知用户
-          view_message: 在“对话”中查看此消息
-        reply_to_conversation_message: "您可以通过直接回复此邮件在 Canvas 中回复此邮件。"
-        subject: "%{user_name}，您刚刚在 Canvas 中发送了一条消息。"
+          view_message: 在“对话”中查看此邮件
+        reply_to_conversation_message: "您可以通过直接回复此电子邮件在 Canvas 中回复此邮件。"
+        subject: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
         unknown_user: 未知用户
-        view_message: 在“对话”中查看此消息
+        view_message: 在“对话”中查看此邮件
       facebook: 
-        body: "%{user_name}，您刚刚在 Canvas 中发送了一条消息。"
+        body: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
         link_text: 查看邮件
         unknown_user: 未知用户
       sms: 
-        body: "%{user_name}，您刚刚在 Canvas 中发送了一条消息："
+        body: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件："
         more_info: "更多信息请访问 %{url}"
         unknown_user: 未知用户
       summary: 
-        body: "%{user_name}，您刚刚在 Canvas 中发送了一条消息："
-        subject: "%{user_name}，您刚刚在 Canvas 中发送了一条消息。"
+        body: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件："
+        subject: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
         unknown_user: 未知用户
       twitter: 
         tweet: "Canvas 警报 - 来自 %{user_name} 的邮件。"
@@ -9057,7 +9057,7 @@ zh:
     file_locked_at: "此文件锁定于 %{at}。"
     file_locked_module: "此文件是单元 *%{module}* 的一部分，尚未解锁。"
     file_locked_until: "此文件锁定至 %{date}。"
-    file_module_time_locked: "此文件属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    file_module_time_locked: "此文件属于单元 *%{module}*，该单元锁定至 %{time}。"
     file_unpublished_module: 此文件是未发布单元的一部分，尚未可用。
     forgot_password: 
       email: 
@@ -9517,7 +9517,7 @@ zh:
     page_locked_at: "此页面锁定于 %{at}。"
     page_locked_module: "此页面是单元 *%{module}* 的一部分，尚未解锁。"
     page_locked_until: "此页面锁定至 %{date}。"
-    page_module_time_locked: "此页面属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    page_module_time_locked: "此页面属于单元 *%{module}*，该单元锁定至 %{time}。"
     page_unpublished_module: 此页面是未发布单元的一部分，尚未可用。
     peer_review_invitation: 
       email: 
@@ -9546,7 +9546,7 @@ zh:
     quiz_locked_at: "此测验锁定于 %{at}。"
     quiz_locked_module: "此测验是单元 *%{module}* 的一部分，尚未解锁。"
     quiz_locked_until: "此测验锁定至 %{date}。"
-    quiz_module_time_locked: "此测验属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    quiz_module_time_locked: "此测验属于单元 *%{module}*，该单元锁定至 %{time}。"
     quiz_regrade_finished: 
       email: 
         body: "已为测验 %{quiz} 完成了重新评分"
@@ -9833,7 +9833,7 @@ zh:
     topic_locked_at: "此主题锁定于 %{at}。"
     topic_locked_module: "此主题是单元 *%{module}* 的一部分，尚未解锁。"
     topic_locked_until: "此主题锁定至 %{date}。"
-    topic_module_time_locked: "此主题属于单元 *%{module}*，该单元在 %{time} 之前锁定。"
+    topic_module_time_locked: "此主题属于单元 *%{module}*，该单元锁定至 %{time}。"
     topic_unpublished_module: 此主题是未发布单元的一部分，尚未可用。
     updated_wiki_page: 
       email: 
@@ -11042,8 +11042,8 @@ zh:
     twitter_select: 
       twitter: Twitter
     ways_to_contact: 
-      bouncing_channel: "Canvas 无法使用此联系方式将消息发送给您。请确保联系信息正确以便从 Canvas 继续接收消息。"
-      bouncing_email: "Canvas 无法将电子邮件发送至此地址。请确保地址正确以便从 Canvas 继续接收电子邮件。"
+      bouncing_channel: "Canvas 无法使用此联系方式向您发送邮件。请确保联系信息正确以便继续从 Canvas 接收邮件。"
+      bouncing_email: "Canvas 无法将电子邮件发送至此地址。请确保地址正确以便继续从 Canvas 接收电子邮件。"
       buttons: 
         confirm: 确认
         ok_thanks: 好，谢谢
@@ -12195,7 +12195,7 @@ zh:
           started: 已开始
         maximum_of_1440_minutes: "最多 1440 分钟（24 小时）"
         minutes: 分钟
-        minutes_from: 从此处获得的分钟
+        minutes_from: 分钟，来自
         moderate_page_title: "%{title}：调整"
         outstanding_autosubmission_description: 这些测验提交项尚未提交，可能是因为学生在提交前退出了页面。如果您希望为其评分，请按下面的“提交”。
         outstanding_quiz_submissions_found: 存在待交的测验提交项。
@@ -12573,7 +12573,7 @@ zh:
           submit_quiz: 提交测验
         headers: 
           draft_preview: 这是测验草拟版本的预览
-          published_preview: 这是已发布测试版本的预览。
+          published_preview: 这是已发布测验版本的预览
         labels: 
           started: 已开始
           times_up: 时间到！提交结果
@@ -15231,8 +15231,8 @@ zh:
     zip_import_filename: "zip_import_%{id}.zip"
   zip_file_name: ".zip 文件"
   zip_file_options_form: 
-    expand: 展开它
-    message: "您希望将 \"%{fileName}\" 的内容展开到当前文件夹中，还是按原样上传 zip 文件？"
-    upload: 上传它
+    expand: 展开
+    message: "您要将 \"%{fileName}\" 的内容展开到当前文件夹中，还是按原样上传 zip 文件？"
+    upload: 上传
     zip_options: "Zip 文件选项"
   zip_no_folder_error: 无法在此课程中找到指定文件夹。
