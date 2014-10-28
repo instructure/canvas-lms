@@ -1,7 +1,8 @@
 define [
   'i18n!student_groups'
   'ember'
-], (I18n,Ember) ->
+  'compiled/util/natcompare'
+], (I18n,Ember, natcompare) ->
 
   StudentGroupsController = Ember.ObjectController.extend
     groups: []
@@ -18,16 +19,24 @@ define [
     groupsUrl: "/api/v1/courses/#{ENV.course_id}/groups?include[]=users&include[]=group_category"
     studentCanOrganizeGroupsForCourse: ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE
     sortedGroups: (->
-      groups = @get('groups') || []
+      groups = @get('groups')?.toArray() || []
       text = @get('filterText').toLowerCase()
       groups = groups.filter (group) ->
+
         text.length == 0 or
           group.name.toLowerCase().indexOf(text) >= 0 or
           group.users.find (user) ->
             (user.display_name and user.display_name.toLowerCase().indexOf(text) >= 0) or
-            (user.name and user.name.toLowerCase().indexOf(text) >= 0)
+              (user.name and user.name.toLowerCase().indexOf(text) >= 0)
 
-      groups.sortBy('group_category_id')
+      groups.sort (group1, group2) ->
+        group1CategoryName = group1.group_category.name
+        group2CategoryName = group2.group_category.name
+        
+        if group1CategoryName != group2CategoryName
+          natcompare.strings group1CategoryName, group2CategoryName
+        else
+          natcompare.strings group1.name, group2.name
     ).property('groups.[]', 'filterText')
 
     removeFromCategory: (categoryId) ->

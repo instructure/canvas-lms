@@ -225,8 +225,9 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
-
-    @groups      = all_groups = @context.groups.active.by_name
+    @groups      = all_groups = @context.groups.active
+                                  .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+                                  .includes(:group_category)
     @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
@@ -282,8 +283,8 @@ class GroupsController < ApplicationController
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
-        paginated_groups = Api.paginate(all_groups, self, path)
-        render :json => paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
+        @paginated_groups = Api.paginate(all_groups, self, path)
+        render :json => @paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
       end
     end
   end
