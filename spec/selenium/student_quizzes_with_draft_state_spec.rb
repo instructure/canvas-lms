@@ -38,5 +38,21 @@ describe "quizzes with draft state" do
       expect(f("#unauthorized_holder")).to be_displayed
     end
   end
+
+  context "with an avaliable date in the future" do
+
+    before(:each) do
+      @context = @course
+      @q = quiz_model
+      @q.unlock_at = Time.now.utc + 200.seconds
+      @q.publish!
+
+    end
+    it "should show an error if avaliable date in future" do
+      get "/courses/#{@course.id}/quizzes/#{@q.id}/"
+      wait_for_ajaximations
+      expect(f(".lock_explanation")).to be_displayed
+    end
+  end
 end
 
