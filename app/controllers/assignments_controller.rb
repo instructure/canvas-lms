@@ -383,14 +383,29 @@ class AssignmentsController < ApplicationController
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
-          {:id => section.id, :name => section.name }
+          {
+            :id => section.id,
+            :name => section.name,
+            :start_at => section.start_at,
+            :end_at => section.end_at,
+            :override_course_dates => section.restrict_enrollments_to_section_dates
+          }
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
             @assignment.overrides_for(@current_user)
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments)
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :COURSE_DATE_RANGE => {
+          :start_at => @context.start_at,
+          :end_at => @context.conclude_at,
+          :override_term_dates => @context.restrict_enrollments_to_course_dates
+        },
+        :TERM_DATE_RANGE => {
+          :start_at => @context.enrollment_term.start_at,
+          :end_at => @context.enrollment_term.end_at
+        }
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
