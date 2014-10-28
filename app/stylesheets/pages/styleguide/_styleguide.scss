@@ -195,30 +195,23 @@
 /////
 ////// Styles for Colors
 /////
-.Colorguide-title {
-  width: 101%;
-  font-size: 15px;
-  padding: 0;
-  text-align: left;    
-}
+
 .Colorguide-container {
-  @extend %flex;
-  flex-flow: row wrap;    
-  justify-content: space-around;
+  display: flex;
+  justify-content: space-around;  
 }
+.Colorguide-container--primary-theme,
 .Colorguide-container--hc-theme {
-  margin-bottom: 30px;
+  width: 50%;
+  margin: 0 5px;
 }
-.Colorguide-color {  
-  height: 100px;
+.Colorguide-color {    
   padding: 25px;
-  @if $use_new_styles {
-    width: 300px;
+  .Colorguide-container--hc-theme & {
+    padding: 35px;
   }
-  @else {
-    float: left;
-    width: 150px;
-  }
+  margin: 5px 0;
+
   color: $base-font-color-light;
   margin-bottom: 5px;
   
@@ -258,12 +251,13 @@
 @else {
 .Colorguide-container--hc-theme {
   .Colorguide-color--primary    {@include colorguide(#0073ac);}
-  .Colorguide-color--secondary  {@include colorguide(#0074af);}
+  .Colorguide-color--secondary  {@include colorguide(#343c44);}
   .Colorguide-color--success    {@include colorguide(#33802a);}
-  .Colorguide-color--neutral    {@include colorguide(#6d6d6d); color: $canvas-light;}
+  .Colorguide-color--neutral    {@include colorguide(hsl(0,0,90%)); color: $canvas-light;}
   .Colorguide-color--action     {@include colorguide(#a23891);}
   .Colorguide-color--danger     {@include colorguide(#ad393a);}
   .Colorguide-color--alert      {@include colorguide(#845a04);}
+  .Colorguide-color--light      {@include colorguide(#ffffff);}
   .Colorguide-color--dark       {@include colorguide(#333333);}  
 }  
 }
