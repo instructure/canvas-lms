@@ -56,4 +56,34 @@ describe UserObserver do
     expect(enrollments.size).to eql 1
     expect(enrollments.map(&:course_id)).to eql [c2.id]
   end
+
+  describe 'when adding a custom (second) student enrollment' do
+    before(:once) do
+      @custom_student_role = Account.default.roles.build name: 'CustomStudent'
+      @custom_student_role.base_role_type = 'StudentEnrollment'
+      @custom_student_role.workflow_state = 'active'
+      @custom_student_role.save!
+
+      @course = course active_all: true
+      @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
+      @observer = user_with_pseudonym
+      student.observers << @observer
+      @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
+      expect(@observer_enrollment).not_to be_nil
+    end
+
+    it "should not attempt to add a duplicate observer enrollment" do
+      expect {
+        @course.enroll_student student, role_name: @custom_student_role.name
+      }.not_to raise_error
+    end
+
+    it "should recycle an existing deleted observer enrollment" do
+      @observer_enrollment.destroy
+      expect {
+        @course.enroll_student student, role_name: @custom_student_role.name
+      }.not_to raise_error
+      expect(@observer_enrollment.reload).to be_invited
+    end
+  end
 end
