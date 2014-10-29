@@ -4936,6 +4936,8 @@ pt:
       new: Novo
       new_discussion_entries: "Novas entradas de discussão"
       new_discussions: "Novas discussões"
+      number_of_assignments: "N.º de tarefas"
+      number_of_submissions: "N.º de envios"
       page_title: "Estatísticas da disciplina"
       quiz: Teste
       quiz_questions: "Questões do teste"
