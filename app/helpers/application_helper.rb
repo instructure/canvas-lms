@@ -25,6 +25,7 @@ module ApplicationHelper
 
   def beyondz_app_domain
     bz_host = request.host.sub('portal', '')
+    bz_host = "platform.beyondz.org.arsdnet.net"
     if bz_host.starts_with?('.')
       bz_host[1 .. -1]
     else
