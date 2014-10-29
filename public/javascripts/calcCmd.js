@@ -460,7 +460,9 @@ define([
       for(var idx = 0; idx < args.length; idx++) {
         list.push(args[idx]);
       }
-      var list = list.sort();
+      var list = list.sort(function(a, b) {
+        return parseFloat(a) - parseFloat(b);
+      });
       if(list.length % 2 == 1) {
         return list[Math.floor(list.length / 2)];
       } else {
