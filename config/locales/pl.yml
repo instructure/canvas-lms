@@ -3745,7 +3745,7 @@ pl:
       module: moduł
       module_details: "Moduły są wyświetlane w kolejności, dlatego tylko moduły, które znajdują się powyżej %{name} można ustawić jako warunki."
       module_name: "Nazwa modułu"
-      modules_keyboard_hint_updated: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
+      modules_keyboard_hint_updated: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), użyj opcji Przenieś do dialogu znajdującej się w menu."
       move_module: 
         after: Po
         before: Przed
@@ -3836,7 +3836,7 @@ pl:
           student_progress: "Zobacz postęp uczestnika dla tego modułu"
       manager_module: "Zarządzaj modułem"
       module_will_unlock_at: "Zostanie odblokowany *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
+      modules_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności modułów (lub elementów modułu), użyj opcji Przenieś do dialogu znajdującej się w menu."
       progression_complete_count: "*Zakończono %{count}*"
       progression_started_count: "*%{count}* w toku"
       reorder_modules: "Przeciągnij, aby zmienić kolejność modułów"
@@ -4797,7 +4797,7 @@ pl:
         after: Po
         before: Przed
         or: LUB
-      nav_items_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności elementów nawigacji kursu, skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
+      nav_items_keyboard_drag_and_drop: "Ostrzeżenie: Aby poprawić dostępność w zmianie kolejności elementów nawigacji kursu, użyj opcji Przenieś do dialogu znajdującej się w menu."
       no_date: "Nie ustawiono daty"
       no_language_preference: "Nie zdefiniowano (konfigurowane przez użytkownika, domyślnie ustawiono %{language})"
       none: Brak
@@ -12331,7 +12331,7 @@ pl:
           select_user: "Wybierz użytkownika %{user}"
       move_handle: 
         move_to: "Przenieś do..."
-        quiz_move_to_accessibility_warning: "Ten element jest bardziej przystępną opcją podczas zmieniania kolejności metodą przeciągnij i upuść."
+        quiz_move_to_accessibility_warning: "Ten element jest bardziej przystępną opcją podczas zmiany kolejności metodą przeciągnij i upuść."
       move_question: 
         cancel: Anuluj
         move_item: "Przenieś element"
