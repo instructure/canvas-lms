@@ -219,3 +219,65 @@ $wellBackground: #e8ecef;
 // override bootstrap orange color for k-12
 @if $is-k12 { $orange: #f55e22; }
 
+
+// 
+// New-component variables that will eventually phase out the legacy stuff above
+//==================================================================================
+//
+
+/// Global light background colors
+//================================
+
+// $can-bg-light-neutral
+@if $use_new_styles { $can-bg-light-neutral: $canvas-neutral; }
+@else { $can-bg-light-neutral: lighten($canvas-neutral, 6%); } 
+
+// $can-bg-light-primary
+@if $use_new_styles {
+  $can-bg-light-primary: lighten($canvas-primary, 53%);
+  @if $use_high_contrast { $can-bg-light-primary: lighten($canvas-primary, 58%); }
+}
+@else { 
+  $can-bg-light-primary: lighten($canvas-primary, 56%); 
+  @if $use_high_contrast { $can-bg-light-primary: lighten($canvas-primary, 64%); }
+}
+
+// $can-bg-light-success
+@if $use_new_styles { 
+  $can-bg-light-success: lighten($canvas-success, 62%);
+  @if $use_high_contrast { $can-bg-light-success: lighten($canvas-success, 69%) }
+}
+@else { 
+  $can-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
+}
+
+// $can-bg-light-alert
+@if $use_new_styles { 
+  $can-bg-light-alert: lighten($canvas-alert, 54%);
+  @if $use_high_contrast { $can-bg-light-alert: lighten($canvas-alert, 58%); }
+}
+@else { 
+  $can-bg-light-alert: lighten($canvas-alert, 50%); 
+  @if $use_high_contrast { $can-bg-light-alert: lighten($canvas-alert, 66%); }
+}
+
+// $can-bg-light-danger
+@if $use_new_styles { 
+  $can-bg-light-danger: lighten($canvas-danger, 48%);
+  @if $use_high_contrast { $can-bg-light-danger: lighten($canvas-danger, 50%); }
+}
+@else { 
+  $can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
+}
+
+
+/// Global border colors
+//======================
+
+// If it's a light border, it should be this color. 
+@if $use_new_styles { $can-border-light: lighten($canvas-secondary, 42%); }
+@else { $can-border-light: $menu-border-color; }
+
+// If it's a dark border, it should be this color.
+@if $use_new_styles { $can-border-dark: lighten($canvas-secondary, 25%); }
+@else { $can-border-dark: lighten(#4b5662, 20%); }
