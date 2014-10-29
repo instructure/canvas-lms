@@ -5046,6 +5046,8 @@ ar:
       new: جديد
       new_discussion_entries: "إدخالات مناقشة جديدة"
       new_discussions: "مناقشات جديدة"
+      number_of_assignments: "عدد المهام"
+      number_of_submissions: "عدد عمليات الإرسال"
       page_title: "إحصاءات المساق"
       quiz: اختبار
       quiz_questions: "أسئلة الاختبار"
