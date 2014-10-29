@@ -25,7 +25,7 @@ group :test do
   gem 'selenium-webdriver', '2.43.0'
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
-  gem 'test_after_commit', '0.3.0', github: 'codekitchen/test_after_commit', branch: 'nested-commit-callbacks'
+  gem 'test_after_commit', '0.4.0'
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'
