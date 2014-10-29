@@ -107,9 +107,9 @@ class AssignmentGroupsController < ApplicationController
       params[:include] = Array(params[:include])
       assignments_by_group = {}
       if params[:include].include? 'assignments'
-        assignment_includes = [:rubric, :quiz, :external_tool_tag]
-        assignment_includes.concat(params[:include] & [:discussion_topic])
-        assignment_includes.concat(params[:include] & [:all_dates])
+        assignment_includes = [:rubric, :quiz, :external_tool_tag, :rubric_association]
+        assignment_includes.concat(params[:include] & ["discussion_topic"])
+        assignment_includes.concat([:assignment_overrides]) if params[:include].include?("all_dates")
 
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
 

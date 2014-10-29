@@ -102,6 +102,7 @@ shared_examples_for "an object whose dates are overridable" do
     context "as a teacher" do
       it "only returns active overrides" do
         override.delete
+        overridable.reload
         expect(overridable.all_dates_visible_to(@teacher).size).to eq 2
       end
     end
