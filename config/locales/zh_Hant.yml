@@ -10273,6 +10273,13 @@ zh_Hant:
       description: "Canvas Facebook 應用程式"
       name: Facebook
     facebook_settings: 
+      description: |-
+          您將需要建立[在 facebook.com 上的新應用程式](%{facebook_url})，然後新增「應用程式於 Facebook 之上」，作為一個平台。
+          設定以下設定選項，以確保您的 Facebook 應用程式正常工作：
+          
+          * **設定 -- 在 Facebook 上的應用程式 -- Canvas 頁面：**請記下您所做選擇(apps.facebook.com 之後的部分)，並在下面的表格中輸入
+           * **設定 -- 在 Facebook 上的應用程式 -- Canvas URL：**設定至%{canvas_url}
+          *儲存您的應用程式之後，請記下該應用程式 ID、用戶端權杖和應用程式密碼
       domain_name: 網域
       headers: 
         domain_settings: 網域設定
@@ -10432,6 +10439,14 @@ zh_Hant:
       description: "Twitter 通知"
       name: Twitter
     twitter_settings: 
+      description: |-
+          您將需要建立[在 Twitter 上的新應用程式](%{twitter_url})。
+          設定以下設定選項，以確保您的 Twitter 應用程式正常工作：
+          
+          * **應用程式類型：**設定為『瀏覽器』
+           * **回呼 URL：**設定為%{callback_url}
+          * **預設存取類型：**設定為『讀、寫和私人訊息』
+          *儲存您的應用程式之後，請記下使用者金鑰和使用者密碼
       domain_name: 網域
       labels: 
         api_key: 取用者金鑰
