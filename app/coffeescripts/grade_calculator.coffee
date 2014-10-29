@@ -28,7 +28,7 @@ define [
       result.group_sums = _(groups).map (group) =>
         group: group
         current: @create_group_sum(group, submissions, true)
-        'final':   @create_group_sum(group, submissions, false)
+        'final': @create_group_sum(group, submissions, false)
       result.current  = @calculate_total(result.group_sums, true, weighting_scheme)
       result['final'] = @calculate_total(result.group_sums, false, weighting_scheme)
       result
@@ -40,8 +40,13 @@ define [
           obj[e[property]] = e
         obj
 
+      # remove assignments without visibility from gradeableAssignments
+      hidden_assignment_ids = _.chain(submissions).
+                                filter( (s)-> s.hidden).
+                                map( (s)-> s.assignment_id).value()
+
       gradeableAssignments = _(group.assignments).filter (a) ->
-        not _.isEqual(a.submission_types, ['not_graded'])
+        not _.isEqual(a.submission_types, ['not_graded']) and not _(hidden_assignment_ids).contains(a.id)
       assignments = arrayToObj gradeableAssignments, "id"
 
       # filter out submissions from other assignment groups
