@@ -23,6 +23,15 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  def beyondz_app_domain
+    bz_host = request.host.sub('staging', '')
+    if bz_host.starts_with?('.')
+      bz_host[1 .. -1]
+    else
+      bz_host
+    end
+  end
+
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
