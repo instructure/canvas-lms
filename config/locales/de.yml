@@ -4888,6 +4888,8 @@ de:
       new: Neu
       new_discussion_entries: "Neue Diskussionsbeiträge"
       new_discussions: "Neue Diskussionen"
+      number_of_assignments: "Anzahl der Aufgaben"
+      number_of_submissions: "Anzahl der Einsendungen"
       page_title: Kursstatistik
       quiz: Quiz
       quiz_questions: Quizfragen
