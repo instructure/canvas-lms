@@ -1,7 +1,8 @@
 define [
+  'underscore'
   './FileUploader'
   './ZipUploader'
-], (FileUploader, ZipUploader) ->
+], (_, FileUploader, ZipUploader) ->
 
   class UploadQueue
     _uploading: false
@@ -15,7 +16,7 @@ define [
 
     getAllUploaders: ->
       all = @_queue.slice()
-      all = all.concat(@currentUploader) if !!@currentUploader
+      all = all.concat(@currentUploader) if @currentUploader
       all.reverse()
 
     getCurrentUploader: ->
@@ -28,12 +29,17 @@ define [
       @onChange()
 
     createUploader: (fileOptions, folder, contextId, contextType) ->
-      if fileOptions.expandZip
-        f = new ZipUploader(fileOptions, folder, contextId, contextType)
+      uploader = if fileOptions.expandZip
+        new ZipUploader(fileOptions, folder, contextId, contextType)
       else
-        f = new FileUploader(fileOptions, folder)
-      f.onProgress = @onUploadProgress
-      f
+        new FileUploader(fileOptions, folder)
+      uploader.onProgress = @onUploadProgress
+      uploader.cancel = =>
+        uploader._xhr?.abort()
+        @_queue = _.without(@_queue, uploader)
+        @onChange()
+
+      uploader
 
     enqueue: (fileOptions, folder, contextId, contextType) ->
       uploader = @createUploader(fileOptions, folder, contextId, contextType)
@@ -41,29 +47,25 @@ define [
       @attemptNextUpload()
 
     dequeue: ->
-      @_queue.shift()
-
-    # An uploader can exist in the upload queue or as a currentUploader. 
-    # This will check both places and remove it.
-    # Returns nothing
-
-    remove: (uploader) =>
-      if @currentUploader == uploader
-        @currentUploader = null
-
-      index = @_queue.indexOf(uploader)
-      @_queue.splice(index, 1)
-
-      @onChange() # Ensure change events happen after queue is updated so everything remains in sync
+      firstNonErroredUpload = _.find @_queue, (upload) -> !upload.error
+      @_queue = _.without(@_queue, firstNonErroredUpload)
+      firstNonErroredUpload
 
     attemptNextUpload: ->
       @onChange()
       return if @_uploading || @_queue.length == 0
-      @currentUploader = @dequeue()
-      if @currentUploader
+      @currentUploader = uploader = @dequeue()
+      if uploader
         @onChange()
         @_uploading = true
-        @currentUploader.upload().then =>
+
+        promise = uploader.upload()
+        promise.fail (failReason) =>
+          # put it back in the queue unless the user aborted it
+          unless failReason is 'user_aborted_upload'
+            @_queue.unshift(uploader)
+
+        promise.always =>
           @_uploading = false
           @currentUploader = null
           @onChange()

@@ -1,15 +1,16 @@
 define [
+  'i18n!react_files'
   'jquery'
   'compiled/models/File'
   './BaseUploader'
   'jquery.ajaxJSON'
-], ($, BBFile, BaseUploader) ->
+], (I18n, $, BBFile, BaseUploader) ->
 
   class FileUploader extends BaseUploader
 
     onUploadPosted: (event) =>
-      if (event.target.status >= 400)
-        @deferred.reject()
+      if event.target.status >= 400
+        @deferred.reject(event.target.status)
         return
 
       url = @uploadData.upload_params.success_url

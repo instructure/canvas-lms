@@ -176,9 +176,6 @@ $ef-thumbnail-size: 36px;
   border-top: 1px solid $base-border-color;
   padding: 0 $base-content-padding;
   line-height: 33px;
-  .progress-bar__bar-container {
-    width: auto;
-  }
   .ef-quota-usage {
     min-width: 330px;
   }
@@ -190,23 +187,9 @@ $ef-thumbnail-size: 36px;
   margin-top: 5px;
   padding-right: 5px;
 }
-.upload-progress-view {
-  display: flex;
-}
-.upload-progress-view__label {
-  margin-left: 5px;
-  margin-top: 5px;
-  width: 49%;
-  color: ensure-contrast(#000, $canvas-secondary);
-  font-size: 0.95em;
-}
-.upload-progress-view__button{
-  padding-bottom: 5px;
-  color: black;
-}
+
 .progress-bar__bar-container {
   height: 9px;
-  width: 49%;
   margin-bottom: 12px;
   border: solid $canvas-primary 1px;
   border-radius: 20px;
@@ -231,10 +214,6 @@ $ef-thumbnail-size: 36px;
   border-radius: 10px;
   border: dashed $canvas-neutral 2px;
   padding: 10px 10px 10px 10px;
-}
-.current_uploads__uploaders {
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
 .ef-breadcrumb-popover {
