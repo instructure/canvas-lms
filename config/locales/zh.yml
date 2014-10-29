@@ -4939,6 +4939,8 @@ zh:
       new: 新建
       new_discussion_entries: 新建讨论条目
       new_discussions: 新建讨论
+      number_of_assignments: 作业数
+      number_of_submissions: 提交项数
       page_title: 课程统计信息
       quiz: 测验
       quiz_questions: 测验题
