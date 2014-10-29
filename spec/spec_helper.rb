@@ -447,6 +447,23 @@ RSpec.configure do |config|
     @account
   end
 
+  def account_with_grading_periods
+    @account = Account.default
+    @account.set_feature_flag!(:multiple_grading_periods, 'on')
+    grading_period_group = @account.grading_period_groups.create!()
+    account_admin_user(account: @account)
+    user_session(@admin)
+    now = Time.zone.now
+    gps = 3.times.map do |n|
+      grading_period_group.
+        grading_periods.create!(weight: 50, start_date: n.month.since(now),
+                                end_date: (n+1).month.since(now),
+                                title: "Grading Period #{n+1}")
+    end
+    gps.last.destroy
+    @account
+  end
+
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do

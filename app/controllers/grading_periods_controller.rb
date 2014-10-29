@@ -114,9 +114,11 @@ class GradingPeriodsController < ApplicationController
   #
   def create
     grading_period_params = params[:grading_periods][0]
+    # grabbing the first grading_period_group for now, until
+    # we decide to allow for multiple grading_period_groups later
+    grading_period_group = @context.grading_period_groups.first_or_create
     # another inheritance check here?
-    @grading_period = @context.grading_periods.new(grading_period_params)
-
+    @grading_period = grading_period_group.grading_periods.new(grading_period_params)
     if authorized_action(@grading_period, @current_user, :create)
       if @grading_period.save
         render json: serialize_jsonapi(@grading_period)

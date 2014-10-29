@@ -79,7 +79,8 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
   has_many :content_migrations, :as => :context
-  has_many :grading_periods, dependent: :destroy
+  has_many :grading_period_groups, dependent: :destroy
+  has_many :grading_periods, through: :grading_period_groups
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
