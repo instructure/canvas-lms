@@ -22,7 +22,7 @@ describe ImportedHtmlConverter do
   
   context ".convert" do
     before(:each) do
-      course
+      course(draft_state: true)
       @path = "/courses/#{@course.id}/"
     end
     
@@ -30,14 +30,14 @@ describe ImportedHtmlConverter do
       test_string = %{<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page">Test Wiki Page</a>}
       @course.wiki.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
   
-      expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<a href="#{@path}wiki/test-wiki-page">Test Wiki Page</a>}
+      expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<a href="#{@path}pages/test-wiki-page">Test Wiki Page</a>}
     end
     
     it "should convert a wiki reference without $ escaped" do
       test_string = %{<a href="$WIKI_REFERENCE$/wiki/test-wiki-page">Test Wiki Page</a>}
       @course.wiki.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
   
-      expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<a href="#{@path}wiki/test-wiki-page">Test Wiki Page</a>}
+      expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<a href="#{@path}pages/test-wiki-page">Test Wiki Page</a>}
     end
     
     it "should convert a wiki reference by migration id" do
