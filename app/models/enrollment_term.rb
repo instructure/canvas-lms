@@ -129,7 +129,15 @@ class EnrollmentTerm < ActiveRecord::Base
     # ignore the start dates as admin
     [ override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at ]
   end
-  
+
+  # return the term dates applicable to the given enrollment(s)
+  def overridden_term_dates(enrollments)
+    dates = enrollments.uniq { |enrollment| enrollment.type }.map { |enrollment| enrollment_dates_for(enrollment) }
+    start_dates = dates.map(&:first)
+    end_dates = dates.map(&:last)
+    [start_dates.include?(nil) ? nil : start_dates.min, end_dates.include?(nil) ? nil : end_dates.max]
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'

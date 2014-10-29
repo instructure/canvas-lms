@@ -1055,6 +1055,30 @@ describe CoursesController, type: :request do
     )
   end
 
+  describe "term dates" do
+    before do
+      @course2.enrollment_term.set_overrides(@course1.account, 'StudentEnrollment' =>
+          {start_at: '2014-01-01T00:00:00Z', end_at: '2014-12-31T00:00:00Z'})
+    end
+
+    it "should return overridden term dates from index" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :include => ['term'] })
+      course_json = json.detect { |c| c['id'] == @course2.id }
+      expect(course_json['term']['start_at']).to eq '2014-01-01T00:00:00Z'
+      expect(course_json['term']['end_at']).to eq '2014-12-31T00:00:00Z'
+    end
+
+    it "should return overridden term dates from show" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course2.id}",
+                      { :controller => 'courses', :action => 'show', :id => @course.to_param, :format => 'json' },
+                      { :include => ['term'] })
+      expect(json['term']['start_at']).to eq '2014-01-01T00:00:00Z'
+      expect(json['term']['end_at']).to eq '2014-12-31T00:00:00Z'
+    end
+  end
+
   it "should return public_syllabus if requested" do
     @course1.public_syllabus = true
     @course1.save
