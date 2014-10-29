@@ -66,19 +66,14 @@ define [
         closeDialog: -> $dialog.dialog('close')
       }), $dialog[0])
 
-    # Function Summary
-    # Opens the restricted dialog window
-
-    handleClick: (event) ->
-      event.preventDefault()
-      @openRestrictedDialog()
 
     render: withReactDOM ->
       if @props.userCanManageFilesForContext
         if @state.published && @state.restricted
           button 
+            type: 'button'
             'data-tooltip': 'left'
-            onClick: @handleClick
+            onClick: @openRestrictedDialog
             ref: "publishCloud"
             className:'btn-link published-status restricted'
             title: I18n.t('restricted_title', "Available from %{from_date} until %{until_date}",from_date: $.datetimeString(@props.model.get('unlock_at')), until_date: $.datetimeString(@props.model.get('lock_at')) )
@@ -86,8 +81,9 @@ define [
               i className:'icon-cloud-lock'
         else if @state.published && @state.hidden
           button 
+            type: 'button'
             'data-tooltip': 'left'
-            onClick: @handleClick
+            onClick: @openRestrictedDialog
             ref: "publishCloud"
             className:'btn-link published-status hiddenState'
             title: I18n.t('hidden_title', 'Hidden. Available with a link')
@@ -95,8 +91,9 @@ define [
               i className:'icon-cloud-lock'
         else if @state.published
           button 
+            type: 'button'
             'data-tooltip': 'left'
-            onClick: @handleClick,
+            onClick: @openRestrictedDialog,
             ref: "publishCloud",
             className:'btn-link published-status published'
             title: I18n.t('published_title', 'Published')
@@ -104,8 +101,9 @@ define [
               i className:'icon-publish'
         else
           button 
+            type: 'button'
             'data-tooltip': 'left'
-            onClick: @handleClick
+            onClick: @openRestrictedDialog
             ref: "publishCloud"
             className:'btn-link published-status unpublished'
             title: I18n.t('unpublished_title', 'Unpublished')

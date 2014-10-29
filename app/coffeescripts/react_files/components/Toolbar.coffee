@@ -124,6 +124,7 @@ define [
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-restrict',
               onClick: @openRestrictedDialog
@@ -134,6 +135,7 @@ define [
               i className: 'icon-cloud-lock'
 
           button {
+            type: 'button'
             disabled: !showingButtons
             className: 'ui-button btn-download'
             onClick: @downloadSelectedAsZip
@@ -145,6 +147,7 @@ define [
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-move'
               onClick: (event) =>
@@ -161,6 +164,7 @@ define [
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-delete'
               onClick: => deleteStuff(@props.selectedItems)
@@ -177,6 +181,7 @@ define [
           div className: 'text-right',
             span className: 'ui-buttonset',
               button {
+                type: 'button'
                 onClick: @addFolder
                 className:'btn btn-add-folder'
                 'aria-label': I18n.t('add_folder', 'Add Folder')
