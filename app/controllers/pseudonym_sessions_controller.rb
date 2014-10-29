@@ -85,7 +85,7 @@ class PseudonymSessionsController < ApplicationController
 
             # Send a non-existent user back to the beyondz main site so our
             # regular application can figure out where they should be
-            redirect_to("http://#{beyondz_app_domain}/")
+            redirect_to("http://#{beyondz_app_domain}/users/not_on_lms")
             return
           end
         else
