@@ -4917,6 +4917,8 @@ ja:
       new: 新規作成
       new_discussion_entries: "新しいディスカッション エントリ"
       new_discussions: 新しいディスカッション
+      number_of_assignments: 課題数
+      number_of_submissions: 提出数
       page_title: コースの統計情報
       quiz: クイズ
       quiz_questions: クイズ問題
