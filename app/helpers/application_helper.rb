@@ -24,7 +24,7 @@ module ApplicationHelper
   include Canvas::LockExplanation
 
   def beyondz_app_domain
-    bz_host = request.host.sub('staging', '')
+    bz_host = request.host.sub('portal', '')
     if bz_host.starts_with?('.')
       bz_host[1 .. -1]
     else
