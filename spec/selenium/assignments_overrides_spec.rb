@@ -14,6 +14,7 @@ describe "assignment groups" do
     before(:each) do
       make_full_screen
       course_with_teacher_logged_in
+      set_course_draft_state
     end
 
     it "should create an assignment with default dates" do
@@ -96,12 +97,12 @@ describe "assignment groups" do
     it "should show a vdd tooltip summary on the course assignments page" do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"
-      expect(f('.assignment_list .assignment_due')).not_to include_text "Multiple Due Dates"
+      expect(f('.assignment .assignment-date-due')).not_to include_text "Multiple Dates"
       add_due_date_override(assignment)
 
       get "/courses/#{@course.id}/assignments"
-      expect(f('.assignment_list .assignment_due')).to include_text "Multiple Due Dates"
-      driver.mouse.move_to f(".assignment_list .assignment_due a")
+      expect(f('.assignment .assignment-date-due')).to include_text "Multiple Dates"
+      driver.mouse.move_to f(".assignment .assignment-date-due a")
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
