@@ -1,0 +1,21 @@
+<%
+  @external_integration_keys ||= {}
+  external_integration_keys = @external_integration_keys.select { |key_type, key| key.grants_any_right?(@current_user, :read, :write) }
+%>
+<% unless external_integration_keys.empty? %>
+  <fieldset id="external_integration_keys">
+    <legend><%= t("External Integration Keys") %></legend>
+    <% external_integration_keys.each do |key_type, key| %>
+      <%= f.fields_for :external_integration_keys do |external_integration_key| %>
+        <div>
+          <%= external_integration_key.label key_type, "#{ExternalIntegrationKey.label_for(key_type)}:" %>
+          <% if key.grants_right?(@current_user, :write) %>
+            <%= external_integration_key.text_field key_type, value: key.key_value %>
+          <% else %>
+            <span><%= key.key_value %></span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </fieldset>
+<% end %>

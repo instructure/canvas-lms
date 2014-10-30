@@ -104,6 +104,7 @@ class Account < ActiveRecord::Base
   has_many :alerts, :as => :context, :include => :criteria
   has_many :user_account_associations
   has_many :report_snapshots
+  has_many :external_integration_keys, :as => :context, :dependent => :destroy
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults

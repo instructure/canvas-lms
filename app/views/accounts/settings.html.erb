@@ -556,6 +556,8 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
+        <%= render partial: 'external_integration_keys', locals: { f: f } %>
+
         <div class="button-container">
           <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
