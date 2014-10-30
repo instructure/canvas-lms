@@ -317,6 +317,7 @@ class UserMerge
       versionable_type = table.to_s.classify
       # TODO: This is a hack to support namespacing
       versionable_type = ['QuizSubmission', 'Quizzes::QuizSubmission'] if table.to_s == 'quizzes/quiz_submissions'
+      version_ids = []
       Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_each do |version|
         begin
           version_attrs = YAML.load(version.yaml)
@@ -330,10 +331,16 @@ class UserMerge
           end
           version.yaml = version_attrs.to_yaml
           version.save!
+          if versionable_type == 'Submission'
+            version_ids << version.id
+          end
         rescue => e
           Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e.to_s}"
           raise e unless Rails.env.production?
         end
+      end
+      if version_ids.present?
+        SubmissionVersion.where(version_id: version_ids, user_id: from_user).update_all(user_id: target_user.id)
       end
     end
   end
