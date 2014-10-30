@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizStatisticsController, type: :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   def api_index(options={}, data={})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"

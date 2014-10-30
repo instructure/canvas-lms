@@ -369,8 +369,6 @@ describe GradeCalculator do
 
     it "should not include unpublished assignments" do
       two_graded_assignments
-
-      @course.enable_feature!(:draft_state)
       @assignment2.unpublish
 
       @user.reload

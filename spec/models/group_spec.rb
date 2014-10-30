@@ -591,34 +591,6 @@ describe Group do
     end
   end
 
-  describe "#feature_enabled?" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @course.root_account.allow_feature!(:draft_state)
-    end
-
-    context "a course with :draft_state enabled" do
-      it "should pass its setting on to its groups" do
-        @course.enable_feature!(:draft_state)
-        expect(group(group_context: @course)).to be_feature_enabled(:draft_state)
-      end
-    end
-
-    context "an account with :draft_state enabled" do
-      before :once do
-        @course.root_account.enable_feature!(:draft_state)
-      end
-
-      it "should pass its setting on to course groups" do
-        expect(group(group_context: @course)).to be_feature_enabled(:draft_state)
-      end
-
-      it "should pass its setting on to account groups" do
-        expect(group(group_context: @course.root_account)).to be_feature_enabled(:draft_state)
-      end
-    end
-  end
-
   describe "#update_max_membership_from_group_category" do
     it "should set max_membership if there is a group category" do
       @group.group_category = @course.group_categories.build(:name => 'foo')

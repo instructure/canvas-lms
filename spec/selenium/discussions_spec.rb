@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 describe "discussions" do
   include_examples "in-process server selenium tests"
 
-  let(:course) { course_model.tap{|course| course.offer!; set_course_draft_state(:course => course)} }
+  let(:course) { course_model.tap{|course| course.offer!} }
   let(:default_section) { course.default_section }
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:section_student) do
@@ -282,7 +282,6 @@ describe "discussions" do
 
       describe "publish icon" do
         before(:each) do
-          Account.default.enable_feature!(:draft_state)
         end
 
         def click_publish_icon(topic)
@@ -711,7 +710,6 @@ describe "discussions" do
       end
 
       it "should allow publishing and unpublishing from a topic's page" do
-        Account.default.enable_feature!(:draft_state)
         topic.workflow_state = 'unpublished'
         topic.save!
         expect(topic.published?).to be_falsey

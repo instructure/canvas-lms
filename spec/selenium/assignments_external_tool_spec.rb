@@ -10,7 +10,6 @@ describe "external tool assignments" do
   end
 
   it "should allow creating through index" do
-    @course.enable_feature!(:draft_state)
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
@@ -30,7 +29,6 @@ describe "external tool assignments" do
   end
 
   it "should allow creating through the 'More Options' link" do
-    @course.enable_feature!(:draft_state)
     get "/courses/#{@course.id}/assignments"
 
     #create assignment

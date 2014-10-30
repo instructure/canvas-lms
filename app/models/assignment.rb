@@ -426,9 +426,7 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
-      if self.context.feature_enabled?(:draft_state)
-        quiz.workflow_state = published? ? 'available' : 'unpublished'
-      end
+      quiz.workflow_state = published? ? 'available' : 'unpublished'
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
       topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
@@ -438,9 +436,7 @@ class Assignment < ActiveRecord::Base
       topic.saved_by = :assignment
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
-      if self.context.feature_enabled?(:draft_state)
-        topic.workflow_state = published? ? 'active' : 'unpublished'
-      end
+      topic.workflow_state = published? ? 'active' : 'unpublished'
       topic.save
       self.discussion_topic = topic
     end
@@ -566,11 +562,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    if !self.context.feature_enabled?(:draft_state) || self.has_student_submissions?
-      self.workflow_state = "published"
-    elsif self.context.feature_enabled?(:draft_state)
-      self.workflow_state = "unpublished"
-    end
+    self.workflow_state = self.has_student_submissions? ? "published" : "unpublished"
     self.save
     self.discussion_topic.restore(:assignment) if from != :discussion_topic && self.discussion_topic
     self.quiz.restore(:assignment) if from != :quiz && self.quiz

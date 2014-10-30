@@ -19,10 +19,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::CourseQuizExtensionsController, type: :request do
   before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
-  before :once do
     course
     @quizzes = [1,2].map do |n|
       quiz = @course.quizzes.create!(:title => "quiz#{n}")

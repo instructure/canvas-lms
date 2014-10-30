@@ -353,7 +353,7 @@ describe ContextModulesController do
     end
 
     it "should reorder unpublished items" do
-      course_with_teacher_logged_in(active_all: true, draft_state: true)
+      course_with_teacher_logged_in(active_all: true)
       pageA = @course.wiki.wiki_pages.create title: "pageA"
       pageA.workflow_state = 'unpublished'
       pageA.save

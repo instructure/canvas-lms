@@ -49,7 +49,11 @@ module QuizzesHelper
   end
 
   def quiz_published_state_warning(quiz=@quiz)
-    !quiz.available? ? unpublished_quiz_warning : unsaved_changes_warning
+    if !quiz.available?
+      unpublished_quiz_warning
+    else
+      unsaved_changes_warning
+    end
   end
 
   def display_save_button?(quiz=@quiz)

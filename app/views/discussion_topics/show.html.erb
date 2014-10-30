@@ -33,7 +33,7 @@
   jammit_css :tinymce, :discussions, :learning_outcomes
 %>
 
-<% if @topic.draft_state_enabled? && @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
+<% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
   <div id="discussion-managebar" class="toolbarView">
     <div class="headerBar">
       <div class="topic">
@@ -55,7 +55,7 @@
     <div class="headerBar">
       <div class="row-fluid form-inline" style="overflow: visible;">
         <div class="pull-right">
-          <% if @topic.draft_state_enabled? && can_do(@context, @current_user, :moderate_forum) %>
+          <% if can_do(@context, @current_user, :moderate_forum) %>
             <button
               id="topic_publish_button"
               data-id='<%= @topic.id %>'
@@ -197,39 +197,14 @@
         <div class="discussion-section message_wrapper">
           <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
 
-          <% if @topic.draft_state_enabled? %>
-            <% if @locked %>
-              <div class="discussion-fyi">
-                <% if @topic.is_a? Announcement %>
-                  <%= t 'announcement_closed', 'This announcement is closed for comments' %>
-                <% else %>
-                  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked, "This topic is closed for comments") %>
-                <% end %>
-              </div>
-            <% end %>
-          <% else %>
-            <% if @topic.post_delayed? %>
-              <div class="discussion-fyi">
-                <% if @topic.is_a? Announcement %>
-                  <% if @topic.delayed_post_at %>
-                    <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-                  <% else %>
-                    <%= t 'announcement_not_visible', 'This announcement is not visible to users' %>
-                  <% end %>
-                <% else %>
-                  <% if @topic.delayed_post_at %>
-                    <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*',:date => datetime_string(@topic.delayed_post_at) %>
-                  <% else %>
-                    <%= t 'topic_not_visible', 'This topic is not visible to users' %>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-            <% if @locked %>
-              <div class="discussion-fyi">
-                <%= t 'locked', 'This topic is closed for comments' %>
-              </div>
-            <% end %>
+          <% if @locked %>
+            <div class="discussion-fyi">
+              <% if @topic.is_a? Announcement %>
+                <%= t 'announcement_closed', 'This announcement is closed for comments' %>
+              <% else %>
+                <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked, "This topic is closed for comments") %>
+              <% end %>
+            </div>
           <% end %>
 
           <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
@@ -323,7 +298,7 @@
 
   </div>
 
-  <% if @context.feature_enabled?(:draft_state) && @headers != false %>
+  <% if @headers != false %>
     <div id="module_sequence_footer"></div>
   <% else %>
     <%=

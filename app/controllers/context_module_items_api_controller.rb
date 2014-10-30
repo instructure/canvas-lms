@@ -355,10 +355,8 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:url] = params[:module_item][:external_url]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
-        if @context.feature_enabled?(:draft_state)
-          @tag.workflow_state = 'unpublished'
-          @tag.save
-        end
+        @tag.workflow_state = 'unpublished'
+        @tag.save
         @module.touch
         render :json => module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag

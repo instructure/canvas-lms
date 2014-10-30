@@ -726,7 +726,7 @@ define([
         $("#no_context_modules_message").slideUp();
         var $publishIcon = $module.find('.publish-icon');
         // new module, setup publish icon and other stuff
-        if (ENV.ENABLE_DRAFT && !$publishIcon.data('id')) {
+        if (!$publishIcon.data('id')) {
           var fixLink = function(locator, attribute) {
               el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
@@ -1056,7 +1056,7 @@ define([
               data.content_tag.type = item_data['item[type]'];
               $item = modules.addItemToModule($module, data.content_tag);
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
-              if (ENV.ENABLE_DRAFT) { initNewItemPublishButton($item, data.content_tag); }
+              initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
             })
           );
@@ -1293,12 +1293,10 @@ define([
   };
 
   $(document).ready(function() {
-    if (ENV.ENABLE_DRAFT) {
-      $('.publish-icon:visible').each(function(index, el) {
-        var view = initPublishButton($(el));
-        overrideModel(view.model, view);
-      });
-    }
+    $('.publish-icon:visible').each(function(index, el) {
+      var view = initPublishButton($(el));
+      overrideModel(view.model, view);
+    });
 
     $('.external_url_link').click(function() {
       window.location = $(this).attr('data-item-href');

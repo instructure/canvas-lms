@@ -5,7 +5,6 @@ module BroadcastPolicies
     let(:context) {
       ctx = mock()
       ctx.stubs(:available?).returns(true)
-      ctx.stubs(:feature_enabled?).with(:draft_state).returns(false)
       ctx.stubs(:concluded?).returns(false)
       ctx
     }
@@ -20,36 +19,12 @@ module BroadcastPolicies
 
     let(:policy) { AssignmentPolicy.new(assignment) }
 
-    context 'draft state' do
-
+    describe "#should_dispatch_assignment_created?" do
       before do
-        context.stubs(:feature_enabled?).with(:draft_state).returns(true)
         assignment.stubs(:workflow_state_changed?).returns true
       end
 
-      describe "#should_dispatch_assignment_created?" do
-        it 'is true when an assignment is published' do
-          expect(policy.should_dispatch_assignment_created?).to be_truthy
-        end
-
-        def wont_send_when
-          yield
-          expect(policy.should_dispatch_assignment_created?).to be_falsey
-        end
-
-        specify {
-          wont_send_when {
-            assignment.stubs(:just_created).returns false
-            assignment.stubs(:workflow_state_changed?).returns false
-          }
-        }
-        specify { wont_send_when { assignment.stubs(:published?).returns false}}
-        specify { wont_send_when { context.stubs(:concluded?).returns true } }
-      end
-    end
-
-    describe "#should_dispatch_assignment_created?" do
-      it 'is true when an assignment is created' do
+      it 'is true when an assignment is published' do
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
@@ -58,9 +33,14 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_created?).to be_falsey
       end
 
-      specify { wont_send_when { context.stubs(:available?).returns false } }
+      specify {
+        wont_send_when {
+          assignment.stubs(:just_created).returns false
+          assignment.stubs(:workflow_state_changed?).returns false
+        }
+      }
+      specify { wont_send_when { assignment.stubs(:published?).returns false}}
       specify { wont_send_when { context.stubs(:concluded?).returns true } }
-      specify { wont_send_when { assignment.stubs(:just_created).returns false } }
     end
 
     describe '#should_dispatch_assignment_due_date_changed?' do

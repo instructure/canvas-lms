@@ -178,10 +178,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def draft_state_enabled?
-    context = self.context
-    context && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:draft_state)
-  end
   attr_accessor :saved_by
   def update_assignment
     return if self.deleted?
@@ -197,7 +193,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.submission_types = "discussion_topic"
       self.assignment.saved_by = :discussion_topic
       self.assignment.workflow_state = 'published' if self.assignment.deleted?
-      if self.draft_state_enabled?
+      unless is_announcement
         self.assignment.workflow_state = published? ? 'published' : 'unpublished'
       end
       self.assignment.save
@@ -549,7 +545,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def active?
     # using state instead of workflow_state so this works with new records
-    self.state == :active || (self.draft_state_enabled? && self.state == :post_delayed)
+    self.state == :active || (!self.is_announcement && self.state == :post_delayed)
   end
 
   def publish
@@ -598,7 +594,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def published?
     return false if workflow_state == 'unpublished'
-    return false if workflow_state == 'post_delayed' && !draft_state_enabled?
+    return false if workflow_state == 'post_delayed' && is_announcement
     true
   end
 
@@ -642,7 +638,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    if should_send_to_stream && (@content_changed || changed_state(:active, draft_state_enabled? ? :unpublished : :post_delayed))
+    if should_send_to_stream && (@content_changed || changed_state(:active, !is_announcement ? :unpublished : :post_delayed))
       self.active_participants
     end
   end
@@ -717,7 +713,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'post_delayed' : 'active'
+    self.workflow_state = 'post_delayed'
     self.save
 
     if from != :assignment && self.for_assignment? && self.root_topic_id.blank?
@@ -870,7 +866,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-      ((record.just_created && record.active?) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+      ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
     }
   end
 
@@ -950,7 +946,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def available_for?(user, opts = {})
     return false if !published?
-    return false if !draft_state_enabled? && locked?
+    return false if is_announcement && locked?
     !locked_for?(user, opts)
   end
 
@@ -975,7 +971,7 @@ class DiscussionTopic < ActiveRecord::Base
     # topic is not published
     if !published?
       false
-    elsif !draft_state_enabled? && unlock_at = available_from_for(user)
+    elsif is_announcement && unlock_at = available_from_for(user)
     # unlock date exists and has passed
       unlock_at < Time.now.utc
     # everything else
@@ -988,7 +984,7 @@ class DiscussionTopic < ActiveRecord::Base
     return true if self.locked? && !(opts[:check_policies] && self.grants_right?(user, :update))
     lock = self.locked_for?(user, opts)
     return false unless lock
-    return false if self.draft_state_enabled? && lock.include?(:unlock_at)
+    return false if !self.is_announcement && lock.include?(:unlock_at)
     lock
   end
 

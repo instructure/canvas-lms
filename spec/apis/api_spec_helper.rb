@@ -159,7 +159,7 @@ def should_translate_user_content(course, include_verifiers=true)
       This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
       This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
-      And refer to this <a href="/courses/#{course.id}/wiki/awesome-page">awesome wiki page</a>.
+      And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>
   }
   html = yield content

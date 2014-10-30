@@ -19,8 +19,7 @@ describe "assignments" do
   end
 
   before(:each) do
-      course_with_teacher_logged_in(:draft_state => true)
-      set_course_draft_state
+    course_with_teacher_logged_in
   end
 
   %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|

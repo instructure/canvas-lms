@@ -1,9 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::FillInMultipleBlanksQuestion do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   let(:answer1) { {id: 1, blank_id: 'blank1', text: 'First', weight: 100} }
   let(:answer2) { {id: 2, blank_id: 'blank2', text: 'Second', weight: 100} }

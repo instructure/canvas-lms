@@ -76,8 +76,9 @@ describe WikiPage do
   end
 
   it "shouldn't allow the front page to be unpublished" do
-    course_with_teacher(active_all: true, draft_state: true)
+    course_with_teacher(active_all: true)
     @course.wiki.set_front_page_url!('front-page')
+
     front_page = @course.wiki.front_page
     expect(front_page).not_to be_can_unpublish
     # the data model doesn't actually disallow this (yet)
@@ -231,18 +232,11 @@ describe WikiPage do
         expect(front_page.body).not_to be_empty
       end
 
-      context 'with draft state' do
-        before do
-          @course.account.allow_feature!(:draft_state)
-          @course.enable_feature!(:draft_state)
-        end
-
-        it 'should publish the front page' do
-          @course.wiki.set_front_page_url!('front-page')
-          front_page = @course.wiki.front_page
-          front_page.initialize_wiki_page(@teacher)
-          expect(front_page).to be_published
-        end
+      it 'should publish the front page' do
+        @course.wiki.set_front_page_url!('front-page')
+        front_page = @course.wiki.front_page
+        front_page.initialize_wiki_page(@teacher)
+        expect(front_page).to be_published
       end
     end
 
@@ -455,8 +449,8 @@ describe WikiPage do
   end
 
   describe "restore" do
-    it "should restore to unpublished state if draft_state is enabled" do
-      course(draft_state: true)
+    it "should restore to unpublished state" do
+      course
       @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
       @page.update_attribute(:workflow_state, 'deleted')
       @page.restore

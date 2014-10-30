@@ -25,9 +25,6 @@ RSpec::Matchers.define :have_question_field do |expected|
 end
 
 describe Quizzes::QuizQuestion::QuestionData do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   let(:question_data_params) do
     {

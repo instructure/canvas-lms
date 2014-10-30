@@ -1,9 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   ASes = Quizzes::QuizQuestion::AnswerSerializers
 

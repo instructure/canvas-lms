@@ -599,7 +599,7 @@ class ApplicationController < ActionController::Base
       fake.workflow_state = 'unpublished'
 
       assignment_scope = :active_assignments
-      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+      if !fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         assignment_scope = :published_assignments
       end

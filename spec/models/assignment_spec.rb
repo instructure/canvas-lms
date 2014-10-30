@@ -73,7 +73,6 @@ describe Assignment do
   describe "#has_student_submissions?" do
     before :once do
       setup_assignment_with_students
-      @assignment.context.root_account.enable_feature!(:draft_state)
     end
 
     it "does not allow itself to be unpublished if it has student submissions" do
@@ -1232,7 +1231,6 @@ describe Assignment do
 
   context "quizzes" do
     before :once do
-      @course.enable_feature!(:draft_state)
       assignment_model(:submission_types => "online_quiz", :course => @course)
     end
 
@@ -1852,7 +1850,6 @@ describe Assignment do
   describe "sections_with_visibility" do
    before(:once) do
      course_with_teacher(:active_all => true)
-     @course.enable_feature!(:draft_state)
      @section = @course.course_sections.create!
      @student = student_in_section(@section, opts={})
      @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
@@ -2880,18 +2877,14 @@ describe Assignment do
 
   describe "#restore" do
     it "should restore to unpublished if draft state w/ no submissions" do
-      @course.enable_feature!(:draft_state)
       assignment_model course: @course
-      @a.context.root_account.enable_feature!(:draft_state)
       @a.destroy
       @a.restore
       expect(@a.reload).to be_unpublished
     end
 
     it "should restore to published if draft state w/ submissions" do
-      @course.enable_feature!(:draft_state)
       setup_assignment_with_homework
-      @assignment.context.root_account.enable_feature!(:draft_state)
       @assignment.destroy
       @assignment.restore
       expect(@assignment.reload).to be_published
@@ -3109,7 +3102,7 @@ end
 
 def setup_differentiated_assignments(opts={})
   if !opts[:course]
-    course_with_teacher(draft_state: true, active_all: true, differentiated_assignments: true)
+    course_with_teacher(active_all: true, differentiated_assignments: true)
   end
 
   @section1 = @course.course_sections.create!(name: 'Section One')

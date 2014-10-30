@@ -20,9 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state_validations_spec.rb')
 
 describe Quizzes::Quiz do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   before :once do
     course

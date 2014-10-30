@@ -137,7 +137,7 @@ module Importers
 
       # be very explicit about draft state courses, but be liberal toward legacy courses
       course.wiki.check_has_front_page
-      if course.feature_enabled?(:draft_state) && course.wiki.has_no_front_page
+      if course.wiki.has_no_front_page
         if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
           if new_front_page = course.wiki.wiki_pages.where(migration_id: mig_id).first
@@ -146,7 +146,7 @@ module Importers
         end
       end
       front_page = course.wiki.front_page
-      course.wiki.unset_front_page! if front_page.nil? || (course.feature_enabled?(:draft_state) && front_page.new_record?)
+      course.wiki.unset_front_page! if front_page.nil? || front_page.new_record?
 
       syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
       if syllabus_should_be_added

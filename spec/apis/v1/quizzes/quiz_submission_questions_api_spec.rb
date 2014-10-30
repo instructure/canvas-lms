@@ -19,9 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   module Helpers
     def create_question(type, factory_options = {}, quiz=@quiz)

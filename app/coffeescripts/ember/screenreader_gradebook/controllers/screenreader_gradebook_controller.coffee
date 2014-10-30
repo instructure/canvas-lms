@@ -86,9 +86,6 @@ define [
       ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
     ).property()
 
-    isDraftState: ->
-      ENV.GRADEBOOK_OPTIONS.draft_state_enabled
-
     publishToSisEnabled: (->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
     ).property()
@@ -507,7 +504,7 @@ define [
         return if assignmentsProxy.findBy('id', as.id)
         @processAssignment(as, assignmentGroups)
 
-        shouldRemoveAssignment = (@isDraftState() and as.published is false) or
+        shouldRemoveAssignment = (as.published is false) or
           as.submission_types.contains 'not_graded' or
           as.submission_types.contains 'attendance' and !@get('showAttendance')
         if shouldRemoveAssignment

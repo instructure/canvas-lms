@@ -23,14 +23,13 @@ require [
         .render()
       new PublishButtonView(model: model, el: $el).render()
 
-    if ENV.DRAFT_STATE
-      # Add module sequence footer
-      $('#sequence_footer').moduleSequenceFooter(
-        courseID: ENV.COURSE_ID
-        assetType: 'Assignment'
-        assetID: ENV.ASSIGNMENT_ID
-        location: location
-      )
+    # Add module sequence footer
+    $('#sequence_footer').moduleSequenceFooter(
+      courseID: ENV.COURSE_ID
+      assetType: 'Assignment'
+      assetID: ENV.ASSIGNMENT_ID
+      location: location
+    )
 
     vddTooltip()
 

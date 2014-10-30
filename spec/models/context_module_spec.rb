@@ -154,14 +154,12 @@ describe ContextModule do
 
     it "should add a header as unpublished" do
       course_module
-      @course.enable_feature!(:draft_state)
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
 
-    context "when draft state is enabled" do
+    context "when differentiated assignments" do
       before do
-        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
         Course.any_instance.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
 
@@ -980,8 +978,8 @@ describe ContextModule do
   end
 
   describe "restore" do
-    it "should restore to unpublished state if draft_state is enabled" do
-      course(draft_state: true)
+    it "should restore to unpublished state" do
+      course
       @module = @course.context_modules.create!
       @module.destroy
       @module.restore

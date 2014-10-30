@@ -2,7 +2,7 @@
   <h2><%= t 'titles.related_items', "Related Items" %></h2>
   <% if @context.allows_speed_grader? %>
     <li id="assignment-speedgrader-link"
-      <% if @context.feature_enabled?(:draft_state) && @assignment.unpublished? %>
+      <% if @assignment.unpublished? %>
         class="hidden"
       <% end %>
     >

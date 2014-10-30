@@ -5,8 +5,6 @@ describe "context_modules" do
   context "as a teacher" do
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
-
       #have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
@@ -368,7 +366,6 @@ describe "context_modules" do
     end
 
     it "should add the 'with-completion-requirements' class to rows that have requirements" do
-      set_course_draft_state
       mod = @course.context_modules.create! name: 'TestModule'
       tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})
 
@@ -382,7 +379,6 @@ describe "context_modules" do
     end
 
     it "should add a title attribute to the text header" do
-      set_course_draft_state
       text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
       mod = @course.context_modules.create! name: 'TestModule'
       tag1 = mod.add_item(title: text_header, type: 'sub_header')
@@ -856,7 +852,6 @@ describe "context_modules" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
@@ -886,7 +881,7 @@ describe "context_modules" do
 
   context "progressions" do
     before :each do
-      course_with_teacher_logged_in(:draft_state => true)
+      course_with_teacher_logged_in
 
       @module1 = @course.context_modules.create!(:name => "module1")
       @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
@@ -998,7 +993,7 @@ describe "context_modules" do
 
   context "menu tools" do
     before do
-      course_with_teacher_logged_in(:draft_state => true)
+      course_with_teacher_logged_in
       Account.default.enable_feature!(:lor_for_account)
 
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -1173,7 +1168,6 @@ describe "context_modules" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
       get "/courses/#{@course.id}/modules"
     end
 

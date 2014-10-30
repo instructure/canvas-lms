@@ -32,7 +32,7 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@context.feature_enabled?(:draft_state)
+    return redirect_to(dashboard_url) if @context == @current_user
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
@@ -72,39 +72,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def old_index
-    return redirect_to(dashboard_url) if @context == @current_user
-    if authorized_action(@context, @current_user, :read)
-      get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
-      get_sorted_assignments
-      add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
-      @context = (@just_viewing_one_course ? @context : @current_user)
-      return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-
-      respond_to do |format|
-        if @contexts.empty?
-          if @context
-            format.html { redirect_to @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
-          else
-            format.html { redirect_to root_url }
-          end
-        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
-          format.html {
-            render :action => :index
-          }
-        else
-          @current_user_submissions ||= @current_user && @current_user.submissions.
-              select([:id, :assignment_id, :score, :workflow_state]).
-              where(:assignment_id => @upcoming_assignments)
-          js_env(:submissions_hash => @submissions_hash)
-          format.html { render :action => :student_index }
-        end
-        # TODO: eager load the rubric associations
-        format.json { render :json => @assignments.map{ |a| a.as_json(include: [:rubric_association, :rubric]) } }
-      end
-    end
-  end
-
   def show
     @assignment ||= @context.assignments.find(params[:id])
     if @assignment.deleted?
@@ -137,7 +104,6 @@ class AssignmentsController < ApplicationController
 
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-        :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
@@ -349,7 +315,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
+    @assignment.workflow_state ||= "unpublished"
     @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
@@ -372,7 +338,7 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment ||= @context.assignments.scoped.new
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    @assignment.workflow_state = 'unpublished'
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'

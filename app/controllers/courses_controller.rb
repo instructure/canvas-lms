@@ -1346,7 +1346,6 @@ class CoursesController < ApplicationController
 
     @context = api_find(Course.active, params[:id])
     assign_localizer
-    js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context
@@ -1397,11 +1396,9 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
-        if @context.feature_enabled?(:draft_state)
-          set_js_rights [:wiki, :page]
-          set_js_wiki_data :course_home => true
-          @padless = true
-        end
+        set_js_rights [:wiki, :page]
+        set_js_wiki_data :course_home => true
+        @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_urls_and_permissions_for_assignment_index

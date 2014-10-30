@@ -1,26 +1,23 @@
-{{#if draftStateEnabled}}
-  {{#if title}}
-    <h1 class="screenreader-only" style="display: inline">{{title}}</h1>
-  {{else}}
-    <h1 class="screenreader-only" style="display: inline">{{#t "page_header_title"}}New Discussion{{/t}}</h1>
-  {{/if}}
-  <div class="discussion-edit-header row-fluid">
-    <div class="span4 offset8 text-right">
-      {{#if published}}
-        <span id="topic-draft-state" class="published-status published">
-          <i class="icon-publish"></i>
-          {{#t "buttons.published"}}Published{{/t}}
-        </span>
-      {{else}}
-        <span id="topic-draft-state" class="published-status unpublished">
-          <i class="icon-unpublished"></i>
-          {{#t "buttons.not_published"}}Not Published{{/t}}
-        </span>
-      {{/if}}
-    </div>
-  </div>
+{{#if title}}
+  <h1 class="screenreader-only" style="display: inline">{{title}}</h1>
+{{else}}
+  <h1 class="screenreader-only" style="display: inline">{{#t "page_header_title"}}New Discussion{{/t}}</h1>
 {{/if}}
-
+<div class="discussion-edit-header row-fluid">
+  <div class="span4 offset8 text-right">
+    {{#if published}}
+      <span id="topic-draft-state" class="published-status published">
+        <i class="icon-publish"></i>
+        {{#t "buttons.published"}}Published{{/t}}
+      </span>
+    {{else}}
+      <span id="topic-draft-state" class="published-status unpublished">
+        <i class="icon-unpublished"></i>
+        {{#t "buttons.not_published"}}Not Published{{/t}}
+      </span>
+    {{/if}}
+  </div>
+</div>
 
 <fieldset>
   <div class="control-group">

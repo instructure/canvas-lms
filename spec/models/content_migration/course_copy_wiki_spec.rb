@@ -7,7 +7,7 @@ describe ContentMigration do
     it "should not escape links to wiki urls" do
       page1 = @copy_from.wiki.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
 
-      body = %{<p>Link to module item: <a href="/courses/%s/#{@copy_from.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/%s#header">some assignment</a></p>}
+      body = %{<p>Link to module item: <a href="/courses/%s/pages/%s#header">some assignment</a></p>}
       page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, page1.url])
 
       run_course_copy
@@ -44,8 +44,6 @@ describe ContentMigration do
       end
 
       it "should not overwrite current front page" do
-        @copy_to.root_account.enable_feature!(:draft_state)
-
         copy_from_front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)
 
@@ -58,8 +56,6 @@ describe ContentMigration do
       end
 
       it "should remain with no front page if other front page is not selected for copy" do
-        @copy_to.root_account.enable_feature!(:draft_state)
-
         front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(front_page.url)
 
@@ -78,9 +74,7 @@ describe ContentMigration do
         expect(@copy_to.wiki.has_no_front_page).to eq true
       end
 
-      it "should set default view to feed if wiki front page is missing and draft state is enabled" do
-        @copy_from.root_account.enable_feature!(:draft_state)
-
+      it "should set default view to feed if wiki front page is missing" do
         @copy_from.default_view = 'wiki'
         @copy_from.save!
         @copy_from.wiki.set_front_page_url!('haha not here')

@@ -476,10 +476,6 @@ RSpec.configure do |config|
         e.save!
         @teacher = u
       end
-      if opts[:draft_state]
-        account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
-      end
       if opts[:differentiated_assignments]
         account.allow_feature!(:differentiated_assignments)
         @course.enable_feature!(:differentiated_assignments)
@@ -673,16 +669,6 @@ RSpec.configure do |config|
       submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
       submission.update_attributes!(score: '5') if opts[:submission_points]
     end
-  end
-
-  def set_course_draft_state(enabled=true, opts={})
-    course = opts[:course] || @course
-    account = opts[:account] || course.account
-
-    account.allow_feature!(:draft_state)
-    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
-
-    enabled
   end
 
   def add_section(section_name)

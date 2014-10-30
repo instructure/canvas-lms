@@ -309,14 +309,13 @@ class DiscussionTopicsController < ApplicationController
                     moderate: user_can_moderate,
                     change_settings: user_can_edit_course_settings?,
                     manage_content: @context.grants_right?(@current_user, session, :manage_content),
-                    publish: user_can_moderate && @context.feature_enabled?(:draft_state)
+                    publish: user_can_moderate
                 },
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
         append_sis_data(hash)
 
         js_env(hash.merge(
-          DRAFT_STATE: @context.feature_enabled?(:draft_state),
           POST_GRADES: @context.feature_enabled?(:post_grades)
         ))
         if user_can_edit_course_settings?
@@ -385,7 +384,6 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DRAFT_STATE: @topic.draft_state_enabled?,
                  POST_GRADES: @context.feature_enabled?(:post_grades),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
       append_sis_data(js_hash)
@@ -855,7 +853,7 @@ class DiscussionTopicsController < ApplicationController
           @errors[:published] = t(:error_draft_state_unauthorized, "You do not have permission to set this topic to draft state.")
         end
       end
-    elsif @topic.new_record? && !@topic.is_announcement && @topic.draft_state_enabled? && user_can_moderate
+    elsif @topic.new_record? && !@topic.is_announcement &&  user_can_moderate
       @topic.unpublish
     end
   end

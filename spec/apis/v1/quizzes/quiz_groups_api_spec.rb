@@ -20,9 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizGroupsController, type: :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   before :once do
     teacher_in_course(:active_all => true)

@@ -1306,7 +1306,7 @@ XML
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to eq true
-      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/wiki/#{wiki.url}"
+      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/pages/#{wiki.url}"
       expect(warning.error_message).to include("body")
     end
   end

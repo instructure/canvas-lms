@@ -215,7 +215,6 @@ describe ContextModule do
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          set_course_draft_state
           page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
           @test_url = "/courses/#{@course.id}/pages/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
@@ -241,7 +240,6 @@ describe ContextModule do
   describe "caching" do
     it "should cache the view separately for each time zone" do
       enable_cache do
-        Account.default.enable_feature! :draft_state
         course active_all: true
 
         mod = @course.context_modules.create!

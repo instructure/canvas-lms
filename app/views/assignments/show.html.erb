@@ -25,13 +25,11 @@
         </h1>
       </div>
       <div class='edit-content'>
-        <% if @context.feature_enabled?(:draft_state) %>
-          <button
-            id="assignment_publish_button"
-            data-id='<%= @assignment.id %>'
-            class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
-          </button>
-        <% end %>
+        <button
+          id="assignment_publish_button"
+          data-id='<%= @assignment.id %>'
+          class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
+        </button>
         <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
           <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
         </a>

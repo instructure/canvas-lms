@@ -256,10 +256,9 @@ describe GradeSummaryPresenter do
   end
 
   describe '#assignments' do
-    it "filters unpublished assignments when draft_state is on" do
+    it "filters unpublished assignments" do
       teacher_in_course
       student_in_course
-      @course.enable_feature!(:draft_state)
       published_assignment = @course.assignments.create!
       unpublished_assign = @course.assignments.create!
       unpublished_assign.update_attribute(:workflow_state, "unpublished")

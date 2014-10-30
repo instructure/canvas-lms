@@ -1,24 +1,4 @@
 <% context ||= @context; asset ||= nil %>
 <% if context && context.is_a?(Course) && asset && @headers != false %>
- <% if context.feature_enabled?(:draft_state) %>
-  <div id="sequence_footer" class="draft_state_enabled" data-course-id="<%= context.id %>" data-asset-id="<%= asset.id %>" data-asset-type="<%= Api::API_DATA_TYPE[asset.class.to_s] || asset.class.to_s %>"></div>
- <% else %>
-  <div id="sequence_footer" style="display: none;">
-    <a class="prev btn" href="#">
-      <i class="icon-arrow-left"></i> <span class="text"><%= t(:previous, "Previous") %></span>
-      <span class="title ellipsis"></span>
-    </a>
-    <a class="next btn" href="#">
-      <span class="text"><%= t(:next, "Next") %></span> <i class="icon-arrow-right"></i>
-      <span class="title ellipsis"></span>
-    </a>
-    <a href="<%= context_url(context, :context_context_modules_item_details_url, asset.asset_string, :module_item_id => params[:module_item_id]) %>" style="display: none;" class="sequence_details_url">&nbsp;</a>
-    <a href="<%= context_url(context, :context_context_modules_item_redirect_url, "{{ id }}") %>" class="module_item_url" style="display: none;">&nbsp;</a>
-    <a href="<%= context_url(context, :context_context_module_url, "{{ id }}") %>" class="module_url" style="display: none;">&nbsp;</a>
-    <div class="all">
-      <a href="<%= context_url(context, :context_context_modules_url) %>"><%= t :full_course_sequence, "see full course sequence" %></a>
-    </div>
-    <div class="clear"></div>
-  </div>
- <% end %>
+  <div id="sequence_footer" data-course-id="<%= context.id %>" data-asset-id="<%= asset.id %>" data-asset-type="<%= Api::API_DATA_TYPE[asset.class.to_s] || asset.class.to_s %>"></div>
 <% end %>

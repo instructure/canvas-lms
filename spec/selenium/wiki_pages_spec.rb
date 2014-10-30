@@ -6,7 +6,6 @@ describe "Navigating to wiki pages" do
   describe "Navigation" do
     before do
       account_model
-      @account.enable_feature!(:draft_state)
       course_with_teacher_logged_in :account => @account
     end
 
@@ -24,7 +23,6 @@ describe "Navigating to wiki pages" do
   describe "Permissions" do
     before do
       course_with_teacher
-      set_course_draft_state
     end
 
     it "displays public content to unregistered users" do
@@ -43,7 +41,7 @@ describe "Navigating to wiki pages" do
 
   context "menu tools" do
     before do
-      course_with_teacher_logged_in(:draft_state => true)
+      course_with_teacher_logged_in
       Account.default.enable_feature!(:lor_for_account)
 
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

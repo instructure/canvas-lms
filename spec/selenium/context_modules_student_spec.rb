@@ -31,8 +31,6 @@ describe "context_modules" do
       @in_progress_text = 'in progress'
 
       course_with_student_logged_in
-      set_course_draft_state
-
       #initial module setup
       @module_1 = create_context_module('Module One')
       @assignment_1 = @course.assignments.create!(:title => "assignment 1")
@@ -207,7 +205,6 @@ describe "context_modules" do
 
     it "should allow a student view student to progress through module content" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
-      set_course_draft_state
       @fake_student = @course.student_view_student
 
       enter_student_view
@@ -246,7 +243,6 @@ describe "context_modules" do
 
       def module_setup
         course_with_teacher_logged_in(:active_all => true)
-        set_course_draft_state
         @module = @course.context_modules.create!(:name => "module")
 
         #create module items

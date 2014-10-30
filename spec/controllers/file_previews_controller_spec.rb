@@ -103,7 +103,6 @@ describe FilePreviewsController do
   end
 
   it "should fulfill module completion requirements" do
-    @course.enable_feature!(:draft_state)
     attachment_model content_type: 'application/msword'
     mod = @course.context_modules.create!(:name => "some module")
     tag = mod.add_item(:id => @attachment.id, :type => 'attachment')

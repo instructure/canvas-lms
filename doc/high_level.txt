@@ -89,7 +89,7 @@ teachers, or students as well.  There's no wiki words, instead there's a
 WYSIWYG editor and a sidebar with all the links you could possibly want.  In
 fact, every editable page inside of Instructure gets the same sidebar, so it's
 easy to link from an assignment page to a forum, a file, a wiki page, etc.
-Wiki pages are accessed by name, and created on demand (/courses/5/wiki/new_page
+Wiki pages are accessed by name, and created on demand (/courses/5/pages/new_page
 would be created if it didn't exist and you went to it).
 
 # Quizzes

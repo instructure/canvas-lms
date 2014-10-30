@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   describe ".from" do
     it "should create an item for a supported question type" do

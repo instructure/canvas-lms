@@ -42,9 +42,6 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 end
 
 describe Quizzes::QuizSubmissionsApiController, type: :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   module Helpers
     def enroll_student

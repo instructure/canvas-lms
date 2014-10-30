@@ -5,7 +5,7 @@ describe "assignments menu tools" do
 
   context "as a teacher" do
     before do
-      course_with_teacher_logged_in(:draft_state => true)
+      course_with_teacher_logged_in
       Account.default.enable_feature!(:lor_for_account)
 
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

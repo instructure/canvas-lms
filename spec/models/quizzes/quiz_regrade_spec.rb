@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizRegrade do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   before { Timecop.freeze(Time.local(2013)) }
   after { Timecop.return }

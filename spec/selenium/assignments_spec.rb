@@ -13,7 +13,6 @@ describe "assignments" do
       course_with_teacher_logged_in
       @course.start_at = nil
       @course.save!
-      set_course_draft_state
       @course.require_assignment_group
     end
 

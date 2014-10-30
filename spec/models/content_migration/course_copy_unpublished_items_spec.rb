@@ -4,10 +4,6 @@ describe ContentMigration do
   context "course copy unpublished items" do
     include_examples "course copy"
 
-    before :once do
-      Account.default.enable_feature!(:draft_state)
-    end
-
     it "should copy unpublished modules" do
       cm = @copy_from.context_modules.create!(:name => "some module")
       cm.publish

@@ -526,11 +526,7 @@ class ContextModulesApiController < ApplicationController
       if ids = params[:module][:prerequisite_module_ids]
         @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
       end
-      if @context.feature_enabled?(:draft_state)
-        @module.workflow_state = 'unpublished'
-      else
-        @module.workflow_state = 'active'
-      end
+      @module.workflow_state = 'unpublished'
 
       if @module.save && set_position
         render :json => module_json(@module, @current_user, session, nil)

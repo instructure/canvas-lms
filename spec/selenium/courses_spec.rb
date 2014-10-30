@@ -22,7 +22,7 @@ describe "courses" do
     context 'draft state' do
 
       before(:each) do
-        course_with_teacher_logged_in({draft_state: true})
+        course_with_teacher_logged_in
       end
 
       def validate_action_button(postion, validation_text)
@@ -60,13 +60,13 @@ describe "courses" do
       end
 
       it "should not show course status if graded submissions exist" do
-        course_with_student_submissions({submission_points: true, draft_state: true})
+        course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
         expect(f('#course_status')).to be_nil
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
-        course_with_student_submissions({draft_state: true})
+        course_with_student_submissions
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect_new_page_load { course_status_buttons.first.click }
@@ -289,7 +289,6 @@ describe "courses" do
 
       it "should display course_home_sub_navigation lti apps (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
         get "/courses/#{@course.id}"
@@ -305,7 +304,6 @@ describe "courses" do
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
         expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)

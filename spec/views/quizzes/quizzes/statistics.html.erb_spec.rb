@@ -20,10 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/statistics" do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
   it "should render with non-nil submission statistics" do
     course_with_student
     view_context

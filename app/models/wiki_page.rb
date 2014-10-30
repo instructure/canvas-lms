@@ -355,7 +355,7 @@ class WikiPage < ActiveRecord::Base
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
-                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/wiki/#{self.url}")
+                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{self.url}")
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end

@@ -195,8 +195,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def path
-    if self.context.respond_to?(:feature_enabled?)
-      self.context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'
-    end
+    # was a shim for draft state, can be removed
+    'pages'
   end
 end

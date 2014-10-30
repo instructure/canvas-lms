@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 def da_setup
   # use after already calling course_with_role_logged_in
   @course.enable_feature!(:differentiated_assignments)
-  @course.enable_feature!(:draft_state)
   @section1 = @course.course_sections.create!(:name => 'Section A')
 end
 

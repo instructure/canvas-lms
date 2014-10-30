@@ -7,7 +7,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     before(:each) do
       course_with_student_logged_in
-      set_course_draft_state
     end
 
     def set_notification_policy

@@ -270,9 +270,7 @@
         <div class="new" style="margin-top: 5px;">
           <%= before_label :topic_name, "Topic Name" %>
           <input type="text" name="title" class="item_title" aria-label="<%= before_label :topic_name, "Topic Name" %>" />
-          <% if @context.feature_enabled? :draft_state %>
-            <input type="hidden" name="published" value="false"/>
-          <% end %>
+          <input type="hidden" name="published" value="false"/>
           <a href="<%= context_url(@context, :api_v1_context_discussion_topics_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>

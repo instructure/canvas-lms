@@ -6,7 +6,6 @@
     :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content),
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
-    :ENABLE_DRAFT => @context.feature_enabled?(:draft_state),
   })
 %>
 <% js_bundle :context_modules %>

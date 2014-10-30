@@ -22,7 +22,7 @@ describe ContextModulesHelper do
   include ContextModulesHelper
 
   describe "module_item_unpublishable?" do
-    let_once(:t_course) { course(draft_state: true, active_all: true) }
+    let_once(:t_course) { course(active_all: true) }
     let_once(:t_module) { t_course.context_modules.create! name: "test module" }
 
     it "should return true for a nil item" do

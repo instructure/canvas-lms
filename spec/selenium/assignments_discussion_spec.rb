@@ -6,7 +6,6 @@ describe "discussion assignments" do
 
   before (:each) do
     @domain_root_account = Account.default
-    @domain_root_account.enable_feature!(:draft_state)
     course_with_teacher_logged_in
   end
 

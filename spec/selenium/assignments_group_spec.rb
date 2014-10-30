@@ -10,9 +10,7 @@ describe "assignment groups" do
 
   before (:each) do
     @domain_root_account = Account.default
-    @domain_root_account.enable_feature!(:draft_state)
     course_with_teacher_logged_in
-    @course.enable_feature!(:draft_state)
     @course.require_assignment_group
     @assignment_group = @course.assignment_groups.first
     @course.assignments.create(:name => "test", :assignment_group => @assignment_group)

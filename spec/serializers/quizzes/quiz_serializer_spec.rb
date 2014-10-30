@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizSerializer do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
 
   def quiz_serializer(options={})
     options.reverse_merge!({

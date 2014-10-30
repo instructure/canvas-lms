@@ -14,7 +14,6 @@ describe "assignment groups" do
     before(:each) do
       make_full_screen
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     it "should create an assignment with default dates" do

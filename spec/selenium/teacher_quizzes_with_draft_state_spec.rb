@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes with draft state" do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"

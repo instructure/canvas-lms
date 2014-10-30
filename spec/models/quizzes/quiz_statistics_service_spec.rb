@@ -20,9 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizStatisticsService do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   let_once (:course) { Course.new.tap { |course| course.id = 1 } }
   let_once :quiz do

@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizStatisticsSerializer do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   let :context do
     Course.new.tap do |course|

@@ -19,9 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizQuestionsController do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   def course_quiz(active=false)
     @quiz = @course.quizzes.create

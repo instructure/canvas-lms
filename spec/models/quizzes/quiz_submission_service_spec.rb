@@ -20,9 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 shared_examples_for 'Takeable Quiz Services' do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   it 'should deny access to locked quizzes' do
     quiz.stubs(:locked?).returns true

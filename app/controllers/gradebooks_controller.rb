@@ -205,7 +205,6 @@ class GradebooksController < ApplicationController
       :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
-      :draft_state_enabled => @context.feature_enabled?(:draft_state),
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
@@ -343,7 +342,7 @@ class GradebooksController < ApplicationController
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    if @context.feature_enabled?(:draft_state) && @assignment.unpublished?
+    if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'Speedgrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])

@@ -466,8 +466,6 @@ describe GradebooksController do
       it "redirects if draft state is enabled and the assignment is unpublished" do
 
         # Unpublished assignment and draft state enabled
-        @course.account.enable_feature!(:draft_state)
-
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         expect(response).to be_redirect
         expect(flash[:notice]).to eq I18n.t(
@@ -530,7 +528,6 @@ describe GradebooksController do
     context 'draft state' do
       it 'should not return unpublished assignments' do
         course_with_student
-        @course.account.enable_feature!(:draft_state)
         ag = @course.assignment_groups.create! group_weight: 100
         a1 = ag.assignments.create! :submission_types => 'online_upload',
                                     :points_possible  => 10,
