@@ -72,18 +72,18 @@ BZ Git branch layout
 ========
 
 UPSTREAM STABLE
-	=> BZ stable - we should never commit to this, it just mirrors upstream stable; it is where we stage changes for upstream PRs
-		=> BZ master (merges from staging)
-		=> BZ staging
-			=> feature branches (will also merge ones from upstream if needed)
-		=> feature branches intended to go upstream (branched off stable)
+* BZ stable - we should never commit to this, it just mirrors upstream stable; it is where we stage changes for upstream PRs
+  * BZ master (merges from staging)
+  * BZ staging
+    * feature branches (will also merge ones from upstream if needed)
+    * feature branches intended to go upstream (branched off stable)
 
 
 Dev wise, we need to use a different branch:
-	* stable matches upstream
-	* we branch from stable for a feature that we want to merge up
-	* our own stuff is in a BZ branch, which works as our master
-	* upstream things that work for us too are merged from the off master branch into our off BZ branch
+  * stable matches upstream
+  * we branch from stable for a feature that we want to merge up
+  * our own stuff is in a BZ branch, which works as our master
+  * upstream things that work for us too are merged from the off master branch into our off BZ branch
 		(git checkout beyondz; git checkout -b integrate_that_thing_with_us; git merge that_thing)
 
 
