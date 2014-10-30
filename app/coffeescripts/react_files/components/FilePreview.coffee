@@ -51,38 +51,16 @@ define [
     getItemsToView: (props) ->
       # Sets up our collection that we will be using.
       onlyIdsToPreview = props.query.only_preview?.split(',')
-      isSearchResults = !!props.query.search_term
-      if isSearchResults
-        folder = props.collection.models
-        files = folder
-      else
-        folder = props.currentFolder
-        files = folder.files
+      files = if !!props.query.search_term
+                props.collection.models
+              else
+                props.currentFolder.files.models
 
-      otherItems =  if onlyIdsToPreview # expects this to be [1,2,34,9] (ids of files to preview)
-                      files.filter (file) ->
-                        file.id in onlyIdsToPreview
-                    else
-                      files
+      otherItems =  files.filter (file) ->
+                      return true unless onlyIdsToPreview
+                      file.id in onlyIdsToPreview
 
-      # If preview contains data (i.e. ?preview=4)
-      if props.query.preview
-        # We go back to the folder to pull this data.
-        initialItem = if isSearchResults
-                        _.find folder, (file) =>
-                          file.id is props.query.preview
-                      else
-                        files.get(props.query.preview)
-
-
-      # If preview doesn't contain data (i.e. ?preview)
-      # we'll just use the first one in our otherItems collection.
-      else
-        # Because otherItems may (or may not be) a Backbone collection (FilesCollection) we change up our method.
-        initialItem = if otherItems instanceof Backbone.Collection
-          otherItems.first()
-        else
-          _.first(otherItems)
+      initialItem = (props.query.preview and _.findWhere(files, {id: props.query.preview})) or files[0]
 
       {initialItem, otherItems}
 
@@ -129,7 +107,7 @@ define [
     getNavigationParams: (opts = {id: null, except: []}) ->
       obj =
         preview: (opts.id if opts.id)
-        search_term: (@props.query.search_term if @props.search_term)
+        search_term: (@props.query.search_term if @props.query.search_term)
         only_preview: (@state.otherItemsString if @state.otherItemsString)
 
       _.each obj, (v, k) ->
@@ -177,9 +155,9 @@ define [
           className: 'ef-file-preview-container-arrow-link'
         },
           div {className: 'ef-file-preview-arrow-link'},
-            i {className: "icon-arrow-open-#{direction}"}      
-              
-              
+            i {className: "icon-arrow-open-#{direction}"}
+
+
 
     scrollLeft: (event) ->
       width = $('.ef-file-preview-footer-list').width()
@@ -204,7 +182,7 @@ define [
 
     render: withReactDOM ->
       ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
-        div {className: 'ef-file-preview-overlay'},            
+        div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
             div {className: 'grid-row middle-xs'},
               div {className: 'col-xs-6'},
@@ -216,29 +194,29 @@ define [
                   a {
                     className: 'ef-file-preview-header-download ef-file-preview-button'
                     href: @state.displayedItem?.get('url')
-                    style: {'border-right': '1px solid #8c8c8c'} if @state.showInfoPanel 
+                    style: {'border-right': '1px solid #8c8c8c'} if @state.showInfoPanel
                   },
                     i {className: 'icon-download'} #Replace with actual icon
                     " " + I18n.t('file_preview_headerbutton_download', 'Download')
                   button {
-                    className: if @state.showInfoPanel then 'ef-file-preview-button--active btn-link ef-file-preview-header-info ef-file-preview-button' else 'btn-link ef-file-preview-header-info ef-file-preview-button'                       
+                    className: if @state.showInfoPanel then 'ef-file-preview-button--active btn-link ef-file-preview-header-info ef-file-preview-button' else 'btn-link ef-file-preview-header-info ef-file-preview-button'
                     onClick: @toggle('showInfoPanel')
                   },
                     i {className: 'icon-info'}
                     ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
                   ReactRouter.Link {
-                    to: @getRouteIdentifier(), 
-                    query: @getNavigationParams(except: 'only_preview'), 
-                    params: @props.params, 
-                    className: 'ef-file-preview-header-close ef-file-preview-button', 
-                    style: {'border-left': '1px solid #8c8c8c'} if @state.showInfoPanel 
+                    to: @getRouteIdentifier(),
+                    query: @getNavigationParams(except: 'only_preview'),
+                    params: @props.params,
+                    className: 'ef-file-preview-header-close ef-file-preview-button',
+                    style: {'border-left': '1px solid #8c8c8c'} if @state.showInfoPanel
                   },
                     i {className: 'icon-end'}
                     ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
 
-          
-          div {className: 'ef-file-preview-stretch'},            
-            div {className: 'ef-file-preview-content'}, 
+
+          div {className: 'ef-file-preview-stretch'},
+            div {className: 'ef-file-preview-content'},
               # We need to render out the left/right arrows
               @renderArrowLink('left') if @state.otherItems?.length > 0
               if @state.displayedItem
