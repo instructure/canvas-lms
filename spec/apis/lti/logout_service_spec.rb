@@ -117,7 +117,7 @@ describe LtiApiController, type: :request do
       login_as 'parajsa', 'password1'
       token = Lti::LogoutService::Token.create(@tool, @pseudonym)
       Lti::LogoutService.register_logout_callback(token, 'http://logout.notify.example.com/789')
-      Net::HTTP.expects(:get).with(URI('http://logout.notify.example.com/789'))
+      CanvasHttp.expects(:get).with('http://logout.notify.example.com/789')
       delete '/logout'
       run_jobs
     end
