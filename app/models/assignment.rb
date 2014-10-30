@@ -1591,11 +1591,6 @@ class Assignment < ActiveRecord::Base
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
   }
 
-  # shim to get MRA build passing (remove once MRA is patched)
-  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
-    visible_to_students_in_course_with_da(user_id, course_id)
-  }
-
   # course_ids should be courses that restrict visibility based on overrides
   # ie: courses with differentiated assignments on or in which the user is not a teacher
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids|
