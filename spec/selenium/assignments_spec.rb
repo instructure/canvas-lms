@@ -1,4 +1,5 @@
 ﻿require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "assignments" do
 
@@ -7,50 +8,6 @@ describe "assignments" do
   include_examples "in-process server selenium tests"
 
   context "as a teacher" do
-
-    def manually_create_assignment(assignment_title = 'new assignment')
-      get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { f('.new_assignment').click }
-      replace_content(f('#assignment_name'), assignment_title)
-    end
-
-    def submit_assignment_form
-      expect_new_page_load { f('.btn-primary[type=submit]').click }
-      wait_for_ajaximations
-    end
-
-    def edit_assignment
-      expect_new_page_load { f('.edit_assignment_link').click }
-      wait_for_ajaximations
-    end
-
-    def run_assignment_edit(assignment)
-      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-
-      yield
-
-      submit_assignment_form
-    end
-
-    def stub_freezer_plugin(frozen_atts = nil)
-      frozen_atts ||= {
-          "assignment_group_id" => "true"
-      }
-      PluginSetting.stubs(:settings_for_plugin).returns(frozen_atts)
-    end
-
-    def frozen_assignment(group)
-      group ||= @course.assignment_groups.first
-      assign = @course.assignments.create!(
-          :name => "frozen",
-          :due_at => Time.now.utc + 2.days,
-          :assignment_group => group,
-          :freeze_on_copy => true
-      )
-      assign.copied = true
-      assign.save!
-      assign
-    end
 
     before(:each) do
       course_with_teacher_logged_in
@@ -106,6 +63,25 @@ describe "assignments" do
       expect(driver.execute_script("return document.title")).to include_text(assignment_name + ' edit')
     end
 
+
+    it "should create an assignment using main add button" do
+      assignment_name = 'first assignment'
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      #create assignment
+      f(".new_assignment").click
+      wait_for_ajaximations
+      f('#assignment_name').send_keys(assignment_name)
+      f('#assignment_text_entry').click
+      submit_assignment_form
+
+      #make sure assignment was added to correct assignment group
+      keep_trying_until do
+        expect(f('h1.title')).to include_text(assignment_name)
+      end
+    end
+
     it "should display assignment on calendar and link to assignment" do
       assignment_name = 'first assignment'
       due_date = Time.now + 2.days
@@ -121,52 +97,6 @@ describe "assignments" do
       f('.more_options_link').click
       wait_for_ajaximations
       expect(f('#assignment_name')['value']).to include_text(assignment_name)
-    end
-
-    it "should create an assignment" do
-      assignment_name = 'first assignment'
-      group1 = @course.assignment_groups.create!(:name => "first group")
-      group2 = @course.assignment_groups.create!(:name => "second group")
-      get "/courses/#{@course.id}/assignments"
-
-      #create assignment
-      f("#assignment_group_#{group2.id} .add_assignment").click
-      wait_for_ajaximations
-      f("#ag_#{group2.id}_assignment_name").send_keys(assignment_name)
-      f('.ui-datepicker-trigger').click
-      wait_for_ajaximations
-      datepicker = datepicker_next
-      datepicker.find_element(:css, '.ui-datepicker-ok').click
-      wait_for_ajaximations
-      submit_form(fj('form.form-dialog:visible'))
-
-      #make sure assignment was added to correct assignment group
-      wait_for_ajaximations
-      keep_trying_until do
-        expect(f("#assignment_group_#{group2.id}")).to include_text(assignment_name)
-      end
-
-      #click on assignment link
-      expect_new_page_load { f("#assignment_#{Assignment.last.id} .ig-title").click }
-      expect(f('h1.title')).to include_text(assignment_name)
-    end
-
-    %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
-      it "should create assignment with #{grading_option} grading option" do
-        assignment_title = 'grading options assignment'
-        manually_create_assignment(assignment_title)
-        wait_for_ajaximations
-        click_option('#assignment_grading_type', grading_option, :value)
-        if grading_option == "percent"
-          replace_content f('#assignment_points_possible'), ('1')
-        end
-        click_option('#assignment_submission_type', 'No Submission')
-        assignment_points_possible = f("#assignment_points_possible")
-        replace_content(assignment_points_possible, "5")
-        submit_assignment_form
-        expect(f('.title')).to include_text(assignment_title)
-        expect(Assignment.find_by_title(assignment_title).grading_type).to eq grading_option
-      end
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
@@ -258,85 +188,25 @@ describe "assignments" do
       expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
     end
 
-    def point_validation
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      yield if block_given?
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-      expect(fj('.error_text div').text).to eq "Points possible must be more than 0 for selected grading type"
-    end
-
-    it "should validate points for percentage grading (> 0)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Percentage')
-      }
-    end
-
-    it "should validate points for percentage grading (!= '')" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Percentage')
-        replace_content f('#assignment_points_possible'), ('')
-      }
-    end
-
-    it "should validate points for percentage grading (digits only)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Percentage')
-        replace_content f('#assignment_points_possible'), ('taco')
-      }
-    end
-
-    it "should validate points for letter grading (> 0)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Letter Grade')
-      }
-    end
-
-    it "should validate points for letter grading (!= '')" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Letter Grade')
-        replace_content f('#assignment_points_possible'), ('')
-      }
-    end
-
-    it "should validate points for letter grading (digits only)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'Letter Grade')
-        replace_content f('#assignment_points_possible'), ('taco')
-      }
-    end
-
-    it "should validate points for GPA scale grading (> 0)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'GPA Scale')
-      }
-    end
-
-    it "should validate points for GPA scale grading (!= '')" do
-      point_validation {
-        click_option('#assignment_grading_type', 'GPA Scale')
-        replace_content f('#assignment_points_possible'), ('')
-      }
-    end
-
-    it "should validate points for GPA scale grading (digits only)" do
-      point_validation {
-        click_option('#assignment_grading_type', 'GPA Scale')
-        replace_content f('#assignment_points_possible'), ('taco')
-      }
-    end
-
     context "frozen assignment", :priority => "2" do
       before do
         stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
         default_group = @course.assignment_groups.create!(:name => "default")
         @frozen_assign = frozen_assignment(default_group)
+      end
+
+      it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
+        get "/courses/#{@course.id}/assignments"
+        fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
+        wait_for_ajaximations
+        expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
+      end
+
+      it "should not allow deleting a frozen assignment from index page" do
+        get "/courses/#{@course.id}/assignments"
+        fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
+        wait_for_ajaximations
+        expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
       end
 
       it "should allow editing the due date even if completely frozen" do
@@ -348,39 +218,6 @@ describe "assignments" do
         expect(f('.assignment_dates').text).to match /Sep 20, 2012/
         #some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
         expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
-      end
-    end
-
-    context "frozen assignment_group_id" do
-      before do
-        stub_freezer_plugin
-        default_group = @course.assignment_groups.create!(:name => "default")
-        @frozen_assign = frozen_assignment(default_group)
-      end
-
-      it "should not allow assignment group to be deleted by teacher if assignment group id frozen", :priority => "2" do
-        get "/courses/#{@course.id}/assignments"
-        expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
-        expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
-      end
-
-      it "should not be locked for admin", :priority => "2" do
-        @course.assignment_groups.create!(:name => "other")
-        course_with_admin_logged_in(:course => @course, :name => "admin user")
-        orig_title = @frozen_assign.title
-
-        run_assignment_edit(@frozen_assign) do
-          # title isn't locked, should allow editing
-          f('#assignment_name').send_keys(' edit')
-
-          expect(f('#assignment_group_id').attribute('disabled')).to be_nil
-          expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
-          expect(f('#assignment_description').attribute('disabled')).to be_nil
-          click_option('#assignment_group_id', "other")
-        end
-
-        expect(f('h1.title')).to include_text(orig_title + ' edit')
-        expect(@frozen_assign.reload.assignment_group.name).to eq "other"
       end
     end
 
@@ -437,27 +274,6 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@a2.id}"
         wait_for_ajaximations
         expect(f("#sequence_footer .module-sequence-footer")).to be_present
-      end
-    end
-
-    context "frozen assignment_group_id", :priority => "2" do
-      before do
-        stub_freezer_plugin
-        default_group = @course.assignment_groups.create!(:name => "default")
-        @frozen_assign = frozen_assignment(default_group)
-      end
-      it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
-        get "/courses/#{@course.id}/assignments"
-        fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
-        wait_for_ajaximations
-        expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
-      end
-
-      it "should not allow deleting a frozen assignment from index page" do
-        get "/courses/#{@course.id}/assignments"
-        fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
-        wait_for_ajaximations
-        expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
       end
     end
 
@@ -561,69 +377,6 @@ describe "assignments" do
 
           expect(@assignment.reload.active_assignment_overrides.count).to eq 1
         end
-      end
-    end
-
-    context "menu tools" do
-      before do
-        course_with_teacher_logged_in(:draft_state => true)
-        Account.default.enable_feature!(:lor_for_account)
-
-        @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-        @tool.assignment_menu = {:url => "http://www.example.com", :text => "Export Assignment"}
-        @tool.quiz_menu = {:url => "http://www.example.com", :text => "Export Quiz"}
-        @tool.discussion_topic_menu = {:url => "http://www.example.com", :text => "Export DiscussionTopic"}
-        @tool.save!
-
-        @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
-      end
-
-      it "should show tool launch links in the gear for items on the index" do
-        plain_assignment = @assignment
-
-        quiz_assignment = assignment_model(:submission_types => "online_quiz", :course => @course)
-        quiz_assignment.reload
-        quiz = quiz_assignment.quiz
-
-        topic_assignment = assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)
-        topic_assignment.reload
-        topic = topic_assignment.discussion_topic
-
-        get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-
-        gear = f("#assignment_#{plain_assignment.id} .al-trigger")
-        gear.click
-        link = f("#assignment_#{plain_assignment.id} li a.menu_tool_link")
-        expect(link).to be_displayed
-        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{plain_assignment.id}"
-
-        gear = f("#assignment_#{topic_assignment.id} .al-trigger")
-        gear.click
-        link = f("#assignment_#{topic_assignment.id} li a.menu_tool_link")
-        expect(link).to be_displayed
-        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{topic.id}"
-
-        gear = f("#assignment_#{quiz_assignment.id} .al-trigger")
-        gear.click
-        link = f("#assignment_#{quiz_assignment.id} li a.menu_tool_link")
-        expect(link).to be_displayed
-        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
-      end
-
-      it "should show tool launch links in the gear for items on the show page" do
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
-
-        gear = f("#assignment_show .al-trigger")
-        gear.click
-        link = f("#assignment_show li a.menu_tool_link")
-        expect(link).to be_displayed
-        expect(link.text).to match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-        expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
       end
     end
   end

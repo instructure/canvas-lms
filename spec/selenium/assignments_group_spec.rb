@@ -32,6 +32,22 @@ describe "assignment groups" do
     expect(ff('.assignment_group .ig-header h2').map(&:text)).to include("Second AG")
   end
 
+  it "should default to proper group when using group's inline add assignment button" do
+    @course.require_assignment_group
+    ag = @course.assignment_groups.create!(:name => "Pamplemousse")
+
+    get "/courses/#{@course.id}/assignments"
+    wait_for_ajaximations
+
+    f("#assignment_group_#{ag.id} .add_assignment").click
+
+    wait_for_ajaximations
+    fj('.more_options:visible').click
+    wait_for_ajaximations
+
+    expect(get_value("#assignment_group_id")).to eq ag.id.to_s
+  end
+
   #Per selenium guidelines, we should not test buttons navigating to a page
   # We could test that the page loads with the correct info from the params elsewhere
   it "should remember entered settings when 'more options' is pressed" do
@@ -170,6 +186,83 @@ describe "assignment groups" do
 
     ags.each {|ag| ag.reload}
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
+  end
+
+  it "should allow quick-adding an assignment to a group", :priority => "2" do
+    @course.require_assignment_group
+    ag = @course.assignment_groups.first
+
+    get "/courses/#{@course.id}/assignments"
+    wait_for_ajaximations
+
+    f("#assignment_group_#{ag.id} .add_assignment").click
+    wait_for_ajaximations
+
+    replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+    replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+    fj('.create_assignment:visible').click
+    wait_for_ajaximations
+
+    a = ag.reload.assignments.last
+    expect(a.name).to eq "Do this"
+    expect(a.points_possible).to eq 13 
+
+    expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "Do this"
+  end
+
+  it "should allow quick-adding two assignments to a group (dealing with form re-render)", :priority => "2" do
+    @course.require_assignment_group
+    ag = @course.assignment_groups.first
+
+    get "/courses/#{@course.id}/assignments"
+    wait_for_ajaximations
+
+    f("#assignment_group_#{ag.id} .add_assignment").click
+    wait_for_ajaximations
+
+    replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+    replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+    fj('.create_assignment:visible').click
+    wait_for_ajaximations
+
+    keep_trying_until do
+      fj("#assignment_group_#{ag.id} .add_assignment").click
+      wait_for_ajaximations
+      fj("#ag_#{ag.id}_assignment_name").displayed?
+    end
+  end
+
+  context "frozen assignment group" do
+    before do
+      stub_freezer_plugin
+      default_group = @course.assignment_groups.create!(:name => "default")
+      @frozen_assign = frozen_assignment(default_group)
+    end
+
+    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", :priority => "2" do
+      get "/courses/#{@course.id}/assignments"
+      expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
+      expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
+    end
+
+    it "should not be locked for admin", :priority => "2" do
+      @course.assignment_groups.create!(:name => "other")
+      course_with_admin_logged_in(:course => @course, :name => "admin user")
+      orig_title = @frozen_assign.title
+
+      run_assignment_edit(@frozen_assign) do
+        # title isn't locked, should allow editing
+        f('#assignment_name').send_keys(' edit')
+
+        expect(f('#assignment_group_id').attribute('disabled')).to be_nil
+        expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
+        expect(f('#assignment_description').attribute('disabled')).to be_nil
+        click_option('#assignment_group_id', "other")
+      end
+
+      expect(f('h1.title')).to include_text(orig_title + ' edit')
+      expect(@frozen_assign.reload.assignment_group.name).to eq "other"
+    end
   end
 
 end

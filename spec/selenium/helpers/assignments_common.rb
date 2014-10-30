@@ -75,3 +75,47 @@ def delete_assignment_group(assignment_group_id, opts={})
     wait_for_ajaximations
   end
 end
+
+def submit_assignment_form
+  expect_new_page_load { f('.btn-primary[type=submit]').click }
+  wait_for_ajaximations
+end
+
+def stub_freezer_plugin(frozen_atts = nil)
+  frozen_atts ||= {
+      "assignment_group_id" => "true"
+  }
+  PluginSetting.stubs(:settings_for_plugin).returns(frozen_atts)
+end
+
+def frozen_assignment(group)
+  group ||= @course.assignment_groups.first
+  assign = @course.assignments.create!(
+      :name => "frozen",
+      :due_at => Time.now.utc + 2.days,
+      :assignment_group => group,
+      :freeze_on_copy => true
+  )
+  assign.copied = true
+  assign.save!
+  assign
+end
+
+def run_assignment_edit(assignment)
+  get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+
+  yield
+
+  submit_assignment_form
+end
+
+def manually_create_assignment(assignment_title = 'new assignment')
+  get "/courses/#{@course.id}/assignments"
+  expect_new_page_load { f('.new_assignment').click }
+  replace_content(f('#assignment_name'), assignment_title)
+end
+
+def click_away_accept_alert
+  f('#section-tabs .home').click
+  driver.switch_to.alert.accept
+end
