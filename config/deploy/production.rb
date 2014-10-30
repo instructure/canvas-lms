@@ -8,6 +8,8 @@ role :app, %w{deploy@portal.beyondz.org}
 role :web, %w{deploy@portal.beyondz.org}
 role :db,  %w{deploy@portal.beyondz.org}
 
+set :branch, 'bz-master'
+
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server definition into the
