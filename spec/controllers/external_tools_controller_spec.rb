@@ -24,9 +24,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 #
 # Returns a valid ExternalTool.
 def new_valid_tool(course)
-  tool = course.context_external_tools.new(:name => "bob",
-                                           :consumer_key => "bob",
-                                           :shared_secret => "bob")
+  tool = course.context_external_tools.new(
+      name: "bob",
+      consumer_key: "bob",
+      shared_secret: "bob",
+      tool_id: 'some_tool',
+      privacy_level: 'public'
+  )
   tool.url = "http://www.example.com/basic_lti"
   tool.resource_selection = {
     :url => "http://#{HostUrl.default_host}/selection_test",
@@ -668,6 +672,29 @@ describe ExternalToolsController do
       end
     end
 
+  end
+
+  describe "'GET 'generate_sessionless_launch'" do
+    it "generates a sessionless launch" do
+      @tool = new_valid_tool(@course)
+      user_session(@user)
+
+      get :generate_sessionless_launch, :course_id => @course.id, id: @tool.id
+
+      expect(response).to be_success
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+      tool_settings = launch_settings['tool_settings']
+
+      expect(launch_settings['launch_url']).to eq 'http://www.example.com/basic_lti'
+      expect(launch_settings['tool_name']).to eq 'bob'
+      expect(launch_settings['analytics_id']).to eq 'some_tool'
+      expect(tool_settings['custom_canvas_course_id']).to eq @course.id.to_s
+      expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
+    end
   end
 
 end
