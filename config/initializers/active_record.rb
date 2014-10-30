@@ -16,6 +16,10 @@ class ActiveRecord::Base
     value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
   end
 
+  class << self
+    delegate :distinct_on, to: :scoped
+  end
+
   alias :clone :dup
 
   def serializable_hash(options = nil)
@@ -425,35 +429,6 @@ class ActiveRecord::Base
     }
   end
 
-  def self.distinct_on(columns, options)
-    columns = Array(columns)
-    bad_options = options.keys - [:select, :order]
-    if bad_options.present?
-      # while it's possible to make this work with :limit, it would be gross
-      # for non-native, so we don't allow it
-      raise "can't use #{bad_options.join(', ')} with distinct on"
-    end
-
-    native = (connection.adapter_name == 'PostgreSQL')
-    options[:select] = "DISTINCT ON (#{columns.join(', ')}) " + (options[:select] || '*') if native
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
-
-    scope = self
-    scope = scope.select(options[:select]) if options[:select]
-    scope = scope.order(options[:order]) if options[:order]
-    result = scope.all
-
-    if !native
-      columns = columns.map{ |c| c.to_s.sub(/.*\./, '') }
-      result = result.inject([]) { |ary, row|
-        ary << row unless ary.last && columns.all?{ |c| ary.last[c] == row[c] }
-        ary
-      }
-    end
-
-    result
-  end
-
   def self.distinct(column, options={})
     column = column.to_s
     options = {:include_nil => false}.merge(options)
@@ -856,6 +831,27 @@ ActiveRecord::Relation.class_eval do
       scope = scope.where("updated_at<?", bound)
     end
     scope.update_all(updated_at: now)
+  end
+
+  def distinct_on(*args)
+    args.map! do |column_name|
+      if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
+        "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+      else
+        column_name.to_s
+      end
+    end
+
+    relation = clone
+    old_select = relation.select_values
+    relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
+    if old_select.empty?
+      relation.select_values.first << "*"
+    else
+      relation.select_values.first << old_select.uniq.join(', ')
+    end
+
+    relation
   end
 end
 

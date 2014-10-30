@@ -1597,9 +1597,9 @@ class User < ActiveRecord::Base
               scope = scope.where(:id => local_ids)
             end
 
-            courses = scope.distinct_on(["courses.id"],
-              :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-              :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+            courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+                order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
+                distinct_on(:id).to_a
 
             unless options[:include_completed_courses]
               enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all

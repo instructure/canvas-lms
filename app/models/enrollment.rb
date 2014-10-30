@@ -965,7 +965,7 @@ class Enrollment < ActiveRecord::Base
   def self.top_enrollment_by(key, rank_order = :default)
     raise "top_enrollment_by_user must be scoped" unless scoped.where_values.present?
     key = key.to_s
-    distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
+    order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
   end
 
   def assign_uuid
