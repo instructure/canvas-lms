@@ -75,6 +75,10 @@ module Api::V1::Submission
       hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
     end
 
+    if includes.include?("visibility")
+      hash['assignment_visible'] = submission.assignment_visible_to_user?(submission.user)
+    end
+
     hash
   end
 

@@ -20,6 +20,7 @@ class Submission < ActiveRecord::Base
   include SendToStream
   attr_protected :submitted_at
   attr_readonly :assignment_id
+  attr_accessor :visible_to_user
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
   belongs_to :user
@@ -798,6 +799,7 @@ class Submission < ActiveRecord::Base
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 
   def assignment_visible_to_user?(user, opts={})
+    return visible_to_user unless visible_to_user.nil?
     assignment.visible_to_user?(user, opts)
   end
 

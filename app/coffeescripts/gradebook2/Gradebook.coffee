@@ -455,8 +455,7 @@ define [
         student = @student(data.user_id)
         for submission in data.submissions
           current_submission = student["assignment_#{submission.assignment_id}"]
-          hidden = current_submission["hidden"] if current_submission?
-          @updateSubmission(submission) unless hidden
+          @updateSubmission(submission) unless current_submission?["hidden"]
         student.loaded = true
         @grid.invalidateRow(student.row)
         @calculateStudentGrade(student)
@@ -499,6 +498,8 @@ define [
           editing and
           activeCell.row is student.row and
           activeCell.cell is cell
+        #check for DA visible
+        submission["hidden"] = !submission.assignment_visible if submission.assignment_visible?
         @updateSubmission(submission)
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive

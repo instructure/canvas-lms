@@ -38,6 +38,7 @@ def create_section_override_for_assignment(assignment_or_quiz, opts={})
   ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
   ao.title = "test override"
   ao.save!
+  ao
 end
 alias :create_section_override_for_quiz :create_section_override_for_assignment
 
