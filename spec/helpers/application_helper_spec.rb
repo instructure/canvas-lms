@@ -477,8 +477,16 @@ describe ApplicationHelper do
         expect(dashboard_url).to eq "http://foo.bar"
       end
 
-      it "with login_success=1, returns a regular canvas dashboard url" do
-        expect(dashboard_url(:login_success => '1')).to eq "http://test.host/?login_success=1"
+      context "with login_success=1" do
+        it "returns a regular canvas dashboard url" do
+          expect(dashboard_url(:login_success => '1')).to eq "http://test.host/?login_success=1"
+        end
+      end
+
+      context "with become_user_id=1" do
+        it "returns a regular canvas dashboard url for masquerading" do
+          expect(dashboard_url(:become_user_id => '1')).to eq "http://test.host/?become_user_id=1"
+        end
       end
 
       context "with a user logged in" do

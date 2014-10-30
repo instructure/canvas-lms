@@ -823,12 +823,12 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 
   def dashboard_path(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 
