@@ -141,7 +141,7 @@ describe "announcements" do
         expect_new_page_load { f('.btn-primary').click }
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
-        expect(what_to_create.find_by_title(topic_title).attachment_id).to be_present
+        expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
       it "should add an attachment to a graded topic" do

@@ -242,7 +242,7 @@ describe "course people" do
           select_from_auto_complete(@student.name, 'student_input')
         end
 
-        expect(@observer.enrollments.find_by_associated_user_id(@student.id)).not_to be_nil
+        expect(@observer.enrollments.where(associated_user_id: @student)).to be_exists
         expect(f("#user_#{@observer.id}.ObserverEnrollment").text).to include("Observing: #{@student.name}")
       end
     end

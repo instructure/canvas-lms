@@ -92,7 +92,7 @@ describe "assignments" do
       submit_form('#add_group_form')
       wait_for_ajaximations
       expect(f('.group_list')).to include_text(new_group_name)
-      expect(Group.find_by_name(new_group_name)).to be_present
+      expect(Group.where(name: new_group_name).first).to be_present
     end
 
     it "should verify lock until date is enforced" do

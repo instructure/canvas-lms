@@ -277,7 +277,7 @@ describe UsersController do
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
           expect(response).to be_success
-          new_pseudo = Pseudonym.find_by_unique_id('jane@example.com')
+          new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
           expect(new_user.observed_users).to eq [@user]
           oe = new_user.observer_enrollments.first
@@ -295,7 +295,7 @@ describe UsersController do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         expect(response).to be_success
 
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p).to be_active
         expect(p.user).to be_pre_registered
         expect(p.user.name).to eq 'Jacob Fugal'
@@ -324,7 +324,7 @@ describe UsersController do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         expect(response).to be_success
 
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p).to be_active
         expect(p.user).to be_pre_registered
         expect(p.user.name).to eq 'Jacob Fugal'
@@ -468,7 +468,7 @@ describe UsersController do
         it "should create a pre_registered user (in the correct account)" do
           post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
           expect(response).to be_success
-          p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+          p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
           expect(p.sis_user_id).to eq 'testsisid'
@@ -478,7 +478,7 @@ describe UsersController do
         it "should create users with non-email pseudonyms" do
           post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
           expect(response).to be_success
-          p = Pseudonym.find_by_unique_id('jacob')
+          p = Pseudonym.where(unique_id: 'jacob').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
           expect(p.sis_user_id).to eq 'testsisid'
@@ -506,7 +506,7 @@ describe UsersController do
         user_session(admin)
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
         expect(response).to be_success
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p.account_id).to eq account.id
         expect(p).to be_active
         expect(p.sis_user_id).to be_nil
@@ -541,7 +541,7 @@ describe UsersController do
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         expect(response).to be_success
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_nil
       end
     end

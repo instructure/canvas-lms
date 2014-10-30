@@ -70,18 +70,18 @@ describe 'Student reports' do
 
       @submission_time = 1.month.ago
       @assignment1.grade_student(@user1, {:grade => '4'})
-      s = Submission.find_by_assignment_id_and_user_id(@assignment1.id, @user1.id)
+      s = Submission.where(assignment_id: @assignment1, user_id: @user1).first
       s.submitted_at = @submission_time
       s.save!
 
       @submission_time2 = 40.days.ago
       @assignment1.grade_student(@user2, {:grade => '5'})
-      s = Submission.find_by_assignment_id_and_user_id(@assignment1.id, @user2.id)
+      s = Submission.where(assignment_id: @assignment1, user_id: @user2).first
       s.submitted_at = @submission_time2
       s.save!
 
       @assignment2.grade_student(@user1, {:grade => '9'})
-      s = Submission.find_by_assignment_id_and_user_id(@assignment2.id, @user1.id)
+      s = Submission.where(assignment_id: @assignment2, user_id: @user1).first
       s.submitted_at = @submission_time2
       s.save!
     end

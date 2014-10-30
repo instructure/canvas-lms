@@ -86,9 +86,9 @@ describe "outcomes" do
         expect(f(".outcomes-content .title").text).to eq title
 
         # and the escaped version should be stored!
-        # LearningOutcome.find_by_short_description(escaped_title).should be_present
+        # expect(LearningOutcome.where(short_description: escaped_title)).to be_exists
         # or not, looks like it isn't being escaped
-        expect(LearningOutcome.find_by_short_description(title)).to be_present
+        expect(LearningOutcome.where(short_description: title)).to be_exists
       end
     end
 

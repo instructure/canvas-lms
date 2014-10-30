@@ -24,7 +24,7 @@ describe "quizzes question banks" do
       end
       question_bank_title.send_keys('goober', :return)
       wait_for_ajaximations
-      question_bank = AssessmentQuestionBank.find_by_title('goober')
+      question_bank = AssessmentQuestionBank.where(title: 'goober').first
       expect(question_bank).to be_present
       expect(question_bank.workflow_state).to eq "active"
       expect(f("#question_bank_adding .title")).to(include_text('goober'))

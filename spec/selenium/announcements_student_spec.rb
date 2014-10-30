@@ -33,7 +33,7 @@ describe "announcements" do
     f('#require_initial_post').click
     wait_for_ajaximations
     expect_new_page_load { submit_form('.form-actions') }
-    announcement = Announcement.find_by_title(topic_title)
+    announcement = Announcement.where(title: topic_title).first
     expect(announcement[:require_initial_post]).to eq true
     student_2 = student_in_course.user
     announcement.discussion_entries.create!(:user => student_2, :message => student_2_entry)

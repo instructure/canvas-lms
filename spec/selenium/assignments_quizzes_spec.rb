@@ -34,7 +34,7 @@ describe "quizzes assignments" do
       assign = @course.assignments.create!(:name => "Testy!", :submission_types => "online_quiz")
       get "/courses/#{@course.id}/assignments"
       edit_assignment(assign.id, :name => "Retest!", :submit => true)
-      expect(Quizzes::Quiz.find_by_assignment_id(assign.id).title).to eq "Retest!"
+      expect(Quizzes::Quiz.where(assignment_id: assign).first.title).to eq "Retest!"
     end
   end
 

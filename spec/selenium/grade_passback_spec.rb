@@ -4,7 +4,7 @@ describe "grade exchange course settings tab" do
   include_examples "in-process server selenium tests"
 
   def getpseudonym(user_sis_id)
-    pseudo = Pseudonym.find_by_sis_user_id(user_sis_id)
+    pseudo = Pseudonym.where(sis_user_id: user_sis_id).first
     expect(pseudo).not_to be_nil
     pseudo
   end
@@ -16,13 +16,13 @@ describe "grade exchange course settings tab" do
   end
 
   def getsection(section_sis_id)
-    section = CourseSection.find_by_sis_source_id(section_sis_id)
+    section = CourseSection.where(sis_source_id: section_sis_id).first
     expect(section).not_to be_nil
     section
   end
 
   def getenroll(user_sis_id, section_sis_id)
-    e = Enrollment.find_by_user_id_and_course_section_id(getuser(user_sis_id).id, getsection(section_sis_id).id)
+    e = Enrollment.where(user_id: getuser(user_sis_id).id, course_section_id: getsection(section_sis_id).id).first
     expect(e).not_to be_nil
     e
   end
@@ -41,7 +41,7 @@ describe "grade exchange course settings tab" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C1,C1,C1,,,active")
-    @course = Course.find_by_sis_source_id("C1")
+    @course = Course.where(sis_source_id: "C1").first
     @course.assignment_groups.create(:name => "Assignments")
     @teacher = getuser("T1")
     process_csv_data_cleanly(
@@ -74,13 +74,13 @@ describe "grade exchange course settings tab" do
     a2.grade_student(getuser("S6"), { :grade => "10", :grader => @teacher })
 
     @stud5, @stud6, @sec4 = nil, nil, nil
-    Pseudonym.find_by_sis_user_id("S5").tap do |p|
+    Pseudonym.where(sis_user_id: "S5").first.tap do |p|
       @stud5 = p
       p.sis_user_id = nil
       p.save
     end
 
-    Pseudonym.find_by_sis_user_id("S6").tap do |p|
+    Pseudonym.where(sis_user_id: "S6").first.tap do |p|
       @stud6 = p
       p.sis_user_id = nil
       p.save
@@ -127,8 +127,8 @@ describe "grade exchange course settings tab" do
         "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75,C\n" +
         "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
         "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
-        "#{@teacher.id},T1,#{getsection("S3").id},S3,#{@stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-        "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud6.user.id, @sec4.id).id},active,90,A-\n"
+        "#{@teacher.id},T1,#{getsection("S3").id},S3,#{@stud5.id},,#{Enrollment.where(user_id: @stud5.user.id, course_section_id: getsection("S3").first.id).id},active,85,B\n" +
+        "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.where(user_id: @stud6.user.id, course_section_id: @sec4.id).first.id},active,90,A-\n"
     SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
     f("#publish_grades_link").click
     wait_for_ajaximations
@@ -149,8 +149,8 @@ describe "grade exchange course settings tab" do
       "#{getenroll("S2", "S2").id},published,",
       "#{getenroll("S3", "S2").id},published,Grade modified",
       "#{getenroll("S4", "S1").id},error,Invalid user",
-      "#{Enrollment.find_by_user_id_and_course_section_id(@stud5.user.id, getsection("S3").id).id},error,Invalid user",
-      "#{Enrollment.find_by_user_id_and_course_section_id(@stud6.user.id, @sec4.id).id},error,")
+      "#{Enrollment.where(user_id: @stud5.user.id, course_section_id: getsection("S3").first.id).id},error,Invalid user",
+      "#{Enrollment.where(user_id: @stud6.user.id, course_section_id: @sec4.id).first.id},error,")
     keep_trying_until { f("#publish_grades_messages").text.strip.split("\n").to_set == "Error: Invalid user - 2\nPublished - 2\nPublished: Grade modified - 1\nError - 1".split("\n").to_set }
   end
 end

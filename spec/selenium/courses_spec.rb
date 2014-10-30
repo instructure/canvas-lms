@@ -208,7 +208,7 @@ describe "courses" do
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
       enrollment.update_attributes(:limit_privileges_to_course_section => true,
-                                   :course_section => CourseSection.find_by_name('Two'))
+                                   :course_section => CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"

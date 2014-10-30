@@ -79,8 +79,8 @@ describe "group weights" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    group_1 = AssignmentGroup.find_by_name(@group1.name)
-    group_2 = AssignmentGroup.find_by_name(@group2.name)
+    group_1 = AssignmentGroup.where(name: @group1.name).first
+    group_2 = AssignmentGroup.where(name: @group2.name).first
 
     #set and check the group weight of the first assignment group
     set_group_weight(group_1, weight_numbers[0])

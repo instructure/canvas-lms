@@ -80,13 +80,13 @@ describe Moodle::Converter do
     it "should convert assignments" do
       expect(@course.assignments.count).to eq 6
 
-      assignment = @course.assignments.find_by_title 'Create a Rails site'
+      assignment = @course.assignments.where(title: 'Create a Rails site').first
       expect(assignment).not_to be_nil
       expect(assignment.description).to eq "<p>Use `rails new` to create your first Rails site</p>"
     end
 
     it "should convert Moodle Workshop to peer reviewed assignment" do
-      assignment = @course.assignments.find_by_title 'My Workshop'
+      assignment = @course.assignments.where(title: 'My Workshop').first
       expect(assignment).not_to be_nil
       expect(assignment.description).to eq "<p>My Workshop Description</p>"
       expect(assignment.peer_reviews).to be_truthy
@@ -102,18 +102,18 @@ describe Moodle::Converter do
       expect(wiki).not_to be_nil
       expect(wiki.wiki_pages.count).to eq 3
 
-      page = wiki.wiki_pages.find_by_title 'My Wiki'
+      page = wiki.wiki_pages.where(title: 'My Wiki').first
       expect(page).not_to be_nil
       expect(page.url).to eq 'my-wiki-my-wiki'
       html = Nokogiri::HTML(page.body)
       href = html.search('a').first.attributes['href'].value
       expect(href).to eq "/courses/#{@course.id}/#{@course.wiki.path}/my-wiki-link"
 
-      page = wiki.wiki_pages.find_by_title 'link'
+      page = wiki.wiki_pages.where(title: 'link').first
       expect(page).not_to be_nil
       expect(page.url).to eq 'my-wiki-link'
 
-      page = wiki.wiki_pages.find_by_title 'New Wiki'
+      page = wiki.wiki_pages.where(title: 'New Wiki').first
       expect(page).not_to be_nil
       expect(page.url).to eq 'new-wiki-new-wiki'
     end
@@ -129,14 +129,14 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Quiz module to a quiz" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       expect(quiz).not_to be_nil
       expect(quiz.description).to match /Pop quiz hot shot/
       expect(quiz.quiz_questions.count).to eq 9
     end
 
     it "should convert Moodle Calculated Question to Canvas calculated_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[0]
       expect(question.question_data[:question_name]).to eq "Calculated Question"
       expect(question.question_data[:question_text]).to eq "How much is [a] + [b] ?"
@@ -152,7 +152,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Description Question to Canvas text_only_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[1]
       expect(question.question_data[:question_name]).to eq "Description Question"
       expect(question.question_data[:question_text]).to eq "Description Question Text"
@@ -160,7 +160,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Essay Question to Canvas essay_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[2]
       expect(question.question_data[:question_name]).to eq "Essay Question"
       expect(question.question_data[:question_text]).to eq "Essay Question Text"
@@ -169,7 +169,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Matching Question to Canvas matching_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[3]
       expect(question.question_data[:question_name]).to eq "Matching Question"
       expect(question.question_data[:question_text]).to eq "Matching Question Text"
@@ -178,7 +178,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Embedded Answers Question to Canvas essay_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[4]
       expect(question.question_data[:question_name]).to eq "Embedded Answers Question"
       expect(question.question_data[:question_text]).to match /Embedded Answers Question Text/
@@ -187,7 +187,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Multiple Choice Question to Canvas multiple_choice_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[5]
       expect(question.question_data[:question_name]).to eq "Multiple Choice Question"
       expect(question.question_data[:question_text]).to eq "Multiple Choice Question Text"
@@ -196,7 +196,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Numerical Question to Canvas numerical_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[6]
       expect(question.question_data[:question_name]).to eq "Numerical Question"
       expect(question.question_data[:question_text]).to eq "Numerical Question Text"
@@ -205,7 +205,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Short Answer Question to Canvas short_answer_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[7]
       expect(question.question_data[:question_name]).to eq "Short Answer Question"
       expect(question.question_data[:question_text]).to eq "Short Answer Question Text"
@@ -214,7 +214,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle True/False Question to Canvas true_false_question" do
-      quiz = @course.quizzes.find_by_title "First Quiz"
+      quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[8]
       expect(question.question_data[:question_name]).to eq "True or False Question"
       expect(question.question_data[:question_text]).to eq "True or False Question Text"
@@ -223,7 +223,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire module to a quiz" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       expect(quiz).not_to be_nil
       expect(quiz.description).to match /Questionnaire Summary/
       expect(quiz.quiz_type).to eq 'survey'
@@ -231,7 +231,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Check Boxes Question to Canvas multiple_answers_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[0]
       expect(question.question_data[:question_name]).to eq "Check Boxes Question"
       expect(question.question_data[:question_text]).to eq "Check Boxes Question Text"
@@ -239,7 +239,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Date Question to Canvas essay_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[1]
       expect(question.question_data[:question_name]).to eq "Date Question"
       expect(question.question_data[:question_text]).to eq "Date Question Text"
@@ -247,7 +247,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Dropdown Box Question to Canvas multiple_choice_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[2]
       expect(question.question_data[:question_name]).to eq "Dropdown Box Question"
       expect(question.question_data[:question_text]).to eq "Dropdown Box Question Text"
@@ -255,7 +255,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Essay Box Question to Canvas essay_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[3]
       expect(question.question_data[:question_name]).to eq "Essay Box Question"
       expect(question.question_data[:question_text]).to eq "Essay Box Question Text"
@@ -263,7 +263,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Label to Canvas text_only_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[4]
       expect(question.question_data[:question_name]).to eq ""
       expect(question.question_data[:question_text]).to eq "Label Text"
@@ -271,7 +271,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Numeric Question to Canvas numerical_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[5]
       expect(question.question_data[:question_name]).to eq "Numeric Question"
       expect(question.question_data[:question_text]).to eq "Numeric Question Text"
@@ -279,7 +279,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Radio Buttons Question to Canvas multiple_choice_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[6]
       expect(question.question_data[:question_name]).to eq "Radio Buttons Question"
       expect(question.question_data[:question_text]).to eq "Radio Buttons Question Text"
@@ -287,7 +287,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Rate Scale 1..5 Question to Canvas multiple_dropdowns_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[7]
       expect(question.question_data[:question_name]).to eq "Rate Scale 1..5 Question"
       expect(question.question_data[:question_text]).to eq "Rate Scale 1..5 Question Text\nquestion1 [response1]\nquestion2 [response2]\nquestion3 [response3]"
@@ -302,7 +302,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Text Box Question to Canvas essay_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[8]
       expect(question.question_data[:question_name]).to eq "Text Box Question"
       expect(question.question_data[:question_text]).to eq "Text Box Question Text"
@@ -310,7 +310,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Questionnaire Yes/No Question to Canvas true_false_question" do
-      quiz = @course.quizzes.find_by_title "My Questionnaire"
+      quiz = @course.quizzes.where(title: "My Questionnaire").first
       question = quiz.quiz_questions[9]
       expect(question.question_data[:question_name]).to eq "Yes No Question"
       expect(question.question_data[:question_text]).to eq "Yes No Question Text"
@@ -318,7 +318,7 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Choice module to a quiz" do
-      quiz = @course.quizzes.find_by_title "My Choice"
+      quiz = @course.quizzes.where(title: "My Choice").first
       expect(quiz).not_to be_nil
       expect(quiz.description).to match /Which one will you choose\?/
       expect(quiz.quiz_type).to eq 'survey'

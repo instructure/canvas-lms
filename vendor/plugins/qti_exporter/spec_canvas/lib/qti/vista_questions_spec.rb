@@ -161,19 +161,19 @@ describe "Converting Blackboard Vista qti" do
   it "should correctly reference associated files" do
     import_into_course
 
-    q = @course.assessment_questions.find_by_migration_id("ID_81847332876966484848484950729496134337732113114455")
+    q = @course.assessment_questions.where(migration_id: "ID_81847332876966484848484950729496134337732113114455").first
     expect(q).not_to be_nil
     expect(q.attachments.count).to eq 3
 
-    a = q.attachments.find_by_display_name("f11g1_r.jpg")
+    a = q.attachments.where(display_name: "f11g1_r.jpg").first
     expect(a.file_state).to eq 'available'
     expect(q.question_data[:question_text]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
-    
-    a = q.attachments.find_by_display_name("f11g2_r.jpg")
+
+    a = q.attachments.where(display_name: "f11g2_r.jpg").first
     expect(a.file_state).to eq 'available'
     expect(q.question_data[:answers][0][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
 
-    a = q.attachments.find_by_display_name("f11g3_r.jpg")
+    a = q.attachments.where(display_name: "f11g3_r.jpg").first
     expect(a.file_state).to eq 'available'
     expect(q.question_data[:answers][1][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
   end

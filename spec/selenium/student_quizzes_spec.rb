@@ -163,7 +163,7 @@ describe "quizzes" do
 
       driver.execute_script("window.close()")
 
-      quiz_sub = @quiz.quiz_submissions.find_by_user_id(@user.id)
+      quiz_sub = @quiz.quiz_submissions.where(user_id: @user).first
       expect(quiz_sub).to be_present
       expect(quiz_sub.workflow_state).to eq "untaken"
 

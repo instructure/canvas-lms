@@ -23,7 +23,7 @@ describe "assignment groups" do
       fill_assignment_overrides
       click_option('#assignment_submission_type', 'No Submission')
       update_assignment!
-      a = Assignment.find_by_title('vdd assignment')
+      a = Assignment.where(title: 'vdd assignment').first
       compare_assignment_times(a)
     end
 

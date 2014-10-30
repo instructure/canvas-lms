@@ -115,7 +115,7 @@ describe "external tools" do
       f('#external_tool_domain').send_keys('instructure.com')
       fj('.ui-dialog:visible .btn-primary').click()
       wait_for_ajaximations
-      f(".edit_tool_link[data-edit-external-tool='#{ContextExternalTool.find_by_name(tool_name).id}']").click
+      f(".edit_tool_link[data-edit-external-tool='#{ContextExternalTool.where(name: tool_name).first.id}']").click
       expect(f('#external_tool_name')).to have_attribute(:value, tool_name)
       expect(f('#external_tool_shared_secret')).to have_attribute(:value, "")
     end
@@ -673,7 +673,7 @@ describe "external tools" do
           f('#external_tool_domain').send_keys('instructure.com')
           f('#external_tool_form').submit()
           wait_for_ajaximations
-          f("#external_tool_#{ContextExternalTool.find_by_name(tool_name).id} .edit_tool_link").click
+          f("#external_tool_#{ContextExternalTool.where(name: tool_name).first.id} .edit_tool_link").click
           expect(f('#external_tool_name')).to have_attribute(:value, tool_name)
           expect(f('#external_tool_shared_secret')).to have_attribute(:value, "")
         end

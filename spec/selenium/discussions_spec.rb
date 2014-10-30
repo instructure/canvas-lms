@@ -1308,7 +1308,7 @@ describe "discussions" do
         get url
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
-        expect(DiscussionTopic.find_by_title(topic_title).attachment_id).to be_present
+        expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
       end
 
       it "should create a podcast enabled topic" do

@@ -57,7 +57,7 @@ describe "gradebook2" do
     end
 
     it "should not show concluded enrollments in active courses by default" do
-      @student_1.enrollments.find_by_course_id(@course.id).conclude
+      @student_1.enrollments.where(course_id: @course).first.conclude
 
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size

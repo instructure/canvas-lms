@@ -690,7 +690,7 @@ describe SIS::CSV::EnrollmentImporter do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
     )
-    course = Course.find_by_sis_source_id('test_1')
+    course = Course.where(sis_source_id: 'test_1').first
     course.offer!
 
     student = Pseudonym.where(:unique_id => "user1").first.user
