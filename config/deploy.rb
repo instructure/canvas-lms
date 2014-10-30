@@ -4,8 +4,6 @@ lock '3.2.1'
 set :application, 'canvas'
 set :repo_url, 'git@github.com:beyond-z/canvas-lms.git'
 
-set :branch, 'bz-master'
-
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
