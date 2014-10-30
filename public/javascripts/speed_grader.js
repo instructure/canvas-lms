@@ -1380,7 +1380,7 @@ define([
         I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
           gradee: gradeeLabel,
           x: EG.currentIndex() + 1,
-          y: jsonData.context.students.length
+          y: this.totalStudentCount()
         })
       );
 
@@ -1422,6 +1422,14 @@ define([
           y: jsonData.context.students.length
         })
       );
+    },
+
+    totalStudentCount: function(){
+      if (sectionToShow) {
+        return _.filter(jsonData.context.students, function(student) {return _.contains(student.section_ids, sectionToShow)}).length;
+      } else {
+        return jsonData.context.students.length;
+      };
     },
 
     loadAttachmentInline: function(attachment){
