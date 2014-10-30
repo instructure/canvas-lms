@@ -8,7 +8,7 @@ define(function(require) {
 
   var ChartMixin = {
     defaults: {
-      updateChart: function(props) {
+      updateChart: function(svg, props) {
         this.removeChart();
         this.__svg = this.createChart(getChartNode(this), props);
       },
@@ -56,7 +56,7 @@ define(function(require) {
       },
 
       shouldComponentUpdate: function(nextProps/*, nextState*/) {
-        this.updateChart(nextProps);
+        this.updateChart(this.__svg, nextProps);
         return false;
       },
 

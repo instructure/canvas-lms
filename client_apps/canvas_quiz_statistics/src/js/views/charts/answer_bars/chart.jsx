@@ -10,6 +10,8 @@ define(function(require) {
   var findWhere = _.findWhere;
   var compact = _.compact;
 
+  var SPECIAL_DATUM_IDS = [ 'other', 'none' ];
+
   var Chart = React.createClass({
     mixins: [ ChartMixin.mixin, ChartInspectorMixin.mixin ],
 
@@ -64,25 +66,49 @@ define(function(require) {
          */
         width: 'auto',
 
-        height: 120
+        height: 120,
+
+        animeDuration: 500
       };
     },
 
     createChart: function(node, props) {
-      var otherAnswers;
-      var width;
+      var width = this.calculateWidth(props);
+      var svg = d3.select(node)
+        .attr('width', width)
+        .attr('height', props.height)
+        .attr('aria-hidden', true)
+        .attr('role', 'presentation')
+        .append('g');
 
+      this.renderBars(svg, props);
+      this.renderStripePattern(svg);
+
+      return svg;
+    },
+
+    calculateWidth: function(props) {
+      if (props.width === 'auto') {
+        return this.getDOMNode().offsetWidth;
+      }
+      else {
+        return parseInt(props.width, 10);
+      }
+    },
+
+    updateChart: function(svg, props) {
+      this.renderBars(svg, props);
+    },
+
+    renderBars: function(svg, props) {
+      var visibilityThreshold;
+      var specialAnswers;
+      var width = this.calculateWidth(props);
       var data = props.answers;
       var barCount = data.length;
 
-      // We need the container element to calculate the chart's width in case
-      // it is set to "auto".
-      var container = this.getDOMNode();
-
       // The highest response count, for defining the y-axis range boundaries.
       var highest = d3.max(mapBy(data, 'y'));
-
-      var visibilityThreshold;
 
       // Uniform width of the bars that will represent answer sets. This amount
       // will consider @props.barWidth only if the chart is large enough to
@@ -97,15 +123,7 @@ define(function(require) {
       // Scales for the x and y axes.
       var x, y;
       var xUpperBound;
-      var svg;
-      var bars;
-
-      if (props.width === 'auto') {
-        width = container.offsetWidth;
-      }
-      else {
-        width = parseInt(props.width, 10);
-      }
+      var bars, stripedBars;
 
       // Need to figure out the upper boundary of the range for the x axis scale;
       // if the container is wide enough to display all the answer bars with the
@@ -131,71 +149,81 @@ define(function(require) {
 
       visibilityThreshold = Math.max(props.visibilityThreshold, y(highest) / 100.0);
 
-      svg = d3.select(node)
-        .attr('width', width)
-        .attr('height', props.height)
-        .attr('aria-hidden', true)
-        .attr('role', 'presentation')
-        .append('g');
-
       bars = svg.selectAll('.bar')
-        .data(data)
-        .enter().append('rect')
-          .attr("class", this.classifyChartBar)
-          .attr("width", effectiveBarWidth)
-          .attr("x", function(d, i) {
-            return x(i);
-          })
-          .attr("y", function(d) {
-            return y(d.y) - visibilityThreshold;
-          })
-          .attr("height", function(d) {
-            return props.height - y(d.y) + visibilityThreshold;
-          });
+        .data(data, function(d, i) { return d.id; });
 
-      ChartInspectorMixin.makeInspectable(bars, this);
+      bars.enter().append('rect')
+        .attr("class", function(d) {
+          return d.correct ? 'bar bar-highlighted' : 'bar';
+        })
+        .attr("x", function(d, i) {
+          return x(i);
+        })
+        .attr('y', props.height)
+        .attr("width", effectiveBarWidth)
+        .attr('height', 0);
+
+      bars.transition()
+        .duration(props.animeDuration)
+        .attr("y", function(d) {
+          return y(d.y) - visibilityThreshold;
+        })
+        .attr("height", function(d) {
+          return props.height - y(d.y) + visibilityThreshold;
+        });
+
+      bars.exit().remove();
 
       // If the special "No Answer" is present, we represent it as a diagonally-
       // striped bar, but to do that we need to render the <svg:pattern> that
       // generates the stripes and use that as a fill pattern, and we also need
       // to create the <svg:rect> that will be filled with that pattern.
-      otherAnswers = compact([
-        findWhere(data, { id: 'other' }),
-        findWhere(data, { id: 'none' })
-      ]);
+      specialAnswers = data.filter(function(d) {
+        return SPECIAL_DATUM_IDS.indexOf(d.id) > -1;
+      });
 
-      if (otherAnswers.length) {
-        this.renderStripePattern(svg);
-        svg.selectAll('.bar.bar-striped')
-          .data(otherAnswers)
-          .enter().append('rect')
-            .attr('class', 'bar bar-striped')
-            // We need to inline the fill style because we are referencing an
-            // inline pattern (#diagonalStripes) which is unreachable from a CSS
-            // directive.
-            //
-            // See this link [StackOverflow] for more info: http://bit.ly/1uDTqyn
-            .attr('style', 'fill: url(#diagonalStripes);')
-            // remove 2 pixels from width and height, and offset it by {1,1} on
-            // both axes to "contain" it inside the margins of the bg rect
-            .attr('x', function(d) {
-              var i = data.indexOf(d); // d is coming from otherAnswers
-              return x(i) + 1;
-            })
-            .attr('width', effectiveBarWidth-2)
-            .attr('y', function(d) {
-              return y(d.y + visibilityThreshold) + 1;
-            })
-            .attr('height', function(d) {
-              return props.height - y(d.y + visibilityThreshold) - 2;
-            });
-      }
+      stripedBars = svg.selectAll('.bar-striped')
+        .data(specialAnswers, function(d) { return d.id; });
 
-      return svg;
+      stripedBars.enter().append('rect')
+        .attr('class', 'bar-striped')
+        // We need to inline the fill style because we are referencing an
+        // inline pattern (#diagonalStripes) which is unreachable from a CSS
+        // directive.
+        //
+        // See this link [StackOverflow] for more info: http://bit.ly/1uDTqyn
+        .style('fill', 'url(#diagonalStripes)')
+        // remove 2 pixels from width and height, and offset it by {1,1} on
+        // both axes to "contain" it inside the margins of the bg rect
+        .attr('x', function(d) {
+          var i = data.indexOf(d); // d is coming from specialAnswers
+          return x(i) + 1;
+        })
+        .attr('width', effectiveBarWidth-2)
+        .attr("y", props.height)
+        .attr('height', 0);
+
+      stripedBars.transition()
+        .duration(props.animeDuration)
+        .attr("y", function(d) {
+          return y(d.y) - visibilityThreshold + 1;
+        })
+        .attr("height", function(d) {
+          return props.height - y(d.y) + visibilityThreshold - 2;
+        });
+
+      stripedBars.exit().remove();
+
+      ChartInspectorMixin.makeInspectable(svg.selectAll('.bar, .bar-striped'), this);
     },
 
     renderStripePattern: function(svg) {
       svg.append('pattern')
+        // we must assign an ID even if it will violate the uniqueness (other
+        // instances will render exactly the same pattern with this ID) because
+        // the inline referencing only works with IDs AND it must be reachable
+        // from the root svg element... so we can't share 1 instance in <body />
+        // or something
         .attr('id', 'diagonalStripes')
         .attr('width', 5)
         .attr('height', 5)
@@ -206,15 +234,6 @@ define(function(require) {
             .attr('d', 'M0,0 L0,10');
     },
 
-    classifyChartBar: function(answer) {
-      if (answer.correct) {
-        return 'bar bar-highlighted';
-      } else {
-        return 'bar';
-      }
-    },
-
-    updateChart: ChartMixin.mixin.updateChart,
     removeChart: ChartMixin.mixin.removeChart,
 
     render: function() {
