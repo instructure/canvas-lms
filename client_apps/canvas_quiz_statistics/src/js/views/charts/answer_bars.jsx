@@ -201,8 +201,8 @@ define(function(require) {
         <table>
           <caption>
             <Text phrase="audible_description">
-              This table contains the number of responses each answer in the
-              question has received.
+              This table lists all the answers to the question, along with the
+              number of responses they have received.
             </Text>
           </caption>
 

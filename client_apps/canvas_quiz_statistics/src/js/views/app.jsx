@@ -13,6 +13,7 @@ define(function(require) {
   var CalculatedRenderer = require('jsx!./questions/calculated');
   var FileUploadRenderer = require('jsx!./questions/file_upload');
   var ScreenReaderContent = require('jsx!../components/screen_reader_content');
+  var SightedUserContent = require('jsx!../components/sighted_user_content');
 
   var extend = _.extend;
   var Renderers = {
@@ -74,10 +75,12 @@ define(function(require) {
               </h2>
 
               <aside className="all-question-controls pull-right">
-                <ToggleDetailsButton
-                  onClick={this.toggleAllDetails}
-                  expanded={quizStatistics.expandingAll}
-                  controlsAll />
+                <SightedUserContent tagName="div">
+                  <ToggleDetailsButton
+                    onClick={this.toggleAllDetails}
+                    expanded={quizStatistics.expandingAll}
+                    controlsAll />
+                </SightedUserContent>
               </aside>
             </header>
 

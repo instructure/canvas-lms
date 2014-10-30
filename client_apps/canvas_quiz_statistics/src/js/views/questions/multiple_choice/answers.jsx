@@ -1,6 +1,8 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
+  var SightedUserContent = require('jsx!../../../components/sighted_user_content');
+
   var Answers = React.createClass({
     getDefaultProps: function() {
       return {
@@ -12,9 +14,9 @@ define(function(require) {
       // .detail-section CSS class makes this section controllable by the
       // "Toggle Details" button
       return(
-        <ol className="answer-drilldown detail-section">
+        <SightedUserContent tagName="ol" className="answer-drilldown detail-section">
           {this.props.answers.map(this.renderAnswer)}
-        </ol>
+        </SightedUserContent>
       );
     },
 
