@@ -214,8 +214,9 @@ class ExternalToolsController < ApplicationController
     opts = {
         launch_url: launch_url,
         resource_type: params[:launch_type],
-        custom_substitution: common_variable_substitutions
+        custom_substitutions: common_variable_substitutions
     }
+
     adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), opts)
 
     launch_settings = {
