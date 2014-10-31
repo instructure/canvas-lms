@@ -9,7 +9,7 @@ group :test do
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
   gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
     gem 'metaclass', '0.0.2'
-  gem 'thin', '1.5.1'
+  gem 'thin', '1.6.3'
     if RUBY_VERSION >= '2.2'
       gem 'eventmachine', :github => 'eventmachine/eventmachine'
     else
