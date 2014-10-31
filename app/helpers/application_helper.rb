@@ -24,8 +24,7 @@ module ApplicationHelper
   include Canvas::LockExplanation
 
   def beyondz_app_url(path)
-    path = path[1 .. -1] if path.starts_with?('/')
-    return "#{BeyondZConfiguration.base_url}#{path}"
+    BeyondZConfiguration.url(path)
   end
 
   def context_user_name(context, user)
