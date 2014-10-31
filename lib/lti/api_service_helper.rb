@@ -21,6 +21,10 @@
 
 module Lti
   module ApiServiceHelper
+    def lti_authenticate
+      @tool_proxy = ToolProxy.where(guid: oauth_consumer_key).first
+      render_unauthorized_action unless @tool_proxy && oauth_authenticated_request?(@tool_proxy.shared_secret)
+    end
 
     def oauth_authenticated_request?(secret)
       !!OAuth::Signature.build(request, :consumer_secret => secret).verify()
