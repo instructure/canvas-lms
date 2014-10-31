@@ -99,4 +99,20 @@ describe Quizzes::QuizSubmissionHistory do
       end
     end
   end
+
+  it "should not lose string encodings" do
+    @quiz       = course.quizzes.create!
+    @submission = @quiz.quiz_submissions.new
+
+    @submission.submission_data = [{data: "\b饭馆"}]
+
+    @submission.workflow_state = "complete"
+    @submission.score = 5.0
+    @submission.attempt = 1
+    @submission.with_versioning(true, &:save!)
+
+    @submission.reload
+    expect(@submission.submission_data[0][:data].encoding).to be(Encoding.find('UTF-8'))
+    expect(@submission.versions[0].model.submission_data[0][:data].encoding).to be(Encoding.find('UTF-8'))
+  end
 end
