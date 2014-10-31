@@ -25,7 +25,7 @@ describe ConversationsController, type: :request do
 
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
-    RoleOverride.create!(context: @course.root_account, permission: 'send_messages_all', enrollment_type: 'TeacherEnrollment', enabled: false)
+    @course.account.role_overrides.create!(permission: 'send_messages_all', role: teacher_role, enabled: false)
     @course.default_section.update_attributes(:name => "the section")
     @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
