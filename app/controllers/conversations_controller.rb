@@ -329,6 +329,14 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
+    @tags.each do |tag|
+      if tag.starts_with?('course') &&
+         params[:recipients].include?(tag) &&
+         !Context.find_by_asset_string(tag).try(:grants_right?, @current_user, session, :send_messages_all)
+        return render_error('recipients', 'invalid')
+      end
+    end
+
     group_conversation     = value_to_boolean(params[:group_conversation])
     batch_private_messages = !group_conversation && @recipients.size > 1
     batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
