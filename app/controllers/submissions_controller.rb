@@ -269,148 +269,211 @@ class SubmissionsController < ApplicationController
   #
   def create
     params[:submission] ||= {}
+
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
-    if authorized_action(@assignment, @current_user, :submit)
-      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
-        flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
-        redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
-        return
-      end
-      @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
-      if api_request?
-        # Verify submission_type is valid, and allowed by the assignment.
-        # This should probably happen for non-api submissions as well, but
-        # that'll take some further investigation/testing.
-        submission_type = params[:submission][:submission_type]
-        unless API_SUBMISSION_TYPES.key?(submission_type) && @assignment.submission_types_array.include?(submission_type)
-          return render(:json => { :message => "Invalid submission[submission_type] given" }, :status => 400)
-        end
+    return unless authorized_action(@assignment, @current_user, :submit)
 
-        submission_params = (['submission_type'] + API_SUBMISSION_TYPES[submission_type]).sort
-        params[:submission].slice!(*submission_params)
-        if params[:submission].keys.sort != submission_params
-          return render(:json => { :message => "Invalid parameters for submission_type #{submission_type}. Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }" }, :status => 400)
-        end
-        params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
+    if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
+      flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
+      redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
+      return
+    end
 
-        if params[:submission].has_key?(:body)
-          params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
-        end
-      end
+    @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
-      if params[:submission][:file_ids].is_a?(Array)
-        attachment_ids = params[:submission][:file_ids]
-      else
-        attachment_ids = (params[:submission][:attachment_ids] || "").split(",")
-      end
+    return unless process_api_submission_params if api_request?
 
-      attachment_ids = attachment_ids.select(&:present?)
-      params[:submission][:attachments] = []
+    lookup_existing_attachments
 
-      attachment_ids.each do |id|
-        params[:submission][:attachments] << @current_user.attachments.active.where(id: id).first if @current_user
-        params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
-        params[:submission][:attachments].compact!
-      end
+    return unless verify_api_call_has_attachment if api_request?
 
-      if api_request?
-        if submission_type == 'online_upload' && params[:submission][:attachments].blank?
-          return render(:json => { :message => "No valid file ids given" }, :status => :bad_request)
-        end
-      else
-        if params[:attachments] && params[:submission][:submission_type] == 'online_upload'
-          # check that the attachments are in allowed formats. we do this here
-          # so the attachments don't get saved and possibly uploaded to
-          # S3, etc. if they're invalid.
+    if !api_request?
+      if online_upload?
+        return unless extensions_allowed?
+        return unless has_file_attached?
 
-          # if extensions are being restricted, check that the extension is whitelisted
-          # The first check here is for web interface submissions that contain only one file
-          # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
-          if @assignment.allowed_extensions.present?
-            if params[:submission][:attachments].any? {|a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
-               params[:attachments].any? do |i, a|
-                 !a[:uploaded_data].empty? &&
-                 !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
-               end
-            flash[:error] = t('errors.invalid_file_type', "Invalid file type")
-            return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-            end
-          end
+        # Create and save Attachment objects, and store them in our params data structure for later processing
+        create_and_save_uploaded_attachments
 
-          # require at least one file to be attached
-          if params[:attachments].blank?
-            flash[:error] = t('errors.no_attached_file', "You must attach at least one file to this assignment")
-            return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-          end
-
-          params[:attachments].each do |idx, attachment|
-            if attachment[:uploaded_data] && !attachment[:uploaded_data].is_a?(String)
-              attachment[:user] = @current_user
-              if @group
-                attachment = @group.attachments.new(attachment)
-              else
-                attachment = @current_user.attachments.new(attachment)
-              end
-              attachment.save
-              params[:submission][:attachments] << attachment
-            end
-          end
-        elsif params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
-          params[:submission][:submission_type] = 'online_upload'
-          attachment = submit_google_doc(params[:google_doc][:document_id])
-          if attachment
-            params[:submission][:attachments] << attachment
-          else
-            return
-          end
-        elsif params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
-          flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
-          return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-        end
-      end
-
-      params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
-
-      begin
-        @submission = @assignment.submit_homework(@current_user, params[:submission])
-      rescue ActiveRecord::RecordInvalid => e
-        respond_to do |format|
-          format.html {
-            flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-            redirect_to course_assignment_url(@context, @assignment)
-          }
-          format.json { render :json => e.record.errors, :status => :bad_request }
-        end
-        return
-      end
-      respond_to do |format|
-        if @submission.save
-          log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
-          format.html {
-            flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-            redirect_to course_assignment_url(@context, @assignment)
-          }
-          format.json {
-            if api_request?
-              render :json => submission_json(@submission, @assignment, @current_user, session, @context, %{submission_comments attachments}), :status => :created, :location => api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
-            else
-              render :json => @submission.as_json(:include => :submission_comments), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
-            end
-          }
+      elsif is_google_doc?
+        params[:submission][:submission_type] = 'online_upload'
+        attachment = submit_google_doc(params[:google_doc][:document_id])
+        if attachment
+          params[:submission][:attachments] << attachment
         else
-          format.html {
-            flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-            render :action => "show", :id => @submission.assignment.context.id
-          }
-          format.json { render :json => @submission.errors, :status => :bad_request }
+          return
         end
+      elsif is_media_recording? && !has_media_recording?
+        flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
+        return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      end
+    end
+
+    params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
+
+    begin
+      @submission = @assignment.submit_homework(@current_user, params[:submission])
+    rescue ActiveRecord::RecordInvalid => e
+      respond_to do |format|
+        format.html {
+          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          redirect_to course_assignment_url(@context, @assignment)
+        }
+        format.json { render :json => e.record.errors, :status => :bad_request }
+      end
+      return
+    end
+
+    respond_to do |format|
+      if @submission.save
+        log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
+        format.html do
+          flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
+          redirect_to course_assignment_url(@context, @assignment)
+        end
+        format.json do
+          if api_request?
+            render :json => submission_json(@submission, @assignment, @current_user, session, @context, %{submission_comments attachments}),
+              :status => :created, :location => api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
+          else
+            render :json => @submission.as_json(:include => :submission_comments), :status => :created,
+              :location => course_gradebook_url(@submission.assignment.context)
+          end
+        end
+      else
+        format.html do
+          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          render :action => "show", :id => @submission.assignment.context.id
+        end
+        format.json { render :json => @submission.errors, :status => :bad_request }
       end
     end
   end
 
-  # Internal: Submit a Google Doc.
+  def lookup_existing_attachments
+    if params[:submission][:file_ids].is_a?(Array)
+      attachment_ids = params[:submission][:file_ids]
+    else
+      attachment_ids = (params[:submission][:attachment_ids] || "").split(",")
+    end
+
+    attachment_ids = attachment_ids.select(&:present?)
+    params[:submission][:attachments] = []
+
+    attachment_ids.each do |id|
+      params[:submission][:attachments] << @current_user.attachments.active.where(id: id).first if @current_user
+      params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
+      params[:submission][:attachments].compact!
+    end
+  end
+  private :lookup_existing_attachments
+
+  def is_media_recording?
+    return params[:submission][:submission_type] == 'media_recording'
+  end
+  private :is_media_recording?
+
+  def has_media_recording?
+    return params[:submission][:media_comment_id].present?
+  end
+  private :has_media_recording?
+
+  def verify_api_call_has_attachment
+    if params[:submission][:submission_type] == 'online_upload' && params[:submission][:attachments].blank?
+      render(:json => { :message => "No valid file ids given" }, :status => :bad_request)
+      return false
+    end
+    return true
+  end
+  private :verify_api_call_has_attachment
+
+  def process_api_submission_params
+    # Verify submission_type is valid, and allowed by the assignment.
+    # This should probably happen for non-api submissions as well, but
+    # that'll take some further investigation/testing.
+    submission_type = params[:submission][:submission_type]
+    unless API_SUBMISSION_TYPES.key?(submission_type) && @assignment.submission_types_array.include?(submission_type)
+      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => 400)
+      return false
+    end
+
+    # Make sure that the submitted parameters match what we expect
+    submission_params = (['submission_type'] + API_SUBMISSION_TYPES[submission_type]).sort
+    params[:submission].slice!(*submission_params)
+    if params[:submission].keys.sort != submission_params
+      render(:json => {
+        :message => "Invalid parameters for submission_type #{submission_type}. " +
+          "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }"
+      }, :status => 400)
+      return false
+    end
+    params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
+
+    if params[:submission].has_key?(:body)
+      params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
+    end
+    return true
+  end
+  private :process_api_submission_params
+
+  def create_and_save_uploaded_attachments
+    params[:attachments].each do |idx, attachment|
+      if attachment[:uploaded_data] && !attachment[:uploaded_data].is_a?(String)
+        attachment[:user] = @current_user
+        if @group
+          attachment = @group.attachments.new(attachment)
+        else
+          attachment = @current_user.attachments.new(attachment)
+        end
+        attachment.save
+        params[:submission][:attachments] << attachment
+      end
+    end
+  end
+  private :create_and_save_uploaded_attachments
+
+  def online_upload?
+    return params[:attachments] && params[:submission][:submission_type] == 'online_upload'
+  end
+  private :online_upload?
+
+  def has_file_attached?
+    # require at least one file to be attached
+    if params[:attachments].blank?
+      flash[:error] = t('errors.no_attached_file', "You must attach at least one file to this assignment")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      return false
+    end
+    return true
+  end
+  private :has_file_attached?
+
+  def extensions_allowed?
+    # if extensions are being restricted, check that the extension is whitelisted
+    # The first check here is for web interface submissions that contain only one file
+    # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
+    if @assignment.allowed_extensions.present?
+      if params[:submission][:attachments].any? {|a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
+         params[:attachments].any? do |i, a|
+           !a[:uploaded_data].empty? &&
+           !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+         end
+      flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      return false
+      end
+    end
+    return true
+  end
+  private :extensions_allowed?
+
+  def is_google_doc?
+    return params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
+  end
+  private :is_google_doc?
+
   def submit_google_doc(document_id)
     # fetch document from google
     google_docs = google_docs_connection
