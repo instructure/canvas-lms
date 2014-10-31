@@ -25,6 +25,7 @@ describe ConversationsController, type: :request do
 
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
+    RoleOverride.create!(context: @course.root_account, permission: 'send_messages_all', enrollment_type: 'TeacherEnrollment', enabled: false)
     @course.default_section.update_attributes(:name => "the section")
     @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
@@ -863,6 +864,16 @@ describe ConversationsController, type: :request do
                 {expected_status: 400})
         expect(json["errors"]).not_to be_nil
         expect(json["errors"]["subject"]).not_to be_nil
+      end
+
+      it "respects course's send_messages_all permission" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @course.asset_string], :body => "test", :subject => "hey erryone" },
+                headers={},
+                {expected_status: 400})
+        expect(json[0]["attribute"]).to eql "recipients"
+        expect(json[0]["message"]).to eql "invalid"
       end
 
       it "should send bulk group messages" do
