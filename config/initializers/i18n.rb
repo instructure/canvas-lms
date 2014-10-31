@@ -129,25 +129,25 @@ I18n.send(:extend, Module.new {
 require "i18n_extraction/i18nliner_scope_extensions"
 
 ActionView::Template.class_eval do
-  def render_with_i18n_scope(view, *args, &block)
-    old_i18n_scope = view.i18n_scope
+  def render_with_i18nliner_scope(view, *args, &block)
+    old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
-      view.i18n_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
+      view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
     end
-    render_without_i18n_scope(view, *args, &block)
+    render_without_i18nliner_scope(view, *args, &block)
   ensure
-    view.i18n_scope = old_i18n_scope
+    view.i18nliner_scope = old_i18nliner_scope
   end
-  alias_method_chain :render, :i18n_scope
+  alias_method_chain :render, :i18nliner_scope
 end
 
 ActionView::Base.class_eval do
-  attr_accessor :i18n_scope
+  attr_accessor :i18nliner_scope
 end
 
 ActionController::Base.class_eval do
-  def i18n_scope
-    @i18n_scope ||= I18nliner::Scope.new(controller_path.tr('/', '.'))
+  def i18nliner_scope
+    @i18nliner_scope ||= I18nliner::Scope.new(controller_path.tr('/', '.'))
   end
 end
 
@@ -155,12 +155,12 @@ ActiveRecord::Base.class_eval do
   include I18nUtilities
   extend I18nUtilities
 
-  def i18n_scope
-    self.class.i18n_scope
+  def i18nliner_scope
+    self.class.i18nliner_scope
   end
 
-  def self.i18n_scope
-    @i18n_scope ||= I18nliner::Scope.new(self.class.name.underscore)
+  def self.i18nliner_scope
+    @i18nliner_scope ||= I18nliner::Scope.new(self.class.name.underscore)
   end
 
   class << self
@@ -188,14 +188,14 @@ ActiveRecord::Base.class_eval do
 end
 
 ActionMailer::Base.class_eval do
-  def i18n_scope
-    @i18n_scope ||= I18nliner::Scope.new("#{mailer_name}.#{action_name}")
+  def i18nliner_scope
+    @i18nliner_scope ||= I18nliner::Scope.new("#{mailer_name}.#{action_name}")
   end
 
   def translate(key, default, options = {})
     key, options = I18nliner::CallHelpers.infer_arguments(args)
     options = inferpolate(options) if I18nliner.infer_interpolation_values
-    options[:i18n_scope] = i18n_scope
+    options[:i18nliner_scope] = i18nliner_scope
     I18n.translate(key, options)
   end
   alias :t :translate
