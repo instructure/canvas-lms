@@ -329,10 +329,9 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
-    @tags.each do |tag|
-      if tag.starts_with?('course') &&
-         params[:recipients].include?(tag) &&
-         !Context.find_by_asset_string(tag).try(:grants_right?, @current_user, session, :send_messages_all)
+    params[:recipients].each do |recipient|
+      if recipient =~ /\Acourse_\d+\Z/ &&
+         !Context.find_by_asset_string(recipient).try(:grants_right?, @current_user, session, :send_messages_all)
         return render_error('recipients', 'invalid')
       end
     end
