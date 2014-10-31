@@ -1,0 +1,8 @@
+test:
+  base_url: https://staging.beyondz.org/
+
+development:
+  base_url: https://staging.beyondz.org/
+
+production:
+  base_url: https://staging.beyondz.org/

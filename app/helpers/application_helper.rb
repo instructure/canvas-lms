@@ -23,14 +23,9 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
-  def beyondz_app_domain
-    bz_host = request.host.sub('portal', '')
-    bz_host = "platform.beyondz.org.arsdnet.net"
-    if bz_host.starts_with?('.')
-      bz_host[1 .. -1]
-    else
-      bz_host
-    end
+  def beyondz_app_url(path)
+    path = path[1 .. -1] if path.starts_with?('/')
+    return "#{BeyondZConfiguration.base_url}#{path}"
   end
 
   def context_user_name(context, user)
