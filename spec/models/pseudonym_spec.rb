@@ -420,7 +420,7 @@ describe Pseudonym do
 
     let(:alice) { account_admin_user_with_role_changes(
       account: account1,
-      membership_type: 'StrongerAdmin',
+      role: custom_account_role('StrongerAdmin', account: account1),
       role_changes: { view_notifications: true }) }
 
     describe ":create" do
