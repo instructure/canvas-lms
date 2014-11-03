@@ -35,13 +35,13 @@ class AccountNotification < ActiveRecord::Base
     ActiveRecord::Associations::Preloader.new(current, [:account, :account_notification_roles]).run
     user_role_ids = {}
 
+    enrollment_types = user.enrollments.shard(user).active.uniq.pluck(:type)
     current.select! do |announcement|
 
       role_ids = announcement.account_notification_roles.map(&:role_id)
       unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         if announcement.account.site_admin?
           # roles user holds with respect to courses
-          enrollment_types = user.enrollments.with_each_shard{ |scope| scope.active.pluck(:type)}.uniq
           user_role_ids[announcement.account_id] = enrollment_types.map{|type| Role.get_built_in_role(type).id}
           # announcements intended for users not enrolled in any courses have the NilEnrollment role type
           user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
@@ -78,6 +78,12 @@ class AccountNotification < ActiveRecord::Base
         if months_in_period = announcement.months_in_display_cycle
           !self.display_for_user?(user.id, months_in_period)
         end
+      end
+
+      roles = enrollment_types.map { |type| Role.get_built_in_role(type) }.map(&:base_role_type).uniq
+
+      if roles == ['StudentEnrollment'] && !account.include_students_in_global_survey?
+        current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
       end
     end
 
