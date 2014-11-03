@@ -1203,11 +1203,11 @@ class ApplicationController < ActionController::Base
 
         success_url = case tag_type
         when :assignments
-          named_context_url(@context, :context_assignments_url)
+          named_context_url(@context, :context_assignments_url, include_host: true)
         when :modules
-          named_context_url(@context, :context_context_modules_url)
+          named_context_url(@context, :context_context_modules_url, include_host: true)
         else
-          named_context_url(@context, :context_url)
+          named_context_url(@context, :context_url, include_host: true)
         end
         if tag.new_tab
           @lti_launch.launch_type = 'window'
