@@ -191,10 +191,12 @@ input.move-module-label-spacer {
   <% end %>
 </div>
 
-<div class="hidden-readable screenreader-only" tabindex="0" aria-label="keyboard instructions">
-  <%= t('modules_keyboard_hint_updated',
-        'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
-</div>
+<% if can_do(@context, @current_user, :manage_content) %>
+  <div class="hidden-readable screenreader-only" tabindex="0" aria-label="keyboard instructions">
+    <%= t('modules_keyboard_hint_updated',
+          'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
+  </div>
+<% end %>
 
 <% keyboard_navigation([
    {:key => t('keycodes.next_module_item', 'Up'), :description => t('keycode_descriptions.next_module_item', 'Select next module or module item')},
