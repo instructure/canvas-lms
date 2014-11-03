@@ -197,6 +197,33 @@ define [
     dirForGroup: (outcomeGroup) ->
       _.find(@directories, (d) -> d.outcomeGroup is outcomeGroup) || @addDirFor(outcomeGroup)
 
+    moveItem: (model, newGroup) ->
+      originalGroup = model.get('parent_outcome_group') || model.outcomeGroup
+      originalDir = @cachedDirectories[originalGroup.id]
+      targetDir =  @cachedDirectories[newGroup.id]
+      if originalGroup.id == newGroup.id
+        $.flashError I18n.t("%{model} is already located in %{newGroup}", {model: model.get('title'), newGroup: newGroup.get('title')})
+        return
+      if model instanceof OutcomeGroup
+        dfd = originalDir.moveGroup(model, newGroup.toJSON())
+      else
+        dfd = originalDir.changeLink(model, newGroup.toJSON())
+      dfd.done =>
+        itemType = if model instanceof OutcomeGroup then 'groups' else 'outcomes'
+        if targetDir
+          dfd = targetDir[itemType].fetch()
+          dfd.done => targetDir.needsReset = true
+        originalDir[itemType].fetch()
+        parentDir = originalDir.parent
+        if parentDir
+          @selectDir(parentDir, parentDir.selectedModel)
+        model.trigger 'finishedMoving'
+        $(".selected:last").focus()
+        #timeout necessary to announce move after modal closes following finishedMoving event
+        setTimeout (->
+          $.flashMessage I18n.t("Successfully moved %{model} to %{newGroup}", {model: model.get('title'), newGroup: newGroup.get('title')})
+        ), 1500
+
     _scrollToDir: (dirIndex, model) ->
       scrollLeft = (@directoryWidth + 1) * (if model instanceof Outcome then dirIndex - 1 else dirIndex)
       @$sidebar.animate {scrollLeft: scrollLeft}, duration: 200

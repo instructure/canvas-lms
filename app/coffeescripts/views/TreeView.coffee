@@ -13,7 +13,7 @@ define [
     tagName: 'li'
 
     @optionProperty 'nestingLevel'
-    @optionProperty 'onlyShowFolders'
+    @optionProperty 'onlyShowSubtrees'
     @optionProperty 'onClick'
     @optionProperty 'dndOptions'
     @optionProperty 'href'
@@ -25,20 +25,22 @@ define [
 
     attributes: ->
       'role': 'treeitem'
+      'data-id': @model.id
       'aria-expanded': "#{!!@model.isExpanded}"
       'aria-level': @nestingLevel
+      'aria-label': @model.get('custom_name') || @model.get('name') || @model.get('title')
       id: @tagId
 
     events:
-      'click .folderLabel': 'toggle'
-      'selectItem .folderLabel': 'selectItem'
+      'click .treeLabel': 'toggle'
+      'selectItem .treeLabel': 'selectItem'
 
     initialize: ->
       @tagId = _.uniqueId 'treenode-'
       @render = _.debounce(@render)
       @model.on         'all', @render, this
-      @model.files.on   'all', @render, this
-      @model.folders.on 'all', @render, this
+      @model.getItems().on   'all', @render, this
+      @model.getSubtrees().on 'all', @render, this
       res = super
       @render()
       res
@@ -52,7 +54,7 @@ define [
       event.preventDefault()
       event.stopPropagation()
 
-      @model.toggle({onlyShowFolders: @onlyShowFolders})
+      @model.toggle({onlyShowSubtrees: @onlyShowSubtrees})
       @$el.attr(@attributes())
 
     selectItem: (event) ->
@@ -60,7 +62,7 @@ define [
       $span.trigger('click')
 
     title_text: ->
-      @model.get('custom_name') || @model.get('name')
+      @model.get('custom_name') || @model.get('name') || @model.get('title')
 
     renderSelf: ->
       return if @model.isNew()
@@ -74,7 +76,7 @@ define [
 
         $label = $("""
           <a
-            class="folderLabel"
+            class="treeLabel"
             role="presentation"
             tabindex="-1"
           >
@@ -102,47 +104,42 @@ define [
         .toggleClass('expanded', !!@model.isExpanded)
         .toggleClass('loading after', !!@model.isExpanding)
 
-      # Let's this work well with file browsers like New Files
+      # Lets this work well with file browsers like New Files
       if (@selectedStyleClass)
         @$label.toggleClass(@selectedStyleClass, window.location.pathname is @href?(@model))
 
     renderContents: ->
       if @model.isExpanded
-        unless @$folderContents
-          @$folderContents = $("<ul role='group' class='folderContents'/>").appendTo(@$el)
-          # TODO: make the scrollContainer generic, not specific to a certain
-          # type of modal dialog
+        unless @$treeContents
+          @$treeContents = $("<ul role='group' class='treeContents'/>").appendTo(@$el)
           subtreesView = new PaginatedCollectionView(
-            collection: @model.folders
+            collection: @model.getSubtrees()
             itemView: TreeView
             itemViewOptions:
               nestingLevel: @nestingLevel+1
-              onlyShowFolders: @onlyShowFolders
+              onlyShowSubtrees: @onlyShowSubtrees
               onClick: @onClick
               dndOptions: @dndOptions
               href: @href
               focusStyleClass: @focusStyleClass
               selectedStyleClass: @selectedStyleClass
             tagName: 'li'
-            className: 'folders'
+            className: 'subtrees'
             template: collectionTemplate
-            scrollContainer: @$folderContents.closest('div[role=tabpanel]')
+            scrollContainer: @$treeContents.closest('div[role=tabpanel]')
           )
-          @$folderContents.append(subtreesView.render().el)
-          unless @onlyShowFolders
-            # TODO: make the scrollContainer generic, not specific to a certain
-            # type of modal dialog
+          @$treeContents.append(subtreesView.render().el)
+          unless @onlyShowSubtrees
             itemsView = new PaginatedCollectionView(
-              collection: @model.files
+              collection: @model.getItems()
               itemView: TreeItemView
               itemViewOptions: {nestingLevel: @nestingLevel+1}
               tagName: 'li'
-              className: 'files'
+              className: 'items'
               template: collectionTemplate
-              scrollContainer: @$folderContents.closest('div[role=tabpanel]')
+              scrollContainer: @$treeContents.closest('div[role=tabpanel]')
             )
-            @$folderContents.append(itemsView.render().el)
-        @$('> .folderContents').removeClass('hidden')
+            @$treeContents.append(itemsView.render().el)
+        @$('> .treeContents').removeClass('hidden')
       else
-        @$('> .folderContents').addClass('hidden')
-
+        @$('> .treeContents').addClass('hidden')

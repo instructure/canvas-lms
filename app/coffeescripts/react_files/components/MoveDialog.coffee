@@ -35,7 +35,7 @@ define [
       })
 
       @treeBrowserViewId = BBTreeBrowserView.create({
-          onlyShowFolders: true,
+          onlyShowSubtrees: true,
           rootModelsFinder: rootFoldersFinder
           rootFoldersToShow: @props.rootFoldersToShow
           onClick: @onSelectFolder

@@ -105,4 +105,139 @@ describe "outcomes as a teacher" do
       end
     end
   end
+
+  context "moving outcomes tree" do
+    before (:each) do
+      course_with_teacher_logged_in
+      who_to_login == 'teacher' ? @context = @course : @context = account
+    end
+
+    it "should alert user if attempting to move with no directory selected" do
+      outcome_model
+      get outcome_url
+      wait_for_ajaximations
+
+      fj('.outcomes-sidebar .outcome-link').click
+      wait_for_ajaximations
+
+      # bring up modal
+      f(".move_button").click()
+      wait_for_ajaximations
+
+      fj('.form-controls .btn-primary').click
+      wait_for_ajaximations
+
+      expect(f('.ic-flash-error').text).to include "No directory is selected, please select a directory before clicking 'move'"
+    end
+
+    it "should move a learning outcome via tree modal" do
+      outcome = outcome_model
+      group = outcome_group_model
+      get outcome_url
+      wait_for_ajaximations
+
+      fj('.outcomes-sidebar .outcome-link').click
+      wait_for_ajaximations
+
+      f(".move_button").click()
+      wait_for_ajaximations
+
+      # should show modal tree
+      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move first new outcome?"
+      expect(ffj('.ui-dialog-content').length).to eq 1
+
+      # move the outcome
+      fj('.treeLabel').click
+      wait_for_ajaximations
+      ff('[role=treeitem] a span')[1].click
+      wait_for_ajaximations
+      fj('.form-controls .btn-primary').click
+      wait_for_ajaximations
+
+      keep_trying_until do
+        message = f('.ic-flash-success').text
+        expect(message).to include "Successfully moved #{outcome.title} to #{group.title}"
+      end
+
+
+      # check for proper updates in outcome group columns on page
+      fj('.outcomes-sidebar .outcome-level:first li').click
+      wait_for_ajaximations
+      expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
+      expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
+
+      # confirm move in db
+      expect(LearningOutcomeGroup.where(id: @outcome_group).first.child_outcome_links.first.content.id).to eq @outcome.id
+
+      #confirm that error appears if moving into parent group it already belongs to
+      fj('.outcomes-sidebar .outcome-link').click
+      wait_for_ajaximations
+      f(".move_button").click()
+      wait_for_ajaximations
+
+      fj('.treeLabel').click
+      wait_for_ajaximations
+
+      ff('[role=treeitem] a span')[1].click
+      fj('.form-controls .btn-primary').click
+      wait_for_ajaximations
+
+      expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"
+    end
+
+    it "should move a learning outcome group via tree modal" do
+      group1 = outcome_group_model
+      group2 = outcome_group_model
+      get outcome_url
+      wait_for_ajaximations
+
+      fj('.outcomes-sidebar .outcome-group:last').click
+      wait_for_ajaximations
+
+      # bring up modal
+      f(".move_button").click()
+      wait_for_ajaximations
+
+      # should show modal tree
+      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move new outcome group?"
+      expect(ffj('.ui-dialog-content').length).to eq 1
+
+      # move the outcome group
+      fj('.treeLabel').click
+      wait_for_ajaximations
+      ff('[role=treeitem] a span')[1].click
+      wait_for_ajaximations
+      fj('.form-controls .btn-primary').click
+      wait_for_ajaximations
+
+      keep_trying_until do
+        message = f('.ic-flash-success').text
+        expect(message).to include "Successfully moved #{group1.title} to #{group2.title}"
+      end
+
+      # check for proper updates in outcome group columns on page
+      fj('.outcomes-sidebar .outcome-level:first li').click
+      wait_for_ajaximations
+      expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
+      expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
+
+      # confirm move in db
+      expect(LearningOutcomeGroup.where(id: group2.id).first.child_outcome_groups.first.id).to eq group1.id
+
+      # check that modal window properly updated
+      fj('.outcomes-sidebar .outcome-group').click
+      wait_for_ajaximations
+
+      f(".move_button").click()
+      wait_for_ajaximations
+
+      fj('.treeLabel').click
+      wait_for_ajaximations
+
+      ff('[role=treeitem] a span')[1].click
+      wait_for_ajaximations
+
+      expect(ff('[role=treeitem]')[1].find_elements(:class, "treeLabel").length).to eq 2
+    end
+  end
 end

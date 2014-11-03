@@ -62,6 +62,8 @@ require [
   content.on 'deleteSuccess', ->
     model = sidebar.$el.find('.outcome-group.selected:last').data('view')?.model
     content.show(model)
+  content.on 'move', (model, newGroup) ->
+    sidebar.moveItem(model, newGroup)
 
   app =
     toolbar: toolbar

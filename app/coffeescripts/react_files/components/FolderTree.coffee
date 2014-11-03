@@ -24,7 +24,7 @@ define [
       })
 
       @treeBrowserId = BBTreeBrowserView.create({
-          onlyShowFolders: true,
+          onlyShowSubtrees: true,
           rootModelsFinder: rootFoldersFinder
           onClick: @onClick
           dndOptions: @props.dndOptions
@@ -71,7 +71,7 @@ define [
     expandTillCurrentFolder: (props) ->
       expandFolder = (folderIndex) ->
         return unless folder = props.rootTillCurrentFolder?[folderIndex]
-        folder.expand(false, {onlyShowFolders: true}).then ->
+        folder.expand(false, {onlyShowSubtrees: true}).then ->
           expandFolder(folderIndex + 1)
       expandFolder(0)
 
