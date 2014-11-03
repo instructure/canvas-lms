@@ -138,6 +138,7 @@ $(document).ready(function() {
         submitted(item_data);
       }
     };
+
     var item_type = $("#add_module_item_select").val();
     if(item_type == 'external_url') {
       var item_data = {
@@ -148,8 +149,10 @@ $(document).ready(function() {
       }
       item_data['item[url]'] = $("#content_tag_create_url").val();
       item_data['item[title]'] = $("#content_tag_create_title").val();
-      submit(item_data);   
+      submit(item_data);
+
     } else if(item_type == 'context_external_tool') {
+
       var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
       var tool_type = tool ? tool.definition_type :$("#add_module_item_select").val()
       var tool_id = tool ? tool.definition_id : 0
@@ -169,15 +172,19 @@ $(document).ready(function() {
       } else {
         submit(item_data);
       }
+
     } else if(item_type == 'context_module_sub_header') {
+
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select").val(),
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[title]'] = $("#sub_header_title").val();
-      submit(item_data);   
+      submit(item_data);
+
     } else {
+
       var $options = $("#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected");
       $options.each(function() {
         var $option = $(this);
@@ -215,6 +222,7 @@ $(document).ready(function() {
             $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").after($option);
             submit(item_data);
           };
+
           if(item_data['item[type]'] == 'attachment') {
             $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {
               callback(data);
@@ -227,7 +235,13 @@ $(document).ready(function() {
               callback(data);
             }, function(data) {
               $("#select_context_content_dialog").loadingImage('remove');
-              $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+              if (data && data.errors && data.errors.title[0] && data.errors.title[0].message && data.errors.title[0].message === "blank") {
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.'));
+                $('.item_title').focus();
+              } else {
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+              }
+
             });
           }
         } else {
@@ -240,9 +254,9 @@ $(document).ready(function() {
     e.preventDefault();
 
     var $tool = $(this);
-    if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) { 
-      $(this).removeClass('selected'); 
-      return; 
+    if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
+      $(this).removeClass('selected');
+      return;
     }
     $tool.parents(".tools").find(".tool.selected").removeClass('selected');
     $tool.addClass('selected');

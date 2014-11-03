@@ -6,7 +6,7 @@ describe "login logout test", :priority => "2" do
   def should_show_message(message_text, selector)
     expect(fj(selector)).to include_text(message_text)
     # the text isn't visible on the page so the webdriver .text method doesn't return it
-    expect(driver.execute_script("return $('#aria_alerts div:last').text()")).to eq message_text
+    expect(driver.execute_script("return $('#flash_screenreader_holder').text()")).to eq message_text
   end
 
   def verify_logout
