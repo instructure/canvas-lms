@@ -146,7 +146,7 @@ describe "admin settings tab" do
       expect(fj('#account_settings_global_includes_settings:visible')).to be_nil
     end
 
-    it "a sub-account should have a global includes section if enabled by the parrent" do
+    it "a sub-account should have a global includes section if enabled by the parent" do
       Account.default.settings = Account.default.settings.merge({ :global_includes => true })
       Account.default.settings = Account.default.settings.merge({ :sub_account_includes => true })
       Account.default.save!
@@ -317,7 +317,7 @@ describe "admin settings tab" do
     end
   end
 
-  context "who can create wew courses" do
+  context "who can create new courses" do
 
     it "should check on teachers" do
       check_box_verifier("#account_settings_teachers_can_create_courses", :teachers_can_create_courses)
