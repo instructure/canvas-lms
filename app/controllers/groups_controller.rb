@@ -626,7 +626,6 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     search_term = params[:search_term].presence
-
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
     else
@@ -634,7 +633,7 @@ class GroupsController < ApplicationController
     end
 
     users = Api.paginate(users, self, api_v1_group_users_url)
-    render :json => users_json(users, @current_user, session, Array(params[:include]))
+    render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
   end
 
   def edit

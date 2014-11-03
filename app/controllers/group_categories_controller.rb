@@ -332,7 +332,6 @@ class GroupCategoriesController < ApplicationController
     end
 
     search_term = params[:search_term].presence
-
     search_params = params.slice(:search_term)
     search_params[:enrollment_type] = "student" if @context.is_a? Course
 
@@ -347,7 +346,7 @@ class GroupCategoriesController < ApplicationController
     end
 
     users = Api.paginate(users, self, api_v1_group_category_users_url)
-    render :json => users.map { |u| user_json(u, @current_user, session, [], @context) }
+    render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
   end
 
   # @API Assign unassigned members
