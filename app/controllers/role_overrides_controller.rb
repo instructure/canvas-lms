@@ -121,7 +121,7 @@ class RoleOverridesController < ApplicationController
 
       account_role_data = []
       @context.available_account_roles.each do |role|
-        account_role_data << json = role_json(@context, role, @current_user, session)
+        account_role_data << role_json(@context, role, @current_user, session)
       end
 
       course_role_data = []

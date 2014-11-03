@@ -16,21 +16,13 @@ define [
       @role = null
       @account_id = null
 
-  test 'the id gets set to the role name when role is created', 1, ->
-    @role.fetch success: =>
-      equal @role.id, "existingRole", "Role id should equal the roles name" 
-
-    @server.respond 'GET', @role.url(), [200, {
-      'Content-Type': 'application/json'
-    }, JSON.stringify({"role": "existingRole"})]
-
   test 'generates the correct url for existing and non-existing roles', 2, -> 
     equal @role.url(), "/api/v1/accounts/#{@account.get('id')}/roles", "non-existing role url"
     
     @role.fetch success: =>
-      equal @role.url(), "/api/v1/accounts/#{@account.get('id')}/roles/existingRole", "existing role url"
+      equal @role.url(), "/api/v1/accounts/#{@account.get('id')}/roles/1", "existing role url"
 
     @server.respond 'GET', @role.url(), [200, {
       'Content-Type': 'application/json'
-    }, JSON.stringify({"role": "existingRole", "account" : @account})]
+    }, JSON.stringify({"role": "existingRole", "id": "1", "account" : @account})]
     
