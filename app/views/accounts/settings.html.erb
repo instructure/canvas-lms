@@ -160,6 +160,13 @@ TEXT
                       <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
                     </td>
                   </tr>
+                  <% if @account.grants_right?(@current_user, :manage_site_settings) %>
+                    <tr>
+                      <td colspan="2"><%= settings.check_box :include_students_in_global_survey, checked: @account.include_students_in_global_survey?%>
+                        <%= settings.label :include_students_in_global_survey, en: "Include students in global surveys" %>
+                      </td>
+                    </tr>
+                  <% end %>
                   <tr>
                     <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
                       <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>

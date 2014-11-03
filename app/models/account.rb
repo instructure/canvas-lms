@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -214,6 +214,7 @@ class Account < ActiveRecord::Base
   add_setting :dashboard_url, root_only: true
   add_setting :product_name, root_only: true
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
+  add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
 
   def settings=(hash)
     if hash.is_a?(Hash)

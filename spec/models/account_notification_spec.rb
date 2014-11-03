@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -117,6 +117,32 @@ describe AccountNotification do
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02'))).to eq false
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02'))).to eq true
       end
+    end
+
+    it "should exclude students on surveys if the account restricts a student" do
+      flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
+      @survey = account_notification(:required_account_service => flag, :account => Account.site_admin)
+      @a1 = account_model
+      @a1.enable_service(flag)
+      @a1.settings[:include_students_in_global_survey] = false
+      @a1.save!
+
+      @unenrolled = @user
+      course_with_teacher(account: @a1)
+      @student_teacher = @user
+      course_with_student(course: @course, user: @student_teacher)
+      course_with_teacher(course: @course, :account => @a1)
+      @teacher = @user
+      account_admin_user(:account => @a1)
+      @admin = @user
+      course_with_student(:course => @course)
+      @student = @user
+
+      expect(AccountNotification.for_user_and_account(@teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@admin, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@student, @a1).map(&:id).sort).to eq []
+      expect(AccountNotification.for_user_and_account(@student_teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, @a1).map(&:id).sort).to eq [@survey.id]
     end
   end
 
