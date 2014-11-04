@@ -2,13 +2,12 @@ define [
   'i18n!overrides'
   'Backbone'
   'underscore'
-  'timezone'
   'jst/assignments/DueDateView'
   'jquery'
   'jquery.toJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], (I18n,Backbone, _, tz, template, $) ->
+], (I18n,Backbone, _, template, $) ->
   class DueDateView extends Backbone.View
     template: template
     tagName: 'li'
@@ -16,7 +15,7 @@ define [
 
     events:
       'click .remove-link' : 'removeDueDate'
-
+    
     # Method Summary
     #  Apply bindings and calendar js to each view
     afterRender: =>
@@ -55,26 +54,20 @@ define [
     validateBeforeSave: (data, errors) =>
       errs = {}
       if data
-        lockAt = data.lock_at
-        unlockAt = data.unlock_at
-        dueAt = data.due_at
-        if ENV.POSSIBLE_DATE_RANGE
-          firstDate = tz.parse(ENV.POSSIBLE_DATE_RANGE.start) if ENV.POSSIBLE_DATE_RANGE.start
-          lastDate = tz.parse(ENV.POSSIBLE_DATE_RANGE.end) if ENV.POSSIBLE_DATE_RANGE.end
-          if firstDate
-            errs.due_at = I18n.t('due_date_before_course_start', 'Due date cannot be before course start date') unless @_validDateSequence(firstDate, dueAt)
-            errs.unlock_at = I18n.t('unlock_date_before_course_start', 'Unlock date cannot be before course start') unless @_validDateSequence(firstDate, unlockAt)
-          if lastDate
-            errs.due_at = I18n.t('due_date_after_course_conclude', 'Due date cannot be after course end date') unless @_validDateSequence(dueAt, lastDate)
-            errs.lock_at = I18n.t('lock_date_after_course_end', 'Lock date cannot be after course end') unless @_validDateSequence(lockAt, lastDate)
-        errs.lock_at = I18n.t('lock_date_before_due_date', 'Lock date cannot be before due date') unless @_validDateSequence(dueAt, lockAt)
-        errs.unlock_at = I18n.t('unlock_date_after_due_date', 'Unlock date cannot be after due date') unless @_validDateSequence(unlockAt, dueAt)
-        errs.unlock_at = I18n.t('unlock_date_after_lock_date','Unlock date cannot be after lock date') unless @_validDateSequence(unlockAt, lockAt)
+          lockAt = data.lock_at
+          unlockAt = data.unlock_at
+          dueAt = data.due_at
+          if lockAt && dueAt && lockAt < dueAt
+            errs.lock_at = I18n.t('lock_date_before_due_date',
+              'Lock date cannot be before due date')
+          if unlockAt && dueAt && unlockAt > dueAt
+            errs.unlock_at = I18n.t('unlock_date_after_due_date',
+              'Unlock date cannot be after due date')
+          else if unlockAt && lockAt && unlockAt > lockAt
+            errs.unlock_at = I18n.t('unlock_date_after_lock_date',
+              'Unlock date cannot be after lock date')
       errors['assignmentOverrides'] = errs if _.keys(errs).length > 0
       errors
-
-    _validDateSequence: (earlyDate, laterDate) =>
-      !(earlyDate && laterDate && earlyDate > laterDate)
 
     updateOverride: =>
       @model.set @getFormValues()
