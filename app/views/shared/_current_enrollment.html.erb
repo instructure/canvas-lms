@@ -34,11 +34,11 @@
 
       </td>
       <% end %>
-      <td class="course-list-course-title-column
+      <td class="course-list-course-title-column ellipsis
         <%= "course-list-no-left-border" if @show_star_column %>
         <%= "course-list-not-favoritable" unless @show_star_column %>">
         <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
-        <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
+        <span class="name" title="<%= current_enrollment.long_name %>">
           <%= current_enrollment.long_name %>
         </span>
 

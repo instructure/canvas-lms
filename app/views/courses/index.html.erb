@@ -24,7 +24,7 @@
 <% @show_star_column = true %>
 <% unless @current_enrollments.empty? %>
   <h2><%= t('headings.my_courses', %{My Courses}) %></h2>
-  <table id="my_courses_table" class="table table-bordered current_enrollments course-list-table">
+  <table id="my_courses_table" class="table table-bordered current_enrollments course-list-table table-layout-fixed">
     <% @current_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
     <% end %>
