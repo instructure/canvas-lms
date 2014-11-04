@@ -59,7 +59,7 @@ describe 'AddRoleIdColumns' do
       @pre_migration.up
       @post_migration.up
 
-      expect(Role.where(:workflow_state => 'built_in').map(&:name).sort).to eq RoleOverride.base_role_types.sort
+      expect(Role.where(:workflow_state => 'built_in').map(&:name).sort).to eq Role::BASE_TYPES.sort
     end
 
     it "should convert account_user membership_type column to role_id" do

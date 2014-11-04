@@ -516,7 +516,7 @@ class AccountsController < ApplicationController
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
       @role_types = RoleOverride.account_membership_types(@account)
-      @enrollment_types = RoleOverride.enrollment_types
+      @enrollment_types = RoleOverride.enrollment_type_labels
       @announcements = @account.announcements
       js_env :APP_CENTER => {
         enabled: Canvas::Plugin.find(:app_center).enabled?

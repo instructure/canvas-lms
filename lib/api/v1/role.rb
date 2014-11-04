@@ -26,7 +26,7 @@ module Api::V1::Role
       :id => role.id,
       :role => role.name,
       :label => role.label,
-      :base_role_type => (role.built_in? && role.account_role?) ? AccountUser::DEFAULT_BASE_ROLE_TYPE : role.base_role_type,
+      :base_role_type => (role.built_in? && role.account_role?) ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
       :workflow_state => role.built_in? ? 'active' : role.workflow_state,
       :permissions => {}
     }
