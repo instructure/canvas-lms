@@ -119,7 +119,7 @@ module Api::V1
       end
 
       if assignment_id = options[:assignment_id]
-        collection = collection.scoped_by_assignment_id(assignment_id)
+        collection = collection.where(assignment_id: assignment_id)
       end
 
       if grader_id = options[:grader_id]
@@ -127,7 +127,7 @@ module Api::V1
           # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
           collection = collection.where("submissions.grader_id<=0")
         else
-          collection = collection.scoped_by_grader_id(grader_id)
+          collection = collection.where(grader_id: grader_id)
         end
       end
 

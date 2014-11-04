@@ -143,7 +143,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     result = alignment.learning_outcome_results.
       for_association(quiz).
       for_associated_asset(question).
-      find_or_initialize_by_user_id(user.id)
+      where(user_id: user.id).
+      first_or_initialize
 
     # force the context and artifact
     result.artifact = self
