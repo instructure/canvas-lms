@@ -395,6 +395,9 @@ define [
     truncate: ( string, max) ->
       return textHelper.truncateText( string, {max: max})
 
+    escape_html: (string) ->
+      htmlEscape string
+
     enrollmentName: enrollmentName
 
     # Public: Print an array as a comma-separated list.
