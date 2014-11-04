@@ -12,7 +12,9 @@
     min-height: 52px;
     border-top: 1px solid $tableBorder;
     background-color: white;
-    &:nth-child(odd) { background-color: $tableBackgroundAccent; }
+    @if $use_high_contrast == false {
+      &:nth-child(odd) { background-color: $tableBackgroundAccent; }
+    }
     &.unread .discussion-title{ font-weight: bold; }
     &.selected { background-color: #d6ecfc; }
   }
