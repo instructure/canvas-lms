@@ -176,27 +176,28 @@ define [
 
     datePicker: ->
       dialog = this
-      $('.date_field', @$el).datetime_field().change ->
-        $picker = $(this)
+      $('.date_field', @$el).datetime_field(datepicker:
+        onClose: ->
+          $picker = $(this)
 
-        # Convert the date to a Date object with proper Timezone conversion
-        due_at = $picker.data('date')
-        error_circle = true
-        if due_at?
-          due_at = $.unfudgeDateForProfileTimezone(due_at).toISOString()
-          error_circle = false
+          # Convert the date to a Date object with proper Timezone conversion
+          due_at = $picker.data('date')
+          error_circle = true
+          if due_at?
+            due_at = $.unfudgeDateForProfileTimezone(due_at).toISOString()
+            error_circle = false
 
-        # Show or hide the red circle, depending on validity of date
-        $circle = $picker.closest('.input-container').prev()
-        dialog.showErrorCircle($circle, error_circle)
+          # Show or hide the red circle, depending on validity of date
+          $circle = $picker.closest('.input-container').prev()
+          dialog.showErrorCircle($circle, error_circle)
 
-        # Update the @model assignment with (possibly null) due_at date
-        assignment_id = parseInt($picker.closest('form.passback-form').data('assignment-id'))
-        if assignment_id?
-          dialog.model.update_assignment(assignment_id, due_at: due_at)
-        else
-          $.flashError('Unable to save due date, assignment_id unavailable')
-
+          # Update the @model assignment with (possibly null) due_at date
+          assignment_id = parseInt($picker.closest('form.passback-form').data('assignment-id'))
+          if assignment_id?
+            dialog.model.update_assignment(assignment_id, due_at: due_at)
+          else
+            $.flashError('Unable to save due date, assignment_id unavailable'))
+      
     saveAssignments: ->
       @saveAssignmentToCanvas(a) for a in @model.modified_assignments()
 
