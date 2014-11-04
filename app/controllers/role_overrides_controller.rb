@@ -57,8 +57,13 @@
 #       "id": 1,
 #       "description": "",
 #       "properties": {
-#         "role": {
+#         "label": {
 #           "description": "The label of the role.",
+#           "example": "New Role",
+#           "type": "string"
+#         },
+#         "role": {
+#           "description": "The label of the role. (Deprecated alias for 'label')",
 #           "example": "New Role",
 #           "type": "string"
 #         },
@@ -129,11 +134,15 @@ class RoleOverridesController < ApplicationController
         course_role_data << role_json(@context, role, @current_user, session)
       end
 
-      js_env :ACCOUNT_ROLES => account_role_data
-      js_env :COURSE_ROLES => course_role_data
-      js_env :ACCOUNT_PERMISSIONS => account_permissions(@context)
-      js_env :COURSE_PERMISSIONS => course_permissions(@context)
-      js_env :IS_SITE_ADMIN => @context.site_admin?
+      js_env({
+        :ACCOUNT_ROLES => account_role_data,
+        :COURSE_ROLES => course_role_data,
+        :ACCOUNT_PERMISSIONS => account_permissions(@context),
+        :COURSE_PERMISSIONS => course_permissions(@context),
+        :IS_SITE_ADMIN => @context.site_admin?
+      })
+
+      @active_tab = 'permissions'
     end
   end
 
@@ -143,8 +152,11 @@ class RoleOverridesController < ApplicationController
   # @argument account_id [Required, String]
   #   The id of the account containing the role
   #
-  # @argument role [Required, String]
-  #   The name and unique identifier for the role
+  # @argument role_id [Required, Integer]
+  #   The unique identifier for the role
+  #
+  # @argument role [String, Deprecated]
+  #   The name for the role
   #
   # @returns Role
   def show
@@ -158,8 +170,11 @@ class RoleOverridesController < ApplicationController
   # @API Create a new role
   # Create a new course-level or account-level role.
   #
-  # @argument role [String, Required]
+  # @argument label [String, Required]
   #   Label for the role.
+  #
+  # @argument role [String, Deprecated]
+  #   Deprecated alias for label.
   #
   # @argument base_role_type [String, "AccountMembership"|"StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Specifies the role type that will be used as a base
@@ -253,7 +268,7 @@ class RoleOverridesController < ApplicationController
   # @example_request
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/roles.json' \
   #        -H "Authorization: Bearer <token>" \ 
-  #        -F 'role=New Role' \ 
+  #        -F 'label=New Role' \
   #        -F 'permissions[read_course_content][explicit]=1' \ 
   #        -F 'permissions[read_course_content][enabled]=1' \ 
   #        -F 'permissions[read_course_list][locked]=1' \ 
@@ -265,7 +280,7 @@ class RoleOverridesController < ApplicationController
   def add_role
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
 
-    name = api_request? ? params[:role] : params[:role_type]
+    name = api_request? ? (params[:label].presence || params[:role]) : params[:role_type]
 
     return render :json => {:message => "missing required parameter 'role'" }, :status => :bad_request if api_request? && name.blank?
 
@@ -276,7 +291,7 @@ class RoleOverridesController < ApplicationController
     role.deleted_at = nil
     if !role.save
       if api_request?
-        render :json => { :message => role.errors.full_messages.to_sentence }, :status => :bad_request
+        render :json => role.errors, :status => :bad_request
       else
         flash[:error] = t(:update_failed_notice, 'Role creation failed')
         redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
@@ -308,8 +323,11 @@ class RoleOverridesController < ApplicationController
   # continue to function with the same permissions they had previously.
   # Built-in roles cannot be deactivated.
   #
-  # @argument role [Required, String]
-  #   Label and unique identifier for the role.
+  # @argument role_id [Required, Integer]
+  #   The unique identifier for the role
+  #
+  # @argument role [String, Deprecated]
+  #   The name for the role
   #
   # @returns Role
   def remove_role
@@ -330,8 +348,11 @@ class RoleOverridesController < ApplicationController
   # @API Activate a role
   # Re-activates an inactive role (allowing it to be assigned to new users)
   #
-  # @argument role [Required, String]
-  #   Label and unique identifier for the role.
+  # @argument role_id [Required, Integer]
+  #   The unique identifier for the role
+  #
+  # @argument role [Deprecated, String]
+  #   The name for the role
   #
   # @returns Role
   def activate_role
@@ -357,15 +378,19 @@ class RoleOverridesController < ApplicationController
   # * AccountAdmin
   # * Any previously created custom role
   #
+  # @argument label [String]
+  #   The label for the role. Can only change the label of a custom role that belongs directly to the account.
+  #
   # @argument permissions[<X>][explicit] [Boolean]
   # @argument permissions[<X>][enabled] [Boolean]
   #   These arguments are described in the documentation for the
   #   {api:RoleOverridesController#add_role add_role method}.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/accounts/:account_id/roles/TaEnrollment \ 
+  #   curl https://<canvas>/api/v1/accounts/:account_id/roles/2 \
   #     -X PUT \ 
-  #     -H 'Authorization: Bearer <access_token>' \ 
+  #     -H 'Authorization: Bearer <access_token>' \
+  #     -F 'label=New Role Name' \
   #     -F 'permissions[manage_groups][explicit]=1' \ 
   #     -F 'permissions[manage_groups][enabled]=1' \ 
   #     -F 'permissions[manage_groups][locked]=1' \ 
@@ -375,6 +400,20 @@ class RoleOverridesController < ApplicationController
   # @returns Role
   def update
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
+
+    if (name = params[:label].presence) && @role.label != name
+      if @role.built_in?
+        return render :json => {:message => "cannot update the 'label' for a built-in role" }, :status => :bad_request
+      elsif @role.account != @context
+        return render :json => {:message => "cannot update the 'label' for an inherited role" }, :status => :bad_request
+      else
+        @role.name = name
+        unless @role.save
+          return render :json => @role.errors, :status => :bad_request
+        end
+      end
+    end
+
     set_permissions_for(@role, @context, params[:permissions])
     RoleOverride.clear_cached_contexts
     render :json => role_json(@context, @role, @current_user, session)

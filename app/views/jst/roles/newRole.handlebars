@@ -1,14 +1,36 @@
-<div class="btn-group">
-  <a class="btn btn-primary dropdown-toggle" aria-role="link" href="#" data-toggle="dropdown" aria-haspopup="true">{{#t "add_role"}}Add Role{{/t}}</a>
-  <div class="dropdown-menu bootstrap-form new-role" aria-hidden="true">
-    <form class="form-inline">
-        <input type='text' aria-label="{{#t "role_name_label"}}Role Name{{/t}}" tabindex=1 placeholder="{{#t "role_name"}}Role name{{/t}}"></input>
-      <select aria-label="Role Basetype" tabindex=2 {{#if adminRoles }}disabled{{/if}}>
-        {{#each base_role_types}}
-          <option role="menuitem" value="{{value}}">{{ label }}</option>
-        {{/each}}
-      </select>
-      <button type="submit" class="btn btn-primary" aria-label="{{#t "add_role_label"}}Add Role{{/t}}" tabindex=3><i class="icon-add"></i> {{#t "add"}}Add{{/t}}</button>
-    <form>
+<div class="form-dialog-content">
+  <div class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="role_label_{{label_id}}">
+        {{#t "role_name"}}Role Name:{{/t}}
+      </label>
+      <div class="controls">
+        <input id="role_label_{{label_id}}" type='text' name="label" value="{{ label }}">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="role_type_{{label_id}}">
+        {{#t "role_type"}}Base Type:{{/t}}
+      </label>
+      <div class="controls">
+        <select id="role_type_{{label_id}}" name="base_role_type" {{#unless editable_type }}disabled{{/unless}}>
+          {{#each base_role_types}}
+            <option role="menuitem" value="{{value}}">{{ label }}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
   </div>
+</div>
+<div class="form-controls">
+  <button
+      class="cancel_button btn dialog_closer"
+      type="button"
+      >{{#t "cancel"}}Cancel{{/t}}</button>
+  <button
+      class="btn btn-primary"
+      data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'
+      type="submit"
+      >{{#t "save"}}Save{{/t}}</button>
 </div>

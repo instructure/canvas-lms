@@ -71,7 +71,7 @@ class Role < ActiveRecord::Base
     if self.active?
       scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", self.name, self.account_id, 'active')
       if self.new_record? ? scope.exists? : scope.where("id <> ?", self.id).exists?
-        self.errors.add(:name, 'is already taken')
+        self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
         return false
       end
     end
@@ -170,7 +170,17 @@ class Role < ActiveRecord::Base
   end
 
   def label
-    self.name
+    if self.built_in?
+      if self.course_role?
+        RoleOverride.enrollment_type_labels.detect{|label| label[:name] == self.name}[:label].call
+      elsif self.name == 'AccountAdmin'
+        RoleOverride::ACCOUNT_ADMIN_LABEL.call
+      else
+        self.name
+      end
+    else
+      self.name
+    end
   end
 
   alias_method :destroy!, :destroy

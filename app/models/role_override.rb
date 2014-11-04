@@ -41,8 +41,9 @@ class RoleOverride < ActiveRecord::Base
     result.presence
   end
 
+  ACCOUNT_ADMIN_LABEL = lambda { t('roles.account_admin', "Account Admin") }
   def self.account_membership_types(account)
-    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => t('roles.account_admin', "Account Admin")}]
+    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => ACCOUNT_ADMIN_LABEL.call}]
     account.available_custom_account_roles.each do |r|
       res << {:id => r.id, :name => r.name, :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => r.name}
     end
