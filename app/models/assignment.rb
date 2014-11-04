@@ -1105,7 +1105,7 @@ class Assignment < ActiveRecord::Base
     res
   end
 
-  SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
+  SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
                              media_comment_id media_comment_type]
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
                                     %w[comment group_comment attachments]).to_set
