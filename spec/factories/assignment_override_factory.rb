@@ -33,8 +33,10 @@ end
 
 def create_section_override_for_assignment(assignment_or_quiz, opts={})
   ao = assignment_or_quiz.assignment_overrides.build
-  ao.due_at = 2.days.from_now
+  ao.due_at = opts[:due_at] || 2.days.from_now
   ao.set_type = "CourseSection"
+  #make sure the default due date is overridden with our override due date
+  ao.due_at_overridden = true
   ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
   ao.title = "test override"
   ao.save!
