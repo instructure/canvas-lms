@@ -2627,7 +2627,7 @@ describe Assignment do
     end
 
     it 'returns the cached value if present' do
-      @assignment.write_attribute(:graded_count, 50)
+      @assignment = Assignment.select("assignments.*, 50 AS graded_count").where(id: @assignment).first
       expect(@assignment.graded_count).to eq 50
     end
   end
@@ -2644,7 +2644,7 @@ describe Assignment do
     end
 
     it 'returns the cached value if present' do
-      @assignment.write_attribute(:submitted_count, 50)
+      @assignment = Assignment.select("assignments.*, 50 AS submitted_count").where(id: @assignment).first
       expect(@assignment.submitted_count).to eq 50
     end
   end
