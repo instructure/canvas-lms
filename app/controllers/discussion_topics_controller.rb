@@ -862,13 +862,20 @@ class DiscussionTopicsController < ApplicationController
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless discussion_topic_hash.has_key?(:group_category_id) && discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
+    return unless discussion_topic_hash.has_key?(:group_category_id)
+    return if discussion_topic_hash[:group_category_id].nil? && @topic.group_category_id.nil?
+    return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
     if @topic.is_announcement
       @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
       return
     end
     if !@topic.can_group?
       @errors[:group] = t(:error_group_change, "You cannot change grouping on a discussion with replies.")
+    end
+    if discussion_topic_hash[:group_category_id]
+      discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
+    else
+      discussion_topic_hash[:group_category] = nil
     end
   end
 

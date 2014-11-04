@@ -31,7 +31,7 @@ class DiscussionTopic < ActiveRecord::Base
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
-    :group_category, :group_category_id
+    :group_category
   attr_accessor :user_has_posted
 
   module DiscussionTypes
