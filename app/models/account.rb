@@ -981,14 +981,6 @@ class Account < ActiveRecord::Base
     self.pseudonyms.map{|p| p.user }.select{|u| u.name.match(string) }
   end
 
-  def self.site_admin
-    get_special_account(:site_admin, 'Site Admin')
-  end
-
-  def self.default
-    get_special_account(:default, 'Default Account')
-  end
-
   class << self
     def special_accounts
       @special_accounts ||= {}
@@ -1007,7 +999,18 @@ class Account < ActiveRecord::Base
     def clear_special_account_cache!(force = false)
       special_account_timed_cache.clear(force)
     end
+
+    def define_special_account(key, name = nil)
+      name ||= key.to_s.titleize
+      instance_eval <<-RUBY
+        def self.#{key}(force_create = false)
+          get_special_account(:#{key}, #{name.inspect}, force_create)
+        end
+      RUBY
+    end
   end
+  define_special_account(:default, 'Default Account')
+  define_special_account(:site_admin)
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
@@ -1023,7 +1026,7 @@ class Account < ActiveRecord::Base
     account
   end
 
-  def self.get_special_account(special_account_type, default_account_name)
+  def self.get_special_account(special_account_type, default_account_name, force_create = false)
     Shard.birth.activate do
       account = special_accounts[special_account_type]
       unless account
@@ -1038,7 +1041,7 @@ class Account < ActiveRecord::Base
           account = special_accounts[special_account_type] = Account.where(id: special_account_id).first
         end
       end
-      if !account && default_account_name
+      if !account && default_account_name && ((!special_account_id && !Rails.env.production?) || force_create)
         # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
