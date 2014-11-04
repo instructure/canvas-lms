@@ -77,7 +77,7 @@ describe "grading standards" do
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{@course.id}/details#tab-details"
+    get "/courses/#{@course.id}/settings"
     form = f("#course_form")
     form.find_element(:css, "#course_grading_standard_enabled").click
     expect(is_checked('#course_form #course_grading_standard_enabled')).to be_truthy

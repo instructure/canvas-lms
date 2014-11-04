@@ -128,7 +128,7 @@ describe "courses" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       f("#ui-id-1").click
       form = f("#course_form")
       expect(form).to be_displayed
@@ -140,7 +140,7 @@ describe "courses" do
       expect(value).to eq "10"
 
       # then try just saving it (without resetting it)
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       form = f("#course_form")
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
@@ -151,7 +151,7 @@ describe "courses" do
       expect(value).to eq "10"
 
       # then make sure it's right after a reload
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
       @course.reload

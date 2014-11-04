@@ -2,8 +2,8 @@
 // - course_settings/compiler-course_settings.scss
 // - account-settings/account-settings.scss
 
-$app_width: 260px;
-$app_height: 145px;
+$app_width: 256px;
+$app_height: 143px;
 
 .star-sprite {
   display: block;
@@ -64,6 +64,7 @@ $app_height: 145px;
   .app-full-view {
     td {
       border: none;
+      vertical-align: top;
     }
     td.app-full-view-left {
       width: 255px;
@@ -107,6 +108,17 @@ $app_height: 145px;
         float: left;
         border: thin solid #eeeeee;
         margin: 0 2px 2px 0;
+        .installed-ribbon {
+          position: absolute;
+          width: 100%;
+          height: 20px;
+          right: 0;
+          z-index: 100;
+          color: #adadad;
+          text-align: right;
+          padding-right: 5px;
+          font-size: 0.9em;
+        }
         .banner_image {
           width: $app_width - 40;
           height: $app_height - 40;
@@ -140,6 +152,9 @@ $app_height: 145px;
     }
   }
   .individual-app {
+    td {
+      vertical-align: top;
+    }
     .gray-box-centered {
       text-align: center;
       color: #666666;
@@ -185,7 +200,7 @@ $app_height: 145px;
   .add-review {
     margin-top: 20px;
     padding-top: 5px;
-    border-top: thin solid #eeeeee;
+    border-top: thin solid #dddddd;
     .rate_app {
       font-weight: bold;
     }
@@ -211,4 +226,29 @@ $app_height: 145px;
 
 fieldset.rate_app_wrapper {
   margin: 0px;
+}
+
+fieldset.add-app-modal {
+  padding: 10px;
+}
+
+.ExternalAppsRoot, .ReactModal__Content--external_tools {
+  .control-group {
+    margin-bottom: 2px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 2px;
+
+    input.input-block-level {
+      display: block;
+      height: 38px;
+    }
+
+    .hint-text {
+      font-weight: normal;
+      display: block;
+    }
+  }
 }

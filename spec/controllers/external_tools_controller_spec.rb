@@ -527,6 +527,7 @@ describe ExternalToolsController do
       obj = OpenStruct.new({:body => xml})
       Net::HTTP.any_instance.stubs(:request).returns(obj)
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
+
       expect(response).to be_success
       expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml

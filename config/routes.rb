@@ -175,6 +175,8 @@ CanvasRails::Application.routes.draw do
 
     get 'undelete' => 'context#undelete_index', as: :undelete_items
     post 'undelete/:asset_string' => 'context#undelete_item', as: :undelete_item
+
+    get "settings#{full_path_glob}", action: :settings
     get :settings
     get 'details' => 'courses#settings'
     post :re_send_invitations
@@ -462,6 +464,7 @@ CanvasRails::Application.routes.draw do
   end
 
   resources :accounts do
+    get "settings#{full_path_glob}", action: :settings
     get :settings
     get :admin_tools
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
