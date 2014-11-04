@@ -24,6 +24,9 @@ define [
       model.bind('change:assignments_to_post', =>
         $(".assignments_to_post_count").html(model.assignments_to_post().length)
       )
+      model.bind('change:assignments_with_errors', =>
+        @render()
+      )
       model.bind('change:assignments_with_errors_count', =>
         $(".assignment-error-count").html(model.get('assignments_with_errors_count'))
         if @model.get('assignments_with_errors_count') == 0
@@ -141,7 +144,6 @@ define [
         $textbox = $(this)
         $circle = $textbox.closest('.input-container').prev()
         name = $textbox.val()
-
         dialog.showErrorCircle($circle, name == '')
 
         # Update the @model assignment with new name

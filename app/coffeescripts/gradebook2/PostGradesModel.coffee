@@ -39,6 +39,7 @@ define [
 
     update_bound_attributes: ->
       @set(assignments_to_post: @assignments_to_post())
+      @set(assignments_with_errors: @missing_and_not_unique())
       @set(assignments_with_errors_count: @assignments_with_errors_count())
 
     ignore_assignment: (id) ->
@@ -74,9 +75,10 @@ define [
     missing_and_not_unique: ->
       get_id = (assignment) -> assignment.id
       missing_ids = _.map(@missing_due_date(), get_id)
-      not_unique_ids = _.map(@not_unique_assignments, get_id)
-      missing_and_not_unique_ids = _.union(missing_ids, not_unique_ids)
-      find_assignment_by_id = (id) => _.find(@assignment_list(), (assignment) -> id == assignment.id)
+      augmented_assignments = _.union(@not_unique_assignments(), @missing_due_date())
+      not_unique_ids = _.map(@not_unique_assignments(), get_id)
+      missing_and_not_unique_ids = _.union(missing_ids, not_unique_ids).sort()
+      find_assignment_by_id = (id) => _.find(augmented_assignments, (assignment) -> id == assignment.id)
       _.map(missing_and_not_unique_ids, find_assignment_by_id)
 
     ungraded_submissions: ->
