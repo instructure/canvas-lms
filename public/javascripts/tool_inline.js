@@ -112,13 +112,23 @@ $(function() {
 window.addEventListener('message', function(e) {
   try {
     var message = JSON.parse(e.data);
-    if (message.subject === 'lti.frameResize') {
-      var height = message.height;
-      if (height >= 5000) height = 5000;
-      if (height <= 0) height = 1;
+    switch (message.subject) {
+      case 'lti.frameResize':
+        var height = message.height;
+        if (height >= 5000) height = 5000;
+        if (height <= 0) height = 1;
 
-      tool_content_wrapper().data('height_overridden', true);
-      resize_tool_content_wrapper(height);
+        tool_content_wrapper().data('height_overridden', true);
+        resize_tool_content_wrapper(height);
+        break;
+
+      case 'lti.setUnloadMessage':
+        setUnloadMessage(message.message);
+        break;
+
+      case 'lti.removeUnloadMessage':
+        removeUnloadMessage();
+        break;
     }
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
@@ -134,5 +144,21 @@ window.addEventListener('message', function(e) {
 
 });
 
+var beforeUnloadHandler;
+function setUnloadMessage(msg) {
+  removeUnloadMessage();
+
+  beforeUnloadHandler = function(e) {
+    return (e.returnValue = msg || "");
+  }
+  window.addEventListener('beforeunload', beforeUnloadHandler);
+}
+
+function removeUnloadMessage() {
+  if (beforeUnloadHandler) {
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+    beforeUnloadHandler = null;
+  }
+}
 
 });
