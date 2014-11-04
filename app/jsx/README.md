@@ -10,7 +10,7 @@ BUT WAIT!
 Your file needs to:
 
 1. Have a file name with the `.jsx` extension.
-2. Start with `/** @jsx React.DOM */
+2. Start with `/** @jsx React.DOM */`
 
 JSX
 ---
