@@ -751,7 +751,7 @@ RSpec.configure do |config|
   end
 
   def custom_account_role(name, opts={})
-    custom_role(AccountUser::DEFAULT_BASE_ROLE_TYPE, name, opts)
+    custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
   end
 
   def student_role

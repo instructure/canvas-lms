@@ -345,7 +345,7 @@ describe "Roles API", type: :request do
         expect(json["account"]["id"]).to eq @account.id
         expect(json["id"]).to eq @role.id
         expect(json["role"]).to eq @role_name
-        expect(json["base_role_type"]).to eq AccountUser::DEFAULT_BASE_ROLE_TYPE
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
 
         # make sure all the expected keys are there, but don't assert on a
         # *only* the expected keys, since plugins may have added more.

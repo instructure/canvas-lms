@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Role do
   context "without account" do
@@ -196,7 +196,7 @@ describe Role do
     before :once do
       account_model
       @sub_account = @account.sub_accounts.create!
-      @base_types = RoleOverride::ENROLLMENT_TYPES.map{|et|et[:base_role_name]}
+      @base_types = Role::ENROLLMENT_TYPES
       @custom_roles = {}
       @base_types.each do |bt|
         if bt == 'DesignerEnrollment'

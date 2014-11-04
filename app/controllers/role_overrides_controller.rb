@@ -269,7 +269,7 @@ class RoleOverridesController < ApplicationController
 
     return render :json => {:message => "missing required parameter 'role'" }, :status => :bad_request if api_request? && name.blank?
 
-    base_role_type = params[:base_role_type] || AccountUser::DEFAULT_BASE_ROLE_TYPE
+    base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
     role = @context.roles.build(:name => name)
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
@@ -295,7 +295,7 @@ class RoleOverridesController < ApplicationController
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
 
-    if base_role = RoleOverride.enrollment_types.find{|br| br[:base_role_name] == base_role_type}
+    if base_role = RoleOverride.enrollment_type_labels.find{|br| br[:base_role_name] == base_role_type}
       json["base_role_type_label"] = base_role[:label].call
     end
 
@@ -477,7 +477,7 @@ class RoleOverridesController < ApplicationController
       hash = {:label => p[1][:label].call, :permission_name => p[0]}
       
       # Check to see if the base role name is in the list of other base role names in p[1] 
-      is_course_permission = !(Enrollment::BASE_ROLE_TYPES & p[1][:available_to]).empty?
+      is_course_permission = !(Role::ENROLLMENT_TYPES & p[1][:available_to]).empty?
 
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin

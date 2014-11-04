@@ -19,6 +19,20 @@
 class Role < ActiveRecord::Base
   NULL_ROLE_TYPE = "NoPermissions"
 
+  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"]
+
+  DEFAULT_ACCOUNT_TYPE = 'AccountMembership'
+  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership']
+
+  BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
+
+  KNOWN_TYPES = (BASE_TYPES +
+    ['StudentViewEnrollment',
+     'TeacherlessStudentEnrollment',
+     'NilEnrollment',
+     'teacher', 'ta', 'designer', 'student', 'observer'
+    ]).freeze
+
   module AssociationHelper
     # this is an override to take advantage of built-in role caching since those are by far the most common
     def role
@@ -42,11 +56,8 @@ class Role < ActiveRecord::Base
   validates_presence_of :name, :workflow_state
   validates_presence_of :account_id, :unless => :built_in?
 
-  validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES, :message => 'is invalid'
-  validates_exclusion_of :name, :in => RoleOverride::KNOWN_ROLE_TYPES, :unless => :built_in?, :message => 'is reserved'
-  validates_exclusion_of :name, :in => Enrollment::SIS_TYPES.values, :unless => :built_in?, :message => 'is reserved'
-
-  NEW_ROLES = true # this is a flag for the plugins because we can't change everything at once :/
+  validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
+  validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
 
   def id
     if self.built_in? && self.shard != Shard.current && role = Role.get_built_in_role(self.name, Shard.current)
@@ -87,8 +98,8 @@ class Role < ActiveRecord::Base
   end
 
   def self.ensure_built_in_roles!
-    unless built_in_roles(true).count == RoleOverride.base_role_types.count
-      RoleOverride.base_role_types.each do |base_type|
+    unless built_in_roles(true).count == BASE_TYPES.count
+      BASE_TYPES.each do |base_type|
         role = Role.new
         role.name = base_type
         role.base_role_type = base_type
@@ -151,11 +162,11 @@ class Role < ActiveRecord::Base
   end
 
   def account_role?
-    AccountUser::BASE_ROLE_TYPES.include?(base_role_type)
+    ACCOUNT_TYPES.include?(base_role_type)
   end
 
   def course_role?
-    Enrollment::BASE_ROLE_TYPES.include?(base_role_type)
+    ENROLLMENT_TYPES.include?(base_role_type)
   end
 
   def label
@@ -173,8 +184,8 @@ class Role < ActiveRecord::Base
   scope :deleted, -> { where(:workflow_state => 'deleted') }
   scope :active, -> { where(:workflow_state => 'active') }
   scope :inactive, -> { where(:workflow_state => 'inactive') }
-  scope :for_courses, -> { where(:base_role_type => Enrollment::BASE_ROLE_TYPES) }
-  scope :for_accounts, -> { where(:base_role_type => AccountUser::BASE_ROLE_TYPES) }
+  scope :for_courses, -> { where(:base_role_type => ENROLLMENT_TYPES) }
+  scope :for_accounts, -> { where(:base_role_type => ACCOUNT_TYPES) }
 
   # Returns a list of hashes for each base enrollment type, and each will have a
   # custom_roles key, each will look like:
@@ -190,7 +201,7 @@ class Role < ActiveRecord::Base
   # ]
   def self.all_enrollment_roles_for_account(account, include_inactive=false)
     custom_roles = account.available_custom_course_roles(include_inactive)
-    RoleOverride::ENROLLMENT_TYPES.map do |br|
+    RoleOverride.enrollment_type_labels.map do |br|
       new = br.clone
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call

@@ -42,14 +42,14 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.account_membership_types(account)
-    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => AccountUser::DEFAULT_BASE_ROLE_TYPE, :label => t('roles.account_admin', "Account Admin")}]
+    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => t('roles.account_admin', "Account Admin")}]
     account.available_custom_account_roles.each do |r|
-      res << {:id => r.id, :name => r.name, :base_role_name => AccountUser::DEFAULT_BASE_ROLE_TYPE, :label => r.name}
+      res << {:id => r.id, :name => r.name, :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => r.name}
     end
     res
   end
 
-  ENROLLMENT_TYPES =
+  ENROLLMENT_TYPE_LABELS =
     [
       # StudentViewEnrollment permissions will mirror StudentPermissions
       {:base_role_name => 'StudentEnrollment', :name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') }, :plural_label => lambda { t('roles.students', 'Students') } },
@@ -58,21 +58,8 @@ class RoleOverride < ActiveRecord::Base
       {:base_role_name => 'DesignerEnrollment', :name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Designer') }, :plural_label => lambda { t('roles.designers', 'Designers') } },
       {:base_role_name => 'ObserverEnrollment', :name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') }, :plural_label => lambda { t('roles.observers', 'Observers') } }
     ].freeze
-  def self.enrollment_types
-    ENROLLMENT_TYPES
-  end
-
-  BASE_ROLE_TYPES = (AccountUser::BASE_ROLE_TYPES + Enrollment::BASE_ROLE_TYPES + [Role::NULL_ROLE_TYPE]).freeze
-  def self.base_role_types
-    BASE_ROLE_TYPES
-  end
-
-  KNOWN_ROLE_TYPES = (BASE_ROLE_TYPES +
-      ['StudentViewEnrollment',
-       'TeacherlessStudentEnrollment',
-       'NilEnrollment']).freeze
-  def self.known_role_types
-    KNOWN_ROLE_TYPES
+  def self.enrollment_type_labels
+    ENROLLMENT_TYPE_LABELS
   end
 
   # immediately register stock canvas-lms permissions
