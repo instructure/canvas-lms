@@ -3,10 +3,8 @@ require 'i18n_extraction'
 
 namespace :i18n do
   desc "Verifies all translation calls"
-  task :check => :environment do
+  task :check => :i18n_environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
-
-    I18n.available_locales
 
     def I18nliner.manual_translations
       I18n.backend.direct_lookup('en')
@@ -48,8 +46,9 @@ namespace :i18n do
     print "Wrote new #{yaml_file}\n\n"
   end
 
-  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js do
+  # like the top-level :environment, but just the i18n-y stuff we need.
+  # also it's faster and doesn't require a db \o/
+  task :i18n_environment do
     # This is intentionally requiring things individually rather than just
     # loading the rails+canvas environment, because that environment isn't
     # available during the deploy process. Don't change this out for a call to
@@ -64,6 +63,7 @@ namespace :i18n do
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller'
     require 'active_record'
+    require 'will_paginate'
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'
@@ -71,7 +71,10 @@ namespace :i18n do
     I18n.backend = I18nema::Backend.new
     I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
     I18n.backend.init_translations
+  end
 
+  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
+  task :generate_js => :i18n_environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     locales = I18n.available_locales - [:en]
