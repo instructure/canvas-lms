@@ -129,19 +129,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :default_values
 
-  # TODO: These overrides for assignment's group_category can be removed after the migration.
-  alias_method :raw_group_category, :group_category
-
-  def group_category
-    return raw_group_category || (self.assignment && self.assignment.group_category)
-  end
-
-  def legacy_group_category_id
-    return self.group_category.id if self.group_category
-  end
-
   def has_group_category?
-    self.group_category.present?
+    !!self.group_category_id
   end
 
   def set_schedule_delayed_transitions
