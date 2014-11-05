@@ -78,7 +78,7 @@ class PseudonymSessionsController < ApplicationController
             successful_login(@user, @pseudonym)
             return
           else
-            unknown_user_url = @domain_root_account.account_authorization_config.unknown_user_url || cas_login_url(:no_auto=>'true')
+            unknown_user_url = @domain_root_account.account_authorization_config.unknown_user_url.presence || cas_login_url(:no_auto=>'true')
             logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
             reset_session
             flash[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.user

@@ -916,7 +916,13 @@ describe PseudonymSessionsController do
       controller.expects(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = account
 
-      # Default to Login url
+      # Default to Login url with a nil value
+      get 'new', :ticket => 'ST-abcd'
+      expect(response).to redirect_to(cas_login_url(:no_auto => 'true'))
+      expect(session[:cas_session]).to be_nil
+
+      # Default to Login url with an empty string value
+      account.account_authorization_config.unknown_user_url = ""
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(cas_login_url(:no_auto => 'true'))
       expect(session[:cas_session]).to be_nil
