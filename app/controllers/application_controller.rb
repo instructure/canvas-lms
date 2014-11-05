@@ -1666,7 +1666,7 @@ class ApplicationController < ActionController::Base
         flash.delete(:info)
         notices << {:type => 'info', :content => info, :icon => 'info'}
       end
-      if notice = (flash[:html_notice] ? flash[:html_notice].html_safe : flash[:notice])
+      if notice = (flash[:html_notice] ? {html: flash[:html_notice]} : flash[:notice])
         if flash[:html_notice]
           flash.delete(:html_notice)
         else
