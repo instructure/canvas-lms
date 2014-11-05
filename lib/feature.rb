@@ -135,7 +135,7 @@ By default, Canvas will try to use Flash first to play videos. Turn this on to t
 then fall back to Flash.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: 'on',
       beta: true
     },
     'high_contrast' =>
