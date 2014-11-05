@@ -16,9 +16,9 @@ group :development do
 
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.2'
-      gem 'byebug', '3.1.2'
+      gem 'byebug', '3.5.1'
     end
-    gem 'byebug', '3.1.2', :platforms => [:ruby_20, :ruby_21]
+    gem 'byebug', '3.5.1', :platforms => [:ruby_20, :ruby_21]
       gem 'columnize', '0.8.9', :platforms => [:ruby_20, :ruby_21]
     gem 'debugger', '1.6.6', :platforms => :ruby_19
   end
