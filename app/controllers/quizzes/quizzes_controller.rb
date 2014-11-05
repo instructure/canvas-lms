@@ -263,22 +263,16 @@ class Quizzes::QuizzesController < ApplicationController
         [qqr.quiz_question_id, qqr.regrade_option]
       end]
       sections = @context.course_sections.active
-      hash = {
-        :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
-        :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user)),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
-        :QUIZ => quiz_json(@quiz, @context, @current_user, session),
-        :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-        :QUIZZES_URL => course_quizzes_url(@context),
-        :QUIZ_IP_FILTERS_URL => api_v1_course_quiz_ip_filters_url(@context, @quiz),
-        :CONTEXT_ACTION_SOURCE => :quizzes,
-        :REGRADE_OPTIONS => regrade_options,
-        :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
-        :POSSIBLE_DATE_RANGE => {
-          :start => @context.start_at,
-          :end => @context.conclude_at
-        }
-      }
+      hash = { :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
+             :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user)),
+             :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+             :QUIZ => quiz_json(@quiz, @context, @current_user, session),
+             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+             :QUIZZES_URL => course_quizzes_url(@context),
+             :QUIZ_IP_FILTERS_URL => api_v1_course_quiz_ip_filters_url(@context, @quiz),
+             :CONTEXT_ACTION_SOURCE => :quizzes,
+             :REGRADE_OPTIONS => regrade_options,
+             :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT }
       append_sis_data(hash)
       js_env(hash)
       render :action => "new"

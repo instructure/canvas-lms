@@ -373,12 +373,6 @@ class DiscussionTopicsController < ApplicationController
             @topic.assignment.overrides_for(@current_user)
             ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
-        possible_date_range = {
-          :POSSIBLE_DATE_RANGE => {
-            :start => @context.start_at,
-            :end => @context.conclude_at
-            }
-          }
       end
 
 
@@ -394,7 +388,6 @@ class DiscussionTopicsController < ApplicationController
                  DRAFT_STATE: @topic.draft_state_enabled?,
                  POST_GRADES: @context.feature_enabled?(:post_grades),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
-      js_hash.merge!(possible_date_range) if possible_date_range
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"

@@ -48,3 +48,4 @@ define [
 
     representsDefaultDueDate: =>
       @getCourseSectionID() is Section.defaultDueDateSectionID
+

@@ -4,9 +4,9 @@ shared_examples_for "quizzes selenium tests" do
   include_examples "in-process server selenium tests"
 
   def create_quiz_with_default_due_dates
-    due_at = Time.zone.now.advance(days:3)
-    unlock_at = Time.zone.now.advance(days:1)
-    lock_at = Time.zone.now.advance(days:5)
+    due_at = Time.zone.now
+    unlock_at = Time.zone.now.advance(days:-2)
+    lock_at = Time.zone.now.advance(days:4)
     @context = @course
     @quiz = quiz_model
     @quiz.generate_quiz_data

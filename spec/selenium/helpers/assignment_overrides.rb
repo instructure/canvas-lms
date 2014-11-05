@@ -22,15 +22,15 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def due_at
-    Time.zone.now.advance(days: 3)
+    Time.zone.now
   end
 
   def unlock_at
-    Time.zone.now.advance(days: 1)
+    Time.zone.now.advance(days: -2)
   end
 
   def lock_at
-    Time.zone.now.advance(days: 5)
+    Time.zone.now.advance(days: 4)
   end
 
   def compare_assignment_times(a)

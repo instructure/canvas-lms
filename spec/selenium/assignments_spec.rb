@@ -82,26 +82,6 @@ describe "assignments" do
       end
     end
 
-    it "should display assignment on calendar and link to assignment" do
-      assignment_name = 'first assignment'
-      due_date = Time.now + 2.days
-      @assignment = @course.assignments.create(:name => assignment_name, :due_at => due_date)
-
-      get "/calendar2#view_name=month&view_start=#{due_date.to_date.to_s}"
-
-      wait_for_ajaximations
-      keep_trying_until do # we might click on it before it has a handler
-        f('.assignment').click
-        wait_for_ajaximations
-        f('.edit_event_link').click
-        true
-      end
-      wait_for_ajaximations
-      f('.more_options_link').click
-      wait_for_ajaximations
-      expect(f('#assignment_name')['value']).to include_text(assignment_name)
-    end
-
     it "only allows an assignment editor to edit points and title if assignment " +
            "if assignment has multiple due dates" do
       middle_number = '15'

@@ -41,7 +41,7 @@ def course_valid_attributes
     :name => 'value for name',
     :group_weighting_scheme => 'value for group_weighting_scheme',
     :start_at => Time.now,
-    :conclude_at => Time.now + 10.days,
+    :conclude_at => Time.now + 100,
     :is_public => true,
     :allow_student_wiki_edits => true,
   }
