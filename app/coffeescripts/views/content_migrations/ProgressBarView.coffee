@@ -1,7 +1,8 @@
 define [
   'Backbone'
-  'jst/content_migrations/ProgressBar'
-], (Backbone, template) -> 
+  'jst/content_migrations/ProgressBar',
+  'i18n!progressbar_view'
+], (Backbone, template, I18n) ->
   class ProgressBarView extends Backbone.View
     template: template
 
@@ -10,9 +11,15 @@ define [
 
     initialize: =>
       super
-      @listenTo @model, "change:completion", => @render()
+      @listenTo @model, "change:completion", =>
+        integer = Math.floor @model.changed?.completion
+        message = I18n.t('Content migration running, %{percent}% complete',{
+            percent: integer
+          })
+        $.screenReaderFlashMessageExclusive(message)
+        @render()
 
-    toJSON: -> 
+    toJSON: ->
       json = super
       json.completion = @model.get('completion')
       json

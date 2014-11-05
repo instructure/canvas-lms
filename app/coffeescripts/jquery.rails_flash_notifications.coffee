@@ -71,6 +71,14 @@ define [
   $.screenReaderFlashError = (content) ->
     screenReaderFlashBox('error', content)
 
+  # This is for when you want to clear the flash message content prior to
+  # updating it with new content.  Makes it so the SR only reads this one
+  # message.
+  $.screenReaderFlashMessageExclusive = (content) ->
+    $screenreader_holder.html("""
+      <span>#{escapeContent(content)}</span>
+    """)
+
   $.initFlashContainer = ->
     initFlashContainer()
 
