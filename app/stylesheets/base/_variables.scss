@@ -29,56 +29,31 @@
 // all the canvas pages in. All of the app variables that denote a
 // color should use or be based off of one of these variables
 
-@if $use_new_styles {
-  $canvas-primary:                  #0099e0; // light blue
-  @if $use_high_contrast { $canvas-primary: #0078c4; } 
 
-  $canvas-secondary:                #5b6c79; // dark blue
-  @if $use_high_contrast { $canvas-secondary: #58646d; }
+$canvas-primary:                  #0099e0; // light blue
+@if $use_high_contrast { $canvas-primary: #0073ac; } 
 
-  $canvas-success:                  #00ad18; // green
-  @if $use_high_contrast { $canvas-success: #008a14; }
+$canvas-secondary:                #5b6c79; // dark blue
+@if $use_high_contrast { $canvas-secondary: #343c44; }
 
-  $canvas-neutral:                  #f4f6f7; // lt gray;
+$canvas-success:                  #00ad18; // green
+@if $use_high_contrast { $canvas-success: #008a14; }
 
-  $canvas-action:                   #ba3fa5; // magenta
-  @if $use_high_contrast { $canvas-action: #a23891; }
+$canvas-neutral:                  hsl(0,0,90%);
 
-  $canvas-danger:                   #ad393a; // red
-  @if $use_high_contrast { $canvas-danger: #a03536; }
+$canvas-action:                   #ba3fa5; // magenta
+@if $use_high_contrast { $canvas-action: #a23891; }
 
-  $canvas-alert:                    #c38406; // gold
-  @if $use_high_contrast { $canvas-alert: #9e6b05; }
+$canvas-danger:                   #ad393a; // red
+@if $use_high_contrast { $canvas-danger: #a03536; }
 
-  $canvas-light:                    #ffffff; // white
+$canvas-alert:                    #c38406; // gold
+@if $use_high_contrast { $canvas-alert: #9e6b05; }
 
-  $canvas-dark:                     #5d6d78; // gray/blue
-  @if $use_high_contrast { $canvas-dark: #405360; }
-}
-@else {
-  $canvas-primary:                  #08c; 
-  @if $use_high_contrast { $canvas-primary: #0073ac; } 
+$canvas-light:                    #ffffff; // white
 
-  $canvas-secondary:                #4b5662; 
-  @if $use_high_contrast { $canvas-secondary: #343c44; }
+$canvas-dark:                     #333333;
 
-  $canvas-success:                  #33802a; 
-
-  $canvas-neutral:                  hsl(0,0,90%);
-
-  $canvas-action:                   #ba3fa5;
-  @if $use_high_contrast { $canvas-action: #a23891; }
-
-  $canvas-danger:                   #ad393a;
-
-  $canvas-alert:                    #c38406;
-  @if $use_high_contrast { $canvas-alert: #845a04; }
-
-  $canvas-light:                    #ffffff;
-
-  $canvas-dark:                     #333333;
-  
-}
 
 
 // Bootstrap Color Variable Overwrites

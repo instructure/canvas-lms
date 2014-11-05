@@ -236,28 +236,16 @@
 .Colorguide-color--alert      {@include colorguide($canvas-alert);}
 .Colorguide-color--light      {@include colorguide($canvas-light);}
 .Colorguide-color--dark       {@include colorguide($canvas-dark);}
-@if $use_new_styles {
-  .Colorguide-container--hc-theme {
-    .Colorguide-color--primary    {@include colorguide(#0078c4);}
-    .Colorguide-color--secondary  {@include colorguide(#58646d);}
-    .Colorguide-color--success    {@include colorguide(#008a14);}
-    .Colorguide-color--neutral    {@include colorguide(#ffffff);}
-    .Colorguide-color--action     {@include colorguide(#a23891);}
-    .Colorguide-color--danger     {@include colorguide(#a03536);}
-    .Colorguide-color--alert      {@include colorguide(#9e6b05);}
-    .Colorguide-color--dark       {@include colorguide(#405360);}  
-  }
-} 
-@else {
+
 .Colorguide-container--hc-theme {
   .Colorguide-color--primary    {@include colorguide(#0073ac);}
   .Colorguide-color--secondary  {@include colorguide(#343c44);}
-  .Colorguide-color--success    {@include colorguide(#33802a);}
+  .Colorguide-color--success    {@include colorguide(#008a14);}
   .Colorguide-color--neutral    {@include colorguide(hsl(0,0,90%)); color: $canvas-light;}
   .Colorguide-color--action     {@include colorguide(#a23891);}
-  .Colorguide-color--danger     {@include colorguide(#ad393a);}
-  .Colorguide-color--alert      {@include colorguide(#845a04);}
+  .Colorguide-color--danger     {@include colorguide(#a03536);}
+  .Colorguide-color--alert      {@include colorguide(#9e6b05);}
   .Colorguide-color--light      {@include colorguide(#ffffff);}
   .Colorguide-color--dark       {@include colorguide(#333333);}  
 }  
-}
+
