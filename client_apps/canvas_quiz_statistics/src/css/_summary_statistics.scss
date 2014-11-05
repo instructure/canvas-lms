@@ -50,6 +50,26 @@
         display: none;
       }
     }
+
+    .x.brush {
+      fill: rgba($contrastColor, 0.1);
+    }
+
+    text.brush-stats {
+      fill: $primaryFg;
+      transition: opacity 0.25s ease 0;
+
+      &.unused {
+        opacity: 0;
+        font-weight: bold;
+      }
+    }
+
+    &:hover {
+      text.brush-stats.unused {
+        opacity: 1;
+      }
+    }
   }
 
   .report-generator.busy {
