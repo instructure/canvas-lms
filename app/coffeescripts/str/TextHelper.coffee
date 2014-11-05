@@ -68,7 +68,7 @@ define [
           else
             link = match
             link = "http://" + link if link[0..3] == 'www.'
-            link = link.replace(/'/g, '%27')
+            link = encodeURI(link).replace(/'/g, '%27')
             links.push link
             "<a href='#{htmlEscape(link)}'>#{htmlEscape(match)}</a>"
         )
