@@ -30,13 +30,13 @@
           <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
           <label for="batch_mode"><%= t(:batch_mode_label, "This is a full batch update") %></label>
           <br>
-          <select id="batch_mode_term_id" name="batch_mode_term_id">
-            <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
-          </select>
           <p class='instruction'>
             <%= mt(:batch_import_instructions,
             "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
           </p>
+          <select id="batch_mode_term_id" name="batch_mode_term_id">
+            <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
+          </select>
         </div>
 
         <div id="stickiness_options">
