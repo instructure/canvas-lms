@@ -25,3 +25,4 @@ define [
     override = new AssignmentOverride id: 1, course_section_id: 1
     override.set 'course_section_id', 3
     strictEqual override.toJSON().assignment_override.id ,undefined
+
