@@ -372,6 +372,29 @@ describe ApplicationController do
   end
 end
 
+describe ApplicationController do
+  describe "flash_notices" do
+    it 'should return notice text for each type' do
+      [:error, :warning, :info, :notice].each do |type|
+        flash[type] = type.to_s
+      end
+      expect(controller.send(:flash_notices)).to match_array([
+         {type: 'error', content: 'error', icon: 'warning'},
+         {type: 'warning', content: 'warning', icon: 'warning'},
+         {type: 'info', content: 'info', icon: 'info'},
+         {type: 'success', content: 'notice', icon: 'check'}
+     ])
+    end
+
+    it 'should wrap html notification text in an object' do
+      flash[:html_notice] = '<p>hello</p>'
+      expect(controller.send(:flash_notices)).to match_array([
+        {type: 'success', content: {html: '<p>hello</p>'}, icon: 'check'}
+      ])
+    end
+  end
+end
+
 describe WikiPagesController do
   describe "set_js_rights" do
     it "should populate js_env with policy rights" do
