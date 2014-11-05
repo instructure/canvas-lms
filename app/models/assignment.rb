@@ -1373,7 +1373,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
-      groups_and_ungrouped(user).map { |group_name, group_students|
+      reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
@@ -1386,10 +1386,15 @@ class Assignment < ActiveRecord::Base
         representative.sortable_name = group_name
         representative.short_name = group_name
 
-        yield representative, others if block_given?
-
-        representative
+        [representative, others]
       }.compact
+
+      sorted_reps_with_others = Canvas::ICU.collate_by(reps_and_others) { |rep, _|
+      rep.sortable_name }
+      if block_given?
+        sorted_reps_with_others.each { |r,o| yield r, o }
+      end
+      sorted_reps_with_others.map &:first
     else
       visible_students_for_speed_grader(user)
     end
