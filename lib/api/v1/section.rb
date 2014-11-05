@@ -35,8 +35,12 @@ module Api::V1::Section
       else
         proxy = proxy.includes(:user)
       end
+      include_enrollments = includes.include?('enrollments')
       res['students'] = proxy.where(:type => 'StudentEnrollment').
-        map { |e| user_json(e.user, user, session, includes) }
+        map { |e|
+          enrollments = include_enrollments ? [e] : nil
+          user_json(e.user, user, session, includes, @context, enrollments)
+        }
     end
     res
   end

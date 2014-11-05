@@ -1481,6 +1481,30 @@ describe CoursesController, type: :request do
         expect(sorted_users).to eq expected_users
       end
 
+      it "returns concluded enrollments if ?enrollment_state[]=concluded" do
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["invited","active"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).to be_empty
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["invited","active","completed"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+      end
+
+      it "returns active and invited enrollments if no enrollment state is given" do
+        json = api_call(:get, api_url, api_route, :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).to be_empty
+      end
+
       it "accepts a list of enrollment_types" do
         ta2 = user(:name => 'SSS Helper')
         ta2_enroll1 = @course1.enroll_user(ta2, 'TaEnrollment', :section => @section1)
