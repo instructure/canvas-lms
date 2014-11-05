@@ -61,7 +61,7 @@ define [
         ,
           success: (m, r) =>
             if r.type == 'error'
-              $.flashError(htmlEscape(I18n.t('save_failed', "Unable to save review: %{message}", { message: r.message })))
+              $.flashError(I18n.t('save_failed', "Unable to save review: %{message}", { message: r.message }))
             m.trigger 'sync'
         @$el.dialog('close')
 

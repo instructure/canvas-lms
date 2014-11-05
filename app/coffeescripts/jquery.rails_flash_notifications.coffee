@@ -4,22 +4,31 @@ define [
   'jquery'
   'underscore'
   'compiled/fn/preventDefault'
+  'str/htmlEscape'
   'jqueryui/effects/drop'
   'vendor/jquery.cookie'
-], (I18n, $, _, preventDefault) ->
+], (I18n, $, _, preventDefault, htmlEscape) ->
+  $holder = []
+  $screenreader_holder = []
 
-  $holder = $("#flash_message_holder")
-  $screenreader_holder = $("#flash_screenreader_holder")
-  $holder.on 'click', '.close_link', preventDefault(->)
-  $holder.on 'click', 'li', ->
-    $this = $(this)
-    return if $this.hasClass('no_close')
-    $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
-    $this.stop(true, true).remove()
+  initFlashContainer = ->
+    $holder = $("#flash_message_holder")
+    return if $holder.length == 0 # not defined yet; call $.initFlashContainer later
+    $screenreader_holder = $("#flash_screenreader_holder")
+    $holder.on 'click', '.close_link', preventDefault(->)
+    $holder.on 'click', 'li', ->
+      $this = $(this)
+      return if $this.hasClass('no_close')
+      $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
+      $this.stop(true, true).remove()
+  initFlashContainer() # look for the container on script load
+
+  escapeContent = (content) ->
+    if content.hasOwnProperty('html') then content.html else htmlEscape(content)
 
   screenReaderFlashBox = (type, content) ->
     $screenreader_node = $("""
-      <span>#{content}</span>
+      <span>#{escapeContent(content)}</span>
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
@@ -30,7 +39,7 @@ define [
     $node = $("""
       <li class="ic-flash-#{type}">
         <i></i>
-        #{content}
+        #{escapeContent(content)}
         <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
       </li>
     """)
@@ -61,6 +70,9 @@ define [
 
   $.screenReaderFlashError = (content) ->
     screenReaderFlashBox('error', content)
+
+  $.initFlashContainer = ->
+    initFlashContainer()
 
   renderServerNotifications = ->
     if ENV.notices?
