@@ -971,28 +971,41 @@ class Submission < ActiveRecord::Base
     @group_broadcast_submission = false
   end
 
-  def past_due?
-    return false if cached_due_date.nil?
-    check_time = submitted_at || Time.now
-    check_time -= 60.seconds if submission_type == 'online_quiz'
-    cached_due_date < check_time
-  end
-  alias_method :past_due, :past_due?
+  # in a module so they can be included in other Submission-like objects. the
+  # contract is that the including class must have the following attributes:
+  #
+  #  * assignment (Assignment)
+  #  * submission_type (String)
+  #  * workflow_state (String)
+  #  * cached_due_date (Time)
+  #  * submitted_at (Time)
+  #  * score (Fixnum)
+  #
+  module Tardiness
+    def past_due?
+      return false if cached_due_date.nil?
+      check_time = submitted_at || Time.now
+      check_time -= 60.seconds if submission_type == 'online_quiz'
+      cached_due_date < check_time
+    end
+    alias_method :past_due, :past_due?
 
-  def late?
-    submitted_at.present? && past_due?
-  end
-  alias_method :late, :late?
+    def late?
+      submitted_at.present? && past_due?
+    end
+    alias_method :late, :late?
 
-  def missing?
-    return false if !past_due? || submitted_at.present?
-    assignment.expects_submission? || !(self.graded? && self.score > 0)
-  end
-  alias_method :missing, :missing?
+    def missing?
+      return false if !past_due? || submitted_at.present?
+      assignment.expects_submission? || !(self.graded? && self.score > 0)
+    end
+    alias_method :missing, :missing?
 
-  def graded?
-    !!self.score && self.workflow_state == 'graded'
+    def graded?
+      !!self.score && self.workflow_state == 'graded'
+    end
   end
+  include Tardiness
 
   def current_submission_graded?
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
