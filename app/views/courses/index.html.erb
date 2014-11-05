@@ -62,6 +62,7 @@
   </table>
 <% end %>
 
+<% @show_star_column = true %>
 <% unless @past_enrollments.empty? %>
   <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
   <table id="past_enrollments_table" class="table table-bordered past_enrollments course-list-table">
