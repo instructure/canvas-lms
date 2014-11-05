@@ -222,7 +222,7 @@ goes to the personal files page for a user ('/files') then you need to turn it o
 END
 
       applies_to: 'Course',
-      state: 'hidden_in_prod',
+      state: 'allowed',
       beta: true
     },
     'modules_next' =>
