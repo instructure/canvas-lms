@@ -104,11 +104,11 @@ describe AuthenticationMethods do
         )
       end
 
-      let(:saml_request) { stub(:forward_url => 'saml_login_url') }
+      let(:saml_request) { stub(:generate_request => 'saml_login_url') }
 
       before do
         skip('requires SAML extension') unless AccountAuthorizationConfig.saml_enabled
-        Onelogin::Saml::AuthRequest.stubs(:generate => saml_request)
+        Onelogin::Saml::AuthRequest.stubs(:new => saml_request)
       end
 
       it 'returns true' do
