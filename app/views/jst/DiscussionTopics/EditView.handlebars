@@ -53,12 +53,12 @@
 <fieldset>
 
   <div class="control-group">
-    <label class="control-label" for="discussion_attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
+    <label class="control-label" role="button" aria-label="{{#t}}Add Attachment{{/t}}" tabindex="0" for="discussion_attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
     <div class="controls">
       {{#each attachments}}
         <div class="attachmentRow">
           <a href="{{url}}" class="{{mimeClass content-type}}">{{display_name}}</a>
-          <button type="button" class="removeAttachment close" style="float:none">×</button>
+          <button type="button" class="removeAttachment close" style="float:none" aria-label="{{#t}}Remove Attachment{{/t}}">×</button>
         </div>
       {{/each}}
       <input type="file"
