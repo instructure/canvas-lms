@@ -56,10 +56,10 @@ define [
           upcoming.push a
       )
 
-      overdue_group = new AssignmentGroup({ id: 'overdue', name: 'Overdue Assignments', assignments: overdue })
-      upcoming_group = new AssignmentGroup({ id: 'upcoming', name: 'Upcoming Assignments', assignments: upcoming })
-      undated_group = new AssignmentGroup({ id: 'undated', name: 'Undated Assignments', assignments: undated })
-      past_group = new AssignmentGroup({ id: 'past', name: 'Past Assignments', assignments: past })
+      overdue_group = new AssignmentGroup({ id: 'overdue', name: I18n.t('overdue_assignments', 'Overdue Assignments'), assignments: overdue })
+      upcoming_group = new AssignmentGroup({ id: 'upcoming', name: I18n.t('upcoming_assignments', 'Upcoming Assignments'), assignments: upcoming })
+      undated_group = new AssignmentGroup({ id: 'undated', name: I18n.t('undated_assignments', 'Undated Assignments'), assignments: undated })
+      past_group = new AssignmentGroup({ id: 'past', name: I18n.t('past_assignments', 'Past Assignments'), assignments: past })
 
       sorted_groups = @_sortGroups(overdue_group, upcoming_group, undated_group, past_group)
 
