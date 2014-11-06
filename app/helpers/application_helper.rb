@@ -756,7 +756,8 @@ module ApplicationHelper
 
   def context_sensitive_datetime_title(datetime, context, options={})
     just_text = options.fetch(:just_text, false)
-    return "" unless datetime.present?
+    default_text = options.fetch(:default_text, "")
+    return default_text unless datetime.present?
     local_time = datetime_string(datetime)
     text = local_time
     if context.present?
