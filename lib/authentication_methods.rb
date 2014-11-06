@@ -350,14 +350,15 @@ module AuthenticationMethods
     reset_session_for_login
     aac ||= @domain_root_account.account_authorization_config
     settings = aac.saml_settings(current_host)
-    request = Onelogin::Saml::AuthRequest::generate(settings)
+    request = Onelogin::Saml::AuthRequest.new(settings)
+    forward_url = request.generate_request
     if aac.debugging? && !aac.debug_get(:request_id)
       aac.debug_set(:request_id, request.id)
-      aac.debug_set(:to_idp_url, request.forward_url)
-      aac.debug_set(:to_idp_xml, request.xml)
+      aac.debug_set(:to_idp_url, forward_url)
+      aac.debug_set(:to_idp_xml, request.request_xml)
       aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
     end
-    delegated_auth_redirect(request.forward_url)
+    delegated_auth_redirect(forward_url)
   end
 
   def delegated_auth_redirect(uri)
