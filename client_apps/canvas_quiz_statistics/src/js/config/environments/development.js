@@ -1,5 +1,4 @@
 define(function(require) {
-  var rawAjax = require('../../util/xhr_request');
   var $ = require('canvas_packages/jquery');
   var Root = this;
   var DEBUG = {

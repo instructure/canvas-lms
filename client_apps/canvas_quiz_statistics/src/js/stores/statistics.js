@@ -11,6 +11,12 @@ define(function(require) {
    * Load stats.
    */
   var store = new Store('statistics', {
+    getInitialState: function() {
+      return {
+        loading: false
+      };
+    },
+
     /**
      * Load quiz statistics.
      *
@@ -22,13 +28,16 @@ define(function(require) {
      *         Fulfills when the stats have been loaded and injected.
      */
     load: function() {
-      var onLoad = this.populate.bind(this);
-
       if (!config.quizStatisticsUrl) {
         return config.onError('Missing configuration parameter "quizStatisticsUrl".');
       }
 
-      return quizStats.fetch().then(onLoad);
+      this.setState({ loading: true });
+
+      return quizStats.fetch().then(function onLoad(payload) {
+        this.populate(payload);
+        this.setState({ loading: false });
+      }.bind(this));
     },
 
     /**
@@ -64,6 +73,10 @@ define(function(require) {
       }
 
       return false;
+    },
+
+    isLoading: function() {
+      return this.state.loading;
     },
 
     getSubmissionStatistics: function() {

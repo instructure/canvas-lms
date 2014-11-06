@@ -9,6 +9,8 @@ define(function(require) {
   var formatNumber = require('../util/format_number');
   var SightedUserContent = require('jsx!../components/sighted_user_content');
   var ScreenReaderContent = require('jsx!../components/screen_reader_content');
+  var Spinner = require('jsx!../components/spinner');
+  var NA_LABEL = I18n.t('not_available_abbrev', 'N/A');
 
   var Column = React.createClass({
     render: function() {
@@ -48,17 +50,22 @@ define(function(require) {
     },
 
     render: function() {
+      var isLoading = this.props.loading;
+
       return(
-        <div id="summary-statistics">
+        <div id="summary-statistics" className={isLoading ? 'loading' : undefined}>
           <header className="padded">
             <h2 className="section-title inline">
               {I18n.t('quiz_summary', 'Quiz Summary')}
             </h2>
 
+            {isLoading && <Spinner />}
+
             <div className="pull-right">
               {this.props.quizReports.map(this.renderReport)}
             </div>
           </header>
+
 
           <table className="text-left">
             <ScreenReaderContent tagName="caption" forceSentenceDelimiter>
@@ -90,24 +97,27 @@ define(function(require) {
             <tbody>
               <tr>
                 <td className="emphasized">
-                  {this.ratioFor(this.props.scoreAverage)}%
+                  {isLoading ? NA_LABEL : (this.ratioFor(this.props.scoreAverage) + '%')}
                 </td>
-                <td>{this.ratioFor(this.props.scoreHigh)}%</td>
-                <td>{this.ratioFor(this.props.scoreLow)}%</td>
-                <td>{formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
-                <td>
-                  <ScreenReaderContent forceSentenceDelimiter>
-                    {secondsToTime.toReadableString(this.props.durationAverage)}
-                  </ScreenReaderContent>
-                  {/*
-                    try to hide the [HH:]MM:SS timestamp from SR users because
-                    it's not really useful, however this doesn't work in all
-                    modes such as the Speak-All mode (at least on VoiceOver)
-                  */}
-                  <SightedUserContent>
-                    {secondsToTime(this.props.durationAverage)}
-                  </SightedUserContent>
-                </td>
+                <td>{isLoading ? NA_LABEL : (this.ratioFor(this.props.scoreHigh) + '%')}</td>
+                <td>{isLoading ? NA_LABEL : (this.ratioFor(this.props.scoreLow) + '%')}</td>
+                <td>{isLoading ? NA_LABEL : formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
+                {isLoading ?
+                  <td key="duration">{NA_LABEL}</td> :
+                  <td key="duration">
+                    <ScreenReaderContent forceSentenceDelimiter>
+                      {secondsToTime.toReadableString(this.props.durationAverage)}
+                    </ScreenReaderContent>
+                    {/*
+                      try to hide the [HH:]MM:SS timestamp from SR users because
+                      it's not really useful, however this doesn't work in all
+                      modes such as the Speak-All mode (at least on VoiceOver)
+                    */}
+                    <SightedUserContent>
+                      {secondsToTime(this.props.durationAverage)}
+                    </SightedUserContent>
+                  </td>
+                }
               </tr>
             </tbody>
           </table>

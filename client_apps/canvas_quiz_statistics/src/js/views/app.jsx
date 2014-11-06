@@ -46,8 +46,6 @@ define(function(require) {
       var props = this.props;
       var quizStatistics = this.props.quizStatistics;
       var submissionStatistics = quizStatistics.submissionStatistics;
-      var questionStatistics = quizStatistics.questionStatistics;
-      var participantCount = submissionStatistics.uniqueCount;
 
       return(
         <div id="canvas-quiz-statistics">
@@ -65,6 +63,7 @@ define(function(require) {
               durationAverage={submissionStatistics.durationAverage}
               quizReports={this.props.quizReports}
               scores={submissionStatistics.scores}
+              loading={this.props.isLoadingStatistics}
               />
           </section>
 
@@ -79,15 +78,45 @@ define(function(require) {
                   <ToggleDetailsButton
                     onClick={this.toggleAllDetails}
                     expanded={quizStatistics.expandingAll}
+                    disabled={this.props.isLoadingStatistics}
                     controlsAll />
                 </SightedUserContent>
               </aside>
             </header>
 
-            {questionStatistics.map(this.renderQuestion.bind(null, participantCount))}
+            {this.renderQuestions()}
           </section>
         </div>
       );
+    },
+
+    renderQuestions: function() {
+      var isLoadingStatistics = this.props.isLoadingStatistics;
+      var questionStatistics = this.props.quizStatistics.questionStatistics;
+      var participantCount = this.props.quizStatistics.submissionStatistics.uniqueCount;
+
+      if (isLoadingStatistics) {
+        return (
+          <p>
+            {I18n.t('loading_questions',
+              'Question statistics are being loaded. Please wait a while.')}
+          </p>
+        );
+      }
+      else if (questionStatistics.length === 0) {
+        return (
+          <p>
+            {I18n.t('empty_question_breakdown', 'There are no question statistics available.')}
+          </p>
+        );
+      }
+      else {
+        return (
+          <div>
+            {questionStatistics.map(this.renderQuestion.bind(null, participantCount))}
+          </div>
+        );
+      }
     },
 
     renderQuestion: function(participantCount, question) {

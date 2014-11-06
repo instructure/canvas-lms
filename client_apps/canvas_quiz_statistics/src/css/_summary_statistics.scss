@@ -35,6 +35,10 @@
     }
   }
 
+  tbody td {
+    transition: opacity 0.5s linear 0s;
+  }
+
   .chart {
     margin-top: 60px;
     width: 100%;
@@ -79,6 +83,12 @@
       opacity: 0.65;
       cursor: default;
       box-shadow: none;
+    }
+  }
+
+  &.loading {
+    tbody td {
+      opacity: 0.25;
     }
   }
 }
