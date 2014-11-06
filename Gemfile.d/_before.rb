@@ -100,11 +100,11 @@ end
 Bundler::Runtime.send(:include, CanvasBundlerRuntime)
 
 if RUBY_VERSION >= '2.2'
-  gem 'syck', github: 'tenderlove/syck'
+  gem 'syck', '1.0.4'
   gem 'iconv', '1.0.4'
 else
   platforms :ruby_20, :ruby_21 do
-    gem 'syck', '1.0.3'
+    gem 'syck', '1.0.4'
     gem 'iconv', '1.0.4'
   end
 end
