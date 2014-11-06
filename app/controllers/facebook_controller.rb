@@ -24,29 +24,17 @@ class FacebookController < ApplicationController
   def notification_preferences
     @cc = @user.communication_channels.where(path_type: 'facebook').first
     if @cc
-      @old_policies = @cc.notification_policies.to_a
-      @policies = []
-      params[:types].each do |type, frequency|
-        notifications = Notification.all.select { |n| n.category == type }
-        notifications.each do |notification|
-          pref = @old_policies.find { |p| p.notification_id == notification.id }
-          pref ||= @cc.notification_policies.build
-          pref.notification_id = notification.id
-          pref.frequency = frequency
-          @policies << pref unless frequency == 'never'
-        end
+      frequencies = {}
+      # translate from categories to actual notifications
+      Notification.all.each do |notification|
+        frequencies[notification.name] = params[:types][notification.category] if params[:types][notification.category]
       end
-      NotificationPolicy.transaction do
-        @old_policies.each{|p| p.frequency = p.notification.default_frequency; p.save! if p.changed? }
-        @policies.each{|p| p.save!}
-      end
+
+      NotificationPolicy.find_all_for(@cc, frequencies)
     end
-    # TODO: i18n... see notification.rb
-    @notification_categories = Notification.dashboard_categories.reject{|c| c.category == "Summaries"}
-    @policies = @cc.notification_policies
     redirect_to facebook_settings_url
   end
-  
+
   def hide_message
     @message = @user.messages.to_facebook.find(params[:id])
     @message.destroy
