@@ -215,7 +215,7 @@
             url: buttonApiUrl,
             success: function(html) {
                 $('#right-side div').prepend(html);
-                $('#addUser').on('click', loadFrame);
+                $('#addUsers').on('click', loadFrame);
             },
             error: function() { }
         });
