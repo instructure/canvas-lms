@@ -111,7 +111,7 @@ module Lti
         end
 
         it 'sets the active tab' do
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response.code).to eq "200"
           expect(assigns[:active_tab]).to eq message_handler.asset_string
         end
@@ -128,7 +128,7 @@ module Lti
           message_handler.parameters = parameters.as_json
           message_handler.save
 
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response.code).to eq "200"
 
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -169,6 +169,30 @@ module Lti
         end
 
       end
+
+      describe "resource link" do
+
+        it 'creates resource_links without a resource_link_fragment' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          expect(response.code).to eq "200"
+
+          lti_launch = assigns[:lti_launch]
+          params = lti_launch.params.with_indifferent_access
+          expect(Base64.urlsafe_decode64(params[:resource_link_id])).to eq "Account_#{account.id},MessageHandler_#{message_handler.id}"
+        end
+
+        it 'creates resource_links with a resource_link_fragment' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, resource_link_fragment: 'my_custom_postfix'
+          expect(response.code).to eq "200"
+
+          lti_launch = assigns[:lti_launch]
+          params = lti_launch.params.with_indifferent_access
+          expect(Base64.urlsafe_decode64(params[:resource_link_id])).to eq "Account_#{account.id},MessageHandler_#{message_handler.id},my_custom_postfix"
+        end
+
+
+      end
+
     end
   end
 end

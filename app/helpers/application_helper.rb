@@ -301,7 +301,7 @@ module ApplicationHelper
         tabs.each do |tab|
           path = nil
           if tab[:args]
-            path = send(tab[:href], *tab[:args])
+            path = tab[:args].instance_of?(Array) ? send(tab[:href], *tab[:args]) : send(tab[:href], tab[:args])
           elsif tab[:no_args]
             path = send(tab[:href])
           else

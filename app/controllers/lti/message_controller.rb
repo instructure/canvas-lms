@@ -44,7 +44,7 @@ module Lti
             launch_url: message_handler.launch_path,
             oauth_consumer_key: tool_proxy.guid,
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-            resource_link_id: build_resource_link_id(tool_proxy),
+            resource_link_id: build_resource_link_id(message_handler),
             context_id: Lti::Asset.opaque_identifier_for(@context),
             tool_consumer_instance_guid: @context.root_account.lti_guid,
             launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
@@ -129,9 +129,9 @@ module Lti
       sorted_bindings.first
     end
 
-    def build_resource_link_id(message_handler, postfix = nil)
-      resource_link_id = "#{params[:tool_launch_context]}_#{message_handler.id}"
-      resource_link_id += "_#{params[:postfix_id]}" if params[:postfix_id]
+    def build_resource_link_id(message_handler)
+      resource_link_id = "#{@context.class}_#{@context.id},MessageHandler_#{message_handler.id}"
+      resource_link_id += ",#{params[:resource_link_fragment]}" if params[:resource_link_fragment]
       Base64.urlsafe_encode64("#{resource_link_id}")
     end
 
