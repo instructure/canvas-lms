@@ -821,16 +821,19 @@ ActiveRecord::Relation.class_eval do
     where(sql, *values.map { |value| [value, value.class.base_class.name] }.flatten)
   end
 
-  def touch_all
+  def not_recently_touched
     scope = self
-    now = Time.now.utc
     if((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
       personal_space -= 1
       # truncate to seconds
-      bound = Time.at(now.to_i - personal_space).utc
+      bound = Time.at(Time.now.to_i - personal_space).utc
       scope = scope.where("updated_at<?", bound)
     end
-    scope.update_all(updated_at: now)
+    scope
+  end
+
+  def touch_all
+    not_recently_touched.update_all(updated_at: Time.now.utc)
   end
 
   def distinct_on(*args)

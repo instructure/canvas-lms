@@ -270,8 +270,8 @@ class StreamItem < ActiveRecord::Base
         lock_type = true
         lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
         # lock the rows in a predefined order to prevent deadlocks
-        User.where(id: user_ids).lock(lock_type).order(:id).pluck(:id)
-        User.where(id: user_ids).update_all(updated_at: Time.now.utc)
+        ids_to_touch = User.where(id: user_ids_subset).not_recently_touched.lock(lock_type).order(:id).pluck(:id)
+        User.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
       end
     end
 
