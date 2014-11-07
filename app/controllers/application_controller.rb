@@ -41,7 +41,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
-  before_filter :refresh_cas_ticket
   before_filter :load_account, :load_user
   before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
@@ -794,12 +793,6 @@ class ApplicationController < ActionController::Base
     # page_view.
     if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.get?)
       generate_page_view
-    end
-  end
-
-  def refresh_cas_ticket
-    if session[:cas_session] && @current_pseudonym
-      @current_pseudonym.claim_cas_ticket(session[:cas_session])
     end
   end
 

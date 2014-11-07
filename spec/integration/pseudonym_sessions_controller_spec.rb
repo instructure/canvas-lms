@@ -131,6 +131,25 @@ describe PseudonymSessionsController do
       expect(session[:cas_session]).to eq 'ST-abcd'
     end
 
+    it "should refresh the users CAS ticket on a request" do
+      user = user_with_pseudonym({:active_all => true})
+      cas_ticket = 'ST-abcd'
+      cas_redis_key = "cas_session:#{cas_ticket}"
+
+      stubby("yes\n#{user.pseudonyms.first.unique_id.capitalize}\n")
+
+      get login_url
+      redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+
+      get cas_login_url :ticket => 'ST-abcd'
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(session[:cas_session]).to eq cas_ticket
+
+      cas_ticket_ttl = Canvas::redis.ttl(cas_redis_key)
+      get dashboard_url(:login_success => 1)
+      expect(Canvas::redis.ttl(cas_redis_key)).to be > cas_ticket_ttl
+    end
+
     context "single sign out" do
       before do
         skip "needs redis" unless Canvas.redis_enabled?
