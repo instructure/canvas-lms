@@ -187,6 +187,8 @@ $hover-color: #E5F3FF;
 $diminutive-color: #acacac;
 
 $masquerade-link-color: #ffa500;
+$ic-sp: 12px;
+$ic-border-radius: $ic-sp/2;
 
 // canvas stuff
 $lightBackground:               rgb(248, 250, 251);
@@ -203,7 +205,6 @@ $activeBG:                      #d6ecfc;
 @if $use_high_contrast { $dimmedOpacity: 0.9; }
 @else { $dimmedOpacity: 0.6; }
 
-$masquerade-link-color: #ffa500;
 
 // Canvas K-12 brand color and global spacing variables
 @if $is-k12 {

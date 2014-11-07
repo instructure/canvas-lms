@@ -18,7 +18,7 @@
       <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}", :editor => '1') %>" id="context_external_tool_resource_selection_url" style="display: none;">&nbsp;</a>
     <% end %>
     <%= t('click_links', %{Click any page to insert a link to that page.}) %>
-    <div id="pages_accordion" role="tabpanel">
+    <div id="pages_accordion" class="ui-accordion--mini" role="tabpanel">
       <% if @context.respond_to?(:wiki) %>
       <a href="<%= polymorphic_url([@context, :wiki_page], id: '{{ page_url }}') %>" id="wiki_sidebar_wiki_url" style="display: none;">&nbsp;</a>
       <div>
