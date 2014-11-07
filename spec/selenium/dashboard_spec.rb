@@ -48,7 +48,7 @@ describe "dashboard" do
 
     it_should_behave_like 'load events list'
 
-    it "should allow hiding a stream item on the dashboard", :non_parallel do
+    it "should allow hiding a stream item on the dashboard" do
       test_hiding("/")
     end
 

@@ -82,9 +82,14 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     desc "Run non-selenium files in a single thread"
-    klass.new(:single) do |t|
+    klass.new(:plugin_non_parallel) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
       t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
+    end
+
+    klass.new(:selenium_non_parallel) do |t|
+      t.rspec_opts = ["--format", "doc", "--tag non_parallel"]
+      t.send(spec_files_attr, FileList['spec/selenium/**/*_spec.rb'] + FileList['{gems,vendor}/plugins/*/spec_canvas/selenium/*_spec.rb'])
     end
 
     desc "Print Specdoc for all specs (excluding plugin specs)"

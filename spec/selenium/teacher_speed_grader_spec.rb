@@ -31,7 +31,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "should list the correct number of students", :non_parallel, :priority => "2" do
+    it "should list the correct number of students", :priority => "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students")).to include_text("1 of 1")
@@ -142,7 +142,7 @@ describe "speed grader" do
       expect(uri.query).to eq "user_id=#{@student.id}"
     end
 
-    it "lets you view previous quiz submissions", :non_parallel do
+    it "lets you view previous quiz submissions" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       submission_dropdown = f("#submission_to_view")
