@@ -285,6 +285,16 @@ END
       state: 'allowed',
       beta: true,
       root_opt_in: true
+    },
+    'gradebook_list_students_by_sortable_name' =>
+    {
+      display_name: -> { I18n.t('features.gradebook_list_students_by_sortable_name', "Gradebook - List Students by Sortable Name") },
+      description: -> { I18n.t('enable_gradebook_list_students_by_sortable_name', <<-END) },
+List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true
     }
   )
 

@@ -260,7 +260,7 @@ define [
             sectionNames = $.toSentence(mySections.sort())
           student.display_name = rowStudentNameTemplate
             avatar_url: student.avatar_url
-            display_name: student.name
+            display_name: if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled then student.sortable_name else student.name
             url: student.enrollment.grades.html_url+'#tab-assignments'
             sectionNames: sectionNames
             alreadyEscaped: true

@@ -650,6 +650,8 @@ define [
     displayName: (->
       if @get('hideStudentNames')
         "hiddenName"
+      else if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled
+        "sortable_name"
       else
         "name"
     ).property('hideStudentNames')
