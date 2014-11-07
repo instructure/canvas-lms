@@ -27,4 +27,9 @@ Rack::MiniProfiler.config.tap do |c|
   end
 end
 
-Rack::MiniProfilerRails.initialize!(Rails.application)
+begin
+  Rack::MiniProfilerRails.initialize!(Rails.application)
+rescue Errno::EACCES
+  # don't care if we couldn't create the temp directory
+  # just means we can't profile
+end
