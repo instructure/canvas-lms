@@ -1,5 +1,5 @@
 class DropIgnoreTermDateRestrictions < ActiveRecord::Migration
-  tag :predeploy
+  tag :postdeploy
 
   def up
     remove_column :enrollment_terms, :ignore_term_date_restrictions
