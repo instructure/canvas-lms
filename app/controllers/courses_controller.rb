@@ -933,7 +933,9 @@ class CoursesController < ApplicationController
   #   {
   #     "allow_student_discussion_topics": true,
   #     "allow_student_forum_attachments": false,
-  #     "allow_student_discussion_editing": true
+  #     "allow_student_discussion_editing": true,
+  #     "grading_standard_enabled": true,
+  #     "grading_standard_id": 137
   #   }
   def settings
     get_context

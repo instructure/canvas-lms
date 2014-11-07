@@ -26,6 +26,8 @@ module Api::V1::Course
     settings[:allow_student_discussion_topics] = course.allow_student_discussion_topics?
     settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments?
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
+    settings[:grading_standard_enabled] = course.grading_standard_enabled?
+    settings[:grading_standard_id] = course.grading_standard_id
     settings
   end
 
