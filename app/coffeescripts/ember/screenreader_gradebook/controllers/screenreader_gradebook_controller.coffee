@@ -184,20 +184,32 @@ define [
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
 
     updateSubmissionsFromExternal: (submissions) ->
-      students = @get('students')
       subs_proxy = @get('submissions')
       selected = @get('selectedSubmission')
+      studentsById = @groupById @get('students')
+      assignmentsById = @groupById @get('assignments')
       submissions.forEach (submission) =>
+        student = studentsById[submission.user_id]
         submissionsForStudent = subs_proxy.findBy('user_id', submission.user_id)
         oldSubmission = submissionsForStudent.submissions.findBy('assignment_id', submission.assignment_id)
 
+        #check for DA visibility
+        if submission.assignment_visible?
+          set(submission, 'hidden', !submission.assignment_visible)
+          @updateAssignmentVisibilities(assignmentsById[submission.assignment_id], submission.user_id)
+
         submissionsForStudent.submissions.removeObject oldSubmission
         submissionsForStudent.submissions.addObject submission
-        student = students.findBy('id', submission.user_id)
         @updateSubmission submission, student
         @calculateStudentGrade student
         if selected and selected.assignment_id == submission.assignment_id and selected.user_id == submission.user_id
           set(this, 'selectedSubmission', submission)
+
+    updateAssignmentVisibilities: (assignment, userId) ->
+      visibilities = get(assignment, 'assignment_visibility')
+      filteredVisibilities = visibilities.filter (id) ->
+        "#{id}" != userId
+      set(assignment, 'assignment_visibility', filteredVisibilities)
 
     calculate: (submissionsArray) ->
       GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
@@ -385,13 +397,35 @@ define [
       students.filter (s) -> s.sections.contains(currentSection.id)
     ).property('students.@each', 'selectedSection')
 
+    groupById: (array) ->
+      array.reduce( (obj, item) ->
+        obj[get(item, 'id')] = item
+        obj
+      ,{})
+
     submissionsLoaded: (->
+      assignments = @get("assignments")
+      assignmentsByID = @groupById assignments
+      studentsByID = @groupById @get("students")
       submissions = @get('submissions')
       submissions.forEach ((submission) ->
-        student = @get('students').findBy('id', submission.user_id)
+        student = studentsByID[submission.user_id]
         if student?
           submission.submissions.forEach ((s) ->
+            assignment = assignmentsByID[s.assignment_id]
+            if !@differentiatedAssignmentVisibleToStudent(assignment, s.user_id)
+              set s, 'hidden', true
             @updateSubmission(s, student)
+          ), this
+          # fill in hidden ones
+          assignments.forEach ((a) ->
+            if !@differentiatedAssignmentVisibleToStudent(a, student.id)
+              sub = {
+                user_id: student.id
+                assignment_id: a.id
+                hidden: true
+              }
+              @updateSubmission(sub, student)
           ), this
           setProperties student,
             'isLoading': false
@@ -425,6 +459,14 @@ define [
     differentiatedAssignmentVisibleToStudent: (assignment, student_id) ->
       return true unless assignment.only_visible_to_overrides
       _.include(assignment.assignment_visibility, +student_id)
+
+    studentsThatCanSeeAssignment: (assignment) ->
+      students = @studentsHash()
+      return students unless assignment?.only_visible_to_overrides
+      assignment.assignment_visibility.reduce( (result, id) ->
+        result[id] = students[id]
+        result
+      ,{})
 
     checkForNoPointsWarning: (ag) ->
       pointsPossible = _.inject ag.assignments
@@ -547,16 +589,12 @@ define [
         sub or {
           user_id: student.id
           assignment_id: assignment.id
+          hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
         }
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedSubmissionHidden: (->
-      assignment = @get('selectedAssignment')
-      student = @get('selectedStudent')
-      if assignment?.only_visible_to_overrides
-        !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
-      else
-        false
+      @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedOutcomeResult: ( ->

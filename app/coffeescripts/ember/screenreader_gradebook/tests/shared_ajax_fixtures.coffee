@@ -363,6 +363,7 @@ define [
               assignment_group_id:'1'
               published: true
               muted: false
+              assignment_visibility: [1,2,3]
             }
           ]
         }
