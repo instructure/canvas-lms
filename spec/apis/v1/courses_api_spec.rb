@@ -2144,7 +2144,9 @@ describe CoursesController, type: :request do
       expect(json).to eq({
         'allow_student_discussion_topics' => true,
         'allow_student_forum_attachments' => false,
-        'allow_student_discussion_editing' => true
+        'allow_student_discussion_editing' => true,
+        'grading_standard_enabled' => false,
+        'grading_standard_id' => nil
       })
     end
 
@@ -2164,7 +2166,9 @@ describe CoursesController, type: :request do
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
         'allow_student_forum_attachments' => true,
-        'allow_student_discussion_editing' => false
+        'allow_student_discussion_editing' => false,
+        'grading_standard_enabled' => false,
+        'grading_standard_id' => nil
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
