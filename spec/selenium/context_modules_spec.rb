@@ -106,51 +106,41 @@ describe "context_modules" do
 
     it "should rearrange child objects in same module" do
       modules = create_modules(1, true)
-
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-      modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
-
+      item1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+      item2 = modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
       get "/courses/#{@course.id}/modules"
-      sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
-
       #setting gui drag icons to pass to driver.action.drag_and_drop
-      a1_img = fj('.context_module_items .context_module_item:first .move_item_link i')
-      a2_img = fj('.context_module_items .context_module_item:last .move_item_link i')
-
+      selector1 = "#context_module_item_#{item1.id} .move_item_link"
+      selector2 = "#context_module_item_#{item2.id} .move_item_link"
+      list_prior_drag = ff("a.title").map(&:text)
       #performs the change position
-      driver.action.drag_and_drop(a2_img, a1_img).perform
+      js_drag_and_drop(selector2, selector1)
       wait_for_ajaximations
-
-      #validates the assignments switched, the number convention doesn't make sense, should be assignment == 2 and assignment2 == 1 but this is working
+      list_post_drag = ff("a.title").map(&:text)
       keep_trying_until do
-        expect(@assignment.position).to eq 2
-        expect(@assignment2.position).to eq 3
+        expect(list_prior_drag[0]).to eq list_post_drag[1]
+        expect(list_prior_drag[1]).to eq list_post_drag[0]
       end
     end
 
     it "should rearrange child object to new module" do
       modules = create_modules(2, true)
-
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-      modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
-
+      item1_mod1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+      item1_mod2 = modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
       get "/courses/#{@course.id}/modules"
-      sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
-
       #setting gui drag icons to pass to driver.action.drag_and_drop
-      a1_img = fj('#context_modules .context_module:first-child .context_module_items .context_module_item:first .move_item_link i')
-      a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link i')
-
+      selector1 = "#context_module_item_#{item1_mod1.id} .move_item_link"
+      selector2 = "#context_module_item_#{item1_mod2.id} .move_item_link"
       #performs the change position
-      driver.action.drag_and_drop(a2_img, a1_img).perform
+      js_drag_and_drop(selector2, selector1)
       wait_for_ajaximations
-
+      list_post_drag = ff("a.title").map(&:text)
       #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
       keep_trying_until do
-        expect(@assignment.position).to eq 2
-        expect(@assignment2.position).to eq 3
+        expect(list_post_drag[0]).to eq "assignment 2"
+        expect(list_post_drag[1]).to eq "assignment 1"
         expect(fj('#context_modules .context_module:last-child .context_module_items .context_module_item')).to be_nil
       end
     end
@@ -222,8 +212,6 @@ describe "context_modules" do
 
       edit_text = 'Module Edited'
       add_module('Edit Module')
-      context_module = f('.context_module')
-      driver.action.move_to(context_module).perform
       f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
       expect(f('.ui-dialog')).to be_displayed
@@ -237,12 +225,8 @@ describe "context_modules" do
 
     it "should add and remove completion criteria" do
       get "/courses/#{@course.id}/modules"
-
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-
       # add completion criterion
-      context_module = f('.context_module')
-      driver.action.move_to(context_module).perform
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
@@ -265,7 +249,6 @@ describe "context_modules" do
       expect(smodule.completion_requirements[0][:type]).to eq 'must_submit'
 
       # delete the criterion, then cancel the form
-      driver.action.move_to(context_module).perform
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
@@ -279,7 +262,6 @@ describe "context_modules" do
 
       # now delete the criterion frd
       # (if the previous step did even though it shouldn't have, this will error)
-      driver.action.move_to(context_module).perform
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
@@ -296,7 +278,6 @@ describe "context_modules" do
       expect(@course.context_modules.first.completion_requirements).to eq []
 
       # and also make sure the form remembers that it's gone (#8329)
-      driver.action.move_to(context_module).perform
       f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
       expect(f('.ui-dialog')).to be_displayed
