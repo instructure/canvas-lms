@@ -158,8 +158,8 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
-      post :join
-      post :close
+      match :join, via: [:get, :post]
+      match :close, via: [:get, :post]
       get :settings
     end
   end
