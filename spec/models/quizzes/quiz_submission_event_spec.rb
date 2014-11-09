@@ -1,6 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionEvent do
+  require File.expand_path(File.dirname(__FILE__) + '/../../quiz_spec_helper.rb')
+
   before :once do
     Account.default.enable_feature!(:draft_state)
   end

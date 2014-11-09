@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizSubmissionEventsController, type: :request do
+  require File.expand_path(File.dirname(__FILE__) + '/../../../quiz_spec_helper.rb')
+
   before :once do
     Account.default.enable_feature!(:draft_state)
   end

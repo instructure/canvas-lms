@@ -148,6 +148,7 @@ require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/quiz_spec_helper')
 
 require 'i18n_tasks'
 require 'handlebars_tasks'

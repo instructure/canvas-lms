@@ -68,5 +68,13 @@ namespace :canvas do
       puts "Done. Bye!"
       puts '*' * 80
     end
+
+    desc 'Create partition tables for the current and upcoming months.'
+    task :create_event_partitions => :environment do |t, args|
+      Shard.with_each_shard do
+        Quizzes::QuizSubmissionEventPartitioner.logger = Logger.new(STDOUT)
+        Quizzes::QuizSubmissionEventPartitioner.process
+      end
+    end
   end
 end

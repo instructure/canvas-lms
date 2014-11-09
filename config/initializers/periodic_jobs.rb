@@ -110,6 +110,13 @@ Rails.configuration.after_initialize do
     end
   end
 
+  # Create a partition 1 month in advance every month:
+  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 1 * *' do
+    Shard.with_each_shard do
+      Quizzes::QuizSubmissionEventPartitioner.process
+    end
+  end
+
   Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
     require plugin_periodic_jobs
   end

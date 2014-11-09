@@ -17,6 +17,8 @@
 #
 
 class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
+  include CanvasPartman::Concerns::Partitioned
+
   EXPORTABLE_ASSOCIATIONS = [ :quiz_submission ]
   EXPORTABLE_ATTRIBUTES = [
     :id,
@@ -51,7 +53,6 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     :created_at
   ]
 
-
   # An event describing the student choosing an answer to a question.
   EVT_ANSWERED = 'answered'.freeze
   RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
@@ -67,6 +68,18 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
       created_at: event.created_at
     }).order('created_at DESC').limit(1)
   }
+
+  partitioned do |t, table_name|
+    index_ns = table_name.sub('quiz_submission_events', 'qse')
+
+    t.index :created_at,
+      name: "#{index_ns}_idx_on_created_at"
+
+    t.index [ :quiz_submission_id, :attempt, :created_at ],
+      name: "#{index_ns}_predecessor_locator_idx"
+
+    t.foreign_key :quiz_submissions
+  end
 
   after_initialize :set_defaults
 
