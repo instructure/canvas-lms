@@ -5,6 +5,7 @@ if CANVAS_RAILS3
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'
   gem 'routing_concerns', '0.1.0'
+  gem 'strong_parameters', '0.2.3'
 else
   gem 'rails', '4.0.10'
   gem 'rack', '1.5.2'

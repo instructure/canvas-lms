@@ -1044,6 +1044,8 @@ class ApplicationController < ActionController::Base
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{message: 'Invalid access token.'}] }
+    when ActionController::ParameterMissing
+      data = { errors: [{message: "#{exception.param} is missing"}] }
     else
       if status_code.is_a?(Symbol)
         status_code_string = status_code.to_s
