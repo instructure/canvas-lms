@@ -18,7 +18,8 @@
 module Utils
   class DatetimeRangePresenter
     attr_reader :start, :zone
-    def initialize(datetime, end_datetime = nil, datetime_type=:event, zone=::Time.zone)
+    def initialize(datetime, end_datetime = nil, datetime_type=:event, zone=nil)
+      zone ||= ::Time.zone
       @start = datetime.in_time_zone(zone) rescue datetime
       @_finish = end_datetime.in_time_zone(zone) rescue end_datetime
       @_datetime_type = datetime_type

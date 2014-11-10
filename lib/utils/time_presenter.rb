@@ -18,7 +18,8 @@
 module Utils
   class TimePresenter
     attr_reader :time, :zone
-    def initialize(time, zone=::Time.zone)
+    def initialize(time, zone=nil)
+      zone ||= ::Time.zone
       @time = time.in_time_zone(zone) rescue time
       @zone = zone
     end
