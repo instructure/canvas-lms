@@ -111,10 +111,17 @@ $ef-thumbnail-size: 36px;
   &.ef-item-selected { background-color: $base-list-item-background--selected }
 
   .al-trigger { opacity: 0 }
-  &:hover .al-trigger, .al-trigger.ui-state-active { opacity: 1 }
+
+  &:hover .al-trigger,
+   .al-trigger.ui-state-active,
+   .al-trigger:focus {
+    opacity: 1
+  }
 
   .btn-link { border-width: 0 }
 }
+
+
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
   color: $base-font-color-dark;
