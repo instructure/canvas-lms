@@ -127,9 +127,9 @@ class AdminsController < ApplicationController
   # @returns [Admin]
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      user = api_find(User, params[:user_id])
+      users = api_find_all(User, Array(params[:user_id])) if params[:user_id]
       scope = @context.account_users
-      scope = scope.where(user_id: user) if params[:user_id]
+      scope = scope.where(user_id: users) if users
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }
