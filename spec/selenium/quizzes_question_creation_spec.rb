@@ -587,7 +587,6 @@ describe "quizzes question creation" do
     end
 
     it "should allow a 3 digit number for a quiz attempt", :priority => "2" do
-      skip("broken spec")
       attempts = "123"
       click_settings_tab
       f('#multiple_attempts_option').click
@@ -600,7 +599,7 @@ describe "quizzes question creation" do
       expect_new_page_load {
         f('.save_quiz_button').click
         wait_for_ajaximations
-        keep_trying_until { expect(f('.admin-links')).to be_displayed }
+        keep_trying_until { expect(f('#quiz_title')).to be_displayed }
       }
 
       expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i
