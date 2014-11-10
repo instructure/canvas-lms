@@ -4,8 +4,11 @@ define (require) ->
 
   class PageFocused extends EventTracker
     eventType: K.EVT_PAGE_FOCUSED
+    options: {
+      frequency: 5000
+    }
 
     install: (deliver) ->
       @bind window, 'focus', ->
         deliver()
-      , throttle: 5000
+      , throttle: @getOption('frequency')
