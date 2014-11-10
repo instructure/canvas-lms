@@ -1,4 +1,5 @@
 class AddRoleIdColumns < ActiveRecord::Migration
+  disable_ddl_transaction!
   tag :predeploy
 
   def up
@@ -183,11 +184,14 @@ class AddRoleIdColumns < ActiveRecord::Migration
       applicable_account_ids[role.account_id] ||= Account.sub_account_ids_recursive(role.account_id) + [role.account_id]
       course_ids[role.account_id] ||= Course.where(:account_id => applicable_account_ids[role.account_id]).pluck(:id)
 
+      course_ids[role.account_id].each_slice(100) do |course_ids_slice|
+        while Enrollment.where("role_id IS NULL AND role_name = ? AND course_id IN (?)", role.name,
+                               course_ids_slice).limit(1000).update_all(:role_id => role.id) > 0; end
+      end
+
       while AccountNotificationRole.where("role_id IS NULL AND role_type = ? AND (SELECT account_id FROM
          account_notifications WHERE id = account_notification_roles.account_notification_id LIMIT 1) IN (?)", role.name,
                               applicable_account_ids[role.account_id]).limit(1000).update_all(:role_id => role.id) > 0; end
-      while Enrollment.where("role_id IS NULL AND role_name = ? AND course_id IN (?)", role.name,
-                              course_ids[role.account_id]).limit(1000).update_all(:role_id => role.id) > 0; end
       while RoleOverride.where("role_id IS NULL AND enrollment_type = ? AND context_type = ? AND context_id IN (?)", role.name, 'Account',
                                applicable_account_ids[role.account_id]).limit(1000).update_all(:role_id => role.id) > 0; end
     end
