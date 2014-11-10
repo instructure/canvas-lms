@@ -55,7 +55,8 @@ module TextHelper
     end
   end
 
-  def datetime_string(start_datetime, datetime_type=:event, end_datetime=nil, shorten_midnight=false, zone=::Time.zone)
+  def datetime_string(start_datetime, datetime_type=:event, end_datetime=nil, shorten_midnight=false, zone=nil)
+    zone ||= ::Time.zone
     presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone)
     presenter.as_string(shorten_midnight: shorten_midnight)
   end

@@ -19,7 +19,8 @@ module Utils
   class DatePresenter
     attr_reader :date, :raw_date, :zone
 
-    def initialize(date, zone=Time.zone)
+    def initialize(date, zone=nil)
+      zone ||= Time.zone
       @raw_date = date
       @date = RelativeDate.new(date, zone)
       @zone = zone
