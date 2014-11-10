@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "login logout test", :priority => "2" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def should_show_message(message_text, selector)
     expect(fj(selector)).to include_text(message_text)

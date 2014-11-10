@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/content_migrations_spec')
 
 describe "large courses", :priority => "2" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def assignments_creation
       500.times do |i|
