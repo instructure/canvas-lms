@@ -25,7 +25,7 @@ module Lti
 
       it 'requires a resource' do
         subject.save
-        subject.errors.first.should == [:resource, "can't be blank"]
+        expect(subject.errors.first).to eq [:resource, "can't be blank"]
       end
 
     end

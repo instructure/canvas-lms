@@ -167,7 +167,7 @@ module Api::V1::Attachment
   end
 
   def check_quota_after_attachment(request)
-    exempt = request.params[:quota_exemption] == @attachment.quota_exemption_key
+    exempt = @attachment.verify_quota_exemption_key(request.params[:quota_exemption])
     if !exempt && Attachment.over_quota?(@attachment.context, @attachment.size)
       render(:json => {:message => 'file size exceeds quota limits'}, :status => :bad_request)
       return false

@@ -2,6 +2,10 @@ require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::AttemptVersion do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   let(:regrade_options) do
     {1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
@@ -48,11 +52,11 @@ describe Quizzes::QuizRegrader::AttemptVersion do
 
   describe "#initialize" do
     it "saves a reference to the passed version" do
-      attempt_version.version.should == version
+      expect(attempt_version.version).to eq version
     end
 
     it "saves a reference to the passed regrade quiz questions" do
-      attempt_version.question_regrades.should == question_regrades
+      expect(attempt_version.question_regrades).to eq question_regrades
     end
   end
 

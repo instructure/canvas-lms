@@ -11,7 +11,9 @@ define [
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
   './CurrentUploads'
-], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads) ->
+  './FilePreview'
+  './UploadDropZone'
+], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
@@ -21,7 +23,6 @@ define [
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
     , 0
-
 
     registerListeners: (props) ->
       return unless props.currentFolder
@@ -54,6 +55,11 @@ define [
           updateAPIQuerySortParams(collection, @props.query)
           # TODO: use scroll position to only fetch the pages we need
           getAllPages(collection, @debouncedForceUpdate)
+      , (jqXHR) =>
+        try
+          parsedResponse = $.parseJSON(jqXHR.responseText)
+        if parsedResponse
+          @setState errorMessages: parsedResponse.errors
 
     componentWillMount: ->
       @registerListeners(@props)
@@ -65,6 +71,7 @@ define [
       setTimeout =>
         @props.onResolvePath({currentFolder:undefined, rootTillCurrentFolder:undefined})
 
+
     componentWillReceiveProps: (newProps) ->
       @unregisterListeners()
       return unless newProps.currentFolder
@@ -73,12 +80,13 @@ define [
         updateAPIQuerySortParams(collection, newProps.query)
 
     render: withReactDOM ->
+      if @state?.errorMessages
+        return div {},
+          @state.errorMessages.map (error) ->
+            div className: 'muted', error.message
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div {
-        className:'ef-directory'
-        role: 'grid'
-        'aria-label': I18n.t('main_file_browser_pane', 'Main file browser pane')
-      },
+      div role: 'grid',
+        UploadDropZone(currentFolder: @props.currentFolder)
         CurrentUploads({})
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')
@@ -97,9 +105,14 @@ define [
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
+              dndOptions: @props.dndOptions
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 
-
-
-
+        # Prepare and render the FilePreview if needed.
+        # As long as ?preview is present in the url.
+        if @props.query.preview?
+          FilePreview
+            currentFolder: @props.currentFolder
+            params: @props.params
+            query: @props.query

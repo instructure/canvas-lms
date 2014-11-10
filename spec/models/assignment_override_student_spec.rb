@@ -28,41 +28,41 @@ describe AssignmentOverrideStudent do
     end
 
     it "should be valid in nominal setup" do
-      @override_student.should be_valid
+      expect(@override_student).to be_valid
     end
 
     it "should always make assignment match the overriden assignment" do
       assignment = assignment_model
       @override_student.assignment = assignment
-      @override_student.should be_valid
-      @override_student.assignment.should == @override.assignment
+      expect(@override_student).to be_valid
+      expect(@override_student.assignment).to eq @override.assignment
     end
 
     it "should reject an empty assignment_override" do
       @override_student.assignment_override = nil
-      @override_student.should_not be_valid
+      expect(@override_student).not_to be_valid
     end
 
     it "should reject a non-adhoc assignment_override" do
       @override_student.assignment_override.set = @course.default_section
-      @override_student.should_not be_valid
+      expect(@override_student).not_to be_valid
     end
 
     it "should reject an empty user" do
       @override_student.user = nil
-      @override_student.should_not be_valid
+      expect(@override_student).not_to be_valid
     end
 
     it "should reject a student not in the course" do
       @override_student.user = user_model
-      @override_student.should_not be_valid
+      expect(@override_student).not_to be_valid
     end
 
     it "should reject duplicate tuples" do
       @override_student.save!
       @override_student2 = @override.assignment_override_students.build
       @override_student2.user = @student
-      @override_student2.should_not be_valid
+      expect(@override_student2).not_to be_valid
     end
   end
 
@@ -70,15 +70,15 @@ describe AssignmentOverrideStudent do
     student_in_course
     @override1 = assignment_override_model(:course => @course)
     @override2 = assignment_override_model(:course => @course)
-    @override1.assignment_id.should_not == @override2.assignment_id
+    expect(@override1.assignment_id).not_to eq @override2.assignment_id
 
     @override_student = @override1.assignment_override_students.build
     @override_student.user = @student
     @override_student.valid? # trigger maintenance
-    @override_student.assignment_id.should == @override1.assignment_id
+    expect(@override_student.assignment_id).to eq @override1.assignment_id
     @override_student.assignment_override = @override2
     @override_student.valid? # trigger maintenance
-    @override_student.assignment_id.should == @override2.assignment_id
+    expect(@override_student.assignment_id).to eq @override2.assignment_id
   end
 
   describe "default_values" do    
@@ -98,11 +98,11 @@ describe AssignmentOverrideStudent do
       end
 
       it "has the assignment's ID" do
-        override_student.assignment_id.should == assignment_id
+        expect(override_student.assignment_id).to eq assignment_id
       end
 
       it "has a nil quiz ID" do
-        override_student.quiz_id.should be_nil
+        expect(override_student.quiz_id).to be_nil
       end
     end
 
@@ -114,11 +114,11 @@ describe AssignmentOverrideStudent do
       end
 
       it "has the assignment's ID" do
-        override_student.assignment_id.should == assignment_id
+        expect(override_student.assignment_id).to eq assignment_id
       end
 
       it "has the quiz's ID" do
-        override_student.quiz_id.should == quiz_id
+        expect(override_student.quiz_id).to eq quiz_id
       end
     end
   end

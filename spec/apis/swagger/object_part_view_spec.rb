@@ -7,18 +7,20 @@ describe ObjectPartView do
   let(:view) { ObjectPartView.new(name, part) }
 
   it "guesses types" do
-    view.guess_type("hey").should == {"type" => "string"}
+    expect(view.guess_type("hey")).to eq({"type" => "string"})
   end
 
   it "renders properties" do
-    view.properties["id"].should ==
+    expect(view.properties["id"]).to eq(
       {
         "type" => "integer",
         "format" => "int64"
       }
-    view.properties["name"].should ==
+    )
+    expect(view.properties["name"]).to eq(
       {
         "type" => "string"
       }
+    )
   end
 end

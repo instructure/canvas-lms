@@ -625,7 +625,7 @@ define([
 
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
-      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
+      data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({

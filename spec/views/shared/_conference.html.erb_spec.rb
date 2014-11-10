@@ -24,7 +24,7 @@ describe "/shared/_conference" do
     course_with_student
     view_context
     render :partial => "shared/conference"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

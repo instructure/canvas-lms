@@ -53,13 +53,13 @@ describe ProgressRunner do
     process_callback_count = 0
     ids = (0..9).to_a
     progress_runner.do_batch_update(ids) do |id|
-      id.should eql process_callback_count
+      expect(id).to eql process_callback_count
       process_callback_count += 1
     end
 
-    process_callback_count.should eql ids.size
-    completed_message_value.should eql ids.size
-    error_callback_called.should be_false
+    expect(process_callback_count).to eql ids.size
+    expect(completed_message_value).to eql ids.size
+    expect(error_callback_called).to be_falsey
   end
 
   it "should rescue exceptions and record messages as errors" do
@@ -71,7 +71,7 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
 
     progress_runner.completed_message do |count|
-      count.should eql 1
+      expect(count).to eql 1
       "abra"
     end
 
@@ -86,10 +86,10 @@ describe ProgressRunner do
       raise "error processing #{id}" if id >= 2
     end
 
-    error_callback_count.should eql 2
+    expect(error_callback_count).to eql 2
     message_lines = @progress.message.lines.map(&:strip).sort
-    message_lines.size.should eql 3
-    message_lines.should eql ["abra", "error processing 2: 2", "error processing 3: 3"]
+    expect(message_lines.size).to eql 3
+    expect(message_lines).to eql ["abra", "error processing 2: 2", "error processing 3: 3"]
   end
 
   it "should have default completion and error messages" do
@@ -100,7 +100,7 @@ describe ProgressRunner do
     progress_runner.do_batch_update(ids) do |id|
       raise "processing error" if id >= 3
     end
-    @progress.message.should eql "2 items processed\nprocessing error: 3, 4"
+    expect(@progress.message).to eql "2 items processed\nprocessing error: 3, 4"
   end
   # These are also tested above
   #it "should accumulate like errors into a single mesage line"
@@ -118,7 +118,7 @@ describe ProgressRunner do
       raise "processing error"
     end
 
-    @progress.message.should eql "0 items processed\nprocessing error: 1, 2, 3, 4"
+    expect(@progress.message).to eql "0 items processed\nprocessing error: 1, 2, 3, 4"
   end
 
   it "updates progress frequency relative to size of input" do

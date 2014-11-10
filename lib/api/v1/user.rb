@@ -29,10 +29,10 @@ module Api::V1::User
   def user_json_preloads(users, preload_email=false)
     # pseudonyms for User#sis_pseudoym_for and User#find_pseudonym_for_account
     # pseudonyms account for Pseudonym#works_for_account?
-    User.send(:preload_associations, users, [{ :pseudonyms => :account }]) if user_json_is_admin?
+    ActiveRecord::Associations::Preloader.new(users, pseudonyms: :account).run if user_json_is_admin?
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
-      User.send(:preload_associations, no_email_users, :communication_channels)
+      ActiveRecord::Associations::Preloader.new(no_email_users, :communication_channels).run
     end
   end
 

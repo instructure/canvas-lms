@@ -21,7 +21,7 @@ describe "conversations new" do
   end
 
   def get_course_filter
-    pending('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
+    skip('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
     #try to make it load the courses first so it doesn't randomly refresh
     selector = '.course-filter.bootstrap-select'
     driver.execute_script(%{$('#{selector}').focus();})
@@ -162,17 +162,17 @@ describe "conversations new" do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should ==('single recipient')
-      c.private?.should be_false
+      expect(c.subject).to eq('single recipient')
+      expect(c.private?).to be_falsey
     end
 
     it "should start a group conversation when there is more than one recipient" do
       get_conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should ==('multiple recipients')
-      c.private?.should be_false
-      c.conversation_participants.collect(&:user_id).sort.should ==([@teacher, @s1, @s2].collect(&:id).sort)
+      expect(c.subject).to eq('multiple recipients')
+      expect(c.private?).to be_falsey
+      expect(c.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
     it "should allow admins to send a message without picking a context" do
@@ -181,15 +181,15 @@ describe "conversations new" do
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should == 'context-free'
-      c.context.should == Account.default
+      expect(c.subject).to eq 'context-free'
+      expect(c.context).to eq Account.default
     end
 
     it "should not allow non-admins to send a message without picking a context" do
       get_conversations
       fj('#compose-btn').click
       wait_for_animations
-      fj('#compose-new-message .ac-input').should have_attribute(:disabled, 'true')
+      expect(fj('#compose-new-message .ac-input')).to have_attribute(:disabled, 'true')
     end
 
     it "should allow non-admins to send a message to an account-level group" do
@@ -214,7 +214,7 @@ describe "conversations new" do
       wait_for_ajaximations
       f('.icon-email').click
       wait_for_ajaximations
-      f('.ac-token').should_not be_nil
+      expect(f('.ac-token')).not_to be_nil
     end
 
     it "should allow selecting multiple recipients in one search" do
@@ -227,7 +227,7 @@ describe "conversations new" do
       keep_trying_until { fj(".ac-result:contains('first student')") }.click
       driver.action.key_up(modifier).perform
       fj(".ac-result:contains('second student')").click
-      ff('.ac-token').count.should == 2
+      expect(ff('.ac-token').count).to eq 2
     end
 
     it "should not send the message on shift-enter" do
@@ -236,7 +236,7 @@ describe "conversations new" do
       driver.action.key_down(:shift).perform
       get_message_body_input.send_keys(:enter)
       driver.action.key_up(:shift).perform
-      fj('#compose-new-message:visible').should_not be_nil
+      expect(fj('#compose-new-message:visible')).not_to be_nil
     end
 
     context "user notes" do
@@ -250,45 +250,45 @@ describe "conversations new" do
         compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
 
         checkbox = f(".user_note")
-        checkbox.should be_displayed
+        expect(checkbox).to be_displayed
         checkbox.click
 
         count1 = @s1.user_notes.count
         count2 = @s2.user_notes.count
         click_send
-        @s1.user_notes.reload.count.should == count1 + 1
-        @s2.user_notes.reload.count.should == count2 + 1
+        expect(@s1.user_notes.reload.count).to eq count1 + 1
+        expect(@s2.user_notes.reload.count).to eq count2 + 1
       end
 
       it "should be allowed with student groups" do
         compose course: @course, to: [@group], body: 'hallo!', send: false
 
         checkbox = f(".user_note")
-        checkbox.should be_displayed
+        expect(checkbox).to be_displayed
         checkbox.click
 
         count1 = @s1.user_notes.count
         click_send
-        @s1.user_notes.reload.count.should == count1 + 1
+        expect(@s1.user_notes.reload.count).to eq count1 + 1
       end
 
       it "should not be allowed if disabled" do
         @course.account.update_attribute(:enable_user_notes, false)
         get_conversations
         compose course: @course, to: [@s1], body: 'hallo!', send: false
-        f(".user_note").should_not be_displayed
+        expect(f(".user_note")).not_to be_displayed
       end
 
       it "should not be allowed for students" do
         user_session(@s1)
         get_conversations
         compose course: @course, to: [@s2], body: 'hallo!', send: false
-        f(".user_note").should_not be_displayed
+        expect(f(".user_note")).not_to be_displayed
       end
 
       it "should not be allowed with non-student recipient" do
         compose course: @course, to: [@teacher], body: 'hallo!', send: false
-        f(".user_note").should_not be_displayed
+        expect(f(".user_note")).not_to be_displayed
       end
     end
   end
@@ -307,13 +307,13 @@ describe "conversations new" do
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      fj('#compose-message-course').should have_attribute(:disabled, 'true')
-      fj('#compose-message-course').should have_value(@course.id.to_s)
-      fj('#compose-message-subject').should have_attribute(:disabled, 'true')
-      fj('#compose-message-subject').should_not be_displayed
-      fj('#compose-message-subject').should have_value(@convo.subject)
-      fj('.message_subject_ro').should be_displayed
-      fj('.message_subject_ro').text.should == @convo.subject
+      expect(fj('#compose-message-course')).to have_attribute(:disabled, 'true')
+      expect(fj('#compose-message-course')).to have_value(@course.id.to_s)
+      expect(fj('#compose-message-subject')).to have_attribute(:disabled, 'true')
+      expect(fj('#compose-message-subject')).not_to be_displayed
+      expect(fj('#compose-message-subject')).to have_value(@convo.subject)
+      expect(fj('.message_subject_ro')).to be_displayed
+      expect(fj('.message_subject_ro').text).to eq @convo.subject
     end
 
     it "should address replies to the most recent author by default" do
@@ -321,8 +321,8 @@ describe "conversations new" do
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      ffj('input[name="recipients[]"]').length.should == 1
-      fj('input[name="recipients[]"]').should have_value(@s2.id.to_s)
+      expect(ffj('input[name="recipients[]"]').length).to eq 1
+      expect(fj('input[name="recipients[]"]')).to have_value(@s2.id.to_s)
     end
 
     it "should add new messages to the conversation" do
@@ -334,9 +334,9 @@ describe "conversations new" do
       set_message_body('Read chapters five and six.')
       click_send
       wait_for_ajaximations
-      ffj('.message-item-view').length.should == initial_message_count + 1
+      expect(ffj('.message-item-view').length).to eq initial_message_count + 1
       @convo.reload
-      @convo.conversation_messages.length.should == initial_message_count + 1
+      expect(@convo.conversation_messages.length).to eq initial_message_count + 1
     end
 
     it "should not allow adding recipients to private messages" do
@@ -345,7 +345,7 @@ describe "conversations new" do
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      fj('.compose_form .ac-input-box.disabled').should_not be_nil
+      expect(fj('.compose_form .ac-input-box.disabled')).not_to be_nil
     end
   end
 
@@ -358,38 +358,38 @@ describe "conversations new" do
 
     it "should default to inbox view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_view_filter).should == 'inbox'
-      conversation_elements.size.should == 2
+      selected = expect(get_bootstrap_select_value(get_view_filter)).to eq 'inbox'
+      expect(conversation_elements.size).to eq 2
     end
 
     it "should have an unread view" do
       get_conversations
       select_view('unread')
-      conversation_elements.size.should == 1
+      expect(conversation_elements.size).to eq 1
     end
 
     it "should have an starred view" do
       get_conversations
       select_view('starred')
-      conversation_elements.size.should == 2
+      expect(conversation_elements.size).to eq 2
     end
 
     it "should have an sent view" do
       get_conversations
       select_view('sent')
-      conversation_elements.size.should == 3
+      expect(conversation_elements.size).to eq 3
     end
 
     it "should have an archived view" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should == 1
+      expect(conversation_elements.size).to eq 1
     end
 
     it "should default to all courses view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_course_filter).should == ''
-      conversation_elements.size.should == 2
+      selected = expect(get_bootstrap_select_value(get_course_filter)).to eq ''
+      expect(conversation_elements.size).to eq 2
     end
 
     it "should truncate long course names" do
@@ -398,36 +398,36 @@ describe "conversations new" do
       get_conversations
       select_course(@course.id)
       button_text = f('.filter-option', get_course_filter).text
-      button_text.should_not == @course.name
-      button_text[0...5].should == @course.name[0...5]
-      button_text[-5..-1].should == @course.name[-5..-1]
+      expect(button_text).not_to eq @course.name
+      expect(button_text[0...5]).to eq @course.name[0...5]
+      expect(button_text[-5..-1]).to eq @course.name[-5..-1]
     end
 
     it "should filter by course" do
       get_conversations
       select_course(@course.id)
-      conversation_elements.size.should == 2
+      expect(conversation_elements.size).to eq 2
     end
 
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id)
       select_view('unread')
-      conversation_elements.size.should == 1
+      expect(conversation_elements.size).to eq 1
     end
 
     it "should hide the spinner after deleting the last conversation" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should == 1
+      expect(conversation_elements.size).to eq 1
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#delete-btn').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      conversation_elements.size.should == 0
-      ffj('.message-list .paginatedLoadingIndicator:visible').length.should == 0
-      ffj('.actions .btn-group button:disabled').size.should == 4
+      expect(conversation_elements.size).to eq 0
+      expect(ffj('.message-list .paginatedLoadingIndicator:visible').length).to eq 0
+      expect(ffj('.actions .btn-group button:disabled').size).to eq 4
     end
   end
 
@@ -446,26 +446,26 @@ describe "conversations new" do
       driver.mouse.move_to(unstarred_elt)
       wait_for_ajaximations
       star_btn = f('.star-btn', unstarred_elt)
-      star_btn.should be_present
-      f('.active', unstarred_elt).should be_nil
+      expect(star_btn).to be_present
+      expect(f('.active', unstarred_elt)).to be_nil
 
       star_btn.click
       wait_for_ajaximations
-      f('.active', unstarred_elt).should be_present
-      @conv_unstarred.reload.starred.should be_true
+      expect(f('.active', unstarred_elt)).to be_present
+      expect(@conv_unstarred.reload.starred).to be_truthy
     end
 
     it "should unstar via star icon" do
       get_conversations
       starred_elt = conversation_elements[0]
       star_btn = f('.star-btn', starred_elt)
-      star_btn.should be_present
-      f('.active', starred_elt).should be_present
+      expect(star_btn).to be_present
+      expect(f('.active', starred_elt)).to be_present
 
       star_btn.click
       wait_for_ajaximations
-      f('.active', starred_elt).should be_nil
-      @conv_starred.reload.starred.should be_false
+      expect(f('.active', starred_elt)).to be_nil
+      expect(@conv_starred.reload.starred).to be_falsey
     end
 
     it "should star via gear menu" do
@@ -474,9 +474,9 @@ describe "conversations new" do
       unstarred_elt.click
       wait_for_ajaximations
       click_star_toggle_menu_item
-      f('.active', unstarred_elt).should be_present
+      expect(f('.active', unstarred_elt)).to be_present
       run_progress_job
-      @conv_unstarred.reload.starred.should be_true
+      expect(@conv_unstarred.reload.starred).to be_truthy
     end
 
     it "should unstar via gear menu" do
@@ -485,9 +485,9 @@ describe "conversations new" do
       starred_elt.click
       wait_for_ajaximations
       click_star_toggle_menu_item
-      f('.active', starred_elt).should be_nil
+      expect(f('.active', starred_elt)).to be_nil
       run_progress_job
-      @conv_starred.reload.starred.should be_false
+      expect(@conv_starred.reload.starred).to be_falsey
     end
   end
 
@@ -502,7 +502,7 @@ describe "conversations new" do
       name = @s2.name
       f('[role=main] header [role=search] input').send_keys(name)
       keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
-      conversation_elements.length.should == 1
+      expect(conversation_elements.length).to eq 1
     end
   end
 
@@ -523,7 +523,7 @@ describe "conversations new" do
     it "should select multiple conversations" do
       get_conversations
       select_all_conversations
-      ff('.messages li.active').count.should == 2
+      expect(ff('.messages li.active').count).to eq 2
     end
 
     it "should select all conversations" do
@@ -532,7 +532,7 @@ describe "conversations new" do
         .send_keys('a')
         .key_up(modifier)
         .perform
-      ff('.messages li.active').count.should == 2
+      expect(ff('.messages li.active').count).to eq 2
     end
 
     it "should archive multiple conversations" do
@@ -540,9 +540,9 @@ describe "conversations new" do
       select_all_conversations
       f('#archive-btn').click
       wait_for_ajaximations
-      conversation_elements.count.should == 0
+      expect(conversation_elements.count).to eq 0
       run_progress_job
-      @conversations.each { |c| c.reload.should be_archived }
+      @conversations.each { |c| expect(c.reload).to be_archived }
     end
 
     it "should delete multiple conversations" do
@@ -551,52 +551,52 @@ describe "conversations new" do
       f('#delete-btn').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      conversation_elements.count.should == 0
+      expect(conversation_elements.count).to eq 0
     end
 
     it "should mark multiple conversations as unread" do
-      pending('breaks b/c jenkins is weird')
+      skip('breaks b/c jenkins is weird')
       get_conversations
       select_all_conversations
       click_unread_toggle_menu_item
-      keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
+      keep_trying_until { expect(ffj('.read-state[aria-checked=false]').count).to eq 2 }
     end
 
     it "should mark multiple conversations as unread" do
-      pending('breaks b/c jenkins is weird')
+      skip('breaks b/c jenkins is weird')
       get_conversations
       select_all_conversations
       click_read_toggle_menu_item
-      keep_trying_until { ffj('.read-state[aria-checked=true]').count.should == 2 }
+      keep_trying_until { expect(ffj('.read-state[aria-checked=true]').count).to eq 2 }
     end
 
     it "should star multiple conversations" do
-      pending('breaks b/c jenkins is weird')
+      skip('breaks b/c jenkins is weird')
       get_conversations
       select_all_conversations
       click_star_toggle_menu_item
       run_progress_job
-      keep_trying_until { ff('.star-btn.active').count.should == 2 }
-      @conversations.each { |c| c.reload.should be_starred }
+      keep_trying_until { expect(ff('.star-btn.active').count).to eq 2 }
+      @conversations.each { |c| expect(c.reload).to be_starred }
     end
   end
 
   describe 'conversations inbox opt-out option' do
     it "should be hidden a feature flag" do
       get "/profile/settings"
-      ff('#disable_inbox').count.should == 0
+      expect(ff('#disable_inbox').count).to eq 0
     end
 
     it "should reveal when the feature flag is set" do
       @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
       get "/profile/settings"
-      ff('#disable_inbox').count.should == 1
+      expect(ff('#disable_inbox').count).to eq 1
     end
 
     context "when activated" do
       it "should set the notification preferences for conversations to ASAP, and hide those options" do
         @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
-        @teacher.reload.disabled_inbox?.should be_falsey
+        expect(@teacher.reload.disabled_inbox?).to be_falsey
         notification = Notification.create!(workflow_state: "active", name: "Conversation Message",
                              category: "Conversation Message", delay_for: 0)
         policy = NotificationPolicy.create!(notification_id: notification.id, communication_channel_id: @teacher.email_channel.id, broadcast: true, frequency: "weekly")
@@ -604,19 +604,19 @@ describe "conversations new" do
         sleep 0.5
 
         get '/profile/communication'
-        ff('td[data-category="conversation_message"]').count.should == 1
-        ff('.unread-messages-count').count.should == 1
+        expect(ff('td[data-category="conversation_message"]').count).to eq 1
+        expect(ff('.unread-messages-count').count).to eq 1
 
         get "/profile/settings"
         f('#disable_inbox').click
         sleep 0.5
 
-        @teacher.reload.disabled_inbox?.should be_truthy
+        expect(@teacher.reload.disabled_inbox?).to be_truthy
 
         get '/profile/communication'
-        ff('td[data-category="conversation_message"]').count.should == 0
-        policy.reload.frequency.should == "immediately"
-        ff('.unread-messages-count').count.should == 0
+        expect(ff('td[data-category="conversation_message"]').count).to eq 0
+        expect(policy.reload.frequency).to eq "immediately"
+        expect(ff('.unread-messages-count').count).to eq 0
       end
     end
   end

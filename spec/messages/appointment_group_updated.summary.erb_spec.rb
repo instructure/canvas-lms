@@ -26,7 +26,7 @@ describe 'appointment_group_updated.email' do
 
     generate_message(:appointment_group_updated, :summary, @appointment_group)
 
-    @message.subject.should include('some title')
-    @message.body.should include('some title')
+    expect(@message.subject).to include('some title')
+    expect(@message.body).to include('some title')
   end
 end

@@ -74,7 +74,7 @@ module CC::Importer::Standard
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
-        prepend_id_to_questions(questions, resource_id)
+        ::Canvas::Migration::MigratorHelper.prepend_id_to_questions(questions, resource_id)
 
         #try to replace relative urls
         questions.each do |question|
@@ -98,7 +98,7 @@ module CC::Importer::Standard
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         quizzes = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
-        prepend_id_to_assessments(quizzes, resource_id)
+        ::Canvas::Migration::MigratorHelper.prepend_id_to_assessments(quizzes, resource_id)
         if quiz = quizzes.first
           quiz[:migration_id] = resource_id
         end

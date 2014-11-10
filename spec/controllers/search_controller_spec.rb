@@ -16,10 +16,10 @@ describe SearchController do
       group.users = [@user, other]
 
       get 'recipients', :search => 'this_is_a_test_'
-      response.should be_success
-      response.body.should include(@course.name)
-      response.body.should include(group.name)
-      response.body.should include(other.name)
+      expect(response).to be_success
+      expect(response.body).to include(@course.name)
+      expect(response.body).to include(group.name)
+      expect(response.body).to include(other.name)
     end
 
     it "should sort alphabetically" do
@@ -32,9 +32,9 @@ describe SearchController do
       group.users << other
 
       get 'recipients', :context => @course.asset_string, :per_page => '1', :type => 'user'
-      response.should be_success
-      response.body.should include('billy')
-      response.body.should_not include('bob')
+      expect(response).to be_success
+      expect(response.body).to include('billy')
+      expect(response.body).not_to include('bob')
     end
 
     it "should optionally show users who haven't finished registration" do
@@ -48,9 +48,9 @@ describe SearchController do
         :search => 'b', :type => 'user', :skip_visibility_checks => true,
         :synthetic_contexts => true, :context => "course_#{@course.id}_students"
       }
-      response.should be_success
-      response.body.should include('bob')
-      response.body.should include('billy')
+      expect(response).to be_success
+      expect(response.body).to include('bob')
+      expect(response.body).to include('billy')
     end
 
     it "should allow filtering out non-messageable courses" do
@@ -62,15 +62,15 @@ describe SearchController do
       term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
       @course2.update_attributes! :enrollment_term => term
       get 'recipients', {search: 'course', :messageable_only => true}
-      response.body.should include('course1')
-      response.body.should_not include('course2')
+      expect(response.body).to include('course1')
+      expect(response.body).not_to include('course2')
     end
 
     it "should return an empty list when searching in a non-messageable context" do
       course_with_student_logged_in(:active_all => true)
       @enrollment.update_attributes(workflow_state: 'deleted')
       get 'recipients', {search: 'foo', :context => @course.asset_string}
-      response.body.should =~ /\[\]\z/
+      expect(response.body).to match /\[\]\z/
     end
 
     it "should handle groups in courses without messageable enrollments" do
@@ -78,22 +78,22 @@ describe SearchController do
       group = @course.groups.create(:name => 'this_is_a_test_group')
       group.users = [@user]
       get 'recipients', {:search => '', :type => 'context'}
-      response.should be_success
+      expect(response).to be_success
       # This is questionable legacy behavior.
-      response.body.should include(group.name)
+      expect(response.body).to include(group.name)
     end
 
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
         user_session(user)
         course(:active_all => true).course_sections.create(:name => "other section")
-        response.should be_success
+        expect(response).to be_success
 
         get 'recipients', {
           :type => 'section', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
         }
-        response.body.should =~ /\[\]\z/
+        expect(response.body).to match /\[\]\z/
       end
 
       it "should return sub-contexts" do
@@ -105,8 +105,8 @@ describe SearchController do
           :type => 'section', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
         }
-        response.should be_success
-        response.body.should include('other section')
+        expect(response).to be_success
+        expect(response.body).to include('other section')
       end
 
       it "should return sub-users" do
@@ -119,8 +119,8 @@ describe SearchController do
           :type => 'user', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_all"
         }
-        response.body.should include(@teacher.name)
-        response.body.should include(@student.name)
+        expect(response.body).to include(@teacher.name)
+        expect(response.body).to include(@student.name)
       end
     end
 
@@ -142,21 +142,21 @@ describe SearchController do
           :context => "course_#{@course.id}",
           :synthetic_contexts => true
         }
-        response.body.should include('"name":"Course Sections"')
+        expect(response.body).to include('"name":"Course Sections"')
         get 'recipients', {
           :context => "course_#{@course.id}_sections",
           :synthetic_contexts => true
         }
-        response.body.should include('Section1')
-        response.body.should_not include('Section2')
+        expect(response.body).to include('Section1')
+        expect(response.body).not_to include('Section2')
       end
 
       it "should exclude non-messageable users" do
         get 'recipients', {
           :context => "course_#{@course.id}_students"
         }
-        response.body.should include('Student1')
-        response.body.should_not include('Student2')
+        expect(response.body).to include('Student1')
+        expect(response.body).not_to include('Student2')
       end
     end
   end

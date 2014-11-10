@@ -157,6 +157,13 @@ define [
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: true})
     equal titleText, "Local: Dec 31, 1969 at  7:00pm<br>Course: Dec 31, 1969 at  6:00pm"
 
+  test "properly spans day boundaries", ->
+    ENV.TIMEZONE = 'America/Chicago'
+    tz.changeZone(chicago, 'America/Chicago')
+    ENV.CONTEXT_TIMEZONE = 'America/New_York'
+    titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 05:30:00Z', hash: {justText: true})
+    equal titleText, "Local: Dec 31, 1969 at 11:30pm<br>Course: Jan 1, 1970 at 12:30am"
+
   test 'stays as one title when the timezone is no different', ->
     ENV.TIMEZONE = 'America/Detroit'
     ENV.CONTEXT_TIMEZONE = 'America/Detroit'
@@ -173,6 +180,7 @@ define [
     ENV.CONTEXT_TIMEZONE = null
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: undefined})
     equal titleText, "data-tooltip title=\"Dec 31, 1969 at  7:00pm\""
+
 
 
   module 'datetimeFormatted',

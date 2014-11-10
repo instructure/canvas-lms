@@ -29,12 +29,12 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
+      expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first).not_to be_nil
+      expect(@copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first).not_to be_nil
     end
 
     it "should copy learning outcome alignments with question banks" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
       default = @copy_from.root_outcome_group
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
@@ -51,17 +51,17 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_lo = @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo))
-      new_bank = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(bank))
+      new_lo = @copy_to.learning_outcomes.where(migration_id: mig_id(lo)).first
+      new_bank = @copy_to.assessment_question_banks.where(migration_id: mig_id(bank)).first
 
-      new_lo.alignments.count.should == 1
+      expect(new_lo.alignments.count).to eq 1
       new_alignment = new_lo.alignments.first
 
-      new_alignment.content.should == new_bank
-      new_alignment.context.should == @copy_to
+      expect(new_alignment.content).to eq new_bank
+      expect(new_alignment.context).to eq @copy_to
 
-      new_alignment.tag.should == 'points_mastery'
-      new_alignment.mastery_score.should == 50.0
+      expect(new_alignment.tag).to eq 'points_mastery'
+      expect(new_alignment.mastery_score).to eq 50.0
     end
 
     it "should copy learning outcomes into the new course" do
@@ -99,38 +99,38 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.created_learning_outcomes.count.should == @copy_from.created_learning_outcomes.count
-      @copy_to.learning_outcome_groups.count.should == @copy_from.learning_outcome_groups.count
-      new_root.child_outcome_links.count.should == old_root.child_outcome_links.count
-      new_root.child_outcome_groups.count.should == old_root.child_outcome_groups.count
+      expect(@copy_to.created_learning_outcomes.count).to eq @copy_from.created_learning_outcomes.count
+      expect(@copy_to.learning_outcome_groups.count).to eq @copy_from.learning_outcome_groups.count
+      expect(new_root.child_outcome_links.count).to eq old_root.child_outcome_links.count
+      expect(new_root.child_outcome_groups.count).to eq old_root.child_outcome_groups.count
 
       lo_new = new_root.child_outcome_links.first.content
-      lo_new.short_description.should == lo.short_description
-      lo_new.description.should == lo.description
-      lo_new.data.should == lo.data
+      expect(lo_new.short_description).to eq lo.short_description
+      expect(lo_new.description).to eq lo.description
+      expect(lo_new.data).to eq lo.data
 
       log_new = new_root.child_outcome_groups.first
-      log_new.title.should == log.title
-      log_new.description.should == log.description
-      log_new.child_outcome_links.length.should == 1
+      expect(log_new.title).to eq log.title
+      expect(log_new.description).to eq log.description
+      expect(log_new.child_outcome_links.length).to eq 1
 
       lo_new = log_new.child_outcome_links.first.content
-      lo_new.short_description.should == lo2.short_description
-      lo_new.description.should == lo2.description
-      lo_new.data.should == lo2.data
+      expect(lo_new.short_description).to eq lo2.short_description
+      expect(lo_new.description).to eq lo2.description
+      expect(lo_new.data).to eq lo2.data
 
       log_sub_new = log_new.child_outcome_groups.first
-      log_sub_new.title.should == log_sub.title
-      log_sub_new.description.should == log_sub.description
+      expect(log_sub_new.title).to eq log_sub.title
+      expect(log_sub_new.description).to eq log_sub.description
 
       log_sub2_new = log_sub_new.child_outcome_groups.first
-      log_sub2_new.title.should == log_sub2.title
-      log_sub2_new.description.should == log_sub2.description
+      expect(log_sub2_new.title).to eq log_sub2.title
+      expect(log_sub2_new.description).to eq log_sub2.description
 
       lo3_new = log_sub2_new.child_outcome_links.first.content
-      lo3_new.short_description.should == lo3.short_description
-      lo3_new.description.should == lo3.description
-      lo3_new.data.should == lo3.data
+      expect(lo3_new.short_description).to eq lo3.short_description
+      expect(lo3_new.description).to eq lo3.description
+      expect(lo3_new.data).to eq lo3.data
     end
 
     it "should not copy deleted learning outcomes into the new course" do
@@ -149,8 +149,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.created_learning_outcomes.count.should == 1
-      @copy_to.created_learning_outcomes.first.migration_id.should == mig_id(lo)
+      expect(@copy_to.created_learning_outcomes.count).to eq 1
+      expect(@copy_to.created_learning_outcomes.first.migration_id).to eq mig_id(lo)
     end
 
     it "should relink to external outcomes" do
@@ -170,9 +170,9 @@ describe ContentMigration do
       run_course_copy
 
       to_root = @copy_to.root_outcome_group
-      to_root.child_outcome_links.count.should == 2
-      to_root.child_outcome_links.find_by_content_id(lo.id).should_not be_nil
-      to_root.child_outcome_links.find_by_content_id(lo2.id).should_not be_nil
+      expect(to_root.child_outcome_links.count).to eq 2
+      expect(to_root.child_outcome_links.where(content_id: lo.id).first).not_to be_nil
+      expect(to_root.child_outcome_links.where(content_id: lo2.id).first).not_to be_nil
     end
 
     it "should create outcomes in new course if external context not found" do
@@ -189,13 +189,13 @@ describe ContentMigration do
       @cm.outcome_to_id_map = {}
       Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
 
-      @cm.warnings.should == ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
+      expect(@cm.warnings).to eq ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
 
       to_root = @copy_to.root_outcome_group
-      to_root.child_outcome_links.count.should == 1
+      expect(to_root.child_outcome_links.count).to eq 1
       new_lo = to_root.child_outcome_links.first.content
-      new_lo.id.should_not == 0
-      new_lo.short_description.should == hash["title"]
+      expect(new_lo.id).not_to eq 0
+      expect(new_lo.short_description).to eq hash["title"]
     end
 
     it "should create rubrics in new course if external context not found" do
@@ -223,11 +223,11 @@ describe ContentMigration do
       @cm.outcome_to_id_map = {}
       Importers::RubricImporter.import_from_migration(hash, @cm)
 
-      @cm.warnings.should == ["The external Rubric couldn't be found for \"root rubric\", creating a copy."]
+      expect(@cm.warnings).to eq ["The external Rubric couldn't be found for \"root rubric\", creating a copy."]
 
       new_rubric = @copy_to.rubrics.first
-      new_rubric.id.should_not == 0
-      new_rubric.title.should == hash["title"]
+      expect(new_rubric.id).not_to eq 0
+      expect(new_rubric.title).to eq hash["title"]
     end
 
     it "should link rubric (and assignments) to outcomes" do
@@ -266,15 +266,15 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_lo2 = @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2))
+      new_lo2 = @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo2)).first
       to_rub = @copy_to.rubrics.first
       to_assign = @copy_to.assignments.first
 
-      to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
-      to_rub.data[1]["ignore_for_scoring"].should == true
-      to_rub.data[0]["learning_outcome_id"].should == lo.id
-      to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
-      to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
+      expect(to_rub.data[1]["learning_outcome_id"]).to eq new_lo2.id
+      expect(to_rub.data[1]["ignore_for_scoring"]).to eq true
+      expect(to_rub.data[0]["learning_outcome_id"]).to eq lo.id
+      expect(to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
+      expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
     end
 
     it "should still associate rubrics and assignments and copy rubric association properties" do
@@ -284,23 +284,23 @@ describe ContentMigration do
 
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
-      rub.should_not be_nil
+      rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
+      expect(rub).not_to be_nil
 
       [:description, :id, :points].each do |k|
-        rub.data.first[k].should == @rubric.data.first[k]
+        expect(rub.data.first[k]).to eq @rubric.data.first[k]
       end
       [:criterion_id, :description, :id, :points].each do |k|
         rub.data.first[:ratings].each_with_index do |criterion, i|
-          criterion[k].should == @rubric.data.first[:ratings][i][k]
+          expect(criterion[k]).to eq @rubric.data.first[:ratings][i][k]
         end
       end
 
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
-      asmnt2.rubric.id.should == rub.id
-      asmnt2.rubric_association.use_for_grading.should == true
-      asmnt2.rubric_association.hide_score_total.should == true
-      asmnt2.rubric_association.summary_data.should == @assoc.summary_data
+      asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(asmnt2.rubric.id).to eq rub.id
+      expect(asmnt2.rubric_association.use_for_grading).to eq true
+      expect(asmnt2.rubric_association.hide_score_total).to eq true
+      expect(asmnt2.rubric_association.summary_data).to eq @assoc.summary_data
     end
 
     it "should copy rubrics associated with assignments when rubric isn't selected" do
@@ -311,10 +311,10 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
-      rub.should_not be_nil
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
-      asmnt2.rubric.id.should == rub.id
+      rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
+      expect(rub).not_to be_nil
+      asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(asmnt2.rubric.id).to eq rub.id
     end
   end
 end

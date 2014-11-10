@@ -20,12 +20,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/show" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :each do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context
     assigns[:quiz] = @course.quizzes.create!
     render "quizzes/quizzes/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should render a notice instead of grades if muted" do
@@ -46,7 +54,7 @@ describe "/quizzes/quizzes/show" do
     assigns[:submission] = submission
     view_context
     render "quizzes/quizzes/show"
-    response.should have_tag ".muted-notice"
+    expect(response).to have_tag ".muted-notice"
     true
   end
 
@@ -57,35 +65,22 @@ describe "/quizzes/quizzes/show" do
     assigns[:quiz] = quiz
     view_context
     render "quizzes/quizzes/show"
-    response.should_not have_tag ".unpublished_warning"
+    expect(response).not_to have_tag ".unpublished_warning"
   end
 
-  it "warns students if quiz is unpublished" do
-    course_with_student_logged_in(:active_all => true)
-    quiz = @course.quizzes.create!
-    assigns[:quiz] = quiz
-    view_context
-    render "quizzes/quizzes/show"
-    response.should have_tag ".unpublished_warning"
-  end
-
-  it "should show header bar and publish button if draft state enabled" do
-    Account.default.enable_feature!(:draft_state)
-
+  it "should show header bar and publish button" do
     course_with_teacher_logged_in(:active_all => true)
     assigns[:quiz] = @course.quizzes.create!
 
     view_context
     render "quizzes/quizzes/show"
 
-    response.should have_tag ".header-bar"
-    response.should have_tag "#quiz-publish-link"
+    expect(response).to have_tag ".header-bar"
+    expect(response).to have_tag "#quiz-publish-link"
   end
 
-  it "should show unpublished quiz changes to instructors with draft state" do
+  it "should show unpublished quiz changes to instructors" do
     course_with_teacher_logged_in(:active_all => true)
-    Account.default.enable_feature!(:draft_state)
-
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
     @quiz.save!
@@ -97,8 +92,8 @@ describe "/quizzes/quizzes/show" do
     view_context
     render "quizzes/quizzes/show"
 
-    response.should have_tag ".unsaved_quiz_warning"
-    response.should_not have_tag ".unpublished_quiz_warning"
+    expect(response).to have_tag ".unsaved_quiz_warning"
+    expect(response).not_to have_tag ".unpublished_quiz_warning"
   end
 
 end

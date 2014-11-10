@@ -1,13 +1,29 @@
 <div>
-  <p>
-    {{#toSentence sections}}<b>{{this}}</b>{{/toSentence}}
-    {{description}}
-  <p>
-  {{#t "modal.chooseDueDate"}}Do you want to go back and select a due date?{{/t}}
-  </p>
+  {{#if da_enabled}}
+    <p>
+    {{#t "modal.notAllSectionsAssigned"}}Not all sections will be assigned this item.{{/t}}
+    </p>
+    {{#t "modal.goBackToInclude"}}Would you like to go back to include:{{/t}}
+    <ul>
+    {{#each sections}}<li><b>{{this}}</b></li>{{/each}}
+    </ul>
+  {{else}}
+    <p>
+      {{#toSentence sections}}<b>{{this}}</b>{{/toSentence}}
+      {{description}}
+    <p>
+    {{#t "modal.chooseDueDate"}}Do you want to go back and select a due date?{{/t}}
+    </p>
+  {{/if}}
 
   <div class="button-container form-actions">
-    <button type="button" class="btn">{{#t "buttons.noDueDate"}}No Due Date{{/t}}</button>
-    <button type="button" class="btn btn-primary">{{#t "buttons.goBack"}}Go Back{{/t}}</button>
+    <button type="button" class="btn">{{#t "buttons.goBack"}}Go Back{{/t}}</button>
+    <button type="button" class="btn btn-primary">
+      {{#if da_enabled}}
+        {{#t "buttons.continue"}}Continue{{/t}}
+      {{else}}
+        {{#t "buttons.noDueDate"}}No Due Date{{/t}}
+      {{/if}}
+    </button>
   </div>
 </div>

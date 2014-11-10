@@ -31,7 +31,7 @@ describe "group weights" do
 
   def check_group_points(expected_weight_text)
     for i in 2..3 do
-      get_group_points[i].text.should == expected_weight_text + ' of grade'
+      expect(get_group_points[i].text).to eq expected_weight_text + ' of grade'
     end
   end
 
@@ -41,30 +41,30 @@ describe "group weights" do
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
     dialog = f('#assignment_group_weights_dialog')
-    dialog.should be_displayed
+    expect(dialog).to be_displayed
 
     group_check = dialog.find_element(:id, 'group_weighting_scheme')
     keep_trying_until do
       group_check.click
-      is_checked('#group_weighting_scheme').should be_true
+      expect(is_checked('#group_weighting_scheme')).to be_truthy
     end
     group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
     set_value(group_weight_input, "")
     set_value(group_weight_input, weight_number)
     fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
-    @course.reload.group_weighting_scheme.should == 'percent'
+    expect(@course.reload.group_weighting_scheme).to eq 'percent'
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)
     assignment_groups.each_with_index do |ag, i|
       heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
-      heading.should include_text("#{weight_numbers[i]}% of grade")
+      expect(heading).to include_text("#{weight_numbers[i]}% of grade")
     end
   end
 
   def validate_group_weight(assignment_group, weight_number)
-    assignment_group.reload.group_weight.should == weight_number
+    expect(assignment_group.reload.group_weight).to eq weight_number
   end
 
   before (:each) do
@@ -129,12 +129,11 @@ describe "group weights" do
   end
 
   it "should display group weights correctly when unsetting group weights through assignments page" do
-    pending("bug 7435 - Gradebook2 keeps weighted assignment groups, even when turned off") do
-      get "/courses/#{@course.id}/assignments"
+    skip("bug 7435 - Gradebook2 keeps weighted assignment groups, even when turned off")
+    get "/courses/#{@course.id}/assignments"
 
-      f('#class_weighting_policy').click
-      wait_for_ajaximations
-      check_group_points('0%')
-    end
+    f('#class_weighting_policy').click
+    wait_for_ajaximations
+    check_group_points('0%')
   end
 end

@@ -126,9 +126,6 @@
   #right_side
     width: 329px
 
-
-
-
 #left_side
   width: 75%
   float: left
@@ -566,3 +563,30 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   margin-left: -150px
   width: 300px
   text-align: center
+
+.dialog_button
+  height: 35px
+
+#record_button div
+  margin: 5px 10px
+  width: 15px
+  height: 15px
+
+#record_button[recording=false] div
+  background-color: $red
+  border-radius: 15px
+
+#record_button[recording=true] div
+  background-color: $black
+
+#text_preview
+  width: 420px
+  height: 100px
+  border: 1px solid $borderColor
+
+#interim_results
+  color: $canvas-success
+
+.no-close
+  .ui-dialog-titlebar-close
+    display: none

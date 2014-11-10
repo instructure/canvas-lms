@@ -20,62 +20,62 @@ describe 'simply_versioned' do
     let(:woozel) { Woozel.create!(:name => 'Eeyore') }
     it "should create the first version on save" do
       woozel = Woozel.new(:name => 'Eeyore')
-      woozel.should_not be_versioned
+      expect(woozel).not_to be_versioned
       woozel.save!
-      woozel.should be_versioned
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Eeyore')
+      expect(woozel).to be_versioned
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Eeyore')
     end
 
     it "should keep the last version up to date for each save" do
-      woozel.should be_versioned
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Eeyore')
+      expect(woozel).to be_versioned
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Eeyore')
       woozel.name = 'Piglet'
       woozel.save!
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Piglet')
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
     it "should create a new version when asked to" do
       woozel.name = 'Piglet'
       woozel.with_versioning(:explicit => true, &:save!)
-      woozel.versions.length.should eql(2)
-      woozel.versions.first.model.name.should eql('Eeyore')
-      woozel.versions.current.model.name.should eql('Piglet')
+      expect(woozel.versions.length).to eql(2)
+      expect(woozel.versions.first.model.name).to eql('Eeyore')
+      expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
     it 'should not create a new version when not explicitly asked to' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Piglet')
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
     it 'should not update the last version when not versioning' do
       woozel.name = 'Piglet'
       woozel.without_versioning(&:save!)
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Eeyore')
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Eeyore')
     end
 
     it 'should not reload one versionable association from the database' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
-      woozel.versions.loaded?.should == false
+      expect(woozel.versions.loaded?).to eq false
       first = woozel.versions.first
       Woozel.connection.expects(:select_all).never
-      first.versionable.should == woozel
+      expect(first.versionable).to eq woozel
     end
 
     it 'should not reload any versionable associations from the database' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
-      woozel.versions.loaded?.should == false
+      expect(woozel.versions.loaded?).to eq false
       all = woozel.versions.all
       Woozel.connection.expects(:select_all).never
       all.each do |version|
-        version.versionable.should == woozel
+        expect(version.versionable).to eq woozel
       end
     end
   end
@@ -84,24 +84,24 @@ describe 'simply_versioned' do
     let(:woozel) { Woozel.create!(:name => 'Eeyore') }
 
     it "should assign the model for the version" do
-      woozel.versions.length.should eql(1)
-      woozel.versions.current.model.name.should eql('Eeyore')
+      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.current.model.name).to eql('Eeyore')
 
       woozel.name = 'Piglet'
       woozel.with_versioning(:explicit => true, &:save!)
 
-      woozel.versions.length.should eql(2)
+      expect(woozel.versions.length).to eql(2)
 
       first_version = woozel.versions.first
       first_model   = first_version.model
-      first_model.name.should eql('Eeyore')
+      expect(first_model.name).to eql('Eeyore')
 
       first_model.name = 'Foo'
       first_version.model = first_model
       first_version.save!
 
       versions = woozel.reload.versions
-      versions.first.model.name.should eql('Foo')
+      expect(versions.first.model.name).to eql('Foo')
     end
   end
 
@@ -112,17 +112,17 @@ describe 'simply_versioned' do
     end
 
     it "should always be true for models loaded directly from AR" do
-      @woozel.should be_current_version
+      expect(@woozel).to be_current_version
       @woozel = Woozel.find(@woozel.id)
-      @woozel.should be_current_version
+      expect(@woozel).to be_current_version
       @woozel.reload
-      @woozel.should be_current_version
-      Woozel.new(name: 'test2').should be_current_version
+      expect(@woozel).to be_current_version
+      expect(Woozel.new(name: 'test2')).to be_current_version
     end
 
     it "should be false for the #model of any version" do
-      @woozel.versions.current.model.should_not be_current_version
-      @woozel.versions.map { |v| v.model.current_version? }.should == [false, false]
+      expect(@woozel.versions.current.model).not_to be_current_version
+      expect(@woozel.versions.map { |v| v.model.current_version? }).to eq [false, false]
     end
   end
 
@@ -137,8 +137,8 @@ describe 'simply_versioned' do
         woozel.reload
       end
       it "can modify a version after loading" do
-        YAML::load(woozel.current_version.yaml)['name'].should == 'test'
-        woozel.current_version.model.name.should == 'test override'
+        expect(YAML::load(woozel.current_version.yaml)['name']).to eq 'test'
+        expect(woozel.current_version.model.name).to eq 'test override'
       end
     end
   end
@@ -149,10 +149,10 @@ describe 'simply_versioned' do
       submission = quiz_model.quiz_submissions.create
       submission.with_versioning(explicit: true, &:save!)
       version = Version.where(:versionable_id => submission.id, :versionable_type => 'Quizzes::QuizSubmission').first
-      version.should_not be_nil
+      expect(version).not_to be_nil
 
       Version.where(id: version).update_all(versionable_type: 'QuizSubmission')
-      Version.find(version.id).versionable_type.should == 'Quizzes::QuizSubmission'
+      expect(Version.find(version.id).versionable_type).to eq 'Quizzes::QuizSubmission'
     end
 
     it 'returns the correct representation of a quiz' do
@@ -162,14 +162,14 @@ describe 'simply_versioned' do
 
       version.versionable_type = 'Quiz'
       version.send(:save_without_callbacks)
-      Version.find(version.id).versionable_type.should == 'Quizzes::Quiz'
+      expect(Version.find(version.id).versionable_type).to eq 'Quizzes::Quiz'
     end
 
     it 'returns the versionable type attribute if not a quiz' do
       assignment = assignment_model
       assignment.with_versioning(explicit: true, &:save!)
       assignment.versions.each do |version|
-        version.versionable_type.should == 'Assignment'
+        expect(version.versionable_type).to eq 'Assignment'
       end
     end
   end

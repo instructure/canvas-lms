@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples 'Answer Serializers'
 
   let :factory_options do
@@ -40,8 +44,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
     it 'should reject unexpected types' do
       [ nil, 'asdf' ].each do |bad_input|
         rc = subject.serialize(bad_input)
-        rc.error.should_not be_nil
-        rc.error.should match(/of type array/i)
+        expect(rc.error).not_to be_nil
+        expect(rc.error).to match(/of type array/i)
       end
     end
   end

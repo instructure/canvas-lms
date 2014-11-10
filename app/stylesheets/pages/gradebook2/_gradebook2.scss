@@ -58,6 +58,10 @@ $cell_height: 33px;
   text-shadow: #fbf8f8 0 0 1px;
 }
 
+.student-grades-link {
+  @if $use_high_contrast { color: darken($linkColor, 5%); } 
+}
+
 .meta-cell .avatar {
   width: 25px;
   height: 25px;
@@ -75,7 +79,6 @@ $cell_height: 33px;
 .student-section {
   margin-top: -7px;
   font-size: 10px;
-  color: #aaaaaa;
 }
 
 .secondary_identifier_cell, .custom_column {
@@ -117,7 +120,8 @@ $cell_height: 33px;
   &.hovered-column,
   &.slick-header-column-active,
   &.ui-state-hover {
-    @include vertical-gradient(#e0ecf9, #bdd2e3);
+    @if $use_high_contrast { @include vertical-gradient(#eef5fc, #d5e2ed); }
+    @else { @include vertical-gradient(#e0ecf9, #bdd2e3); }
   }
   .slick-column-name {
     font-weight: bold;
@@ -126,32 +130,35 @@ $cell_height: 33px;
   }
   a.assignment-name {
     font-weight: normal;
-    color: #1b7ecf;
+    
     text-shadow: white 0 0 1px;
-    //this is for the ellises
+    //this is for the ellipses
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    @if $use_high_contrast {
+      &:hover, &:focus { text-decoration: underline; }
+    }
+    @else { color: $linkColor; }
   }
   .muted {
-    background: url("/images/sound_mute.png") no-repeat center left;
-    padding-left: 16px;
+    background: url("/images/icon-sound-muted.svg") no-repeat left center;
+    background-size: 16px;
+    padding-left: 18px;
   }
   .assignment-points-possible {
     font-weight: normal;
-    text-shadow: #84848a 0 0 1px;
     font-size: 10px;
-    opacity: 0.5;
-    color: #2f2a34;
     margin: {
       left: 10px;
       right: 14px;
     };
+    // If high contrast, default to regular dark text
+    @if $use_high_contrast == false { color: lighten($textColor, 15%); }
   }
   .gradebook-header-drop {
     //put it above the "out of"
     z-index: 1;
-    background: url("/images/jqueryui/gradebook-header-drop.png") no-repeat top left;
     width: 14px;
     height: 14px;
     position: absolute;
@@ -161,6 +168,31 @@ $cell_height: 33px;
     opacity: 0;
     //override jqueryui blue border
     border: 0 none;
+
+    @if $use_high_contrast {
+      background: url("/images/jqueryui/gradebook-header-drop2-high-contrast.png") no-repeat top left;
+      @media (min--moz-device-pixel-ratio: 1.5),
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+        background-image: url("/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png");
+        background-size: 14px 28px;
+      }
+    }
+
+    @else {
+      background: url("/images/jqueryui/gradebook-header-drop2.png") no-repeat top left;
+      @media (min--moz-device-pixel-ratio: 1.5),
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+        background-image: url("/images/jqueryui/gradebook-header-drop2@2x.png");
+        background-size: 14px 28px;
+      }
+    }
+
     &:hover, &.ui-menu-trigger-menu-is-open {
       background-position: bottom left;
       opacity: 1;
@@ -335,13 +367,38 @@ $cell_height: 33px;
   position: absolute;
   top: -1px;
   right: -1px;
-  background: url("/images/gradebook-comments-sprite2.png") no-repeat 100% 0;
   height: 12px;
   width: 12px;
   visibility: hidden;
   //needs to be above "normal but below tooltips"
   z-index: 2;
   overflow: hidden;
+
+  @if $use_high_contrast {
+    background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
+    @media (min--moz-device-pixel-ratio: 1.5),
+    (-o-min-device-pixel-ratio: 3/2),
+    (-webkit-min-device-pixel-ratio: 1.5),
+    (min-device-pixel-ratio: 1.5),
+    (min-resolution: 1.5dppx) {
+      background-image: url("/images/gradebook-comments-sprite3-high-contrast@2x.png");
+      background-size: 17px 105px;
+    }
+  }
+
+  @else {
+    background: url("/images/gradebook-comments-sprite3.png") no-repeat 100% 0;
+    @media (min--moz-device-pixel-ratio: 1.5),
+    (-o-min-device-pixel-ratio: 3/2),
+    (-webkit-min-device-pixel-ratio: 1.5),
+    (min-device-pixel-ratio: 1.5),
+    (min-resolution: 1.5dppx) {
+      background-image: url("/images/gradebook-comments-sprite3@2x.png");
+      background-size: 17px 105px;
+    }
+  }
+  
+
   #gradebook_grid.editable &:hover,
   #gradebook_grid.editable &:focus {
     visibility: visible;
@@ -437,7 +494,8 @@ $cell_height: 33px;
     .outof {
       @include user-select(none);
       text-align: left;
-      color: #888888;
+      // if high contrast, no color value (default to regular dark text color)
+      @if $use_high_contrast == false { color: #888888; }
     }
     .grade {
       border: none;
@@ -581,5 +639,12 @@ $gradebook_checkbox_width: 16px;
 .gradebook_drop_down {
   li, label {
     @include gradebook_menu_label(13px);
+  }
+}
+
+// Very specific declaration to get Choose a Section text to have better text:background contrast in Section dropdown
+#section-to-show-menu {
+  li:first-of-type.ui-state-disabled {
+    opacity: 0.8;
   }
 }

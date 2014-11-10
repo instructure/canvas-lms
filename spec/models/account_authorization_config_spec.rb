@@ -25,7 +25,7 @@ describe AccountAuthorizationConfig do
       @account = Account.new
       @account_config = @account.account_authorization_configs.build(:ldap_filter => '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
       @account_config.save
-      @account_config.auth_filter.should eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
+      expect(@account_config.auth_filter).to eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
     end
 
     describe "test_ldap_search" do
@@ -33,13 +33,13 @@ describe AccountAuthorizationConfig do
         aac = AccountAuthorizationConfig.new
         aac.auth_type = 'ldap'
         aac.ldap_filter = 'bob'
-        aac.test_ldap_search.should be_false
-        aac.errors.full_messages.join.should match /Invalid filter syntax/
+        expect(aac.test_ldap_search).to be_falsey
+        expect(aac.errors.full_messages.join).to match /Invalid filter syntax/
 
         aac.errors.clear
         aac.ldap_filter = '(sAMAccountName={{login}})'
-        aac.test_ldap_search.should be_false
-        aac.errors.full_messages.join.should_not match /Invalid filter syntax/
+        expect(aac.test_ldap_search).to be_falsey
+        expect(aac.errors.full_messages.join).not_to match /Invalid filter syntax/
       end
     end
   end
@@ -58,12 +58,12 @@ describe AccountAuthorizationConfig do
     @account = Account.new
     config = @account.account_authorization_configs.build
     config.change_password_url = ""
-    config.change_password_url.should be_nil
+    expect(config.change_password_url).to be_nil
   end
 
   context "SAML settings" do
     before(:each) do
-      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+      skip("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
       @account = Account.create!(:name => "account")
       @file_that_exists = File.expand_path(__FILE__)
     end
@@ -79,7 +79,7 @@ describe AccountAuthorizationConfig do
 
       s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
 
-      s.encryption_configured?.should be_true
+      expect(s.encryption_configured?).to be_truthy
     end
 
     it "should load the tech contact settings" do
@@ -90,8 +90,8 @@ describe AccountAuthorizationConfig do
 
       s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
 
-      s.tech_contact_name.should == 'Admin Dude'
-      s.tech_contact_email.should == 'admindude@example.com'
+      expect(s.tech_contact_name).to eq 'Admin Dude'
+      expect(s.tech_contact_email).to eq 'admindude@example.com'
     end
 
     it "should allow additional private keys to be set" do
@@ -108,7 +108,7 @@ describe AccountAuthorizationConfig do
 
       s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
 
-      s.xmlsec_additional_privatekeys.should == [@file_that_exists]
+      expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
     end
 
     it "should allow some additional private keys to be set when not all exist" do
@@ -127,48 +127,48 @@ describe AccountAuthorizationConfig do
 
       s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
 
-      s.xmlsec_additional_privatekeys.should == [@file_that_exists]
+      expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
     end
 
     it "should set the entity_id with the current domain" do
       HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
-      @aac.entity_id.should == "http://bob.cody.instructure.com/saml2"
+      expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     end
 
     it "should not overwrite a specific entity_id" do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :entity_id => "http://wtb.instructure.com/saml2")
-      @aac.entity_id.should == "http://wtb.instructure.com/saml2"
+      expect(@aac.entity_id).to eq "http://wtb.instructure.com/saml2"
     end
 
     it "should set requested_authn_context to nil if empty string" do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "")
-      @aac.requested_authn_context.should == nil
+      expect(@aac.requested_authn_context).to eq nil
     end
 
     it "should allow requested_authn_context to be set to anything" do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "anything")
-      @aac.requested_authn_context.should == "anything"
+      expect(@aac.requested_authn_context).to eq "anything"
     end
   end
 
   describe '.resolve_saml_key_path' do
     it "returns nil for nil" do
-      AccountAuthorizationConfig.resolve_saml_key_path(nil).should be_nil
+      expect(AccountAuthorizationConfig.resolve_saml_key_path(nil)).to be_nil
     end
 
     it "returns nil for nonexistent paths" do
-      AccountAuthorizationConfig.resolve_saml_key_path('/tmp/does_not_exist').should be_nil
+      expect(AccountAuthorizationConfig.resolve_saml_key_path('/tmp/does_not_exist')).to be_nil
     end
 
     it "returns abolute paths unmodified when the file exists" do
       Tempfile.open('samlkey') do |samlkey|
-        AccountAuthorizationConfig.resolve_saml_key_path(samlkey.path).should == samlkey.path
+        expect(AccountAuthorizationConfig.resolve_saml_key_path(samlkey.path)).to eq samlkey.path
       end
     end
 
     it "interprets relative paths from the config dir" do
-      AccountAuthorizationConfig.resolve_saml_key_path('initializers').should == Rails.root.join('config', 'initializers').to_s
+      expect(AccountAuthorizationConfig.resolve_saml_key_path('initializers')).to eq Rails.root.join('config', 'initializers').to_s
     end
   end
 
@@ -176,30 +176,30 @@ describe AccountAuthorizationConfig do
     it "should decrypt the password to the original value" do
       c = AccountAuthorizationConfig.new
       c.auth_password = "asdf"
-      c.auth_decrypted_password.should eql("asdf")
+      expect(c.auth_decrypted_password).to eql("asdf")
       c.auth_password = "2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3"
-      c.auth_decrypted_password.should eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
+      expect(c.auth_decrypted_password).to eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
     end
   end
 
   it "should enable canvas auth when destroyed" do
     Account.default.settings[:canvas_authentication] = false
     Account.default.save!
-    Account.default.canvas_authentication?.should be_true
+    expect(Account.default.canvas_authentication?).to be_truthy
     aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
-    Account.default.canvas_authentication?.should be_false
+    expect(Account.default.canvas_authentication?).to be_falsey
     aac.destroy
-    Account.default.reload.canvas_authentication?.should be_true
-    Account.default.settings[:canvas_authentication].should_not be_false
+    expect(Account.default.reload.canvas_authentication?).to be_truthy
+    expect(Account.default.settings[:canvas_authentication]).not_to be_falsey
     Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
     # still true
-    Account.default.reload.canvas_authentication?.should be_true
+    expect(Account.default.reload.canvas_authentication?).to be_truthy
   end
 
   it "should disable open registration when created" do
     Account.default.settings[:open_registration] = true
     Account.default.save!
     Account.default.account_authorization_configs.create!(:auth_type => 'cas')
-    Account.default.reload.open_registration?.should be_false
+    expect(Account.default.reload.open_registration?).to be_falsey
   end
 end

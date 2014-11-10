@@ -66,9 +66,9 @@ describe CustomGradebookColumnDataApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
         course_id: @course.to_param, id: @col.to_param, action: "index",
         controller: "custom_gradebook_column_data_api", format: "json"
-      response.should be_success
+      expect(response).to be_success
       d = @col.custom_gradebook_column_data.where(user_id: @student2.id).first
-      json.should == [custom_gradebook_column_datum_json(d, @user, session)]
+      expect(json).to eq [custom_gradebook_column_datum_json(d, @user, session)]
     end
 
     it 'returns the column data' do
@@ -76,8 +76,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
         course_id: @course.to_param, id: @col.to_param, action: "index",
         controller: "custom_gradebook_column_data_api", format: "json"
-      response.should be_success
-      json.should =~ @col.custom_gradebook_column_data.map { |d|
+      expect(response).to be_success
+      expect(json).to match_array @col.custom_gradebook_column_data.map { |d|
         custom_gradebook_column_datum_json(d, @user, session)
       }
     end
@@ -88,8 +88,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
         course_id: @course.to_param, id: @col.to_param, per_page: "1",
         action: "index", controller: "custom_gradebook_column_data_api",
         format: "json"
-      response.should be_success
-      json.size.should == 1
+      expect(response).to be_success
+      expect(json.size).to eq 1
     end
   end
 
@@ -119,7 +119,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @ta
 
       update(@student2, "asdf")
-      response.should be_success
+      expect(response).to be_success
 
       raw_api_call :put,
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data/#{@student1.id}",
@@ -134,10 +134,10 @@ describe CustomGradebookColumnDataApiController, type: :request do
       json = nil
 
       check = lambda { |content|
-        response.should be_success
-        json["content"].should == content
-        @col.custom_gradebook_column_data.where(user_id: @student1.id)
-        .first.reload.content.should == content
+        expect(response).to be_success
+        expect(json["content"]).to eq content
+        expect(@col.custom_gradebook_column_data.where(user_id: @student1.id)
+        .first.reload.content).to eq content
       }
 
       # create

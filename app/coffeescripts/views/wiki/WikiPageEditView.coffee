@@ -139,11 +139,9 @@ define [
       errors
 
     hasUnsavedChanges: ->
-      json = @toJSON()
-      dirty = @$wikiPageBody.editorBox('is_dirty')
-      if json.CAN.EDIT_TITLE
-        dirty ||= (@model.get('title') ? '') != (@getFormData().title ? '')
-
+      dirty = @$wikiPageBody.editorBox('exists?') && @$wikiPageBody.editorBox('is_dirty')
+      if not dirty and @toJSON().CAN.EDIT_TITLE
+        dirty = (@model.get('title') || '') isnt (@getFormData().title || '')
       dirty
 
     unsavedWarning: ->

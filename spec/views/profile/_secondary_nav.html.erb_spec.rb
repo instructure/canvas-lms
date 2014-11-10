@@ -25,7 +25,7 @@ describe "/profile/_secondary_nav" do
     view_context
 
     render :partial => "profile/secondary_nav"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

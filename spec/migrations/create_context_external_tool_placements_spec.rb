@@ -5,7 +5,7 @@ require 'db/migrate/20140806162559_drop_has_columns_from_context_external_tools.
 describe 'CreateContextExternalToolPlacements' do
   describe "up" do
     it "should populate the context external tool placements table" do
-      pending("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
+      skip("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
       course
 
       migration1 = CreateContextExternalToolPlacements.new
@@ -14,7 +14,7 @@ describe 'CreateContextExternalToolPlacements' do
       tool1 = @course.context_external_tools.new(:name => 'blah', :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       tool1.settings = {:course_navigation => {:url => "http://www.example.com"}}
       tool1.save!
-      tool1.has_placement?(:course_navigation).should == true
+      expect(tool1.has_placement?(:course_navigation)).to eq true
 
       migration2.down
       migration1.down
@@ -22,7 +22,7 @@ describe 'CreateContextExternalToolPlacements' do
       # make sure that the down undoes all the things
       ContextExternalTool.reset_column_information
       tool1_old = ContextExternalTool.find(tool1.id)
-      tool1_old.has_course_navigation.should == true
+      expect(tool1_old.has_course_navigation).to eq true
 
       migration1.up
 
@@ -43,11 +43,11 @@ describe 'CreateContextExternalToolPlacements' do
       migration2.up
       ContextExternalTool.reset_column_information
       tool1.reload
-      tool1.has_placement?(:course_navigation).should == false
-      tool1.has_placement?(:account_navigation).should == true
+      expect(tool1.has_placement?(:course_navigation)).to eq false
+      expect(tool1.has_placement?(:account_navigation)).to eq true
 
       tool2 = @course.context_external_tools.detect{|t| t.id != tool1.id}
-      tool2.has_placement?(:user_navigation).should == true
+      expect(tool2.has_placement?(:user_navigation)).to eq true
     end
   end
 end

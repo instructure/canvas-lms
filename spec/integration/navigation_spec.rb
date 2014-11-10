@@ -39,11 +39,11 @@ describe "navigation" do
     list = page.css(".menu-item-drop-column-list li")
 
     # order of tests assumes alphabetical order of list
-    list[4].text.should match /Summer Term/m # course 3, Summer Term
-    list[3].text.should match /Spring Term/m # course 3, Spring Term
-    list[2].text.should match /Spring Term/ # don't show term cause it doesn't have a name collision
-    list[1].text.should_not match /Term/ # don't show term cause it's the default term
-    list[0].text.should_not match /Term/ # "
+    expect(list[4].text).to match /Summer Term/m # course 3, Summer Term
+    expect(list[3].text).to match /Spring Term/m # course 3, Spring Term
+    expect(list[2].text).to match /Spring Term/ # don't show term cause it doesn't have a name collision
+    expect(list[1].text).not_to match /Term/ # don't show term cause it's the default term
+    expect(list[0].text).not_to match /Term/ # "
   end
 
   it "should not fail on courses where the term no longer exists" do
@@ -56,7 +56,7 @@ describe "navigation" do
     course_with_teacher :course_name => "Course of doom", :user => @user, :active_all => true
     get '/'
     page = Nokogiri::HTML(response.body)
-    page.css('.customListOpen').should_not be_empty
+    expect(page.css('.customListOpen')).not_to be_empty
   end
 
 end

@@ -16,6 +16,7 @@ define [
     @optionProperty 'onlyShowFolders'
     @optionProperty 'rootFoldersToShow'
     @optionProperty 'onClick'
+    @optionProperty 'dndOptions'
     @optionProperty 'href'
 
     # Handle keyboard events for accessibility.
@@ -78,6 +79,7 @@ define [
           model: folder,
           onlyShowFolders: @onlyShowFolders
           onClick: @onClick
+          dndOptions: @dndOptions
           href: @href
         }).$el.appendTo(@$folderTree)
       super

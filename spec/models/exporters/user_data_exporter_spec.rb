@@ -16,22 +16,22 @@ describe "User data exports" do
     sub3 = assignment.submit_homework(@student, :url => "http://reddit.com/r/mylittlepony", :submission_type => "online_url")
 
     exported_attachment = Exporters::UserDataExporter.create_user_data_export(@student)
-    exported_attachment.context.should == @student
-    exported_attachment.folder.name.should == "data exports"
-    exported_attachment.display_name.end_with?("data export.zip").should be_true
+    expect(exported_attachment.context).to eq @student
+    expect(exported_attachment.folder.name).to eq "data exports"
+    expect(exported_attachment.display_name.end_with?("data export.zip")).to be_truthy
 
     zipfile = Zip::File.open(exported_attachment.open)
-    zipfile.entries.count.should == 3
+    expect(zipfile.entries.count).to eq 3
     zipfile.entries.each do |entry|
-      entry.to_s.start_with?("#{exported_attachment.display_name[0..-5]}/#{@course.name}/#{assignment.name}/").should be_true
+      expect(entry.to_s.start_with?("#{exported_attachment.display_name[0..-5]}/#{@course.name}/#{assignment.name}/")).to be_truthy
     end
 
     urlfile = zipfile.entries.detect{|e| e.to_s.include?("submission_link")}
-    zipfile.read(urlfile).include?("<a href=\"#{sub3.url}\">#{sub3.url}</a>").should be_true
+    expect(zipfile.read(urlfile).include?("<a href=\"#{sub3.url}\">#{sub3.url}</a>")).to be_truthy
 
     textfile = zipfile.entries.detect{|e| e.to_s.include?("submission_text")}
-    zipfile.read(textfile).include?(sub2.body).should be_true
+    expect(zipfile.read(textfile).include?(sub2.body)).to be_truthy
 
-    zipfile.entries.any?{|e| e.to_s.end_with?(file.filename)}.should be_true
+    expect(zipfile.entries.any?{|e| e.to_s.end_with?(file.filename)}).to be_truthy
   end
 end

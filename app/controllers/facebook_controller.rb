@@ -130,7 +130,7 @@ class FacebookController < ApplicationController
     elsif session[:facebook_user_id]
       @facebook_user_id = session[:facebook_user_id]
       Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do
-        @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+        @service = UserService.where(service: 'facebook', service_user_id: @facebook_user_id).first
         break if @service
       end
       @user = @service && @service.user
@@ -139,7 +139,7 @@ class FacebookController < ApplicationController
       if @current_user
         @user = @current_user
         session[:facebook_canvas_user_id] = @user.id
-        @service = @user.user_services.find_by_service('facebook')
+        @service = @user.user_services.where(service: 'facebook').first
       end
     end
   end

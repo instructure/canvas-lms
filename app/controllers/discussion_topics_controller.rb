@@ -250,8 +250,6 @@ class DiscussionTopicsController < ApplicationController
     return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
     return child_topic if is_child_topic?
 
-    log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
-
     scope = if params[:only_announcements]
               @context.active_announcements
             else
@@ -278,9 +276,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
-        scope.visible_to_students_with_da_enabled(user_ids)
-      end
+      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
@@ -293,6 +289,8 @@ class DiscussionTopicsController < ApplicationController
 
     respond_to do |format|
       format.html do
+        log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
+
         @active_tab = 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),
                   named_context_url(@context, :context_discussion_topics_url))
@@ -479,6 +477,7 @@ class DiscussionTopicsController < ApplicationController
             }
             if @sequence_asset
               env_hash[:SEQUENCE] = {
+                :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
                 :ASSET_ID => @sequence_asset.id,
                 :COURSE_ID => @sequence_asset.context.id,
               }

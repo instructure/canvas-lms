@@ -16,7 +16,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
-    module_item.should include_text(item_name)
+    expect(module_item).to include_text(item_name)
     module_item
   end
 
@@ -28,7 +28,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     keep_trying_until do
       driver.execute_script("$('.context-modules-main-toolbar .btn-primary').trigger('click')")
       wait_for_ajaximations
-      f('.ui-dialog').should be_displayed
+      expect(f('.ui-dialog')).to be_displayed
     end
 
     add_form = f('#add_context_module_form')
@@ -40,8 +40,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     replace_content(add_form.find_element(:id, 'context_module_name'), module_name)
     submit_form(add_form)
     wait_for_ajaximations
-    add_form.should_not be_displayed
-    f('#context_modules').should include_text(module_name)
+    expect(add_form).not_to be_displayed
+    expect(f('#context_modules')).to include_text(module_name)
   end
 
   def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
@@ -52,7 +52,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     select_module_item(item_select_selector + ' .module_item_select', new_item_text)
     item_title = keep_trying_until do
       item_title = fj('.item_title:visible')
-      item_title.should be_displayed
+      expect(item_title).to be_displayed
       item_title
     end
     replace_content(item_title, item_title_text)
@@ -61,7 +61,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
-    module_item.should include_text(item_title_text)
+    expect(module_item).to include_text(item_title_text)
   end
 
   def add_new_external_item(module_name, url_text, page_name_text)
@@ -82,7 +82,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
-    module_item.should include_text(page_name_text)
+    expect(module_item).to include_text(page_name_text)
   end
 
   def course_module

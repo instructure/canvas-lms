@@ -27,16 +27,16 @@ describe ZipFileImport do
     zf.attachment.update_attributes(:context => zf)
     zf.save!
     zf.process
-    zf.reload.progress.should be_nil
-    zf.state.should == :created
+    expect(zf.reload.progress).to be_nil
+    expect(zf.state).to eq :created
     run_jobs
-    zf.reload.state.should == :imported
-    zf.progress.should == 1.0
-    folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
-    folder.sub_folders.active.count.should == 1
+    expect(zf.reload.state).to eq :imported
+    expect(zf.progress).to eq 1.0
+    expect(folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
+    expect(folder.sub_folders.active.count).to eq 1
     sub = folder.sub_folders.active.first
-    sub.name.should == "adir"
-    sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    expect(sub.name).to eq "adir"
+    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 end
 

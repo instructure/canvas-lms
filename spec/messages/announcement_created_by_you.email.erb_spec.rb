@@ -24,8 +24,8 @@ describe 'announcement_created_by_you.email' do
     announcement_model
     @object = @a
     @message = generate_message(:announcement_created_by_you, :email, @object)
-    @message.subject.should == "value for title: value for name"
-    @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
-    @message.body.should match(/\/courses\/\d+\/announcements\/\d+/)
+    expect(@message.subject).to eq "value for title: value for name"
+    expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+    expect(@message.body).to match(/\/courses\/\d+\/announcements\/\d+/)
   end
 end

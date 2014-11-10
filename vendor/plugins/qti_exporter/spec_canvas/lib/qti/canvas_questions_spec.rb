@@ -7,93 +7,93 @@ describe "Converting Canvas QTI" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::MULTIPLE_CHOICE
+    expect(hash).to eq CanvasExpected::MULTIPLE_CHOICE
   end
   
   it "should convert true false" do
     manifest_node=get_manifest_node('true_false')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::TRUE_FALSE
+    expect(hash).to eq CanvasExpected::TRUE_FALSE
   end
   
   it "should convert multiple answers" do
     manifest_node=get_manifest_node('multiple_answers')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::MULTIPLE_ANSWERS
+    expect(hash).to eq CanvasExpected::MULTIPLE_ANSWERS
   end
   
   it "should convert essays" do
     manifest_node=get_manifest_node('essay')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
-    hash.should == CanvasExpected::ESSAY
+    expect(hash).to eq CanvasExpected::ESSAY
   end
   
   it "should convert short answer" do
     manifest_node=get_manifest_node('short_answer')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::SHORT_ANSWER
+    expect(hash).to eq CanvasExpected::SHORT_ANSWER
   end
   
   it "should convert text only questions" do
     manifest_node=get_manifest_node('text_only')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
-    hash.should == CanvasExpected::TEXT_ONLY
+    expect(hash).to eq CanvasExpected::TEXT_ONLY
   end
   
   it "should convert fill in multiple blanks questions" do
     manifest_node=get_manifest_node('fimb', :question_type=>'fill_in_multiple_blanks_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::FIMB
+    expect(hash).to eq CanvasExpected::FIMB
   end
   
   it "should convert fill in multiple drop downs questions" do
     manifest_node=get_manifest_node('multiple_dropdowns', :question_type=>'multiple_dropdowns_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::MULTIPLE_DROP_DOWNS
+    expect(hash).to eq CanvasExpected::MULTIPLE_DROP_DOWNS
   end
   
   it "should convert matching questions" do
     manifest_node=get_manifest_node('matching', :question_type=>'matching_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::MATCHING
+    expect(hash).to eq CanvasExpected::MATCHING
   end
   
   it "should convert calculated questions (simple)" do
     manifest_node=get_manifest_node('calculated_simple', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::CALCULATED_SIMPLE
+    expect(hash).to eq CanvasExpected::CALCULATED_SIMPLE
   end
 
   it "should convert calculated questions missing formulas (e.g., imported from blackboard)" do
     manifest_node=get_manifest_node('calculated_without_formula', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::CALCULATED_WITHOUT_FORMULA
+    expect(hash).to eq CanvasExpected::CALCULATED_WITHOUT_FORMULA
   end
   
   it "should convert calculated questions (complex)" do
     manifest_node=get_manifest_node('calculated', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::CALCULATED_COMPLEX
+    expect(hash).to eq CanvasExpected::CALCULATED_COMPLEX
   end
   
   it "should convert numerical questions" do
     manifest_node=get_manifest_node('numerical', :question_type=>'numerical_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == CanvasExpected::NUMERICAL
+    expect(hash).to eq CanvasExpected::NUMERICAL
   end
 
   it "should get html properties" do
-    get_question_hash(CANVAS_FIXTURE_DIR, 'multiple_choice_html').should == {:neutral_comments => "meh",
+    expect(get_question_hash(CANVAS_FIXTURE_DIR, 'multiple_choice_html')).to eq({:neutral_comments => "meh",
                                                                              :migration_id => "ie690f9d83784275a4d26a26daee5ebca",
                                                                              :correct_comments_html => "<strong>correct</strong>",
                                                                              :answers =>
@@ -118,11 +118,11 @@ describe "Converting Canvas QTI" do
                                                                              :points_possible => 10,
                                                                              :correct_comments => "correct",
                                                                              :question_text => "<div><p><strong>html for fun</strong></p></div>",
-                                                                             :question_bank_id => "i35b5819e71e59e50208a2071da15dee5"}
+                                                                             :question_bank_id => "i35b5819e71e59e50208a2071da15dee5"})
   end
 
   it "should convert links to external banks" do
-    get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions].should == [{:pick_count => 3,
+    expect(get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions]).to eq [{:pick_count => 3,
                                                                                   :questions => [],
                                                                                   :question_points => 5,
                                                                                   :question_type => "question_group",
@@ -142,15 +142,15 @@ describe "Converting Canvas QTI" do
 
   it "should leave text answers as text" do
     hash = get_quiz_data(CANVAS_FIXTURE_DIR, 'mc_text_answers').first.first
-    hash[:answers][0][:text].should == '<br />'
-    hash[:answers][0][:html].should be_nil
-    hash[:answers][1][:text].should == '<hr />'
-    hash[:answers][1][:html].should be_nil
-    hash[:answers][2][:text].should == '<pre>'
-    hash[:answers][2][:html].should be_nil
-    hash[:answers][3][:text].should == '<n />'
-    hash[:answers][3][:html].should be_nil
-    hash[:question_text].should == "<div><p>This tag is an inline element that will restart text that follows it onto next line.</p></div>"
+    expect(hash[:answers][0][:text]).to eq '<br />'
+    expect(hash[:answers][0][:html]).to be_nil
+    expect(hash[:answers][1][:text]).to eq '<hr />'
+    expect(hash[:answers][1][:html]).to be_nil
+    expect(hash[:answers][2][:text]).to eq '<pre>'
+    expect(hash[:answers][2][:html]).to be_nil
+    expect(hash[:answers][3][:text]).to eq '<n />'
+    expect(hash[:answers][3][:html]).to be_nil
+    expect(hash[:question_text]).to eq "<div><p>This tag is an inline element that will restart text that follows it onto next line.</p></div>"
   end
 
 end

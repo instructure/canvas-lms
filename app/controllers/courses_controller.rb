@@ -238,6 +238,10 @@ require 'set'
 #         "restrict_enrollments_to_course_dates": {
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "course_format": {
+#           "example": "online",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -480,6 +484,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
+  # @argument course[course_format] [String]
+  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
   # @returns Course
   def create
@@ -1205,15 +1212,15 @@ class CoursesController < ApplicationController
         locks = {}
         types.each do |type, ids|
           if type == 'assignment'
-            @context.assignments.active.find_all_by_id(ids).compact.each do |assignment|
+            @context.assignments.active.where(id: ids).each do |assignment|
               locks[assignment.asset_string] = assignment.locked_for?(@current_user)
             end
           elsif type == 'quiz'
-            @context.quizzes.active.include_assignment.find_all_by_id(ids).compact.each do |quiz|
+            @context.quizzes.active.include_assignment.where(id: ids).each do |quiz|
               locks[quiz.asset_string] = quiz.locked_for?(@current_user)
             end
           elsif type == 'discussion_topic'
-            @context.discussion_topics.active.find_all_by_id(ids).compact.each do |topic|
+            @context.discussion_topics.active.where(id: ids).each do |topic|
               locks[topic.asset_string] = topic.locked_for?(@current_user)
             end
           end
@@ -1351,6 +1358,8 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
+      log_asset_access("home:#{@context.asset_string}", "home", "other")
+
       check_incomplete_registration
 
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
@@ -1522,7 +1531,7 @@ class CoursesController < ApplicationController
                           :search_method => @context.user_list_search_mode_for(@current_user),
                           :initial_type => params[:enrollment_type])
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
-        Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
+        ActiveRecord::Associations::Preloader.new(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}]).run
         json = @enrollments.map { |e|
           { 'enrollment' =>
             { 'associated_user_id' => e.associated_user_id,
@@ -1738,6 +1747,8 @@ class CoursesController < ApplicationController
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
+  # @argument course[course_format] [String]
+  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \

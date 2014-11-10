@@ -9,7 +9,7 @@ describe "auth" do
       get "/logout"
 
       expect_new_page_load { f('#modal-box form input[type=submit]').submit() }
-      driver.current_url.should match %r{/login}
+      expect(driver.current_url).to match %r{/login}
     end
   end
 end

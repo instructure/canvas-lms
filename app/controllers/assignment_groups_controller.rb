@@ -113,12 +113,18 @@ class AssignmentGroupsController < ApplicationController
 
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
 
+        da_enabled = @context.feature_enabled?(:differentiated_assignments)
+        include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+        if include_visibility && da_enabled
+          assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: all_visible_assignments.map(&:id))
+        end
+
         # because of a bug with including content_tags, we are preloading here rather than in
         # visible_assignments with multiple associations referencing content_tags table and therefore
         # aliased table names the conditons on has_many :context_module_tags will break
         if params[:include].include? "module_ids"
           module_includes = [:context_module_tags,{:discussion_topic => :context_module_tags},{:quiz => :context_module_tags}]
-          Assignment.send(:preload_associations, all_visible_assignments, module_includes)
+          ActiveRecord::Associations::Preloader.new(all_visible_assignments, module_includes).run
         end
 
         assignment_descriptions = all_visible_assignments.map(&:description)
@@ -147,7 +153,9 @@ class AssignmentGroupsController < ApplicationController
                                   stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
                                   preloaded_user_content_attachments: user_content_attachments,
-                                  assignments: assignments_by_group[g.id]
+                                  assignments: assignments_by_group[g.id],
+                                  assignment_visibilities: assignment_visibilities,
+                                  differentiated_assignments_enabled: da_enabled
                                   )
           }
           render :json => json
@@ -169,7 +177,7 @@ class AssignmentGroupsController < ApplicationController
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
-      group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.find_all_by_id(order).map(&:assignment_group_id))).uniq.compact
+      group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
       Assignment.where(:id => order, :context_id => @context, :context_type => @context.class.to_s).update_all(:assignment_group_id => @group)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       AssignmentGroup.where(:id => group_ids).update_all(:updated_at => Time.now.utc)

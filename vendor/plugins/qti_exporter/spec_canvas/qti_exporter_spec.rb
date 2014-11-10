@@ -14,34 +14,34 @@ describe Qti::Converter do
     setup_migration
     do_migration
 
-    @course.attachments.count.should == 2
-    @course.attachments.map(&:filename).sort.should == ['header-logo.png', 'smiley.jpg']
+    expect(@course.attachments.count).to eq 2
+    expect(@course.attachments.map(&:filename).sort).to eq ['header-logo.png', 'smiley.jpg']
     attachment = @course.attachments.detect { |a| a.filename == 'header-logo.png' }
     quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.quiz_questions.count.should == 2
+    expect(quiz).to be_present
+    expect(quiz.quiz_questions.count).to eq 2
     quiz.quiz_questions.each do |q|
       text = Nokogiri::HTML::DocumentFragment.parse(q.question_data['question_text'])
-      text.css('img').first['src'].should == "/courses/#{@course.id}/files/#{attachment.id}/preview"
+      expect(text.css('img').first['src']).to eq "/courses/#{@course.id}/files/#{attachment.id}/preview"
 
       # verify that the associated assessment_question got links translated
       aq = q.assessment_question
       text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['question_text'])
-      text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+      expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
 
       if aq.question_data['answers'][1]["comments_html"] =~ /\<img/
         text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['answers'][1]["comments_html"])
-        text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+        expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
       end
     end
-    quiz.assignment.should be_nil
+    expect(quiz.assignment).to be_nil
   end
 
   it "should bring in canvas meta data" do
     setup_migration(File.expand_path("../fixtures/qti/canvas_qti.zip", __FILE__))
     do_migration
-    @course.quizzes.count.should == 1
-    @course.quizzes.first.description.should == "<p>Quiz Description</p>"
+    expect(@course.quizzes.count).to eq 1
+    expect(@course.quizzes.first.description).to eq "<p>Quiz Description</p>"
   end
 
   describe "applying respondus settings" do
@@ -67,10 +67,10 @@ describe Qti::Converter do
       do_migration
 
       quiz = @course.quizzes.last
-      quiz.should be_present
-      quiz.assignment.should_not be_nil
-      quiz.assignment.title.should == quiz.title
-      quiz.assignment.should be_published
+      expect(quiz).to be_present
+      expect(quiz.assignment).not_to be_nil
+      expect(quiz.assignment.title).to eq quiz.title
+      expect(quiz.assignment).to be_published
     end
 
     it "should re-use the same assignment on update" do
@@ -81,20 +81,20 @@ describe Qti::Converter do
       @migration.save!
       do_migration
 
-      @course.quizzes.size.should == 1
-      @course.assignments.size.should == 1
+      expect(@course.quizzes.size).to eq 1
+      expect(@course.assignments.size).to eq 1
       quiz = @course.quizzes.last
-      quiz.should be_present
-      quiz.assignment.should_not be_nil
-      quiz.assignment.title.should == quiz.title
-      quiz.assignment.should be_published
+      expect(quiz).to be_present
+      expect(quiz.assignment).not_to be_nil
+      expect(quiz.assignment.title).to eq quiz.title
+      expect(quiz.assignment).to be_published
     end
 
     it "should correctly set the assignment submission_type" do
       do_migration
       assign = @course.assignments.last
-      assign.submission_types.should == 'online_quiz'
-      assign.quiz.for_assignment?.should be_true
+      expect(assign.submission_types).to eq 'online_quiz'
+      expect(assign.quiz.for_assignment?).to be_truthy
     end
   end
 
@@ -103,20 +103,20 @@ describe Qti::Converter do
     do_migration
 
     quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.quiz_questions.size.should == 2
+    expect(quiz).to be_present
+    expect(quiz.quiz_questions.size).to eq 2
     # various checks on the data
     qq = quiz.quiz_questions.first
     d = qq.question_data
-    d['correct_comments'].should == "I can't believe you got that right. Awesome!"
-    d['correct_comments_html'].should == "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
-    d['incorrect_comments_html'].should == "<b>Wrong. </b>That's a bummer."
-    d['points_possible'].should == 3
-    d['question_name'].should == 'q1'
-    d['answers'].map { |a| a['weight'] }.should == [0,100,0]
-    d['answers'].map { |a| a['comments'] }.should == ['nope', 'yes!', nil]
+    expect(d['correct_comments']).to eq "I can't believe you got that right. Awesome!"
+    expect(d['correct_comments_html']).to eq "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
+    expect(d['incorrect_comments_html']).to eq "<b>Wrong. </b>That's a bummer."
+    expect(d['points_possible']).to eq 3
+    expect(d['question_name']).to eq 'q1'
+    expect(d['answers'].map { |a| a['weight'] }).to eq [0,100,0]
+    expect(d['answers'].map { |a| a['comments'] }).to eq ['nope', 'yes!', nil]
     attachment = @course.attachments.detect { |a| a.filename == 'smiley.jpg' }
-    d['answers'].map { |a| a['comments_html'] }.should == [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
+    expect(d['answers'].map { |a| a['comments_html'] }).to eq [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
   end
 
   it "should import respondus question types" do
@@ -124,9 +124,9 @@ describe Qti::Converter do
     do_migration
 
     quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.should_not be_available
-    quiz.quiz_questions.size.should == 9
+    expect(quiz).to be_present
+    expect(quiz).not_to be_available
+    expect(quiz.quiz_questions.size).to eq 9
     match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import question_bank_migration_id quiz_question_id])
   end
 
@@ -137,8 +137,8 @@ describe Qti::Converter do
     do_migration
 
     quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.should be_available
+    expect(quiz).to be_present
+    expect(quiz).to be_available
   end
 
   it "should be able to import directly into an assessment question bank" do
@@ -148,10 +148,10 @@ describe Qti::Converter do
     @migration.save!
     do_migration
 
-    @course.quizzes.count.should == 0
+    expect(@course.quizzes.count).to eq 0
     qb = @course.assessment_question_banks.last
-    qb.should be_present
-    qb.assessment_questions.size.should == 9
+    expect(qb).to be_present
+    expect(qb.assessment_questions.size).to eq 9
     data = qb.assessment_questions.map(&:question_data).sort_by!{|q| q["migration_id"]}
     match_ignoring(data, RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id missing_links position prepped_for_import question_bank_migration_id quiz_question_id])
   end
@@ -161,17 +161,17 @@ describe Qti::Converter do
     when Hash
       a_ = a.reject { |k,v| ignoring.include?(k) }
       b_ = b.reject { |k,v| ignoring.include?(k) }
-      a_.keys.sort.should == b_.keys.sort
+      expect(a_.keys.sort).to eq b_.keys.sort
       a_.each { |k,v| match_ignoring(v, b[k], ignoring) }
     when Array
-      a.size.should == b.size
+      expect(a.size).to eq b.size
       a.each_with_index do |e,i|
         match_ignoring(e.to_hash, b[i], ignoring)
       end
     when Quizzes::QuizQuestion::QuestionData
-      a.to_hash.should == b
+      expect(a.to_hash).to eq b
     else
-      a.should == b
+      expect(a).to eq b
     end
   end
 
@@ -201,7 +201,7 @@ describe Qti::Converter do
   def do_migration
     Canvas::Migration::Worker::QtiWorker.new(@migration.id).perform
     @migration.reload
-    @migration.should be_imported
+    expect(@migration).to be_imported
   end
 
   RESPONDUS_QUESTIONS =

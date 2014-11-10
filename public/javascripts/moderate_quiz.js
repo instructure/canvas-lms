@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 define([
   'i18n!quizzes.moderate',
   'jquery' /* $ */,
@@ -31,6 +30,7 @@ define([
   'jquery.templateData' /* fillTemplateData */,
   'vendor/date' /* Date.parse */
 ], function(I18n, $, timing) {
+  var DIALOG_WIDTH = 490;
   /**
    * Updates the digit(s) in the "gets X extra minutes" message in a student's
    * block.
@@ -178,10 +178,13 @@ define([
     function checkChange() {
       var cnt = $(".student_check:checked").length;
       $("#checked_count").text(cnt);
-      $(".moderate_multiple_button").showIf(cnt);
+      $(".moderate_multiple_link").showIf(cnt);
     }
     $("#check_all").change(function() {
-      $(".student_check").attr('checked', $(this).attr('checked'));
+      var isChecked = $(this).is(":checked");
+      $(".student_check").each(function(index, elem) {
+        $(elem).prop("checked", isChecked);
+      });
       checkChange();
     });
     $(".student_check").change(function() {
@@ -191,7 +194,8 @@ define([
       checkChange();
     });
 
-    $(".moderate_multiple_button").live('click', function(event) {
+    $(".moderate_multiple_link").live('click', function(event) {
+      event.preventDefault();
       var student_ids = []
       var data = {};
       $(".student_check:checked").each(function() {
@@ -215,7 +219,7 @@ define([
       $("#moderate_student_form").fillFormData(data);
       $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
-        width: 400
+        width: DIALOG_WIDTH
       }).fixDialogButtons();
     });
 
@@ -234,7 +238,7 @@ define([
       $("#moderate_student_dialog h2").text(I18n.t('extensions_for_student', "Extensions for %{student}", {'student': name}));
       $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
-        width: 400
+        width: DIALOG_WIDTH
       }).fixDialogButtons();
     });
     $(".reload_link").click(function(event) {
@@ -354,7 +358,7 @@ define([
       $dialog.find("button").attr('disabled', false);
       $dialog.dialog({
         title: I18n.t('titles.extend_quiz_time', "Extend Quiz Time"),
-        width: 400
+        width: DIALOG_WIDTH
       }).fixDialogButtons();
     });
     $("#extend_time_dialog").find(".cancel_button").click(function() {
@@ -380,5 +384,106 @@ define([
         $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.time_extension_failed', "Extend Time Failed, please try again"));
       });
     });
+
+    var outstanding = {
+      init: function(event) {
+        event.preventDefault();
+        this.$container = $(".child_container")
+
+        this.showDialog();
+        this.showResultsList(this.data);
+      },
+      fetchData: function () {
+        var indexUrl = $(".outstanding_index_url").attr('href');
+        $.ajaxJSON(indexUrl, "GET", null, this.storeDataAndShowAlert.bind(this));
+      },
+      storeDataAndShowAlert: function(data) {
+        if (data.quiz_submissions.length > 0) {
+          this.toggleAlertHeader();
+          this.data = data;
+        }
+      },
+      toggleAlertHeader: function() {
+        $(".alert").toggle();
+      },
+      showResultsList: function(data) {
+        this.adjustDialogHeight(data);
+        $("#autosubmit_content_description_things_to_do").show();
+
+        this.buildResultList(data);
+        $("#autosubmit_form_submit_btn").prop('disabled', false);
+      },
+      adjustDialogHeight: function(data) {
+        var height = 80;
+        height = height + (data['quiz_submissions'].length * 29);
+        if (height > 270) {
+          height = 270;
+        }
+        this.dialog.animate({height: height + 'px'});
+      },
+      buildResultList: function(data) {
+        $.each(data["quiz_submissions"], function (index, qs) {
+          clone = $(".example_autosubmit_row").clone()
+            .removeClass("example_autosubmit_row")
+            .appendTo(".outstanding_submissions_list").show();
+          clone.children("input").val(qs.id);
+          clone.find("input").prop("checked", true)
+            .attr('id', "id_" + index);
+          clone.children("label").attr("for", 'id_'+index)
+            .text(data["users"][index].sortable_name);
+          clone.show();
+        });
+      },
+      submitOutstandings: function () {
+        var gradeUrl = $(".outstanding_grade_url").attr('href');
+        var ids = this.$container.find("input:checked").map(function extractQSIds () {
+          return this.value;
+        }).get()
+        var json = {'quiz_submission_ids': ids };
+        $.ajaxJSON(gradeUrl, "POST", json, function successReporting(data,xhr) {
+          if (xhr.status === 204) {
+            if (ids.length == this.data["users"].length) {
+              this.toggleAlertHeader();
+            }
+            $.flashMessage("Successfully graded outstanding quizzes")
+            this.closeDialog();
+            updateSubmissions();
+          }
+        }.bind(this));
+      },
+      cleanUpEventListeners: function () {
+        $('#autosubmit_form_cancel_btn').off();
+        $('#autosubmit_form_submit_btn').off();
+      },
+      closeDialog: function() {
+        $("#autosubmit_content_description_things_to_do").hide();
+        $("#autosubmit_content_description_all_done").hide();
+        $(".autosubmit_data_row").not(".example_autosubmit_row").remove();
+        this.cleanUpEventListeners();
+        this.dialog.dialog('close');
+      },
+      setFocusOnLoad: function(event, ui) {
+        $("#autosubmit_form").focus();
+      },
+      showDialog: function() {
+        this.dialog = $("#autosubmit_form").dialog({
+          title: I18n.t('titles.autosubmit_dialog', "Outstanding Quiz Submissions"),
+          modal: true,
+          width: DIALOG_WIDTH,
+          height: 200,
+          close: this.closeDialog.bind(this)
+        }).dialog('open').fixDialogButtons();
+
+        // Set up button behaviors
+        $('#autosubmit_form_cancel_btn').on('click keyclick', function() {
+          this.closeDialog();
+        }.bind(this));
+        $("#autosubmit_form_submit_btn").on("click keyclick", this.submitOutstandings.bind(this));
+
+        this.setFocusOnLoad();
+      }
+    };
+    outstanding.fetchData();
+    $("#check_outstanding").click(outstanding.init.bind(outstanding));
   });
 });

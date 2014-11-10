@@ -33,7 +33,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     end
 
     def test_builder(enrollment, res)
-      Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map{|d|d.map(&:to_i)}.should == res.map{|d|d.map(&:to_i)}
+      expect(Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map{|d|d.map(&:to_i)}).to eq res.map{|d|d.map(&:to_i)}
     end
 
     context "has enrollment dates from enrollment" do
@@ -140,14 +140,14 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       course_with_teacher(:active_all => true)
       @enrollment.reload
       loaded_course = @enrollment.association(:course).loaded?
-      loaded_course.should be_false
+      expect(loaded_course).to be_falsey
       Canvas::Builders::EnrollmentDateBuilder.preload([@enrollment])
       loaded_course = @enrollment.association(:course).loaded?
       loaded_course_section = @enrollment.association(:course_section).loaded?
       loaded_enrollment_term = @enrollment.course.association(:enrollment_term).loaded?
-      loaded_course.should be_true
-      loaded_course_section.should be_true
-      loaded_enrollment_term.should be_true
+      expect(loaded_course).to be_truthy
+      expect(loaded_course_section).to be_truthy
+      expect(loaded_enrollment_term).to be_truthy
 
       # should already be cached on the object
       Rails.cache.expects(:fetch).never
@@ -166,10 +166,10 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         loaded_course = @enrollment.association(:course).loaded?
         loaded_course_section = @enrollment.association(:course_section).loaded?
         loaded_enrollment_term = @enrollment.course.association(:enrollment_term).loaded?
-        loaded_course.should be_true
+        expect(loaded_course).to be_truthy
         # it shouldn't have had to load these associations
-        loaded_course_section.should be_false
-        loaded_enrollment_term.should be_false
+        expect(loaded_course_section).to be_falsey
+        expect(loaded_enrollment_term).to be_falsey
         # should already be cached on the object
 
         Rails.cache.expects(:fetch).never

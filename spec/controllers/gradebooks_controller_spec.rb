@@ -33,7 +33,7 @@ describe GradebooksController do
   end
 
   it "should use GradebooksController" do
-    controller.should be_an_instance_of(GradebooksController)
+    expect(controller).to be_an_instance_of(GradebooksController)
   end
 
   describe "GET 'index'" do
@@ -46,20 +46,20 @@ describe GradebooksController do
     it "should redirect teacher to gradebook" do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil
-      response.should redirect_to(:action => 'show')
+      expect(response).to redirect_to(:action => 'show')
     end
 
     it "should render for current user" do
       user_session(@student)
       get 'grade_summary', :course_id => @course.id, :id => nil
-      response.should render_template('grade_summary')
+      expect(response).to render_template('grade_summary')
     end
 
     it "should render with specified user_id" do
       user_session(@student)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should render_template('grade_summary')
-      assigns[:presenter].courses_with_grades.should_not be_nil
+      expect(response).to render_template('grade_summary')
+      expect(assigns[:presenter].courses_with_grades).not_to be_nil
     end
 
     it "should not allow access for wrong user" do
@@ -74,8 +74,8 @@ describe GradebooksController do
     it "should allow access for a linked observer" do
       user_session(@observer)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should render_template('grade_summary')
-      assigns[:courses_with_grades].should be_nil
+      expect(response).to render_template('grade_summary')
+      expect(assigns[:courses_with_grades]).to be_nil
     end
 
     it "should not allow access for a linked student" do
@@ -104,16 +104,16 @@ describe GradebooksController do
       user_session(@teacher)
       @teacher_enrollment.conclude
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should be_success
-      response.should render_template('grade_summary')
-      assigns[:courses_with_grades].should be_nil
+      expect(response).to be_success
+      expect(response).to render_template('grade_summary')
+      expect(assigns[:courses_with_grades]).to be_nil
     end
 
     it "should allow concluded students to see their grades pages" do
       user_session(@student)
       @student_enrollment.conclude
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should render_template('grade_summary')
+      expect(response).to render_template('grade_summary')
     end
 
     it "give a student the option to switch between courses" do
@@ -124,9 +124,9 @@ describe GradebooksController do
       student_in_course :user => @student, :active_all => 1
       user_session(@student)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should be_success
-      assigns[:presenter].courses_with_grades.should_not be_nil
-      assigns[:presenter].courses_with_grades.length.should == 2
+      expect(response).to be_success
+      expect(assigns[:presenter].courses_with_grades).not_to be_nil
+      expect(assigns[:presenter].courses_with_grades.length).to eq 2
     end
 
     it "should not give a teacher the option to switch between courses when viewing a student's grades" do
@@ -137,8 +137,8 @@ describe GradebooksController do
       student_in_course :user => @student, :active_all => 1
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      response.should be_success
-      assigns[:courses_with_grades].should be_nil
+      expect(response).to be_success
+      expect(assigns[:courses_with_grades]).to be_nil
     end
 
     it "should not give a linked observer the option to switch between courses when viewing a student's grades" do
@@ -156,15 +156,15 @@ describe GradebooksController do
 
       user_session(@observer)
       get 'grade_summary', :course_id => course1.id, :id => @student.id
-      response.should be_success
-      assigns[:courses_with_grades].should be_nil
+      expect(response).to be_success
+      expect(assigns[:courses_with_grades]).to be_nil
     end
 
     it "should assign values for grade calculator to ENV" do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:js_env][:submissions].should_not be_nil
-      assigns[:js_env][:assignment_groups].should_not be_nil
+      expect(assigns[:js_env][:submissions]).not_to be_nil
+      expect(assigns[:js_env][:assignment_groups]).not_to be_nil
     end
 
     it "should not include assignment discussion information in grade calculator ENV data" do
@@ -174,7 +174,7 @@ describe GradebooksController do
       assignment1.save!
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"].should be_nil
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
     it "doesn't leak muted scores" do
@@ -187,9 +187,9 @@ describe GradebooksController do
       a2.grade_student(@student, grade: 5)
       get 'grade_summary', course_id: @course.id, id: @student.id
       expected =
-      assigns[:js_env][:submissions].sort_by { |s|
+      expect(assigns[:js_env][:submissions].sort_by { |s|
         s['assignment_id']
-      }.should == [
+      }).to eq [
         {'score' => nil, 'assignment_id' => a1.id},
         {'score' => 5, 'assignment_id' => a2.id}
       ]
@@ -202,7 +202,7 @@ describe GradebooksController do
       assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:presenter].assignments.select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
+      expect(assigns[:presenter].assignments.select{|a| a.class == Assignment}.map(&:id)).to eq [assignment3, assignment2, assignment1].map(&:id)
     end
 
     context "with assignment due date overrides" do
@@ -216,7 +216,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
-          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i.should == due_at.to_i
+          expect(assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i).to eq due_at.to_i
         end
       end
 
@@ -247,7 +247,7 @@ describe GradebooksController do
         session[:become_user_id] = @fake_student.id
 
         get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
-        assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i.should == @due_at.to_i
+        expect(assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i).to eq @due_at.to_i
       end
 
       it "should reflect group overrides when student is a member" do
@@ -325,8 +325,8 @@ describe GradebooksController do
       shared_examples_for "working download" do
         it "should successfully return data" do
           get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
-          response.should be_success
-          response.body.should match(/\AStudent,/)
+          expect(response).to be_success
+          expect(response.body).to match(/\AStudent,/)
         end
         it "should not recompute enrollment grades" do
           Enrollment.expects(:recompute_final_score).never
@@ -357,19 +357,19 @@ describe GradebooksController do
       it "redirects to Grid View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "2"
         get "show", :course_id => @course.id
-        response.should render_template("gradebook2")
+        expect(response).to render_template("gradebook2")
       end
 
       it "redirects to Individual View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "srgb"
         get "show", :course_id => @course.id
-        response.should render_template("screenreader")
+        expect(response).to render_template("screenreader")
       end
     end
 
     it "renders the unauthorized page without gradebook authorization" do
       get "show", :course_id => @course.id
-      response.should render_template("shared/unauthorized")
+      expect(response).to render_template("shared/unauthorized")
     end
   end
 
@@ -378,11 +378,11 @@ describe GradebooksController do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil
 
-      response.should redirect_to(:action => 'show')
+      expect(response).to redirect_to(:action => 'show')
 
       # tell it to use gradebook 2
       get 'change_gradebook_version', :course_id => @course.id, :version => 2
-      response.should redirect_to(:action => 'show')
+      expect(response).to redirect_to(:action => 'show')
     end
   end
 
@@ -392,12 +392,12 @@ describe GradebooksController do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
-      response.should be_redirect
-      assigns[:assignment].should eql(@assignment)
-      assigns[:submissions].should_not be_nil
-      assigns[:submissions].length.should eql(1)
-      assigns[:submissions][0].submission_comments.should_not be_nil
-      assigns[:submissions][0].submission_comments[0].comment.should eql("some comment")
+      expect(response).to be_redirect
+      expect(assigns[:assignment]).to eql(@assignment)
+      expect(assigns[:submissions]).not_to be_nil
+      expect(assigns[:submissions].length).to eql(1)
+      expect(assigns[:submissions][0].submission_comments).not_to be_nil
+      expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
     end
 
     it "should allow attaching files to comments for submission" do
@@ -406,14 +406,14 @@ describe GradebooksController do
       @student = @course.enroll_user(User.create!(:name => "some user"))
       data = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
       post 'update_submission', :course_id => @course.id, :attachments => {"0" => {:uploaded_data => data}}, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
-      response.should be_redirect
-      assigns[:assignment].should eql(@assignment)
-      assigns[:submissions].should_not be_nil
-      assigns[:submissions].length.should eql(1)
-      assigns[:submissions][0].submission_comments.should_not be_nil
-      assigns[:submissions][0].submission_comments[0].comment.should eql("some comment")
-      assigns[:submissions][0].submission_comments[0].attachments.length.should eql(1)
-      assigns[:submissions][0].submission_comments[0].attachments[0].display_name.should eql("doc.doc")
+      expect(response).to be_redirect
+      expect(assigns[:assignment]).to eql(@assignment)
+      expect(assigns[:submissions]).not_to be_nil
+      expect(assigns[:submissions].length).to eql(1)
+      expect(assigns[:submissions][0].submission_comments).not_to be_nil
+      expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
+      expect(assigns[:submissions][0].submission_comments[0].attachments.length).to eql(1)
+      expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
     end
 
     it "should not allow updating submissions for concluded courses" do
@@ -432,11 +432,11 @@ describe GradebooksController do
       s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"), :assignment => @assignment)
 
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s1.user_id}
-      response.should be_redirect
+      expect(response).to be_redirect
 
       # attempt to grade another section should throw not found
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s2.user_id}
-      flash[:error].should eql 'Submission was unsuccessful: Submission Failed'
+      expect(flash[:error]).to eql 'Submission was unsuccessful: Submission Failed'
     end
   end
 
@@ -448,8 +448,8 @@ describe GradebooksController do
       Course.any_instance.stubs(:large_roster?).returns(true)
 
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
-      response.should be_redirect
-      flash[:notice].should == 'SpeedGrader is disabled for this course'
+      expect(response).to be_redirect
+      expect(flash[:notice]).to eq 'SpeedGrader is disabled for this course'
     end
 
     context "draft state" do
@@ -469,20 +469,20 @@ describe GradebooksController do
         @course.account.enable_feature!(:draft_state)
 
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
-        response.should be_redirect
-        flash[:notice].should == I18n.t(
+        expect(response).to be_redirect
+        expect(flash[:notice]).to eq I18n.t(
           :speedgrader_enabled_only_for_published_content,
                            'Speedgrader is enabled only for published content.')
 
         # Published assignment and draft state enabled
         @assign.publish
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
-        response.should_not be_redirect
+        expect(response).not_to be_redirect
       end
 
       it "does not redirect if draft state isn't enabled" do
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
-        response.should_not be_redirect
+        expect(response).not_to be_redirect
       end
 
     end
@@ -491,15 +491,15 @@ describe GradebooksController do
   describe "POST 'speed_grader_settings'" do
     it "lets you set your :enable_speedgrader_grade_by_question preference" do
       user_session(@teacher)
-      @teacher.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+      expect(@teacher.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
 
       post 'speed_grader_settings', course_id: @course.id,
         enable_speedgrader_grade_by_question: "1"
-      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should be_true
+      expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).to be_truthy
 
       post 'speed_grader_settings', course_id: @course.id,
         enable_speedgrader_grade_by_question: "0"
-      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+      expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
     end
   end
 
@@ -512,7 +512,7 @@ describe GradebooksController do
       AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
       @controller.instance_variable_set(:@current_user, @user)
-      @controller.light_weight_ags_json([ag]).should == [
+      expect(@controller.light_weight_ags_json([ag])).to eq [
         {
           id: ag.id,
           rules: {
@@ -548,7 +548,7 @@ describe GradebooksController do
 
       @controller.instance_variable_set(:@context, @course)
       @controller.instance_variable_set(:@current_user, @user)
-      @controller.light_weight_ags_json([ag]).should == [
+      expect(@controller.light_weight_ags_json([ag])).to eq [
         {
           id: ag.id,
           rules: {},

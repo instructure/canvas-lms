@@ -47,7 +47,7 @@ describe "Outcomes API", type: :request do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should require read permission" do
@@ -69,7 +69,7 @@ describe "Outcomes API", type: :request do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should still require a user for global outcomes" do
@@ -99,7 +99,7 @@ describe "Outcomes API", type: :request do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      json.should == {
+      expect(json).to eq({
         "id" => @outcome.id,
         "context_id" => @account.id,
         "context_type" => "Account",
@@ -109,7 +109,7 @@ describe "Outcomes API", type: :request do
         "vendor_guid" => "vendorguid9000",
         "can_edit" => true,
         "description" => @outcome.description
-      }
+      })
     end
 
     it "should include criterion if it has one" do
@@ -130,7 +130,7 @@ describe "Outcomes API", type: :request do
                    :id => @outcome.id.to_s,
                    :format => 'json')
 
-      json.should == {
+      expect(json).to eq({
         "id" => @outcome.id,
         "context_id" => @account.id,
         "context_type" => "Account",
@@ -147,7 +147,7 @@ describe "Outcomes API", type: :request do
           { "points" => 3, "description" => "Meets Expectations" },
           { "points" => 0, "description" => "Does Not Meet Expectations" }
         ]
-      }
+      })
     end
   end
 
@@ -209,9 +209,9 @@ describe "Outcomes API", type: :request do
                  ]
                })
       @outcome.reload
-      @outcome.title.should == "Updated Outcome"
-      @outcome.description.should == "Description of updated outcome"
-      @outcome.data[:rubric_criterion].should == {
+      expect(@outcome.title).to eq "Updated Outcome"
+      expect(@outcome.description).to eq "Description of updated outcome"
+      expect(@outcome.data[:rubric_criterion]).to eq({
         :description => 'Updated Outcome',
         :mastery_points => 5,
         :points_possible => 10,
@@ -220,7 +220,7 @@ describe "Outcomes API", type: :request do
           { :points => 5, :description => "Meets Expectations" },
           { :points => 0, :description => "Does Not Meet Expectations" }
         ]
-      }
+      })
     end
 
     it "should leave alone fields not provided" do
@@ -232,8 +232,8 @@ describe "Outcomes API", type: :request do
                { :title => "New Title" })
 
       @outcome.reload
-      @outcome.title.should == "New Title"
-      @outcome.description.should == "Description of my outcome"
+      expect(@outcome.title).to eq "New Title"
+      expect(@outcome.description).to eq "Description of my outcome"
     end
 
     it "should return the updated outcome json" do
@@ -246,7 +246,7 @@ describe "Outcomes API", type: :request do
                  :description => "New Description",
                  :vendor_guid => "vendorguid9000"})
 
-      json.should == {
+      expect(json).to eq({
         "id" => @outcome.id,
         "context_id" => @account.id,
         "context_type" => "Account",
@@ -256,7 +256,7 @@ describe "Outcomes API", type: :request do
         "url" => api_v1_outcome_path(:id => @outcome.id),
         "can_edit" => true,
         "description" => "New Description"
-      }
+      })
     end
   end
 end

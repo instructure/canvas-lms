@@ -15,7 +15,7 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajaximations
 
-    f('.discussion-title').text.should == @topic_title
+    expect(f('.discussion-title').text).to eq @topic_title
   end
 
   it "should reply to the threaded discussion" do
@@ -25,9 +25,9 @@ describe "threaded discussions" do
 
     add_reply(entry_text)
     last_entry = DiscussionEntry.last
-    get_all_replies.count.should == 1
-    @last_entry.find_element(:css, '.message').text.should == entry_text
-    last_entry.depth.should == 1
+    expect(get_all_replies.count).to eq 1
+    expect(@last_entry.find_element(:css, '.message').text).to eq entry_text
+    expect(last_entry.depth).to eq 1
   end
 
   it "should allow replies more than 2 levels deep" do
@@ -35,7 +35,7 @@ describe "threaded discussions" do
     reply_depth.times { |i| @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply #{i} from student", :parent_entry => DiscussionEntry.last) }
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
-    DiscussionEntry.last.depth.should == reply_depth
+    expect(DiscussionEntry.last.depth).to eq reply_depth
   end
 
   it "should allow edits to entries with replies" do
@@ -45,7 +45,7 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
     edit_entry(entry, edit_text)
-    entry.reload.message.should match(edit_text)
+    expect(entry.reload.message).to match(edit_text)
   end
 
   it "should edit a reply" do
@@ -69,7 +69,7 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
     edit_entry(entry, edit_text)
-    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+    expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
   end
 
   it "should support repeated editing" do
@@ -77,11 +77,11 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajaximations
     edit_entry(entry, 'New text 1')
-    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+    expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
     # second edit
     edit_entry(entry, 'New text 2')
     entry.reload
-    entry.message.should match 'New text 2'
+    expect(entry.message).to match 'New text 2'
   end
 
   it "should display editor name and timestamp after delete" do
@@ -92,6 +92,6 @@ describe "threaded discussions" do
     add_reply(entry_text)
     entry = DiscussionEntry.last
     delete_entry(entry)
-    f("#entry-#{entry.id} .discussion-title").text.should match("Deleted by #{@teacher.name} on")
+    expect(f("#entry-#{entry.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
   end
 end

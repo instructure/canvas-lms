@@ -20,7 +20,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       login_as(@student.name)
       get "/courses/#{@course.id}/wiki"
-      fj("img[src='/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview']").should be_displayed
+      expect(fj("img[src='/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview']")).to be_displayed
       #check_image would be good to do here but the src on the image in the wiki body is messed up
     end
   end

@@ -320,7 +320,7 @@ class OutcomeGroupsApiController < ApplicationController
       end
 
       # preload the links' outcomes' contexts.
-      ContentTag.send(:preload_associations, @links, :learning_outcome_content => :context)
+      ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
 
       # render to json and serve
       render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }

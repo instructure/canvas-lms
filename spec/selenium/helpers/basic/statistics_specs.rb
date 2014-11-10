@@ -6,7 +6,7 @@ shared_examples_for "statistics basic tests" do
   end
 
   def validate_item_list(css, header_text)
-    f(css).text.should include_text(header_text)
+    expect(f(css).text).to include_text(header_text)
   end
 
   context "with admin initially logged in" do
@@ -18,13 +18,13 @@ shared_examples_for "statistics basic tests" do
     end
 
     it "should validate recently started courses display" do
-      pending('list is not available on sub account level') if account != Account.default
+      skip('list is not available on sub account level') if account != Account.default
       get url
       validate_item_list(list_css[:created], @course.name)
     end
 
     it "should validate recently started courses display" do
-      pending('spec is broken on sub account level') if account != Account.default
+      skip('spec is broken on sub account level') if account != Account.default
       get url
       validate_item_list(list_css[:started], @course.name)
     end
@@ -35,14 +35,14 @@ shared_examples_for "statistics basic tests" do
     end
 
     it "should validate link works in list" do
-      pending('spec is broken on sub account level') if account != Account.default
+      skip('spec is broken on sub account level') if account != Account.default
       get url
       expect_new_page_load { f(list_css[:started]).find_element(:css, '.header').click }
-      f('#section-tabs-header').should include_text(@course.name)
+      expect(f('#section-tabs-header')).to include_text(@course.name)
     end
 
     it "should validate recently ended courses display" do
-      pending('spec is broken on sub account level') if account != Account.default
+      skip('spec is broken on sub account level') if account != Account.default
       concluded_course = Course.create!(:name => 'concluded course', :account => account)
       concluded_course.update_attributes(:conclude_at => 1.day.ago)
       get url

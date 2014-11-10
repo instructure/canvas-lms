@@ -148,9 +148,9 @@ namespace :js do
       Dir.chdir(app_dir) do
         puts "Building client app '#{app_name}'"
 
-        begin
+        if File.exists?('./package.json')
           puts "\tRunning 'npm install'..."
-          output = `npm install`
+          output = `npm install` rescue `npm cache clean && npm install`
           unless $?.exitstatus == 0
             puts <<-MESSAGE
             -------------------------------------------------------------------
@@ -165,7 +165,7 @@ namespace :js do
 
         begin
           puts "\tRunning 'npm run build'..."
-          output = `npm run build`
+          output = `./script/build`
           unless $?.exitstatus == 0
             puts <<-MESSAGE
             -------------------------------------------------------------------

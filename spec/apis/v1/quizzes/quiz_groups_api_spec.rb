@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizGroupsController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     teacher_in_course(:active_all => true)
     @quiz = @course.quizzes.create! :title => 'title'
     @bank = @course.assessment_question_banks.create! :title => 'Test Bank'
@@ -39,48 +43,48 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "creates a question group for a quiz" do
       api_create_quiz_group('name' => 'testing')
-      new_quiz_group.name.should == 'testing'
+      expect(new_quiz_group.name).to eq 'testing'
     end
 
     it "pulls questions from an assessment bank for a group" do
       api_create_quiz_group('assessment_question_bank_id' => @bank.id)
-      new_quiz_group.assessment_question_bank_id.should == @bank.id
+      expect(new_quiz_group.assessment_question_bank_id).to eq @bank.id
     end
 
     it "doesn't assign assessment bank if bank doesn't exist" do
       api_create_quiz_group('assessment_question_bank_id' => 999)
-      new_quiz_group.assessment_question_bank_id.should be_nil
+      expect(new_quiz_group.assessment_question_bank_id).to be_nil
     end
 
     it "doesn't allow setting fields not in the whitelist" do
       api_create_quiz_group('migration_id' => 123)
-      new_quiz_group.migration_id.should be_nil
+      expect(new_quiz_group.migration_id).to be_nil
     end
 
     it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
       json = api_create_quiz_group({'name' => name}, :expected_status => 422)
-      json.should have_key 'errors'
-      json["errors"].should have_key "name"
-      new_quiz_group.should be_nil
+      expect(json).to have_key 'errors'
+      expect(json["errors"]).to have_key "name"
+      expect(new_quiz_group).to be_nil
     end
 
     it "renders a validation error when pick_count isn't a number" do
       name = 'A Group'
       pick_count = 'NaN'
       json = api_create_quiz_group({name: name, pick_count: pick_count}, expected_status: 422)
-      json.should have_key 'errors'
-      json["errors"].should have_key "pick_count"
-      new_quiz_group.should be_nil
+      expect(json).to have_key 'errors'
+      expect(json["errors"]).to have_key "pick_count"
+      expect(new_quiz_group).to be_nil
     end
 
     it "renders a validation error when question_points isn't a number" do
       name = 'A Group'
       question_points = 'NaN'
       json = api_create_quiz_group({name: name, question_points: question_points}, expected_status: 422)
-      json.should have_key 'errors'
-      json["errors"].should have_key "question_points"
-      new_quiz_group.should be_nil
+      expect(json).to have_key 'errors'
+      expect(json["errors"]).to have_key "question_points"
+      expect(new_quiz_group).to be_nil
     end
   end
 
@@ -100,38 +104,38 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "updates group attributes" do
       api_update_quiz_group(:name => 'testing')
-      @group.reload.name.should == 'testing'
+      expect(@group.reload.name).to eq 'testing'
     end
 
     it "won't allow update of assessment bank for a group" do
       api_update_quiz_group('assessment_question_bank_id' => @bank.id)
-      @group.reload.assessment_question_bank_id.should be_nil
+      expect(@group.reload.assessment_question_bank_id).to be_nil
     end
 
     it "doesn't allow setting fields not in the whitelist" do
       api_update_quiz_group('migration_id' => 123)
-      @group.reload.migration_id.should be_nil
+      expect(@group.reload.migration_id).to be_nil
     end
 
     it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
       json = api_update_quiz_group({'name' => name}, :expected_status => 422)
-      json.should have_key 'errors'
-      @group.reload.name.should == 'Test Group'
+      expect(json).to have_key 'errors'
+      expect(@group.reload.name).to eq 'Test Group'
     end
 
     it "renders a validation error when pick_count isn't a number" do
       pick_count = "NaN"
       json = api_update_quiz_group({pick_count: pick_count}, expected_status: 422)
-      json.should have_key 'errors'
-      json["errors"].should have_key "pick_count"
+      expect(json).to have_key 'errors'
+      expect(json["errors"]).to have_key "pick_count"
     end
 
     it "renders a validation error when question_points isn't a number" do
       question_points = "NaN"
       json = api_update_quiz_group({question_points: question_points}, expected_status: 422)
-      json.should have_key 'errors'
-      json["errors"].should have_key "question_points"
+      expect(json).to have_key 'errors'
+      expect(json["errors"]).to have_key "question_points"
     end
   end
 
@@ -144,7 +148,7 @@ describe Quizzes::QuizGroupsController, type: :request do
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
                   {:controller=>"quizzes/quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
                   {}, {'Accept' => 'application/vnd.api+json'})
-      Group.exists?(@group.id).should be_false
+      expect(Group.exists?(@group.id)).to be_falsey
     end
   end
 
@@ -167,7 +171,7 @@ describe Quizzes::QuizGroupsController, type: :request do
                   {'Accept' => 'application/vnd.api+json'})
 
       order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
-      order.should == [@question3.id, @question1.id, @question2.id]
+      expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
   end
 end

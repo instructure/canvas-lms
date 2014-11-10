@@ -1,6 +1,7 @@
 <%
+  module_item_next ||= nil
   module_item = module_item_next
-  published_status = module_item_published?(module_item) ? 'published' : 'unpublished'
+  published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
   tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {
   'min_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must reach the minimum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
@@ -30,7 +31,7 @@
     <%= module_item.item_class if module_item %>
   "
 >
-<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item_published?(module_item) %> <%= 'student-view' unless editable %>">
+<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' unless editable %>">
     <div class="ig-title module-item-title ellipses">
       <% if editable || module_item.nil? %>
       <span

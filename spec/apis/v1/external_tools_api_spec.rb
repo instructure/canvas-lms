@@ -78,53 +78,53 @@ describe ExternalToolsController, type: :request do
 
         it 'should allow sessionless launches by url' do
           response = sessionless_launch(@course, 'course', {url: tool.url})
-          response.code.should == '200'
+          expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML(response.body)
-          doc.at_css('form').should_not be_nil
-          doc.at_css('form')['action'].should == tool.url
+          expect(doc.at_css('form')).not_to be_nil
+          expect(doc.at_css('form')['action']).to eq tool.url
         end
 
         it 'should allow sessionless launches by tool id' do
           response = sessionless_launch(@course, 'course', {id: tool.id.to_s})
-          response.code.should == '200'
+          expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML(response.body)
-          doc.at_css('form').should_not be_nil
-          doc.at_css('form')['action'].should == tool.url
+          expect(doc.at_css('form')).not_to be_nil
+          expect(doc.at_css('form')['action']).to eq tool.url
         end
 
         it 'returns 401 if the user is not authorized for the course' do
           user_with_pseudonym
           params = {id: tool.id.to_s}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
-          code.should == 401
+          expect(code).to eq 401
         end
 
         it "returns a service unavailible if redis isn't availiable" do
           Canvas.stubs(:redis_enabled?).returns(false)
           params = {id: tool.id.to_s}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
-          code.should == 503
+          expect(code).to eq 503
           json = JSON.parse(response.body)
-          json["errors"]["redis"].first["message"].should == 'Redis is not enabled, but is required for sessionless LTI launch'
+          expect(json["errors"]["redis"].first["message"]).to eq 'Redis is not enabled, but is required for sessionless LTI launch'
         end
 
         context 'assessment launch' do
           it 'returns a bad request response if there is no assignment_id' do
             params = {id: tool.id.to_s, launch_type: 'assessment'}
             code = get_raw_sessionless_launch_url(@course, 'course', params)
-            code.should == 400
+            expect(code).to eq 400
             json = JSON.parse(response.body)
-            json["errors"]["assignment_id"].first["message"].should == 'An assignment id must be provided for assessment LTI launch'
+            expect(json["errors"]["assignment_id"].first["message"]).to eq 'An assignment id must be provided for assessment LTI launch'
           end
 
           it 'returns a bad request response if the assignment is not found in the class' do
             params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: -1}
             code = get_raw_sessionless_launch_url(@course, 'course', params)
-            code.should == 400
+            expect(code).to eq 400
             json = JSON.parse(response.body)
-            json["errors"]["assignment_id"].first["message"].should == 'The assignment was not found in this course'
+            expect(json["errors"]["assignment_id"].first["message"]).to eq 'The assignment was not found in this course'
           end
 
           it "returns an unauthorized response if the user can't read the assignment" do
@@ -136,7 +136,7 @@ describe ExternalToolsController, type: :request do
             student_in_course(course: @course)
             params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
             code = get_raw_sessionless_launch_url(@course, 'course', params)
-            code.should == 401
+            expect(code).to eq 401
           end
 
           it "returns a bad request if the assignment doesn't have an external_tool_tag" do
@@ -145,9 +145,9 @@ describe ExternalToolsController, type: :request do
               :submission_types => "online_url")
             params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: assignment.id}
             code = get_raw_sessionless_launch_url(@course, 'course', params)
-            code.should == 400
+            expect(code).to eq 400
             json = JSON.parse(response.body)
-            json["errors"]["assignment_id"].first["message"].should == 'The assignment must have an external tool tag'
+            expect(json["errors"]["assignment_id"].first["message"]).to eq 'The assignment must have an external tool tag'
           end
 
           it "returns a sessionless launch url" do
@@ -157,14 +157,14 @@ describe ExternalToolsController, type: :request do
             tag.save!
             params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
             json = get_sessionless_launch_url(@course, 'course', params)
-            json.should include('url')
+            expect(json).to include('url')
 
             # remove the user session (it's supposed to be sessionless, after all), and make the request
             remove_user_session
 
             # request/verify the lti launch page
             get json['url']
-            response.code.should == '200'
+            expect(response.code).to eq '200'
 
           end
 
@@ -173,22 +173,22 @@ describe ExternalToolsController, type: :request do
         it "returns a bad request response if there is no tool_id or url" do
           params = {}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
-          code.should == 400
+          expect(code).to eq 400
           json = JSON.parse(response.body)
-          json["errors"]["id"].first["message"].should == 'An id or a url must be provided'
-          json["errors"]["url"].first["message"].should == 'An id or a url must be provided'
+          expect(json["errors"]["id"].first["message"]).to eq 'An id or a url must be provided'
+          expect(json["errors"]["url"].first["message"]).to eq 'An id or a url must be provided'
         end
 
         it 'redirects if there is no matching tool for the launch_url, and tool id' do
           params = {url: 'http://my_non_esisting_tool_domain.com', id: -1}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
-          code.should == 302
+          expect(code).to eq 302
         end
 
         it 'redirects if there is no matching tool for the and tool id' do
           params = { id: -1}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
-          code.should == 302
+          expect(code).to eq 302
         end
 
 
@@ -249,20 +249,20 @@ describe ExternalToolsController, type: :request do
 
         it 'should allow sessionless launches by url' do
           response = sessionless_launch(@account, 'account', {url: tool.url})
-          response.code.should == '200'
+          expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML(response.body)
-          doc.at_css('form').should_not be_nil
-          doc.at_css('form')['action'].should == tool.url
+          expect(doc.at_css('form')).not_to be_nil
+          expect(doc.at_css('form')['action']).to eq tool.url
         end
 
         it 'should allow sessionless launches by tool id' do
           response = sessionless_launch(@account, 'account', {id: tool.id.to_s})
-          response.code.should == '200'
+          expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML(response.body)
-          doc.at_css('form').should_not be_nil
-          doc.at_css('form')['action'].should == tool.url
+          expect(doc.at_css('form')).not_to be_nil
+          expect(doc.at_css('form')['action']).to eq tool.url
         end
       end
     end
@@ -275,7 +275,7 @@ describe ExternalToolsController, type: :request do
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
-    HashDiff.diff(json, example_json(et)).should == []
+    expect(HashDiff.diff(json, example_json(et))).to eq []
   end
 
   def not_found_call(context, type="course")
@@ -292,8 +292,8 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'index', :format => 'json',
                      :"#{type}_id" => context.id.to_s})
 
-    json.size.should == 1
-    HashDiff.diff(json.first, example_json(et)).should == []
+    expect(json.size).to eq 1
+    expect(HashDiff.diff(json.first, example_json(et))).to eq []
   end
 
   def search_call(context, type="course")
@@ -306,7 +306,7 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'index', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :search_term => 'fir'})
 
-    json.map{|h| h['id']}.sort.should == ids.sort
+    expect(json.map{|h| h['id']}.sort).to eq ids.sort
   end
 
   def only_selectables(context, type="course")
@@ -317,18 +317,18 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'index', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :selectable => 'true'})
 
-    json.length.should == 1
-    json.first['id'].should == not_selectable.id
+    expect(json.length).to eq 1
+    expect(json.first['id']).to eq not_selectable.id
   end
 
   def create_call(context, type="course")
     json = api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
                     {:controller => 'external_tools', :action => 'create', :format => 'json',
                      :"#{type}_id" => context.id.to_s}, post_hash)
-    context.context_external_tools.count.should == 1
+    expect(context.context_external_tools.count).to eq 1
 
     et = context.context_external_tools.last
-    HashDiff.diff(json, example_json(et)).should == []
+    expect(HashDiff.diff(json, example_json(et))).to eq []
   end
 
   def update_call(context, type="course")
@@ -338,7 +338,7 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'update', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
     et.reload
-    HashDiff.diff(json, example_json(et)).should == []
+    expect(HashDiff.diff(json, example_json(et))).to eq []
   end
 
   def destroy_call(context, type="course")
@@ -348,8 +348,8 @@ describe ExternalToolsController, type: :request do
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
 
     et.reload
-    et.workflow_state.should == 'deleted'
-    context.context_external_tools.active.count.should == 0
+    expect(et.workflow_state).to eq 'deleted'
+    expect(context.context_external_tools.active.count).to eq 0
   end
 
   def error_call(context, type="course")
@@ -358,43 +358,43 @@ describe ExternalToolsController, type: :request do
                   :"#{type}_id" => context.id.to_s},
                  {})
     json = JSON.parse response.body
-    response.code.should == "400"
-    json["errors"]["name"].should_not be_nil
-    json["errors"]["shared_secret"].should_not be_nil
-    json["errors"]["consumer_key"].should_not be_nil
-    json["errors"]["url"].first["message"].should == "Either the url or domain should be set."
-    json["errors"]["domain"].first["message"].should == "Either the url or domain should be set."
+    expect(response.code).to eq "400"
+    expect(json["errors"]["name"]).not_to be_nil
+    expect(json["errors"]["shared_secret"]).not_to be_nil
+    expect(json["errors"]["consumer_key"]).not_to be_nil
+    expect(json["errors"]["url"].first["message"]).to eq "Either the url or domain should be set."
+    expect(json["errors"]["domain"].first["message"]).to eq "Either the url or domain should be set."
   end
 
   def unauthorized_call(context, type="course")
     raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
                     {:controller => 'external_tools', :action => 'index',
                      :format => 'json', :"#{type}_id" => context.id.to_s})
-    response.code.should == "401"
+    expect(response.code).to eq "401"
   end
 
   def paginate_call(context, type="course")
     7.times { |i| context.context_external_tools.create!(:name => "test_#{i}", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti") }
-    context.context_external_tools.count.should == 7
+    expect(context.context_external_tools.count).to eq 7
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?per_page=3",
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3'})
 
-    json.length.should == 3
+    expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
-    links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
-    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
-    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
+    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2/
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
 
     # get the last page
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?page=3&per_page=3",
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3', :page => '3'})
-    json.length.should == 1
+    expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
-    links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
-    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
-    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
+    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
   end
 
   def tool_with_everything(context, opts={})
@@ -446,7 +446,7 @@ describe ExternalToolsController, type: :request do
   def sessionless_launch(context, type, params)
     # initial api call
     json = get_sessionless_launch_url(context, type, params)
-    json.should include('url')
+    expect(json).to include('url')
 
     # remove the user session (it's supposed to be sessionless, after all), and make the request
     remove_user_session

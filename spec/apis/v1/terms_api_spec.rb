@@ -41,8 +41,8 @@ describe TermsApiController, type: :request do
 
         json = get_terms
         names = json.map{ |t| t['name'] }
-        names.should include(@term1.name)
-        names.should_not include(@term2.name)
+        expect(names).to include(@term1.name)
+        expect(names).not_to include(@term2.name)
       end
 
       it "should list active terms with state=active" do
@@ -50,8 +50,8 @@ describe TermsApiController, type: :request do
 
         json = get_terms(workflow_state: 'active')
         names = json.map{ |t| t['name'] }
-        names.should include(@term1.name)
-        names.should_not include(@term2.name)
+        expect(names).to include(@term1.name)
+        expect(names).not_to include(@term2.name)
       end
 
       it "should list deleted terms with state=deleted" do
@@ -59,8 +59,8 @@ describe TermsApiController, type: :request do
 
         json = get_terms(workflow_state: 'deleted')
         names = json.map{ |t| t['name'] }
-        names.should_not include(@term1.name)
-        names.should include(@term2.name)
+        expect(names).not_to include(@term1.name)
+        expect(names).to include(@term2.name)
       end
 
       it "should list all terms, active and deleted, with state=all" do
@@ -68,8 +68,8 @@ describe TermsApiController, type: :request do
 
         json = get_terms(workflow_state: 'all')
         names = json.map{ |t| t['name'] }
-        names.should include(@term1.name)
-        names.should include(@term2.name)
+        expect(names).to include(@term1.name)
+        expect(names).to include(@term2.name)
       end
 
       it "should list all terms, active and deleted, with state=[all]" do
@@ -77,8 +77,8 @@ describe TermsApiController, type: :request do
 
         json = get_terms(workflow_state: ['all'])
         names = json.map{ |t| t['name'] }
-        names.should include(@term1.name)
-        names.should include(@term2.name)
+        expect(names).to include(@term1.name)
+        expect(names).to include(@term2.name)
       end
     end
 
@@ -90,8 +90,8 @@ describe TermsApiController, type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
                         { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
 
-        json['enrollment_terms'].first['name'].should == @term2.name
-        json['enrollment_terms'].last['name'].should == @term1.name
+        expect(json['enrollment_terms'].first['name']).to eq @term2.name
+        expect(json['enrollment_terms'].last['name']).to eq @term1.name
       end
 
       it "should order by end_at second" do
@@ -102,8 +102,8 @@ describe TermsApiController, type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
                         { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
 
-        json['enrollment_terms'].first['name'].should == @term2.name
-        json['enrollment_terms'].last['name'].should == @term1.name
+        expect(json['enrollment_terms'].first['name']).to eq @term2.name
+        expect(json['enrollment_terms'].last['name']).to eq @term1.name
       end
 
       it "should order by id last" do
@@ -115,16 +115,16 @@ describe TermsApiController, type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
                         { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
 
-        json['enrollment_terms'].first['name'].should == @term1.name
-        json['enrollment_terms'].last['name'].should == @term2.name
+        expect(json['enrollment_terms'].first['name']).to eq @term1.name
+        expect(json['enrollment_terms'].last['name']).to eq @term2.name
       end
     end
 
     it "should paginate" do
       json = get_terms(per_page: 1)
-      json.size.should == 1
-      response.headers.should include('Link')
-      response.headers['Link'].should match(/rel="next"/)
+      expect(json.size).to eq 1
+      expect(response.headers).to include('Link')
+      expect(response.headers['Link']).to match(/rel="next"/)
     end
   end
 end

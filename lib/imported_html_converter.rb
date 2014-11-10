@@ -21,7 +21,7 @@ class ImportedHtmlConverter
   include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
-
+  REFERENCE_KEYWORDS = %w{CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE}
   # yields warnings
   def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
@@ -43,7 +43,10 @@ class ImportedHtmlConverter
           new_url = nil
           missing_relative_url = nil
 
-          val = URI.unescape(node[attr]) rescue node[attr]
+          val = node[attr].dup
+          REFERENCE_KEYWORDS.each do |ref|
+            val.gsub!("%24#{ref}%24", "$#{ref}$")
+          end
 
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
@@ -57,12 +60,12 @@ class ImportedHtmlConverter
           elsif val =~ /discussion_topic_migration_id=(.*)/
             if topic_migration_id = $1
               if linked_topic = context.discussion_topics.where(migration_id: topic_migration_id).first
-                new_url = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
+                new_url = "#{course_path}/discussion_topics/#{linked_topic.id}"
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/(.*)}
             if tag = context.context_module_tags.where(:migration_id => $1).select('id').first
-              new_url = URI::escape "#{course_path}/modules/items/#{tag.id}"
+              new_url = "#{course_path}/modules/items/#{tag.id}"
             end
           elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
             type = $1
@@ -74,18 +77,18 @@ class ImportedHtmlConverter
               new_url = "#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}"
             elsif type == 'attachments'
               if att = context.attachments.where(migration_id: migration_id).first
-                new_url = URI::escape("#{course_path}/files/#{att.id}/preview")
+                new_url = "#{course_path}/files/#{att.id}/preview"
               end
             elsif context.respond_to?(type) && context.send(type).respond_to?(:where)
               if object = context.send(type).where(migration_id: migration_id).first
-                new_url = URI::escape("#{course_path}/#{type_for_url}/#{object.id}")
+                new_url = "#{course_path}/#{type_for_url}/#{object.id}"
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
             section = $1
-            new_url = URI::escape("#{course_path}/#{section}")
+            new_url = "#{course_path}/#{section}"
           elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
-            rel_path = $1
+            rel_path = URI.unescape($1)
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
               new_url = replace_media_comment_data(node, rel_path, context, opts) {|warning, data| yield warning, data if block_given?}
               unless new_url
@@ -120,8 +123,9 @@ class ImportedHtmlConverter
           else
             begin
               if relative_url?(node[attr])
-                unless new_url = replace_relative_file_url(val, context)
-                  missing_relative_url = val
+                unescaped = URI.unescape(val)
+                unless new_url = replace_relative_file_url(unescaped, context)
+                  missing_relative_url = unescaped
                 end
               else
                 new_url = node[attr]

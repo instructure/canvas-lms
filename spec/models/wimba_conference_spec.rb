@@ -23,7 +23,7 @@ describe WimbaConference do
   include_examples 'WebConference'
   
   # implements this WebConference option:
-  it { should respond_to :admin_settings_url }
+  it { is_expected.to respond_to :admin_settings_url }
 
   before(:all) do
     WimbaConference.class_eval do
@@ -72,37 +72,37 @@ describe WimbaConference do
   it "should correctly retrieve a config hash" do
     conference = WimbaConference.new
     config = conference.config
-    config.should_not be_nil
-    config[:conference_type].should eql('Wimba')
-    config[:class_name].should eql('WimbaConference')
+    expect(config).not_to be_nil
+    expect(config[:conference_type]).to eql('Wimba')
+    expect(config[:class_name]).to eql('WimbaConference')
   end
 
   it "should confirm valid config" do
-    WimbaConference.new.valid_config?.should be_true
-    WimbaConference.new(:conference_type => "Wimba").valid_config?.should be_true
+    expect(WimbaConference.new.valid_config?).to be_truthy
+    expect(WimbaConference.new(:conference_type => "Wimba").valid_config?).to be_truthy
   end
 
   it "should be active if an admin has joined" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
     # this makes it active
     conference.initiate_conference
-    conference.admin_join_url(@user).should_not be_nil
+    expect(conference.admin_join_url(@user)).not_to be_nil
 
-    conference.conference_status.should eql(:active)
-    conference.participant_join_url(@user).should_not be_nil
+    expect(conference.conference_status).to eql(:active)
+    expect(conference.participant_join_url(@user)).not_to be_nil
   end
 
   it "should be closed if it has not been initiated" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
-    conference.conference_status.should eql(:closed)
-    conference.participant_join_url(@user).should be_nil
+    expect(conference.conference_status).to eql(:closed)
+    expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "should be closed if no admins have joined" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
     conference.initiate_conference
-    conference.conference_status.should eql(:closed)
-    conference.participant_join_url(@user).should be_nil
+    expect(conference.conference_status).to eql(:closed)
+    expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "should correctly generate join urls" do
@@ -112,8 +112,8 @@ describe WimbaConference do
     # someone's admin/participant-ness is negotiated beforehand through api calls and isn't
     # reflected in the token/url
     join_url = "http://wimba.test/launcher.cgi.pl?hzA=s3kr1tfor#{conference.wimba_id(@user.uuid)}&room=#{conference.wimba_id}"
-    conference.admin_join_url(@user).should eql(join_url)
-    conference.participant_join_url(@user).should eql(join_url)
+    expect(conference.admin_join_url(@user)).to eql(join_url)
+    expect(conference.participant_join_url(@user)).to eql(join_url)
   end
 
   it "should correctly return archive urls" do
@@ -124,11 +124,11 @@ describe WimbaConference do
     conference.ended_at = 1.hour.ago
     conference.save
     urls = conference.external_url_for("archive", @user)
-    urls.should eql [{:id => "abc123", :name => "ABC 123"}, {:id => "def456", :name => "DEF 456"}]
+    expect(urls).to eql [{:id => "abc123", :name => "ABC 123"}, {:id => "def456", :name => "DEF 456"}]
   end
 
   it "should not return archive urls if the conference hasn't started" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 120, :context => course)
-    conference.external_url_for("archive", @user).should be_empty
+    expect(conference.external_url_for("archive", @user)).to be_empty
   end
 end

@@ -1132,6 +1132,11 @@ ru:
         one: "%{file_size} *из одного файла*"
         other: "%{file_size} *из %{count} файлов*"
       uploaded_file_storage_header: "Загруженное хранилище файлов"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "В этом отчете могут неточно отображаться оценки курсов с заданиями, в которых отключен звук. "
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2608,6 +2613,7 @@ ru:
     messages_sent: "Сообщения отправлены"
     missing_due_date_dialog: 
       buttons: 
+        continue: Продолжить
         goBack: "Вернуться назад"
         noDueDate: "Нет даты выполнения"
       modal: 
@@ -4072,30 +4078,13 @@ ru:
       unstar_conversation: "Снять метку с разговора"
     message_deleted: "Сообщение удалено!"
     message_detail: 
+      delete: Удалить
+      forward: Переслать
+      message_actions: "Действия над сообщениями"
+      more_options: "Дополнительные опции"
       no_subject: "Нет темы"
-    message_form: 
-      buttons: 
-        reply: Ответ
-        reply_all: "Ответить всем"
-        send_message: Отправить
-      headings: 
-        new_message: "Новое сообщение"
-      inbox_actions: 
-        add_people: "Добавить людей"
-      labels: 
-        add_to_faculty_journal: "Добавить как запись журнала преподавателей"
-        group_conversation: "Этот групповой разговор. Участники будут видеть все ответы"
-        message: "Сообщение:"
-        to: "Кому:"
-      links: 
-        add_attachment: Вложить
-        media_comment: Запись
-      media_comment: "Мультимедийный комментарий"
-      titles: 
-        add_attachment: "Добавить вложение"
-        media_comment: "Записанный мультимедийный комментарий"
-        record_media_comment: "Записать аудио- или видеокомментарий"
-        remove_media_comment: "Удалить мультимедийный комментарий"
+      reply: Ответ
+      reply_all: "Ответить всем"
     message_form_dialog: 
       body: "Текст сообщения"
       headings: 
@@ -4148,7 +4137,6 @@ ru:
       few: "и %{count} других"
       one: "и 1 другой"
       other: "и %{count} других"
-    search_category: "Поиск %{category}"
     star: "Отметить звездочкой "
     star_conversation: "Отметить разговор звездочкой"
     titles: 
@@ -4164,6 +4152,9 @@ ru:
       few: "%{count} курса обработано"
       one: "1 курс обработан"
       other: "%{count} курсов обработано"
+    course_format: 
+      not_set: "Не установлено"
+      online: Онлайн
     course_not_found: "Курс не найден"
     csv: 
       comments: Комментарии
@@ -4747,6 +4738,7 @@ ru:
         allow_student_organized_groups: "Разрешить студентам организовывать собственные группы"
         conclude_at: Завершается
         course_code: "Код курса"
+        course_format: Формат
         course_lock_all_announcements: "Отключить комментарии в объявлениях"
         course_name: Имя
         course_section_name: "Добавить новый раздел"
@@ -5067,8 +5059,6 @@ ru:
       student: 
         count: "Количество неверно ответивших студентов"
         ratio: "Коэффициент неверно ответивших студентов"
-  current_uploads: 
-    close: закрыть
   curve_grades_dialog: 
     average_score: "Средний балл"
     buttons: 
@@ -6316,6 +6306,13 @@ ru:
     post_grades: "Опубликовать оценки в SIS"
     student_groups: "Страница новых групп студентов"
     student_outcome_gradebook: "Табель успеваемости студента по усвоению обучения"
+  file_preview: 
+    file_preview_headerbutton_close: Закрыть
+    file_preview_hide: Скрыть
+    file_preview_infotable_datecreated: "Дата создания"
+    file_preview_infotable_name: Имя
+    file_preview_infotable_status: Состояние
+    file_preview_show: Показать
   file_rename_form: 
     back: Назад
     change: Изменить
@@ -6358,6 +6355,7 @@ ru:
       uploading_zip: "Произошло несколько ошибок при загрузке архива"
     fields: 
       file: Файл
+    files_page_title: Файлы
     full_index: 
       alts: 
         file_locked: заблокирован
@@ -6545,6 +6543,7 @@ ru:
       no_students_in_groups_close: "Извините, но отправка для этого задания не может быть оценена в Speedgrader, поскольку нет назначенных пользователей. Пожалуйста, назначьте пользователей в данный набор групп и повторите попытку. Нажмите кнопку 'OK', чтобы закрыть это окно."
       no_students_in_section: "Невозможно найти студентов в этом разделе, возврат к отображению всех разделов."
     buttons: 
+      dialog_buttons: Отменить
       saving_settings: "Сохранение настроек..."
       submit_comment: "Отправить комментарий"
       submitting: "Идет отправка..."
@@ -6578,7 +6577,6 @@ ru:
     student: Студент
     student_mute_notification: "Инструктор выполняет оценку"
     titles: 
-      click_to_record: "Щелкните микрофон для записи комментариев"
       dropped_assignment_no_total: "Это задание не будет учитываться в итоговом подсчете"
       hypothetical_score: "Это оценка \"Что если\""
     turnitin: 
@@ -6826,7 +6824,6 @@ ru:
         out_of: Из
         score: Результат
       icons: 
-        rubric_results: "См. результаты рубрики"
         turnitin_results: "См. результаты Turnitin"
       labels: 
         final_grade_hidden: "Вычисление общего результата отключено"
@@ -7282,6 +7279,11 @@ ru:
         assign_user_to_group: "Назначить пользователя в данную группу"
         assign_user_to_group_name: "Назначить пользователя в группу %{name}"
         no_groups_created: "Прежде чем добавлять пользователей, необходимо создать группы."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Установить первого присоединившегося студента в качестве лидера группы"
+        auto_group_leader: "Автоматически назначать лидера в группе студентов"
+        auto_random_group_leader: "Установить случайного студента в качестве лидера группы"
+        leadership: Лидерство
       edit_group_assignment: 
         all_available_groups_full: "Все доступные группы набраны."
         all_groups_full_suggestion: "Измените ограничения группы или добавьте больше групп."
@@ -7306,15 +7308,11 @@ ru:
         search_users: "Поиск пользователей"
       group_category_create: 
         allow_self_signup: "Разрешить самостоятельную регистрацию"
-        auto_first_group_leader: "Установить первого присоединившегося студента в качестве лидера группы"
-        auto_group_leader: "Автоматически назначать лидера в группе студентов"
-        auto_random_group_leader: "Установить случайного студента в качестве лидера группы"
         cancel: Отменить
         create_groups: "Создать %h{num_groups} групп(ы) сейчас"
         create_groups_manually: "Я создам группы вручную"
         group_set_name: "Имя набора групп"
         group_structure: "Структура группы"
-        leadership: Лидерство
         leave_group_limit_blank: "Оставить поле пустым при отсутствии лимита"
         limit_group_size: "*Ограничить группы до %h{group_limit} участников"
         require_same_section: "Члены группы должны находиться в одном разделе"
@@ -7902,7 +7900,6 @@ ru:
       media_contribution: "Вклад мультимедиа"
       play_comment: "Воспроизведение мультимедийного комментария"
       record_upload_media_comment: "Запись/загрузка мультимедийного комментария"
-    track_uploaded_successfully: "Запись загружена успешно, нажмите «обновить», чтобы просмотреть."
     upload: Загрузить
     uploading: Загрузка...
   menu: 
@@ -10238,6 +10235,14 @@ ru:
     : Нет
     ? "yes"
     : Да
+  orbis_report_header_assignment_id: "идентификатор задания"
+  orbis_report_header_assignment_title: "заголовок задания"
+  orbis_report_header_canvas_course_id: "идентификатор курса"
+  orbis_report_header_course_name: "название курса"
+  orbis_report_header_course_sis_id: "идентификатор sis курса"
+  orbis_report_header_points_possible: "возможные баллы"
+  orbis_report_header_student_name: "имя студента"
+  orbis_report_header_submission_score: "оценка отправки"
   outcome_groups: 
     invalid_file: "Неверный файл группы результатов"
   outcome_groups_api: 
@@ -12121,14 +12126,11 @@ ru:
           save: Сохранить
         end_quiz_reference_time_current_end: "текущее время окончания"
         end_quiz_reference_time_now: сейчас
-        end_quiz_when: "Завершить контрольную работу через %{n} минут(ы) после %{reference_time}."
         extended_quiz_time_explanation: "Можно дать этому студенту дополнительное время для текущей попытки выполнения контрольной работы. Сколько времени им предоставить?"
         finished_in: "завершено в %{duration}"
-        global_extra_attempts: "все уже получили %{n}"
         headers: 
           attempt: Попытка
           attempts_left: "Осталось попыток"
-          extended_quiz_time: "Увеличить время на выполнение контрольной работы"
           score: Оценка
           student: Студент
           student_extensions: "Расширения студента"
@@ -12137,15 +12139,14 @@ ru:
         labels: 
           ending: Завершение
           extra_attempts: "Дополнительные попытки"
-          extra_time_per_attempt: "Дополнительное время на каждую попытку"
           manually_unlock: "Вручную разблокировать контрольную работу для следующей попытки"
           reset_has_seen_results: "Позволить студентам еще раз просмотреть результаты"
           started: Начато
         minutes: минуты
         moderate_page_title: "%{title}: Модерировать"
         page_title: "Модерирование контрольной работы"
-        student_gets_extra_time: "*%{student_name}* **получает %{extra_time} дополнительных (-ые) минут(ы) для каждой попытки**"
         student_n: "Студент %{n}"
+        submitting: "Идет отправка..."
         titles: 
           change_user_extensions: "Изменить расширения пользователя"
           manually_unlocked: "Разблокировано вручную"
@@ -12684,8 +12685,6 @@ ru:
   react_files: 
     add_folder: "Добавить папку"
     cancel: Отменить
-    confirm_delete: "Вы уверены, что хотите удалить %{name}?"
-    confirm_delete_selected: "Вы уверены, что хотите удалить эти элементы: %{count}?"
     count_items_selected: "%{count} элементов выбрано"
     created_at: "Дата создания"
     created_at_short: Создано
@@ -12700,6 +12699,7 @@ ru:
         three_chars: "Введите в строку поиска, по крайней мере, 3 буквы."
         your_search: "По вашему запросу – \"%{search_term}\" – не найдено ни одного файла."
     files: Файлы
+    files_heading: Файлы
     folder: Папка
     labels: 
       select: "Выбрать этот элемент"
@@ -12792,8 +12792,7 @@ ru:
       cancel: Отменить
       update: Обновить
     label: 
-      availableFrom: От
-      availableUntil: До
+      availableUntil: "Заблокировать до"
     options: 
       publish: 
         description: Опубликовать

@@ -20,11 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizzesApiController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context 'locked api item' do
     let(:item_type) { 'quiz' }
 
     let(:locked_item) do
-      @course.quizzes.create!(:title => 'Locked Quiz')
+      quiz = @course.quizzes.create!(:title => 'Locked Quiz')
+      quiz.publish!
+      quiz
     end
 
     def api_get_json
@@ -48,7 +54,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                       :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}")
 
       quiz_ids = json.collect { |quiz| quiz['id'] }
-      quiz_ids.should == quizzes.map(&:id)
+      expect(quiz_ids).to eq quizzes.map(&:id)
     end
 
     it "should search for quizzes by title" do
@@ -60,7 +66,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                       :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
                       :search_term => 'fir')
 
-      json.map{|h| h['id'] }.sort.should == ids.sort
+      expect(json.map{|h| h['id'] }.sort).to eq ids.sort
     end
 
     it "should return unauthorized if the quiz tab is disabled" do
@@ -85,7 +91,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                       :format => 'json',
                       :course_id => "#{@course.id}")
       quiz_ids = json.collect { |quiz| quiz['id'] }
-      quiz_ids.should == [ published_quiz.id]
+      expect(quiz_ids).to eq [ published_quiz.id]
     end
 
     context "jsonapi style" do
@@ -99,11 +105,11 @@ describe Quizzes::QuizzesApiController, type: :request do
                         'Accept' => 'application/vnd.api+json')
         meta = json['meta']
         meta = json['meta']
-        meta['permissions']['quizzes']['create'].should == true
+        expect(meta['permissions']['quizzes']['create']).to eq true
 
         json = json['quizzes']
         quiz_ids = json.collect { |quiz| quiz['id'] }
-        quiz_ids.should == quizzes.map(&:id).map(&:to_s)
+        expect(quiz_ids).to eq quizzes.map(&:id).map(&:to_s)
 
       end
 
@@ -120,7 +126,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                         'Accept' => 'application/vnd.api+json')
         json = json['quizzes']
         quiz_ids = json.collect { |quiz| quiz['id'] }
-        quiz_ids.should == [ available_quiz.id.to_s ]
+        expect(quiz_ids).to eq [ available_quiz.id.to_s ]
       end
     end
   end
@@ -139,7 +145,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it "includes unpublished questions in question count" do
-        @json['question_count'].should == 1
+        expect(@json['question_count']).to eq 1
       end
     end
 
@@ -151,7 +157,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                          { :controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"}, {},
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
-        @json.should =~ [
+        expect(@json).to match_array [
           Quizzes::QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
         ]
@@ -166,7 +172,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it "should return a not found error message" do
-        @json.inspect.should include "does not exist"
+        expect(@json.inspect).to include "does not exist"
       end
     end
   end
@@ -191,7 +197,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
         @quiz = Quizzes::Quiz.first
-        @json.should =~ [
+        expect(@json).to match_array [
           Quizzes::QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
         ]
@@ -200,24 +206,24 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "creates a quiz for the course" do
       api_create_quiz({ 'title' => 'testing' })
-      new_quiz.title.should == 'testing'
+      expect(new_quiz.title).to eq 'testing'
     end
 
     it "doesn't allow setting fields not in the whitelist" do
       api_create_quiz({ 'assignment_id' => 123 })
-      new_quiz.assignment_id.should be_nil
+      expect(new_quiz.assignment_id).to be_nil
     end
 
     it "allows creating a published quiz" do
       api_create_quiz('published' => true)
-      new_quiz.should be_published
+      expect(new_quiz).to be_published
     end
 
     it "renders an error when the title is too long" do
       title = 'a' * ActiveRecord::Base.maximum_string_length + '!'
       json = api_create_quiz({ 'title' => title }, :expected_status => 400 )
-      json.should have_key 'errors'
-      new_quiz.should be_nil
+      expect(json).to have_key 'errors'
+      expect(new_quiz).to be_nil
     end
 
     describe "validations" do
@@ -228,84 +234,84 @@ describe Quizzes::QuizzesApiController, type: :request do
 
         it "should put the quiz in a group owned by its course" do
           api_create_quiz({'title' => 'test quiz', 'assignment_group_id' => my_group.id})
-          new_quiz.assignment_group_id.should == my_group.id
+          expect(new_quiz.assignment_group_id).to eq my_group.id
         end
 
         it "should not put the quiz in a group not owned by its course" do
           api_create_quiz({'title' => 'test quiz', 'assignment_group_id' => other_group.id})
-          new_quiz.assignment_group_id.should_not == other_group.id
+          expect(new_quiz.assignment_group_id).not_to eq other_group.id
         end
       end
 
       context "hide_results" do
         it "should set hide_results='until_after_last_attempt' if allowed_attempts > 1" do
           api_create_quiz({'hide_results' => 'until_after_last_attempt', 'allowed_attempts' => 3})
-          new_quiz.hide_results.should == 'until_after_last_attempt'
+          expect(new_quiz.hide_results).to eq 'until_after_last_attempt'
         end
 
         it "should not hide_results='until_after_last_attempt' if allowed_attempts == 1" do
           api_create_quiz({'hide_results' => 'until_after_last_attempt', 'allowed_attempts' => 1})
-          new_quiz.hide_results.should_not == 'until_after_last_attempt'
+          expect(new_quiz.hide_results).not_to eq 'until_after_last_attempt'
         end
 
         it "should not hide_results='until_after_last_attempt' if allowed_attempts < 1" do
           api_create_quiz({'hide_results' => 'until_after_last_attempt', 'allowed_attempts' => -1})
-          new_quiz.hide_results.should_not == 'until_after_last_attempt'
+          expect(new_quiz.hide_results).not_to eq 'until_after_last_attempt'
         end
       end
 
       context "show_correct_answers" do
         it "should be set if hide_results is disabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => nil})
-          new_quiz.show_correct_answers.should be_false
+          expect(new_quiz.show_correct_answers).to be_falsey
         end
 
         it "should be ignored if hide_results is enabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => 'always'})
-          new_quiz.show_correct_answers.should be_true
+          expect(new_quiz.show_correct_answers).to be_truthy
         end
       end
 
       context "scoring_policy" do
         it "should set scoring policy if allowed_attempts > 1" do
           api_create_quiz({'scoring_policy' => 'keep_latest', 'allowed_attempts' => 3})
-          new_quiz.scoring_policy.should == 'keep_latest'
+          expect(new_quiz.scoring_policy).to eq 'keep_latest'
         end
 
         it "should not set scoring policy if allowed_attempts == 1" do
           api_create_quiz({'scoring_policy' => 'keep_latest', 'allowed_attempts' => 1})
-          new_quiz.scoring_policy.should_not == 'keep_latest'
+          expect(new_quiz.scoring_policy).not_to eq 'keep_latest'
         end
 
         it "should not set scoring policy if allowed_attempts > 1" do
           api_create_quiz({'scoring_policy' => 'keep_latest', 'allowed_attempts' => -1})
-          new_quiz.scoring_policy.should_not == 'keep_latest'
+          expect(new_quiz.scoring_policy).not_to eq 'keep_latest'
         end
       end
 
       context "cant_go_back" do
         it "should set cant_go_back if one_question_at_a_time is true" do
           api_create_quiz({'cant_go_back' => true, 'one_question_at_a_time' => true})
-          new_quiz.cant_go_back.should be_true
+          expect(new_quiz.cant_go_back).to be_truthy
         end
 
         it "should not set cant_go_back if one_question_at_a_time is not true" do
           api_create_quiz({'cant_go_back' => true, 'one_question_at_a_time' => false})
-          new_quiz.cant_go_back.should_not be_true
+          expect(new_quiz.cant_go_back).not_to be_truthy
         end
       end
 
       context 'time_limit' do
         it 'should discard negative values' do
           api_create_quiz({'time_limit' => -25})
-          new_quiz.time_limit.should be_nil
+          expect(new_quiz.time_limit).to be_nil
         end
       end
 
       context 'allowed_attempts' do
         it 'should discard values less than -1' do
           api_create_quiz({'allowed_attempts' => -25})
-          new_quiz.allowed_attempts.should == 1
+          expect(new_quiz.allowed_attempts).to eq 1
         end
       end
     end
@@ -319,7 +325,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                {controller: 'quizzes/quizzes_api', action: 'destroy',
                 format: 'json', course_id: @course.id.to_s,
                 id: quiz.id.to_s})
-      quiz.reload.should be_deleted
+      expect(quiz.reload).to be_deleted
     end
   end
 
@@ -338,7 +344,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "updates quiz attributes" do
       api_update_quiz({'title' => 'old title'}, {'title' => 'new title'})
-      updated_quiz.title.should == 'new title'
+      expect(updated_quiz.title).to eq 'new title'
     end
     context "jsonapi style request" do
 
@@ -348,20 +354,20 @@ describe Quizzes::QuizzesApiController, type: :request do
                          { :controller=>"quizzes/quizzes_api", :action=>"update", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"},
                          { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
                         'Accept' => 'application/vnd.api+json')
-        response.should be_success
+        expect(response).to be_success
       end
     end
 
     it "doesn't allow setting fields not in the whitelist" do
       api_update_quiz({}, {'assignment_id' => 123})
-      updated_quiz.assignment_id.should_not == 123
+      expect(updated_quiz.assignment_id).not_to eq 123
     end
 
     it "renders an error when the title is too long" do
       long_title = 'a' * ActiveRecord::Base.maximum_string_length + '!'
       json = api_update_quiz({}, {'title' => long_title}, :expected_status => 400 )
-      json.should have_key 'errors'
-      updated_quiz.title.should == 'title'
+      expect(json).to have_key 'errors'
+      expect(updated_quiz.title).to eq 'title'
     end
 
     context 'lockdown_browser' do
@@ -371,29 +377,29 @@ describe Quizzes::QuizzesApiController, type: :request do
         # so register and enable it for these test
         Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
                 :settings => {:enabled => false}})
-        setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+        setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
         setting.settings = {:enabled => true}
         setting.save!
       end
 
       it 'should allow setting require_lockdown_browser' do
         api_update_quiz({'require_lockdown_browser' => false}, {'require_lockdown_browser' => true})
-        updated_quiz.require_lockdown_browser.should be_true
+        expect(updated_quiz.require_lockdown_browser).to be_truthy
       end
 
       it 'should allow setting require_lockdown_browser_for_results' do
         api_update_quiz({'require_lockdown_browser' => true, 'require_lockdown_browser_for_results' => false}, {'require_lockdown_browser_for_results' => true})
-        updated_quiz.require_lockdown_browser_for_results.should be_true
+        expect(updated_quiz.require_lockdown_browser_for_results).to be_truthy
       end
 
       it 'should allow setting require_lockdown_browser_monitor' do
         api_update_quiz({'require_lockdown_browser_monitor' => false}, {'require_lockdown_browser_monitor' => true})
-        updated_quiz.require_lockdown_browser_monitor.should be_true
+        expect(updated_quiz.require_lockdown_browser_monitor).to be_truthy
       end
 
       it 'should allow setting lockdown_browser_monitor_data' do
         api_update_quiz({'lockdown_browser_monitor_data' => nil}, {'lockdown_browser_monitor_data' => 'VGVzdCBEYXRhCg=='})
-        updated_quiz.lockdown_browser_monitor_data.should == 'VGVzdCBEYXRhCg=='
+        expect(updated_quiz.lockdown_browser_monitor_data).to eq 'VGVzdCBEYXRhCg=='
       end
     end
 
@@ -401,25 +407,25 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       it "allows un/publishing an unpublished quiz" do
         api_update_quiz({},{})
-        @quiz.reload.should_not be_published # in 'created' state by default
+        expect(@quiz.reload).not_to be_published # in 'created' state by default
         json = api_update_quiz({}, {published: false})
-        json['unpublishable'].should == true
-        @quiz.reload.should be_unpublished
+        expect(json['unpublishable']).to eq true
+        expect(@quiz.reload).to be_unpublished
         json = api_update_quiz({}, {published: true})
-        json['unpublishable'].should == true
-        @quiz.reload.should be_published
+        expect(json['unpublishable']).to eq true
+        expect(@quiz.reload).to be_published
         api_update_quiz({},{published: nil}) # nil shouldn't change published
-        @quiz.reload.should be_published
+        expect(@quiz.reload).to be_published
 
         @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
         json = api_update_quiz({},{}) # nil shouldn't change published
-        json['unpublishable'].should == false
+        expect(json['unpublishable']).to eq false
 
         json = api_update_quiz({}, {published: false}, {expected_status: 400})
-        json['errors']['published'].should_not be_nil
+        expect(json['errors']['published']).not_to be_nil
 
         ActiveRecord::Base.reset_any_instantiation!
-        @quiz.reload.should be_published
+        expect(@quiz.reload).to be_published
       end
 
       it "should not lose quiz question count when publishing with draft state" do
@@ -430,8 +436,8 @@ describe Quizzes::QuizzesApiController, type: :request do
           question_data: multiple_choice_question_data
         )
         json = api_update_quiz({}, {published: true})
-        @quiz.reload.should be_published
-        @quiz.question_count.should == 1
+        expect(@quiz.reload).to be_published
+        expect(@quiz.question_count).to eq 1
       end
     end
 
@@ -439,72 +445,72 @@ describe Quizzes::QuizzesApiController, type: :request do
       context "hide_results" do
         it "should set hide_results='until_after_last_attempt' if allowed_attempts > 1" do
           api_update_quiz({'allowed_attempts' => 3}, {'hide_results' => 'until_after_last_attempt'})
-          updated_quiz.hide_results.should == 'until_after_last_attempt'
+          expect(updated_quiz.hide_results).to eq 'until_after_last_attempt'
         end
 
         it "should not hide_results='until_after_last_attempt' if allowed_attempts == 1" do
           api_update_quiz({'allowed_attempts' => 1}, {'hide_results' => 'until_after_last_attempt'})
-          updated_quiz.hide_results.should_not == 'until_after_last_attempt'
+          expect(updated_quiz.hide_results).not_to eq 'until_after_last_attempt'
         end
 
         it "should not hide_results='until_after_last_attempt' if allowed_attempts < 1" do
           api_update_quiz({'allowed_attempts' => -1}, {'hide_results' => 'until_after_last_attempt'})
-          updated_quiz.hide_results.should_not == 'until_after_last_attempt'
+          expect(updated_quiz.hide_results).not_to eq 'until_after_last_attempt'
         end
       end
 
       context "show_correct_answers" do
         it "should save show_correct_answers if hide_results is null" do
           api_update_quiz({'hide_results' => nil}, {'show_correct_answers' => false})
-          updated_quiz.show_correct_answers.should be_false
+          expect(updated_quiz.show_correct_answers).to be_falsey
         end
 
         it "should not save show_correct_answers if hide_results is not null" do
           api_update_quiz({'hide_results' => 'always'}, {'show_correct_answers' => false})
-          updated_quiz.show_correct_answers.should be_true
+          expect(updated_quiz.show_correct_answers).to be_truthy
         end
       end
 
       context "scoring_policy" do
         it "should set scoring policy if allowed_attempts > 1" do
           api_update_quiz({'allowed_attempts' => 3}, {'scoring_policy' => 'keep_latest'})
-          updated_quiz.scoring_policy.should == 'keep_latest'
+          expect(updated_quiz.scoring_policy).to eq 'keep_latest'
         end
 
         it "should not set scoring policy if allowed_attempts == 1" do
           api_update_quiz({'allowed_attempts' => 1}, {'scoring_policy' => 'keep_latest'})
-          updated_quiz.scoring_policy.should_not == 'keep_latest'
+          expect(updated_quiz.scoring_policy).not_to eq 'keep_latest'
         end
 
         it "should not set scoring policy if allowed_attempts > 1" do
           api_update_quiz({'allowed_attempts' => -1}, {'scoring_policy' => 'keep_latest'})
-          updated_quiz.scoring_policy.should_not == 'keep_latest'
+          expect(updated_quiz.scoring_policy).not_to eq 'keep_latest'
         end
       end
 
       context "cant_go_back" do
         it "should set cant_go_back if one_question_at_a_time is true" do
           api_update_quiz({'one_question_at_a_time' => true}, {'cant_go_back' => true})
-          updated_quiz.cant_go_back.should be_true
+          expect(updated_quiz.cant_go_back).to be_truthy
         end
 
         it "should not set cant_go_back if one_question_at_a_time is not true" do
           api_update_quiz({'one_question_at_a_time' => false}, {'cant_go_back' => true})
-          updated_quiz.cant_go_back.should_not be_true
+          expect(updated_quiz.cant_go_back).not_to be_truthy
         end
       end
 
       context 'time_limit' do
         it 'should discard negative values' do
           api_update_quiz({'time_limit' => 10}, {'time_limit' => -25})
-          updated_quiz.time_limit.should == 10
+          expect(updated_quiz.time_limit).to eq 10
         end
       end
 
       context 'allowed_attempts' do
         it 'should discard values less than -1' do
           api_update_quiz({'allowed_attempts' => -1}, {'allowed_attempts' => -25})
-          updated_quiz.allowed_attempts.should == -1
+          expect(updated_quiz.allowed_attempts).to eq -1
         end
       end
     end
@@ -529,7 +535,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                   {'Accept' => 'application/vnd.api+json'})
 
       # should be authorization error
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     it "should reorder a quiz's questions" do
@@ -542,7 +548,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       # should reorder the quiz questions
       order = @quiz.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
-      order.should == [@question3.id, @question1.id, @question2.id]
+      expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
 
     it "should reorder a quiz's questions and groups" do
@@ -557,10 +563,10 @@ describe Quizzes::QuizzesApiController, type: :request do
                   {'Accept' => 'application/vnd.api+json'})
 
       # should reorder group
-      @question3.reload.position.should == 1
-      @group.reload.position.should     == 2
-      @question1.reload.position.should == 3
-      @question2.reload.position.should == 4
+      expect(@question3.reload.position).to eq 1
+      expect(@group.reload.position).to     eq 2
+      expect(@question1.reload.position).to eq 3
+      expect(@question2.reload.position).to eq 4
     end
 
     it "should pull questions out of a group to the root quiz" do
@@ -575,7 +581,125 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       # should remove items from the group
       order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
-      order.should == [@question1.id]
+      expect(order).to eq [@question1.id]
+    end
+  end
+
+  describe "differentiated assignments" do
+    def calls_display_quiz(quiz, opts={except: []})
+      get_index(quiz.context)
+      expect(JSON.parse(response.body).to_s).to include("#{quiz.title}")
+      get_show(quiz)
+      expect(JSON.parse(response.body).to_s).to include("#{quiz.title}")
+    end
+
+    def calls_do_not_show_quiz(quiz)
+      get_index(quiz.context)
+      expect(JSON.parse(response.body).to_s).not_to include("#{quiz.title}")
+      get_show(quiz)
+      assert_status(401)
+    end
+
+    def get_index(course)
+      raw_api_call(:get, "/api/v1/courses/#{course.id}/quizzes",
+                   :controller => "quizzes/quizzes_api",
+                   :action => "index",
+                   :format => "json",
+                   :course_id => "#{course.id}")
+    end
+
+    def get_show(quiz)
+      raw_api_call(:get, "/api/v1/courses/#{quiz.context.id}/quizzes/#{quiz.id}",
+                        :controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{quiz.context.id}", :id => "#{quiz.id}")
+    end
+
+    def create_quiz_for_da(opts={})
+      @quiz = Quizzes::Quiz.create!({
+        context: @course,
+        description: 'descript foo',
+        only_visible_to_overrides: opts[:only_visible_to_overrides],
+        points_possible: rand(1000),
+        title: opts[:title]
+      })
+      @quiz.publish
+      @quiz.save!
+      @assignment = @quiz.assignment
+      @quiz
+    end
+
+    before(:once) do
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @student_with_override, @student_without_override= create_users(2, return_type: :record)
+
+      @quiz_with_restricted_access = create_quiz_for_da(title: "only visible to student one", only_visible_to_overrides: true)
+      @quiz_visible_to_all = create_quiz_for_da(title: "assigned to all", only_visible_to_overrides: false)
+
+      @course.enroll_student(@student_without_override, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student_with_override)
+      create_section_override_for_quiz(@quiz_with_restricted_access, {course_section: @section})
+
+      @observer = User.create
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active')
+      @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+    end
+
+    context "feature flag on" do
+      before {@course.enable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all quizzes" do
+        @user = @teacher
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "lets students with visibility see quizzes" do
+        @user = @student_with_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it 'gives observers the same visibility as their student' do
+        @user = @observer
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it 'observers without students see all' do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q)}
+      end
+
+      it "restricts access to students without visibility" do
+        @user = @student_without_override
+        calls_do_not_show_quiz(@quiz_with_restricted_access)
+        calls_display_quiz(@quiz_visible_to_all)
+      end
+
+      it "doesnt show extra assignments with overrides in the index" do
+        @quiz_assigned_to_empty_section = create_quiz_for_da(title: "assigned to none", only_visible_to_overrides: true)
+        @unassigned_section = @course.course_sections.create!(name: "unassigned section")
+        create_section_override_for_quiz(@quiz_assigned_to_empty_section, {course_section: @unassigned_section})
+
+        @user = @student_with_override
+        get_index(@course)
+        expect(JSON.parse(response.body).to_s).not_to include("#{@quiz_assigned_to_empty_section.title}")
+      end
+    end
+
+    context "feature flag off" do
+      before {@course.disable_feature!(:differentiated_assignments)}
+      it "lets the teacher see all quizzes" do
+        @user = @teacher
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "lets students with visibility see quizzes" do
+        @user = @student_with_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
+
+      it "does not restrict access to students without visibility" do
+        @user = @student_without_override
+        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+      end
     end
   end
 end

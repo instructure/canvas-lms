@@ -188,4 +188,10 @@ class Wiki < ActiveRecord::Base
     page.initialize_wiki_page(user)
     page
   end
+
+  def path
+    if self.context.respond_to?(:feature_enabled?)
+      self.context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'
+    end
+  end
 end

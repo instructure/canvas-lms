@@ -33,7 +33,7 @@ describe "/wiki_pages/show" do
   it "should render" do
     render "wiki_pages/show"
     doc = Nokogiri::HTML(response.body)
-    doc.css('#wiki_body').text.index(assigns[:page].body).should_not be_nil
+    expect(doc.css('#wiki_body').text.index(assigns[:page].body)).not_to be_nil
   end
 
   it "should not render user content when editing" do
@@ -41,8 +41,8 @@ describe "/wiki_pages/show" do
     render "wiki_pages/show"
 
     doc = Nokogiri::HTML(response.body)
-    doc.css('#wiki_body').text.index(assigns[:page].body).should be_nil
-    doc.css('#wiki_body').text.index('Editing Content').should_not be_nil
+    expect(doc.css('#wiki_body').text.index(assigns[:page].body)).to be_nil
+    expect(doc.css('#wiki_body').text.index('Editing Content')).not_to be_nil
   end
 end
 

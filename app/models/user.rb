@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
   include Context
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
-  attr_accessor :previous_id, :menu_data
+  attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
@@ -110,6 +110,7 @@ class User < ActiveRecord::Base
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
+  has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
@@ -209,6 +210,18 @@ class User < ActiveRecord::Base
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :assignment_id => assignment_id, :course_id => course_id })
   }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :able_to_see_quiz_in_course_with_da, lambda {|quiz_id, course_id|
+    joins(:quiz_student_visibilities).
+    where(:quiz_student_visibilities => { :quiz_id => quiz_id, :course_id => course_id })
+  }
+
+  def assignment_and_quiz_visibilities(opts = {})
+     opts = {user_id: self.id}.merge(opts)
+     {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
+      quiz_ids: Quizzes::QuizStudentVisibility.where(opts).order('quiz_id desc').pluck(:quiz_id)}
+  end
 
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause
@@ -1203,7 +1216,7 @@ class User < ActiveRecord::Base
 
   def self.user_id_from_avatar_key(key)
     user_id, sig = key.to_s.split(/-/, 2)
-    (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
+    Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
@@ -1338,27 +1351,11 @@ class User < ActiveRecord::Base
 
   def assignments_visibile_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
+    published_visible_assignments = course.active_assignments.published
     if course.feature_enabled?(:differentiated_assignments)
-      return assignments_visible_as_observer(course) if course.user_has_been_observer?(self)
-      course.active_assignments.published.visible_to_student_in_course_with_da(self.id, course.id)
-    else
-      course.active_assignments.published
+      published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
     end
-  end
-
-  def assignments_visible_as_observer(course)
-    return [] unless course.user_has_been_observer?(self)
-
-    observed_student_ids = ObserverEnrollment.observed_student_ids(course, self)
-    if self.student_enrollments.any?
-      observed_student_ids.concat self.student_enrollments.pluck(:user_id)
-    end
-
-    if course.feature_enabled?(:differentiated_assignments) && observed_student_ids.any?
-      course.active_assignments.visible_to_student_in_course_with_da(observed_student_ids, course.id)
-    else
-      course.active_assignments
-    end
+    published_visible_assignments
   end
 
   def assignments_needing_submitting(opts={})
@@ -1421,7 +1418,7 @@ class User < ActiveRecord::Base
               expecting_submission.
               not_ignored_by(self, 'grading').
               need_grading_info(limit)
-            Assignment.send :preload_associations, as, :context
+            ActiveRecord::Associations::Preloader.new(as, :context).run
             as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
           end
           # outer limit, since there could be limit * n_shards results
@@ -1587,9 +1584,9 @@ class User < ActiveRecord::Base
               scope = scope.where(:id => local_ids)
             end
 
-            courses = scope.distinct_on(["courses.id"],
-              :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-              :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+            courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+                order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
+                distinct_on(:id).to_a
 
             unless options[:include_completed_courses]
               enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
@@ -1616,8 +1613,15 @@ class User < ActiveRecord::Base
         end
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
-          Enrollment.send(:preload_associations, pending_enrollments, :course)
-          res.concat(pending_enrollments.map { |e| c = e.course; c.write_attribute(:primary_enrollment, e.type); c.write_attribute(:primary_enrollment_rank, e.rank_sortable.to_s); c.write_attribute(:primary_enrollment_state, e.workflow_state); c.write_attribute(:invitation, e.uuid); c })
+          ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
+          res.concat(pending_enrollments.map do |e|
+            c = e.course
+            c.primary_enrollment = e.type
+            c.primary_enrollment_rank = e.rank_sortable.to_s
+            c.primary_enrollment_state = e.workflow_state
+            c.invitation = e.uuid
+            c
+          end)
           res.uniq!
         end
       end
@@ -1656,7 +1660,7 @@ class User < ActiveRecord::Base
       res
     end + temporary_invitations
     if opts[:preload_courses]
-      Enrollment.send(:preload_associations, enrollments, [:course])
+      ActiveRecord::Associations::Preloader.new(enrollments, :course).run
     end
     enrollments
   end
@@ -1730,7 +1734,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          Submission.send(:preload_associations, submissions, [:assignment, :user, :submission_comments])
+          ActiveRecord::Associations::Preloader.new(submissions, [:assignment, :user, :submission_comments]).run
           submissions
         end
       end
@@ -2367,18 +2371,20 @@ class User < ActiveRecord::Base
     [time, ips, hmac]
   end
 
-  def otp_secret_key_remember_me_cookie(time, current_cookie, remote_ip = nil)
+  def otp_secret_key_remember_me_cookie(time, current_cookie, remote_ip = nil, options = {})
     _, ips, _ = parse_otp_remember_me_cookie(current_cookie)
     cookie = [time.to_i, *[*ips, remote_ip].compact.sort].join('-')
 
-    "#{cookie}-#{Canvas::Security.hmac_sha1("#{cookie}.#{self.otp_secret_key}")}"
+    hmac_string = "#{cookie}.#{self.otp_secret_key}"
+    return hmac_string if options[:hmac_string]
+    "#{cookie}-#{Canvas::Security.hmac_sha1(hmac_string)}"
   end
 
   def validate_otp_secret_key_remember_me_cookie(value, remote_ip = nil)
     time, ips, hmac = parse_otp_remember_me_cookie(value)
     time.to_i >= (Time.now.utc - 30.days).to_i &&
         (remote_ip.nil? || ips.include?(remote_ip)) &&
-        value == otp_secret_key_remember_me_cookie(time, value)
+        Canvas::Security.verify_hmac_sha1(hmac, otp_secret_key_remember_me_cookie(time, value, nil, hmac_string: true))
   end
 
   def otp_secret_key
@@ -2388,7 +2394,7 @@ class User < ActiveRecord::Base
 
   def otp_secret_key=(key)
     if key
-      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key', self.shard.settings[:encryption_key])
+      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key')
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end

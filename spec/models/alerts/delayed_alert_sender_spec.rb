@@ -71,7 +71,7 @@ module Alerts
 
           DelayedAlertSender.evaluate_for_course(@course, account_alerts)
 
-          account_alerts.should == []
+          expect(account_alerts).to eq []
         end
       end
 
@@ -244,7 +244,7 @@ module Alerts
           alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
           alert.save!
           @mock_notification.expects(:create_message).with do |alert, _, _|
-            alert.criteria.first.criterion_type.should == 'UngradedTimespan'
+            expect(alert.criteria.first.criterion_type).to eq 'UngradedTimespan'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -255,7 +255,7 @@ module Alerts
           alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
           alert.save!
           @mock_notification.expects(:create_message).with do |alert, _, _|
-            alert.criteria.first.criterion_type.should == 'UngradedCount'
+            expect(alert.criteria.first.criterion_type).to eq 'UngradedCount'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -272,7 +272,7 @@ module Alerts
           alert.save!
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with do |alert, _, _|
-            alert.criteria.first.criterion_type.should == 'UserNote'
+            expect(alert.criteria.first.criterion_type).to eq 'UserNote'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -284,7 +284,7 @@ module Alerts
           alert.save!
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with do |alert, _, _|
-            alert.criteria.first.criterion_type.should == 'Interaction'
+            expect(alert.criteria.first.criterion_type).to eq 'Interaction'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)

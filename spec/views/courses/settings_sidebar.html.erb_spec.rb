@@ -37,7 +37,7 @@ describe "courses/_settings_sidebar.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      response.body.should_not match(/Conclude this Course/)
+      expect(response.body).not_to match(/Conclude this Course/)
     end
 
     it "should display if the course and its term haven't ended" do
@@ -45,7 +45,7 @@ describe "courses/_settings_sidebar.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      response.body.should match(/Conclude this Course/)
+      expect(response.body).to match(/Conclude this Course/)
     end
   end
 
@@ -55,7 +55,7 @@ describe "courses/_settings_sidebar.html.erb" do
       assigns[:current_user] = @user
       render
       doc = Nokogiri::HTML.parse(response.body)
-      doc.at_css('#reset_course_content_dialog')['style'].should == 'display:none;'
+      expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
     end
   end
 
@@ -85,7 +85,7 @@ describe "courses/_settings_sidebar.html.erb" do
       assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
       render
       doc = Nokogiri::HTML.parse(response.body)
-      doc.css('.course-settings-sub-navigation-lti').size.should == num_tools
+      expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
     end
 
     it "should include the launch type parameter" do
@@ -94,7 +94,7 @@ describe "courses/_settings_sidebar.html.erb" do
       render
       doc = Nokogiri::HTML.parse(response.body)
       tool_link = doc.at_css('.course-settings-sub-navigation-lti')
-      tool_link['href'].should include("launch_type=course_settings_sub_navigation")
+      expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
     end
   end
 

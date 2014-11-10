@@ -20,16 +20,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionAttempt do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "#initialize" do
     it "should assign number" do
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1)
-      attempt.number.should == 1
+      expect(attempt.number).to eq 1
     end
 
     it "should assign versions" do
       versions = [1, 2, 3]
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1, :versions => versions)
-      attempt.versions.should == versions
+      expect(attempt.versions).to eq versions
     end
   end
 end

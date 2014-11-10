@@ -27,25 +27,25 @@ describe "API Error Handling", type: :request do
   describe "ActiveRecord Error JSON override" do
     it "should not return the base object in ErrorMessage.to_json" do
       err = ActiveModel::BetterErrors::ErrorMessage.new(@user, :name, :invalid, "invalid name")
-      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name', 'options' => {} }
+      expect(JSON.parse(err.to_json)).to eq({ 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name', 'options' => {} })
     end
 
     it "should not return the base object in ActiveRecord::Errors.to_json" do
       page = WikiPage.new(:body => 'blah blah', :title => 'blah blah')
-      page.valid?.should be_false
+      expect(page.valid?).to be_falsey
       errors = page.errors.to_json
       parsed = JSON.parse(errors)['errors']
-      parsed.size.should > 0
-      errors.should_not match(/blah blah/)
-      parsed.each { |k,v| v.each { |i| i.keys.sort.should == ['attribute', 'message', 'type'] } }
+      expect(parsed.size).to be > 0
+      expect(errors).not_to match(/blah blah/)
+      parsed.each { |k,v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
     end
   end
 
   it "should respond not_found for 404 errors" do
     get "/api/v1/courses/54321", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
-    response.response_code.should == 404
+    expect(response.response_code).to eq 404
     json = JSON.parse(response.body)
-    json['errors'].should == [{'message' => 'The specified resource does not exist.'}]
+    expect(json['errors']).to eq [{'message' => 'The specified resource does not exist.'}]
   end
 end
 

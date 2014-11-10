@@ -23,12 +23,12 @@ describe "collaborations" do
     f(".collaboration_#{collaboration.id} .delete_collaboration_link").click
 
     if type == 'google_docs'
-      keep_trying_until { f('#delete_collaboration_dialog .delete_button').should be_displayed }
+      keep_trying_until { expect(f('#delete_collaboration_dialog .delete_button')).to be_displayed }
       f('#delete_collaboration_dialog .delete_button').click
     else
       #driver.switch_to.alert.accept
     end
-    keep_trying_until { f(".collaboration_#{collaboration.id} .delete_collaboration_link").should be_nil }
+    keep_trying_until { expect(f(".collaboration_#{collaboration.id} .delete_collaboration_link")).to be_nil }
   end
 
   # Public: Given an array of collaborations, verify their presence.
@@ -48,7 +48,7 @@ describe "collaborations" do
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
       keep_trying_until {
-        form_visible?.should == form_visible
+        expect(form_visible?).to eq form_visible
       }
     end
   end
@@ -122,7 +122,7 @@ describe "collaborations" do
           create_collaboration!(type, title)
           validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
           delete_collaboration(@collaboration, type)
-          form_visible?.should be_true
+          expect(form_visible?).to be_truthy
         end
 
         it 'should not display the new collaboration form when the penultimate collaboration is deleted' do
@@ -141,9 +141,9 @@ describe "collaborations" do
 
           validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
           delete_collaboration(@collaboration1, type)
-          form_visible?.should be_false
+          expect(form_visible?).to be_falsey
           delete_collaboration(@collaboration2, type)
-          form_visible?.should be_true
+          expect(form_visible?).to be_truthy
         end
 
         it 'should leave the new collaboration form open when the last collaboration is deleted' do
@@ -152,7 +152,7 @@ describe "collaborations" do
                                      /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
           f('.add_collaboration_link').click
           delete_collaboration(@collaboration, type)
-          form_visible?.should be_true
+          expect(form_visible?).to be_truthy
         end
       end
     end

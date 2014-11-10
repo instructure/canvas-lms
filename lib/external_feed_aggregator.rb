@@ -31,14 +31,16 @@ class ExternalFeedAggregator
   
   def process
     Shackles.activate(:slave) do
-      ExternalFeed.transaction do
-        ExternalFeed.to_be_polled.find_each do |feed|
+      start = Time.now.utc
+      begin
+        feeds = ExternalFeed.to_be_polled(start).limit(1000).to_a
+        feeds.each do |feed|
           next if !feed.context || feed.context.root_account.deleted?
           Shackles.activate(:master) do
             process_feed(feed)
           end
         end
-      end
+      end while (!feeds.empty?)
     end
   end
   

@@ -45,11 +45,11 @@ describe Polling::PollSessionsController, type: :request do
       json = get_index
       poll_sessions_json = json['poll_sessions']
       session_ids = @poll.poll_sessions.pluck(:id)
-      poll_sessions_json.size.should == 3
+      expect(poll_sessions_json.size).to eq 3
 
       poll_sessions_json.each_with_index do |session, i|
-        session_ids.should include(session['id'].to_i)
-        session['is_published'].should be_false
+        expect(session_ids).to include(session['id'].to_i)
+        expect(session['is_published']).to be_falsey
       end
     end
 
@@ -58,16 +58,16 @@ describe Polling::PollSessionsController, type: :request do
       poll_sessions_json = json['poll_sessions']
       session_ids = @poll.poll_sessions.pluck(:id)
 
-      poll_sessions_json.size.should == 3
+      expect(poll_sessions_json.size).to eq 3
 
       poll_sessions_json.each_with_index do |session, i|
-        session_ids.should include(session['id'].to_i)
-        session['is_published'].should be_false
+        expect(session_ids).to include(session['id'].to_i)
+        expect(session['is_published']).to be_falsey
       end
 
-      json.should have_key('meta')
-      json['meta'].should have_key('pagination')
-      json['meta']['primaryCollection'].should == 'poll_sessions'
+      expect(json).to have_key('meta')
+      expect(json['meta']).to have_key('pagination')
+      expect(json['meta']['primaryCollection']).to eq 'poll_sessions'
     end
   end
 
@@ -101,8 +101,8 @@ describe Polling::PollSessionsController, type: :request do
       json = get_show
       poll_session_json = json['poll_sessions'].first
 
-      poll_session_json['id'].should == @poll_session.id.to_s
-      poll_session_json['is_published'].should be_true
+      expect(poll_session_json['id']).to eq @poll_session.id.to_s
+      expect(poll_session_json['is_published']).to be_truthy
     end
 
     context "as a teacher" do
@@ -112,8 +112,8 @@ describe Polling::PollSessionsController, type: :request do
         @user = @teacher
         json = get_show
         poll_json = json['poll_sessions'].first
-        poll_json['id'].should == @poll_session.id.to_s
-        poll_json['is_published'].should be_false
+        expect(poll_json['id']).to eq @poll_session.id.to_s
+        expect(poll_json['is_published']).to be_falsey
       end
 
       it "embeds the associated poll submissions" do
@@ -127,8 +127,8 @@ describe Polling::PollSessionsController, type: :request do
         json = get_show
         poll_session_json = json['poll_sessions'].first
 
-        poll_session_json.should have_key('poll_submissions')
-        poll_session_json['poll_submissions'].size.should == 3
+        expect(poll_session_json).to have_key('poll_submissions')
+        expect(poll_session_json['poll_submissions'].size).to eq 3
       end
 
       it "shows the results of a current poll session" do
@@ -142,9 +142,9 @@ describe Polling::PollSessionsController, type: :request do
         json = get_show
         poll_session_json = json['poll_sessions'].first
 
-        poll_session_json.should have_key('results')
-        poll_session_json['results'][choice1.id.to_s].should == 3
-        poll_session_json['results'][choice2.id.to_s].should == 2
+        expect(poll_session_json).to have_key('results')
+        expect(poll_session_json['results'][choice1.id.to_s]).to eq 3
+        expect(poll_session_json['results'][choice2.id.to_s]).to eq 2
       end
     end
 
@@ -158,9 +158,9 @@ describe Polling::PollSessionsController, type: :request do
 
         get_show(true)
 
-        response.code.should == '401'
+        expect(response.code).to eq '401'
         @poll_session.reload
-        @poll_session.poll_submissions.size.should be_zero
+        expect(@poll_session.poll_submissions.size).to be_zero
       end
 
       it "returns has_submitted as true if the student has made a submission" do
@@ -170,8 +170,8 @@ describe Polling::PollSessionsController, type: :request do
         @user = submission.user
         json = get_show['poll_sessions'].first
 
-        json.should have_key('has_submitted')
-        json['has_submitted'].should be_true
+        expect(json).to have_key('has_submitted')
+        expect(json['has_submitted']).to be_truthy
       end
 
       it "doesn't embed the associated poll submissions" do
@@ -185,8 +185,8 @@ describe Polling::PollSessionsController, type: :request do
 
         json = get_show['poll_sessions'].first
 
-        json.should have_key('poll_submissions')
-        json['poll_submissions'].size.should be_zero
+        expect(json).to have_key('poll_submissions')
+        expect(json['poll_submissions'].size).to be_zero
       end
 
       it "does embed the student's own submission" do
@@ -200,8 +200,8 @@ describe Polling::PollSessionsController, type: :request do
         )
 
         json = get_show['poll_sessions'].first
-        json.should have_key('poll_submissions')
-        json['poll_submissions'].size.should be(1)
+        expect(json).to have_key('poll_submissions')
+        expect(json['poll_submissions'].size).to be(1)
       end
 
       context "when has_public_results is false" do
@@ -218,7 +218,7 @@ describe Polling::PollSessionsController, type: :request do
           json = get_show
           poll_session_json = json['poll_sessions'].first
 
-          poll_session_json.should_not have_key('results')
+          expect(poll_session_json).not_to have_key('results')
         end
       end
 
@@ -238,7 +238,7 @@ describe Polling::PollSessionsController, type: :request do
           json = get_show
           poll_session_json = json['poll_sessions'].first
 
-          poll_session_json.should have_key('results')
+          expect(poll_session_json).to have_key('results')
         end
       end
     end
@@ -262,23 +262,23 @@ describe Polling::PollSessionsController, type: :request do
     context "as a teacher" do
       it "creates a poll session successfully" do
         post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: true)
-        @poll.poll_sessions.size.should == 1
-        @poll.poll_sessions.first.course_section.should == @section
-        @poll.poll_sessions.first.has_public_results.should be_true
+        expect(@poll.poll_sessions.size).to eq 1
+        expect(@poll.poll_sessions.first.course_section).to eq @section
+        expect(@poll.poll_sessions.first.has_public_results).to be_truthy
       end
 
       it "defaults has_public_results to false if has_public_results is blank" do
         post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: "")
-        @poll.poll_sessions.size.should == 1
-        @poll.poll_sessions.first.course_section.should == @section
-        @poll.poll_sessions.first.has_public_results.should be_false
+        expect(@poll.poll_sessions.size).to eq 1
+        expect(@poll.poll_sessions.first.course_section).to eq @section
+        expect(@poll.poll_sessions.first.has_public_results).to be_falsey
       end
 
       it "returns an error if the supplied course section is invalid" do
         post_create({course_section_id: @section.id + 666, course_id: @course.id}, true)
 
-        response.code.should == "404"
-        response.body.should =~ /The specified resource does not exist/
+        expect(response.code).to eq "404"
+        expect(response.body).to match /The specified resource does not exist/
       end
     end
   end
@@ -307,8 +307,8 @@ describe Polling::PollSessionsController, type: :request do
 
         put_update(course_section_id: section.id, has_public_results: true)
         @poll_session.reload
-        @poll_session.course_section.id.should == section.id
-        @poll_session.has_public_results.should be_true
+        expect(@poll_session.course_section.id).to eq section.id
+        expect(@poll_session.has_public_results).to be_truthy
       end
 
       it "updates courses and sections gracefully" do
@@ -316,12 +316,12 @@ describe Polling::PollSessionsController, type: :request do
         new_course.enroll_teacher(@teacher)
         new_section = new_course.course_sections.create!(name: 'Another nother section')
 
-        new_course.should_not == @course
+        expect(new_course).not_to eq @course
 
         put_update(course_section_id: new_section.id, course_id: new_course.id)
         @poll_session.reload
-        @poll_session.course.should == new_course
-        @poll_session.course_section.should == new_section
+        expect(@poll_session.course).to eq new_course
+        expect(@poll_session.course_section).to eq new_section
       end
     end
 
@@ -334,9 +334,9 @@ describe Polling::PollSessionsController, type: :request do
         put_update({course_section_id: section.id}, true)
 
         @poll_session.reload
-        response.code.should == '401'
-        @poll_session.course_section.id.should_not == section.id
-        @poll_session.course_section.id.should == original_id
+        expect(response.code).to eq '401'
+        expect(@poll_session.course_section.id).not_to eq section.id
+        expect(@poll_session.course_section.id).to eq original_id
       end
     end
   end
@@ -361,12 +361,12 @@ describe Polling::PollSessionsController, type: :request do
       it "publishes a poll session successfully" do
         @poll_session.update_attribute(:is_published, false)
         @poll_session.reload
-        @poll_session.is_published.should be_false
+        expect(@poll_session.is_published).to be_falsey
 
         get_open
 
         @poll_session.reload
-        @poll_session.is_published.should be_true
+        expect(@poll_session.is_published).to be_truthy
       end
 
       context "not teaching the course" do
@@ -374,13 +374,13 @@ describe Polling::PollSessionsController, type: :request do
           course_with_teacher
           @poll_session.update_attribute(:is_published, false)
           @poll_session.reload
-          @poll_session.is_published.should be_false
+          expect(@poll_session.is_published).to be_falsey
 
           get_open
 
-          response.code.should == '401'
+          expect(response.code).to eq '401'
           @poll_session.reload
-          @poll_session.is_published.should_not be_true
+          expect(@poll_session.is_published).not_to be_truthy
         end
       end
     end
@@ -390,13 +390,13 @@ describe Polling::PollSessionsController, type: :request do
         student_in_course(:active_all => true, :course => @course)
         @poll_session.update_attribute(:is_published, false)
         @poll_session.reload
-        @poll_session.is_published.should be_false
+        expect(@poll_session.is_published).to be_falsey
 
         get_open
 
         @poll_session.reload
-        response.code.should == '401'
-        @poll_session.is_published.should_not be_true
+        expect(response.code).to eq '401'
+        expect(@poll_session.is_published).not_to be_truthy
       end
     end
   end
@@ -423,7 +423,7 @@ describe Polling::PollSessionsController, type: :request do
         get_close
 
         @poll_session.reload
-        @poll_session.is_published.should be_false
+        expect(@poll_session.is_published).to be_falsey
       end
 
       context "not teaching the course" do
@@ -431,13 +431,13 @@ describe Polling::PollSessionsController, type: :request do
           course_with_teacher
           @poll_session.update_attribute(:is_published, true)
           @poll_session.reload
-          @poll_session.is_published.should be_true
+          expect(@poll_session.is_published).to be_truthy
 
           get_close
 
-          response.code.should == '401'
+          expect(response.code).to eq '401'
           @poll_session.reload
-          @poll_session.is_published.should_not be_false
+          expect(@poll_session.is_published).not_to be_falsey
         end
       end
     end
@@ -449,8 +449,8 @@ describe Polling::PollSessionsController, type: :request do
         get_close
 
         @poll_session.reload
-        response.code.should == '401'
-        @poll_session.is_published.should be_true
+        expect(response.code).to eq '401'
+        expect(@poll_session.is_published).to be_truthy
       end
     end
   end
@@ -484,9 +484,9 @@ describe Polling::PollSessionsController, type: :request do
 
       session_ids = json.map { |session| session["id"].to_i }
 
-      session_ids.should include(@published.id)
-      session_ids.should_not include(@unenrolled.id)
-      session_ids.should_not include(@not_published.id)
+      expect(session_ids).to include(@published.id)
+      expect(session_ids).not_to include(@unenrolled.id)
+      expect(session_ids).not_to include(@not_published.id)
     end
 
     it "doesn't return poll sessions for course sections the user is not enrolled in" do
@@ -500,8 +500,8 @@ describe Polling::PollSessionsController, type: :request do
 
       session_ids = json.map { |session| session["id"].to_i }
 
-      session_ids.should include(@published.id)
-      session_ids.should_not include(@wrong_course_section.id)
+      expect(session_ids).to include(@published.id)
+      expect(session_ids).not_to include(@wrong_course_section.id)
     end
 
     it "paginates to the jsonapi standard if requested" do
@@ -516,13 +516,13 @@ describe Polling::PollSessionsController, type: :request do
       sessions = json['poll_sessions']
       session_ids = sessions.map { |session| session["id"].to_i }
 
-      session_ids.should include(@published.id)
-      session_ids.should_not include(@unenrolled.id)
-      session_ids.should_not include(@not_published.id)
+      expect(session_ids).to include(@published.id)
+      expect(session_ids).not_to include(@unenrolled.id)
+      expect(session_ids).not_to include(@not_published.id)
 
-      json.should have_key('meta')
-      json['meta'].should have_key('pagination')
-      json['meta']['primaryCollection'].should == 'poll_sessions'
+      expect(json).to have_key('meta')
+      expect(json['meta']).to have_key('pagination')
+      expect(json['meta']['primaryCollection']).to eq 'poll_sessions'
     end
   end
 
@@ -556,9 +556,9 @@ describe Polling::PollSessionsController, type: :request do
 
       session_ids = json.map { |session| session["id"].to_i }
 
-      session_ids.should include(@not_published.id)
-      session_ids.should_not include(@unenrolled.id)
-      session_ids.should_not include(@published.id)
+      expect(session_ids).to include(@not_published.id)
+      expect(session_ids).not_to include(@unenrolled.id)
+      expect(session_ids).not_to include(@published.id)
     end
 
     it "doesn't return poll sessions for course sections the user is not enrolled in" do
@@ -572,8 +572,8 @@ describe Polling::PollSessionsController, type: :request do
 
       session_ids = json.map { |session| session["id"].to_i }
 
-      session_ids.should include(@not_published.id)
-      session_ids.should_not include(@wrong_course_section.id)
+      expect(session_ids).to include(@not_published.id)
+      expect(session_ids).not_to include(@wrong_course_section.id)
     end
 
     it "paginates to the jsonapi standard if requested" do
@@ -590,13 +590,13 @@ describe Polling::PollSessionsController, type: :request do
       sessions = json['poll_sessions']
       session_ids = sessions.map { |session| session["id"].to_i }
 
-      session_ids.should include(@not_published.id)
-      session_ids.should_not include(@unenrolled.id)
-      session_ids.should_not include(@published.id)
+      expect(session_ids).to include(@not_published.id)
+      expect(session_ids).not_to include(@unenrolled.id)
+      expect(session_ids).not_to include(@published.id)
 
-      json.should have_key('meta')
-      json['meta'].should have_key('pagination')
-      json['meta']['primaryCollection'].should == 'poll_sessions'
+      expect(json).to have_key('meta')
+      expect(json['meta']).to have_key('pagination')
+      expect(json['meta']['primaryCollection']).to eq 'poll_sessions'
     end
   end
 end

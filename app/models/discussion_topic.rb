@@ -32,6 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category, :group_category_id
+  attr_accessor :user_has_posted
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -476,14 +477,39 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :visible_to_students_with_da_enabled, lambda { |user_ids|
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     joins("LEFT JOIN assignment_student_visibilities ON assignment_student_visibilities.assignment_id = discussion_topics.assignment_id").
-    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids)
+    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids).
+    where("discussion_topics.context_id IN (?)",course_ids)
    }
 
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
+
+  def self.visible_ids_by_user(opts)
+    # pluck id, assignment_id, and user_id from discussions joined with the SQL view
+    plucked_visibilities = pluck_discussion_visibilities(opts).group_by{|r| r["user_id"]}
+    # discussions with no user_id are visible to all, so add them into every students hash at the end
+    ids_of_discussions_visible_to_all = (plucked_visibilities.delete(nil) || []).map{|r| r["id"]}.uniq
+    # format to be hash of user_id's with array of discussion_ids: {1 => [2,3,4], 2 => [2,4]}
+    opts[:user_id].reduce({}) do |vis_hash, student_id|
+      vis_hash[student_id] = begin
+        ids_from_pluck = (plucked_visibilities[student_id.to_s] || []).map{|r| r["id"]}
+        ids_from_pluck.concat(ids_of_discussions_visible_to_all).map(&:to_i)
+      end
+      vis_hash
+    end
+  end
+
+  def self.pluck_discussion_visibilities(opts)
+    # once on Rails 4 change this to a multi-column pluck
+    # and clean up reformatting in visible_ids_by_user
+    connection.select_all(
+      self.visible_to_students_in_course_with_da(opts[:user_id],opts[:course_id]).
+        select(["discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id"])
+    )
+  end
 
   def should_lock_yet
     # not assignment or vdd aware! only use this to check the topic's own field!
@@ -730,7 +756,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && self.available_for?(user) }
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.closed_for_comment_for?(user) }
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
@@ -742,10 +768,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.active? && self.available_for?(user) && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && !self.closed_for_comment_for?(user) &&
+        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
 
-    given { |user, session| self.active? && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :read
 
     given { |user, session|
@@ -841,7 +868,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { active_participants - [user] }
+    p.to { active_participants_with_visibility - [user] }
     p.whenever { |record|
       record.context.available? and
         !record.context.concluded? and
@@ -866,6 +893,15 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def active_participants_with_visibility
+    return active_participants unless context.feature_enabled?(:differentiated_assignments)
+    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id).pluck(:user_id)
+    # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
+    instructor_ids = context.participating_instructors.pluck(:id)
+    users_with_visibility.concat(instructor_ids)
+    active_participants.select{|p| users_with_visibility.include?(p.id)}
+  end
+
   def participating_users(user_ids)
     context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
   end
@@ -878,7 +914,23 @@ class DiscussionTopic < ActiveRecord::Base
     poster_ids = posters.map(&:id)
     legacy_sub_ids &= poster_ids
     sub_ids += legacy_sub_ids
-    participating_users(sub_ids)
+
+    subscribed_users = participating_users(sub_ids)
+
+    if context.feature_enabled?(:differentiated_assignments) && self.for_assignment?
+      students_with_visibility = AssignmentStudentVisibility.where(course_id: context_id, assignment_id: assignment_id).pluck(:user_id)
+      admin_ids = self.context.participating_admins.pluck(:id)
+      observer_ids = self.context.participating_observers.pluck(:id)
+      observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(self.context,observer_ids)
+
+      subscribed_users.select!{ |user|
+        students_with_visibility.include?(user.id) || admin_ids.include?(user.id) ||
+        # an observer with no students or one with students who have visibility
+        (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
+      }
+    end
+
+    subscribed_users
   end
 
   def posters
@@ -935,6 +987,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def closed_for_comment_for?(user, opts={})
+    return true if self.locked?
     lock = self.locked_for?(user, opts)
     return false unless lock
     return false if self.draft_state_enabled? && lock.include?(:unlock_at)

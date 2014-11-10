@@ -38,8 +38,8 @@ describe CC::CCHelper do
       translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
-      @exporter.media_object_infos[@obj.id].should_not be_nil
-      @exporter.media_object_infos[@obj.id][:asset][:id].should == 'one'
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
     end
 
     it "should not touch media links on course copy" do
@@ -48,7 +48,7 @@ describe CC::CCHelper do
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       translated = @exporter.html_content(orig)
-      translated.should == orig
+      expect(translated).to eq orig
     end
 
     it "should translate media links using an alternate flavor" do
@@ -56,15 +56,15 @@ describe CC::CCHelper do
       translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
-      @exporter.media_object_infos[@obj.id].should_not be_nil
-      @exporter.media_object_infos[@obj.id][:asset][:id].should == 'two'
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'two'
     end
 
     it "should ignore media links with no media comment id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
       html = %{<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>}
       translated = @exporter.html_content(html)
-      translated.should == html
+      expect(translated).to eq html
     end
 
     it "should find media objects outside the context (because course copy)" do
@@ -73,7 +73,7 @@ describe CC::CCHelper do
       @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
-      @exporter.used_media_objects.map(&:media_id).should eql(['abcde'])
+      expect(@exporter.used_media_objects.map(&:media_id)).to eql(['abcde'])
     end
 
     it "should export html with a utf-8 charset" do
@@ -81,8 +81,8 @@ describe CC::CCHelper do
       html = %{<div>My Title\302\240</div>}
       exported = @exporter.html_page(html, "my title page")
       doc = Nokogiri::HTML(exported)
-      doc.encoding.upcase.should == 'UTF-8'
-      doc.at_css('html body div').to_s.should == "<div>My Title\302\240</div>"
+      expect(doc.encoding.upcase).to eq 'UTF-8'
+      expect(doc.at_css('html body div').to_s).to eq "<div>My Title\302\240</div>"
     end
 
     it "should only translate course when trying to translate /cousers/x/users/y type links" do
@@ -91,14 +91,14 @@ describe CC::CCHelper do
       <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
       HTML
       translated = @exporter.html_content(orig)
-      translated.should =~ /users\/#{@teacher.id}/
+      expect(translated).to match /users\/#{@teacher.id}/
     end
 
     it "should interpret links to the files page as normal course pages" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       html = %{<a href="/courses/#{@course.id}/files">File page index</a>}
       translated = @exporter.html_content(html)
-      translated.should match %r{\$CANVAS_COURSE_REFERENCE\$/files}
+      expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
 
     it "should prepend the domain to links outside the course" do
@@ -112,8 +112,8 @@ describe CC::CCHelper do
       HTML
       doc = Nokogiri::HTML.parse(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      urls[0].should == "%24WIKI_REFERENCE%24/wiki/front-page"
-      urls[1].should == "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
+      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/front-page"
+      expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
     it "should copy pages correctly when the title starts with a number" do
@@ -126,7 +126,7 @@ describe CC::CCHelper do
       HTML
       doc = Nokogiri::HTML.parse(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      urls[0].should == "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/#{page.url}"
     end
 
     it "should copy pages correctly when the title consists only of a number" do
@@ -139,7 +139,7 @@ describe CC::CCHelper do
       HTML
       doc = Nokogiri::HTML.parse(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      urls[0].should == "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/#{page.url}"
     end
   end
 end

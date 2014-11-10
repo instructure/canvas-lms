@@ -27,8 +27,8 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should_not be_displayed
-    f('#no_changes_detected').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
+    expect(f('#no_changes_detected')).to be_displayed
   end
 
   it "should show only changed assignment" do
@@ -43,11 +43,11 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should_not be_displayed
-    f('#no_changes_detected').should_not be_displayed
+    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
+    expect(f('#no_changes_detected')).not_to be_displayed
 
-    ff('.grid-header div.h').length.should == 2
-    f('#assignments_without_changes_alert').should be_displayed
+    expect(ff('.grid-header div.h').length).to eq 2
+    expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
   it "should show a new assignment" do
@@ -57,19 +57,19 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
-    ff('.assignment_section #assignment_resolution_template').length.should == 1
-    f('.assignment_section #assignment_resolution_template .title').text.should == 'New Assignment'
+    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
+    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'New Assignment'
 
     click_option('.assignment_section #assignment_resolution_template select', 'new', :value)
 
     submit_form('#gradebook_importer_resolution_section')
 
-    f('#no_changes_detected').should_not be_displayed
+    expect(f('#no_changes_detected')).not_to be_displayed
 
-    ff('.grid-header div.h').length.should == 2
-    f('#assignments_without_changes_alert').should_not be_displayed
+    expect(ff('.grid-header div.h').length).to eq 2
+    expect(f('#assignments_without_changes_alert')).not_to be_displayed
   end
 
   it "should say no changes if no changes after matching assignment" do
@@ -82,16 +82,16 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
-    ff('.assignment_section #assignment_resolution_template').length.should == 1
-    f('.assignment_section #assignment_resolution_template .title').text.should == 'Assignment 2'
+    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
+    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 2'
 
     click_option('.assignment_section #assignment_resolution_template select', assignment.id.to_s, :value)
 
     submit_form('#gradebook_importer_resolution_section')
 
-    f('#no_changes_detected').should be_displayed
+    expect(f('#no_changes_detected')).to be_displayed
   end
 
   it "should show assignment with changes after matching assignment" do
@@ -106,19 +106,19 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
-    ff('.assignment_section #assignment_resolution_template').length.should == 1
-    f('.assignment_section #assignment_resolution_template .title').text.should == 'Assignment 3'
+    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
+    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 3'
 
     click_option('.assignment_section #assignment_resolution_template select', assignment2.id.to_s, :value)
 
     submit_form('#gradebook_importer_resolution_section')
 
-    f('#no_changes_detected').should_not be_displayed
+    expect(f('#no_changes_detected')).not_to be_displayed
 
-    ff('.grid-header div.h').length.should == 2
-    f('#assignments_without_changes_alert').should be_displayed
+    expect(ff('.grid-header div.h').length).to eq 2
+    expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
   it "should say no changes after matching student" do
@@ -131,16 +131,16 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
-    ff('.student_section #student_resolution_template').length.should == 1
-    f('.student_section #student_resolution_template .name').text.should == 'Student'
+    expect(ff('.student_section #student_resolution_template').length).to eq 1
+    expect(f('.student_section #student_resolution_template .name').text).to eq 'Student'
 
     click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
 
     submit_form('#gradebook_importer_resolution_section')
 
-    f('#no_changes_detected').should be_displayed
+    expect(f('#no_changes_detected')).to be_displayed
   end
 
   it "should show assignment with changes after matching student" do
@@ -155,18 +155,18 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
 
-    f('#gradebook_importer_resolution_section').should be_displayed
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
-    ff('.student_section #student_resolution_template').length.should == 1
-    f('.student_section #student_resolution_template .name').text.should == 'Student'
+    expect(ff('.student_section #student_resolution_template').length).to eq 1
+    expect(f('.student_section #student_resolution_template .name').text).to eq 'Student'
 
     click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
 
     submit_form('#gradebook_importer_resolution_section')
 
-    f('#no_changes_detected').should_not be_displayed
+    expect(f('#no_changes_detected')).not_to be_displayed
 
-    ff('.grid-header div.h').length.should == 2
-    f('#assignments_without_changes_alert').should be_displayed
+    expect(ff('.grid-header div.h').length).to eq 2
+    expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 end

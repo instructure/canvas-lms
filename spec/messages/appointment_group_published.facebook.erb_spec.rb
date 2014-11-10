@@ -26,9 +26,9 @@ describe 'appointment_group_published.facebook' do
 
     generate_message(:appointment_group_published, :facebook, @appointment_group, :user => @user)
 
-    @message.body.should include('some title')
-    @message.body.should include(@course.name)
-    @message.body.should include("/appointment_groups/#{@appointment_group.id}")
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(@course.name)
+    expect(@message.body).to include("/appointment_groups/#{@appointment_group.id}")
   end
 
   it "should render for groups" do
@@ -39,9 +39,9 @@ describe 'appointment_group_published.facebook' do
 
     generate_message(:appointment_group_published, :facebook, @appointment_group)
 
-    @message.body.should include('some title')
-    @message.body.should include(@course.name)
-    @message.body.should include(cat.name)
-    @message.body.should include("/appointment_groups/#{@appointment_group.id}")
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(@course.name)
+    expect(@message.body).to include(cat.name)
+    expect(@message.body).to include("/appointment_groups/#{@appointment_group.id}")
   end
 end

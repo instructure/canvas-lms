@@ -2,6 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
 
@@ -27,9 +31,9 @@ describe "quizzes" do
     gear = f("#summary_quiz_#{@quiz.id} .al-trigger")
     gear.click
     link = f("#summary_quiz_#{@quiz.id} li a.menu_tool_link")
-    link.should be_displayed
-    link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-    link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
+    expect(link).to be_displayed
+    expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
+    expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
   end
 
   it "should show tool launch links in the gear for items on the show page" do
@@ -39,9 +43,9 @@ describe "quizzes" do
     gear = f("#quiz_show .al-trigger")
     gear.click
     link = f("#quiz_show li a.menu_tool_link")
-    link.should be_displayed
-    link.text.should match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-    link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
+    expect(link).to be_displayed
+    expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
+    expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
   end
 
 end

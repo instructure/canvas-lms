@@ -32,7 +32,7 @@ describe "/discussion_topics/show" do
     assigns[:all_entries] = @topic.discussion_entries
     assigns[:presenter] = DiscussionTopicPresenter.new(@topic, @user)
     render "discussion_topics/show"
-    response.should have_tag("div#discussion_subentries")
+    expect(response).to have_tag("div#discussion_subentries")
   end
 
   it "should render in a group context" do
@@ -51,9 +51,9 @@ describe "/discussion_topics/show" do
     assigns[:all_entries] = @topic.discussion_entries
     assigns[:assignment] = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @user)
     assigns[:presenter] = DiscussionTopicPresenter.new(@topic, @user)
-    @topic.for_assignment?.should be_true
-    @topic.assignment.rubric_association.rubric.should_not be_nil
+    expect(@topic.for_assignment?).to be_truthy
+    expect(@topic.assignment.rubric_association.rubric).not_to be_nil
     render "discussion_topics/show"
-    response.should have_tag("div#discussion_subentries")
+    expect(response).to have_tag("div#discussion_subentries")
   end
 end

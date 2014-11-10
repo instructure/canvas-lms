@@ -1134,6 +1134,11 @@ en-AU:
         one: "%{file_size} *from one file*"
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "Courses with muted assignments may not accurately reflect scores in this report."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2599,6 +2604,7 @@ en-AU:
     messages_sent: "Messages Sent"
     missing_due_date_dialog: 
       buttons: 
+        continue: Continue
         goBack: "Go Back"
         noDueDate: "No Due Date"
       modal: 
@@ -4064,30 +4070,13 @@ en-AU:
       unstar_conversation: "Unstar conversation"
     message_deleted: "Message Deleted!"
     message_detail: 
+      delete: Delete
+      forward: Forward
+      message_actions: "Message actions"
+      more_options: "More options"
       no_subject: "No subject"
-    message_form: 
-      buttons: 
-        reply: Reply
-        reply_all: "Reply all"
-        send_message: Send
-      headings: 
-        new_message: "New Message"
-      inbox_actions: 
-        add_people: "Add People"
-      labels: 
-        add_to_faculty_journal: "Add as a Faculty Journal entry"
-        group_conversation: "This is a group conversation. Participants will see everyone's replies"
-        message: "Message:"
-        to: "To:"
-      links: 
-        add_attachment: Attach
-        media_comment: Record
-      media_comment: "Media Comment"
-      titles: 
-        add_attachment: "Add an attachment"
-        media_comment: "Recorded media comment"
-        record_media_comment: "Record an audio or video comment"
-        remove_media_comment: "Remove media comment"
+      reply: Reply
+      reply_all: "Reply all"
     message_form_dialog: 
       body: Body
       headings: 
@@ -4138,7 +4127,6 @@ en-AU:
     other_recipients: 
       one: "and 1 other"
       other: "and %{count} others"
-    search_category: "Search %{category}"
     star: Star
     star_conversation: "Star conversation"
     titles: 
@@ -4153,6 +4141,9 @@ en-AU:
     batch_update_message: 
       one: "1 course processed"
       other: "%{count} courses processed"
+    course_format: 
+      not_set: "Not Set"
+      online: Online
     course_not_found: "The course was not found"
     csv: 
       comments: Comments
@@ -4733,6 +4724,7 @@ en-AU:
         allow_student_organized_groups: "Let Students organize their own Groups"
         conclude_at: Ends
         course_code: "Course Code"
+        course_format: Format
         course_lock_all_announcements: "Disable comments on announcements"
         course_name: Name
         course_section_name: "Add a New Section"
@@ -5052,8 +5044,6 @@ en-AU:
       student: 
         count: "Wrong Student Count"
         ratio: "Wrong Student Ratio"
-  current_uploads: 
-    close: close
   curve_grades_dialog: 
     average_score: "Average Score"
     buttons: 
@@ -6273,6 +6263,12 @@ en-AU:
     post_grades: "Post Grades to SIS"
     student_groups: "New Student Groups Page"
     student_outcome_gradebook: "Student Learning Mastery Gradebook"
+  file_preview: 
+    file_preview_headerbutton_close: Close
+    file_preview_hide: Hide
+    file_preview_infotable_name: Name
+    file_preview_infotable_status: Status
+    file_preview_show: Show
   file_rename_form: 
     back: Back
     change: Change
@@ -6315,6 +6311,7 @@ en-AU:
       uploading_zip: "There were errors uploading the zip file."
     fields: 
       file: File
+    files_page_title: Files
     full_index: 
       alts: 
         file_locked: locked
@@ -6500,6 +6497,7 @@ en-AU:
       no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
     buttons: 
+      dialog_buttons: Cancel
       saving_settings: "Saving Settings..."
       submit_comment: "Submit Comment"
       submitting: Submitting...
@@ -6533,7 +6531,6 @@ en-AU:
     student: Student
     student_mute_notification: "Instructor is working on grades"
     titles: 
-      click_to_record: "Click the mic to record your comments"
       dropped_assignment_no_total: "This assignment will not be considered in the total calculation"
       hypothetical_score: "This is a What-If score"
     turnitin: 
@@ -6777,7 +6774,6 @@ en-AU:
         out_of: "Out of"
         score: Score
       icons: 
-        rubric_results: "See rubric results"
         turnitin_results: "See Turnitin results"
       labels: 
         final_grade_hidden: "Calculation of totals has been disabled"
@@ -7235,6 +7231,11 @@ en-AU:
         assign_user_to_group: "Assign user to this group"
         assign_user_to_group_name: "Assign user to group %{name}"
         no_groups_created: "Groups need to be created before users can be added."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Set first student to join as group leader"
+        auto_group_leader: "Automatically assign a student group leader"
+        auto_random_group_leader: "Set a random student as group leader"
+        leadership: Leadership
       edit_group_assignment: 
         all_available_groups_full: "All available groups are full."
         all_groups_full_suggestion: "Either change group limits or add more groups."
@@ -7259,15 +7260,11 @@ en-AU:
         search_users: "Search users"
       group_category_create: 
         allow_self_signup: "Allow self sign-up"
-        auto_first_group_leader: "Set first student to join as group leader"
-        auto_group_leader: "Automatically assign a student group leader"
-        auto_random_group_leader: "Set a random student as group leader"
         cancel: Cancel
         create_groups: "Create %h{num_groups} groups now"
         create_groups_manually: "I'll create groups manually"
         group_set_name: "Group Set Name"
         group_structure: "Group Structure"
-        leadership: Leadership
         leave_group_limit_blank: "Leave blank for no limit"
         limit_group_size: "Limit groups to %h{group_limit} members"
         require_same_section: "Require group members to be in the same section"
@@ -7848,7 +7845,6 @@ en-AU:
       media_contribution: "Media Contribution"
       play_comment: "Play Media Comment"
       record_upload_media_comment: "Record/Upload Media Comment"
-    track_uploaded_successfully: "Track uploaded successfuly, refresh to see it."
     upload: Upload
     uploading: Uploading...
   menu: 
@@ -10167,6 +10163,15 @@ en-AU:
     : "No"
     ? "yes"
     : "Yes"
+  orbis_report_header_assignment_id: "assignment id"
+  orbis_report_header_assignment_title: "assignment title"
+  orbis_report_header_canvas_course_id: "course id"
+  orbis_report_header_course_name: "course name"
+  orbis_report_header_course_sis_id: "course sis id"
+  orbis_report_header_points_possible: "points possible"
+  orbis_report_header_student_canvas_id: "canvas user id"
+  orbis_report_header_student_name: "student name"
+  orbis_report_header_submission_score: "submission score"
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
   outcome_groups_api: 
@@ -12038,14 +12043,11 @@ en-AU:
           save: Save
         end_quiz_reference_time_current_end: "the current end time"
         end_quiz_reference_time_now: now
-        end_quiz_when: "End the quiz %{n} minutes from %{reference_time}."
         extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
         finished_in: "finished in %{duration}"
-        global_extra_attempts: "everyone gets %{n} already"
         headers: 
           attempt: Attempt
           attempts_left: "Attempts Left"
-          extended_quiz_time: "Extend Quiz Time"
           score: Score
           student: Student
           student_extensions: "Student Extensions"
@@ -12054,15 +12056,14 @@ en-AU:
         labels: 
           ending: Ending
           extra_attempts: "Extra Attempts"
-          extra_time_per_attempt: "Extra Time on Every Attempt"
           manually_unlock: "Manually unlock the quiz for the next attempt"
           reset_has_seen_results: "Let the student see the results one more time"
           started: Started
         minutes: minutes
         moderate_page_title: "%{title}: Moderate"
         page_title: "Moderate Quiz"
-        student_gets_extra_time: "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**"
         student_n: "Student %{n}"
+        submitting: Submitting...
         titles: 
           change_user_extensions: "Change user extensions"
           manually_unlocked: "Manually Unlocked"
@@ -12577,8 +12578,6 @@ en-AU:
   react_files: 
     add_folder: "Add Folder"
     cancel: Cancel
-    confirm_delete: "Are you sure you want to delete %{name}?"
-    confirm_delete_selected: "Are you sure you want to delete these %{count} items?"
     count_items_selected: "%{count} items selected"
     created_at_short: Created
     delete: Delete
@@ -12592,6 +12591,7 @@ en-AU:
         three_chars: "Enter at least 3 letters in the search box."
         your_search: "Your search - \"%{search_term}\" - did not match any files."
     files: Files
+    files_heading: Files
     folder: Folder
     labels: 
       select: "Select This Item"
@@ -12679,8 +12679,7 @@ en-AU:
       cancel: Cancel
       update: Update
     label: 
-      availableFrom: From
-      availableUntil: Until
+      availableUntil: "Lock Until"
     options: 
       publish: 
         description: Publish

@@ -114,7 +114,7 @@ module ApplicationHelper
   end
 
   def url_helper_context_from_object(context)
-    (context ? context.class.base_ar_class : context.class).name.underscore
+    (context ? context.class.base_class : context.class).name.underscore
   end
 
   def message_user_path(user, context = nil)
@@ -373,7 +373,7 @@ module ApplicationHelper
 
   def active_external_tool_by_id(tool_id)
     # don't use for groups. they don't have account_chain_ids
-    tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
+    tool = @context.context_external_tools.active.where(tool_id: tool_id).first
     return tool if tool
 
     # account_chain_ids is in the order we need to search for tools
@@ -565,12 +565,6 @@ module ApplicationHelper
   # <% } %>
   def ot(*args)
     concat(t(*args))
-  end
-
-  def jt(key, default, js_options='{}')
-    full_key = key =~ /\A#/ ? key.sub(/\A#/, '') : i18n_scope + '.' + key
-    translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
-    raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
   end
 
   def join_title(*parts)
@@ -828,12 +822,12 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 
   def dashboard_path(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 

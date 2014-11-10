@@ -6,7 +6,7 @@ describe 'DataFixup::FixIncorrectAttachmentFileState' do
     file1 = attachment_model file_state: 'active'
     file2 = attachment_model file_state: 'deleted'
     FixIncorrectAttachmentFileState.up
-    file1.reload.file_state.should == 'available'
-    file2.reload.file_state.should == 'deleted'
+    expect(file1.reload.file_state).to eq 'available'
+    expect(file2.reload.file_state).to eq 'deleted'
   end
 end

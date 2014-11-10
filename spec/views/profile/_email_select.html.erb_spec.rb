@@ -27,7 +27,7 @@ describe "/profile/_email_select" do
     assigns[:email_channels] = [cc]
 
     render :partial => "profile/email_select", :object => cc
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

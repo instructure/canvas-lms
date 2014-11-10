@@ -31,7 +31,7 @@ class AccountNotification < ActiveRecord::Base
 
   def self.for_user_and_account(user, account)
     current = self.for_account(account)
-    preload_associations(current, [:account, :account_notification_roles])
+    ActiveRecord::Associations::Preloader.new(current, [:account, :account_notification_roles]).run
     user_role_types = {}
 
     current.select! do |announcement|

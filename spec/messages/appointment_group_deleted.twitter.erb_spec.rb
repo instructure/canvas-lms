@@ -26,6 +26,6 @@ describe 'appointment_group_deleted.twitter' do
     generate_message(:appointment_group_deleted, :twitter, @appointment_group,
                      :data => {:cancel_reason => "just because"})
 
-    @message.body.should include('some title')
+    expect(@message.body).to include('some title')
   end
 end

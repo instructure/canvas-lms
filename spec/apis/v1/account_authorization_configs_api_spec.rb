@@ -44,7 +44,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
       res = call_index
 
-      res.map{|c|c['idp_entity_id']}.join.should == 'rad'
+      expect(res.map{|c|c['idp_entity_id']}.join).to eq 'rad'
     end
 
     it "should return unauthorized error" do
@@ -67,20 +67,20 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should create a saml aac" do
       call_create(@saml_hash)
       aac = @account.account_authorization_config
-      aac.auth_type.should == 'saml'
-      aac.idp_entity_id.should == 'http://example.com/saml1'
-      aac.log_in_url.should == 'http://example.com/saml1/sli'
-      aac.log_out_url.should == 'http://example.com/saml1/slo'
-      aac.certificate_fingerprint.should == '111222'
-      aac.identifier_format.should == 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
-      aac.position.should == 1
+      expect(aac.auth_type).to eq 'saml'
+      expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
+      expect(aac.log_in_url).to eq 'http://example.com/saml1/sli'
+      expect(aac.log_out_url).to eq 'http://example.com/saml1/slo'
+      expect(aac.certificate_fingerprint).to eq '111222'
+      expect(aac.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+      expect(aac.position).to eq 1
     end
 
     it "should work with rails form style params" do
       call_create({:account_authorization_config => @saml_hash})
       aac = @account.account_authorization_config
-      aac.auth_type.should == 'saml'
-      aac.idp_entity_id.should == 'http://example.com/saml1'
+      expect(aac.auth_type).to eq 'saml'
+      expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
     end
 
     it "should create multiple saml aacs" do
@@ -88,53 +88,53 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_create(@saml_hash.merge('idp_entity_id' => "secondeh"))
 
       aac1 = @account.account_authorization_configs.first
-      aac1.idp_entity_id.should == 'http://example.com/saml1'
-      aac1.position.should == 1
+      expect(aac1.idp_entity_id).to eq 'http://example.com/saml1'
+      expect(aac1.position).to eq 1
 
       aac2 = @account.account_authorization_configs.last
-      aac2.idp_entity_id.should == 'secondeh'
-      aac2.position.should == 2
+      expect(aac2.idp_entity_id).to eq 'secondeh'
+      expect(aac2.position).to eq 2
     end
 
     it "should create an ldap aac" do
       call_create(@ldap_hash)
       aac = @account.account_authorization_config
-      aac.auth_type.should == 'ldap'
-      aac.auth_host.should == '127.0.0.1'
-      aac.auth_filter.should == 'filter1'
-      aac.auth_username.should == 'username1'
-      aac.auth_decrypted_password.should == 'password1'
-      aac.position.should == 1
+      expect(aac.auth_type).to eq 'ldap'
+      expect(aac.auth_host).to eq '127.0.0.1'
+      expect(aac.auth_filter).to eq 'filter1'
+      expect(aac.auth_username).to eq 'username1'
+      expect(aac.auth_decrypted_password).to eq 'password1'
+      expect(aac.position).to eq 1
     end
     it "should create multiple ldap aacs" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2'))
       aac = @account.account_authorization_configs.first
-      aac.auth_host.should == '127.0.0.1'
-      aac.position.should == 1
+      expect(aac.auth_host).to eq '127.0.0.1'
+      expect(aac.position).to eq 1
       aac2 = @account.account_authorization_configs.last
-      aac2.auth_host.should == '127.0.0.2'
-      aac2.position.should == 2
+      expect(aac2.auth_host).to eq '127.0.0.2'
+      expect(aac2.position).to eq 2
     end
     it "should default ldap auth_over_tls to 'start_tls'" do
       call_create(@ldap_hash)
-      @account.account_authorization_config.auth_over_tls.should == 'start_tls'
+      expect(@account.account_authorization_config.auth_over_tls).to eq 'start_tls'
     end
 
     it "should create a cas aac" do
       call_create(@cas_hash)
 
       aac = @account.account_authorization_config
-      aac.auth_type.should == 'cas'
-      aac.auth_base.should == '127.0.0.1'
-      aac.position.should == 1
+      expect(aac.auth_type).to eq 'cas'
+      expect(aac.auth_base).to eq '127.0.0.1'
+      expect(aac.position).to eq 1
     end
 
     it "should not allow multiple cas aacs (for now)" do
       call_create(@cas_hash)
       json = call_create(@cas_hash, 422)
-      json.keys.sort.should == ['error_report_id', 'errors']
-      json['errors'].should == [
+      expect(json.keys.sort).to eq ['error_report_id', 'errors']
+      expect(json['errors']).to eq [
         { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
       ]
     end
@@ -142,26 +142,26 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should error when mixing auth_types (for now)" do
       call_create(@ldap_hash)
       json = call_create(@saml_hash, 422)
-      json['errors'].first['error_code'].should == 'mixing_authentication_types'
+      expect(json['errors'].first['error_code']).to eq 'mixing_authentication_types'
     end
 
     it "should update positions" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2', 'position' => 1))
 
-      @account.account_authorization_config.auth_host.should == '127.0.0.2'
+      expect(@account.account_authorization_config.auth_host).to eq '127.0.0.2'
 
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.3', 'position' => 2))
 
-      @account.account_authorization_configs[0].auth_host.should == '127.0.0.2'
-      @account.account_authorization_configs[1].auth_host.should == '127.0.0.3'
-      @account.account_authorization_configs[2].auth_host.should == '127.0.0.1'
+      expect(@account.account_authorization_configs[0].auth_host).to eq '127.0.0.2'
+      expect(@account.account_authorization_configs[1].auth_host).to eq '127.0.0.3'
+      expect(@account.account_authorization_configs[2].auth_host).to eq '127.0.0.1'
     end
 
     it "should error if deprecated and new style are used" do
       json = call_create({:account_authorization_config => {"0" => @ldap_hash}}.merge(@ldap_hash), 400)
-      json.keys.sort.should == ['error_report_id', 'errors']
-      json['errors'].should == [
+      expect(json.keys.sort).to eq ['error_report_id', 'errors']
+      expect(json['errors']).to eq [
         "error_code" => "deprecated_request_syntax",
         "message" => "This request syntax has been deprecated",
         "field" => nil,
@@ -170,7 +170,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should error if empty post params sent" do
       json = call_create({}, 422)
-      json['errors'].first.should == { 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' }
+      expect(json['errors'].first).to eq({ 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' })
     end
 
     it "should return unauthorized error" do
@@ -182,7 +182,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @account.settings = { :open_registration => true }
       @account.save!
       call_create(@cas_hash)
-      @account.open_registration?.should be_false
+      expect(@account.open_registration?).to be_falsey
     end
   end
 
@@ -204,7 +204,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @saml_hash['requested_authn_context'] = nil
       @saml_hash['login_attribute'] = 'nameid'
       @saml_hash['unknown_user_url'] = nil
-      json.should == @saml_hash
+      expect(json).to eq @saml_hash
     end
 
     it "should return ldap aac" do
@@ -220,7 +220,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['change_password_url'] = nil
       @ldap_hash['position'] = 1
-      json.should == @ldap_hash
+      expect(json).to eq @ldap_hash
     end
 
     it "should return cas aac" do
@@ -232,7 +232,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
       @cas_hash['unknown_user_url'] = nil
-      json.should == @cas_hash
+      expect(json).to eq @cas_hash
     end
 
     it "should 404" do
@@ -260,7 +260,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_update(aac.id, @saml_hash)
 
       aac.reload
-      aac.idp_entity_id.should == 'hahahaha'
+      expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
     it "should work with rails form style params" do
@@ -269,7 +269,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_update(aac.id, {:account_authorization_config => @saml_hash})
 
       aac.reload
-      aac.idp_entity_id.should == 'hahahaha'
+      expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
     it "should update an ldap aac" do
@@ -278,7 +278,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_update(aac.id, @ldap_hash)
 
       aac.reload
-      aac.auth_host.should == '192.168.0.1'
+      expect(aac.auth_host).to eq '192.168.0.1'
     end
 
     it "should update a cas aac" do
@@ -287,13 +287,13 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_update(aac.id, @cas_hash)
 
       aac.reload
-      aac.auth_base.should == '192.168.0.1'
+      expect(aac.auth_base).to eq '192.168.0.1'
     end
 
     it "should error when mixing auth_types" do
       aac = @account.account_authorization_configs.create!(@saml_hash)
       json = call_update(aac.id, @cas_hash, 400)
-      json['message'].should == 'Can not change type of authorization config, please delete and create new config.'
+      expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
     end
 
     it "should update positions" do
@@ -303,7 +303,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @ldap_hash['position'] = 1
       call_update(aac2.id, @ldap_hash)
 
-      @account.account_authorization_config.id.should == aac2.id
+      expect(@account.account_authorization_config.id).to eq aac2.id
     end
 
     it "should 404" do
@@ -329,7 +329,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac = @account.account_authorization_configs.create!(@saml_hash)
       call_destroy(aac.id)
 
-      @account.account_authorization_config.should be_nil
+      expect(@account.account_authorization_config).to be_nil
     end
 
     it "should reposition correctly" do
@@ -342,19 +342,19 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac2.reload
       aac3.reload
       aac4.reload
-      @account.account_authorization_configs.count.should == 3
-      @account.account_authorization_config.id.should == aac2.id
-      aac2.position.should == 1
-      aac3.position.should == 2
-      aac4.position.should == 3
+      expect(@account.account_authorization_configs.count).to eq 3
+      expect(@account.account_authorization_config.id).to eq aac2.id
+      expect(aac2.position).to eq 1
+      expect(aac3.position).to eq 2
+      expect(aac4.position).to eq 3
 
       call_destroy(aac3.id)
       aac2.reload
       aac4.reload
-      @account.account_authorization_configs.count.should == 2
-      @account.account_authorization_config.id.should == aac2.id
-      aac2.position.should == 1
-      aac4.position.should == 2
+      expect(@account.account_authorization_configs.count).to eq 2
+      expect(@account.account_authorization_config.id).to eq aac2.id
+      expect(aac2.position).to eq 1
+      expect(aac4.position).to eq 2
     end
 
     it "should 404" do
@@ -376,33 +376,33 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should get the url" do
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
              { :controller => 'account_authorization_configs', :action => 'show_discovery_url', :account_id => @account.id.to_s, :format => 'json' })
-      json.should == {'discovery_url' => @account.auth_discovery_url}
+      expect(json).to eq({'discovery_url' => @account.auth_discovery_url})
     end
 
     it "should set the url" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
              { :controller => 'account_authorization_configs', :action => 'update_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
              {'discovery_url' => 'http://example.com/different_url'})
-      json.should == {'discovery_url' => 'http://example.com/different_url'}
+      expect(json).to eq({'discovery_url' => 'http://example.com/different_url'})
       @account.reload
-      @account.auth_discovery_url.should == 'http://example.com/different_url'
+      expect(@account.auth_discovery_url).to eq 'http://example.com/different_url'
     end
 
     it "should clear if set to empty string" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
              { :controller => 'account_authorization_configs', :action => 'update_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
              {'discovery_url' => ''})
-      json.should == {'discovery_url' => nil}
+      expect(json).to eq({'discovery_url' => nil})
       @account.reload
-      @account.auth_discovery_url.should == nil
+      expect(@account.auth_discovery_url).to eq nil
     end
 
     it "should delete the url" do
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
              { :controller => 'account_authorization_configs', :action => 'destroy_discovery_url', :account_id => @account.id.to_s, :format => 'json' })
-      json.should == {'discovery_url' => nil}
+      expect(json).to eq({'discovery_url' => nil})
       @account.reload
-      @account.auth_discovery_url.should == nil
+      expect(@account.auth_discovery_url).to eq nil
     end
 
     it "should return unauthorized" do

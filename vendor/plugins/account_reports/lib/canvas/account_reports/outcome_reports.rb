@@ -154,6 +154,7 @@ module Canvas::AccountReports
           @total = students.count
           i = 0
           students.find_each do |row|
+            row = row.attributes.dup
             row['assignment url'] =
               "https://#{host}" +
                 "/courses/#{row['course id']}" +

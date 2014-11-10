@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes regressions" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
 
@@ -19,9 +23,9 @@ describe "quizzes regressions" do
     wait_for_tiny f('#quiz_description')
     click_questions_tab
     click_new_question_button
-    ff(".question_holder .question_form").length.should == 1
+    expect(ff(".question_holder .question_form").length).to eq 1
     f(".question_holder .question_form .cancel_link").click
-    ff(".question_holder .question_form").length.should == 0
+    expect(ff(".question_holder .question_form").length).to eq 0
   end
 
   it "should pop up calendar on top of #main" do
@@ -29,21 +33,8 @@ describe "quizzes regressions" do
     wait_for_ajaximations
     fj('.due-date-row input:first + .ui-datepicker-trigger').click
     cal = f('#ui-datepicker-div')
-    cal.should be_displayed
-    cal.style('z-index').should > f('#main').style('z-index')
-  end
-
-  it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
-    5.times { @course.quizzes.create!(:title => "My Quiz") }
-    get "/courses/#{@course.id}/quizzes"
-    publish_multiple = f('.publish_multiple_quizzes_link')
-    cancel = f('#publish_multiple_quizzes_dialog .cancel_button')
-
-    5.times do
-      publish_multiple.click
-      ffj('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
-      cancel.click
-    end
+    expect(cal).to be_displayed
+    expect(cal.style('z-index')).to be > f('#main').style('z-index')
   end
 
   it "should flag a quiz question while taking a quiz as a teacher" do
@@ -70,7 +61,7 @@ describe "quizzes regressions" do
     expect_new_page_load {
       f("#submit_quiz_button").click
     }
-    f('#quiz_title').text.should == @q.title
+    expect(f('#quiz_title').text).to eq @q.title
   end
 
   it "should mark questions as answered when the window loses focus" do
@@ -91,15 +82,15 @@ describe "quizzes regressions" do
       sleep 1
       wait_for_ajaximations
       keep_trying_until {
-        ff('#question_list .answered').size.should == 1  
+        expect(ff('#question_list .answered').size).to eq 1  
       }
       
-      input.should have_attribute(:value, "1.0000")
+      expect(input).to have_attribute(:value, "1.0000")
     end
   end
 
   it "creates assignment with default due date" do
-    pending('daylight savings time fix')
+    skip('daylight savings time fix')
     get "/courses/#{@course.id}/quizzes/new"
     wait_for_ajaximations
     fill_assignment_overrides
@@ -131,7 +122,7 @@ describe "quizzes regressions" do
     wait_for_ajaximations
     fj('#rubrics .add_rubric_link:visible').click
     keep_trying_until {
-      fj('.rubric_grading:visible').should be_nil
+      expect(fj('.rubric_grading:visible')).to be_nil
     }
   end
 

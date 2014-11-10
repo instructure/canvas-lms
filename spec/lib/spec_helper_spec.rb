@@ -23,22 +23,22 @@ describe "spec_helper" do
   context "encompass" do
     it "should check values" do
       root = { :key1 => :value1, :key2 => :value2 }
-      root.should_not encompass({ :key1 => "value1", :key2 => "value2" })
-      root.should encompass({ :key1 => :value1, :key2 => :value2 })
-      [root].should_not encompass([{ :key1 => "value1", :key2 => "value2" }])
-      [root].should encompass([{ :key1 => :value1, :key2 => :value2 }])
+      expect(root).not_to encompass({ :key1 => "value1", :key2 => "value2" })
+      expect(root).to encompass({ :key1 => :value1, :key2 => :value2 })
+      expect([root]).not_to encompass([{ :key1 => "value1", :key2 => "value2" }])
+      expect([root]).to encompass([{ :key1 => :value1, :key2 => :value2 }])
     end
 
     it "should check array length" do
       root = [{ :key1 => :value1, :key2 => :value2 },
               { :key1 => :value1, :key2 => :value2 },
               { :key1 => :value1, :key2 => :value2 }]
-      root.should encompass([{ :key1 => :value1, :key2 => :value2 },
+      expect(root).to encompass([{ :key1 => :value1, :key2 => :value2 },
                              { :key1 => :value1, :key2 => :value2 },
                              { :key1 => :value1, :key2 => :value2 }])
-      root.should_not encompass([{ :key1 => :value1, :key2 => :value2 },
+      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 }])
-      root.should_not encompass([{ :key1 => :value1, :key2 => :value2 },
+      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 }])
@@ -46,62 +46,62 @@ describe "spec_helper" do
 
     it "should support comparing dictionaries with different types of things" do
       thing_to_check = { :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }
-      { :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }.should encompass(thing_to_check)
-      { :mkey1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 2, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "mkey2" => 2.0, 3 => :val3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "key2" => 2.1, 3 => :val3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "key2" => 2.0, 2 => :val3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "key2" => 2.0, 3 => :mval3, 4.0 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "key2" => 2.0, 3 => :val3, 4.1 => "val4" }.should_not encompass(thing_to_check)
-      { :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "mval4" }.should_not encompass(thing_to_check)
-      [{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }].should encompass([thing_to_check])
-      [{ :mkey1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 2, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "mkey2" => 2.0, 3 => :val3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "key2" => 2.1, 3 => :val3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "key2" => 2.0, 2 => :val3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "key2" => 2.0, 3 => :mval3, 4.0 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.1 => "val4" }].should_not encompass([thing_to_check])
-      [{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "mval4" }].should_not encompass([thing_to_check])
+      expect({ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }).to encompass(thing_to_check)
+      expect({ :mkey1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 2, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "mkey2" => 2.0, 3 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "key2" => 2.1, 3 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "key2" => 2.0, 2 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "key2" => 2.0, 3 => :mval3, 4.0 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.1 => "val4" }).not_to encompass(thing_to_check)
+      expect({ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "mval4" }).not_to encompass(thing_to_check)
+      expect([{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }]).to encompass([thing_to_check])
+      expect([{ :mkey1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 2, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "mkey2" => 2.0, 3 => :val3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "key2" => 2.1, 3 => :val3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "key2" => 2.0, 2 => :val3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "key2" => 2.0, 3 => :mval3, 4.0 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.1 => "val4" }]).not_to encompass([thing_to_check])
+      expect([{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "mval4" }]).not_to encompass([thing_to_check])
     end
 
     it "should support dictionary encompassing" do
       root = { :key1 => :val1, :key2 => :val2, :key3 => :val3 }
-      root.should encompass({ :key1 => :val1, :key2 => :val2 })
-      root.should encompass({ :key1 => :val1, :key3 => :val3 })
-      root.should encompass({ :key2 => :val2, :key3 => :val3 })
-      root.should encompass({ :key1 => :val1 })
-      root.should encompass({ :key2 => :val2 })
-      root.should encompass({ :key3 => :val3 })
-      root.should_not encompass({ :key1 => :val1, :key2 => :val2, :key4 => :val4 })
-      root.should_not encompass({ :key1 => :val1, :key3 => :val3, :key4 => :val4 })
-      root.should_not encompass({ :key2 => :val2, :key3 => :val3, :key4 => :val4 })
-      root.should_not encompass({ :key1 => :val1, :key4 => :val4 })
-      root.should_not encompass({ :key2 => :val2, :key4 => :val4 })
-      root.should_not encompass({ :key3 => :val3, :key4 => :val4 })
-      root.should_not encompass({ :key1 => :val2, :key2 => :val2 })
-      root.should_not encompass({ :key1 => :val2, :key3 => :val3 })
-      root.should_not encompass({ :key2 => :val2, :key3 => :val1 })
-      root.should_not encompass({ :key1 => :val2 })
-      root.should_not encompass({ :key2 => :val3 })
-      root.should_not encompass({ :key3 => :val1 })
+      expect(root).to encompass({ :key1 => :val1, :key2 => :val2 })
+      expect(root).to encompass({ :key1 => :val1, :key3 => :val3 })
+      expect(root).to encompass({ :key2 => :val2, :key3 => :val3 })
+      expect(root).to encompass({ :key1 => :val1 })
+      expect(root).to encompass({ :key2 => :val2 })
+      expect(root).to encompass({ :key3 => :val3 })
+      expect(root).not_to encompass({ :key1 => :val1, :key2 => :val2, :key4 => :val4 })
+      expect(root).not_to encompass({ :key1 => :val1, :key3 => :val3, :key4 => :val4 })
+      expect(root).not_to encompass({ :key2 => :val2, :key3 => :val3, :key4 => :val4 })
+      expect(root).not_to encompass({ :key1 => :val1, :key4 => :val4 })
+      expect(root).not_to encompass({ :key2 => :val2, :key4 => :val4 })
+      expect(root).not_to encompass({ :key3 => :val3, :key4 => :val4 })
+      expect(root).not_to encompass({ :key1 => :val2, :key2 => :val2 })
+      expect(root).not_to encompass({ :key1 => :val2, :key3 => :val3 })
+      expect(root).not_to encompass({ :key2 => :val2, :key3 => :val1 })
+      expect(root).not_to encompass({ :key1 => :val2 })
+      expect(root).not_to encompass({ :key2 => :val3 })
+      expect(root).not_to encompass({ :key3 => :val1 })
     end
 
     it "should support array encompassing" do
       root = [{:key1 => :val1, :key2 => :val2}, {:key3 => :val3, :key4 => :val4}]
-      root.should encompass([{:key1 => :val1}, {:key3 => :val3, :key4 => :val4}])
-      root.should encompass([{:key2 => :val2}, {:key3 => :val3}])
-      root.should encompass([{:key1 => :val1}, {:key4 => :val4}])
-      root.should encompass([{:key2 => :val2}, {:key4 => :val4}])
-      root.should encompass([{:key2 => :val2, :key1 => :val1}, {:key4 => :val4}])
-      root.should_not encompass([{:key2 => :val1}, {:key4 => :val4}])
-      root.should_not encompass([{:key2 => :val1}, {:key4 => :val3}])
-      root.should_not encompass([{:key2 => :val2}, {:key4 => :val3}])
-      root.should_not encompass([{:key2 => :val2}, {:key4 => :val3}, {:key1 => :val2}])
-      root.should_not encompass([{:key4 => :val4}, {:key2 => :val2}])
-      root.should_not encompass([{:key2 => :val2}])
-      root.should_not encompass([{:key2 => :val2, :key3 => :val3}, {:key4 => :val4}])
+      expect(root).to encompass([{:key1 => :val1}, {:key3 => :val3, :key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2}, {:key3 => :val3}])
+      expect(root).to encompass([{:key1 => :val1}, {:key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2}, {:key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2, :key1 => :val1}, {:key4 => :val4}])
+      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val4}])
+      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val3}])
+      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}])
+      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}, {:key1 => :val2}])
+      expect(root).not_to encompass([{:key4 => :val4}, {:key2 => :val2}])
+      expect(root).not_to encompass([{:key2 => :val2}])
+      expect(root).not_to encompass([{:key2 => :val2, :key3 => :val3}, {:key4 => :val4}])
     end
 
   end

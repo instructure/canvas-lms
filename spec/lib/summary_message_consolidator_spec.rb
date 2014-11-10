@@ -28,9 +28,9 @@ describe "SummaryMessageConsolidator" do
     expects_job_with_tag('Delayed::Batch.serial', 2) do
       SummaryMessageConsolidator.process
     end
-    messages.each { |m| m.reload.workflow_state.should == 'sent'; m.batched_at.should be_present }
+    messages.each { |m| expect(m.reload.workflow_state).to eq 'sent'; expect(m.batched_at).to be_present }
     queued = created_jobs.map { |j| j.payload_object.jobs.map { |j| j.payload_object.args } }.flatten
-    queued.map(&:to_i).sort.should == messages.map(&:id).sort
+    expect(queued.map(&:to_i).sort).to eq messages.map(&:id).sort
   end
 
   it "should send summaries from different accounts in separate messages" do

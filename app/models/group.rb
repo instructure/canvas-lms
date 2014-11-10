@@ -630,4 +630,8 @@ class Group < ActiveRecord::Base
   def account_chain
     @account_chain ||= Account.account_chain(account_id)
   end
+
+  def sortable_name
+    name
+  end
 end

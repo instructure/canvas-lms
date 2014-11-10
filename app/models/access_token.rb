@@ -23,7 +23,12 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
 
   def self.authenticate(token_string)
-    token = self.where(:crypted_token => hashed_token(token_string)).first
+    hashed_tokens = all_hashed_tokens(token_string)
+    token = self.where(:crypted_token => hashed_tokens).first
+    if token && token.crypted_token != hashed_tokens.first
+      token.crypted_token = hashed_tokens.first
+      token.save!
+    end
     token = nil unless token.try(:usable?)
     token
   end
@@ -34,6 +39,10 @@ class AccessToken < ActiveRecord::Base
     # However, what we're essentially looking for is a hash of the token
     # "signed" or concatenated with the secret encryption key, so this is perfect.
     Canvas::Security.hmac_sha1(token)
+  end
+
+  def self.all_hashed_tokens(token)
+    Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token) }
   end
 
   def usable?

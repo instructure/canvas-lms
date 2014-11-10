@@ -34,30 +34,30 @@ describe SubmissionVersion do
 
   describe "index_version" do
     it "should create a new record" do
-      lambda{
+      expect{
         SubmissionVersion.index_version(@version)
-      }.should change(SubmissionVersion, :count)
+      }.to change(SubmissionVersion, :count)
     end
 
     it "should set the index record's version_id" do
       index = SubmissionVersion.index_version(@version)
-      index.version_id.should == @version.id
+      expect(index.version_id).to eq @version.id
     end
 
     it "should set the index record's context" do
       index = SubmissionVersion.index_version(@version)
-      index.context_type.should == 'Course'
-      index.context_id.should == @course.id
+      expect(index.context_type).to eq 'Course'
+      expect(index.context_id).to eq @course.id
     end
 
     it "should set the index record's user_id" do
       index = SubmissionVersion.index_version(@version)
-      index.user_id.should == @submission.user_id
+      expect(index.user_id).to eq @submission.user_id
     end
 
     it "should set the index record's assignment_id" do
       index = SubmissionVersion.index_version(@version)
-      index.assignment_id.should == @submission.assignment_id
+      expect(index.assignment_id).to eq @submission.assignment_id
     end
   end
 
@@ -69,9 +69,9 @@ describe SubmissionVersion do
       contexts = submissions.map{ |submission| submission.assignment.context }
       versions = submissions.map{ |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
 
-      lambda{
+      expect{
         SubmissionVersion.index_versions(versions)
-      }.should change(SubmissionVersion, :count).by(n)
+      }.to change(SubmissionVersion, :count).by(n)
     end
 
     context "invalid yaml" do
@@ -80,15 +80,15 @@ describe SubmissionVersion do
       end
 
       it "should error on invalid yaml by default" do
-        lambda{
+        expect{
           SubmissionVersion.index_versions([@version])
-        }.should raise_error
+        }.to raise_error
       end
 
       it "should allow ignoring invalid yaml errors" do
-        lambda{
+        expect{
           SubmissionVersion.index_versions([@version], ignore_errors: true)
-        }.should_not raise_error
+        }.not_to raise_error
       end
     end
   end
@@ -97,9 +97,9 @@ describe SubmissionVersion do
     attrs = YAML.load(@version.yaml)
     attrs.delete('assignment_id')
     @version.update_attribute(:yaml, attrs.to_yaml)
-    lambda{
+    expect{
       SubmissionVersion.index_version(@version)
       SubmissionVersion.index_versions([@version])
-    }.should_not change(SubmissionVersion, :count)
+    }.not_to change(SubmissionVersion, :count)
   end
 end

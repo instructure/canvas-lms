@@ -24,6 +24,7 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
+      val = (Feature.production_environment? ? 'hidden' : 'allowed') if key == :state && val == 'hidden_in_prod'
       next if key == :state && !%w(hidden off allowed on).include?(val)
       instance_variable_set "@#{key}", val
     end
@@ -228,7 +229,7 @@ goes to the personal files page for a user ('/files') then you need to turn it o
 END
 
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'hidden_in_prod',
       beta: true
     },
     'modules_next' =>
@@ -278,6 +279,16 @@ END
 Enable the new quiz statistics page for an account.
 END
       applies_to: 'Course',
+      state: 'allowed',
+      development: true
+    },
+    'multiple_grading_periods' =>
+    {
+      display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
+      description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
+Enable multiple grading periods management in the account admin, and use in the Gradebook.
+END
+      applies_to: 'RootAccount',
       state: 'allowed',
       development: true
     }

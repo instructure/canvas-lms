@@ -34,19 +34,19 @@ module Lti
       it 'requires the message type' do
         subject.message_type = nil
         subject.save
-        subject.errors.first.should == [:message_type, "can't be blank"]
+        expect(subject.errors.first).to eq [:message_type, "can't be blank"]
       end
 
       it 'requires the launch path' do
         subject.launch_path = nil
         subject.save
-        subject.errors.first.should == [:launch_path, "can't be blank"]
+        expect(subject.errors.first).to eq [:launch_path, "can't be blank"]
       end
 
       it 'requires a resource_handler' do
         subject.resource_handler = nil
         subject.save
-        subject.errors.first.should == [:resource_handler, "can't be blank"]
+        expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
       end
     end
 
@@ -58,7 +58,7 @@ module Lti
         mh3 = create_message_handler(create_resource_handler, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request')
-        message_handlers.count.should == 2
+        expect(message_handlers.count).to eq 2
       end
 
       it 'returns all message_handlers for mutlipe message types' do
@@ -68,7 +68,7 @@ module Lti
         mh3 = create_message_handler(rh, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request', 'other_type')
-        message_handlers.count.should == 2
+        expect(message_handlers.count).to eq 2
       end
 
     end
@@ -83,7 +83,7 @@ module Lti
           rh = create_resource_handler(tp, resource_type_code: code)
           create_message_handler(rh)
         end
-        Set.new(described_class.for_context(account)).should == Set.new(message_handlers)
+        expect(Set.new(described_class.for_context(account))).to eq Set.new(message_handlers)
       end
 
       it 'returns all message_handlers for multiple tool_proxy' do
@@ -93,7 +93,7 @@ module Lti
           rh = create_resource_handler(tp)
           create_message_handler(rh)
         end
-        Set.new(described_class.for_context(account)).should == Set.new(message_handlers)
+        expect(Set.new(described_class.for_context(account))).to eq Set.new(message_handlers)
       end
 
     end

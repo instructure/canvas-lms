@@ -39,16 +39,16 @@ describe CalendarEventsController do
       user_session(@student)
       get 'show', :course_id => @course.id, :id => @event.id, :format => :json
       # response.should be_success
-      assigns[:event].should_not be_nil
-      assigns[:event].should eql(@event)
+      expect(assigns[:event]).not_to be_nil
+      expect(assigns[:event]).to eql(@event)
     end
 
     it "should render show page" do
       user_session(@student)
       get 'show', :course_id => @course.id, :id => @event.id
-      assigns[:event].should_not be_nil
+      expect(assigns[:event]).not_to be_nil
       # make sure that the show.html.erb template is rendered
-      response.should render_template('calendar_events/show')
+      expect(response).to render_template('calendar_events/show')
     end
 
   end
@@ -81,9 +81,9 @@ describe CalendarEventsController do
     it "should create a new event" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :calendar_event => {:title => "some event"}
-      response.should be_redirect
-      assigns[:event].should_not be_nil
-      assigns[:event].title.should eql("some event")
+      expect(response).to be_redirect
+      expect(assigns[:event]).not_to be_nil
+      expect(assigns[:event].title).to eql("some event")
     end
   end
   
@@ -115,10 +115,10 @@ describe CalendarEventsController do
     it "should update the event" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @event.id, :calendar_event => {:title => "new title"}
-      response.should be_redirect
-      assigns[:event].should_not be_nil
-      assigns[:event].should eql(@event)
-      assigns[:event].title.should eql("new title")
+      expect(response).to be_redirect
+      expect(assigns[:event]).not_to be_nil
+      expect(assigns[:event]).to eql(@event)
+      expect(assigns[:event].title).to eql("new title")
     end
   end
   
@@ -137,14 +137,14 @@ describe CalendarEventsController do
     it "should delete the event" do
       user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @event.id
-      response.should be_redirect
-      assigns[:event].should_not be_nil
-      assigns[:event].should eql(@event)
-      assigns[:event].should_not be_frozen
-      assigns[:event].should be_deleted
+      expect(response).to be_redirect
+      expect(assigns[:event]).not_to be_nil
+      expect(assigns[:event]).to eql(@event)
+      expect(assigns[:event]).not_to be_frozen
+      expect(assigns[:event]).to be_deleted
       @course.reload
-      @course.calendar_events.should be_include(@event)
-      @course.calendar_events.active.should_not be_include(@event)
+      expect(@course.calendar_events).to be_include(@event)
+      expect(@course.calendar_events.active).not_to be_include(@event)
     end
   end
 end

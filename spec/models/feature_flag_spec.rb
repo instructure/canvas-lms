@@ -35,56 +35,56 @@ describe FeatureFlag do
   context "validation" do
     it "should validate the state" do
       flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'nonplussed')
-      flag.should_not be_valid
+      expect(flag).not_to be_valid
     end
 
     it "should validate the feature exists" do
       flag = t_root_account.feature_flags.build(feature: 'xyzzy')
-      flag.should_not be_valid
+      expect(flag).not_to be_valid
     end
 
     it "should allow 'allowed' state only in accounts" do
       flag = t_sub_account.feature_flags.build(feature: 'course_feature', state: 'allowed')
-      flag.should be_valid
+      expect(flag).to be_valid
 
       flag = t_course.feature_flags.build(feature: 'course_feature', state: 'allowed')
-      flag.should_not be_valid
+      expect(flag).not_to be_valid
     end
 
     it "should validate the feature applies to the context" do
       flag = t_root_account.feature_flags.build(feature: 'root_account_feature')
-      flag.should be_valid
+      expect(flag).to be_valid
 
       flag = t_sub_account.feature_flags.build(feature: 'root_account_feature')
-      flag.should_not be_valid
+      expect(flag).not_to be_valid
     end
 
     it "should validate the locking account is in the chain" do
       flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: t_sub_account)
-      flag.should be_valid
+      expect(flag).to be_valid
 
       other_account = account_model
       flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: other_account)
-      flag.should_not be_valid
+      expect(flag).not_to be_valid
     end
   end
 
   describe "locked?" do
     it "should return false for allowed features" do
       flag = t_root_account.feature_flags.create! feature: 'account_feature', state: 'allowed'
-      flag.locked?(t_root_account).should be_false
-      flag.locked?(t_sub_account).should be_false
+      expect(flag.locked?(t_root_account)).to be_falsey
+      expect(flag.locked?(t_sub_account)).to be_falsey
     end
 
     describe "not allowed" do
       let!(:t_flag) { t_root_account.feature_flags.create! feature: 'account_feature', state: 'off' }
 
       it "should be false in the setting context" do
-        t_flag.locked?(t_root_account).should be_false
+        expect(t_flag.locked?(t_root_account)).to be_falsey
       end
 
       it "should be true in a lower context" do
-        t_flag.locked?(t_sub_account).should be_true
+        expect(t_flag.locked?(t_sub_account)).to be_truthy
       end
 
       describe "locking_account" do
@@ -95,16 +95,16 @@ describe FeatureFlag do
 
         it "should be false if the user has privileges" do
           site_admin_user
-          t_flag.locked?(t_root_account, @user).should be_false
+          expect(t_flag.locked?(t_root_account, @user)).to be_falsey
         end
 
         it "should be true if the user does not have privileges" do
           account_admin_user account: t_root_account
-          t_flag.locked?(t_root_account, @user).should be_true
+          expect(t_flag.locked?(t_root_account, @user)).to be_truthy
         end
 
         it "should be true if the user is unspecified" do
-          t_flag.locked?(t_root_account).should be_true
+          expect(t_flag.locked?(t_root_account)).to be_truthy
         end
       end
     end

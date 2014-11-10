@@ -17,7 +17,7 @@ define [
         $(returnFocusTo).focus()
 
     rootFolderToShow = _.find filesEnv.rootFolders, (folder) ->
-      (folder.get('context_type').toLowerCase() + 's' is contextType) and (''+folder.get('context_id') is contextId)
+      (folder.get('context_type').toLowerCase() + 's' is contextType) and (''+folder.get('context_id') is ''+contextId)
 
     React.renderComponent(MoveDialog({
       thingsToMove: thingsToMove

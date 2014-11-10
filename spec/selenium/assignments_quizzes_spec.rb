@@ -13,7 +13,7 @@ describe "quizzes assignments" do
       get "/courses/#{@course.id}/assignments"
       build_assignment_with_type("Quiz", :submit => true)
       expect_new_page_load { f(".assignment_list .group_assignment .assignment_title a").click }
-      driver.current_url.should match %r{/courses/\d+/quizzes/\d+}
+      expect(driver.current_url).to match %r{/courses/\d+/quizzes/\d+}
     end
   end
 
@@ -23,7 +23,7 @@ describe "quizzes assignments" do
       build_assignment_with_type("Quiz", :name => "Testy!")
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
-      fj('input[name="quiz[title]"]').attribute(:value).should == "Testy!"
+      expect(fj('input[name="quiz[title]"]').attribute(:value)).to eq "Testy!"
     end
   end
 
@@ -34,7 +34,7 @@ describe "quizzes assignments" do
       driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
       f("#assignment_#{assign.id} .edit_assignment_link").click
       edit_assignment(:name => "Retest!", :submit => true)
-      Quizzes::Quiz.find_by_assignment_id(assign.id).title.should == "Retest!"
+      expect(Quizzes::Quiz.find_by_assignment_id(assign.id).title).to eq "Retest!"
     end
   end
 
@@ -47,7 +47,7 @@ describe "quizzes assignments" do
       edit_assignment(:name => "Retest!")
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
-      fj('input[name="quiz[title]"]').attribute(:value).should == "Retest!"
+      expect(fj('input[name="quiz[title]"]').attribute(:value)).to eq "Retest!"
     end
   end
 end

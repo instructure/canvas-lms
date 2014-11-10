@@ -42,15 +42,15 @@ describe ProgressSerializer do
     :updated_at, :message
   ].map(&:to_s).each do |key|
     it "serializes #{key}" do
-      json[key].should == progress.send(key)
+      expect(json[key]).to eq progress.send(key)
     end
   end
 
   it 'serializes id' do
-    json['id'].should == "1"
+    expect(json['id']).to eq "1"
   end
 
   it 'serializes url' do
-    json['url'].should == 'http://example.com/api/v1/progress/1'
+    expect(json['url']).to eq 'http://example.com/api/v1/progress/1'
   end
 end

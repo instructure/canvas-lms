@@ -88,16 +88,16 @@ describe "GradeChangeAudit API", type: :request do
     def expect_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .to include([event.id, event.event_type])
       json
     end
 
     def forbid_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should_not include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .not_to include([event.id, event.event_type])
       json
     end
 
@@ -235,11 +235,11 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "should only return one page of results" do
-        @json['events'].size.should == 2
+        expect(@json['events'].size).to eq 2
       end
 
       it "should have pagination headers" do
-        response.headers['Link'].should match(/rel="next"/)
+        expect(response.headers['Link']).to match(/rel="next"/)
       end
     end
   end

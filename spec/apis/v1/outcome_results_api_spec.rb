@@ -238,20 +238,20 @@ describe "Outcome Results API", type: :request do
         api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
         json = JSON.parse(response.body)
-        json.keys.sort.should == %w(meta rollups)
-        json['rollups'].size.should == 1
+        expect(json.keys.sort).to eq %w(meta rollups)
+        expect(json['rollups'].size).to eq 1
         json['rollups'].each do |rollup|
-          rollup.keys.sort.should == %w(links scores)
-          rollup['links'].keys.sort.should == %w(section user)
-          rollup['links']['section'].should == @course.course_sections.first.id.to_s
-          rollup['links']['user'].should == outcome_student.id.to_s
-          rollup['scores'].size.should == 1
+          expect(rollup.keys.sort).to eq %w(links scores)
+          expect(rollup['links'].keys.sort).to eq %w(section user)
+          expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
+          expect(rollup['links']['user']).to eq outcome_student.id.to_s
+          expect(rollup['scores'].size).to eq 1
           rollup['scores'].each do |score|
-            score.keys.sort.should == %w(count links score)
-            score['count'].should == 1
-            score['score'].should == first_outcome_rating[:points]
-            score['links'].keys.sort.should == %w(outcome)
-            score['links']['outcome'].should == outcome_object.id.to_s
+            expect(score.keys.sort).to eq %w(count links score)
+            expect(score['count']).to eq 1
+            expect(score['score']).to eq first_outcome_rating[:points]
+            expect(score['links'].keys.sort).to eq %w(outcome)
+            expect(score['links']['outcome']).to eq outcome_object.id.to_s
           end
         end
       end
@@ -260,8 +260,8 @@ describe "Outcome Results API", type: :request do
         outcome_result
         user_session @user
         get "courses/#{@course.id}/outcome_rollups.csv"
-        response.should be_success
-        response.body.should == "Student name,Student ID,new outcome result,new outcome mastery points\n"+
+        expect(response).to be_success
+        expect(response.body).to eq "Student name,Student ID,new outcome result,new outcome mastery points\n"+
           "User,#{outcome_student.id},3,3\n"
       end
 
@@ -273,24 +273,24 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ['users'])
           json = JSON.parse(response.body)
-          json.keys.sort.should == %w(linked meta rollups)
-          json['rollups'].size.should == 2
+          expect(json.keys.sort).to eq %w(linked meta rollups)
+          expect(json['rollups'].size).to eq 2
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(links scores)
-            rollup['links'].keys.sort.should == %w(section user)
-            rollup['links']['section'].should == @course.course_sections.first.id.to_s
-            student_ids.should be_include(rollup['links']['user'])
-            rollup['scores'].size.should == 1
+            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup['links'].keys.sort).to eq %w(section user)
+            expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
+            expect(student_ids).to be_include(rollup['links']['user'])
+            expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(count links score)
-              score['count'].should == 1
-              [0,1].should be_include(score['score'])
-              score['links'].keys.sort.should == %w(outcome)
-              score['links']['outcome'].should == outcome_object.id.to_s
+              expect(score.keys.sort).to eq %w(count links score)
+              expect(score['count']).to eq 1
+              expect([0,1]).to be_include(score['score'])
+              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links']['outcome']).to eq outcome_object.id.to_s
             end
           end
-          json['linked'].keys.sort.should == %w(users)
-          json['linked']['users'].size.should == 2
+          expect(json['linked'].keys.sort).to eq %w(users)
+          expect(json['linked']['users'].size).to eq 2
         end
       end
 
@@ -301,24 +301,24 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s, include: ['users'])
           json = JSON.parse(response.body)
-          json.keys.sort.should == %w(linked meta rollups)
-          json['rollups'].size.should == 2
+          expect(json.keys.sort).to eq %w(linked meta rollups)
+          expect(json['rollups'].size).to eq 2
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(links scores)
-            rollup['links'].keys.sort.should == %w(section user)
-            rollup['links']['section'].should == outcome_course_sections[0].id.to_s
-            outcome_course_sections[0].student_ids.map(&:to_s).should be_include(rollup['links']['user'])
-            rollup['scores'].size.should == 1
+            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup['links'].keys.sort).to eq %w(section user)
+            expect(rollup['links']['section']).to eq outcome_course_sections[0].id.to_s
+            expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup['links']['user'])
+            expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(count links score)
-              score['count'].should == 1
-              [0,2].should be_include(score['score'])
-              score['links'].keys.sort.should == %w(outcome)
-              score['links']['outcome'].should == outcome_object.id.to_s
+              expect(score.keys.sort).to eq %w(count links score)
+              expect(score['count']).to eq 1
+              expect([0,2]).to be_include(score['score'])
+              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links']['outcome']).to eq outcome_object.id.to_s
             end
           end
-          json['linked'].keys.sort.should == %w(users)
-          json['linked']['users'].size.should == outcome_course_sections[0].students.count
+          expect(json['linked'].keys.sort).to eq %w(users)
+          expect(json['linked']['users'].size).to eq outcome_course_sections[0].students.count
         end
       end
 
@@ -327,18 +327,18 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['courses'], aggregate: 'course'),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['courses'], aggregate: 'course')
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['courses'].should be_present
-          json['linked']['courses'][0]['id'].should == outcome_course.id.to_s
+          expect(json['linked']).to be_present
+          expect(json['linked']['courses']).to be_present
+          expect(json['linked']['courses'][0]['id']).to eq outcome_course.id.to_s
         end
 
         it "side loads outcomes" do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes'])
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['outcomes'].should be_present
-          json['linked']['outcomes'][0]['id'].should == outcome_object.id.to_s
+          expect(json['linked']).to be_present
+          expect(json['linked']['outcomes']).to be_present
+          expect(json['linked']['outcomes'][0]['id']).to eq outcome_object.id.to_s
         end
 
         it "side loads outcome groups" do
@@ -348,23 +348,25 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_groups']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_groups'])
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['outcome_groups'].should be_present
+          expect(json['linked']).to be_present
+          expect(json['linked']['outcome_groups']).to be_present
           group_titles = json['linked']['outcome_groups'].map { |g| g['id'] }.sort
           expected_titles = [root_group, child_group, grandchild_group].map(&:id).map(&:to_s).sort
-          group_titles.should == expected_titles
+          expect(group_titles).to eq expected_titles
         end
 
         it "side loads outcome links" do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_links']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_links'])
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['outcome_links'].should be_present
-          json['linked']['outcome_links'].first['outcome_group']['id'].should ==
+          expect(json['linked']).to be_present
+          expect(json['linked']['outcome_links']).to be_present
+          expect(json['linked']['outcome_links'].first['outcome_group']['id']).to eq(
             outcome_course.root_outcome_group.id.to_s
-          json['linked']['outcome_links'].first['outcome']['id'].should ==
+          )
+          expect(json['linked']['outcome_links'].first['outcome']['id']).to eq(
             outcome_object.id.to_s
+          )
         end
 
         it "side loads users" do
@@ -372,9 +374,9 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['users'])
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['users'].should be_present
-          json['linked']['users'][0]['id'].should == outcome_student.id.to_s
+          expect(json['linked']).to be_present
+          expect(json['linked']['users']).to be_present
+          expect(json['linked']['users'][0]['id']).to eq outcome_student.id.to_s
         end
 
         it "side loads alignments" do
@@ -382,18 +384,18 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes', 'outcomes.alignments']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes', 'outcomes.alignments'])
           json = JSON.parse(response.body)
-          json['linked'].should be_present
-          json['linked']['outcomes'].should be_present
-          json['linked']['outcomes.alignments'].should be_present
-          json['linked']['outcomes'][0]['alignments'].sort.should == [outcome_assignment.asset_string, outcome_rubric.asset_string]
+          expect(json['linked']).to be_present
+          expect(json['linked']['outcomes']).to be_present
+          expect(json['linked']['outcomes.alignments']).to be_present
+          expect(json['linked']['outcomes'][0]['alignments'].sort).to eq [outcome_assignment.asset_string, outcome_rubric.asset_string]
           alignments = json['linked']['outcomes.alignments']
           alignments.sort_by!{|a| a['id']}
-          alignments[0]['id'].should == outcome_assignment.asset_string
-          alignments[0]['name'].should == outcome_assignment.name
-          alignments[0]['html_url'].should == course_assignment_url(outcome_course, outcome_assignment)
-          alignments[1]['id'].should == outcome_rubric.asset_string
-          alignments[1]['name'].should == outcome_rubric.title
-          alignments[1]['html_url'].should == course_rubric_url(outcome_course, outcome_rubric)
+          expect(alignments[0]['id']).to eq outcome_assignment.asset_string
+          expect(alignments[0]['name']).to eq outcome_assignment.name
+          expect(alignments[0]['html_url']).to eq course_assignment_url(outcome_course, outcome_assignment)
+          expect(alignments[1]['id']).to eq outcome_rubric.asset_string
+          expect(alignments[1]['name']).to eq outcome_rubric.title
+          expect(alignments[1]['html_url']).to eq course_rubric_url(outcome_course, outcome_rubric)
         end
       end
     end
@@ -415,9 +417,9 @@ describe "Outcome Results API", type: :request do
         api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
         json = JSON.parse(response.body)
-        json['rollups'].size.should == 1
+        expect(json['rollups'].size).to eq 1
         rollup = json['rollups'][0]
-        rollup['scores'].size.should == 7
+        expect(rollup['scores'].size).to eq 7
       end
 
       it "filters by outcome id" do
@@ -425,10 +427,10 @@ describe "Outcome Results API", type: :request do
         api_call(:get, outcome_rollups_url(outcome_course, outcome_ids: outcome_ids.join(','), include: ['outcomes']),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(','), include: ['outcomes'])
         json = JSON.parse(response.body)
-        json['linked']['outcomes'].size.should == outcome_ids.length
-        json['linked']['outcomes'].map{|x| x['id']}.sort.should == outcome_ids
+        expect(json['linked']['outcomes'].size).to eq outcome_ids.length
+        expect(json['linked']['outcomes'].map{|x| x['id']}.sort).to eq outcome_ids
         rollup = json['rollups'][0]
-        rollup['scores'].size.should == outcome_ids.length
+        expect(rollup['scores'].size).to eq outcome_ids.length
       end
 
       it "filters by outcome group id" do
@@ -436,10 +438,10 @@ describe "Outcome Results API", type: :request do
         api_call(:get, outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id, include: ['outcomes']),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id, include: ['outcomes'])
         json = JSON.parse(response.body)
-        json['linked']['outcomes'].size.should == outcome_ids.length
-        json['linked']['outcomes'].map{|x| x['id']}.sort.should == outcome_ids
+        expect(json['linked']['outcomes'].size).to eq outcome_ids.length
+        expect(json['linked']['outcomes'].map{|x| x['id']}.sort).to eq outcome_ids
         rollup = json['rollups'][0]
-        rollup['scores'].size.should == outcome_ids.length
+        expect(rollup['scores'].size).to eq outcome_ids.length
       end
     end
 
@@ -450,17 +452,17 @@ describe "Outcome Results API", type: :request do
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: outcome_course.id.to_s, aggregate: 'course')
         json = JSON.parse(response.body)
-        json.keys.sort.should == %w(rollups)
-        json['rollups'].size.should == 1
+        expect(json.keys.sort).to eq %w(rollups)
+        expect(json['rollups'].size).to eq 1
         json['rollups'].each do |rollup|
-          rollup.keys.sort.should == %w(links scores)
+          expect(rollup.keys.sort).to eq %w(links scores)
           rollup['links']['course'] == @course.id.to_s
-          rollup['scores'].size.should == 1
+          expect(rollup['scores'].size).to eq 1
           rollup['scores'].each do |score|
-            score.keys.sort.should == %w(count links score)
-            score['count'].should == 1
-            score['score'].should == first_outcome_rating[:points]
-            score['links'].keys.sort.should == %w(outcome)
+            expect(score.keys.sort).to eq %w(count links score)
+            expect(score['count']).to eq 1
+            expect(score['score']).to eq first_outcome_rating[:points]
+            expect(score['links'].keys.sort).to eq %w(outcome)
           end
         end
       end
@@ -475,17 +477,17 @@ describe "Outcome Results API", type: :request do
                    course_id: outcome_course.id.to_s, aggregate: 'course',
                    user_ids: student_id_str)
           json = JSON.parse(response.body)
-          json.keys.sort.should == %w(rollups)
-          json['rollups'].size.should == 1
+          expect(json.keys.sort).to eq %w(rollups)
+          expect(json['rollups'].size).to eq 1
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(links scores)
-            rollup['links']['course'].should == @course.id.to_s
-            rollup['scores'].size.should == 1
+            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup['links']['course']).to eq @course.id.to_s
+            expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(count links score)
-              score['count'].should == 2
-              score['score'].should == 0.5
-              score['links'].keys.sort.should == %w(outcome)
+              expect(score.keys.sort).to eq %w(count links score)
+              expect(score['count']).to eq 2
+              expect(score['score']).to eq 0.5
+              expect(score['links'].keys.sort).to eq %w(outcome)
             end
           end
         end
@@ -500,17 +502,17 @@ describe "Outcome Results API", type: :request do
                    course_id: outcome_course.id.to_s, aggregate: 'course',
                    section_id: outcome_course_sections[0].id.to_s)
           json = JSON.parse(response.body)
-          json.keys.sort.should == %w(rollups)
-          json['rollups'].size.should == 1
+          expect(json.keys.sort).to eq %w(rollups)
+          expect(json['rollups'].size).to eq 1
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(links scores)
-            rollup['links']['course'].should == outcome_course.id.to_s
-            rollup['scores'].size.should == 1
+            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup['links']['course']).to eq outcome_course.id.to_s
+            expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(count links score)
-              score['count'].should == outcome_course_sections[0].enrollments.count
-              score['score'].should == 1
-              score['links'].keys.sort.should == %w(outcome)
+              expect(score.keys.sort).to eq %w(count links score)
+              expect(score['count']).to eq outcome_course_sections[0].enrollments.count
+              expect(score['score']).to eq 1
+              expect(score['links'].keys.sort).to eq %w(outcome)
             end
           end
         end
@@ -526,9 +528,9 @@ describe "Outcome Results API", type: :request do
       api_call(:get, outcome_results_url(outcome_course, include: ['alignments']),
                controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['alignments'])
       json = JSON.parse(response.body)
-      json['linked'].should be_present
-      json['linked']['alignments'].should be_present
-      json['linked']['alignments'][0]['id'].should == outcome_assignment.asset_string
+      expect(json['linked']).to be_present
+      expect(json['linked']['alignments']).to be_present
+      expect(json['linked']['alignments'][0]['id']).to eq outcome_assignment.asset_string
     end
 
     it "returns outcome results" do
@@ -536,12 +538,12 @@ describe "Outcome Results API", type: :request do
       api_call(:get, outcome_results_url(outcome_course),
                controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      json['outcome_results'].should be_present
-      json['outcome_results'][0]["id"].should == outcome_result.id.to_s
-      json['outcome_results'][0]["score"].should == outcome_result.score
-      json['outcome_results'][0]["links"]["learning_outcome"].should == outcome_object.id.to_s
-      json['outcome_results'][0]["links"]["alignment"].should == outcome_assignment.asset_string
-      json['outcome_results'][0]["links"]["user"].should == outcome_student.id.to_s
+      expect(json['outcome_results']).to be_present
+      expect(json['outcome_results'][0]["id"]).to eq outcome_result.id.to_s
+      expect(json['outcome_results'][0]["score"]).to eq outcome_result.score
+      expect(json['outcome_results'][0]["links"]["learning_outcome"]).to eq outcome_object.id.to_s
+      expect(json['outcome_results'][0]["links"]["alignment"]).to eq outcome_assignment.asset_string
+      expect(json['outcome_results'][0]["links"]["user"]).to eq outcome_student.id.to_s
     end
   end
 
@@ -559,13 +561,13 @@ describe "Outcome Results API", type: :request do
       api_call(:get, outcome_rollups_url(outcome_course),
         controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      json.keys.sort.should == %w(meta rollups)
-      json['rollups'].size.should == 2
-      json['rollups'].collect{|x| x['links']['user']}.sort.should == [student.id.to_s, student2.id.to_s].sort
+      expect(json.keys.sort).to eq %w(meta rollups)
+      expect(json['rollups'].size).to eq 2
+      expect(json['rollups'].collect{|x| x['links']['user']}.sort).to eq [student.id.to_s, student2.id.to_s].sort
       json['rollups'].each do |rollup|
-        rollup.keys.sort.should == %w(links scores)
-        rollup['scores'].size.should == 1
-        rollup['links'].keys.sort.should == %w(section user)
+        expect(rollup.keys.sort).to eq %w(links scores)
+        expect(rollup['scores'].size).to eq 1
+        expect(rollup['links'].keys.sort).to eq %w(section user)
       end
     end
   end

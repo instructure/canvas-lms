@@ -3,43 +3,43 @@ if Qti.migration_executable
 describe "Converting Blackboard 8 qti" do
 
   it "should convert multiple choice" do
-    get_question_hash(bb8_question_dir, 'multiple_choice').should == BB8Expected::MULTIPLE_CHOICE
+    expect(get_question_hash(bb8_question_dir, 'multiple_choice')).to eq BB8Expected::MULTIPLE_CHOICE
   end
 
   it "should convert multiple choice" do
-    get_question_hash(bb8_question_dir, 'multiple_choice_blank_answers').should == BB8Expected::MULTIPLE_CHOICE_BLANK_ANSWERS
+    expect(get_question_hash(bb8_question_dir, 'multiple_choice_blank_answers')).to eq BB8Expected::MULTIPLE_CHOICE_BLANK_ANSWERS
   end
 
   it "should convert either/or (yes/no) into multiple choice" do
-    get_question_hash(bb8_question_dir, 'either_or_yes_no').should == BB8Expected::EITHER_OR_YES_NO
+    expect(get_question_hash(bb8_question_dir, 'either_or_yes_no')).to eq BB8Expected::EITHER_OR_YES_NO
   end
 
   it "should convert either/or (agree/disagree) into multiple choice" do
-    get_question_hash(bb8_question_dir, 'either_or_agree_disagree').should == BB8Expected::EITHER_OR_AGREE_DISAGREE
+    expect(get_question_hash(bb8_question_dir, 'either_or_agree_disagree')).to eq BB8Expected::EITHER_OR_AGREE_DISAGREE
   end
 
   it "should convert either/or (true/false) into multiple choice" do
-    get_question_hash(bb8_question_dir, 'either_or_true_false').should == BB8Expected::EITHER_OR_TRUE_FALSE
+    expect(get_question_hash(bb8_question_dir, 'either_or_true_false')).to eq BB8Expected::EITHER_OR_TRUE_FALSE
   end
 
   it "should convert either/or (right/wrong) into multiple choice" do
-    get_question_hash(bb8_question_dir, 'either_or_right_wrong').should == BB8Expected::EITHER_OR_RIGHT_WRONG
+    expect(get_question_hash(bb8_question_dir, 'either_or_right_wrong')).to eq BB8Expected::EITHER_OR_RIGHT_WRONG
   end
 
   it "should convert multiple answer questions" do
-    get_question_hash(bb8_question_dir, 'multiple_answer').should == BB8Expected::MULTIPLE_ANSWER
+    expect(get_question_hash(bb8_question_dir, 'multiple_answer')).to eq BB8Expected::MULTIPLE_ANSWER
   end
 
   it "should convert true/false questions" do
-    get_question_hash(bb8_question_dir, 'true_false').should == BB8Expected::TRUE_FALSE
+    expect(get_question_hash(bb8_question_dir, 'true_false')).to eq BB8Expected::TRUE_FALSE
   end
 
   it "should convert essay questions" do
-    get_question_hash(bb8_question_dir, 'essay').should == BB8Expected::ESSAY
+    expect(get_question_hash(bb8_question_dir, 'essay')).to eq BB8Expected::ESSAY
   end
 
   it "should convert short answer questions" do
-    get_question_hash(bb8_question_dir, 'short_response').should == BB8Expected::SHORT_RESPONSE
+    expect(get_question_hash(bb8_question_dir, 'short_response')).to eq BB8Expected::SHORT_RESPONSE
   end
 
   it "should convert matching questions" do
@@ -47,71 +47,71 @@ describe "Converting Blackboard 8 qti" do
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:text].sub('left', 'right')
+      expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
     end
     # compare everything else without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == BB8Expected::MATCHING
+    expect(hash).to eq BB8Expected::MATCHING
   end
 
   it "should convert opinion scale/likert questions into multiple choice questions" do
-    get_question_hash(bb8_question_dir, 'likert').should == BB8Expected::LIKERT
+    expect(get_question_hash(bb8_question_dir, 'likert')).to eq BB8Expected::LIKERT
   end
 
   it "should convert fill in the blank questions into short answer question"do
-    get_question_hash(bb8_question_dir, 'fill_in_the_blank').should == BB8Expected::FILL_IN_THE_BLANK
+    expect(get_question_hash(bb8_question_dir, 'fill_in_the_blank')).to eq BB8Expected::FILL_IN_THE_BLANK
   end
 
   it "should flag file response questions as not supported" do
-    get_question_hash(bb8_question_dir, 'file_upload').should == BB8Expected::FILE_RESPONSE
+    expect(get_question_hash(bb8_question_dir, 'file_upload')).to eq BB8Expected::FILE_RESPONSE
   end
 
   it "should flag hotspot questions as not supported" do
-    get_question_hash(bb8_question_dir, 'hot_spot').should == BB8Expected::HOT_SPOT
+    expect(get_question_hash(bb8_question_dir, 'hot_spot')).to eq BB8Expected::HOT_SPOT
   end
 
   it "should flag quiz bowl questions as not supported" do
-    get_question_hash(bb8_question_dir, 'quiz_bowl').should == BB8Expected::QUIZ_BOWL
+    expect(get_question_hash(bb8_question_dir, 'quiz_bowl')).to eq BB8Expected::QUIZ_BOWL
   end
 
   it "should convert fill in multiple blanks questions" do
-    get_question_hash(bb8_question_dir, 'fill_in_the_blank_plus').should == BB8Expected::FILL_IN_MULTIPLE_BLANKS
+    expect(get_question_hash(bb8_question_dir, 'fill_in_the_blank_plus')).to eq BB8Expected::FILL_IN_MULTIPLE_BLANKS
   end
 
   it "should convert jumbled sentence questions" do
-    get_question_hash(bb8_question_dir, 'jumbled_sentence').should == BB8Expected::JUMBLED_SENTENCE
+    expect(get_question_hash(bb8_question_dir, 'jumbled_sentence')).to eq BB8Expected::JUMBLED_SENTENCE
   end
 
   it "should convert ordering questions into matching questions" do
     hash = get_question_hash(bb8_question_dir, 'ordering')
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == BB8Expected::ORDER
+    expect(hash).to eq BB8Expected::ORDER
   end
 
   it "should convert simple calculated questions" do
-    get_question_hash(bb8_question_dir, 'calculated_simple').should == BB8Expected::CALCULATED_SIMPLE
+    expect(get_question_hash(bb8_question_dir, 'calculated_simple')).to eq BB8Expected::CALCULATED_SIMPLE
   end
 
   it "should convert complex calculated questions" do
-    get_question_hash(bb8_question_dir, 'calculated_complex').should == BB8Expected::CALCULATED_COMPLEX
+    expect(get_question_hash(bb8_question_dir, 'calculated_complex')).to eq BB8Expected::CALCULATED_COMPLEX
   end
 
   it "should convert calculated numeric questions" do
-    get_question_hash(bb8_question_dir, 'calculated_numeric').should == BB8Expected::CALCULATED_NUMERIC
+    expect(get_question_hash(bb8_question_dir, 'calculated_numeric')).to eq BB8Expected::CALCULATED_NUMERIC
   end
 
   it "should convert the assessments into quizzes" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
     a = Qti::AssessmentTestConverter.new(manifest_node, bb8_question_dir)
     a.create_instructure_quiz
-    a.quiz.should == BB8Expected::ASSESSMENT
+    expect(a.quiz).to eq BB8Expected::ASSESSMENT
   end
 
   it "should grab multiple html divs" do
     hash = get_question_hash(bb8_question_dir, 'with_image')
-    hash[:question_text].should == "San Jose, purple on this map, is an example of a ___________ culture region.\n<br/>\n<img src=\"5e19c40a33964748a1ec13af98715c7f/Picture3.jpg\" alt=\"Picture3.jpg\">"
+    expect(hash[:question_text]).to eq "San Jose, purple on this map, is an example of a ___________ culture region.\n<br/>\n<img src=\"5e19c40a33964748a1ec13af98715c7f/Picture3.jpg\" alt=\"Picture3.jpg\">"
   end
 
 end

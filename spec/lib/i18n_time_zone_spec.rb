@@ -23,15 +23,15 @@ describe I18nTimeZone do
   context "::all" do
     it "should provide an array of i18n tz instances" do
       tzs = I18nTimeZone.all
-      tzs.first.class.should == I18nTimeZone
-      tzs.count.should == ActiveSupport::TimeZone::MAPPING.count
+      expect(tzs.first.class).to eq I18nTimeZone
+      expect(tzs.count).to eq ActiveSupport::TimeZone::MAPPING.count
     end
   end
 
   context "#keyify" do
     it "should provide a translation key for valid time zone name" do
       t_key = I18nTimeZone['International Date Line West'].keyify
-      t_key.should == "#time_zones.international_date_line_west"
+      expect(t_key).to eq "#time_zones.international_date_line_west"
     end
   end
 
@@ -43,7 +43,7 @@ describe I18nTimeZone do
       I18n.locale = :es
       I18n.backend.stub({es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" }}}) do
         tz = I18nTimeZone['International Date Line West']
-        tz.to_s.should == "Línea de fecha internacional del oeste (-11:00)"
+        expect(tz.to_s).to eq "Línea de fecha internacional del oeste (-11:00)"
       end
     end
   end

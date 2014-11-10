@@ -304,7 +304,7 @@ class CalendarEventsApiController < ApplicationController
 
     scope = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
-    CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
+    ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
     events = apply_assignment_overrides(events) if @type == :assignment
     mark_submitted_assignments(@current_user, events) if @type == :assignment
 
@@ -701,7 +701,7 @@ class CalendarEventsApiController < ApplicationController
         @context_codes += AppointmentGroup.
           reservable_by(@current_user).
           intersecting(@start_date, @end_date).
-          find_all_by_id(group_codes).
+          where(id: group_codes).
           map(&:asset_string)
       end
       # include manageable appointment group events for the specified contexts

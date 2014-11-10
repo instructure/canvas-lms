@@ -347,6 +347,9 @@ define([
           $error_box.remove();
         });
       }
+    }).delegate('label.repetition', 'click', function(event){
+      event.preventDefault();
+      $(this).parents('.alert').find('input[name="repetition"]').prop('checked', true);
     });
   });
 });

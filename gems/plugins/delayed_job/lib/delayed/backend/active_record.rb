@@ -292,7 +292,15 @@ module Delayed
           strand = options[:strand]
           transaction_for_singleton(strand) do
             job = self.where(:strand => strand, :locked_at => nil).order(:id).first
-            job || self.create(options)
+            new_job = new(options)
+            if job
+              new_job.initialize_defaults
+              job.run_at = [job.run_at, new_job.run_at].min
+              job.save! if job.changed?
+            else
+              new_job.save!
+            end
+            job || new_job
           end
         end
 

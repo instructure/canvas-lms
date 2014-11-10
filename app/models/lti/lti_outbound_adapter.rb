@@ -39,7 +39,7 @@ module Lti
       variable_substitutor = LtiOutbound::VariableSubstitutor.new
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert if @user
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
@@ -124,7 +124,7 @@ module Lti
     def encode_source_id(assignment)
       @tool.shard.activate do
         payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
+        "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
       end
     end
   end

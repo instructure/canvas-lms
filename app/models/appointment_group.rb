@@ -325,7 +325,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def eligible_participant?(participant)
-    return false unless participant && participant.class.base_ar_class.name == participant_type
+    return false unless participant && participant.class.base_class.name == participant_type
     codes = participant.appointment_context_codes
     return false unless (codes[:primary] & appointment_group_contexts.map(&:context_code)).present?
     return false unless sub_context_codes.empty? || (codes[:secondary] & sub_context_codes).present?

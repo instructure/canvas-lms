@@ -27,16 +27,16 @@ module Lti
           course_with_teacher_logged_in(:active_all => true)
           get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
-          lti_launch.resource_url.should == 'http://tool.consumer.url'
+          expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
-          launch_params['lti_message_type'].should == 'ToolProxyRegistrationRequest'
-          launch_params['lti_version'].should == 'LTI-2p0'
-          launch_params['launch_presentation_document_target'].should == 'iframe'
-          launch_params['reg_key'].should_not be_empty
-          launch_params['reg_password'].should_not be_empty
+          expect(launch_params['lti_message_type']).to eq 'ToolProxyRegistrationRequest'
+          expect(launch_params['lti_version']).to eq 'LTI-2p0'
+          expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
+          expect(launch_params['reg_key']).not_to be_empty
+          expect(launch_params['reg_password']).not_to be_empty
 
           account_tp_url_stub = course_tool_consumer_profile_url(@course, 'abc123').gsub('abc123', '')
-          launch_params['tc_profile_url'].should include(account_tp_url_stub)
+          expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
       end
 
@@ -45,15 +45,15 @@ module Lti
           course_with_teacher_logged_in(:active_all => true)
           get 'registration', account_id: @course.root_account.id, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
-          lti_launch.resource_url.should == 'http://tool.consumer.url'
+          expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
-          launch_params['lti_message_type'].should == 'ToolProxyRegistrationRequest'
-          launch_params['lti_version'].should == 'LTI-2p0'
-          launch_params['launch_presentation_document_target'].should == 'iframe'
-          launch_params['reg_key'].should_not be_empty
-          launch_params['reg_password'].should_not be_empty
+          expect(launch_params['lti_message_type']).to eq 'ToolProxyRegistrationRequest'
+          expect(launch_params['lti_version']).to eq 'LTI-2p0'
+          expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
+          expect(launch_params['reg_key']).not_to be_empty
+          expect(launch_params['reg_password']).not_to be_empty
           account_tp_url_stub = account_tool_consumer_profile_url(@course.root_account, 'abc123').gsub('abc123', '')
-          launch_params['tc_profile_url'].should include(account_tp_url_stub)
+          expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
       end
 
@@ -84,22 +84,22 @@ module Lti
 
         it 'returns the signed params' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
-          response.code.should == "200"
+          expect(response.code).to eq "200"
 
           lti_launch = assigns[:lti_launch]
-          lti_launch.resource_url.should == 'https://samplelaunch/blti'
+          expect(lti_launch.resource_url).to eq 'https://samplelaunch/blti'
           params = lti_launch.params.with_indifferent_access
-          params[:oauth_consumer_key].should == 'guid'
-          params[:context_id].should_not be_empty
-          params[:resource_link_id].should_not be_empty
-          params[:tool_consumer_instance_guid].should_not be_empty
-          params[:launch_presentation_document_target].should == 'iframe'
-          params[:oauth_signature].should_not be_empty
+          expect(params[:oauth_consumer_key]).to eq 'guid'
+          expect(params[:context_id]).not_to be_empty
+          expect(params[:resource_link_id]).not_to be_empty
+          expect(params[:tool_consumer_instance_guid]).not_to be_empty
+          expect(params[:launch_presentation_document_target]).to eq 'iframe'
+          expect(params[:oauth_signature]).not_to be_empty
         end
 
         it 'returns a 404 when when no handler is found' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: 0
-          response.code.should == "404"
+          expect(response.code).to eq "404"
         end
 
         it 'does custom variable expansion for tool settings' do
@@ -110,12 +110,12 @@ module Lti
           message_handler.save
 
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
-          response.code.should == "200"
+          expect(response.code).to eq "200"
 
           params = assigns[:lti_launch].params.with_indifferent_access
-          params['custom_lti_link.custom.url'].should include('api/lti/tool_settings/')
-          params['custom_tool_proxy_binding.custom.url'].should include('api/lti/tool_settings/')
-          params['custom_tool_proxy.custom.url'].should include('api/lti/tool_settings/')
+          expect(params['custom_lti_link.custom.url']).to include('api/lti/tool_settings/')
+          expect(params['custom_tool_proxy_binding.custom.url']).to include('api/lti/tool_settings/')
+          expect(params['custom_tool_proxy.custom.url']).to include('api/lti/tool_settings/')
         end
 
         it 'uses the correct binding' do

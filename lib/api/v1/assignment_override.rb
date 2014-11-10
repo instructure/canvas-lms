@@ -43,7 +43,7 @@ module Api::V1::AssignmentOverride
   def assignment_override_collection(assignment, include_students=false)
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @current_user)
     if include_students
-      AssignmentOverride.send(:preload_associations, overrides, :assignment_override_students)
+      ActiveRecord::Associations::Preloader.new(overrides, :assignment_override_students).run
     end
     overrides
   end

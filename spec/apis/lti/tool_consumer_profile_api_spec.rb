@@ -28,14 +28,14 @@ module Lti
       it 'renders "application/json"' do
         tool_consumer_profile_id = 'a_made_up_id'
         get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}", tool_consumer_profile_id: tool_consumer_profile_id, account_id: account.id
-        response.content_type.should == 'application/json'
+        expect(response.content_type).to eq 'application/json'
       end
 
       it 'returns the consumer profile JSON' do
         tool_consumer_profile_id = 'a_made_up_id'
         get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}", tool_consumer_profile_id: tool_consumer_profile_id, account_id: account.id
         profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
-        profile.type.should == 'ToolConsumerProfile'
+        expect(profile.type).to eq 'ToolConsumerProfile'
       end
 
     end

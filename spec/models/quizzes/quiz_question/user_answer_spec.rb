@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::UserAnswer do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let(:answer_data) do
     {:question_1 => ["1"]}
   end
@@ -12,11 +16,11 @@ describe Quizzes::QuizQuestion::UserAnswer do
 
   describe "#initialize" do
     it "saves question_ids" do
-      answer.question_id.should == question_id
+      expect(answer.question_id).to eq question_id
     end
 
     it "saves the points possible" do
-      answer.points_possible.should == points_possible
+      expect(answer.points_possible).to eq points_possible
     end
   end
 end

@@ -129,28 +129,28 @@ describe UsersController, type: :request do
              :controller => "users", :action => "ignore_item",
              :format => "json", :purpose => "grading",
              :asset_string => "assignment_#{@a2.id}", :permanent => "1")
-    response.should be_success
+    expect(response).to be_success
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
 
     # after new student submission, still ignored
     another_submission
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
   end
 
   it "should ignore a todo item until the next change" do
     api_call(:delete, @a2_json['ignore'],
              :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "0")
-    response.should be_success
+    expect(response).to be_success
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
 
     # after new student submission, no longer ignored
     another_submission
@@ -167,7 +167,7 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items",
                     :format => "json")
-    response.should be_success
+    expect(response).to be_success
   end
 
 end

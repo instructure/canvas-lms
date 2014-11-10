@@ -60,48 +60,48 @@ describe 'DataFixup::PopulateConversationMessageProperties' do
       [c1, c2, c3, c4, c5, c6, c7].each(&:reload)
       [m1, m2, m3, m4, m5, m6, m7].each(&:reload)
 
-      c1.has_attachments?.should be_false
-      c1.has_media_objects?.should be_false
-      m1.read_attribute(:has_attachments).should be_false
-      m1.read_attribute(:has_media_objects).should be_false
-      m1.attachment_ids.should be_nil
-      m1.media_comment.should be_nil
+      expect(c1.has_attachments?).to be_falsey
+      expect(c1.has_media_objects?).to be_falsey
+      expect(m1.read_attribute(:has_attachments)).to be_falsey
+      expect(m1.read_attribute(:has_media_objects)).to be_falsey
+      expect(m1.attachment_ids).to be_nil
+      expect(m1.media_comment).to be_nil
 
-      c2.has_attachments?.should be_true
-      c2.has_media_objects?.should be_false
-      m2.read_attribute(:has_attachments).should be_true
-      m2.read_attribute(:has_media_objects).should be_false
-      m2.attachment_ids.should eql a.id.to_s
+      expect(c2.has_attachments?).to be_truthy
+      expect(c2.has_media_objects?).to be_falsey
+      expect(m2.read_attribute(:has_attachments)).to be_truthy
+      expect(m2.read_attribute(:has_media_objects)).to be_falsey
+      expect(m2.attachment_ids).to eql a.id.to_s
 
-      c3.has_attachments?.should be_true
-      c3.has_media_objects?.should be_false
-      m3.read_attribute(:has_attachments).should be_true
-      m3.read_attribute(:has_media_objects).should be_false
-      m3.attachment_ids.should be_nil # it's on the forwarded message
+      expect(c3.has_attachments?).to be_truthy
+      expect(c3.has_media_objects?).to be_falsey
+      expect(m3.read_attribute(:has_attachments)).to be_truthy
+      expect(m3.read_attribute(:has_media_objects)).to be_falsey
+      expect(m3.attachment_ids).to be_nil # it's on the forwarded message
 
-      c4.has_attachments?.should be_true
-      c4.has_media_objects?.should be_false
-      m4.read_attribute(:has_attachments).should be_true
-      m4.read_attribute(:has_media_objects).should be_false
-      m4.attachment_ids.should be_nil
+      expect(c4.has_attachments?).to be_truthy
+      expect(c4.has_media_objects?).to be_falsey
+      expect(m4.read_attribute(:has_attachments)).to be_truthy
+      expect(m4.read_attribute(:has_media_objects)).to be_falsey
+      expect(m4.attachment_ids).to be_nil
 
-      c5.has_attachments?.should be_false
-      c5.has_media_objects?.should be_true
-      m5.read_attribute(:has_attachments).should be_false
-      m5.read_attribute(:has_media_objects).should be_true
-      m5.media_comment.should eql mc
+      expect(c5.has_attachments?).to be_falsey
+      expect(c5.has_media_objects?).to be_truthy
+      expect(m5.read_attribute(:has_attachments)).to be_falsey
+      expect(m5.read_attribute(:has_media_objects)).to be_truthy
+      expect(m5.media_comment).to eql mc
 
-      c6.has_attachments?.should be_false
-      c6.has_media_objects?.should be_true
-      m6.read_attribute(:has_attachments).should be_false
-      m6.read_attribute(:has_media_objects).should be_true
-      m6.media_comment.should be_nil
+      expect(c6.has_attachments?).to be_falsey
+      expect(c6.has_media_objects?).to be_truthy
+      expect(m6.read_attribute(:has_attachments)).to be_falsey
+      expect(m6.read_attribute(:has_media_objects)).to be_truthy
+      expect(m6.media_comment).to be_nil
 
-      c7.has_attachments?.should be_false
-      c7.has_media_objects?.should be_true
-      m7.read_attribute(:has_attachments).should be_false
-      m7.read_attribute(:has_media_objects).should be_true
-      m7.media_comment.should be_nil
+      expect(c7.has_attachments?).to be_falsey
+      expect(c7.has_media_objects?).to be_truthy
+      expect(m7.read_attribute(:has_attachments)).to be_falsey
+      expect(m7.read_attribute(:has_media_objects)).to be_truthy
+      expect(m7.media_comment).to be_nil
     end
   end
 end

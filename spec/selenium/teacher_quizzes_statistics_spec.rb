@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quiz statistics" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "quizzes selenium tests"
 
   describe "item analysis" do
@@ -79,7 +83,7 @@ describe "quiz statistics" do
       preview_the_quiz
       publish_the_quiz
       take_the_quiz_as_a_student
-      generate_item_analysis.length.should == 1
+      expect(generate_item_analysis.length).to eq 1
     end
 
   end
@@ -110,12 +114,12 @@ describe "quiz statistics" do
 
       it "should validate correct number of questions are showing up" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
-        ff('.question').count.should == @quiz.quiz_questions.count
+        expect(ff('.question').count).to eq @quiz.quiz_questions.count
       end
 
       it "should validate number attempts on questions" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
-        ff('.question .question_attempts').each { |attempt| attempt.text.should == '1 attempt' }
+        ff('.question .question_attempts').each { |attempt| expect(attempt.text).to eq '1 attempt' }
       end
 
       it "should validate question graph tooltip" do
@@ -124,7 +128,7 @@ describe "quiz statistics" do
 
         @quiz.quiz_questions.each_with_index do |question, index|
           driver.execute_script("$('.tooltip_text:eq(#{index})').css('visibility', 'visible')")
-          fj(".tooltip_text:eq(#{index})").should include_text '100%'
+          expect(fj(".tooltip_text:eq(#{index})")).to include_text '100%'
         end
       end
 
@@ -132,7 +136,7 @@ describe "quiz statistics" do
         @course.large_roster = true
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
-        f("#content").should include_text "This course is too large to display statistics. They can still be downloaded from the right hand sidebar."
+        expect(f("#content")).to include_text "This course is too large to display statistics. They can still be downloaded from the right hand sidebar."
       end
     end
 
@@ -143,14 +147,14 @@ describe "quiz statistics" do
       end
 
       it "should validate average time taken for quiz" do
-        summary_rows[0].should include_text 'less than a minute'
+        expect(summary_rows[0]).to include_text 'less than a minute'
       end
 
       %w(correct incorrect high_score low_score mean_score standard_deviation).each_with_index do |data_point, i|
 
         it "should validate #{data_point} number for initial info" do
           index = (i + 1) # + 1 to get rid of the first row
-          index == 2 ? (summary_rows[index].should include_text("2")) : (summary_rows[index].should include_text("0"))
+          index == 2 ? (expect(summary_rows[index]).to include_text("2")) : (expect(summary_rows[index]).to include_text("0"))
         end
       end
     end
@@ -169,13 +173,13 @@ describe "quiz statistics" do
           index = (i + 1) # + 1 to get rid of the first row
           case index
             when 1
-              summary_rows[index].should include_text(@expected_side_bar_numbers[0])
+              expect(summary_rows[index]).to include_text(@expected_side_bar_numbers[0])
             when 2
-              summary_rows[index].should include_text(@expected_side_bar_numbers[1])
+              expect(summary_rows[index]).to include_text(@expected_side_bar_numbers[1])
             when 3..5
-              summary_rows[index].should include_text(@expected_side_bar_numbers[2])
+              expect(summary_rows[index]).to include_text(@expected_side_bar_numbers[2])
             when 6
-              summary_rows[index].should include_text(@expected_side_bar_numbers[0])
+              expect(summary_rows[index]).to include_text(@expected_side_bar_numbers[0])
           end
         end
       end

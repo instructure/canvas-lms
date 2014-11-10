@@ -31,12 +31,12 @@ describe "editing grades" do
       wait_for_ajaximations
       open_comment_dialog(0, 0)
       grade_box = f("form.submission_details_grade_form input.grading_value")
-      grade_box.attribute('value').should == ASSIGNMENT_1_POINTS
+      expect(grade_box.attribute('value')).to eq ASSIGNMENT_1_POINTS
       set_value(grade_box, 7)
       f("form.submission_details_grade_form button").click
       wait_for_ajax_requests
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)'), '7')
-      final_score_for_row(0).should == "80%"
+      expect(final_score_for_row(0)).to eq "80%"
     end
   end
 
@@ -53,8 +53,8 @@ describe "editing grades" do
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', points.to_s)
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
-    f('.score_value').text.should == points.to_s
-    f('#after_fudge_points_total').text.should == points.to_s
+    expect(f('.score_value').text).to eq points.to_s
+    expect(f('#after_fudge_points_total').text).to eq points.to_s
   end
 
   it "should treat ungraded as 0s when asked, and ignore when not" do
@@ -62,24 +62,24 @@ describe "editing grades" do
     wait_for_ajaximations
 
     # make sure it shows like it is not treating ungraded as 0's by default
-    is_checked('#include_ungraded_assignments').should be_false
-    final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
-    final_score_for_row(1).should == STUDENT_2_TOTAL_IGNORING_UNGRADED
+    expect(is_checked('#include_ungraded_assignments')).to be_falsey
+    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_IGNORING_UNGRADED
+    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_IGNORING_UNGRADED
 
     # set the "treat ungraded as 0's" option in the header
     open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
 
     # now make sure that the grades show as if those ungraded assignments had a '0'
-    is_checked('#include_ungraded_assignments').should be_true
-    final_score_for_row(0).should == STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    final_score_for_row(1).should == STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(is_checked('#include_ungraded_assignments')).to be_truthy
+    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
 
     # reload the page and make sure it remembered the setting
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    is_checked('#include_ungraded_assignments').should be_true
-    final_score_for_row(0).should == STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    final_score_for_row(1).should == STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(is_checked('#include_ungraded_assignments')).to be_truthy
+    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
 
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
@@ -91,8 +91,8 @@ describe "editing grades" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
-    final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
-    final_score_for_row(1).should == STUDENT_2_TOTAL_IGNORING_UNGRADED
+    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_IGNORING_UNGRADED
+    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_IGNORING_UNGRADED
   end
 
   it "should change grades and validate course total is correct" do
@@ -108,8 +108,8 @@ describe "editing grades" do
     #refresh page and make sure the grade sticks
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    final_score_for_row(0).should == expected_edited_total
-    final_score_for_row(1).should == expected_edited_total
+    expect(final_score_for_row(0)).to eq expected_edited_total
+    expect(final_score_for_row(1)).to eq expected_edited_total
   end
 
   it "should allow setting a letter grade on a no-points assignment" do
@@ -119,11 +119,11 @@ describe "editing grades" do
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', 'A-')
     wait_for_ajax_requests
-    f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5').should include_text('A-')
-    @assignment.reload.submissions.size.should == 1
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5')).to include_text('A-')
+    expect(@assignment.reload.submissions.size).to eq 1
     sub = @assignment.submissions.first
-    sub.grade.should == 'A-'
-    sub.score.should == 0.0
+    expect(sub.grade).to eq 'A-'
+    expect(sub.score).to eq 0.0
   end
 
   it "should not update default grades for users not in this section" do
@@ -135,8 +135,8 @@ describe "editing grades" do
     driver.execute_script "$('#section_option_#{@other_section.id}').click()"
 
     set_default_grade(2, 13)
-    @other_section.users.each { |u| u.submissions.map(&:grade).should include '13' }
-    @course.default_section.users.each { |u| u.submissions.map(&:grade).should_not include '13' }
+    @other_section.users.each { |u| expect(u.submissions.map(&:grade)).to include '13' }
+    @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include '13' }
   end
 
   it "should edit a grade, move to the next cell and validate focus is not lost" do
@@ -151,7 +151,7 @@ describe "editing grades" do
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajax_requests
-    f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3').should have_class('editable')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3')).to have_class('editable')
   end
 
   it "should display dropped grades correctly after editing a grade" do
@@ -163,8 +163,8 @@ describe "editing grades" do
     assignment_2_sel= '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
-    a1['class'].should include 'dropped'
-    a2['class'].should_not include 'dropped'
+    expect(a1['class']).to include 'dropped'
+    expect(a2['class']).not_to include 'dropped'
 
     grade_input = keep_trying_until do
       a2.click
@@ -173,8 +173,8 @@ describe "editing grades" do
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajaximations
-    f(assignment_1_sel)['class'].should_not include 'dropped'
-    f(assignment_2_sel)['class'].should include 'dropped'
+    expect(f(assignment_1_sel)['class']).not_to include 'dropped'
+    expect(f(assignment_2_sel)['class']).to include 'dropped'
   end
 
   it "should update a grade when clicking outside of slickgrid" do
@@ -189,7 +189,7 @@ describe "editing grades" do
     set_value(grade_input, 3)
     ff('body')[0].click
     wait_for_ajax_requests
-    ff('.gradebook_cell_editable').count.should == 0
+    expect(ff('.gradebook_cell_editable').count).to eq 0
   end
 
   it "should validate curving grades option" do
@@ -204,12 +204,12 @@ describe "editing grades" do
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
     keep_trying_until do
-      driver.switch_to.alert.should_not be_nil
+      expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.dismiss
       true
     end
     driver.switch_to.default_content
-    find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text.should == curved_grade_text
+    expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
 
   it "should optionally assign zeroes to unsubmitted assignments during curving" do
@@ -226,21 +226,21 @@ describe "editing grades" do
     fj('.ui-dialog-buttonpane button:visible').click
 
     keep_trying_until do
-      driver.switch_to.alert.should_not be_nil
+      expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.dismiss
       true
     end
 
     driver.switch_to.default_content
-    find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text.should == '0'
+    expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq '0'
   end
 
   it "should correctly set default grades for a specific section" do
-      pending("intermittently fails")
-      def open_section_menu_and_click(menu_item_css)
+      skip("intermittently fails")
+      open_section_menu_and_click ->(menu_item_css) do
         f('#section_to_show').click
         section_menu = f('#section-to-show-menu')
-        section_menu.should be_displayed
+        expect(section_menu).to be_displayed
         section_menu.find_element(:css, menu_item_css).click
       end
 
@@ -249,10 +249,10 @@ describe "editing grades" do
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
 
-      open_section_menu_and_click('#section-to-show-menu-1')
+      open_section_menu_and_click.call('#section-to-show-menu-1')
       set_default_grade(2, expected_grade)
-      open_section_menu_and_click('#section-to-show-menu-0')
-      f(gradebook_row_1).should be_displayed
+      open_section_menu_and_click.call('#section-to-show-menu-0')
+      expect(f(gradebook_row_1)).to be_displayed
       validate_cell_text(f("#{gradebook_row_1} .r2"), '-')
   end
 
@@ -276,7 +276,7 @@ describe "editing grades" do
     set_default_grade(2, expected_grade)
     grade_grid = f('#gradebook_grid .container_1')
     StudentEnrollment.count.times do |n|
-      find_slick_cells(n, grade_grid)[2].text.should == expected_grade
+      expect(find_slick_cells(n, grade_grid)[2].text).to eq expected_grade
     end
   end
 
@@ -286,7 +286,7 @@ describe "editing grades" do
     wait_for_ajaximations
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     keep_trying_until do
-      flash_message_present?(:error, /refresh/).should be_true
+      expect(flash_message_present?(:error, /refresh/)).to be_truthy
     end
   end
 end

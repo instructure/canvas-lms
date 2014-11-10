@@ -50,21 +50,21 @@ module Lti
 
       it 'returns the lti link simple json' do
         get "/api/lti/tool_settings/#{@link_setting.id}.json", tool_setting_id: @link_setting, bubble: false
-        JSON.parse(body).should == {"link" => "setting"}
+        expect(JSON.parse(body)).to eq({"link" => "setting"})
       end
 
       it 'returns the lti link tool settings json with bubble' do
         get "/api/lti/tool_settings/#{@link_setting.id}.json", tool_setting_id: @link_setting, bubble: true
         json = JSON.parse(body)
         setting = json['@graph'].find { |setting| setting['@type'] == "LtiLink" }
-        setting['custom'].should == {"link" => "setting"}
+        expect(setting['custom']).to eq({"link" => "setting"})
       end
 
       it 'creates a new lti link tool setting' do
         tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: 'resource_link')
         params = {'link' => 'settings'}
         put "/api/lti/tool_settings/#{tool_setting.id}.json", params.to_json, {'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolsettings.simple+json', 'ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings.simple+json'}
-        tool_setting.reload.custom.should == {'link' => 'settings'}
+        expect(tool_setting.reload.custom).to eq({'link' => 'settings'})
       end
 
     end
@@ -73,21 +73,21 @@ module Lti
 
       it 'returns the lti link simple json' do
         get "/api/lti/tool_settings/#{@binding_setting.id}.json", tool_setting_id: @binding_setting.id, bubble: false
-        JSON.parse(body).should == {"binding" => "setting"}
+        expect(JSON.parse(body)).to eq({"binding" => "setting"})
       end
 
       it 'returns the lti link tool settings json with bubble' do
         get "/api/lti/tool_settings/#{@binding_setting.id}.json", tool_setting_id: @binding_setting.id, bubble: true
         json = JSON.parse(body)
         setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxyBinding" }
-        setting['custom'].should == {"binding" => "setting"}
+        expect(setting['custom']).to eq({"binding" => "setting"})
       end
 
       it 'creates a new binding tool setting' do
         tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account)
         params = {'binding' => 'settings'}
         put "/api/lti/tool_settings/#{tool_setting.id}.json", params.to_json, {'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolsettings.simple+json', 'ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings.simple+json'}
-        tool_setting.reload.custom.should == {'binding' => 'settings'}
+        expect(tool_setting.reload.custom).to eq({'binding' => 'settings'})
       end
 
     end
@@ -96,21 +96,21 @@ module Lti
 
       it 'returns the lti link simple json' do
         get "/api/lti/tool_settings/#{@proxy_setting.id}.json", link_id: @proxy_setting.id, bubble: false
-        JSON.parse(body).should == {"proxy" => "setting"}
+        expect(JSON.parse(body)).to eq({"proxy" => "setting"})
       end
 
       it 'returns the lti link tool settings json with bubble' do
         get "/api/lti/tool_settings/#{@proxy_setting.id}.json", link_id: @proxy_setting.id, bubble: true
         json = JSON.parse(body)
         setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxy" }
-        setting['custom'].should == {"proxy" => "setting"}
+        expect(setting['custom']).to eq({"proxy" => "setting"})
       end
 
       it 'creates a new tool_proxy tool setting' do
         tool_setting = ToolSetting.create(tool_proxy: tool_proxy)
         params = {'tool_proxy' => 'settings'}
         put "/api/lti/tool_settings/#{tool_setting.id}.json", params.to_json, {'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolsettings.simple+json', 'ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings.simple+json'}
-        tool_setting.reload.custom.should == {'tool_proxy' => 'settings'}
+        expect(tool_setting.reload.custom).to eq({'tool_proxy' => 'settings'})
       end
 
       context 'bubble' do
@@ -119,33 +119,33 @@ module Lti
           get "/api/lti/tool_settings/#{@link_setting.id}.json", tool_setting_id: @link_setting.id, bubble: true
           json = JSON.parse(body)
           link_setting = json['@graph'].find { |setting| setting['@type'] == "LtiLink" }
-          link_setting['custom'].should == {"link" => "setting"}
+          expect(link_setting['custom']).to eq({"link" => "setting"})
           binding_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxyBinding" }
-          binding_setting['custom'].should == {"binding" => "setting"}
+          expect(binding_setting['custom']).to eq({"binding" => "setting"})
           proxy_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxy" }
-          proxy_setting['custom'].should == {"proxy" => "setting"}
+          expect(proxy_setting['custom']).to eq({"proxy" => "setting"})
         end
 
         it 'bubbles up from binding' do
           get "/api/lti/tool_settings/#{@binding_setting.id}.json", tool_setting_id: @binding_setting.id, bubble: true
           json = JSON.parse(body)
           link_setting = json['@graph'].find { |setting| setting['@type'] == "LtiLink" }
-          link_setting.should be_nil
+          expect(link_setting).to be_nil
           binding_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxyBinding" }
-          binding_setting['custom'].should == {"binding" => "setting"}
+          expect(binding_setting['custom']).to eq({"binding" => "setting"})
           proxy_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxy" }
-          proxy_setting['custom'].should == {"proxy" => "setting"}
+          expect(proxy_setting['custom']).to eq({"proxy" => "setting"})
         end
 
         it 'bubbles up from tool proxy' do
           get "/api/lti/tool_settings/#{@proxy_setting.id}.json", tool_setting_id: @proxy_setting.id, bubble: true
           json = JSON.parse(body)
           link_setting = json['@graph'].find { |setting| setting['@type'] == "LtiLink" }
-          link_setting.should be_nil
+          expect(link_setting).to be_nil
           binding_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxyBinding" }
-          binding_setting.should be_nil
+          expect(binding_setting).to be_nil
           proxy_setting = json['@graph'].find { |setting| setting['@type'] == "ToolProxy" }
-          proxy_setting['custom'].should == {"proxy" => "setting"}
+          expect(proxy_setting['custom']).to eq({"proxy" => "setting"})
         end
 
       end

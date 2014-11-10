@@ -28,9 +28,9 @@ describe "concluded/unconcluded" do
     wait_for_ajax_requests
 
     entry = f(".slick-cell.l2.r2")
-    entry.should be_displayed
+    expect(entry).to be_displayed
     entry.click
-    entry.find_element(:css, ".gradebook-cell-editable").should be_displayed
+    expect(entry.find_element(:css, ".gradebook-cell-editable")).to be_displayed
   end
 
   it "should not let the teacher edit the gradebook when concluded" do
@@ -38,21 +38,21 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
 
     entry = f(".slick-cell.l2.r2")
-    entry.should be_displayed
+    expect(entry).to be_displayed
     entry.click
-    entry.find_element(:css, ".gradebook-cell").should_not have_class('gradebook-cell-editable')
+    expect(entry.find_element(:css, ".gradebook-cell")).not_to have_class('gradebook-cell-editable')
   end
 
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
 
     entry = f(".slick-cell.l2.r2")
-    entry.should be_displayed
+    expect(entry).to be_displayed
     driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
     entry.find_element(:css, ".gradebook-cell-comment").click
     wait_for_animations
-    f(".submission_details_dialog").should be_displayed
-    f(".submission_details_dialog #add_a_comment").should be_displayed
+    expect(f(".submission_details_dialog")).to be_displayed
+    expect(f(".submission_details_dialog #add_a_comment")).to be_displayed
   end
 
   it "should not let the teacher add comments to the gradebook when concluded" do
@@ -60,8 +60,8 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
 
     entry = f(".slick-cell.l2.r2")
-    entry.should be_displayed
+    expect(entry).to be_displayed
     driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
-    entry.find_element(:css, ".gradebook-cell-comment").should_not be_displayed
+    expect(entry.find_element(:css, ".gradebook-cell-comment")).not_to be_displayed
   end
 end

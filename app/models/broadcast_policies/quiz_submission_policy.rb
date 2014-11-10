@@ -15,13 +15,15 @@ module BroadcastPolicies
     def should_dispatch_submission_grade_changed?
       quiz_is_accepting_messages? &&
       quiz_submission.submission.graded_at &&
-      quiz_submission.changed_in_state(:complete, :fields => [:score])
+      quiz_submission.changed_in_state(:complete, :fields => [:score]) &&
+      user_has_visibility?
     end
 
     def should_dispatch_submission_needs_grading?
       !quiz.survey? &&
       quiz_is_accepting_messages? &&
-      quiz_submission.pending_review?
+      quiz_submission.pending_review? &&
+      user_has_visibility?
     end
 
     private
@@ -39,6 +41,11 @@ module BroadcastPolicies
 
     def manually_graded
       quiz_submission.changed_in_state(:pending_review, :fields => [:fudge_points])
+    end
+
+    def user_has_visibility?
+      return true unless quiz_submission.context.feature_enabled?(:differentiated_assignments)
+      Quizzes::QuizStudentVisibility.where(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
     end
   end
 end

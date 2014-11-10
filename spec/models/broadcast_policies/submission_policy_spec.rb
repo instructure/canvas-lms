@@ -7,6 +7,7 @@ module BroadcastPolicies
       stub("Course").tap do |c|
         c.stubs(:available?).returns(true)
         c.stubs(:id).returns(1)
+        c.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
     end
     let(:assignment) do
@@ -48,6 +49,7 @@ module BroadcastPolicies
         s.stubs(:late?).returns(false)
         s.stubs(:quiz_submission).returns(nil)
         s.stubs(:user).returns(user)
+        s.stubs(:context).returns(course)
       end
     end
 
@@ -57,11 +59,11 @@ module BroadcastPolicies
       before { submission.stubs(:late?).returns true }
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_submitted_late?.should be_false
+        expect(policy.should_dispatch_assignment_submitted_late?).to be_falsey
       end
 
       it 'is true with the inputs are true' do
-        policy.should_dispatch_assignment_submitted_late?.should be_true
+        expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
       end
       specify { wont_send_when {
         submission.stubs(:group_broadcast_submission).returns true
@@ -76,18 +78,18 @@ module BroadcastPolicies
       it "still sends when the state was just changed even when it wasn't just created" do
         submission.stubs(:just_created).returns false
         submission.stubs(:changed_state_to).with(:submitted).returns true
-        policy.should_dispatch_assignment_submitted_late?.should be_true
+        expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
       end
     end
 
     describe '#should_dispatch_assignment_submitted?' do
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_submitted?.should be_false
+        expect(policy.should_dispatch_assignment_submitted?).to be_falsey
       end
 
       it 'is true when the relevant inputs are true' do
-        policy.should_dispatch_assignment_submitted?.should be_true
+        expect(policy.should_dispatch_assignment_submitted?).to be_truthy
       end
       specify { wont_send_when { course.stubs(:available?).returns false}}
       specify { wont_send_when { submission.stubs(:submitted?).returns false }}
@@ -101,11 +103,11 @@ module BroadcastPolicies
 
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_resubmitted?.should be_false
+        expect(policy.should_dispatch_assignment_resubmitted?).to be_falsey
       end
 
       it 'is true when the relevant inputs are true' do
-        policy.should_dispatch_assignment_resubmitted?.should be_true
+        expect(policy.should_dispatch_assignment_resubmitted?).to be_truthy
       end
       specify { wont_send_when { course.stubs(:available?).returns false}}
       specify { wont_send_when { submission.stubs(:submitted?).returns false }}
@@ -122,11 +124,11 @@ module BroadcastPolicies
 
       def wont_send_when
         yield
-        policy.should_dispatch_group_assignment_submitted_late?.should be_false
+        expect(policy.should_dispatch_group_assignment_submitted_late?).to be_falsey
       end
 
       it 'returns true when the inputs are all true' do
-        policy.should_dispatch_group_assignment_submitted_late?.should be_true
+        expect(policy.should_dispatch_group_assignment_submitted_late?).to be_truthy
       end
       specify { wont_send_when { submission.stubs(:group_broadcast_submission).returns false }}
       specify { wont_send_when { course.stubs(:available?).returns false}}
@@ -141,11 +143,11 @@ module BroadcastPolicies
 
       def wont_send_when
         yield
-        policy.should_dispatch_submission_graded?.should be_false
+        expect(policy.should_dispatch_submission_graded?).to be_falsey
       end
 
       it 'returns true when all inputs are true' do
-        policy.should_dispatch_submission_graded?.should be_true
+        expect(policy.should_dispatch_submission_graded?).to be_truthy
       end
 
       specify { wont_send_when{ assignment.stubs(:muted?).returns true }}
@@ -165,11 +167,11 @@ module BroadcastPolicies
 
       def wont_send_when
         yield
-        policy.should_dispatch_submission_grade_changed?.should be_false
+        expect(policy.should_dispatch_submission_grade_changed?).to be_falsey
       end
 
       it 'returns true when all inputs are true' do
-        policy.should_dispatch_submission_grade_changed?.should be_true
+        expect(policy.should_dispatch_submission_grade_changed?).to be_truthy
       end
 
       specify { wont_send_when{ assignment.stubs(:muted?).returns true }}
@@ -177,6 +179,7 @@ module BroadcastPolicies
       specify { wont_send_when{ submission.stubs(:quiz_submission).returns stub }}
       specify { wont_send_when{ course.stubs(:available?).returns false }}
       specify { wont_send_when{ assignment.stubs(:published?).returns false }}
+      specify { wont_send_when{ SubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false)}}
     end
 
   end

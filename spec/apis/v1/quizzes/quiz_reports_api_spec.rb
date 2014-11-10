@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizReportsController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports [index]" do
     def api_index(params={}, options={})
       method = options[:raw] ? :raw_api_call : :api_call
@@ -52,9 +56,9 @@ describe Quizzes::QuizReportsController, type: :request do
         stats.save!
 
         json = api_index
-        json.length.should == 2
-        json.map { |report| report['report_type'] }.sort.
-          should == %w[ item_analysis student_analysis ]
+        expect(json.length).to eq 2
+        expect(json.map { |report| report['report_type'] }.sort).
+          to eq %w[ item_analysis student_analysis ]
       end
 
       describe 'the `includes_all_versions` flag' do
@@ -65,7 +69,7 @@ describe Quizzes::QuizReportsController, type: :request do
             report['report_type'] == 'student_analysis'
           end
 
-          student_analysis['includes_all_versions'].should == true
+          expect(student_analysis['includes_all_versions']).to eq true
         end
 
         it 'defaults to false' do
@@ -75,7 +79,7 @@ describe Quizzes::QuizReportsController, type: :request do
             report['report_type'] == 'student_analysis'
           end
 
-          student_analysis['includes_all_versions'].should == false
+          expect(student_analysis['includes_all_versions']).to eq false
         end
       end
 
@@ -86,10 +90,10 @@ describe Quizzes::QuizReportsController, type: :request do
 
           json = api_index({}, { jsonapi: true })
 
-          json['quiz_reports'].should be_present
-          json['quiz_reports'].length.should == 2
-          json['quiz_reports'].map { |report| report['report_type'] }.sort.
-            should == %w[ item_analysis student_analysis ]
+          expect(json['quiz_reports']).to be_present
+          expect(json['quiz_reports'].length).to eq 2
+          expect(json['quiz_reports'].map { |report| report['report_type'] }.sort).
+            to eq %w[ item_analysis student_analysis ]
         end
       end
     end
@@ -117,23 +121,23 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it "should create a new report" do
-      Quizzes::QuizStatistics.count.should == 0
+      expect(Quizzes::QuizStatistics.count).to eq 0
       json = api_create({:quiz_report => {:report_type => "item_analysis"}})
-      Quizzes::QuizStatistics.count.should == 1
-      json['id'].should == Quizzes::QuizStatistics.first.id
+      expect(Quizzes::QuizStatistics.count).to eq 1
+      expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
 
     it "should reuse an existing report" do
       @quiz.statistics_csv('item_analysis')
-      Quizzes::QuizStatistics.count.should == 1
+      expect(Quizzes::QuizStatistics.count).to eq 1
       json = api_create({:quiz_report => {:report_type => "item_analysis"}})
-      Quizzes::QuizStatistics.count.should == 1
-      json['id'].should == Quizzes::QuizStatistics.first.id
+      expect(Quizzes::QuizStatistics.count).to eq 1
+      expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
 
     context 'JSON-API' do
       it "should create a new report" do
-        Quizzes::QuizStatistics.count.should == 0
+        expect(Quizzes::QuizStatistics.count).to eq 0
 
         json = api_create({
           quiz_reports: [{
@@ -141,10 +145,10 @@ describe Quizzes::QuizReportsController, type: :request do
           }]
         }, { jsonapi: true })
 
-        Quizzes::QuizStatistics.count.should == 1
+        expect(Quizzes::QuizStatistics.count).to eq 1
 
-        json['quiz_reports'].should be_present
-        json['quiz_reports'][0]['id'].should == "#{Quizzes::QuizStatistics.first.id}"
+        expect(json['quiz_reports']).to be_present
+        expect(json['quiz_reports'][0]['id']).to eq "#{Quizzes::QuizStatistics.first.id}"
       end
     end
   end
@@ -181,8 +185,8 @@ describe Quizzes::QuizReportsController, type: :request do
 
       it 'shows the report' do
         json = api_show
-        json['id'].should == @report.id
-        json['report_type'].should == 'student_analysis'
+        expect(json['id']).to eq @report.id
+        expect(json['report_type']).to eq 'student_analysis'
       end
 
       it 'embeds its attachment automatically in JSON format' do
@@ -190,16 +194,16 @@ describe Quizzes::QuizReportsController, type: :request do
         @report.reload
 
         json = api_show
-        json['file'].should be_present
-        json['file']['id'].should == @report.csv_attachment.id
+        expect(json['file']).to be_present
+        expect(json['file']['id']).to eq @report.csv_attachment.id
       end
 
       context 'JSON-API' do
         it 'renders' do
           json = api_show({}, { jsonapi: true })
-          json['quiz_reports'].should be_present
-          json['quiz_reports'][0]['id'].should == "#{@report.id}"
-          json['quiz_reports'][0]['report_type'].should == 'student_analysis'
+          expect(json['quiz_reports']).to be_present
+          expect(json['quiz_reports'][0]['id']).to eq "#{@report.id}"
+          expect(json['quiz_reports'][0]['report_type']).to eq 'student_analysis'
         end
 
         it 'embeds its attachment with ?include=file' do
@@ -207,8 +211,8 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.reload
 
           json = api_show({:include=>['file']}, { jsonapi: true })
-          json['quiz_reports'][0]['file'].should be_present
-          json['quiz_reports'][0]['file']['id'].should == @report.csv_attachment.id
+          expect(json['quiz_reports'][0]['file']).to be_present
+          expect(json['quiz_reports'][0]['file']['id']).to eq @report.csv_attachment.id
         end
 
         it 'embeds its progress with ?include=progress' do
@@ -216,9 +220,9 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.reload
 
           json = api_show({:include=>['progress']}, { jsonapi: true })
-          json['quiz_reports'][0]['file'].should_not be_present
-          json['quiz_reports'][0]['progress'].should be_present
-          json['quiz_reports'][0]['progress']['id'].should == @report.progress.id
+          expect(json['quiz_reports'][0]['file']).not_to be_present
+          expect(json['quiz_reports'][0]['progress']).to be_present
+          expect(json['quiz_reports'][0]['progress']['id']).to eq @report.progress.id
         end
       end
     end # context 'with privileged access'

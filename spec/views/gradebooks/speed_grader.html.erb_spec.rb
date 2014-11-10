@@ -32,13 +32,13 @@ describe "/gradebooks/speed_grader" do
 
   it "should render" do
     render "gradebooks/speed_grader"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "includes a link back to the gradebook (gradebook2 by default)" do
     render "gradebooks/speed_grader"
     course_id = @course.id
-    response.body.should include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
+    expect(response.body).to include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
   end
 end
 

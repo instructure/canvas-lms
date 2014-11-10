@@ -12,17 +12,17 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       user1.reload
       user2.reload
-      user1.should_not be_deleted
-      user2.should be_deleted
+      expect(user1).not_to be_deleted
+      expect(user2).to be_deleted
     end
 
     it "should move pseudonyms to the new user" do
       user2.pseudonyms.create!(:unique_id => 'sam@yahoo.com')
       UserMerge.from(user2).into(user1)
       user2.reload
-      user2.pseudonyms.should be_empty
+      expect(user2.pseudonyms).to be_empty
       user1.reload
-      user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
+      expect(user1.pseudonyms.map(&:unique_id)).to be_include('sam@yahoo.com')
     end
 
     it "should use avatar information from merged user if none exists" do
@@ -34,7 +34,7 @@ describe UserMerge do
       user2.reload
 
       [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
-        user1[attr].should == user2[attr]
+        expect(user1[attr]).to eq user2[attr]
       end
     end
 
@@ -47,14 +47,14 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       user1.reload
       user2.reload
-      user1.avatar_state.should_not == user2.avatar_state
+      expect(user1.avatar_state).not_to eq user2.avatar_state
     end
 
     it "should move access tokens to the new user" do
       at = AccessToken.create!(:user => user2, :developer_key => DeveloperKey.default)
       UserMerge.from(user2).into(user1)
       at.reload
-      at.user_id.should == user1.id
+      expect(at.user_id).to eq user1.id
     end
 
     it "should move submissions to the new user (but only if they don't already exist)" do
@@ -69,16 +69,16 @@ describe UserMerge do
       s3 = a2.find_or_create_submission(user2)
       s3.submission_type = "online_quiz"
       s3.save!
-      user2.submissions.length.should eql(2)
-      user1.submissions.length.should eql(1)
+      expect(user2.submissions.length).to eql(2)
+      expect(user1.submissions.length).to eql(1)
       UserMerge.from(user2).into(user1)
       user2.reload
       user1.reload
-      user2.submissions.length.should eql(1)
-      user2.submissions.first.id.should eql(s2.id)
-      user1.submissions.length.should eql(2)
-      user1.submissions.map(&:id).should be_include(s1.id)
-      user1.submissions.map(&:id).should be_include(s3.id)
+      expect(user2.submissions.length).to eql(1)
+      expect(user2.submissions.first.id).to eql(s2.id)
+      expect(user1.submissions.length).to eql(2)
+      expect(user1.submissions.map(&:id)).to be_include(s1.id)
+      expect(user1.submissions.map(&:id)).to be_include(s3.id)
     end
 
     it "should overwrite submission objects that do not contain actual student submissions (e.g. what_if grades)" do
@@ -90,8 +90,8 @@ describe UserMerge do
 
       UserMerge.from(user2).into(user1)
 
-      user1.reload.submissions.should == [s2.reload]
-      user2.reload.submissions.should == []
+      expect(user1.reload.submissions).to eq [s2.reload]
+      expect(user2.reload.submissions).to eq []
 
       user1.destroy
       user2.destroy
@@ -106,8 +106,8 @@ describe UserMerge do
 
       UserMerge.from(user2).into(user1)
 
-      user1.reload.submissions.should == [s3.reload]
-      user2.reload.submissions.should == [s4.reload]
+      expect(user1.reload.submissions).to eq [s3.reload]
+      expect(user2.reload.submissions).to eq [s4.reload]
     end
 
     it "should move quiz submissions to the new user (but only if they don't already exist)" do
@@ -118,20 +118,20 @@ describe UserMerge do
       q2 = quiz_model
       qs3 = q2.generate_submission(user2)
 
-      user1.quiz_submissions.length.should eql(1)
-      user2.quiz_submissions.length.should eql(2)
+      expect(user1.quiz_submissions.length).to eql(1)
+      expect(user2.quiz_submissions.length).to eql(2)
 
       UserMerge.from(user2).into(user1)
 
       user2.reload
       user1.reload
 
-      user2.quiz_submissions.length.should eql(1)
-      user2.quiz_submissions.first.id.should eql(qs2.id)
+      expect(user2.quiz_submissions.length).to eql(1)
+      expect(user2.quiz_submissions.first.id).to eql(qs2.id)
 
-      user1.quiz_submissions.length.should eql(2)
-      user1.quiz_submissions.map(&:id).should be_include(qs1.id)
-      user1.quiz_submissions.map(&:id).should be_include(qs3.id)
+      expect(user1.quiz_submissions.length).to eql(2)
+      expect(user1.quiz_submissions.map(&:id)).to be_include(qs1.id)
+      expect(user1.quiz_submissions.map(&:id)).to be_include(qs3.id)
     end
 
     it "should move ccs to the new user (but only if they don't already exist)" do
@@ -178,7 +178,7 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       user1.reload
       user2.reload
-      user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+      expect(user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['A@instructure.com', 'active'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
@@ -195,7 +195,7 @@ describe UserMerge do
           ['n@instructure.com', 'retired'],
           ['o@instructure.com', 'retired']
       ]
-      user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['a@instructure.com', 'retired'],
           ['c@instructure.com', 'retired'],
           ['d@instructure.com', 'retired'],
@@ -204,7 +204,7 @@ describe UserMerge do
           ['i@instructure.com', 'retired'],
       ]
       %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
-        CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }.should be_nil
+        expect(CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }).to be_nil
       end
     end
 
@@ -220,19 +220,19 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       enrollment1.reload
-      enrollment1.user.should == user1
-      enrollment1.should be_deleted
+      expect(enrollment1.user).to eq user1
+      expect(enrollment1).to be_deleted
       enrollment2.reload
-      enrollment2.should be_active
-      enrollment2.user.should == user2
+      expect(enrollment2).to be_active
+      expect(enrollment2.user).to eq user2
       enrollment3.reload
-      enrollment3.should be_invited
+      expect(enrollment3).to be_invited
       enrollment4.reload
-      enrollment4.user.should == user2
-      enrollment4.should be_invited
+      expect(enrollment4.user).to eq user2
+      expect(enrollment4).to be_invited
 
       user1.reload
-      user1.enrollments.should == [enrollment1]
+      expect(user1.enrollments).to eq [enrollment1]
     end
 
     it "should remove conflicting module progressions" do
@@ -262,8 +262,8 @@ describe UserMerge do
       expect { UserMerge.from(user1).into(user2) }.to_not raise_error
 
       #it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
-      ContextModuleProgression.where(user_id:user1, context_module_id:[context_module, context_module2]).count.should == 0
-      ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count.should == 2
+      expect(ContextModuleProgression.where(user_id:user1, context_module_id:[context_module, context_module2]).count).to eq 0
+      expect(ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count).to eq 2
     end
 
     it "should move and uniquify observee enrollments" do
@@ -275,16 +275,16 @@ describe UserMerge do
       observer2 = user_with_pseudonym
       user1.observers << observer1 << observer2
       user2.observers << observer2
-      ObserverEnrollment.count.should eql 3
+      expect(ObserverEnrollment.count).to eql 3
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
       UserMerge.from(user1).into(user2)
-      user1.observee_enrollments.size.should eql 1 #deleted
-      user1.observee_enrollments.active_or_pending.should be_empty
-      user2.observee_enrollments.size.should eql 2
-      user2.observee_enrollments.active_or_pending.size.should eql 2
-      observer1.observer_enrollments.active_or_pending.size.should eql 1
-      observer2.observer_enrollments.active_or_pending.size.should eql 1
+      expect(user1.observee_enrollments.size).to eql 1 #deleted
+      expect(user1.observee_enrollments.active_or_pending).to be_empty
+      expect(user2.observee_enrollments.size).to eql 2
+      expect(user2.observee_enrollments.active_or_pending.size).to eql 2
+      expect(observer1.observer_enrollments.active_or_pending.size).to eql 1
+      expect(observer2.observer_enrollments.active_or_pending.size).to eql 1
     end
 
     it "should move and uniquify observers" do
@@ -295,9 +295,9 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       user1.reload
-      user1.observers.should be_empty
+      expect(user1.observers).to be_empty
       user2.reload
-      user2.observers.sort_by(&:id).should eql [observer1, observer2]
+      expect(user2.observers.sort_by(&:id)).to eql [observer1, observer2]
     end
 
     it "should move and uniquify observed users" do
@@ -308,9 +308,9 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       user1.reload
-      user1.observed_users.should be_empty
+      expect(user1.observed_users).to be_empty
       user2.reload
-      user2.observed_users.sort_by(&:id).should eql [student1, student2]
+      expect(user2.observed_users.sort_by(&:id)).to eql [student1, student2]
     end
 
     it "should move conversations to the new user" do
@@ -323,14 +323,14 @@ describe UserMerge do
       old_private_hash = c2.conversation.private_hash
 
       UserMerge.from(user1).into(user2)
-      c1.reload.user_id.should eql user2.id
-      c1.conversation.participants.should_not include(user1)
-      user1.reload.unread_conversations_count.should eql 0
+      expect(c1.reload.user_id).to eql user2.id
+      expect(c1.conversation.participants).not_to include(user1)
+      expect(user1.reload.unread_conversations_count).to eql 0
 
-      c2.reload.user_id.should eql user2.id
-      c2.conversation.participants.should_not include(user1)
-      c2.conversation.private_hash.should_not eql old_private_hash
-      user2.reload.unread_conversations_count.should eql 2
+      expect(c2.reload.user_id).to eql user2.id
+      expect(c2.conversation.participants).not_to include(user1)
+      expect(c2.conversation.private_hash).not_to eql old_private_hash
+      expect(user2.reload.unread_conversations_count).to eql 2
     end
 
     it "should point other user's observers to the new user" do
@@ -339,7 +339,7 @@ describe UserMerge do
       oe = course1.enroll_user(observer, 'ObserverEnrollment')
       oe.update_attribute(:associated_user_id, user1.id)
       UserMerge.from(user1).into(user2)
-      oe.reload.associated_user_id.should == user2.id
+      expect(oe.reload.associated_user_id).to eq user2.id
     end
 
     it "should move appointments" do
@@ -358,8 +358,8 @@ describe UserMerge do
       res2 = ag.appointments.last.reserve_for(user2, @teacher)
       UserMerge.from(user1).into(user2)
       res1.reload
-      res1.context_id.should == user2.id
-      res1.context_code.should == user2.asset_string
+      expect(res1.context_id).to eq user2.id
+      expect(res1.context_code).to eq user2.asset_string
     end
 
     it "should move user attachments and handle duplicates" do
@@ -370,13 +370,13 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       run_jobs
 
-      user2.attachments.count.should == 2
-      user2.attachments.not_deleted.count.should == 2
+      expect(user2.attachments.count).to eq 2
+      expect(user2.attachments.not_deleted.count).to eq 2
 
-      user2.attachments.not_deleted.detect{|a| a.md5 == attachment1.md5}.should == attachment3
+      expect(user2.attachments.not_deleted.detect{|a| a.md5 == attachment1.md5}).to eq attachment3
 
       new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
-      new_attachment.display_name.should_not == "test.txt" # attachment2 should be copied and renamed because it has unique file data
+      expect(new_attachment.display_name).not_to eq "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
 
     it "should move discussion topics and entries" do
@@ -385,8 +385,8 @@ describe UserMerge do
 
       UserMerge.from(user2).into(user1)
 
-      topic.reload.user.should == user1
-      entry.reload.user.should == user1
+      expect(topic.reload.user).to eq user1
+      expect(entry.reload.user).to eq user1
     end
 
     it "should freshen moved topics" do
@@ -394,7 +394,7 @@ describe UserMerge do
       now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
       Timecop.freeze(now) do
         UserMerge.from(user2).into(user1)
-        topic.reload.updated_at.should == now
+        expect(topic.reload.updated_at).to eq now
       end
     end
 
@@ -404,7 +404,7 @@ describe UserMerge do
       now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
       Timecop.freeze(now) do
         UserMerge.from(user2).into(user1)
-        topic.reload.updated_at.should == now
+        expect(topic.reload.updated_at).to eq now
       end
     end
   end
@@ -419,22 +419,22 @@ describe UserMerge do
     course_with_student(:account => subsubaccount1, :user => user1)
     course_with_student(:account => subsubaccount2, :user => user2)
 
-    user1.associated_accounts.map(&:id).sort.should == [account1, subaccount1, subsubaccount1].map(&:id).sort
-    user2.associated_accounts.map(&:id).sort.should == [account2, subaccount2, subsubaccount2].map(&:id).sort
+    expect(user1.associated_accounts.map(&:id).sort).to eq [account1, subaccount1, subsubaccount1].map(&:id).sort
+    expect(user2.associated_accounts.map(&:id).sort).to eq [account2, subaccount2, subsubaccount2].map(&:id).sort
 
-    pseudo1.user.should == user1
-    pseudo2.user.should == user2
+    expect(pseudo1.user).to eq user1
+    expect(pseudo2.user).to eq user2
 
     UserMerge.from(user1).into(user2)
 
     pseudo1, pseudo2 = [pseudo1, pseudo2].map{|p| Pseudonym.find(p.id)}
     user1, user2 = [user1, user2].map{|u| User.find(u.id)}
 
-    pseudo1.user.should == pseudo2.user
-    pseudo1.user.should == user2
+    expect(pseudo1.user).to eq pseudo2.user
+    expect(pseudo1.user).to eq user2
 
-    user1.associated_accounts.map(&:id).sort.should == []
-    user2.associated_accounts.map(&:id).sort.should == [account1, account2, subaccount1, subaccount2, subsubaccount1, subsubaccount2].map(&:id).sort
+    expect(user1.associated_accounts.map(&:id).sort).to eq []
+    expect(user2.associated_accounts.map(&:id).sort).to eq [account1, account2, subaccount1, subaccount2, subsubaccount1, subsubaccount2].map(&:id).sort
   end
 
   context "versions" do
@@ -458,17 +458,17 @@ describe UserMerge do
         :body => 'hi again'
       })
 
-      s1.versions.count.should eql(2)
-      s1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
-      s_other.versions.first.model.user_id.should eql(other_user.id)
+      expect(s1.versions.count).to eql(2)
+      s1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      expect(s_other.versions.first.model.user_id).to eql(other_user.id)
 
       UserMerge.from(user2).into(user1)
       s1 = Submission.find(s1.id)
       s_other.reload
 
-      s1.versions.count.should eql(2)
-      s1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
-      s_other.versions.first.model.user_id.should eql(other_user.id)
+      expect(s1.versions.count).to eql(2)
+      s1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      expect(s_other.versions.first.model.user_id).to eql(other_user.id)
     end
 
     it "should update quiz submissions" do
@@ -478,19 +478,19 @@ describe UserMerge do
       qs2 = @quiz_submission
       Version.where(:versionable_type => "Quizzes::QuizSubmission", :versionable_id => qs2).update_all(:versionable_type => "QuizSubmission")
 
-      qs1.versions.should be_present
-      qs1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
-      qs2.versions.should be_present
-      qs2.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      expect(qs1.versions).to be_present
+      qs1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      expect(qs2.versions).to be_present
+      qs2.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
 
       UserMerge.from(user2).into(user1)
       qs1.reload
       qs2.reload
 
-      qs1.versions.should be_present
-      qs1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
-      qs2.versions.should be_present
-      qs2.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      expect(qs1.versions).to be_present
+      qs1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      expect(qs2.versions).to be_present
+      qs2.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
     end
 
     it "should update other appropriate versions" do
@@ -498,19 +498,19 @@ describe UserMerge do
       wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
       ra = rubric_assessment_model(:context => @course, :user => user2)
 
-      wiki_page.versions.should be_present
-      wiki_page.versions.each{ |v| v.model.user_id.should eql(user2.id) }
-      ra.versions.should be_present
-      ra.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      expect(wiki_page.versions).to be_present
+      wiki_page.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      expect(ra.versions).to be_present
+      ra.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
 
       UserMerge.from(user2).into(user1)
       wiki_page.reload
       ra.reload
 
-      wiki_page.versions.should be_present
-      wiki_page.versions.each{ |v| v.model.user_id.should eql(user1.id) }
-      ra.versions.should be_present
-      ra.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      expect(wiki_page.versions).to be_present
+      wiki_page.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      expect(ra.versions).to be_present
+      ra.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
     end
   end
 
@@ -531,12 +531,12 @@ describe UserMerge do
         UserMerge.from(user1).into(@user2)
       end
 
-      user1.should be_deleted
-      p1.reload.user.should == @user2
-      cc1.reload.should be_retired
-      @user2.communication_channels.all.map(&:path).sort.should == ['user1@example.com', 'user2@example.com']
-      @user2.all_pseudonyms.should == [@p2, p1]
-      @user2.associated_shards.should == [@shard1, Shard.default]
+      expect(user1).to be_deleted
+      expect(p1.reload.user).to eq @user2
+      expect(cc1.reload).to be_retired
+      expect(@user2.communication_channels.all.map(&:path).sort).to eq ['user1@example.com', 'user2@example.com']
+      expect(@user2.all_pseudonyms).to eq [@p2, p1]
+      expect(@user2.associated_shards).to eq [@shard1, Shard.default]
     end
 
     it "should associate the user with all shards" do
@@ -555,8 +555,8 @@ describe UserMerge do
         UserMerge.from(user1).into(@user2)
       end
 
-      @user2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
-      @user2.all_pseudonyms.sort_by(&:id).should == [p1, @p2, @p3].sort_by(&:id)
+      expect(@user2.associated_shards.sort_by(&:id)).to eq [Shard.default, @shard1, @shard2].sort_by(&:id)
+      expect(@user2.all_pseudonyms.sort_by(&:id)).to eq [p1, @p2, @p3].sort_by(&:id)
     end
 
     it "should move ccs to the new user (but only if they don't already exist)" do
@@ -611,7 +611,7 @@ describe UserMerge do
 
       user1.reload
       @user2.reload
-      @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+      expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['A@instructure.com', 'active'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
@@ -630,7 +630,7 @@ describe UserMerge do
       ]
       # on cross shard merges, the deleted user retains all CCs (pertinent ones were
       # duplicated over to the surviving shard)
-      user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['a@instructure.com', 'retired'],
           ['b@instructure.com', 'retired'],
           ['c@instructure.com', 'retired'],
@@ -657,10 +657,10 @@ describe UserMerge do
       @user2.reload
 
       UserMerge.from(@user2).into(user1)
-      user1.communication_channels.reload.length.should == 1
+      expect(user1.communication_channels.reload.length).to eq 1
       cc2 = user1.communication_channels.first
-      cc2.path.should == 'abc'
-      cc2.workflow_state.should == 'retired'
+      expect(cc2.path).to eq 'abc'
+      expect(cc2.workflow_state).to eq 'retired'
     end
 
     it "should move user attachments and handle duplicates" do
@@ -680,7 +680,7 @@ describe UserMerge do
                                              :uploaded_data => StringIO.new("root_attachment_data"))
       user1_attachment3.content_type = "text/plain"
       user1_attachment3.save!
-      user1_attachment3.root_attachment.should == root_attachment
+      expect(user1_attachment3.root_attachment).to eq root_attachment
 
       @shard1.activate do
         new_account = Account.create!
@@ -699,16 +699,16 @@ describe UserMerge do
       UserMerge.from(user1).into(@user2)
       run_jobs
 
-      @user2.attachments.not_deleted.count.should == 5
+      expect(@user2.attachments.not_deleted.count).to eq 5
 
       new_user2_attachment1 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id}
-      new_user2_attachment1.root_attachment.should == @user2_attachment2
-      new_user2_attachment1.display_name.should_not == user1_attachment2.display_name #should rename
-      new_user2_attachment1.namespace.should_not == user1_attachment1.namespace
+      expect(new_user2_attachment1.root_attachment).to eq @user2_attachment2
+      expect(new_user2_attachment1.display_name).not_to eq user1_attachment2.display_name #should rename
+      expect(new_user2_attachment1.namespace).not_to eq user1_attachment1.namespace
 
       new_user2_attachment2 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment3.md5}
-      new_user2_attachment2.root_attachment.should be_nil
-      new_user2_attachment2.content_type.should == "text/plain"
+      expect(new_user2_attachment2.root_attachment).to be_nil
+      expect(new_user2_attachment2.content_type).to eq "text/plain"
     end
 
     context "manual invitation" do
@@ -729,7 +729,7 @@ describe UserMerge do
           @course.enroll_user(user2)
 
           # cache the temporary invitations
-          user1.temporary_invitations.should_not be_empty
+          expect(user1.temporary_invitations).not_to be_empty
 
           # when the user follows the confirmation link, they will be prompted to merge into the other user
           UserMerge.from(user2).into(user1)
@@ -738,7 +738,7 @@ describe UserMerge do
           # (otherwise it will retrieve it in CoursesController#fetch_enrollment,
           # which causes the login loop in CoursesController#accept_enrollment)
           user1.reload
-          user1.temporary_invitations.should be_empty
+          expect(user1.temporary_invitations).to be_empty
         end
       end
     end

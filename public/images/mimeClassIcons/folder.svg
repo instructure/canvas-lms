@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="28px" height="36px" viewBox="0 0 28 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1 (8751) - http://www.bohemiancoding.com/sketch -->
+    <title>folder</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="folder" sketch:type="MSArtboardGroup">
+            <path d="M2,13 L2,31 L5,31 L5,14 L27,14 L27,12 L2,12 L2,13 L2,13 Z" id="Rectangle-70" fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
+            <path d="M27,12 L27,10.5 C27,9.67157288 26.3325806,9 25.5099035,9 L10.9938083,9 C10.4474545,9 10,8.55181759 10,7.99895656 L10,6.99791312 C10,5.89449617 9.11256671,5 8.00038502,5 L1.99961498,5 C0.895258123,5 0,5.89826062 0,6.99791312 L0,9.00104344 L0,11 L0,29 L2,31 L2,13.9974219 C2,12.8942762 2.88976324,12 4.00359486,12 L27,12 L27,12 Z M5.00359486,13 C3.89703997,13 3,13.8926228 3,14.9950893 L3,31 L28,31 L28,14.9950893 C28,13.8932319 27.1102368,13 25.9964051,13 L5.00359486,13 L5.00359486,13 Z" id="Rectangle-67" fill="#384A58" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

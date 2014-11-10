@@ -150,11 +150,11 @@ define [
     refs.unlock_at.getDOMNode().value = '123'
     refs.lock_at.getDOMNode().value = '123'
 
-    sinon.spy(@restrictedDialogForm.props.models[0], 'save')
+    stubbedSave = sinon.spy(@restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
 
     ok @restrictedDialogForm.props.models[0].save.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123', locked: false}}), 'Called save with single hidden true attribute'
-    @restrictedDialogForm.props.models[0].save.restore()
+    stubbedSave.restore()
 
   module 'RestrictedDialogForm Multiple Items',
     setup: ->

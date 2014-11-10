@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../file_uploads_spec_helper')
 
 describe Quizzes::QuizSubmissionFilesController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   context "quiz submissions file uploads" do
     before :once do
       course_with_student :active_all => true

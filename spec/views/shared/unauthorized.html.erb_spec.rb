@@ -24,7 +24,7 @@ describe "/shared/unauthorized" do
     course_with_student
     view_context
     render "shared/unauthorized"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

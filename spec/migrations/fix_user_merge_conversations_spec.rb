@@ -22,7 +22,7 @@ require 'db/migrate/20120216163427_fix_user_merge_conversations.rb'
 describe 'FixUserMergeConversations' do
   describe "up" do
     it "should work" do
-      pending "no longer possible to create bad data due to db constraint"
+      skip "no longer possible to create bad data due to db constraint"
       u1 = user
       u2 = user
       u3 = user
@@ -30,7 +30,7 @@ describe 'FixUserMergeConversations' do
       c1 = Conversation.initiate([u1, u2], true)
       c1.conversation_participants.create!(:user => u1)
       c1.update_attribute(:private_hash, 'no longer valid')
-      c1.conversation_participants.size.should eql 3
+      expect(c1.conversation_participants.size).to eql 3
 
       c2 = Conversation.initiate([u1, u3], true)
       c2.update_attribute(:private_hash, 'well this is clearly wrong')
@@ -39,9 +39,9 @@ describe 'FixUserMergeConversations' do
 
       FixUserMergeConversations.up
 
-      c1.reload.conversation_participants.size.should eql 2
-      c1.private_hash.should_not eql 'no longer valid'
-      lambda { c2.reload }.should raise_error
+      expect(c1.reload.conversation_participants.size).to eql 2
+      expect(c1.private_hash).not_to eql 'no longer valid'
+      expect { c2.reload }.to raise_error
     end
   end
 end

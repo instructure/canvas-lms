@@ -27,11 +27,11 @@ describe "/shared/_select_content_dialog" do
     folder.attachments.create!(:context => @course, :uploaded_data => default_uploaded_data, :display_name => "a")
     view_context
     render :partial => "shared/select_content_dialog"
-    response.should_not be_nil
+    expect(response).not_to be_nil
     page = Nokogiri(response.body)
     options = page.css("#attachments_select .module_item_select option")
-    options[1].text.should == "a"
-    options[2].text.should == "b"
+    expect(options[1].text).to eq "a"
+    expect(options[2].text).to eq "b"
   end
 
   it "should include unpublished wiki pages" do
@@ -47,7 +47,7 @@ describe "/shared/_select_content_dialog" do
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
     options = page.css("#wiki_pages_select .module_item_select option")
-    (%w(unpublished_page published_page) - options.map(&:text)).should be_empty
+    expect(%w(unpublished_page published_page) - options.map(&:text)).to be_empty
   end
 
   it "should not offer to create assigments or quizzes if the user doesn't have permission" do
@@ -58,9 +58,9 @@ describe "/shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    page.css(%Q{#quizs_select .module_item_select option[value="#{existing_quiz.id}"]}).should_not be_empty
-    page.css(%Q{#quizs_select .module_item_select option[value="new"]}).should be_empty
-    page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should be_empty
+    expect(page.css(%Q{#quizs_select .module_item_select option[value="#{existing_quiz.id}"]})).not_to be_empty
+    expect(page.css(%Q{#quizs_select .module_item_select option[value="new"]})).to be_empty
+    expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).to be_empty
   end
 
   it "should offer to create assigments if the user has permission" do
@@ -69,7 +69,7 @@ describe "/shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should_not be_empty
+    expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).not_to be_empty
   end
 
   it "should create new topics in unpublished state if draft state is enabled" do
@@ -77,15 +77,7 @@ describe "/shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    page.at_css(%Q{#discussion_topics_select .new input[name="published"][value="false"]}).should_not be_nil
-  end
-
-  it "should create new topics in published state if draft state is disabled" do
-    course_with_teacher(active_all: true, draft_state: false)
-    view_context
-    render partial: 'shared/select_content_dialog'
-    page = Nokogiri(response.body)
-    page.at_css(%Q{#discussion_topics_select .new input[name="published"]}).should be_nil
+    expect(page.at_css(%Q{#discussion_topics_select .new input[name="published"][value="false"]})).not_to be_nil
   end
 end
 

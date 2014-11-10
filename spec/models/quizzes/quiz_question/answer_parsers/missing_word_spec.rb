@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb
 
 
 describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "#parse" do
     let(:raw_answers) do
       [
@@ -64,7 +68,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
       end
 
       it "defaults to the first answer being correct" do
-        @answer_data.answers.first[:weight].should == 100
+        expect(@answer_data.answers.first[:weight]).to eq 100
       end
 
     end

@@ -7,7 +7,7 @@ def set_default_grade(cell_index, points = "5")
   f('.grading_value').send_keys(points)
   submit_dialog(dialog, '.ui-button')
   keep_trying_until do
-    driver.switch_to.alert.should_not be_nil
+    expect(driver.switch_to.alert).not_to be_nil
     driver.switch_to.alert.dismiss
     true
   end
@@ -26,7 +26,7 @@ def open_assignment_options(cell_index)
   driver.action.move_to(assignment_cell).perform
   trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
   trigger.click
-  fj("##{trigger['aria-owns']}").should be_displayed
+  expect(fj("##{trigger['aria-owns']}")).to be_displayed
 end
 
 def find_slick_cells(row_index, element)
@@ -41,7 +41,7 @@ def edit_grade(cell, grade)
     driver.execute_script("$('#{cell}').hover().click()")
     sleep 1
     input = fj("#{cell} .grade")
-    input.should_not be_nil
+    expect(input).not_to be_nil
     input
   end
   set_value(grade_input, grade)
@@ -50,14 +50,14 @@ def edit_grade(cell, grade)
 end
 
 def validate_cell_text(cell, text)
-  cell.text.should == text
+  expect(cell.text).to eq text
   cell.text
 end
 
 def open_gradebook_settings(element_to_click = nil)
   keep_trying_until do
     f('#gradebook_settings').click
-    ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
+    expect(ff('#gradebook-toolbar ul.ui-kyle-menu').last).to be_displayed
     true
   end
   yield(f('#gradebook_settings')) if block_given?
@@ -84,7 +84,7 @@ def switch_to_section(section=nil)
   section = section.id if section.is_a?(CourseSection)
   section ||= ""
   fj('.section-select-button:visible').click
-  keep_trying_until { fj('.section-select-menu:visible').should be_displayed }
+  keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
   fj("label[for='section_option_#{section}']").click
   wait_for_ajaximations
 end

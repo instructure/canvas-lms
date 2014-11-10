@@ -64,8 +64,8 @@ describe Importers::CalendarEventImporter do
 
   def check_paragraph_link(s, type = nil)
     md = s.match %r(^<p><a href=['"]([^'"]*)['"])
-    md.should_not be_nil
-    md[1].should match %r(courses/\d+/#{type}/\d+) if type
+    expect(md).not_to be_nil
+    expect(md[1]).to match %r(courses/\d+/#{type}/\d+) if type
   end
 
   describe '.import_from_migration' do
@@ -81,59 +81,59 @@ describe Importers::CalendarEventImporter do
         attachment_value: 'http://example.com'
       }
       Importers::CalendarEventImporter.import_from_migration(hash, migration_course, nil, event)
-      event.should_not be_new_record
-      event.imported.should be_true
-      event.migration_id.should == '42'
-      event.title.should == 'event title'
-      event.description.should match('the event description')
-      event.description.should match('example.com')
+      expect(event).not_to be_new_record
+      expect(event.imported).to be_truthy
+      expect(event.migration_id).to eq '42'
+      expect(event.title).to eq 'event title'
+      expect(event.description).to match('the event description')
+      expect(event.description).to match('example.com')
     end
   end
 
   describe '.import_migration_attachment_suffix' do
     it "handles external_url" do
       result = attachment_suffix('external_url', 'http://example.com')
-      result.should include 'http://example.com'
+      expect(result).to include 'http://example.com'
       check_paragraph_link(result)
     end
 
     it "handles assignments" do
       result = attachment_suffix('assignment', migration_assignment.migration_id.to_s)
-      result.should include migration_assignment.id.to_s
+      expect(result).to include migration_assignment.id.to_s
       check_paragraph_link(result, 'assignments')
     end
 
     it "handles assessments" do
       result = attachment_suffix('assessment', migration_quiz.migration_id.to_s)
-      result.should include migration_quiz.id.to_s
+      expect(result).to include migration_quiz.id.to_s
       check_paragraph_link(result, 'quizzes')
     end
 
     it "handles files" do
       result = attachment_suffix('file', migration_attachment.migration_id.to_s)
-      result.should include migration_attachment.id.to_s
+      expect(result).to include migration_attachment.id.to_s
       check_paragraph_link(result)
       # Attachment doesn't follow the typical url pattern
-      result.should include "/files/#{migration_attachment.id}/download"
+      expect(result).to include "/files/#{migration_attachment.id}/download"
     end
 
     it "handles web_links" do
       migration_course.expects(:external_url_hash).returns('value' => {'url' => 'http://example.com', 'name' => 'example link'})
       result = attachment_suffix('web_link', 'value')
-      result.should include 'example link'
-      result.should include 'http://example.com'
+      expect(result).to include 'example link'
+      expect(result).to include 'http://example.com'
       check_paragraph_link(result)
     end
 
     it "handles discussion topics" do
       result = attachment_suffix('topic', migration_topic.migration_id.to_s)
-      result.should include migration_topic.id.to_s
+      expect(result).to include migration_topic.id.to_s
       check_paragraph_link(result, 'discussion_topics')
     end
 
     it "returns empty string on unrecognized types" do
       result = attachment_suffix('invalid', '42')
-      result.should be_empty
+      expect(result).to be_empty
     end
 
   end
@@ -145,17 +145,17 @@ describe Importers::CalendarEventImporter do
         context = get_import_context(system)
 
         data[:events_to_import] = {}
-        Importers::CalendarEventImporter.import_from_migration(data, context).should be_nil
-        context.calendar_events.count.should == 0
+        expect(Importers::CalendarEventImporter.import_from_migration(data, context)).to be_nil
+        expect(context.calendar_events.count).to eq 0
 
         data[:events_to_import][data[:migration_id]] = true
         Importers::CalendarEventImporter.import_from_migration(data, context)
         Importers::CalendarEventImporter.import_from_migration(data, context)
-        context.calendar_events.count.should == 1
+        expect(context.calendar_events.count).to eq 1
 
-        event = CalendarEvent.find_by_migration_id(data[:migration_id])
-        event.title.should == data[:title]
-        event.description.gsub("&#x27;", "'").index(data[:description]).should_not be_nil
+        event = CalendarEvent.where(migration_id: data[:migration_id]).first
+        expect(event.title).to eq data[:title]
+        expect(event.description.gsub("&#x27;", "'").index(data[:description])).not_to be_nil
       end
     end
   end

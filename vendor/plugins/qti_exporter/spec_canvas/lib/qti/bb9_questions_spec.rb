@@ -10,17 +10,17 @@ describe "Converting Blackboard 9 qti" do
     matches = []
     hash[:matches].each {|m| matches << m[:match_id]}
     hash[:answers].each do |a|
-      matches.include?(a[:match_id]).should be_true
+      expect(matches.include?(a[:match_id])).to be_truthy
     end
     # compare everything else without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == BB9Expected::MATCHING
+    expect(hash).to eq BB9Expected::MATCHING
   end
 
   it "should find question references in selection_metadata" do
     hash = get_quiz_data(BB9_FIXTURE_DIR, 'group_with_selection_references')[1][0]
-    hash[:questions].first[:questions].first.should == {:question_type=>"question_reference", :migration_id=>"_428569_1"}
+    expect(hash[:questions].first[:questions].first).to eq({:question_type=>"question_reference", :migration_id=>"_428569_1"})
   end
 
   it "should convert matching questions where the answers are given out of order" do
@@ -28,17 +28,17 @@ describe "Converting Blackboard 9 qti" do
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:text].sub('left', 'right')
+      expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
     end
     # compare everything else without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == BB9Expected::MATCHING2
+    expect(hash).to eq BB9Expected::MATCHING2
   end
 
   it "should convert true/false questions using identifiers, not mattext" do
     hash = get_question_hash(bb9_question_dir, 'true_false', false, :flavor => Qti::Flavors::BBLEARN)
-    hash[:answers].each {|m| m[:migration_id].should == m[:text]}
+    hash[:answers].each {|m| expect(m[:migration_id]).to eq m[:text]}
   end
 end
 

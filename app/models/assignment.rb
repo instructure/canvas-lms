@@ -295,9 +295,8 @@ class Assignment < ActiveRecord::Base
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
 
-    unless read_attribute(:turnitin_settings)
-      self.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
-    end
+    # make sure the defaults get serialized
+    self.turnitin_settings = turnitin_settings
 
     if res[:assignment_id]
       self.turnitin_settings[:created] = true
@@ -311,7 +310,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings
-    read_attribute(:turnitin_settings) || Turnitin::Client.default_assignment_turnitin_settings
+    super.empty? ? Turnitin::Client.default_assignment_turnitin_settings : super
   end
 
   def turnitin_settings=(settings)
@@ -585,37 +584,9 @@ class Assignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility
-    if self.differentiated_assignments_applies?
-      context.all_students.able_to_see_assignment_in_course_with_da(self.id, context.id)
-    else
-      context.all_students
-    end
-  end
-
-  def visible_to_user?(user)
-    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
-    visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
-  end
-
-  def visible_to_observer?(user)
-    return true if !differentiated_assignments_applies?
-    return false unless context.user_has_been_observer?(user)
-
-    visible_student_ids = students_with_visibility.pluck(:id)
-
-    observed_students_ids = ObserverEnrollment.observed_student_ids(context, user)
-
-    # observers can be students as well, so their own assignments must be included
-    if user.student_enrollments.where(course_id: self.context_id).any?
-      observed_students_ids << user.id
-    end
-
-    # if the observer doesn't have students, show them published assignments
-    has_visible_students = (observed_students_ids & visible_student_ids).any?
-    return has_visible_students if observed_students_ids.any?
-
-    self.published?
+  def students_with_visibility(scope=context.all_students)
+    return scope unless self.differentiated_assignments_applies?
+    scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
   end
 
   attr_accessor :saved_by
@@ -646,7 +617,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def score_to_grade_percent(score=0.0)
-    if self.points_possible > 0
+    if points_possible && points_possible > 0
       result = score.to_f / self.points_possible
       result = (result * 1000.0).round / 10.0
     else
@@ -866,7 +837,8 @@ class Assignment < ActiveRecord::Base
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
       context.grants_right?(user, session, :participate_as_student) &&
-      !locked_for?(user)
+      !locked_for?(user) &&
+      visible_to_user?(user)
     }
     can :submit and can :attach_submission_comment_files
 
@@ -1129,7 +1101,7 @@ class Assignment < ActiveRecord::Base
   SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
                              media_comment_id media_comment_type]
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment]).to_set
+                                    %w[comment group_comment attachments]).to_set
 
   def submit_homework(original_student, opts={})
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
@@ -1393,7 +1365,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
-      groups_and_ungrouped(user).map { |group_name, group_students|
+      reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
@@ -1406,10 +1378,15 @@ class Assignment < ActiveRecord::Base
         representative.sortable_name = group_name
         representative.short_name = group_name
 
-        yield representative, others if block_given?
-
-        representative
+        [representative, others]
       }.compact
+
+      sorted_reps_with_others = Canvas::ICU.collate_by(reps_and_others) { |rep, _|
+      rep.sortable_name }
+      if block_given?
+        sorted_reps_with_others.each { |r,o| yield r, o }
+      end
+      sorted_reps_with_others.map &:first
     else
       visible_students_for_speed_grader(user)
     end
@@ -1432,10 +1409,7 @@ class Assignment < ActiveRecord::Base
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[user.global_id] ||= (
       student_scope = user ? context.students_visible_to(user) : context.participating_students
-      if self.differentiated_assignments_applies?
-        student_scope = student_scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
-      end
-      student_scope
+      students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end
 
@@ -1502,12 +1476,7 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-
-    student_ids = if self.differentiated_assignments_applies?
-                    context.students.able_to_see_assignment_in_course_with_da(self.id, self.context.id).pluck(:id)
-                  else
-                    context.student_ids
-                  end
+    student_ids = students_with_visibility(context.students).pluck(:id)
 
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
@@ -1615,9 +1584,14 @@ class Assignment < ActiveRecord::Base
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
+
+  # shim to get MRA build passing (remove once MRA is patched)
+  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+    visible_to_students_in_course_with_da(user_id, course_id)
   }
 
   # course_ids should be courses that restrict visibility based on overrides

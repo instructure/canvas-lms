@@ -55,7 +55,7 @@ describe "course rubrics" do
       @rubric.save!
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
-      f('.rubric_total').should include_text "5"
+      expect(f('.rubric_total')).to include_text "5"
 
       f('#right-side .edit_rubric_link').click
       criterion_points = fj(".criterion_points:visible")
@@ -63,11 +63,11 @@ describe "course rubrics" do
       criterion_points.send_keys(:return)
       submit_form("#edit_rubric_form")
       wait_for_ajaximations
-      fj('.rubric_total').should include_text "10"
+      expect(fj('.rubric_total')).to include_text "10"
 
       # check again after reload
       refresh_page
-      fj('.rubric_total').should include_text "10" #avoid selenium caching
+      expect(fj('.rubric_total')).to include_text "10" #avoid selenium caching
     end
 
     it "should not display the edit form more than once" do
@@ -76,7 +76,7 @@ describe "course rubrics" do
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
       2.times { |n| f('#right-side .edit_rubric_link').click }
-      ff('.rubric .button-container').length.should == 1
+      expect(ff('.rubric .button-container').length).to eq 1
     end
 
     it "should import a rubric outcome row" do
@@ -87,14 +87,14 @@ describe "course rubrics" do
       wait_for_ajaximations
       import_outcome
 
-      f('tr.learning_outcome_criterion .criterion_description .description').text.should == @outcome.title
-      ff('tr.learning_outcome_criterion td.rating .description').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
-      ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
+      expect(f('tr.learning_outcome_criterion .criterion_description .description').text).to eq @outcome.title
+      expect(ff('tr.learning_outcome_criterion td.rating .description').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
+      expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.order(:id).last
-      rubric.data.first[:ratings].map { |r| r[:description] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
-      rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
+      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
+      expect(rubric.data.first[:ratings].map { |r| r[:points] }).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
     end
 
     it "should not allow editing a criterion row linked to an outcome" do
@@ -110,14 +110,14 @@ describe "course rubrics" do
       wait_for_ajaximations
 
       links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")
-      links.any?(&:displayed?).should be_false
+      expect(links.any?(&:displayed?)).to be_falsey
     end
 
     it "should not show 'use for grading' as an option" do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/rubrics"
       f('.add_rubric_link').click
-      fj('.rubric_grading:hidden').should_not be_nil
+      expect(fj('.rubric_grading:hidden')).not_to be_nil
     end
   end
 
@@ -144,13 +144,13 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
     wait_for_ajaximations
-    f('.rubric .criterion .custom_rating_comments').text.should == comment
-    f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
+    expect(f('.rubric .criterion .custom_rating_comments').text).to eq comment
+    expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    f('.rubric .criterion .custom_rating_comments').text.should == comment
-    f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
+    expect(f('.rubric .criterion .custom_rating_comments').text).to eq comment
+    expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
   end
 end
