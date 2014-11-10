@@ -1,8 +1,8 @@
 <fieldset class="pad-box auto-group-leader-controls">
   <span class="control-label">{{#t "leadership"}}Leadership{{/t}}</span>
   <div class="controls">
-    <label class="checkbox" for="enable_auto_leader">
-      {{checkbox "enable_auto_leader" class="auto-group-leader-toggle"}}
+    <label class="checkbox" for="enable_auto_leader-{{uniqid}}">
+      {{checkbox "enable_auto_leader" uniqid=true class="auto-group-leader-toggle"}}
       {{#t "auto_group_leader"}}Automatically assign a student group leader{{/t}}
     </label>
   </div>
